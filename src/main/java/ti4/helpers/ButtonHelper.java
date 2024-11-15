@@ -3523,10 +3523,8 @@ public class ButtonHelper {
             String cardID = buttonID.split("_")[3];
             String planetName = buttonID.split("_")[4];
             Tile tile = game.getTileFromPlanet(planetName);
-            String messageText = player.getRepresentation() + " explored " +
-                Emojis.getEmojiFromDiscord(drawColor) +
-                "Planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile " + tile.getPosition()
-                + ")*:";
+            String messageText = player.getRepresentation() + " explored " + Emojis.getEmojiFromDiscord(drawColor) + "Planet "
+                + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile " + tile.getPosition() + ")*:";
             ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
             if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                 && game.getPhaseOfGame().contains("agenda")) {
