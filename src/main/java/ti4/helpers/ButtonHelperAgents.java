@@ -8,8 +8,6 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -18,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExploreFrontier;
@@ -30,8 +29,7 @@ import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.TurnStart;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
-import ti4.commands.units.AddUnits;
-import ti4.commands.units.RemoveUnits;
+import ti4.commands2.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -55,7 +53,7 @@ public class ButtonHelperAgents {
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         ButtonHelper.deleteMessage(event);
-        new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet), "1 infantry " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, p2.getColor(), game.getTileFromPlanet(planet), "1 infantry " + planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you removed 1 infantry from " + planetRep);
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " 1 infantry of yours on " + planetRep + " was removed via the Ggrocuto Rinn, the Xxcha agent.");
     }
@@ -428,8 +426,8 @@ public class ButtonHelperAgents {
                 + " to " + Helper.getPlanetRepresentation(planetDestination, game);
 
         }
-        new RemoveUnits().unitParsing(event, player.getColor(), tile, unit + " " + planetRemoval, game);
-        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planetDestination),
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, unit + " " + planetRemoval, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileFromPlanet(planetDestination),
             unit + " " + planetDestination, game);
         if ("mech".equalsIgnoreCase(unit)) {
             if (uH.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
@@ -882,7 +880,7 @@ public class ButtonHelperAgents {
             String posNPlanet = rest.replace("sardakkagent_", "");
             String pos = posNPlanet.split("_")[0];
             String planetName = posNPlanet.split("_")[1];
-            new AddUnits().unitParsing(event, player.getColor(), game.getTileByPosition(pos),
+            UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileByPosition(pos),
                 "2 gf " + planetName, game);
             String successMessage = player.getFactionEmoji() + " placed 2 " + Emojis.infantry + " on "
                 + Helper.getPlanetRepresentation(planetName, game) + ".";
@@ -913,9 +911,9 @@ public class ButtonHelperAgents {
             String posNPlanet = rest.replace("l1z1xagent_", "");
             String pos = posNPlanet.split("_")[0];
             String planetName = posNPlanet.split("_")[1];
-            new RemoveUnits().unitParsing(event, player.getColor(), game.getTileByPosition(pos),
+            UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileByPosition(pos),
                 "1 infantry " + planetName, game);
-            new AddUnits().unitParsing(event, player.getColor(), game.getTileByPosition(pos),
+            UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileByPosition(pos),
                 "1 mech " + planetName, game);
             String successMessage = player.getFactionEmoji() + " replaced 1 " + Emojis.infantry + " on "
                 + Helper.getPlanetRepresentation(planetName, game) + " with 1 mech.";
@@ -982,7 +980,7 @@ public class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Jgin Faru, the Dih-Mohn" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String planet = rest.split("_")[1];
-            new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
+            UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileFromPlanet(planet),
                 "1 inf " + planet, game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getFactionEmoji() + " landed 1 extra infantry on "
@@ -1693,7 +1691,7 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), "Player did not have a ship in the active system, no destroyer placed");
             return;
         }
-        new AddUnits().unitParsing(event, player.getColor(), tile, "1 destroyer", game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 destroyer", game);
         String msg = player.getFactionEmojiOrColor() + " place 1 destroyer in "
             + tile.getRepresentationForButtons(game, player)
             + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Sal Sparrow, the Nokar" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent. "
@@ -1719,8 +1717,8 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), "Player did not have any infantry in the active system, no mech placed");
             return;
         }
-        new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 inf", game);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "1 mech", game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 inf", game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 mech", game);
         String msg = player.getFactionEmojiOrColor() + " replace 1 infantry with 1 mech in "
             + tile.getRepresentationForButtons(game, player)
             + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Zelian A, the Zelian" + (bentor.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
@@ -1808,7 +1806,7 @@ public class ButtonHelperAgents {
         String msg = player.getFactionEmoji() + " put 1 space dock on "
             + Helper.getPlanetRepresentation(planet, game) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "George Nobin, the Celdauri" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
-        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "1 sd " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileFromPlanet(planet), "1 sd " + planet, game);
         if (player.getCommodities() > 1) {
             player.setCommodities(player.getCommodities() - 2);
             msg += "\n" + player.getFactionEmoji() + " Paid 2 commodities";
@@ -2029,32 +2027,32 @@ public class ButtonHelperAgents {
         String successMessage = player.getFactionEmojiOrColor() + " Replaced a ship with 1 ";
         switch (unit) {
             case "destroyer" -> {
-                new AddUnits().unitParsing(event, player.getColor(), tile, "destroyer", game);
+                UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "destroyer", game);
                 successMessage += Emojis.destroyer;
 
             }
             case "cruiser" -> {
-                new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
+                UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "cruiser", game);
                 successMessage += Emojis.cruiser;
 
             }
             case "carrier" -> {
-                new AddUnits().unitParsing(event, player.getColor(), tile, "carrier", game);
+                UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "carrier", game);
                 successMessage += Emojis.carrier;
 
             }
             case "dreadnought" -> {
-                new AddUnits().unitParsing(event, player.getColor(), tile, "dreadnought", game);
+                UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "dreadnought", game);
                 successMessage += Emojis.dreadnought;
 
             }
             case "fighter" -> {
-                new AddUnits().unitParsing(event, player.getColor(), tile, "fighter", game);
+                UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "fighter", game);
                 successMessage += Emojis.fighter;
 
             }
             case "warsun" -> {
-                new AddUnits().unitParsing(event, player.getColor(), tile, "warsun", game);
+                UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "warsun", game);
                 successMessage += Emojis.warsun;
 
             }
@@ -2177,7 +2175,7 @@ public class ButtonHelperAgents {
             player.getFactionEmoji() + " removed 1 infantry from "
                 + ButtonHelper.getUnitHolderRep(unitHolder, tile, game) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Doctor Sucaban, the Jol-Nar" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
-        new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + unitHName, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 infantry " + unitHName, game);
         if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
             ButtonHelper.deleteTheOneButton(event);
         }

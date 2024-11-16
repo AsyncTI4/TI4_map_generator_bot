@@ -21,9 +21,7 @@ import ti4.commands.cardsso.ShowAllSO;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.tokens.AddCC;
-import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
-import ti4.commands.units.RemoveUnits;
+import ti4.commands2.units.MoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -141,7 +139,7 @@ public class ButtonHelperCommanders {
     public static void cymiaeCommanderRes(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         String msg = player.getFactionEmoji() + " will discard 1 " + Emojis.ActionCard + " AC to move or place 1 " + Emojis.mech + "mech on " + Helper.getPlanetRepresentation(planet, game);
-        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "mech " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileFromPlanet(planet), "mech " + planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " use buttons to discard",
@@ -205,7 +203,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " removed 1 infantry from "
                 + ButtonHelper.getUnitHolderRep(unitHolder, tile, game) + " using Brother Omar, the Yin Commander.");
-        new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + unitHName, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 infantry " + unitHName, game);
         event.getMessage().delete().queue();
     }
 
@@ -313,8 +311,8 @@ public class ButtonHelperCommanders {
 
             String unitStringFrom = unitType.value + " " + unitHolderFrom;
             String unitStringTo = unitType.value + " " + unitHolderTo;
-            new RemoveUnits().unitParsing(context.getEvent(), player.getColor(), from, unitStringFrom, game);
-            new AddUnits().unitParsing(context.getEvent(), player.getColor(), to, unitStringTo, game);
+            UnitModifier.parseAndUpdateGame(context.getEvent(), player.getColor(), from, unitStringFrom, game);
+            UnitModifier.parseAndUpdateGame(context.getEvent(), player.getColor(), to, unitStringTo, game);
 
             String fromLang = "from " + planetName + (planetName.equals("space") ? " in " + from.getRepresentationForButtons(game, player) : "");
             String toLang = planetNameTo.equals("space") ? "in space of tile " + to.getRepresentationForButtons(game, player) : "on " + planetNameTo;
@@ -363,7 +361,7 @@ public class ButtonHelperCommanders {
     public static void resolveGhostCommanderPlacement(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "fighter", game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "fighter", game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " placed 1 fighter in " + tile.getRepresentation() + " using Sai Seravus, the Creuss commander");
     }
 
@@ -371,7 +369,7 @@ public class ButtonHelperCommanders {
     public static void resolveKhraskCommanderPlacement(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "inf", game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "inf", game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " placed 1 infantry in " + tile.getRepresentation()
                 + " using Hkot Tokal, the Khrask Commander.");
@@ -480,7 +478,7 @@ public class ButtonHelperCommanders {
         String planet = buttonID.split("_")[1];
         ButtonHelper.deleteTheOneButton(event);
         Tile tile = game.getTileFromPlanet(planet);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 inf " + planet, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " placed 1 infantry on "
                 + Helper.getPlanetRepresentation(planet, game) + " using Claire Gibson, the Sol Commander.");
@@ -533,12 +531,12 @@ public class ButtonHelperCommanders {
 
         String message = player.getFactionEmojiOrColor() + " moved 1 " + mechorInf + " from " + planetRepresentation2 + " to "
             + planetRepresentation + " using G'hom Sek'kus, the N'orr Commander.";
-        new RemoveUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet2), "1 " + mechorInf + " " + planet2, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileFromPlanet(planet2), "1 " + mechorInf + " " + planet2, game);
 
         Tile tile = game.getTileFromPlanet(planet1);
         tile = MoveUnits.flipMallice(event, tile, game);
         planet1 = planet1.replace("lockedm", "m");
-        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet1), "1 " + mechorInf + " " + planet1, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileFromPlanet(planet1), "1 " + mechorInf + " " + planet1, game);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         CommanderUnlockCheck.checkPlayer(player, "naaz");

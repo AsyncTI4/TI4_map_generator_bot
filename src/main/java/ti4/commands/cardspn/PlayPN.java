@@ -16,7 +16,6 @@ import ti4.buttons.Buttons;
 import ti4.commands.cardsac.PickACFromDiscard;
 import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
@@ -31,6 +30,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.UnitModifier;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -186,7 +186,7 @@ public class PlayPN extends PNCardsSubcommandData {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if ("dspnlizh".equalsIgnoreCase(id) || "dspnchei".equalsIgnoreCase(id)) {
-            new AddUnits().unitParsing(event, player.getColor(),
+            UnitModifier.parseAndUpdateGame(event, player.getColor(),
                 game.getTileByPosition(game.getActiveSystem()), "2 ff", game);
             String message = player.getRepresentationUnfogged() + " added 2 fighters to the active system";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);

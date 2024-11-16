@@ -15,8 +15,7 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.TurnStart;
 import ti4.commands.special.CheckDistance;
 import ti4.commands.tokens.AddToken;
-import ti4.commands.units.AddUnits;
-import ti4.commands.units.RemoveUnits;
+import ti4.commands2.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -71,7 +70,7 @@ public class ButtonHelperTacticalAction {
                         unitkey = unitkey.replace("damaged", "");
                         damagedMsg = " damaged ";
                     }
-                    new AddUnits().unitParsing(event, player.getColor(),
+                    UnitModifier.parseAndUpdateGame(event, player.getColor(),
                         game.getTileByPosition(pos), (amount) + " " + unitkey + " " + planet, game);
                     if (damagedMsg.contains("damaged")) {
                         if ("".equalsIgnoreCase(planet)) {
@@ -226,7 +225,7 @@ public class ButtonHelperTacticalAction {
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColor());
         rest = rest.replace("damaged", "");
         if (amount < 0) {
-            new AddUnits().unitParsing(event, player.getColor(), game.getTileByPosition(pos),
+            UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileByPosition(pos),
                 (amount * -1) + " " + unitName + " " + planet, game);
             if (buttonLabel.toLowerCase().contains("damaged")) {
                 if ("".equalsIgnoreCase(planet)) {

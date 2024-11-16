@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.uncategorized.ShowGame;
-import ti4.commands.units.AddRemoveUnits;
+import ti4.commands2.units.AddRemoveUnits;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Game;

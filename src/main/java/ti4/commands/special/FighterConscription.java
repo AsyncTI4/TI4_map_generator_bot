@@ -8,10 +8,10 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.UnitModifier;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -83,7 +83,7 @@ public class FighterConscription extends SpecialSubcommandData {
             }
 
             if (!blockaded && (hasCap || hasSD)) {
-                new AddUnits().unitParsing(event, player.getColor(), tile, "ff", game);
+                UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "ff", game);
                 tilesAffected.add(tile);
             }
         }

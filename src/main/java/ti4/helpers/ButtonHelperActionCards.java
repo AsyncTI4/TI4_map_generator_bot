@@ -22,9 +22,8 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.special.NaaluCommander;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
-import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
-import ti4.commands.units.RemoveUnits;
+import ti4.commands2.units.MoveUnits;
+import ti4.commands2.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -784,7 +783,7 @@ public class ButtonHelperActionCards {
     public static void resolveGhostShipStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         tile = MoveUnits.flipMallice(event, tile, game);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "destroyer", game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "destroyer", game);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " put 1 destroyer in " + tile.getRepresentation());
@@ -1289,7 +1288,7 @@ public class ButtonHelperActionCards {
         if ("space".equalsIgnoreCase(unitHolderName)) {
             unitHolderName = "";
         }
-        new RemoveUnits().unitParsing(event, p2.getColor(), tile, "sd " + unitHolderName, game);
+        UnitModifier.parseAndUpdateGame(event, p2.getColor(), tile, "sd " + unitHolderName, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " you killed the space dock in " + tile.getRepresentation());
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
@@ -1365,8 +1364,8 @@ public class ButtonHelperActionCards {
     @ButtonHandler("resolveUpgrade_")
     public static void resolveUpgrade(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        new RemoveUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "dread", game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "cruiser", game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "dread", game);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " replaced 1 cruiser with 1 dreadnought in " + tile.getRepresentation());
@@ -1608,7 +1607,7 @@ public class ButtonHelperActionCards {
         if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
             ButtonHelperFactionSpecific.offerMahactInfButtons(p2, game);
         }
-        new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet),
+        UnitModifier.parseAndUpdateGame(event, p2.getColor(), game.getTileFromPlanet(planet),
             amountToKill + " inf " + planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " you exhausted " + planetRep

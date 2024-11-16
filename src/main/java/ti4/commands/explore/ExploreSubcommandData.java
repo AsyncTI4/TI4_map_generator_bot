@@ -24,7 +24,6 @@ import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.relic.RelicDraw;
 import ti4.commands.tokens.AddToken;
-import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -37,6 +36,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.UnitModifier;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -369,7 +369,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     Set<String> tokenList = ButtonHelper.getUnitHolderFromPlanetName(planetID, game).getTokenList();
                     boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
                     if (!containsDMZ) {
-                        new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetID, game);
+                        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "inf " + planetID, game);
                         message = player.getFactionEmoji() + Emojis.getColorEmojiWithName(player.getColor()) + Emojis.infantry
                             + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
                             + ", however this placement *is* optional.";
@@ -510,7 +510,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "ancientshipyard" -> {
                 List<String> colors = tile == null ? List.of() : tile.getUnitHolders().get("space").getUnitColorsOnHolder();
                 if (colors.isEmpty() || colors.contains(player.getColorID())) {
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
+                    UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "cruiser", game);
                     MessageHelper.sendMessageToEventChannel(event, "Cruiser added to the system automatically.");
                 } else {
                     MessageHelper.sendMessageToEventChannel(event, "Someone else's ships were in the system, no cruiser added");

@@ -11,10 +11,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.unions.IThreadContainerUnion;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
@@ -164,16 +162,6 @@ public class CommandHelper {
             }
         }
         return false;
-    }
-
-    public static String getHeaderText(GenericInteractionCreateEvent event) {
-        if (event instanceof SlashCommandInteractionEvent) {
-            return " used `" + ((SlashCommandInteractionEvent) event).getCommandString() + "`";
-        }
-        if (event instanceof ButtonInteractionEvent) {
-            return " pressed `" + ((ButtonInteractionEvent) event).getButton().getId() + "`";
-        }
-        return " used the force";
     }
 
     @Nullable

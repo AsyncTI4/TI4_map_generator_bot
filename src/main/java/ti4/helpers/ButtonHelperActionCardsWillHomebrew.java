@@ -10,8 +10,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
+import ti4.commands2.units.MoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.listeners.annotations.ButtonHandler;
@@ -54,7 +53,7 @@ public class ButtonHelperActionCardsWillHomebrew {
     public static void resolveDefenseInstallationStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         player.exhaustPlanet(planet);
-        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "pds " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileFromPlanet(planet), "pds " + planet, game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and put 1 PDS on it");
@@ -287,7 +286,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         tile = MoveUnits.flipMallice(event, tile, game);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "cruiser", game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " put 1 cruiser in " + tile.getRepresentation());

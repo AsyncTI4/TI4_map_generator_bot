@@ -13,9 +13,15 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.collections4.CollectionUtils;
+import ti4.ResourceHelper;
 import ti4.helpers.Storage;
+import ti4.helpers.Units;
+import ti4.map.Game;
+import ti4.map.Tile;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 
@@ -186,5 +192,29 @@ public class TileHelper {
 
     public static boolean isValidPlanet(String planetID) {
         return planetIdsToPlanetModels.containsKey(planetID);
+    }
+
+    public static String getUnitPath(Units.UnitKey unit, boolean allEyesOnMe) {
+        ResourceHelper rs = ResourceHelper.getInstance();
+        return allEyesOnMe ? rs.getUnitFile(unit, true) : rs.getUnitFile(unit);
+    }
+
+    public static Tile getTileObject(SlashCommandInteractionEvent event, String tileID, Game game) {
+        return getTile(event, tileID, game);
+    }
+
+    public static Tile getTile(SlashCommandInteractionEvent event, String tileID, Game game) {
+        if (game.isTileDuplicated(tileID)) {
+            MessageHelper.replyToMessage(event, "Duplicate tile name `" + tileID + "` found, please use position coordinates");
+            return null;
+        }
+        Tile tile = game.getTile(tileID);
+        if (tile == null) {
+            tile = game.getTileByPosition(tileID);
+        }
+        if (tile == null) {
+            MessageHelper.replyToMessage(event, "Tile in map not found: " + tileID);
+        }
+        return tile;
     }
 }

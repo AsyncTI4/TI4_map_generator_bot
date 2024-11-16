@@ -12,10 +12,10 @@ public class CardsInfoHelper {
     public static String getHeaderText(GenericInteractionCreateEvent event) {
         if (event instanceof SlashCommandInteractionEvent) {
             return " used `" + ((SlashCommandInteractionEvent) event).getCommandString() + "`";
-        } else if (event instanceof ButtonInteractionEvent) {
-            return " pressed `" + ((ButtonInteractionEvent) event).getButton().getId() + "`";
-        } else {
-            return " used the force";
         }
+        if (event instanceof ButtonInteractionEvent) {
+            return " pressed `" + ((ButtonInteractionEvent) event).getButton().getId() + "`";
+        }
+        return " used the force";
     }
 }

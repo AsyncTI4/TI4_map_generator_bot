@@ -20,7 +20,6 @@ import ti4.commands.status.ListTurnOrder;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.RemoveCC;
-import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -32,6 +31,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.UnitModifier;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -170,7 +170,7 @@ public class HeroPlay extends LeaderAction {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                         if (player.getPlanetsAllianceMode().contains(uH.getName())
                             && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
-                            new AddUnits().unitParsing(event, player.getColor(), tile, "2 ff", game);
+                            UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "2 ff", game);
                             break;
                         }
                     }

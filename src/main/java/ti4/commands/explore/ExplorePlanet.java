@@ -15,16 +15,16 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.units.AddRemoveUnits;
-import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
+import ti4.generator.PlanetHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.UnitModifier;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -59,7 +59,7 @@ public class ExplorePlanet extends ExploreSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "System not found that contains planet");
             return;
         }
-        planetName = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planetName));
+        planetName = PlanetHelper.getPlanet(tile, AliasHandler.resolvePlanet(planetName));
         PlanetModel planet = Mapper.getPlanet(planetName);
         if (Optional.ofNullable(planet).isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "Invalid planet");
@@ -235,7 +235,7 @@ public class ExplorePlanet extends ExploreSubcommandData {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab Arcologies.");
         }
         if (ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord", player, tile)) {
-            new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf " + planetName, game);
+            UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 inf " + planetName, game);
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Infantry added due to presence of The Lord (a Ghemina flagship) . Technically happens after exploring.");
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && game.getPhaseOfGame().contains("agenda")) {

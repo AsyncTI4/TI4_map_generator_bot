@@ -9,7 +9,6 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.listeners.annotations.ButtonHandler;
@@ -37,7 +36,7 @@ public class ExploreHelper {
             ButtonHelper.addReaction(event, false, false, "Didn't have any Comms/TGs to spend, no mech placed", "");
             return;
         }
-        new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName, game);
         planetName = Mapper.getPlanet(planetName) == null ? "`error?`" : Mapper.getPlanet(planetName).getName();
         ButtonHelper.addReaction(event, false, false, "Spent a " + commOrTg + " for a Mech on " + planetName, "");
         ButtonHelper.deleteMessage(event);
@@ -148,11 +147,11 @@ public class ExploreHelper {
         failed = message.contains("Please try again.");
         if (!failed) {
             if ("mech".equalsIgnoreCase(mech)) {
-                new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
+                UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileFromPlanet(planet),
                     "mech " + planet, game);
                 message += "Placed mech on" + Mapper.getPlanet(planet).getName();
             } else {
-                new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
+                UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileFromPlanet(planet),
                     "2 infantry " + planet, game);
                 message += "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
             }

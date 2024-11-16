@@ -31,8 +31,6 @@ import ti4.commands.player.SendDebt;
 import ti4.commands.player.TurnStart;
 import ti4.commands.tech.TechExhaust;
 import ti4.commands.tokens.AddCC;
-import ti4.commands.units.AddUnits;
-import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -110,7 +108,7 @@ public class ButtonHelperFactionSpecific {
         String planet = buttonID.split("_")[1];
         String opposingFaction = buttonID.split("_")[2];
         Tile tile = game.getTileFromPlanet(planet);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 inf " + planet, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " placed 1 infantry at the end of a round of ground combat on "
                 + Helper.getPlanetRepresentation(planet, game)
@@ -265,8 +263,8 @@ public class ButtonHelperFactionSpecific {
 
         UnitHolder unitHolder = tile.getUnitHolders().get("space");
         player.addOwnedUnitByID(cav);
-        new RemoveUnits().unitParsing(event, player.getColor(), tile, unit, game);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "cavalry", game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, unit, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "cavalry", game);
         if (damaged) {
             unitHolder.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
             unitHolder.addUnitDamage(Mapper.getUnitKey("cavalry", player.getColorID()), 1);
@@ -294,8 +292,8 @@ public class ButtonHelperFactionSpecific {
                                 Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
                             unitHolder.removeUnitDamage(Mapper.getUnitKey("cavalry", player.getColorID()), 1);
                         }
-                        new RemoveUnits().unitParsing(event, player.getColor(), tile, "cavalry", game);
-                        new AddUnits().unitParsing(event, player.getColor(), tile, unit, game);
+                        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "cavalry", game);
+                        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, unit, game);
 
                     }
                 }
@@ -415,8 +413,8 @@ public class ButtonHelperFactionSpecific {
     public static void handleTitansConstructionMechDeployStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         Tile tile = game.getTileFromPlanet(planet);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "1 mech " + planet, game);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 mech " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 inf " + planet, game);
         String msg = player.getRepresentationUnfogged() + " deployed 1 mech and 1 infantry on "
             + Helper.getPlanetRepresentation(planet, game);
         ButtonHelper.sendMessageToRightStratThread(player, game, msg, "construction");
@@ -540,7 +538,7 @@ public class ButtonHelperFactionSpecific {
         String planet = buttonID.split("_")[1];
         String msg = player.getFactionEmoji() + " paid 1TG " + player.gainTG(-1) + " to place 1 mech on " + Helper.getPlanetRepresentation(planet, game);
         delete(event);
-        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "mech " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileFromPlanet(planet), "mech " + planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
@@ -647,8 +645,8 @@ public class ButtonHelperFactionSpecific {
             if (unitHolder instanceof Planet) {
                 if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
                     int numff = unitHolder.getUnitCount(UnitType.Fighter, player.getColor());
-                    new AddUnits().unitParsing(event, player.getColor(), tile, numff + " ff", game);
-                    new RemoveUnits().unitParsing(event, player.getColor(), tile, numff + " ff " + unitHolder.getName(),
+                    UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, numff + " ff", game);
+                    UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, numff + " ff " + unitHolder.getName(),
                         game);
                 }
             }
@@ -764,7 +762,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("tnelisDeploy_")
     public static void tnelisDeploy(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileFromPlanet(planet),
             "1 mech " + planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " landed 1 mech on "
@@ -987,9 +985,9 @@ public class ButtonHelperFactionSpecific {
             if (saar.unitBelongsToPlayer(unitKey) && unit.getIsGroundForce()) {
                 String unitName = unitKey.unitName();
                 int amount = unitEntry.getValue();
-                new RemoveUnits().unitParsing(event, saar.getColor(), game.getTileFromPlanet(origPlanet),
+                UnitModifier.parseAndUpdateGame(event, saar.getColor(), game.getTileFromPlanet(origPlanet),
                     amount + " " + unitName + " " + origPlanet, game);
-                new AddUnits().unitParsing(event, saar.getColor(), game.getTileFromPlanet(newPlanet),
+                UnitModifier.parseAndUpdateGame(event, saar.getColor(), game.getTileFromPlanet(newPlanet),
                     amount + " " + unitName + " " + newPlanet, game);
             }
         }
@@ -1026,9 +1024,9 @@ public class ButtonHelperFactionSpecific {
             int amount = unitEntry.getValue();
             String unitName = unitKey.unitName();
 
-            new RemoveUnits().unitParsing(event, hacan.getColor(), game.getTileFromPlanet(origPlanet),
+            UnitModifier.parseAndUpdateGame(event, hacan.getColor(), game.getTileFromPlanet(origPlanet),
                 amount + " " + unitName + " " + origPlanet, game);
-            new AddUnits().unitParsing(event, hacan.getColor(), game.getTileFromPlanet(newPlanet),
+            UnitModifier.parseAndUpdateGame(event, hacan.getColor(), game.getTileFromPlanet(newPlanet),
                 amount + " " + unitName + " " + newPlanet, game);
             if (unitGroupRef.equalsIgnoreCase("units")) {
             } else if (!unitName.equalsIgnoreCase("mech")) {
@@ -1077,7 +1075,7 @@ public class ButtonHelperFactionSpecific {
         }
 
         String unit = buttonID.split("_")[2];
-        new RemoveUnits().unitParsing(event, player.getColor(), cabal.getNomboxTile(), unit, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), cabal.getNomboxTile(), unit, game);
         MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(),
             cabal.getRepresentationUnfogged() + " released 1 " + player.getFactionEmojiOrColor()
                 + " " + unit + " from prison");
@@ -1095,11 +1093,11 @@ public class ButtonHelperFactionSpecific {
     public static void resolveKolleccReleaseButton(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String unit = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(game.getActiveSystem());
-        new RemoveUnits().unitParsing(event, player.getColor(), player.getNomboxTile(), unit, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), player.getNomboxTile(), unit, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getRepresentationUnfogged() + " put 1 captured " + unit + " in the space area of "
                 + tile.getRepresentationForButtons(game, player) + " using Shroud of Lith abiility");
-        new AddUnits().unitParsing(event, player.getColor(), tile, unit, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, unit, game);
         if (!player.getNomboxTile().getUnitHolders().get("space").getUnits()
             .containsKey(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor()))) {
             ButtonHelper.deleteTheOneButton(event);
@@ -1140,7 +1138,7 @@ public class ButtonHelperFactionSpecific {
                 if (blockader.unitBelongsToPlayer(unitKey)) {
                     int amount = unitHolder.getUnits().get(unitKey);
                     String unit = unitKey.unitName();
-                    new RemoveUnits().unitParsing(event, blockader.getColor(), cabal.getNomboxTile(), amount + " " + unit, game);
+                    UnitModifier.parseAndUpdateGame(event, blockader.getColor(), cabal.getNomboxTile(), amount + " " + unit, game);
                     MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(),
                         cabal.getRepresentationUnfogged() + " released " + amount + " " + blockader.getFactionEmojiOrColor() + " " + unit + " from prison due to blockade");
                     if (cabal != blockader) {
@@ -1345,9 +1343,9 @@ public class ButtonHelperFactionSpecific {
             requiredNum = 3;
         }
         if (ButtonHelper.getNumberOfInfantryOnPlanet(planet, game, player) + 1 > requiredNum) {
-            new RemoveUnits().unitParsing(event, player.getColor(), tile, requiredNum + " infantry " + planet,
+            UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, requiredNum + " infantry " + planet,
                 game);
-            new AddUnits().unitParsing(event, player.getColor(), tile, "sd " + planet, game);
+            UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "sd " + planet, game);
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji()
                 + " deployed 1 space dock on " + planet + " by removing " + requiredNum + " infantry");
             event.getMessage().delete().queue();
@@ -1586,7 +1584,7 @@ public class ButtonHelperFactionSpecific {
         String planet = buttonID;
         String message = player.getFactionEmojiOrColor() + " replaced " + Emojis.pds + " on " + Helper.getPlanetRepresentation(planet, game) + " with a " + Emojis.flagship;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), "flagship", game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), "flagship", game);
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), player.getColor());
         game.getTile(AliasHandler.resolveTile(planet)).removeUnit(planet, unitKey, 1);
         event.getMessage().delete().queue();
@@ -1661,7 +1659,7 @@ public class ButtonHelperFactionSpecific {
             + player.getRepresentation()
             + " just had destroyed in the active system using Ipswitch, Loose Cannon, the Mentak Hero.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-        new AddUnits().unitParsing(event, mentak.getColor(), tile, amount + " " + unit, game);
+        UnitModifier.parseAndUpdateGame(event, mentak.getColor(), tile, amount + " " + unit, game);
     }
 
     public static void cabalEatsUnit(Player player, Game game, Player cabal, int amount, String unit,
@@ -1684,7 +1682,7 @@ public class ButtonHelperFactionSpecific {
             }
             msg = msg.replace("infantrys", "infantry");
 
-            new AddUnits().unitParsing(event, color, cabal.getNomboxTile(), amount + " " + unit, game);
+            UnitModifier.parseAndUpdateGame(event, color, cabal.getNomboxTile(), amount + " " + unit, game);
         }
         MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(), msg);
 
@@ -1695,8 +1693,8 @@ public class ButtonHelperFactionSpecific {
         String planet = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
         Tile tile = game.getTileFromPlanet(planet);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "1 " + unit + " " + planet, game);
-        new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 " + unit + " " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 infantry " + planet, game);
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " replaced 1 of their infantry with 1 " + unit + " on "
@@ -2108,7 +2106,7 @@ public class ButtonHelperFactionSpecific {
                 if ("space".equals(name)) {
                     name = "";
                 }
-                new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 mech " + name, game);
+                UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 mech " + name, game);
                 msg += "\n" + player.getFactionEmoji() + " removed 1 mech from " + tile.getRepresentation()
                     + " (" + uH.getName() + ").";
                 break;
@@ -2220,13 +2218,13 @@ public class ButtonHelperFactionSpecific {
         String planet = buttonID.split("_")[1];
         String unit = "infantry";
         Tile tile = game.getTileFromPlanet(planet);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "1 " + unit + " " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 " + unit + " " + planet, game);
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
                 continue;
             }
             if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet)) {
-                new RemoveUnits().unitParsing(event, p2.getColor(), tile, "1 infantry " + planet, game);
+                UnitModifier.parseAndUpdateGame(event, p2.getColor(), tile, "1 infantry " + planet, game);
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -2469,8 +2467,8 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
         Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
         buttons.add(DoneExhausting);
-        new AddUnits().unitParsing(event, player.getColor(), game.getTileByPosition(tilePos), "warsun", game);
-        new RemoveUnits().unitParsing(event, player.getColor(), game.getTileByPosition(tilePos), toRemove, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileByPosition(tilePos), "warsun", game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileByPosition(tilePos), toRemove, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " replaced " + Emojis.spacedock + " on " + Helper.getPlanetRepresentationPlusEmoji(planet) + " with a " + Emojis.warsun);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -2509,7 +2507,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("rohdhnaRecycle_")
     public static void resolveRohDhnaRecycle(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String unitName = buttonID.split("_")[1];
-        new RemoveUnits().unitParsing(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()), "1 " + unitName, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()), "1 " + unitName, game);
         UnitModel unit = Mapper.getUnit(unitName);
         int toGain = (int) unit.getCost() - 1;
 

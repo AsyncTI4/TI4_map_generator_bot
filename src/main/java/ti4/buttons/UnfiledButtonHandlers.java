@@ -54,8 +54,6 @@ import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
-import ti4.commands.units.AddRemoveUnits;
-import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.generator.TileGenerator;
 import ti4.helpers.AgendaHelper;
@@ -76,8 +74,10 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PlayAreaHelper;
 import ti4.helpers.PlayerPreferenceHelper;
 import ti4.helpers.PlayerTitleHelper;
+import ti4.helpers.UnitModifier;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
@@ -319,7 +319,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void winnuStructure(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String unit = buttonID.replace("winnuStructure_", "").split("_")[0];
         String planet = buttonID.replace("winnuStructure_", "").split("_")[1];
-        new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), unit + " " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), unit + " " + planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " Placed a " + unit + " on " + Helper.getPlanetRepresentation(planet, game));
     }
 
@@ -330,7 +330,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         UnitHolder plan = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         plan.removeAllUnits(player.getColor());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Removed all units on " + planet + " for " + player.getRepresentation());
-        AddRemoveUnits.addPlanetToPlayArea(event, game.getTileFromPlanet(planet), planet, game);
+        PlayAreaHelper.addPlanetToPlayArea(game, event, game.getTileFromPlanet(planet), planet, game);
     }
 
     @ButtonHandler("jrStructure_")
@@ -355,7 +355,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("dacxive_")
     public static void daxcive(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String planet = buttonID.replace("dacxive_", "");
-        new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), "infantry " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), "infantry " + planet, game);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game) + " via the tech Dacxive Animators");
         ButtonHelper.deleteMessage(event);
     }
@@ -364,7 +364,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void glimmerHeroOn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
-        new AddUnits().unitParsing(event, player.getColor(), game.getTileByPosition(pos), unit, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTileByPosition(pos), unit, game);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " chose to duplicate a " + unit + " in " + game.getTileByPosition(pos).getRepresentationForButtons(game, player));
         ButtonHelper.deleteMessage(event);
     }
@@ -700,7 +700,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 Tile tile = game.getTileFromPlanet(planetName);
                 String msg = player.getRepresentation() + " added 1 infantry to " + planetName
                     + " due to the arcane citadel";
-                new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + planetName, game);
+                UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 infantry " + planetName, game);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
@@ -2355,7 +2355,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Kuuasi Aun Jalatai, the Keleres (Argent) hero, was not purged - something went wrong.");
         }
-        new AddUnits().unitParsing(event, player.getColor(),
+        UnitModifier.parseAndUpdateGame(event, player.getColor(),
             game.getTileByPosition(game.getActiveSystem()), "2 cruiser, 1 flagship",
             game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),

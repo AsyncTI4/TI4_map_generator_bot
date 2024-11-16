@@ -1340,7 +1340,7 @@ public class Helper {
             String un = unit.split("_")[0];
             // UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(un),
             // player.getColor());
-            new ti4.commands.units.RemoveUnits().unitParsing(event, player.getColor(), tile,
+            UnitModifier.parseAndUpdateGame(event, player.getColor(), tile,
                 producedUnits.get(unit) + " " + AliasHandler.resolveUnit(un) + planetOrSpace, game);
         }
 

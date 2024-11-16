@@ -7,12 +7,12 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.UnitModifier;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -58,7 +58,7 @@ public class RiseOfMessiah extends SpecialSubcommandData {
                     if (ignorePlanet) {
                         continue;
                     }
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + unitHolder.getName(), game);
+                    UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "inf " + unitHolder.getName(), game);
                     PlanetModel planetModel = Mapper.getPlanet(unitHolder.getName());
                     if (planetModel != null) {
                         sb.append("\n> ").append(Helper.getPlanetRepresentationPlusEmoji(unitHolder.getName()));

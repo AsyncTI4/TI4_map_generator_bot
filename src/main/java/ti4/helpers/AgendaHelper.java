@@ -54,7 +54,6 @@ import ti4.commands.special.SwordsToPlowsharesTGGain;
 import ti4.commands.special.WormholeResearchFor;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
-import ti4.commands.units.AddUnits;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.generator.TileGenerator;
@@ -86,7 +85,7 @@ public class AgendaHelper {
         String planet = buttonID.split("_")[2];
         Tile tile = game.getTileFromPlanet(planet);
         if (tile != null) {
-            new AddUnits().unitParsing(event, p2.getColor(), tile, "1 inf " + planet, game);
+            UnitModifier.parseAndUpdateGame(event, p2.getColor(), tile, "1 inf " + planet, game);
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
             "1 " + p2.getColor() + " infantry was added to " + planet);
@@ -2751,7 +2750,7 @@ public class AgendaHelper {
                         Tile tile = game.getTileFromPlanet(planetName);
                         String msg = player.getRepresentation() + " added 1 infantry to " + planetName
                             + " due to the arcane citadel";
-                        new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + planetName, game);
+                        UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 infantry " + planetName, game);
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
                 }
@@ -2805,7 +2804,7 @@ public class AgendaHelper {
                                 Tile tile = game.getTileFromPlanet(planetName);
                                 String msg = player.getRepresentation() + " added 1 infantry to " + planetName
                                     + " due to the Arcane Citadel";
-                                new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + planetName, game);
+                                UnitModifier.parseAndUpdateGame(event, player.getColor(), tile, "1 infantry " + planetName, game);
                                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                             }
                         }

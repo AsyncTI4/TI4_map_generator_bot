@@ -27,9 +27,8 @@ import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SCPlay;
-import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
-import ti4.commands.units.RemoveUnits;
+import ti4.commands2.units.MoveUnits;
+import ti4.commands2.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -148,8 +147,8 @@ public class ButtonHelperHeroes {
             unitName = unitName.replace("damaged", "");
         }
         destination = MoveUnits.flipMallice(event, destination, game);
-        new RemoveUnits().unitParsing(event, player.getColor(), origin, unitName + " " + unitHolderName, game);
-        new AddUnits().unitParsing(event, player.getColor(), destination, unitName, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), origin, unitName + " " + unitHolderName, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), destination, unitName, game);
         String msg2 = player.getFactionEmoji() + " moved 1 " + unitName + " from "
             + origin.getRepresentationForButtons(game, player) + " to "
             + destination.getRepresentationForButtons(game, player);
@@ -946,11 +945,11 @@ public class ButtonHelperHeroes {
                         ButtonHelper.resolveInfantryDeath(game, p2, amountInf);
                     }
                     if (amountInf > 0) {
-                        new RemoveUnits().unitParsing(event, p2.getColor(), tile, amountInf + " inf " + name, game);
+                        UnitModifier.parseAndUpdateGame(event, p2.getColor(), tile, amountInf + " inf " + name, game);
                     }
                     int amountFF = unitHolder.getUnitCount(UnitType.Fighter, p2.getColor());
                     if (amountFF > 0) {
-                        new RemoveUnits().unitParsing(event, p2.getColor(), tile, amountFF + " ff", game);
+                        UnitModifier.parseAndUpdateGame(event, p2.getColor(), tile, amountFF + " ff", game);
                     }
                     if (amountFF + amountInf > 0) {
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
@@ -1565,7 +1564,7 @@ public class ButtonHelperHeroes {
         String planet = planetNInf.split("_")[0];
         String amount = planetNInf.split("_")[1];
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
-        new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), amount + " inf " + planet, game);
+        UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), amount + " inf " + planet, game);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " Chose to land " + amount + " infantry on " + Helper.getPlanetRepresentation(planet, game));
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
@@ -1722,7 +1721,7 @@ public class ButtonHelperHeroes {
 
             new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitKey, player.getColor(), false,
                 game);
-            new AddUnits().unitParsing(event, player.getColor(), tile2, totalUnits + " " + unitName, game);
+            UnitModifier.parseAndUpdateGame(event, player.getColor(), tile2, totalUnits + " " + unitName, game);
             if (damagedUnits > 0) {
                 game.getTileByPosition(pos2).addUnitDamage("space", unitKey, damagedUnits);
             }
@@ -1748,7 +1747,7 @@ public class ButtonHelperHeroes {
 
             new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitKey, player.getColor(), false,
                 game);
-            new AddUnits().unitParsing(event, player.getColor(), tile2, totalUnits + " " + unitName, game);
+            UnitModifier.parseAndUpdateGame(event, player.getColor(), tile2, totalUnits + " " + unitName, game);
             if (damagedUnits > 0) {
                 game.getTileByPosition(pos2).addUnitDamage("space", unitKey, damagedUnits);
             }

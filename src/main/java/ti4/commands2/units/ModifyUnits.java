@@ -1,22 +1,22 @@
-package ti4.commands.units;
+package ti4.commands2.units;
 
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateCommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ModifyUnits implements Command {
+public class ModifyUnits extends GameStateCommand {
+
+    public ModifyUnits() {
+        super(true, true);
+    }
 
     @Override
     public String getName() {
@@ -24,18 +24,14 @@ public class ModifyUnits implements Command {
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getName());
+    public String getDescription() {
+        return "Modify units";
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game  game = GameManager.getUserActiveGame(event.getUser().getId());
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
+        Game  game = getGame();
+        Player player = getPlayer();
         getModifyTiles(player, game);
     }
 
@@ -52,10 +48,4 @@ public class ModifyUnits implements Command {
         String message = player.getRepresentation() + " Use the buttons to select the tile in which you wish to modify units. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
-
-    @Override
-    public void register(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getName(), "Present the Modify Units menu"));
-    }
-
 }

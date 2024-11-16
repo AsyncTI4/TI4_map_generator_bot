@@ -1,10 +1,10 @@
-package ti4.commands.capture;
+package ti4.commands2.capture;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.GameStateSubcommand;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.map.Tile;

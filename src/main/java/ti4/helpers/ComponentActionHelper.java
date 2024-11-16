@@ -17,7 +17,6 @@ import ti4.commands.ds.DrawBlueBackTile;
 import ti4.commands.leaders.ExhaustLeader;
 import ti4.commands.leaders.HeroPlay;
 import ti4.commands.player.TurnStart;
-import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
@@ -342,7 +341,7 @@ public class ComponentActionHelper {
                     List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship);
                     Tile tile = tiles.getFirst();
                     List<Button> buttons = TurnStart.getStartOfTurnButtons(p1, game, true, event);
-                    new AddUnits().unitParsing(event, p1.getColor(), tile, "1 cruiser", game);
+                    UnitModifier.parseAndUpdateGame(event, p1.getColor(), tile, "1 cruiser", game);
                     successMessage = successMessage + "Produced 1 " + Emojis.cruiser + " in tile "
                         + tile.getRepresentationForButtons(game, p1) + ".";
                     MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);

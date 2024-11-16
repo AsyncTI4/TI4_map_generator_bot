@@ -13,7 +13,6 @@ import ti4.buttons.Buttons;
 import ti4.commands.ds.DrawBlueBackTile;
 import ti4.commands.ds.DrawRedBackTile;
 import ti4.commands.tokens.RemoveCC;
-import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
@@ -25,6 +24,7 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.UnitModifier;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
 import ti4.listeners.annotations.ButtonHandler;
@@ -268,7 +268,7 @@ public class TechExhaust extends TechAddRemove {
             case "lgf" -> { // Lazax Gate Folding
                 if (CollectionUtils.containsAny(player.getPlanetsAllianceMode(), Constants.MECATOLS)) {
                     deleteIfButtonEvent(event);
-                    new AddUnits().unitParsing(event, player.getColor(), game.getMecatolTile(), "inf mr", game);
+                    UnitModifier.parseAndUpdateGame(event, player.getColor(), game.getMecatolTile(), "inf mr", game);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
                     sendNextActionButtonsIfButtonEvent(event, game, player);
