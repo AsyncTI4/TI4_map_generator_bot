@@ -41,7 +41,7 @@ public class Replace extends GameSubcommandData {
         Game game;
         var gameOption = event.getOption(Constants.GAME_NAME);
         if (gameOption != null) {
-            game = GameManager.getGame(gameOption.getName());
+            game = GameManager.getGame(gameOption.getAsString());
         } else {
             game = getActiveGame();
         }
@@ -78,7 +78,7 @@ public class Replace extends GameSubcommandData {
         Player replacedPlayer = CommandHelper.getPlayerFromEvent(game, event);
         if (replacedPlayer == null) {
             if (replacedPlayerOption != null) {
-                MessageHelper.replyToMessage(event, "Could not find the specified player, try using the faction/color option.");
+                MessageHelper.replyToMessage(event, "Could not find the player to be replaced, try using the faction/color option.");
             } else {
                 MessageHelper.replyToMessage(event, "Could not find the specified faction/color, try using the player option.");
             }
