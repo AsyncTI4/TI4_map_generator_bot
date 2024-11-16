@@ -8,10 +8,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.cardspn.PNInfo;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -43,8 +43,8 @@ public abstract class PNAddRemove extends FrankenSubcommandData {
 
         doAction(player, pnIDs);
         game.checkPromissoryNotes();
-        PNInfo.checkAndAddPNs(getActiveGame(), player);
-        PNInfo.sendPromissoryNoteInfo(game, player, false, event);
+        PromissoryNoteHelper.checkAndAddPNs(getActiveGame(), player);
+        PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false, event);
     }
 
     public abstract void doAction(Player player, List<String> pnIDs);

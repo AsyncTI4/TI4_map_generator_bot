@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.custom.PeekAtStage1;
 import ti4.commands.custom.PeekAtStage2;
@@ -59,7 +58,7 @@ public class ButtonHelperAbilities {
         Map<UnitKey, Integer> units = unitHolder.getUnits();
         String msg = player.getRepresentation() + " choose the opponent ship you wish to build using " + Emojis.influence + " influence";
         if (player.getPromissoryNotes().containsKey("dspnmort") && !player.getPromissoryNotesOwned().contains("dspnmort")) {
-            PlayPN.resolvePNPlay("dspnmort", player, game, event);
+            PromissoryNoteHelper.resolvePNPlay("dspnmort", player, game, event);
         }
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {

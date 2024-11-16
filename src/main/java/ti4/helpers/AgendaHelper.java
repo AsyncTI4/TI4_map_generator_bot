@@ -38,7 +38,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands.cardspn.PlayPN;
 import ti4.commands.fow.FOWOptions;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
@@ -3595,7 +3594,7 @@ public class AgendaHelper {
             }
 
             ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
-            PlayPN.resolvePNPlay(pnKey, player, game, event);
+            PromissoryNoteHelper.resolvePNPlay(pnKey, player, game, event);
         } else {
             ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
 

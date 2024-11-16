@@ -51,7 +51,7 @@ public class UnlockLeader extends LeaderAction {
             MessageHelper.sendMessageToChannel(channel, player.getFactionEmoji() + "Set Commodity Total to " + player.getCommoditiesTotal());
         }
         if (leaderID.contains("naalucommander")) {
-            //PNInfo.sendPromissoryNoteInfo(game, player, false);
+            //PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
             CardsInfo.sendVariousAdditionalButtons(game, player);
             MessageHelper.sendMessageToChannel(channel, player.getRepresentationUnfogged() + " you may use M'aban, the Naalu Commander, via button in your cards info thread");
 

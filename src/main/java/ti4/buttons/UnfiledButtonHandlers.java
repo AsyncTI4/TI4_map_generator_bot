@@ -25,8 +25,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.cardspn.PlayPN;
-import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.explore.ExplorePlanet;
@@ -75,6 +73,8 @@ import ti4.helpers.ExploreHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerPreferenceHelper;
 import ti4.helpers.PlayerTitleHelper;
+import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
@@ -1368,11 +1368,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 String key2 = "queueToScoreSOs";
                 String key3 = "potentialScoreSOBlockers";
                 String key3b = "potentialScorePOBlockers";
-                String message = "Drew A Secret Objective";
+                String message;
                 for (Player player2 : Helper.getInitativeOrder(game)) {
                     if (player2 == player) {
                         int soIndex = Integer.parseInt(soID);
-                        ScoreSO.scoreSO(event, game, player, soIndex, channel);
+                        SecretObjectiveHelper.scoreSO(event, game, player, soIndex, channel);
                         if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                             game.setStoredValue(key2, game.getStoredValue(key2)
                                 .replace(player.getFaction() + "*", ""));
@@ -1382,7 +1382,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                                 .replace(player.getFaction() + "*", ""));
                             if (!game.getStoredValue(key3b).contains(player.getFaction() + "*")) {
                                 Helper.resolvePOScoringQueue(game, event);
-                                // Helper.resolveSOScoringQueue(game, event);
                             }
                         }
 
@@ -1406,7 +1405,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             } else {
                 try {
                     int soIndex = Integer.parseInt(soID);
-                    ScoreSO.scoreSO(event, game, player, soIndex, channel);
+                    SecretObjectiveHelper.scoreSO(event, game, player, soIndex, channel);
                 } catch (Exception e) {
                     BotLogger.log(event, "Could not parse SO ID: " + soID, e);
                     event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.")
@@ -3388,7 +3387,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("useTA_")
     public static void useTA(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String ta = buttonID.replace("useTA_", "") + "_ta";
-        PlayPN.resolvePNPlay(ta, player, game, event);
+        PromissoryNoteHelper.resolvePNPlay(ta, player, game, event);
         ButtonHelper.deleteMessage(event);
     }
 

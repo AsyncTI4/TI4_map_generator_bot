@@ -13,15 +13,15 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
 import ti4.commands.Command;
-import ti4.commands.cardspn.PNInfo;
-import ti4.commands2.cardsso.SOInfo;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -62,7 +62,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
             return;
         }
         game.checkPromissoryNotes();
-        PNInfo.checkAndAddPNs(game, player);
+        PromissoryNoteHelper.checkAndAddPNs(game, player);
         sendCardsInfo(game, player, event);
     }
 
@@ -78,7 +78,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
     public static void sendCardsInfo(Game game, Player player) {
         SOInfo.sendSecretObjectiveInfo(game, player);
         ActionCardHelper.sendActionCardInfo(game, player);
-        PNInfo.sendPromissoryNoteInfo(game, player, false);
+        PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game,
                 """

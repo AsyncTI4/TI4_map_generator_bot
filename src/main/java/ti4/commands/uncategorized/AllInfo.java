@@ -9,17 +9,17 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
-import ti4.commands.cardspn.PNInfo;
-import ti4.commands2.cardsso.SOInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.player.AbilityInfo;
 import ti4.commands.player.UnitInfo;
 import ti4.commands.relic.RelicInfo;
 import ti4.commands.tech.TechInfo;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -108,7 +108,7 @@ public class AllInfo implements Command {
         RelicInfo.sendRelicInfo(game, player);
         SOInfo.sendSecretObjectiveInfo(game, player);
         ActionCardHelper.sendActionCardInfo(game, player);
-        PNInfo.sendPromissoryNoteInfo(game, player, false);
+        PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         CardsInfo.sendVariousAdditionalButtons(game, player);
     }
 

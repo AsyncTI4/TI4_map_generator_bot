@@ -15,8 +15,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.franken.LeaderAdd;
 import ti4.commands.leaders.HeroPlay;
@@ -1203,7 +1201,7 @@ public class ButtonHelperHeroes {
         p1.removePromissoryNote(id);
         p2.setPromissoryNote(id);
         if (id.contains("dspnveld")) {
-            PlayPN.resolvePNPlay(id, p2, game, event);
+            PromissoryNoteHelper.resolvePNPlay(id, p2, game, event);
         }
         boolean sendSftT = false;
         boolean sendAlliance = false;
@@ -1221,8 +1219,8 @@ public class ButtonHelperHeroes {
                 }
             }
         }
-        PNInfo.sendPromissoryNoteInfo(game, p1, false);
-        PNInfo.sendPromissoryNoteInfo(game, p2, false);
+        PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
+        PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
         String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
         message2 = p1.getRepresentation() + " sent " + Emojis.PN + text + "PN to " + ident2;
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2);

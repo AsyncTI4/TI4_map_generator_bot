@@ -9,11 +9,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cardspn.PNInfo;
 import ti4.commands.custom.SpinTilesInRings;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -131,8 +131,8 @@ public class Cleanup extends StatusSubcommandData {
                 if (pnModel.getText().contains("eturn this card") && pnModel.getText().contains("end of the status phase")) {
                     player.removePromissoryNote(pn);
                     pnOwner.setPromissoryNote(pn);
-                    PNInfo.sendPromissoryNoteInfo(game, pnOwner, false);
-                    PNInfo.sendPromissoryNoteInfo(game, player, false);
+                    PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);
+                    PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pnOwner.getFactionEmoji() + " " + pnModel.getName() + " was returned");
                 }
             }
