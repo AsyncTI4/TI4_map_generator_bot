@@ -130,8 +130,9 @@ public class Replace extends GameSubcommandData {
             }
         }
 
-        replacedPlayer.setUserName(replacementUser.getName());
+        String oldPlayerUserId = replacedPlayer.getUserID();
         replacedPlayer.setUserID(replacementUser.getId());
+        replacedPlayer.setUserName(replacementUser.getName());
         replacedPlayer.setTotalTurnTime(0);
         replacedPlayer.setNumberTurns(0);
         if (replacedPlayer.getUserID().equals(game.getSpeakerUserID())) {
@@ -148,8 +149,7 @@ public class Replace extends GameSubcommandData {
             mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(replacementMember).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
         }
 
-        String removedPlayerID = replacedPlayer.getUserID();
-        game.getMiltyDraftManager().replacePlayer(game, removedPlayerID, replacedPlayer.getUserID());
+        game.getMiltyDraftManager().replacePlayer(oldPlayerUserId, replacedPlayer.getUserID());
 
         if (speaker) {
             game.setSpeakerUserID(replacedPlayer.getUserID());
