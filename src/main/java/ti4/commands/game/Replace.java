@@ -127,6 +127,7 @@ public class Replace extends GameSubcommandData {
         }
 
         String oldPlayerUserId = replacedPlayer.getUserID();
+        String oldPlayerUserName = replacedPlayer.getUserName();
         replacedPlayer.setUserID(replacementUser.getId());
         replacedPlayer.setUserName(replacementUser.getName());
         replacedPlayer.setTotalTurnTime(0);
@@ -154,7 +155,7 @@ public class Replace extends GameSubcommandData {
             game.getMiltyDraftManager().repostDraftInformation(game);
         }
 
-        String message = "Game: " + game.getName() + "  Player: " + replacedPlayer.getUserName() + " replaced by player: " + replacementUser.getName();
+        String message = "Game: " + game.getName() + "  Player '" + oldPlayerUserName + "' replaced by player '" + replacementUser.getName() + "'";
         if (FoWHelper.isPrivateGame(game)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
