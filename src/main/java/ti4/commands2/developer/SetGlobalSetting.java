@@ -1,14 +1,15 @@
-package ti4.commands.developer;
+package ti4.commands2.developer;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
 import ti4.message.MessageHelper;
 
-public class SetGlobalSetting extends DeveloperSubcommandData {
+class SetGlobalSetting extends Subcommand {
 
     public SetGlobalSetting() {
         super(Constants.SET_SETTING, "Set or change a global setting");
@@ -22,18 +23,13 @@ public class SetGlobalSetting extends DeveloperSubcommandData {
         OptionMapping setting = event.getOption(Constants.SETTING_NAME);
         OptionMapping value = event.getOption(Constants.SETTING_VALUE);
         OptionMapping type = event.getOption(Constants.SETTING_TYPE);
+        if ("string".equals(type.getAsString()))
+            GlobalSettings.setSetting(setting.getAsString(), value.getAsString());
+        if ("number".equals(type.getAsString()))
+            GlobalSettings.setSetting(setting.getAsString(), value.getAsInt());
+        if ("bool".equals(type.getAsString()))
+            GlobalSettings.setSetting(setting.getAsString(), Boolean.parseBoolean(value.getAsString()));
 
-        if (setting != null && value != null && type != null) {
-            if ("string".equals(type.getAsString()))
-                GlobalSettings.setSetting(setting.getAsString(), value.getAsString());
-            if ("number".equals(type.getAsString()))
-                GlobalSettings.setSetting(setting.getAsString(), value.getAsInt());
-            if ("bool".equals(type.getAsString()))
-                GlobalSettings.setSetting(setting.getAsString(), Boolean.parseBoolean(value.getAsString()));
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Bad Command!");
-            return;
-        }
         MessageHelper.sendMessageToChannel(event.getChannel(), "Setting `" + "(" + type.getAsString() + ") " + setting.getAsString() + "` set to `" + value.getAsString() + "`");
         MessageHelper.sendMessageToChannel(event.getChannel(), GlobalSettings.getSettingsRepresentation());
     }
