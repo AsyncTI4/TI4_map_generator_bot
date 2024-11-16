@@ -3,13 +3,14 @@ package ti4.commands.franken;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.commands.cardspn.PNInfo;
 import ti4.helpers.Constants;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class PNAdd extends PNAddRemove {
+
     public PNAdd() {
         super(Constants.PN_ADD, "Add a Promissory Note to your faction's owned notes");
     }
@@ -35,7 +36,7 @@ public class PNAdd extends PNAddRemove {
                 sb.append("\n");
                 continue;
             }
-            sb.append(PNInfo.getPromissoryNoteRepresentation(game, pnID));
+            sb.append(PromissoryNoteHelper.getPromissoryNoteRepresentation(game, pnID));
             sb.append("\n");
             player.addOwnedPromissoryNoteByID(pnID);
         }

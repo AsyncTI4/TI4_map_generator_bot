@@ -38,8 +38,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands.cardspn.PlayPN;
-import ti4.commands.cardsso.SOInfo;
 import ti4.commands.fow.FOWOptions;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
@@ -52,6 +50,7 @@ import ti4.commands.special.WormholeResearchFor;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.units.AddUnits;
+import ti4.commands2.cardsso.SOInfo;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.generator.TileGenerator;
@@ -3595,7 +3594,7 @@ public class AgendaHelper {
             }
 
             ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
-            PlayPN.resolvePNPlay(pnKey, player, game, event);
+            PromissoryNoteHelper.resolvePNPlay(pnKey, player, game, event);
         } else {
             ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
 
