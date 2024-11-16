@@ -13,12 +13,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.PickACFromDiscard;
 import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -192,7 +192,7 @@ public class PlayPN extends PNCardsSubcommandData {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
         if ("dspncymi".equalsIgnoreCase(id)) {
-            PickACFromDiscard.pickACardFromDiscardStep1(event, game, player);
+            ActionCardHelper.pickACardFromDiscardStep1(event, game, player);
         }
         if ("dspnkort".equalsIgnoreCase(id)) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "kortalipn");

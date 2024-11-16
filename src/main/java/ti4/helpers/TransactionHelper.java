@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardspn.PlayPN;
 import ti4.commands.leaders.CommanderUnlockCheck;
@@ -976,8 +975,8 @@ public class TransactionHelper {
                 p1.removeActionCard(acNum);
                 p2.setActionCard(acID);
                 ButtonHelper.checkACLimit(game, event, p2);
-                ACInfo.sendActionCardInfo(game, p2);
-                ACInfo.sendActionCardInfo(game, p1);
+                ActionCardHelper.sendActionCardInfo(game, p2);
+                ActionCardHelper.sendActionCardInfo(game, p1);
                 if (!p1.hasAbility("arbiters") && !p2.hasAbility("arbiters")) {
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
