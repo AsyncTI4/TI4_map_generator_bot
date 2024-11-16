@@ -1,6 +1,5 @@
 package ti4.commands.game;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -50,7 +49,6 @@ public class Replace extends GameSubcommandData {
             return;
         }
 
-        Collection<Player> players = game.getPlayers().values();
         Member member = event.getMember();
         boolean isAdmin = false;
         if (member != null) {
@@ -63,7 +61,7 @@ public class Replace extends GameSubcommandData {
             }
         }
 
-        if (players.stream().noneMatch(player -> player.getUserID().equals(event.getUser().getId())) && !isAdmin) {
+        if (game.getPlayer(event.getUser().getId()) == null && !isAdmin) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Only game players or Bothelpers can replace a player.");
             return;
         }
@@ -120,7 +118,6 @@ public class Replace extends GameSubcommandData {
         }
 
         String message = "Game: " + game.getName() + "  Player: " + replacedPlayer.getUserName() + " replaced by player: " + replacementUser.getName();
-        boolean speaker = replacedPlayer.isSpeaker();
         Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
         for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
             List<String> value = poEntry.getValue();
@@ -135,10 +132,10 @@ public class Replace extends GameSubcommandData {
         replacedPlayer.setUserName(replacementUser.getName());
         replacedPlayer.setTotalTurnTime(0);
         replacedPlayer.setNumberTurns(0);
-        if (replacedPlayer.getUserID().equals(game.getSpeakerUserID())) {
+        if (oldPlayerUserId.equals(game.getSpeakerUserID())) {
             game.setSpeakerUserID(replacementUser.getId());
         }
-        if (replacedPlayer.getUserID().equals(game.getActivePlayerID())) {
+        if (oldPlayerUserId.equals(game.getActivePlayerID())) {
             // do not update stats for this action
             game.setActivePlayerID(replacementUser.getId());
         }
@@ -151,9 +148,6 @@ public class Replace extends GameSubcommandData {
 
         game.getMiltyDraftManager().replacePlayer(oldPlayerUserId, replacedPlayer.getUserID());
 
-        if (speaker) {
-            game.setSpeakerUserID(replacedPlayer.getUserID());
-        }
         GameSaveLoadManager.saveGame(game, event);
         // Load the new game instance so that we can repost the milty draft
         game = GameSaveLoadManager.reload(game.getName());
