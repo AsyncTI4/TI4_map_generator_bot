@@ -16,6 +16,7 @@ class ShowAllAC extends GameStateSubcommand {
     public ShowAllAC() {
         super(Constants.SHOW_ALL_AC, "Show all Action Cards one player", false, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override

@@ -16,6 +16,7 @@ class SendACRandom extends GameStateSubcommand {
     public SendACRandom() {
         super(Constants.SEND_AC_RANDOM, "Send a random Action Card to a player", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
