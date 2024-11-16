@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.CommandHelper;
+import ti4.commands2.CommandHelper;
 import ti4.commands2.ParentCommand;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
