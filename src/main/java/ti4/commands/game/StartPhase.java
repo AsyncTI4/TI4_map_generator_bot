@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardspn.PlayPN;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
@@ -23,6 +22,7 @@ import ti4.commands.status.ListTurnOrder;
 import ti4.generator.MapGenerator;
 import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -114,13 +114,13 @@ public class StartPhase extends GameSubcommandData {
             if (game.getStoredValue("LastMinuteDeliberation") != null
                 && game.getStoredValue("LastMinuteDeliberation").contains(p2.getFaction())
                 && p2.getActionCards().containsKey("last_minute_deliberation")) {
-                PlayAC.playAC(event, game, p2, "last minute deliberation", game.getMainGameChannel());
+                ActionCardHelper.playAC(event, game, p2, "last minute deliberation", game.getMainGameChannel());
                 return;
             }
             if (game.getStoredValue("SpecialSession") != null
                 && game.getStoredValue("SpecialSession").contains(p2.getFaction())
                 && p2.getActionCards().containsKey("special_session")) {
-                PlayAC.playAC(event, game, p2, "special session", game.getMainGameChannel());
+                ActionCardHelper.playAC(event, game, p2, "special session", game.getMainGameChannel());
                 return;
             }
 
@@ -142,24 +142,24 @@ public class StartPhase extends GameSubcommandData {
             if (game.getStoredValue("Summit") != null
                 && game.getStoredValue("Summit").contains(p2.getFaction())
                 && p2.getActionCards().containsKey("summit")) {
-                PlayAC.playAC(event, game, p2, "summit", game.getMainGameChannel());
+                ActionCardHelper.playAC(event, game, p2, "summit", game.getMainGameChannel());
             }
 
             if (game.getStoredValue("Investments") != null
                 && game.getStoredValue("Investments").contains(p2.getFaction())
                 && p2.getActionCards().containsKey("investments")) {
-                PlayAC.playAC(event, game, p2, "investments", game.getMainGameChannel());
+                ActionCardHelper.playAC(event, game, p2, "investments", game.getMainGameChannel());
             }
 
             if (game.getStoredValue("PreRevolution") != null
                 && game.getStoredValue("PreRevolution").contains(p2.getFaction())
                 && p2.getActionCards().containsKey("revolution")) {
-                PlayAC.playAC(event, game, p2, "revolution", game.getMainGameChannel());
+                ActionCardHelper.playAC(event, game, p2, "revolution", game.getMainGameChannel());
             }
             if (game.getStoredValue("Deflection") != null
                 && game.getStoredValue("Deflection").contains(p2.getFaction())
                 && p2.getActionCards().containsKey("deflection")) {
-                PlayAC.playAC(event, game, p2, "deflection", game.getMainGameChannel());
+                ActionCardHelper.playAC(event, game, p2, "deflection", game.getMainGameChannel());
             }
             if (p2.hasLeader("zealotshero") && p2.getLeader("zealotshero").get().isActive()) {
                 if (!game.getStoredValue("zealotsHeroTechs").isEmpty()) {

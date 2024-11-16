@@ -25,10 +25,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.DrawAC;
-import ti4.commands.cardsac.PlayAC;
-import ti4.commands.cardsac.ShowAllAC;
 import ti4.commands.cardspn.PlayPN;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
@@ -58,6 +54,7 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.generator.TileGenerator;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -100,7 +97,7 @@ import ti4.model.TemporaryCombatModifierModel;
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
  */
-public class UnfiledButtonHandlers { // TODO: move all of these methods to a better location, closer to the orignal button call and/or other related code
+public class UnfiledButtonHandlers { // TODO: move all of these methods to a better location, closer to the original button call and/or other related code
 
     @ButtonHandler("purgeKortaliHero_")
     public static void purgeKortaliHero(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
@@ -193,8 +190,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void getACFrom(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = buttonID.replace("getACFrom_", "");
         Player victim = game.getPlayerFromColorOrFaction(faction);
-        List<Button> buttons = ButtonHelperFactionSpecific.getButtonsToTakeSomeonesAC(game, player, victim);
-        ShowAllAC.showAll(victim, player, game);
+        List<Button> buttons = ButtonHelperFactionSpecific.getButtonsToTakeSomeonesAC(player, victim);
+        ActionCardHelper.showAll(victim, player, game);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged() + " Select which AC you would like to steal", buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -668,7 +665,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 }
             }
             if (hasSabo) {
-                PlayAC.playAC(event, game, player, saboID, game.getActionsChannel());
+                ActionCardHelper.playAC(event, game, player, saboID, game.getActionsChannel());
             } else {
                 message = "Tried to play a Sabo but found none in hand.";
                 sendReact = false;
@@ -923,11 +920,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void cancelAFBHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        Player opponent = player;
-        String msg = "\n" + opponent.getRepresentationUnfogged() + " cancelled 1 hit with an ability.";
+        String msg = "\n" + player.getRepresentationUnfogged() + " cancelled 1 hit with an ability.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
-        String finChecker = "FFCC_" + opponent.getFaction() + "_";
+        String finChecker = "FFCC_" + player.getFaction() + "_";
         buttons.add(Buttons.green(finChecker + "autoAssignAFBHits_" + tile.getPosition() + "_" + h,
             "Auto-assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "_afb",
@@ -942,11 +938,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void cancelPDSOffenseHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        Player opponent = player;
-        String msg = "\n" + opponent.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
+        String msg = "\n" + player.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
-        String finChecker = "FFCC_" + opponent.getFaction() + "_";
+        String finChecker = "FFCC_" + player.getFaction() + "_";
         buttons.add(Buttons.green(finChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + h,
             "Auto-assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "_pds",
@@ -963,11 +958,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void cancelGroundHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        Player opponent = player;
-        String msg = "\n" + opponent.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
+        String msg = "\n" + player.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
-        String finChecker = "FFCC_" + opponent.getFaction() + "_";
+        String finChecker = "FFCC_" + player.getFaction() + "_";
         buttons.add(Buttons.green(finChecker + "autoAssignGroundHits_" + tile.getPosition() + "_" + h,
             "Auto-assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(
@@ -1469,7 +1463,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     channel2 = player.getPrivateChannel();
                 }
                 MessageHelper.sendMessageToChannel(channel2, sb);
-                ACInfo.sendActionCardInfo(game, player);
+                ActionCardHelper.sendActionCardInfo(game, player);
                 String message = "Use buttons to end turn or do another action.";
                 if (stalling) {
                     String message3 = "Use buttons to drop 1 mech on a planet or decline";
@@ -1481,7 +1475,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 }
                 if (drawReplacement) {
-                    DrawAC.drawActionCards(game, player, 1, true);
+                    ActionCardHelper.drawActionCards(game, player, 1, true);
                 }
                 ButtonHelper.checkACLimit(game, event, player);
                 ButtonHelper.deleteMessage(event);
@@ -1499,7 +1493,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                             + " agent, to make yourself draw 1AC.",
                         buttons2);
                 }
-                PlayAC.serveReverseEngineerButtons(game, player, List.of(acID));
+                ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
             } catch (Exception e) {
                 BotLogger.log(event, "Something went wrong discarding", e);
             }
@@ -1537,7 +1531,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         if (channel != null) {
             try {
-                String error = PlayAC.playAC(event, game, player, acID, channel);
+                String error = ActionCardHelper.playAC(event, game, player, acID, channel);
                 if (error != null) {
                     event.getChannel().sendMessage(error).queue();
                 }
@@ -1962,8 +1956,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
                 }
                 MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                if (reaction != null) {
-                }
             });
         } catch (Exception e) {
             game.removeMessageIDForSabo(messageId);
@@ -2451,7 +2443,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("getDiscardButtonsACs")
     public static void getDiscardButtonsACs(Player player, Game game) {
         String msg = player.getRepresentationUnfogged() + " use buttons to discard";
-        List<Button> buttons = ACInfo.getDiscardActionCardButtons(player, false);
+        List<Button> buttons = ActionCardHelper.getDiscardActionCardButtons(player, false);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -2602,13 +2594,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             game.drawActionCard(player.getUserID());
             game.drawActionCard(player.getUserID());
             CommanderUnlockCheck.checkPlayer(player, "yssaril");
-            ACInfo.sendActionCardInfo(game, player, event);
+            ActionCardHelper.sendActionCardInfo(game, player, event);
             message = "Drew 2 ACs With Scheming. Please Discard 1 AC.";
         }
         ButtonHelper.addReaction(event, true, false, message, "");
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " use buttons to discard",
-            ACInfo.getDiscardActionCardButtons(player, false));
+            ActionCardHelper.getDiscardActionCardButtons(player, false));
 
         ButtonHelper.deleteMessage(event);
         ButtonHelper.checkACLimit(game, event, player);
@@ -2623,7 +2615,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         } else {
             game.drawActionCard(player.getUserID());
             CommanderUnlockCheck.checkPlayer(player, "yssaril");
-            ACInfo.sendActionCardInfo(game, player, event);
+            ActionCardHelper.sendActionCardInfo(game, player, event);
             message = "Drew 1 AC";
         }
         ButtonHelper.addReaction(event, true, false, message, "");
@@ -2640,7 +2632,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         } else {
             game.drawActionCard(player.getUserID());
             CommanderUnlockCheck.checkPlayer(player, "yssaril");
-            ACInfo.sendActionCardInfo(game, player, event);
+            ActionCardHelper.sendActionCardInfo(game, player, event);
             message = "Drew 1 AC";
         }
         ButtonHelper.addReaction(event, true, false, message, "");
@@ -2853,16 +2845,16 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             game.drawActionCard(player.getUserID());
             game.drawActionCard(player.getUserID());
             message = player.getFactionEmoji() + " Drew 2 ACs With Scheming. Please Discard 1 AC.";
-            ACInfo.sendActionCardInfo(game, player, event);
+            ActionCardHelper.sendActionCardInfo(game, player, event);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(player, false));
+                ActionCardHelper.getDiscardActionCardButtons(player, false));
         } else if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
             message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
         } else {
             game.drawActionCard(player.getUserID());
-            ACInfo.sendActionCardInfo(game, player, event);
+            ActionCardHelper.sendActionCardInfo(game, player, event);
             message = player.getFactionEmoji() + " Drew 1 AC";
         }
         CommanderUnlockCheck.checkPlayer(player, "yssaril");
@@ -2885,17 +2877,17 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             game.drawActionCard(player.getUserID());
             game.drawActionCard(player.getUserID());
             message = player.getFactionEmoji() + " Drew 2 ACs With Scheming. Please Discard 1 AC.";
-            ACInfo.sendActionCardInfo(game, player, event);
+            ActionCardHelper.sendActionCardInfo(game, player, event);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(player, false));
+                ActionCardHelper.getDiscardActionCardButtons(player, false));
 
         } else if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
             message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
         } else {
             game.drawActionCard(player.getUserID());
-            ACInfo.sendActionCardInfo(game, player, event);
+            ActionCardHelper.sendActionCardInfo(game, player, event);
             message = player.getFactionEmoji() + " Drew 1 AC";
         }
         player.checkCommanderUnlock("yssaril");
@@ -3048,7 +3040,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             for (int i = 0; i < count; i++) {
                 game.drawActionCard(player.getUserID());
             }
-            ACInfo.sendActionCardInfo(game, player, event);
+            ActionCardHelper.sendActionCardInfo(game, player, event);
             ButtonHelper.checkACLimit(game, event, player);
         }
 
@@ -3056,7 +3048,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (hasSchemingAbility) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(player, false));
+                ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
         CommanderUnlockCheck.checkPlayer(player, "yssaril");
         ButtonHelper.deleteTheOneButton(event);
@@ -3300,7 +3292,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void drawActionCards(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         try {
             int count = Integer.parseInt(buttonID.replace("drawActionCards_", ""));
-            DrawAC.drawActionCards(game, player, count, true);
+            ActionCardHelper.drawActionCards(game, player, count, true);
             ButtonHelper.deleteTheOneButton(event);
         } catch (Exception ignored) {
         }
@@ -3466,7 +3458,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 game.drawActionCard(player.getUserID());
             }
             ButtonHelper.checkACLimit(game, event, player);
-            ACInfo.sendActionCardInfo(game, player, event);
+            ActionCardHelper.sendActionCardInfo(game, player, event);
         }
 
         CommanderUnlockCheck.checkPlayer(player, "yssaril");
@@ -3474,7 +3466,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (hasSchemingAbility) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(player, false));
+                ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
 
         ButtonHelper.addReaction(event, false, false, message, "");

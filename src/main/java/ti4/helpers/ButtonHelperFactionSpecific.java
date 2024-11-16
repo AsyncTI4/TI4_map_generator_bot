@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.game.StartPhase;
@@ -635,7 +634,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("spyNetPlayerChooses")
     public static void resolveSpyNetPlayerChooses(Player player, Game game, ButtonInteractionEvent event) {
         Player yssaril = findPNOwner("spynet", game);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1 AC", ACInfo.getToBeStolenActionCardButtons(game, yssaril));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1 AC", ActionCardHelper.getToBeStolenActionCardButtons(yssaril));
         event.getMessage().delete().queue();
     }
 
@@ -1901,7 +1900,7 @@ public class ButtonHelperFactionSpecific {
         player.refreshPlanet(planet);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " use buttons to discard",
-            ACInfo.getDiscardActionCardButtons(player, false));
+            ActionCardHelper.getDiscardActionCardButtons(player, false));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
@@ -1925,10 +1924,10 @@ public class ButtonHelperFactionSpecific {
             buttons);
     }
 
-    public static List<Button> getButtonsToTakeSomeonesAC(Game game, Player thief, Player victim) {
+    public static List<Button> getButtonsToTakeSomeonesAC(Player thief, Player victim) {
         List<Button> takeACs = new ArrayList<>();
         String secretScoreMsg = "_ _\nClick a button to take 1 Action Card";
-        List<Button> acButtons = ACInfo.getToBeStolenActionCardButtons(game, victim);
+        List<Button> acButtons = ActionCardHelper.getToBeStolenActionCardButtons(victim);
         if (!acButtons.isEmpty()) {
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
             ThreadChannel cardsInfoThreadChannel = thief.getCardsInfoThread();
@@ -1976,8 +1975,8 @@ public class ButtonHelperFactionSpecific {
             player.getRepresentationUnfogged() + "Acquired " + acID);
         MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(),
             "# " + player2.getRepresentationUnfogged() + " Lost " + acID + " to a players ability");
-        ACInfo.sendActionCardInfo(game, player2);
-        ACInfo.sendActionCardInfo(game, player);
+        ActionCardHelper.sendActionCardInfo(game, player2);
+        ActionCardHelper.sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, event, player);
         CommanderUnlockCheck.checkPlayer(player, "yssaril");
         event.getMessage().delete().queue();

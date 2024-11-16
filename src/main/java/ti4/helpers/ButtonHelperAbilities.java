@@ -12,8 +12,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.PickACFromDiscard;
 import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.custom.PeekAtStage1;
@@ -236,7 +234,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
         int count = Integer.parseInt(buttonID.split("_")[1]);
         game.drawActionCard(player.getUserID(), count);
-        ACInfo.sendActionCardInfo(game, player, event);
+        ActionCardHelper.sendActionCardInfo(game, player, event);
         ButtonHelper.checkACLimit(game, event, player);
     }
 
@@ -494,7 +492,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
         int count = Integer.parseInt(buttonID.split("_")[1]);
         game.drawActionCard(player.getUserID(), count - 1);
-        ACInfo.sendActionCardInfo(game, player, event);
+        ActionCardHelper.sendActionCardInfo(game, player, event);
         String msg2 = player.getFactionEmoji() + " is choosing to resolve their Autonetic Memory ability";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         List<Button> buttons = new ArrayList<>();
@@ -515,7 +513,7 @@ public class ButtonHelperAbilities {
 
     public static void autoneticMemoryStep3a(Game game, Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
-        PickACFromDiscard.pickACardFromDiscardStep1(event, game, player);
+        ActionCardHelper.pickACardFromDiscardStep1(event, game, player);
     }
 
     public static void addOmenDie(Game game, int omenDie) {

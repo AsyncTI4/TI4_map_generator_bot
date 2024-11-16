@@ -30,7 +30,7 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import ti4.commands.CommandManager;
 import ti4.commands.capture.CaptureCommand;
-import ti4.commands.cardsac.ACCardsCommand;
+import ti4.commands2.cardsac.ACCardsCommand;
 import ti4.commands.cardspn.PNCardsCommand;
 import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.combat.CombatCommand;
