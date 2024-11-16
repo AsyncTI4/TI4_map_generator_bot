@@ -20,6 +20,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -37,7 +38,18 @@ public class Replace extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game;
+        var gameOption = event.getOption(Constants.GAME_NAME);
+        if (gameOption != null) {
+            game = GameManager.getGame(gameOption.getName());
+        } else {
+            game = getActiveGame();
+        }
+        if (game == null) {
+            MessageHelper.replyToMessage(event, "Unable to determine the game to run the command against...");
+            return;
+        }
+
         Collection<Player> players = game.getPlayers().values();
         Member member = event.getMember();
         boolean isAdmin = false;
