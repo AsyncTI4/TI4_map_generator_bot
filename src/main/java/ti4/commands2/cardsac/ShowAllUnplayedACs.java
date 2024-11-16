@@ -5,6 +5,7 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.GameStateSubcommand;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -26,7 +27,7 @@ class ShowAllUnplayedACs extends GameStateSubcommand {
     public static void showUnplayedACs(Game game, GenericInteractionCreateEvent event) {
         List<String> unplayedACs = Helper.unplayedACs(game);
         String title = game.getName() + " -- Unplayed Action Cards";
-        String actionCardString = ShowDiscardActionCards.actionCardListCondensedNoIds(unplayedACs, title);
+        String actionCardString = ActionCardHelper.actionCardListCondensedNoIds(unplayedACs, title);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), actionCardString);
     }
 }

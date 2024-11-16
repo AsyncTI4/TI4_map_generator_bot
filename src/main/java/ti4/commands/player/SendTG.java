@@ -33,7 +33,7 @@ public class SendTG extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        Player otherPlayer = CommandCommandHelper.getOtherPlayerFromEvent(game, event);
+        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (otherPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player to send TGs/Commodities could not be found");
             return;

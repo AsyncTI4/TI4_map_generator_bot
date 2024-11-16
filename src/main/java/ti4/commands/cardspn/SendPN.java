@@ -79,7 +79,7 @@ public class SendPN extends PNCardsSubcommandData {
 			return;
 		}
 
-		Player targetPlayer = CommandCommandHelper.getOtherPlayerFromEvent(game, event);
+		Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
 		if (targetPlayer == null) {
 			MessageHelper.sendMessageToEventChannel(event, "No such Player in game");
 			return;

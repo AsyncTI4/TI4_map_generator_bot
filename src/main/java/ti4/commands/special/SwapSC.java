@@ -29,7 +29,7 @@ public class SwapSC extends SpecialSubcommandData {
         }
 
         //resolve player2
-        Player player2 = CommandCommandHelper.getOtherPlayerFromEvent(game, event);
+        Player player2 = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (player2 == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player 2 could not be found");
             return;

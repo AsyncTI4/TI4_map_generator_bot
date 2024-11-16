@@ -28,7 +28,7 @@ public class SendDebt extends PlayerSubcommandData {
             return;
         }
 
-        Player receivingPlayer = CommandCommandHelper.getOtherPlayerFromEvent(game, event);
+        Player receivingPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (receivingPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player to send Debt could not be found");
             return;

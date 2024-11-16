@@ -32,7 +32,7 @@ public class Whisper extends FOWSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;
         }
-        Player otherPlayer = CommandCommandHelper.getOtherPlayerFromEvent(game, event);
+        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (otherPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to send message to could not be found");
             return;

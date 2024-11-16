@@ -45,7 +45,7 @@ public class ShowRandomSO extends SOCardsSubcommandData {
 
         player.setSecret(soID);
 
-        Player otherPlayer = CommandCommandHelper.getOtherPlayerFromEvent(game, event);
+        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (otherPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player not found");
             return;
