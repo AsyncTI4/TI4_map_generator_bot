@@ -117,7 +117,6 @@ public class Replace extends GameSubcommandData {
             guild.addRoleToMember(replacementMember, roles.getFirst()).queue();
         }
 
-        String message = "Game: " + game.getName() + "  Player: " + replacedPlayer.getUserName() + " replaced by player: " + replacementUser.getName();
         Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
         for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
             List<String> value = poEntry.getValue();
@@ -155,6 +154,7 @@ public class Replace extends GameSubcommandData {
             game.getMiltyDraftManager().repostDraftInformation(game);
         }
 
+        String message = "Game: " + game.getName() + "  Player: " + replacedPlayer.getUserName() + " replaced by player: " + replacementUser.getName();
         if (FoWHelper.isPrivateGame(game)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
