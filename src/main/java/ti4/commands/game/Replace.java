@@ -37,8 +37,6 @@ public class Replace extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        User callerUser = event.getUser();
-
         Game game = getActiveGame();
         Collection<Player> players = game.getPlayers().values();
         Member member = event.getMember();
@@ -52,42 +50,52 @@ public class Replace extends GameSubcommandData {
                 }
             }
         }
-        if (players.stream().noneMatch(player -> player.getUserID().equals(callerUser.getId())) && !isAdmin) {
+
+        if (players.stream().noneMatch(player -> player.getUserID().equals(event.getUser().getId())) && !isAdmin) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Only game players or Bothelpers can replace a player.");
             return;
         }
 
-        OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
-        OptionMapping removePlayerOption = event.getOption(Constants.PLAYER);
-        OptionMapping addOption = event.getOption(Constants.PLAYER2);
-        if ((removeOption == null && removePlayerOption == null) || addOption == null) {
-            MessageHelper.replyToMessage(event, "Specify player to remove and replacement");
+        OptionMapping removedPlayerFactionOption = event.getOption(Constants.FACTION_COLOR);
+        OptionMapping removedPlayerOption = event.getOption(Constants.PLAYER);
+        if (removedPlayerFactionOption == null && removedPlayerOption == null) {
+            MessageHelper.replyToMessage(event, "Specify player to remove.");
             return;
         }
 
         Player removedPlayer = CommandHelper.getPlayerFromEvent(game, event);
-        if (removedPlayer == null || (removePlayerOption == null && removedPlayer.getFaction() == null)) {
-            MessageHelper.replyToMessage(event, "Could not find faction/color to replace");
-            return;
-        }
-        String removedPlayerID = removedPlayer.getUserID();
-
-        boolean isNullFaction = removedPlayer.getFaction() == null || removedPlayer.getFaction().equals("null");
-        if (removePlayerOption == null && isNullFaction) {
-            MessageHelper.replyToMessage(event, "Cannot determine player if they are not set up. Specify `player` option instead.");
-            return;
-        }
-
-        User addedUser = addOption.getAsUser();
-        boolean notRealPlayer = players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()));
-        if (!notRealPlayer) {
-            if (game.getPlayer(addedUser.getId()).getFaction() == null) {
-                game.removePlayer(addedUser.getId());
+        if (removedPlayer == null) {
+            if (removedPlayerOption != null) {
+                MessageHelper.replyToMessage(event, "Could not find the specified player, try using the faction/color option.");
+            } else {
+                MessageHelper.replyToMessage(event, "Could not find the specified faction/color, try using the player option.");
             }
+            return;
+        }
+
+        OptionMapping addedPlayerOption = event.getOption(Constants.PLAYER2);
+        if (addedPlayerOption == null) {
+            MessageHelper.replyToMessage(event, "Specify player to be replaced.");
+            return;
+        }
+
+        User addedUser = addedPlayerOption.getAsUser();
+        Player playerToAdd = game.getPlayer(addedUser.getId());
+        if (playerToAdd != null && playerToAdd.getFaction() != null) {
+            MessageHelper.replyToMessage(event, "Specify player that is **__not__** in the game to be the replacement");
+            return;
+        } else if (playerToAdd != null) {
+            game.removePlayer(addedUser.getId()); // spectators or others
+        }
+
+        Guild guild = game.getGuild();
+        Member addedMember = guild.getMemberById(addedUser.getId());
+        if (addedMember == null) {
+            MessageHelper.replyToMessage(event, "Added player must be on the game's server.");
+            return;
         }
 
         //REMOVE ROLE
-        Guild guild = game.getGuild();
         Member removedMember = guild.getMemberById(removedPlayer.getUserID());
         List<Role> roles = guild.getRolesByName(game.getName(), true);
         if (removedMember != null && roles.size() == 1) {
@@ -95,26 +103,12 @@ public class Replace extends GameSubcommandData {
         }
 
         //ADD ROLE
-        Member addedMember = guild.getMemberById(addedUser.getId());
-        if (addedMember == null) return;
-
         if (roles.size() == 1) {
             guild.addRoleToMember(addedMember, roles.getFirst()).queue();
         }
 
-        String message;
-        if (players.stream().noneMatch(player -> player.getUserID().equals(removedPlayer.getUserID()))) {
-            MessageHelper.replyToMessage(event, "Specify player that is in game to be removed");
-            return;
-        }
-        if (players.stream().anyMatch(player -> player.getUserID().equals(addedUser.getId()))) {
-            MessageHelper.replyToMessage(event, "Specify player that is **__not__** in the game to be the replacement");
-            return;
-        }
-
-        message = "Game: " + game.getName() + "  Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
-        Player player = game.getPlayer(removedPlayer.getUserID());
-        boolean speaker = player.isSpeaker();
+        String message = "Game: " + game.getName() + "  Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
+        boolean speaker = removedPlayer.isSpeaker();
         Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
         for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
             List<String> value = poEntry.getValue();
@@ -124,10 +118,10 @@ public class Replace extends GameSubcommandData {
             }
         }
 
-        player.setUserName(addedUser.getName());
-        player.setUserID(addedUser.getId());
-        player.setTotalTurnTime(0);
-        player.setNumberTurns(0);
+        removedPlayer.setUserName(addedUser.getName());
+        removedPlayer.setUserID(addedUser.getId());
+        removedPlayer.setTotalTurnTime(0);
+        removedPlayer.setNumberTurns(0);
         if (removedPlayer.getUserID().equals(game.getSpeakerUserID())) {
             game.setSpeakerUserID(addedUser.getId());
         }
@@ -141,10 +135,12 @@ public class Replace extends GameSubcommandData {
         if (mapThread != null && !mapThread.isLocked()) {
             mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(addedMember).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
         }
-        game.getMiltyDraftManager().replacePlayer(game, removedPlayerID, player.getUserID());
+
+        String removedPlayerID = removedPlayer.getUserID();
+        game.getMiltyDraftManager().replacePlayer(game, removedPlayerID, removedPlayer.getUserID());
 
         if (speaker) {
-            game.setSpeakerUserID(player.getUserID());
+            game.setSpeakerUserID(removedPlayer.getUserID());
         }
         GameSaveLoadManager.saveGame(game, event);
         // Load the new game instance so that we can repost the milty draft
