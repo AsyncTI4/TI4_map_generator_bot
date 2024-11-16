@@ -160,6 +160,5 @@ public class Replace extends GameSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
         }
-
     }
 }
