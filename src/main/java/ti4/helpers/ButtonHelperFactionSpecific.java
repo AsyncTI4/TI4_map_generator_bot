@@ -634,7 +634,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("spyNetPlayerChooses")
     public static void resolveSpyNetPlayerChooses(Player player, Game game, ButtonInteractionEvent event) {
         Player yssaril = findPNOwner("spynet", game);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1 AC", ACInfo.getToBeStolenActionCardButtons(game, yssaril));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1 AC", ActionCardHelper.getToBeStolenActionCardButtons(yssaril));
         event.getMessage().delete().queue();
     }
 
@@ -1924,10 +1924,10 @@ public class ButtonHelperFactionSpecific {
             buttons);
     }
 
-    public static List<Button> getButtonsToTakeSomeonesAC(Game game, Player thief, Player victim) {
+    public static List<Button> getButtonsToTakeSomeonesAC(Player thief, Player victim) {
         List<Button> takeACs = new ArrayList<>();
         String secretScoreMsg = "_ _\nClick a button to take 1 Action Card";
-        List<Button> acButtons = ACInfo.getToBeStolenActionCardButtons(game, victim);
+        List<Button> acButtons = ActionCardHelper.getToBeStolenActionCardButtons(victim);
         if (!acButtons.isEmpty()) {
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
             ThreadChannel cardsInfoThreadChannel = thief.getCardsInfoThread();

@@ -21,6 +21,7 @@ import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -449,7 +450,7 @@ public class HeroPlay extends LeaderAction {
                         continue;
                     }
                     List<Button> buttons = new ArrayList<>(
-                        ACInfo.getYssarilHeroActionCardButtons(player, p2));
+                        ActionCardHelper.getYssarilHeroActionCardButtons(player, p2));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                         p2.getRepresentationUnfogged()
                             + " Kyver, Blade and Key, the Yssaril hero, has been played.  Use buttons to select which AC you will offer to them.",

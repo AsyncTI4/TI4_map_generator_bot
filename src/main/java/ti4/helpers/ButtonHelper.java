@@ -656,7 +656,7 @@ public class ButtonHelper {
     public static void resolveDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
         String deck = buttonID.replace("showDeck_", "");
         switch (deck) {
-            case "ac" -> ShowDiscardActionCards.showDiscard(game, event, false);
+            case "ac" -> ActionCardHelper.showDiscard(game, event, false);
             case "agenda" -> AgendaHelper.showDiscards(game, event);
             case "relic" -> RelicShowRemaining.showRemaining(event, false, game, player);
             case "unscoredSO" -> ShowUnScoredSOs.showUnscored(game, event);

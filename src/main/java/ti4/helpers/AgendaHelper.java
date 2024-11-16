@@ -52,7 +52,6 @@ import ti4.commands.special.WormholeResearchFor;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.units.AddUnits;
-import ti4.commands2.cardsac.DiscardACRandom;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.generator.TileGenerator;

@@ -516,7 +516,7 @@ public class ComponentActionHelper {
             }
             case "actionCards" -> {
                 String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
-                List<Button> acButtons = ACInfo.getActionPlayActionCardButtons(p1);
+                List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
                 if (!acButtons.isEmpty()) {
                     List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
                     ThreadChannel cardsInfoThreadChannel = p1.getCardsInfoThread();

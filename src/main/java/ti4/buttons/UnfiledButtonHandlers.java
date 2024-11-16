@@ -190,7 +190,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void getACFrom(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = buttonID.replace("getACFrom_", "");
         Player victim = game.getPlayerFromColorOrFaction(faction);
-        List<Button> buttons = ButtonHelperFactionSpecific.getButtonsToTakeSomeonesAC(game, player, victim);
+        List<Button> buttons = ButtonHelperFactionSpecific.getButtonsToTakeSomeonesAC(player, victim);
         ActionCardHelper.showAll(victim, player, game);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged() + " Select which AC you would like to steal", buttons);
         ButtonHelper.deleteMessage(event);

@@ -12,6 +12,7 @@ import ti4.commands.explore.ExploreInfo;
 import ti4.commands.relic.RelicShowRemaining;
 import ti4.commands.tech.TechShowDeck;
 import ti4.commands2.GameStateSubcommand;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.listeners.annotations.ButtonHandler;
@@ -36,7 +37,7 @@ class ShowDiscardedAgendas extends GameStateSubcommand {
     public static void resolveDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
         String deck = buttonID.replace("showDeck_", "");
         switch (deck) {
-            case "ac" -> ShowDiscardActionCards.showDiscard(game, event, false);
+            case "ac" -> ActionCardHelper.showDiscard(game, event, false);
             case "agenda" -> AgendaHelper.showDiscards(game, event);
             case "relic" -> RelicShowRemaining.showRemaining(event, false, game, player);
             case "unscoredSO" -> ShowUnScoredSOs.showUnscored(game, event);

@@ -17,6 +17,7 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.generator.Mapper;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GameCreationHelper;
 import ti4.helpers.Helper;
@@ -122,7 +123,7 @@ public class Eliminate extends AddRemovePlayer {
                     String sb = "Player: " + player.getUserName() + " - " + "Discarded Action Card:" + "\n" + Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
                     MessageHelper.sendMessageToChannel(event.getChannel(), sb);
                 }
-                PlayAC.serveReverseEngineerButtons(game, player, new ArrayList<>(acs.keySet()));
+                ActionCardHelper.serveReverseEngineerButtons(game, player, new ArrayList<>(acs.keySet()));
 
                 //unscore all of a players SOs
                 acs = new LinkedHashMap<>(player.getSecretsScored());

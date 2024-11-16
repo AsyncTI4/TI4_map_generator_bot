@@ -47,7 +47,7 @@ public class CryypterHelper {
             ActionCardHelper.getDiscardActionCardButtons(player, false));
 
         ButtonHelper.checkACLimit(game, null, player);
-        if (addScheming && player.hasAbility("scheming")) ACInfo.sendDiscardActionCardButtons(player, false);
+        if (addScheming && player.hasAbility("scheming")) ActionCardHelper.sendDiscardActionCardButtons(player, false);
         if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
             CommanderUnlockCheck.checkPlayer(player, "yssaril");
         }
