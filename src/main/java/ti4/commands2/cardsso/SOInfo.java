@@ -1,4 +1,4 @@
-package ti4.commands.cardsso;
+package ti4.commands2.cardsso;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -12,8 +12,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.status.ListPlayerInfoButton;
-import ti4.commands.uncategorized.InfoThreadCommand;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -24,24 +23,15 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
 
-public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
-    public SOInfo() {
-        super(Constants.INFO, "Sent scored and unscored Secret Objectives to your Cards Info thread");
-    }
+public class SOInfo extends GameStateSubcommand {
 
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getName());
+    public SOInfo() {
+        super(Constants.INFO, "Sent scored and unscored Secret Objectives to your Cards Info thread", true, false);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-        sendSecretObjectiveInfo(game, player, event);
+        sendSecretObjectiveInfo(getGame(), getPlayer(), event);
         MessageHelper.sendMessageToEventChannel(event, "SO Info Sent");
     }
 
@@ -82,10 +72,6 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
     }
 
     public static String getSecretObjectiveRepresentationShort(String soID) {
-        return getSecretObjectiveRepresentationShort(soID, null);
-    }
-
-    public static String getSecretObjectiveRepresentationShort(String soID, Integer soUniqueID) {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
         String soName = so.getName();
@@ -94,14 +80,14 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
     }
 
     public static String getSecretObjectiveRepresentation(String soID) {
-        return getSecretObjectiveRepresentation(soID, null, true);
+        return getSecretObjectiveRepresentation(soID, true);
     }
 
     public static String getSecretObjectiveRepresentationNoNewLine(String soID) {
-        return getSecretObjectiveRepresentation(soID, null, false);
+        return getSecretObjectiveRepresentation(soID, false);
     }
 
-    private static String getSecretObjectiveRepresentation(String soID, Integer soUniqueID, boolean newLine) {
+    private static String getSecretObjectiveRepresentation(String soID, boolean newLine) {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
         String soName = so.getName();
@@ -160,7 +146,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
         return sb.toString();
     }
 
-    public static List<Button> getUnscoredSecretObjectiveButtons(Game game, Player player) {
+    public static List<Button> getUnscoredSecretObjectiveButtons(Player player) {
         Map<String, Integer> secretObjectives = player.getSecrets();
         List<Button> soButtons = new ArrayList<>();
         if (secretObjectives != null && !secretObjectives.isEmpty()) {
@@ -176,26 +162,24 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
         return soButtons;
     }
 
-    public static void sendSODiscardButtons(Game game, Player player) {
-        sendSODiscardButtons(game, player, "");
+    public static void sendSODiscardButtons(Player player) {
+        sendSODiscardButtons(player, "");
     }
 
-    public static void sendSODiscardButtons(Game game, Player player, String suffix) {
-        List<Button> buttons = getSODiscardButtonsWithSuffix(game, player, suffix);
+    public static void sendSODiscardButtons(Player player, String suffix) {
+        List<Button> buttons = getSODiscardButtonsWithSuffix(player, suffix);
         String message = "Use buttons to discard a Secret Objective:";
         if ("redraw".equals(suffix)) {
             message += "\n> - A new secret will be automatically drawn for you";
-        } else if (!"".equals(suffix)) {
-            suffix = "";
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 
-    public static List<Button> getUnscoredSecretObjectiveDiscardButtons(Game game, Player player) {
-        return getSODiscardButtonsWithSuffix(game, player, "");
+    public static List<Button> getUnscoredSecretObjectiveDiscardButtons(Player player) {
+        return getSODiscardButtonsWithSuffix(player, "");
     }
 
-    public static List<Button> getSODiscardButtonsWithSuffix(Game game, Player player, String suffix) {
+    public static List<Button> getSODiscardButtonsWithSuffix(Player player, String suffix) {
         Map<String, Integer> secretObjectives = player.getSecrets();
         List<Button> soButtons = new ArrayList<>();
         if (secretObjectives != null && !secretObjectives.isEmpty()) {

@@ -1,45 +1,36 @@
-package ti4.commands.cardspn;
+package ti4.commands2.cardspn;
 
 import java.util.Map;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
-public class SendPN extends PNCardsSubcommandData {
+class SendPN extends GameStateSubcommand {
+
 	public SendPN() {
-		super(Constants.SEND_PN, "Send Promissory Note to player");
+		super(Constants.SEND_PN, "Send Promissory Note to player", true, true);
 		addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
-		addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target faction or color").setRequired(true).setAutoComplete(true));
+		addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
 	}
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		Game game = getActiveGame();
-		Player player = CommandHelper.getPlayerFromEvent(game, event);
-		if (player == null) {
-			MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-			return;
-		}
-		OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
-		if (option == null) {
-			MessageHelper.sendMessageToEventChannel(event, "Please select what Promissory Note to send");
-			return;
-		}
-
-		String value = option.getAsString().toLowerCase();
+		Player player = getPlayer();
+		String value = event.getOption(Constants.PROMISSORY_NOTE_ID).getAsString().toLowerCase();
 		String id = null;
 		int pnIndex;
 		try {
@@ -79,6 +70,7 @@ public class SendPN extends PNCardsSubcommandData {
 			return;
 		}
 
+		Game game = getGame();
 		Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
 		if (targetPlayer == null) {
 			MessageHelper.sendMessageToEventChannel(event, "No such Player in game");
@@ -98,7 +90,7 @@ public class SendPN extends PNCardsSubcommandData {
 		targetPlayer.setPromissoryNote(id);
 
 		if (id.contains("dspnveld") && !targetPlayer.ownsPromissoryNote(id)) {
-			PlayPN.resolvePNPlay(id, targetPlayer, game, event);
+			PromissoryNoteHelper.resolvePNPlay(id, targetPlayer, game, event);
 		}
 
 		boolean placeDirectlyInPlayArea = pnModel.isPlayedDirectlyToPlayArea();
@@ -106,8 +98,8 @@ public class SendPN extends PNCardsSubcommandData {
 			targetPlayer.setPromissoryNotesInPlayArea(id);
 		}
 
-		PNInfo.sendPromissoryNoteInfo(game, targetPlayer, false);
-		PNInfo.sendPromissoryNoteInfo(game, player, false);
+		PromissoryNoteHelper.sendPromissoryNoteInfo(game, targetPlayer, false);
+		PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
 
 		String extraText = placeDirectlyInPlayArea ? "**" + pnModel.getName() + "**" : "";
 		String message = player.getRepresentation() + " sent " + Emojis.PN + extraText + " to " + targetPlayer.getRepresentation();

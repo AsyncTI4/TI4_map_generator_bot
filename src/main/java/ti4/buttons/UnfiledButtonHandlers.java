@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.commands.cardspn.PlayPN;
-import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.explore.ExploreFrontier;
@@ -52,6 +51,7 @@ import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
+import ti4.commands2.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.generator.TileGenerator;
 import ti4.helpers.ActionCardHelper;
@@ -1245,7 +1245,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("get_so_discard_buttons")
     public static void getSODiscardButtons(ButtonInteractionEvent event, Player player, Game game) {
         String secretScoreMsg = "_ _\nClick a button below to discard your Secret Objective";
-        List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(game, player);
+        List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(player);
         if (!soButtons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
         } else {
@@ -1338,9 +1338,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     @ButtonHandler("get_so_score_buttons")
-    public static void getSoScoreButtons(ButtonInteractionEvent event, Game game, Player player) {
+    public static void getSoScoreButtons(ButtonInteractionEvent event, Player player) {
         String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
-        List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveButtons(game, player);
+        List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveButtons(player);
         if (!soButtons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
         } else {

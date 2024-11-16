@@ -1,4 +1,4 @@
-package ti4.commands.cardsso;
+package ti4.commands2.cardsso;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,25 +7,20 @@ import java.util.List;
 import java.util.Map;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowAllSOToAll extends SOCardsSubcommandData {
+class ShowAllSOToAll extends GameStateSubcommand {
+
     public ShowAllSOToAll() {
-        super(Constants.SHOW_ALL_SO_TO_ALL, "Show all Secret Objectives to all players");
+        super(Constants.SHOW_ALL_SO_TO_ALL, "Show all Secret Objectives to all players", true, false);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Player player = getPlayer();
 
         StringBuilder sb = new StringBuilder();
 
@@ -34,7 +29,7 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
         List<String> secretObjectives = new ArrayList<>(player.getSecrets().keySet());
         Collections.shuffle(secretObjectives);
         Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(player.getSecretsScored());
-        for (String id : game.getSoToPoList()) {
+        for (String id : getGame().getSoToPoList()) {
             scoredSecretObjective.remove(id);
         }
 

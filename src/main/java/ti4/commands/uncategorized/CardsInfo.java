@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
 import ti4.commands.Command;
 import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardsso.SOInfo;
+import ti4.commands2.cardsso.SOInfo;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ActionCardHelper;

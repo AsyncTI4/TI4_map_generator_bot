@@ -21,7 +21,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardsso.SOInfo;
+import ti4.commands2.cardsso.SOInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ListPlayerInfoButton;
 import ti4.commands2.CommandHelper;

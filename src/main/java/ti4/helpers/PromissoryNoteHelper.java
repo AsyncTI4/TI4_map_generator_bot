@@ -1,104 +1,179 @@
-package ti4.commands.cardspn;
+package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.units.AddUnits;
-import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
-import ti4.helpers.ActionCardHelper;
-import ti4.helpers.AgendaHelper;
-import ti4.helpers.AliasHandler;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperCommanders;
-import ti4.helpers.ButtonHelperFactionSpecific;
-import ti4.helpers.CombatTempModHelper;
-import ti4.helpers.ComponentActionHelper;
-import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
-import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
-import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
-import ti4.model.TechnologyModel;
+import ti4.model.Source;
 import ti4.model.TemporaryCombatModifierModel;
 
-public class PlayPN extends PNCardsSubcommandData {
-    public PlayPN() {
-        super(Constants.PLAY_PN, "Play Promissory Note");
-        addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
+@UtilityClass
+public class PromissoryNoteHelper {
+
+    public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat) {
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                getPromissoryNoteCardInfo(game, player, longFormat, false),
+                getPNButtons(game, player));
     }
 
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-        OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Please select what Promissory Note to play");
-            return;
+    public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
+        checkAndAddPNs(game, player);
+        game.checkPromissoryNotes();
+        String headerText = player.getRepresentationUnfogged() + " Heads up, someone used some command";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        sendPromissoryNoteInfo(game, player, longFormat);
+    }
+
+    public static String getPromissoryNoteCardInfo(Game game, Player player, boolean longFormat, boolean excludePlayArea) {
+        StringBuilder sb = new StringBuilder();
+
+        //PROMISSORY NOTES
+        sb.append("**Promissory Notes:**").append("\n");
+        int index = 1;
+        Map<String, Integer> promissoryNotes = player.getPromissoryNotes();
+        List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
+        if (promissoryNotes == null) {
+            return sb.toString();
         }
 
-        String value = option.getAsString().toLowerCase();
-        String pnID = null;
-        int pnIndex;
-        try {
-            pnIndex = Integer.parseInt(value);
-            for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
-                if (pn.getValue().equals(pnIndex)) {
-                    pnID = pn.getKey();
+        if (promissoryNotes.isEmpty()) {
+            sb.append("> None");
+        } else {
+            for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
+                if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
+                    sb.append("> `").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`");
+                    sb.append(getPromissoryNoteRepresentation(game, pn.getKey(), longFormat));
+                    index++;
                 }
             }
-        } catch (Exception e) {
-            boolean foundSimilarName = false;
-            String cardName = "";
-            for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
-                String pnName = Mapper.getPromissoryNote(pn.getKey()).getName();
-                if (pnName != null) {
-                    pnName = pnName.toLowerCase();
-                    if (pnName.contains(value) || pn.getKey().contains(value)) {
-                        if (foundSimilarName && !cardName.equals(pnName)) {
-                            MessageHelper.sendMessageToEventChannel(event, "Multiple cards with similar name founds, please use ID");
-                            return;
+
+            if (!excludePlayArea) {
+                //PLAY AREA PROMISSORY NOTES
+                sb.append("\n\n").append("__**PLAY AREA Promissory Notes:**__").append("\n");
+                if (promissoryNotesInPlayArea.isEmpty()) {
+                    sb.append("> None");
+                } else {
+                    for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
+                        if (promissoryNotesInPlayArea.contains(pn.getKey())) {
+                            sb.append("`").append(index).append(".");
+                            sb.append("(").append(pn.getValue()).append(")`");
+                            sb.append(getPromissoryNoteRepresentation(game, pn.getKey(), longFormat));
+                            index++;
                         }
-                        pnID = pn.getKey();
-                        foundSimilarName = true;
-                        cardName = pnName;
                     }
                 }
             }
         }
+        return sb.toString();
+    }
 
-        if (pnID == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
+    public static String getPromissoryNoteRepresentation(Game game, String pnID) {
+        return getPromissoryNoteRepresentation(game, pnID, null, true);
+    }
+
+    public static String getPromissoryNoteRepresentation(Game game, String pnID, boolean longFormat) {
+        return getPromissoryNoteRepresentation(game, pnID, null, longFormat);
+    }
+
+    public static String getPromissoryNoteRepresentation(Game game, String pnID, Integer pnUniqueID, boolean longFormat) {
+        PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pnID);
+        if (pnModel == null) {
+            String error = "Could not find representation for PN ID: " + pnID;
+            BotLogger.log(error);
+            return error;
+        }
+        String pnName = pnModel.getName();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(Emojis.PN);
+        if (pnModel.getFaction().isPresent()) sb.append(Emojis.getFactionIconFromDiscord(pnModel.getFaction().get()));
+        sb.append("__**").append(pnName).append("**__");
+        sb.append(pnModel.getSource().emoji());
+        sb.append("   ");
+
+        String pnText = pnModel.getText();
+        Player pnOwner = game.getPNOwner(pnID);
+        if (pnOwner != null && pnOwner.isRealPlayer()) {
+            if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
+            sb.append(Emojis.getColorEmojiWithName(pnOwner.getColor()));
+            pnText = pnText.replaceAll(pnOwner.getColor(), Emojis.getColorEmojiWithName(pnOwner.getColor()));
+        }
+
+        if (longFormat ||
+                Mapper.isValidFaction(pnModel.getFaction().orElse("").toLowerCase()) ||
+                (pnModel.getSource() != Source.ComponentSource.base && pnModel.getSource() != Source.ComponentSource.pok)) {
+            sb.append("      ").append(pnText);
+        }
+        sb.append("\n");
+        return sb.toString();
+    }
+
+    public static void checkAndAddPNs(Game game, Player player) {
+        String playerColor = AliasHandler.resolveColor(player.getColor());
+        String playerFaction = player.getFaction();
+        if (!Mapper.isValidColor(playerColor) || !Mapper.isValidFaction(playerFaction)) {
             return;
         }
 
-        playPN(event, game, player, pnID);
+        // All PNs a Player brought to the game (owns)
+        List<String> promissoryNotes = new ArrayList<>(player.getPromissoryNotesOwned());
+
+        // Remove PNs in other players' hands and player areas and purged PNs
+        for (Player player_ : game.getPlayers().values()) {
+            promissoryNotes.removeAll(player_.getPromissoryNotes().keySet());
+            promissoryNotes.removeAll(player_.getPromissoryNotesInPlayArea());
+        }
+        promissoryNotes.removeAll(player.getPromissoryNotes().keySet());
+        promissoryNotes.removeAll(player.getPromissoryNotesInPlayArea());
+        promissoryNotes.removeAll(game.getPurgedPN());
+
+        // Any remaining PNs are missing from the game and can be re-added to the player's hand
+        if (!promissoryNotes.isEmpty()) {
+            for (String promissoryNote : promissoryNotes) {
+                player.setPromissoryNote(promissoryNote);
+            }
+        }
     }
 
-    private void playPN(GenericInteractionCreateEvent event, Game game, Player player, String pnID) {
-        resolvePNPlay(pnID, player, game, event);
+    public static List<Button> getPNButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (String pnShortHand : player.getPromissoryNotes().keySet()) {
+            if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
+                continue;
+            }
+            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
+            Player owner = game.getPNOwner(pnShortHand);
+            if (owner == player || pnShortHand.endsWith("_ta")) {
+                continue;
+            }
+
+            Button transact;
+            if (game.isFowMode()) {
+                transact = Buttons.green("resolvePNPlay_" + pnShortHand,
+                        "Play " + owner.getColor() + " " + promissoryNote.getName());
+            } else {
+                transact = Buttons.green("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+            }
+            buttons.add(transact);
+        }
+        return buttons;
     }
 
     public static void resolvePNPlay(String id, Player player, Game game, GenericInteractionCreateEvent event) {
@@ -153,8 +228,8 @@ public class PlayPN extends PNCardsSubcommandData {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, sb.toString());
         }
         // And refresh cards info
-        PNInfo.sendPromissoryNoteInfo(game, player, false);
-        PNInfo.sendPromissoryNoteInfo(game, owner, false);
+        sendPromissoryNoteInfo(game, player, false);
+        sendPromissoryNoteInfo(game, owner, false);
         MessageHelper.sendMessageToChannel(owner.getCardsInfoThread(), owner.getRepresentationUnfogged() + " someone played one of your PNs (" + pnName + ")");
 
         if (id.contains("dspnveld")) {
@@ -383,42 +458,27 @@ public class PlayPN extends PNCardsSubcommandData {
         if (pn.getText().toLowerCase().contains("action:") && !"acq".equalsIgnoreCase(id)) {
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         }
-        TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pn.getAlias(), player.getNumberTurns());
-        if (posssibleCombatMod != null) {
-            player.addNewTempCombatMod(posssibleCombatMod);
+        TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pn.getAlias(), player.getNumberTurns());
+        if (possibleCombatMod != null) {
+            player.addNewTempCombatMod(possibleCombatMod);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Combat modifier will be applied next time you push the combat roll button.");
         }
     }
 
-    @ButtonHandler("resolvePNPlay_")
-    public static void resolvePNPlay(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String pnID = buttonID.replace("resolvePNPlay_", "");
-
-        if (pnID.contains("ra_")) {
-            String tech = AliasHandler.resolveTech(pnID.replace("ra_", ""));
-            TechnologyModel techModel = Mapper.getTech(tech);
-            pnID = pnID.replace("_" + tech, "");
-            String message = player.getFactionEmojiOrColor() + " Acquired The Tech " + techModel.getRepresentation(false) + " via Research Agreement";
-            player.addTech(tech);
-            String key = "RAForRound" + game.getRound() + player.getFaction();
-            if (game.getStoredValue(key).isEmpty()) {
-                game.setStoredValue(key, tech);
-            } else {
-                game.setStoredValue(key, game.getStoredValue(key) + "." + tech);
-            }
-            ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
-            CommanderUnlockCheck.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        }
-        resolvePNPlay(pnID, player, game, event);
-        if (!"bmfNotHand".equalsIgnoreCase(pnID)) {
-            ButtonHelper.deleteMessage(event);
+    public void showAll(Player player, Player targetPlayer, Game game) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Game: ").append(game.getName()).append("\n");
+        sb.append("Player: ").append(player.getUserName()).append("\n");
+        sb.append("Showed Promissory Notes:").append("\n");
+        List<String> promissoryNotes = new ArrayList<>(player.getPromissoryNotes().keySet());
+        Collections.shuffle(promissoryNotes);
+        int index = 1;
+        for (String id : promissoryNotes) {
+            sb.append(index).append(". ").append(Mapper.getPromissoryNote(id).getName()).append(" (original owner ").append(game.getPNOwner(id).getFactionEmojiOrColor()).append(")").append("\n");
+            index++;
         }
 
-        var posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID, player.getNumberTurns());
-        if (posssibleCombatMod != null) {
-            player.addNewTempCombatMod(posssibleCombatMod);
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Combat modifier will be applied next time you push the combat roll button.");
-        }
+        MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, game, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "All PNs shown to player");
     }
 }

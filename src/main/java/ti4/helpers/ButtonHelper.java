@@ -52,7 +52,7 @@ import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardsso.ShowUnScoredSOs;
+import ti4.commands2.cardsso.ShowUnScoredSOs;
 import ti4.commands.combat.CombatRoll;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.explore.ExploreInfo;
