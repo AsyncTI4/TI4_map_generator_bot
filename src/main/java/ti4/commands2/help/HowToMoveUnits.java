@@ -1,14 +1,16 @@
-package ti4.commands.help;
+package ti4.commands2.help;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.message.MessageHelper;
 
-public class HowToMoveUnits extends HelpSubcommandData {
+public class HowToMoveUnits extends Subcommand {
+
     public HowToMoveUnits() {
         super(Constants.HOW_TO_MOVE_UNITS, "How to move units using the /move_units command");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.EXAMPLES_ONLY, "True to only show examples"));

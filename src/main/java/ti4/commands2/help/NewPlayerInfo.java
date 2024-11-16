@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands2.help;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -6,9 +6,10 @@ import java.nio.file.Paths;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.ResourceHelper;
+import ti4.commands2.Subcommand;
 import ti4.message.MessageHelper;
 
-public class NewPlayerInfo extends HelpSubcommandData {
+public class NewPlayerInfo extends Subcommand {
 
     public NewPlayerInfo() {
         super("new_player_info", "Information for players new to AsyncTI4");

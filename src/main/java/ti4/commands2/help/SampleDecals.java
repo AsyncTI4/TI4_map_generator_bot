@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands2.help;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands.player.ChangeUnitDecal;
+import ti4.commands2.Subcommand;
 import ti4.generator.DrawingUtil;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
@@ -22,7 +23,8 @@ import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.message.MessageHelper;
 
-public class SampleDecals extends HelpSubcommandData {
+public class SampleDecals extends Subcommand {
+
     public SampleDecals() {
         super(Constants.SAMPLE_DECALS, "Show a sample image of dreadnoughts with various decals.");
         addOptions(new OptionData(OptionType.STRING, Constants.DECAL_HUE, "Category of decals to show (default: all)").setAutoComplete(true));

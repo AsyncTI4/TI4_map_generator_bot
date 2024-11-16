@@ -1,13 +1,14 @@
-package ti4.commands.help;
+package ti4.commands2.help;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.ResourceHelper;
+import ti4.commands2.Subcommand;
 import ti4.message.MessageHelper;
 
-public class WhatsTIGL extends HelpSubcommandData {
+public class WhatsTIGL extends Subcommand {
 
     public WhatsTIGL() {
         super("what_is_tigl", "Quick description of what TIGL is");

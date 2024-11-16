@@ -1,18 +1,14 @@
-package ti4.commands.help;
+package ti4.commands2.help;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class HelpAction extends HelpSubcommandData {
+public class HelpAction extends Subcommand {
 
     public HelpAction() {
         super(Constants.HELP_DOCUMENTATION, "Show Help Documentation");
-    }
-
-    @Override
-    public String getActionID() {
-        return Constants.HELP;
     }
 
     @Override

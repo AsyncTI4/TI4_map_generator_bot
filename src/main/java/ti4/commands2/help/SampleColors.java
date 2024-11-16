@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands2.help;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
+import ti4.commands2.Subcommand;
 import ti4.generator.DrawingUtil;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
@@ -22,7 +23,8 @@ import ti4.helpers.Storage;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
 
-public class SampleColors extends HelpSubcommandData {
+public class SampleColors extends Subcommand {
+
     public SampleColors() {
         super(Constants.SAMPLE_COLORS, "Show a sample image of dreadnoughts in various player colors.");
         addOptions(new OptionData(OptionType.STRING, Constants.HUE, "General hue of colors to show (default: all)").setAutoComplete(true));
