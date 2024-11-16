@@ -24,7 +24,7 @@ public class AddAllianceMember extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        Player otherPlayer = CommandCommandHelper.getOtherPlayerFromEvent(game, event);
         if (otherPlayer == null || otherPlayer.isNotRealPlayer()) {
             MessageHelper.sendMessageToEventChannel(event, "Player to add to the alliance could not be found");
             return;

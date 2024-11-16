@@ -1,102 +1,288 @@
-package ti4.commands.cardsac;
+package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.TurnStart;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
-import ti4.helpers.AgendaHelper;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperActionCards;
-import ti4.helpers.ButtonHelperFactionSpecific;
-import ti4.helpers.ButtonHelperHeroes;
-import ti4.helpers.CombatTempModHelper;
-import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
-import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.GenericCardModel;
 import ti4.model.TemporaryCombatModifierModel;
 
-public class PlayAC extends ACCardsSubcommandData {
-    public PlayAC() {
-        super(Constants.PLAY_AC, "Play an Action Card");
-        addOptions(new OptionData(OptionType.STRING, Constants.ACTION_CARD_ID, "Action Card ID that is sent between () or Name/Part of Name").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
+@UtilityClass
+public class ActionCardHelper {
+
+    public static void sendActionCardInfo(Game game, Player player) {
+        // AC INFO
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getActionCardInfo(game, player));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nClick a button below to play an Action Card", getPlayActionCardButtons(game, player));
+
+        sendTrapCardInfo(game, player);
     }
 
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-
-        OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Please select what Action Card to discard");
-            return;
-        }
-
-        String reply = playAC(event, game, player, option.getAsString().toLowerCase(), event.getChannel());
-        if (reply != null) {
-            MessageHelper.sendMessageToEventChannel(event, reply);
+    private static void sendTrapCardInfo(Game game, Player player) {
+        if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { // Lih-zo trap abilities
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getTrapCardInfo(player));
         }
     }
 
-    public static String playAC(GenericInteractionCreateEvent event, Game game, Player player, String value, MessageChannel channel) {
-        String acID = null;
-        int acIndex = -1;
-        try {
-            acIndex = Integer.parseInt(value);
-            for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
-                if (so.getValue().equals(acIndex)) {
-                    acID = so.getKey();
+    private static String getTrapCardInfo(Player player) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("_ _\n");
+        sb.append("**Trap Cards:**").append("\n");
+        int index = 1;
+        Map<String, Integer> trapCards = player.getTrapCards();
+        Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
+        if (trapCards != null) {
+            if (trapCards.isEmpty()) {
+                sb.append("> None");
+            } else {
+                for (Map.Entry<String, Integer> trapCard : trapCards.entrySet()) {
+                    Integer value = trapCard.getValue();
+                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
+                    sb.append(getTrapCardRepresentation(trapCard.getKey(), trapCardsPlanets));
+                    index++;
                 }
             }
-        } catch (Exception e) {
-            boolean foundSimilarName = false;
-            String cardName = "";
-            for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
-                String actionCardName = Mapper.getActionCard(ac.getKey()).getName();
-                if (actionCardName != null) {
-                    actionCardName = actionCardName.toLowerCase();
-                    if (actionCardName.contains(value)) {
-                        if (foundSimilarName && !cardName.equals(actionCardName)) {
-                            return "Multiple cards with similar name founds, please use ID";
-                        }
-                        acID = ac.getKey();
-                        acIndex = ac.getValue();
-                        foundSimilarName = true;
-                        cardName = actionCardName;
+        }
+        return sb.toString();
+    }
+
+    public static String getTrapCardRepresentation(String trapID, Map<String, String> trapCardsPlanets) {
+        StringBuilder sb = new StringBuilder();
+        GenericCardModel trap = Mapper.getTrap(trapID);
+        String planet = trapCardsPlanets.get(trapID);
+
+        sb.append(trap.getRepresentation());
+        if (planet != null) {
+            Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+            String representation = planetRepresentations.get(planet);
+            if (representation == null) {
+                representation = planet;
+            }
+            sb.append(" **__Planet: ").append(representation).append("**__");
+        }
+        sb.append("\n");
+        return sb.toString();
+    }
+
+    private static String getActionCardInfo(Game game, Player player) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("_ _\n");
+
+        // ACTION CARDS
+        sb.append("**Action Cards (").append(player.getAc()).append("/").append(ButtonHelper.getACLimit(game, player)).append("):**").append("\n");
+        int index = 1;
+
+        Map<String, Integer> actionCards = player.getActionCards();
+        if (actionCards != null) {
+            if (actionCards.isEmpty()) {
+                sb.append("> None");
+            } else {
+                for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                    Integer value = ac.getValue();
+                    ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
+
+                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
+                    if (actionCard == null) {
+                        sb.append("Something broke here");
+                    } else {
+                        sb.append(actionCard.getRepresentation());
                     }
+
+                    index++;
                 }
             }
         }
-        if (acID == null) {
-            // MessageHelper.sendMessageToEventChannel(event, );
-            return "No such Action Card ID found, please retry";
+
+        return sb.toString();
+    }
+
+    private static List<Button> getPlayActionCardButtons(Game game, Player player) {
+        List<Button> acButtons = new ArrayList<>();
+        Map<String, Integer> actionCards = player.getActionCards();
+
+        if (actionCards != null && !actionCards.isEmpty()
+                && !ButtonHelper.isPlayerElected(game, player, "censure")
+                && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCard(key).getName();
+                if (ac_name != null) {
+                    acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name, Emojis.ActionCard));
+                }
+            }
         }
-        return resolveActionCard(event, game, player, acID, acIndex, channel);
+        if (ButtonHelper.isPlayerElected(game, player, "censure") || ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+            acButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard an AC (You are politically censured)"));
+        } else {
+            acButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard an AC"));
+        }
+        if (actionCards != null && !actionCards.isEmpty()
+                && !ButtonHelper.isPlayerElected(game, player, "censure")
+                && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace") || actionCards.containsKey("special_session")
+                || actionCards.containsKey("investments") || actionCards.containsKey("last_minute_deliberation") || actionCards.containsKey("revolution") || actionCards.containsKey("deflection") || actionCards.containsKey("summit"))) {
+            acButtons.add(Buttons.gray("checkForAllACAssignments", "Pre assign ACs"));
+        }
+
+        return acButtons;
+    }
+
+    public static List<Button> getActionPlayActionCardButtons(Player player) {
+        List<Button> acButtons = new ArrayList<>();
+        Map<String, Integer> actionCards = player.getActionCards();
+        if (actionCards != null && !actionCards.isEmpty()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCard(key).getName();
+                ActionCardModel actionCard = Mapper.getActionCard(key);
+                String actionCardWindow = actionCard.getWindow();
+                if (ac_name != null && "Action".equalsIgnoreCase(actionCardWindow)) {
+                    acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name, Emojis.ActionCard));
+                }
+            }
+        }
+        return acButtons;
+    }
+
+    public static void sendDiscardActionCardButtons(Player player, boolean doingAction) {
+        List<Button> buttons = getDiscardActionCardButtons(player, doingAction);
+        String msg = player.getRepresentationUnfogged() + " use buttons to discard";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    public static void sendDiscardAndDrawActionCardButtons(Player player) {
+        List<Button> buttons = getDiscardActionCardButtonsWithSuffix(player, "redraw");
+        String msg = player.getRepresentationUnfogged() + " use buttons to discard. A new action card will be automatically drawn afterwards.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    public static List<Button> getDiscardActionCardButtons(Player player, boolean doingAction) {
+        return getDiscardActionCardButtonsWithSuffix(player, doingAction ? "stall" : "");
+    }
+
+    public static List<Button> getDiscardActionCardButtonsWithSuffix(Player player, String suffix) {
+        List<Button> acButtons = new ArrayList<>();
+        Map<String, Integer> actionCards = player.getActionCards();
+
+        if (actionCards != null && !actionCards.isEmpty()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCard(key).getName();
+                if (ac_name != null) {
+                    acButtons.add(Buttons.blue("ac_discard_from_hand_" + value + suffix, "(" + value + ") " + ac_name, Emojis.ActionCard));
+                }
+            }
+        }
+        return acButtons;
+    }
+
+    public static List<Button> getToBeStolenActionCardButtons(Player player) {
+        List<Button> acButtons = new ArrayList<>();
+        Map<String, Integer> actionCards = player.getActionCards();
+        if (actionCards != null && !actionCards.isEmpty()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCard(key).getName();
+                if (ac_name != null) {
+                    acButtons.add(Buttons.red("takeAC_" + value + "_" + player.getFaction(), ac_name, Emojis.ActionCard));
+                }
+            }
+        }
+        return acButtons;
+    }
+
+    @ButtonHandler("refreshACInfo")
+    public static void sendActionCardInfo(Game game, Player player, GenericInteractionCreateEvent event) {
+        String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        sendActionCardInfo(game, player);
+    }
+
+    public static void discardAC(GenericInteractionCreateEvent event, Game game, Player player, int acNumericalID) {
+        String acID = null;
+        for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+            if (ac.getValue().equals(acNumericalID)) {
+                acID = ac.getKey();
+            }
+        }
+
+        if (acID == null || !game.discardActionCard(player.getUserID(), acNumericalID)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry: " + acID);
+            return;
+        }
+        String message = player.getRepresentationNoPing() + " discarded Action Card: " + Mapper.getActionCard(acID).getRepresentationJustName();
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        sendActionCardInfo(game, player);
+    }
+
+    public void discardRandomAC(GenericInteractionCreateEvent event, Game game, Player player, int count) {
+        if (count < 1) {
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("Player: ").append(player.getUserName()).append(" - ");
+        sb.append("Discarded Action Card:").append("\n");
+        while (count > 0 && !player.getActionCards().isEmpty()) {
+            Map<String, Integer> actionCards_ = player.getActionCards();
+            List<String> cards_ = new ArrayList<>(actionCards_.keySet());
+            Collections.shuffle(cards_);
+            String acID = cards_.getFirst();
+            boolean removed = game.discardActionCard(player.getUserID(), actionCards_.get(acID));
+            if (!removed) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Cards found, please retry");
+                return;
+            }
+            sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
+            count--;
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+        sendActionCardInfo(game, player);
+    }
+
+    public static void drawActionCards(Game game, Player player, int count, boolean resolveAbilities) {
+        if (count > 10) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
+            return;
+        }
+        String message = player.getRepresentation() + " Drew " + count + " AC";
+        if (resolveAbilities && player.hasAbility("scheming")) {
+            message = player.getRepresentation() + " Drew [" + count + "+1=" + (count + 1) + "] AC (Scheming)";
+            count++;
+        }
+        if (resolveAbilities && player.hasAbility("autonetic_memory")) {
+            ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
+            return;
+        }
+        game.drawActionCard(player.getUserID(), count);
+
+        sendActionCardInfo(game, player);
+        ButtonHelper.checkACLimit(game, null, player);
+        if (resolveAbilities && player.hasAbility("scheming")) sendDiscardActionCardButtons(player, false);
+        CommanderUnlockCheck.checkPlayer(player, "yssaril");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
     }
 
     public static String resolveActionCard(GenericInteractionCreateEvent event, Game game, Player player, String acID, int acIndex, MessageChannel channel) {
@@ -654,7 +840,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 + "Skhot Unit X-12, the Cymiae" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw 1AC.", buttons2);
         }
 
-        ACInfo.sendActionCardInfo(game, player);
+        sendActionCardInfo(game, player);
         return null;
     }
 
@@ -697,5 +883,189 @@ public class PlayAC extends ACCardsSubcommandData {
             message = message.replace(player.getRepresentation(), "");
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message, buttons);
+    }
+
+    public static String playAC(GenericInteractionCreateEvent event, Game game, Player player, String value, MessageChannel channel) {
+        String acID = null;
+        int acIndex = -1;
+        try {
+            acIndex = Integer.parseInt(value);
+            for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
+                if (so.getValue().equals(acIndex)) {
+                    acID = so.getKey();
+                }
+            }
+        } catch (Exception e) {
+            boolean foundSimilarName = false;
+            String cardName = "";
+            for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+                String actionCardName = Mapper.getActionCard(ac.getKey()).getName();
+                if (actionCardName != null) {
+                    actionCardName = actionCardName.toLowerCase();
+                    if (actionCardName.contains(value)) {
+                        if (foundSimilarName && !cardName.equals(actionCardName)) {
+                            return "Multiple cards with similar name founds, please use ID";
+                        }
+                        acID = ac.getKey();
+                        acIndex = ac.getValue();
+                        foundSimilarName = true;
+                        cardName = actionCardName;
+                    }
+                }
+            }
+        }
+        if (acID == null) {
+            return "No such Action Card ID found, please retry";
+        }
+        return resolveActionCard(event, game, player, acID, acIndex, channel);
+    }
+
+    public static void sendActionCard(GenericInteractionCreateEvent event, Game game, Player player, Player p2, String acID) {
+        Integer handIndex = player.getActionCards().get(acID);
+        ButtonHelper.checkACLimit(game, event, p2);
+        if (acID == null || handIndex == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find AC in your hand.");
+            return;
+        }
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find other player.");
+            return;
+        }
+
+        player.removeActionCard(handIndex);
+        p2.setActionCard(acID);
+        sendActionCardInfo(game, player);
+        sendActionCardInfo(game, p2);
+    }
+
+    public void sendRandomACPart2(GenericInteractionCreateEvent event, Game game, Player player, Player player_) {
+        Map<String, Integer> actionCardsMap = player.getActionCards();
+        List<String> actionCards = new ArrayList<>(actionCardsMap.keySet());
+        if (actionCards.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No Action Cards in hand");
+        }
+        Collections.shuffle(actionCards);
+        String acID = actionCards.getFirst();
+        // FoW specific pinging
+        if (game.isFowMode()) {
+            FoWHelper.pingPlayersTransaction(game, event, player, player_, Emojis.ActionCard + " Action Card", null);
+        }
+        player.removeActionCard(actionCardsMap.get(acID));
+        player_.setActionCard(acID);
+        sendActionCardInfo(game, player_);
+        ButtonHelper.checkACLimit(game, event, player_);
+        sendActionCardInfo(game, player);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "# " + player.getRepresentation() + " you lost the AC " + Mapper.getActionCard(acID).getName());
+        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), "# " + player_.getRepresentation() + " you gained the AC " + Mapper.getActionCard(acID).getName());
+    }
+
+    public static void showAll(Player player, Player player_, Game game) {
+        StringBuilder sb = new StringBuilder();
+        StringBuilder sa = new StringBuilder();
+        sa.append("You have shown your cards to player: ").append(player_.getUserName()).append("\n");
+        sa.append("Your cards were presented in the order below. You may reference the number listed when discussing the cards:\n");
+        sb.append("Game: ").append(game.getName()).append("\n");
+        sb.append("Player: ").append(player.getUserName()).append("\n");
+        sb.append("Showed Action Cards, they were also presented the cards in the order you see them so you may reference the number when talking to them:").append("\n");
+        List<String> actionCards = new ArrayList<>(player.getActionCards().keySet());
+        Collections.shuffle(actionCards);
+        int index = 1;
+        for (String id : actionCards) {
+            sa.append(index).append(". ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
+            sb.append(index).append(". ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
+            index++;
+        }
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sa.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb.toString());
+    }
+
+    public static void showDiscard(Game game, GenericInteractionCreateEvent event, boolean showFullText) {
+        StringBuilder sb = new StringBuilder();
+        List<Map.Entry<String, Integer>> discards = game.getDiscardActionCards().entrySet().stream().toList();
+
+        Button showFullTextButton = null;
+        if (showFullText) {
+            sb.append(actionCardListFullText(discards, "Action card discard list"));
+        } else {
+            sb.append(discardListCondensed(discards, "Action card discard list"));
+            showFullTextButton = Buttons.green("ACShowDiscardFullText", "Show Full Text");
+        }
+        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), sb.toString(), showFullTextButton);
+    }
+
+    public static String actionCardListCondensedNoIds(List<String> discards, String title) {
+        StringBuilder sb = new StringBuilder();
+        if (title != null) sb.append("**__").append(title).append(":__**");
+        Map<String, List<String>> cardsByName = discards.stream()
+            .collect(Collectors.groupingBy(ac -> Mapper.getActionCard(ac).getName()));
+        int index = 1;
+        int pad = cardsByName.size() > 99 ? 4 : (cardsByName.size() > 9 ? 3 : 2);
+
+        List<Map.Entry<String, List<String>>> displayOrder = new ArrayList<>(cardsByName.entrySet());
+        displayOrder.sort(Map.Entry.comparingByKey());
+        for (Map.Entry<String, List<String>> acEntryList : displayOrder) {
+            sb.append("\n").append(index).append(". ");
+            sb.append(Emojis.ActionCard.repeat(acEntryList.getValue().size()));
+            sb.append(" **").append(acEntryList.getKey()).append("**");
+            // sb.append(Mapper.getActionCard()
+            index++;
+        }
+        return sb.toString();
+    }
+
+    private static String actionCardListFullText(List<Map.Entry<String, Integer>> discards, String title) {
+        // Set up the entry list
+        List<Map.Entry<String, Integer>> aclist = new ArrayList<>(discards);
+        Collections.reverse(aclist);
+        Map<String, List<Map.Entry<String, Integer>>> cardsByName = new LinkedHashMap<>();
+        aclist.forEach(ac -> {
+            String name = Mapper.getActionCard(ac.getKey()).getName();
+            if (!cardsByName.containsKey(name)) cardsByName.put(name, new ArrayList<>());
+            cardsByName.get(name).addFirst(ac);
+        });
+        List<Map.Entry<String, List<Map.Entry<String, Integer>>>> entries = new ArrayList<>(cardsByName.entrySet());
+        Collections.reverse(entries);
+
+        // Build the string
+        StringBuilder sb = new StringBuilder("**__").append(title).append(":__**");
+        int index = 1;
+
+        for (Map.Entry<String, List<Map.Entry<String, Integer>>> acEntryList : entries) {
+            List<String> ids = acEntryList.getValue().stream().map(i -> "`(" + i.getValue() + ")`").toList();
+            sb.append("\n").append(index).append(". ");
+            sb.append(Emojis.ActionCard.repeat(ids.size()));
+            sb.append(" **").append(acEntryList.getKey()).append("** - ");
+            sb.append(Mapper.getActionCard(acEntryList.getValue().getFirst().getKey()).getRepresentationJustText());
+            index++;
+        }
+        return sb.toString();
+    }
+
+    public static String discardListCondensed(List<Map.Entry<String, Integer>> discards, String title) {
+        // Set up the entry list
+        List<Map.Entry<String, Integer>> aclist = new ArrayList<>(discards);
+        Collections.reverse(aclist);
+        Map<String, List<Map.Entry<String, Integer>>> cardsByName = new LinkedHashMap<>();
+        aclist.forEach(ac -> {
+            String name = Mapper.getActionCard(ac.getKey()).getName();
+            if (!cardsByName.containsKey(name)) cardsByName.put(name, new ArrayList<>());
+            cardsByName.get(name).addFirst(ac);
+        });
+        List<Map.Entry<String, List<Map.Entry<String, Integer>>>> entries = new ArrayList<>(cardsByName.entrySet());
+        Collections.reverse(entries);
+
+        // Build the string
+        StringBuilder sb = new StringBuilder("**__").append(title).append(":__**");
+        int index = 1;
+        int pad = cardsByName.size() > 99 ? 4 : (cardsByName.size() > 9 ? 3 : 2);
+        for (Map.Entry<String, List<Map.Entry<String, Integer>>> acEntryList : entries) {
+            List<String> ids = acEntryList.getValue().stream().map(i -> "`(" + i.getValue() + ")`").toList();
+            sb.append("\n`").append(Helper.leftpad(index + ".", pad)).append("` - ");
+            sb.append(Emojis.ActionCard.repeat(ids.size()));
+            sb.append(" **").append(acEntryList.getKey()).append("**");
+            sb.append(String.join(",", ids));
+            index++;
+        }
+        return sb.toString();
     }
 }

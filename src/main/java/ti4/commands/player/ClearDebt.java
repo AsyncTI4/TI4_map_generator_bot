@@ -27,7 +27,7 @@ public class ClearDebt extends PlayerSubcommandData {
             return;
         }
 
-        Player clearedPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        Player clearedPlayer = CommandCommandHelper.getOtherPlayerFromEvent(game, event);
         if (clearedPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player to have debt cleared could not be found");
             return;

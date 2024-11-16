@@ -37,7 +37,7 @@ public class RelicSendFragments extends RelicSubcommandData {
 		Game game = getActiveGame();
 		Player sender = CommandHelper.getPlayerFromEvent(game, event);
 
-		Player receiver = CommandHelper.getOtherPlayerFromEvent(game, event);
+		Player receiver = CommandCommandHelper.getOtherPlayerFromEvent(game, event);
 		if (receiver == null) {
 			MessageHelper.sendMessageToEventChannel(event, "Target player could not be found in game:" + game.getName());
 			return;

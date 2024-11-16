@@ -29,7 +29,7 @@ public class ShowAllSO extends SOCardsSubcommandData {
             return;
         }
 
-        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        Player otherPlayer = CommandCommandHelper.getOtherPlayerFromEvent(game, event);
         if (otherPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player not found");
             return;

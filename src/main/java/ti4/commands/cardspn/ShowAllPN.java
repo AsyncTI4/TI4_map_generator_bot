@@ -31,7 +31,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        Player targetPlayer = CommandCommandHelper.getOtherPlayerFromEvent(game, event);
         if (targetPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Target player not found");
             return;

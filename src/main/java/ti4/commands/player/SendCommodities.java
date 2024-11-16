@@ -32,7 +32,7 @@ public class SendCommodities extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        Player otherPlayer = CommandCommandHelper.getOtherPlayerFromEvent(game, event);
         if (otherPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player to send TG/Commodities could not be found");
             return;
