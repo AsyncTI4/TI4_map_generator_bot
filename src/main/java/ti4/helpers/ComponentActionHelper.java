@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardspn.PlayPN;
 import ti4.commands.ds.DrawBlueBackTile;
@@ -414,7 +413,7 @@ public class ComponentActionHelper {
                 } else if ("stallTactics".equalsIgnoreCase(buttonID)) {
                     String secretScoreMsg = "_ _\n" + p1.getRepresentationUnfogged()
                         + " Click a button below to discard an Action Card";
-                    List<Button> acButtons = ACInfo.getDiscardActionCardButtons(p1, true);
+                    List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
                         p1.getRepresentation() + " is resolving their Stall Tactics ability");
                     if (!acButtons.isEmpty()) {

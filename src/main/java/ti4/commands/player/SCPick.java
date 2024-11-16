@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardspn.PlayPN;
 import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
@@ -120,7 +119,7 @@ public class SCPick extends PlayerSubcommandData {
                 }
                 if (game.getStoredValue("Public Disgrace").contains(p2.getFaction())
                     && p2.getActionCards().containsKey("disgrace")) {
-                    PlayAC.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
+                    ActionCardHelper.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
                     game.setStoredValue("Public Disgrace", "");
                     Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
                     int scNumber = scpick;

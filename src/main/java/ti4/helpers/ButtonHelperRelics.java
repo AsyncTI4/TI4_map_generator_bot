@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -51,14 +50,14 @@ public class ButtonHelperRelics {
                     + " Drew 2 ACs With Scheming. Please Discard 1 AC with the blue buttons";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " use buttons to discard",
-                    ACInfo.getDiscardActionCardButtons(player, false));
+                    ActionCardHelper.getDiscardActionCardButtons(player, false));
             } else if (player.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
                 message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
             } else {
                 game.drawActionCard(player.getUserID());
                 message = player.getFactionEmoji() + " Drew 1 AC";
-                ACInfo.sendActionCardInfo(game, player, event);
+                ActionCardHelper.sendActionCardInfo(game, player, event);
             }
             CommanderUnlockCheck.checkPlayer(player, "yssaril");
 

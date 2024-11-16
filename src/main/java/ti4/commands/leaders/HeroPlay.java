@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.relic.RelicDraw;
 import ti4.commands.special.KeleresHeroMentak;

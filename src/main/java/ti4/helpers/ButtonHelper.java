@@ -21,11 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import lombok.Data;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -49,11 +44,13 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.ShowDiscardActionCards;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.ShowUnScoredSOs;
 import ti4.commands.combat.CombatRoll;
@@ -773,12 +770,12 @@ public class ButtonHelper {
             message = "Drew " + amount + " AC." + message;
         }
 
-        ACInfo.sendActionCardInfo(game, player, event);
+        ActionCardHelper.sendActionCardInfo(game, player, event);
         CommanderUnlockCheck.checkPlayer(player, "yssaril");
         if (player.hasAbility("scheming")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(player, false));
+                ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
 
         addReaction(event, true, false, message, "");
@@ -1310,7 +1307,7 @@ public class ButtonHelper {
                 ident + " you are exceeding the AC hand limit of " + limit
                     + ". Please discard down to the limit. Check your cards info thread for the blue discard buttons. ");
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                ident + " use buttons to discard", ACInfo.getDiscardActionCardButtons(player, false));
+                ident + " use buttons to discard", ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
     }
 
@@ -6511,14 +6508,14 @@ public class ButtonHelper {
             message = p2.getFactionEmoji() + " Drew 2 ACs with Scheming. Please discard 1 AC with the blue buttons";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                 p2.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(p2, false));
+                ActionCardHelper.getDiscardActionCardButtons(p2, false));
         } else if (p2.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, p2, 1);
             message = p2.getFactionEmoji() + " Triggered Autonetic Memory Option";
         } else {
             game.drawActionCard(p2.getUserID());
             message = p2.getFactionEmoji() + " Drew 1 AC";
-            ACInfo.sendActionCardInfo(game, p2, event);
+            ActionCardHelper.sendActionCardInfo(game, p2, event);
         }
         return message;
     }

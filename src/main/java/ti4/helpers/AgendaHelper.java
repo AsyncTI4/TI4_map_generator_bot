@@ -38,9 +38,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.DiscardACRandom;
-import ti4.commands.cardsac.DrawAC;
 import ti4.commands.cardspn.PlayPN;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.fow.FOWOptions;
@@ -55,6 +52,7 @@ import ti4.commands.special.WormholeResearchFor;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.units.AddUnits;
+import ti4.commands2.cardsac.DiscardACRandom;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.generator.TileGenerator;
@@ -209,7 +207,7 @@ public class AgendaHelper {
                         for (Player player : game.getRealPlayers()) {
                             if (player.getTechs().contains("ws") || player.getTechs().contains("pws2")
                                 || player.getTechs().contains("dsrohdws")) {
-                                new DiscardACRandom().discardRandomAC(event, game, player, player.getAc());
+                                ActionCardHelper.discardRandomAC(event, game, player, player.getAc());
                             }
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -288,7 +286,7 @@ public class AgendaHelper {
                     if (!"for".equalsIgnoreCase(winner)) {
                         winOrLose = getWinningVoters(winner, game);
                         for (Player playerWL : winOrLose) {
-                            new DiscardACRandom().discardRandomAC(event, game, playerWL, playerWL.getAc());
+                            ActionCardHelper.discardRandomAC(event, game, playerWL, playerWL.getAc());
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                             "Discarded the ACs of those who voted against");
@@ -332,7 +330,7 @@ public class AgendaHelper {
                 if ("sanctions".equalsIgnoreCase(agID)) {
                     if (!"for".equalsIgnoreCase(winner)) {
                         for (Player playerWL : game.getRealPlayers()) {
-                            new DiscardACRandom().discardRandomAC(event, game, playerWL, 1);
+                            ActionCardHelper.discardRandomAC(event, game, playerWL, 1);
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                             "Discarded 1 random AC of each player");
@@ -410,7 +408,7 @@ public class AgendaHelper {
                 }
                 if ("execution".equalsIgnoreCase(agID)) {
                     String message = "Discarded elected player's ACs and marked them as unable to vote on the next agenda.";
-                    new DiscardACRandom().discardRandomAC(event, game, player2, player2.getAc());
+                    ActionCardHelper.discardRandomAC(event, game, player2, player2.getAc());
                     game.setStoredValue("PublicExecution", player2.getFaction());
                     if (game.getSpeakerUserID().equalsIgnoreCase(player2.getUserID())) {
                         message = message + " Also passed the speaker token.";
@@ -802,7 +800,7 @@ public class AgendaHelper {
                             }
                         }
                     } else {
-                        DrawAC.drawActionCards(game, playerWL, aID, true);
+                        ActionCardHelper.drawActionCards(game, playerWL, aID, true);
                         playerWL.setFleetCC(playerWL.getFleetCC() + 1);
                         playerWL.setTacticalCC(playerWL.getTacticalCC() + 1);
                         playerWL.setStrategicCC(playerWL.getStrategicCC() + 1);
@@ -836,7 +834,7 @@ public class AgendaHelper {
                 if (!"for".equalsIgnoreCase(winner)) {
                     winOrLose = getLosingVoters(winner, game);
                     for (Player playerWL : winOrLose) {
-                        new DiscardACRandom().discardRandomAC(event, game, playerWL, playerWL.getAc());
+                        ActionCardHelper.discardRandomAC(event, game, playerWL, playerWL.getAc());
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                         "Discarded the ACs of those who voted for");
@@ -850,12 +848,12 @@ public class AgendaHelper {
                             game.drawActionCard(playerWL.getUserID());
                             if (playerWL.hasAbility("scheming")) {
                                 game.drawActionCard(playerWL.getUserID());
-                                ACInfo.sendActionCardInfo(game, playerWL, event);
+                                ActionCardHelper.sendActionCardInfo(game, playerWL, event);
                                 MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(),
                                     playerWL.getRepresentationUnfogged() + " use buttons to discard",
-                                    ACInfo.getDiscardActionCardButtons(playerWL, false));
+                                    ActionCardHelper.getDiscardActionCardButtons(playerWL, false));
                             } else {
-                                ACInfo.sendActionCardInfo(game, playerWL, event);
+                                ActionCardHelper.sendActionCardInfo(game, playerWL, event);
                             }
                         }
                         CommanderUnlockCheck.checkPlayer(playerWL, "yssaril");
@@ -877,12 +875,12 @@ public class AgendaHelper {
                             game.drawActionCard(playerWL.getUserID());
                             if (playerWL.hasAbility("scheming")) {
                                 game.drawActionCard(playerWL.getUserID());
-                                ACInfo.sendActionCardInfo(game, playerWL, event);
+                                ActionCardHelper.sendActionCardInfo(game, playerWL, event);
                                 MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(),
                                     playerWL.getRepresentationUnfogged() + " use buttons to discard",
-                                    ACInfo.getDiscardActionCardButtons(playerWL, false));
+                                    ActionCardHelper.getDiscardActionCardButtons(playerWL, false));
                             } else {
-                                ACInfo.sendActionCardInfo(game, playerWL, event);
+                                ActionCardHelper.sendActionCardInfo(game, playerWL, event);
                             }
                         }
 
@@ -2325,10 +2323,10 @@ public class AgendaHelper {
                                     game.drawActionCard(winningR.getUserID());
                                     MessageHelper.sendMessageToChannelWithButtons(winningR.getCardsInfoThread(),
                                         winningR.getRepresentationUnfogged() + " use buttons to discard",
-                                        ACInfo.getDiscardActionCardButtons(winningR, false));
+                                        ActionCardHelper.getDiscardActionCardButtons(winningR, false));
                                 }
                                 ButtonHelper.checkACLimit(game, event, winningR);
-                                ACInfo.sendActionCardInfo(game, winningR, event);
+                                ActionCardHelper.sendActionCardInfo(game, winningR, event);
                             }
 
                             StringBuilder sb = new StringBuilder(identity);
@@ -2354,14 +2352,14 @@ public class AgendaHelper {
                                 game.drawActionCard(winningR.getUserID());
                                 game.drawActionCard(winningR.getUserID());
                                 ButtonHelper.checkACLimit(game, event, winningR);
-                                ACInfo.sendActionCardInfo(game, winningR, event);
+                                ActionCardHelper.sendActionCardInfo(game, winningR, event);
                             }
                             if (winningR.hasAbility("scheming")) {
                                 amount = 4;
                                 game.drawActionCard(winningR.getUserID());
                                 MessageHelper.sendMessageToChannelWithButtons(winningR.getCardsInfoThread(),
                                     winningR.getRepresentationUnfogged() + " use buttons to discard",
-                                    ACInfo.getDiscardActionCardButtons(winningR, false));
+                                    ActionCardHelper.getDiscardActionCardButtons(winningR, false));
                             }
 
                             game.setSpeakerUserID(winningR.getUserID());
