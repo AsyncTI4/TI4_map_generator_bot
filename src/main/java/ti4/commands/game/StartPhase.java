@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardspn.PlayPN;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
 import ti4.commands.status.Cleanup;
@@ -35,6 +34,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.listeners.UserJoinServerListener;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
@@ -469,7 +469,7 @@ public class StartPhase extends GameSubcommandData {
                 && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {
                 if (!p2.getPromissoryNotesInPlayArea().contains("gift")
                     && p2.getPromissoryNotes().containsKey("gift")) {
-                    PlayPN.resolvePNPlay("gift", p2, game, event);
+                    PromissoryNoteHelper.resolvePNPlay("gift", p2, game, event);
                 }
             }
         }

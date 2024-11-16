@@ -10,8 +10,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
-import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardspn.PlayPN;
 import ti4.commands.ds.DrawBlueBackTile;
 import ti4.commands.leaders.ExhaustLeader;
 import ti4.commands.leaders.HeroPlay;
@@ -196,7 +194,7 @@ public class ComponentActionHelper {
             if (prom == null) {
                 MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentationUnfogged()
                     + " you have a null PN. Please use /pn purge after reporting it " + pn);
-                PNInfo.sendPromissoryNoteInfo(game, p1, false);
+                PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
             }
         }
 
@@ -306,7 +304,7 @@ public class ComponentActionHelper {
                 }
             }
             case "relic" -> resolveRelicComponentAction(game, p1, event, buttonID);
-            case "pn" -> PlayPN.resolvePNPlay(buttonID, p1, game, event);
+            case "pn" -> PromissoryNoteHelper.resolvePNPlay(buttonID, p1, game, event);
             case "ability" -> {
                 if ("starForge".equalsIgnoreCase(buttonID)) {
 

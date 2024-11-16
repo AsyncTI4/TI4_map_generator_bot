@@ -15,8 +15,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardsso.SOInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.search.SearchMyTitles;
@@ -25,6 +23,7 @@ import ti4.commands.tokens.AddToken;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
@@ -33,6 +32,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -243,7 +243,7 @@ public class Setup extends PlayerSubcommandData {
         TechInfo.sendTechInfo(game, player, event);
         LeaderInfo.sendLeadersInfo(game, player, event);
         UnitInfo.sendUnitInfo(game, player, event, false);
-        PNInfo.sendPromissoryNoteInfo(game, player, false, event);
+        PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false, event);
 
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             if (player.getFaction().contains("keleres")) {

@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsso.SOInfo;
 import ti4.commands.tokens.AddCC;
+import ti4.commands2.cardsso.SOInfo;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
@@ -58,7 +58,7 @@ public class IgnisAuroraHelperTechs {
 
     @ButtonHandler("fibrileRealign_SO")
     public static void handleFibrileSO(ButtonInteractionEvent event, Game game, Player player) {
-        SOInfo.sendSODiscardButtons(game, player, "redraw");
+        SOInfo.sendSODiscardButtons(player, "redraw");
         ButtonHelper.deleteMessage(event);
     }
 
