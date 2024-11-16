@@ -215,6 +215,22 @@ public class ActionCardHelper {
         return acButtons;
     }
 
+    public static List<Button> getYssarilHeroActionCardButtons(Player yssaril, Player notYssaril) {
+        List<Button> acButtons = new ArrayList<>();
+        Map<String, Integer> actionCards = notYssaril.getActionCards();
+        if (actionCards != null && !actionCards.isEmpty()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCard(key).getName();
+                if (ac_name != null) {
+                    acButtons.add(Buttons.gray("yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(), ac_name, Emojis.ActionCard));
+                }
+            }
+        }
+        return acButtons;
+    }
+
     @ButtonHandler("refreshACInfo")
     public static void sendActionCardInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
