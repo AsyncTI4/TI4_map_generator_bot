@@ -4,36 +4,27 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SwapSC extends SpecialSubcommandData {
+public class SwapSC extends GameStateSubcommand {
+
     public SwapSC() {
-        super(Constants.SWAP_SC, "Swap your SC with player2. Use OPTIONAL faction_or_color_2 to swap two other players' SCs");
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to swap SC with").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (default you)").setAutoComplete(true).setRequired(false));
+        super(Constants.SWAP_SC, "Swap your SC with player2. Use OPTIONAL faction_or_color_2 to swap two other players' SCs", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to swap SC with").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to swap SC with").setAutoComplete(true).setRequired(false));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-
-        //resolve player1
-        Player player1 = CommandHelper.getPlayerFromEvent(game, event);
-        if (player1 == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
-
-        //resolve player2
+        Game game = getGame();
+        Player player1 = getPlayer();
         Player player2 = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (player2 == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player 2 could not be found");
-            return;
-        }
+
         if (player1.equals(player2)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Players provided are the same player");
             return;
@@ -62,6 +53,5 @@ public class SwapSC extends SpecialSubcommandData {
             "> " + player2.getRepresentation() + Emojis.getSCEmojiFromInteger(player2SC) + " " + ":arrow_right:" + " " + Emojis.getSCEmojiFromInteger(player1SC) + "\n" +
             "> " + player1.getRepresentation() + Emojis.getSCEmojiFromInteger(player1SC) + " " + ":arrow_right:" + " " + Emojis.getSCEmojiFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
-        // ListTurnOrder.turnOrder(event, activeMap);
     }
 }

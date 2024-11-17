@@ -16,17 +16,17 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class AverageTurnTime extends StatisticsSubcommandData {
+class AverageTurnTime extends Subcommand {
 
     public AverageTurnTime() {
-        super(Constants.AVERAGE_TURN_TIME, "Average turn time accross all games for all players");
+        super(Constants.AVERAGE_TURN_TIME, "Average turn time across all games for all players");
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)").setRequired(false));
         addOptions(new OptionData(OptionType.INTEGER, Constants.MINIMUM_NUMBER_OF_TURNS, "Minimum number of turns to show (Default = 1)").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.IGNORE_ENDED_GAMES, "True to exclude ended games from the calculation (default = false)"));
@@ -40,8 +40,6 @@ public class AverageTurnTime extends StatisticsSubcommandData {
     }
 
     private String getAverageTurnTimeText(SlashCommandInteractionEvent event) {
-        Map<String, Game> maps = GameManager.getGameNameToGame();
-
         Map<String, Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
         Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
 
@@ -49,19 +47,8 @@ public class AverageTurnTime extends StatisticsSubcommandData {
         boolean showMedian = event.getOption(Constants.SHOW_MEDIAN, false, OptionMapping::getAsBoolean);
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (Game game : maps.values().stream().filter(endedGamesFilter).toList()) {
-            for (Player player : game.getPlayers().values()) {
-                Entry<Integer, Long> playerTurnTime = Map.entry(player.getNumberTurns(), player.getTotalTurnTime());
-                playerTurnTimes.merge(player.getUserID(), playerTurnTime, (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerTurnTime.getKey(), oldEntry.getValue() + playerTurnTime.getValue()));
-
-                if (playerTurnTime.getKey() == 0) continue;
-                Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
-                playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
-                    if (value == null) value = new HashSet<>();
-                    value.add(averageTurnTime);
-                    return value;
-                });
-            }
+        for (Game game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
+            mapPlayerTurnTimes(playerTurnTimes, playerAverageTurnTimes, game);
         }
 
         HashMap<String, Long> playerMedianTurnTimes = playerAverageTurnTimes.entrySet().stream().map(e -> Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList()))).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
@@ -105,6 +92,23 @@ public class AverageTurnTime extends StatisticsSubcommandData {
         return sb.toString();
     }
 
+    private void mapPlayerTurnTimes(Map<String, Entry<Integer, Long>> playerTurnTimes, Map<String, Set<Long>> playerAverageTurnTimes, Game game) {
+        for (var player : game.getRealPlayers()) {
+            Integer totalTurns = game.getPlayer(player.getUserID()).getNumberTurns();
+            Long totalTurnTime = game.getPlayer(player.getUserID()).getTotalTurnTime();
+            Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
+            playerTurnTimes.merge(player.getUserID(), playerTurnTime, (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerTurnTime.getKey(), oldEntry.getValue() + playerTurnTime.getValue()));
+
+            if (playerTurnTime.getKey() == 0) continue;
+            Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
+            playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
+                if (value == null) value = new HashSet<>();
+                value.add(averageTurnTime);
+                return value;
+            });
+        }
+    }
+
     public String getSelectUsersTurnTimes(List<User> users, Map<String, Entry<Integer, Long>> playerTurnTimes) {
         StringBuilder sb = new StringBuilder();
 
@@ -129,23 +133,11 @@ public class AverageTurnTime extends StatisticsSubcommandData {
     }
 
     public Map<String, Entry<Integer, Long>> getAllPlayersTurnTimes(boolean ignoreEndedGames) {
-        Map<String, Game> maps = GameManager.getGameNameToGame();
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
         Map<String, Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
         Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
-        for (Game game : maps.values().stream().filter(endedGamesFilter).toList()) {
-            for (Player player : game.getPlayers().values()) {
-                Entry<Integer, Long> playerTurnTime = Map.entry(player.getNumberTurns(), player.getTotalTurnTime());
-                playerTurnTimes.merge(player.getUserID(), playerTurnTime, (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerTurnTime.getKey(), oldEntry.getValue() + playerTurnTime.getValue()));
-
-                if (playerTurnTime.getKey() == 0) continue;
-                Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
-                playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
-                    if (value == null) value = new HashSet<>();
-                    value.add(averageTurnTime);
-                    return value;
-                });
-            }
+        for (var game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
+            mapPlayerTurnTimes(playerTurnTimes, playerAverageTurnTimes, game);
         }
         return playerTurnTimes;
     }

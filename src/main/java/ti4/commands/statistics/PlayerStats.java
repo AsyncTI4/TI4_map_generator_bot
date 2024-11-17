@@ -11,12 +11,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PlayerStats extends StatisticsSubcommandData {
+class PlayerStats extends Subcommand {
 
     private static final String MINIMUM_GAME_COUNT_FILTER = "has_minimum_game_count";
     private static final String MAX_LIST_SIZE = "max_list_size";

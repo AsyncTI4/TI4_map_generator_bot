@@ -6,11 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.commands2.Subcommand;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ExportToCSV extends StatisticsSubcommandData {
+class ExportToCSV extends Subcommand {
+
     public static final String EXPORT = "export_games_to_csv";
 
     public ExportToCSV() {
@@ -21,16 +24,12 @@ public class ExportToCSV extends StatisticsSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         List<Game> games = GameStatisticFilterer.getFilteredGames(event);
-        int playerCount = 6;
-        try {
-            playerCount = event.getOption(GameStatisticFilterer.PLAYER_COUNT_FILTER).getAsInt();
-        } catch (Exception ignored) {
-        }
         if (games.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No games found matching filter.");
             return;
         }
 
+        int playerCount = event.getOption(GameStatisticFilterer.PLAYER_COUNT_FILTER, 6, OptionMapping::getAsInt);
         StringBuilder output = new StringBuilder(header(playerCount));
         for (Game game : games) {
             output.append(System.lineSeparator()).append(gameToCsv(game));

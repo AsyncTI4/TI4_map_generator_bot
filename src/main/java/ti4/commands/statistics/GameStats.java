@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands2.Subcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -35,7 +36,7 @@ import ti4.model.PublicObjectiveModel;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public class GameStats extends StatisticsSubcommandData {
+class GameStats extends Subcommand {
 
     private static final String PLAYER_COUNT_FILTER = "player_count";
     private static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";

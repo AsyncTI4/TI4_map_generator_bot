@@ -3,6 +3,7 @@ package ti4.commands.statistics;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -11,7 +12,8 @@ import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 
-public final class GameStatisticFilterer {
+@UtilityClass
+public class GameStatisticFilterer {
 
     public static final String PLAYER_COUNT_FILTER = "player_count";
     public static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
@@ -20,9 +22,6 @@ public final class GameStatisticFilterer {
     public static final String FOG_FILTER = "is_fog";
     public static final String HOMEBREW_FILTER = "has_homebrew";
     public static final String HAS_WINNER_FILTER = "has_winner";
-
-    private GameStatisticFilterer() {
-    }
 
     public static List<OptionData> gameStatsFilters() {
         List<OptionData> filters = new ArrayList<>();

@@ -14,14 +14,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class MedianTurnTime extends StatisticsSubcommandData {
+class MedianTurnTime extends Subcommand {
 
     public MedianTurnTime() {
         super(Constants.MEDIAN_TURN_TIME, "Median turn time accross all games for all players");
@@ -37,8 +37,6 @@ public class MedianTurnTime extends StatisticsSubcommandData {
     }
 
     private String getAverageTurnTimeText(SlashCommandInteractionEvent event) {
-        Map<String, Game> maps = GameManager.getGameNameToGame();
-
         Map<String, Integer> playerTurnCount = new HashMap<>();
 
         Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
@@ -46,9 +44,11 @@ public class MedianTurnTime extends StatisticsSubcommandData {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (Game game : maps.values().stream().filter(endedGamesFilter).toList()) {
-            for (Player player : game.getPlayers().values()) {
-                Entry<Integer, Long> playerTurnTime = Map.entry(player.getNumberTurns(), player.getTotalTurnTime());
+        for (Game game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
+            for (var player : game.getRealPlayers()) {
+                Integer totalTurns = player.getNumberTurns();
+                Long totalTurnTime = player.getTotalTurnTime();
+                Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
                 if (playerTurnTime.getKey() == 0) continue;
                 Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
                 playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {

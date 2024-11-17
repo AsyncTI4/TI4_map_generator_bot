@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.commands2.Subcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -19,7 +20,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 
-public class GameWinsWithOtherFactions extends StatisticsSubcommandData {
+class GameWinsWithOtherFactions extends Subcommand {
 
     private static final String PLAYER_COUNT_FILTER = "player_count";
     private static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";

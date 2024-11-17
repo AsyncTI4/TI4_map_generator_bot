@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.Subcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -20,7 +21,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 
-public class FactionRecordOfTech extends StatisticsSubcommandData {
+class FactionRecordOfTech extends Subcommand {
 
     private static final String FACTION_WON_FILTER = "faction_won";
 
@@ -93,7 +94,6 @@ public class FactionRecordOfTech extends StatisticsSubcommandData {
         techsResearched.entrySet().stream()
             .sorted(comparator)
             .forEach(techResearched -> {
-
                 sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
                 sb.append("` ").append(techResearched.getKey());
                 sb.append(": ").append(techResearched.getValue());

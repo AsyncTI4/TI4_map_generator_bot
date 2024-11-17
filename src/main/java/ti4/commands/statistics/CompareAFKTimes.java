@@ -7,13 +7,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class CompareAFKTimes extends StatisticsSubcommandData {
+class CompareAFKTimes extends Subcommand {
 
     public CompareAFKTimes() {
         super(Constants.COMPARE_AFK_TIMES, "Compare different players set AFK Times");
@@ -45,8 +46,7 @@ public class CompareAFKTimes extends StatisticsSubcommandData {
         if (playerID == null) {
             return "";
         }
-        OptionMapping option;
-        option = event.getOption(playerID);
+        OptionMapping option = event.getOption(playerID);
         if (option == null) {
             return "";
         }

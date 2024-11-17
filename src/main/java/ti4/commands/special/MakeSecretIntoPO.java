@@ -7,9 +7,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.SecretObjectiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -22,7 +22,7 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Secret Objective to make Public");
@@ -62,7 +62,7 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
             Mapper.getSecretObjectivesJustNames().get(soName) + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
-        SecretObjectiveHelper.sendSecretObjectiveInfo(game, playerWithSO, event);
+        SOInfo.sendSecretObjectiveInfo(game, playerWithSO, event);
 
     }
 }

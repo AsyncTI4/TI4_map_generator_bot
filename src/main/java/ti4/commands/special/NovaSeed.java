@@ -6,8 +6,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands2.CommandHelper;
-import ti4.generator.TileHelper;
+import ti4.commands.units.AddRemoveUnits;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -30,8 +29,10 @@ public class NovaSeed extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
+        Game game = getGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -43,7 +44,7 @@ public class NovaSeed extends SpecialSubcommandData {
             return;
         }
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = TileHelper.getTile(event, tileID, game);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
@@ -54,7 +55,7 @@ public class NovaSeed extends SpecialSubcommandData {
 
     public static void secondHalfOfNovaSeed(Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
         String message1 = "Moments before disaster in game " + game.getName();
-        StellarConverter.postTileInDisasterWatch(game, event, tile, 1, message1);
+        StellarConverter.postTileInDisasterWatch(game, tile, 1, message1);
 
         //Remove all other players units from the tile in question
         for (Player player_ : game.getPlayers().values()) {
@@ -75,7 +76,7 @@ public class NovaSeed extends SpecialSubcommandData {
         String message2 = tile.getRepresentation() +
                 " has been nova seeded by " +
                 player.getRepresentation();
-        StellarConverter.postTileInDisasterWatch(game, event, novaTile, 1, message2);
+        StellarConverter.postTileInDisasterWatch(game, novaTile, 1, message2);
 
         if (player.hasLeaderUnlocked("muaathero")) {
             Leader playerLeader = player.getLeader("muaathero").orElse(null);

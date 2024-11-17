@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -19,10 +19,10 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class SleeperToken extends SpecialSubcommandData {
+public class SleeperToken extends GameStateSubcommand {
 
     public SleeperToken() {
-        super(Constants.SLEEPER_TOKEN, "Select planets were to add/remove Sleeper tokens");
+        super(Constants.SLEEPER_TOKEN, "Select planets were to add/remove Sleeper tokens", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET2, "2nd Planet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET3, "3rd Planet").setAutoComplete(true));
@@ -33,12 +33,8 @@ public class SleeperToken extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
+        Game game = getGame();
+        Player player = getPlayer();
 
         sleeperForPlanet(event, game, Constants.PLANET, player);
         sleeperForPlanet(event, game, Constants.PLANET2, player);

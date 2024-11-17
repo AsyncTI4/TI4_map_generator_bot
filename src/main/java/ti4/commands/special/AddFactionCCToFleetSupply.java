@@ -11,6 +11,7 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 
 public class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
+
     public AddFactionCCToFleetSupply() {
         super(Constants.ADD_CC_TO_FS, "Add Faction CC to Fleet Supply");
     }

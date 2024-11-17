@@ -4,12 +4,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.tokens.AddCC;
+import ti4.commands.uncategorized.ShowGame;
+import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.MoveUnits;
-import ti4.commands2.CommandHelper;
-import ti4.commands2.uncategorized.ShowGame;
-import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
@@ -31,7 +30,7 @@ public class MoveAllUnits extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         if (tileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
@@ -44,19 +43,21 @@ public class MoveAllUnits extends SpecialSubcommandData {
             return;
         }
         String tile1ID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile1 = TileHelper.getTile(event, tile1ID, game);
+        Tile tile1 = AddRemoveUnits.getTile(event, tile1ID, game);
         if (tile1 == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tile1ID + "`. Tile not found");
             return;
         }
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
 
         String tile2ID = AliasHandler.resolveTile(tileOptionTo.getAsString().toLowerCase());
-        Tile tile2 = TileHelper.getTile(event, tile2ID, game);
+        Tile tile2 = AddRemoveUnits.getTile(event, tile2ID, game);
 
         UnitHolder space = tile2.getUnitHolders().get("space");
         for (UnitHolder uH : tile1.getUnitHolders().values()) {
@@ -80,7 +81,7 @@ public class MoveAllUnits extends SpecialSubcommandData {
                 MoveUnits.removeTacticsCC(event, player.getColor(), tile2, game);
             }
             if (!"no".equals(value)) {
-                AddCC.addCC(event, player.getColor(), tile2, false);
+                CommandCounterHelper.addCC(event, player.getColor(), tile2, false);
             }
             Helper.isCCCountCorrect(event, game, player.getColor());
         }

@@ -3,10 +3,10 @@ package ti4.commands.special;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands2.CommandHelper;
+import ti4.commands.cardspn.PNInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -21,9 +21,11 @@ public class NaaluCommander extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -70,7 +72,7 @@ public class NaaluCommander extends SpecialSubcommandData {
             if (!first) sb.append("\n\n");
             first = false;
             sb.append("## ").append(player_.getRepresentation(false, false)).append("'s ");
-            sb.append(PromissoryNoteHelper.getPromissoryNoteCardInfo(game, player_, false, true));
+            sb.append(PNInfo.getPromissoryNoteCardInfo(game, player_, false, true));
         }
 
         if (!game.isFowMode()) {

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands2.Subcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -15,11 +16,10 @@ import ti4.map.GameManager;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class StellarConverter extends StatisticsSubcommandData {
+class StellarConverter extends Subcommand {
 
     public StellarConverter() {
         super(Constants.STELLAR_CONVERTER, "Number of times each planet has been converted");
-        //addOptions(new OptionData(OptionType.BOOLEAN, Constants.IGNORE_ENDED_GAMES, "True to exclude ended games from the calculation (default = false)"));
     }
 
     @Override

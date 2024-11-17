@@ -6,12 +6,11 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.generator.TileGenerator;
 import ti4.helpers.ButtonHelper;
@@ -25,27 +24,17 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class StellarConverter extends SpecialSubcommandData {
+public class StellarConverter extends GameStateSubcommand {
 
     public StellarConverter() {
-        super(Constants.STELLAR_CONVERTER, "Stellar Convert a planet.");
+        super(Constants.STELLAR_CONVERTER, "Stellar Convert a planet.", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to be converted.").setRequired(true).setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found.");
-            return;
-        }
-
-        OptionMapping planetOption = event.getOption(Constants.PLANET);
-        if (planetOption == null) {
-            return;
-        }
-        String planetName = planetOption.getAsString();
+        Game game = getGame();
+        String planetName = event.getOption(Constants.PLANET).getAsString();
         if (!game.getPlanets().contains(planetName)) {
             MessageHelper.replyToMessage(event, "Planet not found in map.");
             return;
@@ -60,7 +49,6 @@ public class StellarConverter extends SpecialSubcommandData {
     }
 
     public static void secondHalfOfStellar(Game game, String planetName, GenericInteractionCreateEvent event) {
-
         Tile tile = game.getTileFromPlanet(planetName);
         if (tile == null) {
             MessageHelper.replyToMessage(event, "System not found that contains planet.");
@@ -80,7 +68,7 @@ public class StellarConverter extends SpecialSubcommandData {
             if (p2.getPlanets().contains(planetName)) {
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + " we regret to inform you but " + Mapper.getPlanet(planetName).getName() + " has been Stellar Converted.");
-                int amountToKill = 0;
+                int amountToKill;
                 amountToKill = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
                 if (p2.hasInf2Tech()) {
                     ButtonHelper.resolveInfantryDeath(game, p2, amountToKill);
@@ -115,10 +103,5 @@ public class StellarConverter extends SpecialSubcommandData {
             FileUpload systemWithContext = new TileGenerator(game, event, null, rings, tile.getPosition()).createFileUpload();
             MessageHelper.sendMessageWithFile(watchParty, systemWithContext, message, false);
         }
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        SpecialCommand.reply(event);
     }
 }

@@ -5,10 +5,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.tokens.AddCC;
-import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -26,8 +25,10 @@ public class DiploSystem extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
+        Game game = getGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -58,7 +59,7 @@ public class DiploSystem extends SpecialSubcommandData {
             if (player_ != player && player_.isRealPlayer() && !player.getAllianceMembers().contains(player_.getFaction())) {
                 String color = player_.getColor();
                 if (Mapper.isValidColor(color)) {
-                    AddCC.addCC(event, color, tile);
+                    CommandCounterHelper.addCC(event, color, tile);
                     Helper.isCCCountCorrect(event, game, color);
                 }
             }
