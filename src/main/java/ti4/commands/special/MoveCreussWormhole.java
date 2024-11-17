@@ -8,21 +8,21 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.units.AddRemoveUnits;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-public class MoveCreussWormhole extends SpecialSubcommandData {
+class MoveCreussWormhole extends GameStateSubcommand {
 
     public MoveCreussWormhole() {
-        super(Constants.MOVE_CREUSS_WORMHOLE, "Adds or moves a Creuss wormhole token to the target system.");
+        super(Constants.MOVE_CREUSS_WORMHOLE, "Adds or moves a Creuss wormhole token to the target system.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Target System/Tile name").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CREUSS_TOKEN_NAME, "Token Name").setRequired(true).setAutoComplete(true));
     }
@@ -30,21 +30,11 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayerFromEvent(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Player player = getPlayer();
 
-        OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        if (tileOption == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Specify a tile");
-            return;
-        }
-        String tileID = AliasHandler.resolveTile(StringUtils.substringBefore(tileOption.getAsString().toLowerCase(), " "));
-        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
+        String tileName = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
+        String tileID = AliasHandler.resolveTile(tileName);
+        Tile tile = TileHelper.getTile(event, tileID, game);
         if (tile == null) {
             MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;

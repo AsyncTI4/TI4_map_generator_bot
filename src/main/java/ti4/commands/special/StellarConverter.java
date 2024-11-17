@@ -24,7 +24,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class StellarConverter extends GameStateSubcommand {
+class StellarConverter extends GameStateSubcommand {
 
     public StellarConverter() {
         super(Constants.STELLAR_CONVERTER, "Stellar Convert a planet.", true, false);

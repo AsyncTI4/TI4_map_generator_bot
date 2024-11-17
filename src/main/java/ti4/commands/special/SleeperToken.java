@@ -19,7 +19,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class SleeperToken extends GameStateSubcommand {
+class SleeperToken extends GameStateSubcommand {
 
     public SleeperToken() {
         super(Constants.SLEEPER_TOKEN, "Select planets were to add/remove Sleeper tokens", true, true);

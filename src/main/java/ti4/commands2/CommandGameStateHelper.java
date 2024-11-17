@@ -41,7 +41,7 @@ class CommandGameStateHelper {
     }
 
     public void postExecute(SlashCommandInteractionEvent event) {
-        if (saveGame && gameLastModifiedDate.get() != game.get().getLastModifiedDate()) {
+        if (saveGame) { // if gameLastModifiedDate.get() != game.get().getLastModifiedDate()
             GameSaveLoadManager.saveGame(game.get(), event);
         }
         game.remove();

@@ -21,7 +21,7 @@ class ListSlashCommandsUsed extends Subcommand {
 
     public ListSlashCommandsUsed() {
         super(Constants.LIST_SLASH_COMMANDS_USED, "List the frequency with which slash commands are used");
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ONLY_LAST_MONTH, "Only include games started in last month? y/n").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ONLY_LAST_MONTH, "Only include games started in last month? y/n"));
     }
 
     public void execute(SlashCommandInteractionEvent event) {

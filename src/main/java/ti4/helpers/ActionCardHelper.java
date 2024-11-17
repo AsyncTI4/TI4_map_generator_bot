@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
@@ -18,15 +19,20 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.TurnStart;
+import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.GenericCardModel;
+import ti4.model.PlanetModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.model.UnitModel;
 
 @UtilityClass
 public class ActionCardHelper {
@@ -1147,5 +1153,108 @@ public class ActionCardHelper {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
 
         ActionCardHelper.sendActionCardInfo(game, player);
+    }
+
+    public static void doRise(Player player, GenericInteractionCreateEvent event, Game game) {
+        List<String> planets = player.getPlanetsAllianceMode();
+        StringBuilder sb = new StringBuilder();
+        sb.append(player.getRepresentationNoPing()).append(" added one ").append(Emojis.infantry).append(" to each of: ");
+        int count = 0;
+        for (Tile tile : game.getTileMap().values()) {
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                if (planets.contains(unitHolder.getName())) {
+                    Set<String> tokenList = unitHolder.getTokenList();
+                    boolean ignorePlanet = false;
+                    for (String token : tokenList) {
+                        if (token.contains("dmz") || token.contains(Constants.WORLD_DESTROYED_PNG) || token.contains("arcane_shield")) {
+                            ignorePlanet = true;
+                            break;
+                        }
+                    }
+                    if (ignorePlanet) {
+                        continue;
+                    }
+                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + unitHolder.getName(), game);
+                    PlanetModel planetModel = Mapper.getPlanet(unitHolder.getName());
+                    if (planetModel != null) {
+                        sb.append("\n> ").append(Helper.getPlanetRepresentationPlusEmoji(unitHolder.getName()));
+                        count++;
+                    }
+                }
+            }
+        }
+        if (count == 0) {
+            sb = new StringBuilder(player.getRepresentationNoPing()).append(" did not have any planets which could receive +1 infantry");
+        } else if (count > 5) {
+            sb.append("\n> Total of ").append(count);
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+    }
+
+    public static void doFfCon(GenericInteractionCreateEvent event, Player player, Game game) {
+        String colorID = Mapper.getColorID(player.getColor());
+
+        List<Tile> tilesAffected = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            boolean hasSD = false;
+            boolean hasCap = false;
+            boolean blockaded = false;
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                // player has a space dock in the system
+                int numSd = unitHolder.getUnitCount(Units.UnitType.Spacedock, colorID);
+                numSd += unitHolder.getUnitCount(Units.UnitType.CabalSpacedock, colorID);
+                numSd += unitHolder.getUnitCount(Units.UnitType.PlenaryOrbital, colorID);
+                if (numSd > 0) {
+                    hasSD = true;
+                }
+
+                // Check if space area contains capacity units or another player's units
+                if ("space".equals(unitHolder.getName())) {
+                    Map<Units.UnitKey, Integer> units = unitHolder.getUnits();
+                    for (Map.Entry<Units.UnitKey, Integer> unit : units.entrySet()) {
+                        Units.UnitKey unitKey = unit.getKey();
+
+                        Integer quantity = unit.getValue();
+
+                        if (player.unitBelongsToPlayer(unitKey) && quantity != null && quantity > 0) {
+                            UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                            if (unitModel == null) continue;
+                            if (unitModel.getCapacityValue() > 0) {
+                                hasCap = true;
+                            }
+                        } else if (quantity != null && quantity > 0) {
+                            blockaded = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (blockaded || hasCap) {
+                    break;
+                }
+            }
+
+            if (!blockaded && (hasCap || hasSD)) {
+                new AddUnits().unitParsing(event, player.getColor(), tile, "ff", game);
+                tilesAffected.add(tile);
+            }
+        }
+
+        String msg = "Added " + tilesAffected.size() + " fighter" + (tilesAffected.size() == 1 ? "" : "s") + ".";
+        if (!tilesAffected.isEmpty()) {
+            msg += " Please check fleet size and capacity in each of the systems: ";
+        }
+        boolean first = true;
+        StringBuilder msgBuilder = new StringBuilder(msg);
+        for (Tile tile : tilesAffected) {
+            if (first) {
+                msgBuilder.append("\n> **").append(tile.getPosition()).append("**");
+                first = false;
+            } else {
+                msgBuilder.append(", **").append(tile.getPosition()).append("**");
+            }
+        }
+        msg = msgBuilder.toString();
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 }

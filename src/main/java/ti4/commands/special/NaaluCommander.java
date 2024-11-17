@@ -3,39 +3,29 @@ package ti4.commands.special;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.cardspn.PNInfo;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 
-public class NaaluCommander extends SpecialSubcommandData {
+class NaaluCommander extends GameStateSubcommand {
 
     public NaaluCommander() {
-        super(Constants.NAALU_COMMANDER, "Look at your neighbours' promissory notes and the top and bottom of the agenda deck.");
+        super(Constants.NAALU_COMMANDER, "Look at your neighbours' promissory notes and the top and bottom of the agenda deck.", false, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getGame();
-
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayerFromEvent(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-        secondHalfOfNaaluCommander(event, game, player);
+        secondHalfOfNaaluCommander(event, getGame(), getPlayer());
     }
 
     @ButtonHandler("naaluCommander")
     public static void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game game, Player player) {
-
         if (!game.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
             MessageHelper.sendMessageToEventChannel(event, "Only players with access to M'aban, the Naalu Commander, unlocked may use this ability.");
             return;
@@ -72,7 +62,7 @@ public class NaaluCommander extends SpecialSubcommandData {
             if (!first) sb.append("\n\n");
             first = false;
             sb.append("## ").append(player_.getRepresentation(false, false)).append("'s ");
-            sb.append(PNInfo.getPromissoryNoteCardInfo(game, player_, false, true));
+            sb.append(PromissoryNoteHelper.getPromissoryNoteCardInfo(game, player_, false, true));
         }
 
         if (!game.isFowMode()) {

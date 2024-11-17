@@ -43,8 +43,6 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SCPlay;
-import ti4.commands.special.RiseOfMessiah;
-import ti4.commands.special.SwordsToPlowsharesTGGain;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.units.AddUnits;
@@ -809,11 +807,11 @@ public class AgendaHelper {
             if ("plowshares".equalsIgnoreCase(agID)) {
                 if ("for".equalsIgnoreCase(winner)) {
                     for (Player playerB : game.getRealPlayers()) {
-                        new SwordsToPlowsharesTGGain().doSwords(playerB, event, game);
+                        doSwords(playerB, event, game);
                     }
                 } else {
                     for (Player playerB : game.getRealPlayers()) {
-                        RiseOfMessiah.doRise(playerB, event, game);
+                        ActionCardHelper.doRise(playerB, event, game);
                     }
                 }
             }

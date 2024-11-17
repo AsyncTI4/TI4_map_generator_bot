@@ -33,7 +33,7 @@ class PlayerStats extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String statisticToShow = event.getOption(Constants.PLAYER_STATISTIC, null, OptionMapping::getAsString);
-        PlayerStatistics stat = PlayerStatistics.fromString(statisticToShow);
+        PlayerStatTypes stat = PlayerStatTypes.fromString(statisticToShow);
         if (stat == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
             return;
@@ -139,41 +139,4 @@ class PlayerStats extends Subcommand {
 
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Player Win Percent", sb.toString());
     }
-
-    public enum PlayerStatistics {
-
-        PLAYER_WIN_PERCENT("Player win percent", "Shows the win percent of each player rounded to the nearest integer"), //
-        PLAYER_GAME_COUNT("Player game count", "Shows the number of games each player has played in");
-
-        private final String name;
-        private final String description;
-
-        PlayerStatistics(String name, String description) {
-            this.name = name;
-            this.description = description;
-        }
-
-        @Override
-        public String toString() {
-            return super.toString().toLowerCase();
-        }
-
-        public static PlayerStatistics fromString(String id) {
-            for (PlayerStatistics stat : values()) {
-                if (id.equals(stat.toString())) {
-                    return stat;
-                }
-            }
-            return null;
-        }
-
-        public String getAutoCompleteName() {
-            return name + ": " + description;
-        }
-
-        public boolean search(String searchString) {
-            return name.toLowerCase().contains(searchString) || description.toLowerCase().contains(searchString) || toString().contains(searchString);
-        }
-    }
-
 }

@@ -39,8 +39,6 @@ import ti4.commands.player.Pass;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
-import ti4.commands.special.FighterConscription;
-import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
@@ -2671,13 +2669,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("fighterConscription")
     public static void fighterConscription(ButtonInteractionEvent event, Player player, Game game) {
-        FighterConscription.doFfCon(event, player, game);
+        ActionCardHelper.doFfCon(event, player, game);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("riseOfAMessiah")
     public static void riseOfAMessiah(ButtonInteractionEvent event, Player player, Game game) {
-        RiseOfMessiah.doRise(player, event, game);
+        ActionCardHelper.doRise(player, event, game);
         ButtonHelper.deleteMessage(event);
     }
 

@@ -60,7 +60,7 @@ class GameStats extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String statisticToShow = event.getOption(Constants.GAME_STATISTIC, null, OptionMapping::getAsString);
-        GameStatistics stat = GameStatistics.fromString(statisticToShow);
+        GameStatTypes stat = GameStatTypes.fromString(statisticToShow);
         if (stat == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
             return;
@@ -77,7 +77,6 @@ class GameStats extends Subcommand {
             case FACTION_WINS -> showMostWinningFactions(event);
             case PHASE_TIMES -> showTimeOfRounds(event);
             case SOS_SCORED -> listScoredSOsPulledRelicsRevealedPOs(event);
-            //case UNFINISHED_GAMES -> findHowManyUnfinishedGamesAreDueToNewPlayers(event);
             case FACTION_WIN_PERCENT -> showFactionWinPercent(event);
             case COLOUR_WINS -> showMostWinningColour(event);
             case GAME_COUNT -> showGameCount(event);
@@ -89,68 +88,7 @@ class GameStats extends Subcommand {
         }
     }
 
-    /**
-     * Represents a simple statistic.
-     * Just add a new enum for every statistic and it will handle the autocomplete for you.
-     */
-    public enum GameStatistics {
-        // Add your new statistic here
-        UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"), AVERAGE_TURNS("Average Turn Amount", "Show the average turns for a faction in a game"), PING_LIST("Ping List", "List of how many times people have been pinged"), HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on CCs/plastics that bot has"), GAME_LENGTH("Game Length", "Show game lengths"), GAME_LENGTH_4MO("Game Length (past 4 months)",
-            "Show game lengths from the past 4 months"), FACTIONS_PLAYED("Plays per Faction", "Show faction play count"), COLOURS_PLAYED("Plays per Colour",
-                "Show colour play count"), FACTION_WINS("Wins per Faction",
-                    "Show the wins per faction"), SOS_SCORED("Times an SO has been scored", "Show the amount of times each SO has been scored"), FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"), COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
-        // UNFINISHED_GAMES("Unfinished games", "Show the games where at least 1 BP was scored but no winner was declared"),
-        WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"), PHASE_TIMES("Phase Times", "Shows how long each phase lasted, in days"), SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred with SftT"), GAME_COUNT("Total game count", "Shows the total game count");
-
-        private final String name;
-        private final String description;
-
-        GameStatistics(String name, String description) {
-            this.name = name;
-            this.description = description;
-        }
-
-        @Override
-        public String toString() {
-            return super.toString().toLowerCase();
-        }
-
-        /**
-         * Converts a string identifier to the corresponding SimpleStatistics enum value.
-         * 
-         * @param id the string identifier
-         * @return the SimpleStatistics enum value, or null if not found
-         */
-        public static GameStatistics fromString(String id) {
-            for (GameStatistics stat : values()) {
-                if (id.equals(stat.toString())) {
-                    return stat;
-                }
-            }
-            return null;
-        }
-
-        /**
-         * Gets the name and description of the statistic for auto-complete suggestions.
-         * 
-         * @return the auto-complete name
-         */
-        public String getAutoCompleteName() {
-            return name + ": " + description;
-        }
-
-        /**
-         * Searches for a given string within the name, description, or string representation of the statistic.
-         * 
-         * @param searchString the string to search for
-         * @return true if the string is found, false otherwise
-         */
-        public boolean search(String searchString) {
-            return name.toLowerCase().contains(searchString) || description.toLowerCase().contains(searchString) || toString().contains(searchString);
-        }
-    }
-
-    public static void listPingCounterList(SlashCommandInteractionEvent event) {
+    private static void listPingCounterList(SlashCommandInteractionEvent event) {
         Game reference = GameManager.getGame("finreference");
         Map<String, Integer> pings = new HashMap<>();
         for (String pingsFor : reference.getMessagesThatICheckedForAllReacts().keySet()) {
@@ -182,7 +120,7 @@ class GameStats extends Subcommand {
         MessageHelper.sendMessageToThread(event.getChannel(), "Ping Counts", sb.toString());
     }
 
-    public static void listScoredSOsPulledRelicsRevealedPOs(SlashCommandInteractionEvent event) {
+    private static void listScoredSOsPulledRelicsRevealedPOs(SlashCommandInteractionEvent event) {
         Map<String, Integer> sos = new HashMap<>();
         Map<String, Integer> publics = new HashMap<>();
         Map<String, Integer> relics = new HashMap<>();
@@ -231,7 +169,6 @@ class GameStats extends Subcommand {
         int index = 1;
         StringBuilder sb = new StringBuilder("List of times a particular secret has been scored\n");
         for (String ket : topThousand.keySet()) {
-
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(ket).append(": ");
             sb.append(topThousand.get(ket));
@@ -261,7 +198,6 @@ class GameStats extends Subcommand {
         index = 1;
         sb = new StringBuilder("List of times a particular relic has been drawn \n");
         for (String ket : topThousand.keySet()) {
-
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(ket).append(": ");
             sb.append(topThousand.get(ket));
@@ -271,7 +207,7 @@ class GameStats extends Subcommand {
         MessageHelper.sendMessageToThread(event.getChannel(), "Relics Drawn Count", sb.toString());
     }
 
-    public static void sendAllNames(SlashCommandInteractionEvent event) {
+    private static void sendAllNames(SlashCommandInteractionEvent event) {
         StringBuilder names = new StringBuilder();
         int num = 0;
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
@@ -286,7 +222,7 @@ class GameStats extends Subcommand {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
     }
 
-    public static void calculateSpendToWinCorrellation(SlashCommandInteractionEvent event) {
+    private static void calculateSpendToWinCorrellation(SlashCommandInteractionEvent event) {
         StringBuilder names = new StringBuilder();
         int num = 0;
         int gamesWhereHighestWon = 0;
@@ -323,7 +259,7 @@ class GameStats extends Subcommand {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Expenses", names.toString());
     }
 
-    public static boolean hasPlayerFinishedAGame(Player player) {
+    private static boolean hasPlayerFinishedAGame(Player player) {
         String userID = player.getUserID();
 
         Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
@@ -339,7 +275,7 @@ class GameStats extends Subcommand {
         return !games.isEmpty();
     }
 
-    public static int numberOfPlayersUnfinishedGames(String userID) {
+    private static int numberOfPlayersUnfinishedGames(String userID) {
         Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
         Predicate<Game> endedGamesFilter = game -> game.isHasEnded() && game.getWinner().isEmpty() && game.getHighestScore() > 0;
         Predicate<Game> allFilterPredicates = endedGamesFilter.and(ignoreSpectateFilter);
@@ -353,7 +289,7 @@ class GameStats extends Subcommand {
         return games.size();
     }
 
-    public static void findHowManyUnfinishedGamesAreDueToNewPlayers(SlashCommandInteractionEvent event) {
+    private static void findHowManyUnfinishedGamesAreDueToNewPlayers(SlashCommandInteractionEvent event) {
         StringBuilder names = new StringBuilder();
         int num = 0;
         Predicate<Game> allFilterPredicates = game1 -> game1.isHasEnded() && game1.getWinner().isEmpty() && game1.getHighestScore() > 0;
@@ -380,7 +316,7 @@ class GameStats extends Subcommand {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
     }
 
-    public static void showGameLengths(SlashCommandInteractionEvent event, Integer pastDays) {
+    private static void showGameLengths(SlashCommandInteractionEvent event, Integer pastDays) {
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         if (pastDays == null) pastDays = 3650;
         int num = 0;
@@ -615,7 +551,7 @@ class GameStats extends Subcommand {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Plays per Colour", sb.toString());
     }
 
-    public static String convertMillisecondsToDays(float milliseconds) {
+    private static String convertMillisecondsToDays(float milliseconds) {
         // Constants for time conversion  
         final float millisecondsInADay = 24 * 60 * 60 * 1000; // milliseconds in a day  
 
@@ -712,7 +648,7 @@ class GameStats extends Subcommand {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Wins per Colour", sb.toString());
     }
 
-    public static void showWinningPath(SlashCommandInteractionEvent event) {
+    private static void showWinningPath(SlashCommandInteractionEvent event) {
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         Map<String, Integer> winningPathCount = getAllWinningPathCounts(filteredGames);
         int gamesWithWinnerCount = winningPathCount.values().stream().reduce(0, Integer::sum);
@@ -732,7 +668,7 @@ class GameStats extends Subcommand {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Winning Paths", sb.toString());
     }
 
-    public static Map<String, Integer> getAllWinningPathCounts(List<Game> games) {
+    private static Map<String, Integer> getAllWinningPathCounts(List<Game> games) {
         Map<String, Integer> winningPathCount = new HashMap<>();
         for (Game game : games) {
             game.getWinner().ifPresent(winner -> {
@@ -744,7 +680,7 @@ class GameStats extends Subcommand {
         return winningPathCount;
     }
 
-    public static String getWinningPath(Game game, Player winner) {
+    private static String getWinningPath(Game game, Player winner) {
         int stage1Count = getPublicVictoryPoints(game, winner.getUserID(), 1);
         int stage2Count = getPublicVictoryPoints(game, winner.getUserID(), 2);
         int secretCount = winner.getSecretVictoryPoints();
@@ -813,7 +749,7 @@ class GameStats extends Subcommand {
         return otherVictoryPoint;
     }
 
-    public static void showWinsWithSupport(SlashCommandInteractionEvent event) {
+    private static void showWinsWithSupport(SlashCommandInteractionEvent event) {
         Map<Integer, Integer> supportWinCount = new HashMap<>();
         AtomicInteger gameWithWinnerCount = new AtomicInteger();
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);

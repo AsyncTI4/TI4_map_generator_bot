@@ -4,32 +4,27 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cardsso.SOInfo;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class MakeSecretIntoPO extends SpecialSubcommandData {
+class MakeSecretIntoPO extends GameStateSubcommand {
+
     public MakeSecretIntoPO() {
-        super(Constants.MAKE_SO_INTO_PO, "Make Secret Objective a Public Objective");
+        super(Constants.MAKE_SO_INTO_PO, "Make Secret Objective a Public Objective", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Secret Objective to make Public");
-            return;
-        }
-
-        int soID = option.getAsInt();
+        int soID = event.getOption(Constants.SECRET_OBJECTIVE_ID).getAsInt();
         String soName = "";
         Player playerWithSO = null;
 
@@ -62,7 +57,7 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
             Mapper.getSecretObjectivesJustNames().get(soName) + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
-        SOInfo.sendSecretObjectiveInfo(game, playerWithSO, event);
+        SecretObjectiveHelper.sendSecretObjectiveInfo(game, playerWithSO, event);
 
     }
 }

@@ -26,8 +26,8 @@ import ti4.commands.game.Undo;
 import ti4.commands.map.Preset;
 import ti4.commands.milty.ForcePick;
 import ti4.commands.player.ChangeUnitDecal;
-import ti4.commands.statistics.GameStats.GameStatistics;
-import ti4.commands.statistics.PlayerStats;
+import ti4.commands.statistics.GameStatTypes;
+import ti4.commands.statistics.PlayerStatTypes;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.uncategorized.ServerPromote;
 import ti4.generator.Mapper;
@@ -771,22 +771,22 @@ public class AutoCompleteProvider {
             }
             case Constants.GAME_STATISTIC -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<GameStatistics> stats = Arrays.asList(GameStatistics.values());
+                List<GameStatTypes> stats = Arrays.asList(GameStatTypes.values());
                 List<Command.Choice> options = stats.stream()
                     .filter(stat -> stat.search(enteredValue))
                     .limit(25)
-                    .sorted(Comparator.comparing(GameStatistics::getAutoCompleteName))
+                    .sorted(Comparator.comparing(GameStatTypes::getAutoCompleteName))
                     .map(stat -> new Command.Choice(stat.getAutoCompleteName(), stat.toString()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
             case Constants.PLAYER_STATISTIC -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<PlayerStats.PlayerStatistics> stats = Arrays.asList(PlayerStats.PlayerStatistics.values());
+                List<PlayerStatTypes> stats = Arrays.asList(PlayerStatTypes.values());
                 List<Command.Choice> options = stats.stream()
                     .filter(stat -> stat.search(enteredValue))
                     .limit(25)
-                    .sorted(Comparator.comparing(PlayerStats.PlayerStatistics::getAutoCompleteName))
+                    .sorted(Comparator.comparing(PlayerStatTypes::getAutoCompleteName))
                     .map(stat -> new Command.Choice(stat.getAutoCompleteName(), stat.toString()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();

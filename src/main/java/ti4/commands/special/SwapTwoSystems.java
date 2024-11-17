@@ -14,7 +14,7 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-public class SwapTwoSystems extends GameStateSubcommand {
+class SwapTwoSystems extends GameStateSubcommand {
 
     public SwapTwoSystems() {
         super(Constants.SWAP_SYSTEMS, "Swap two systems", true, false);

@@ -12,12 +12,12 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class StasisInfantry extends GameStateSubcommand {
+class StasisInfantry extends GameStateSubcommand {
 
     public StasisInfantry() {
         super(Constants.STASIS_INFANTRY, "Add/Remove Infantry to Stasis Capsule", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.COUNT, "Infantry count").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 

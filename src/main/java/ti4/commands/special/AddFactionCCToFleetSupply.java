@@ -7,10 +7,9 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 
-public class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
+class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
 
     public AddFactionCCToFleetSupply() {
         super(Constants.ADD_CC_TO_FS, "Add Faction CC to Fleet Supply");
@@ -23,7 +22,5 @@ public class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
             Helper.isCCCountCorrect(event, game, color);
         }
         CommanderUnlockCheck.checkPlayer(player, "mahact");
-        GameSaveLoadManager.saveGame(game, event);
-
     }
 }

@@ -18,7 +18,7 @@ class ListTitlesGiven extends Subcommand {
 
     public ListTitlesGiven() {
         super(Constants.LIST_TITLES_GIVEN, "List the frequency with which slash commands are used");
-        addOptions(new OptionData(OptionType.STRING, Constants.TITLE, "Breakdown for a specific title").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.TITLE, "Breakdown for a specific title"));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
