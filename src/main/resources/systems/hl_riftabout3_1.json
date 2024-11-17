@@ -1,6 +1,7 @@
 {
     "id": "hl_riftabout3_1",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "riftabout3_1"
     ],
