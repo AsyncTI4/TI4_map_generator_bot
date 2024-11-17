@@ -61,8 +61,6 @@ import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.Setup;
 import ti4.commands.player.TurnStart;
-import ti4.commands.special.CheckDistance;
-import ti4.commands.special.DiploSystem;
 import ti4.commands.tech.TechShowDeck;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddToken;
@@ -4376,9 +4374,9 @@ public class ButtonHelper {
                     UnitModel uni = player.getUnitByBaseType(unit);
                     if (activeSystem != null && uni != null && uni.getIsShip()
                         && !uni.getBaseType().equalsIgnoreCase("fighter")) {
-                        int distance = CheckDistance.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
+                        int distance = CheckDistanceHelper.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
                             game.getActiveSystem(), true);
-                        int riftDistance = CheckDistance.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
+                        int riftDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
                             game.getActiveSystem(), false);
                         int moveValue = uni.getMoveValue();
                         if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasTech("absol_amd")) {
@@ -6343,7 +6341,7 @@ public class ButtonHelper {
             String message = player.getFactionEmoji() + " chose to use the mahact PN in the tile " + tile.getRepresentation();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         } else {
-            if (!DiploSystem.diploSystem(event, game, player, planet.toLowerCase())) {
+            if (!DiploSystemHelper.diploSystem(event, game, player, planet.toLowerCase())) {
                 return;
             }
             String message = player.getFactionEmoji() + " chose to diplo the system containing "

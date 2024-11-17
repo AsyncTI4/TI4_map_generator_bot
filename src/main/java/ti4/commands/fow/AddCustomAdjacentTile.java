@@ -18,7 +18,7 @@ public class AddCustomAdjacentTile extends FOWSubcommandData {
         super(Constants.ADD_CUSTOM_ADJACENT_TILES, "Add Custom Adjacent Tiles. ");
         addOptions(new OptionData(OptionType.STRING, Constants.PRIMARY_TILE, "Primary Tile").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ADJACENT_TILES, "Adjacent Tiles").setRequired(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.TWO_WAY, "Are added tiles two way connection").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.TWO_WAY, "Are added tiles two way connection"));
     }
 
     @Override

@@ -12,8 +12,8 @@ class AddControlToken extends GameStateSubcommand {
     public AddControlToken() {
         super(Constants.ADD_CONTROL_TOKEN, "Add or remove a faction control token to a law", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction that owns the token, default you").setRequired(false).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO, "True to remove instead of add tokens").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction that owns the token, default you").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO, "True to remove instead of add tokens"));
     }
 
     @Override

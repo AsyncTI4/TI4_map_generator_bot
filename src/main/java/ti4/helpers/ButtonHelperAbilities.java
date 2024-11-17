@@ -18,7 +18,6 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.player.TurnStart;
-import ti4.commands.special.SleeperToken;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
@@ -755,7 +754,7 @@ public class ButtonHelperAbilities {
         String planet = buttonID;
         String message = player.getFactionEmojiOrColor() + " put a Sleeper on " + Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        new SleeperToken().addOrRemoveSleeper(event, game, planet, player);
+        SleeperTokenHelper.addOrRemoveSleeper(event, game, planet, player);
         event.getMessage().delete().queue();
     }
 
@@ -1142,7 +1141,7 @@ public class ButtonHelperAbilities {
         String planet = buttonID;
         String message = player.getFactionEmojiOrColor() + " removed a Sleeper from " + planet;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        new SleeperToken().addOrRemoveSleeper(event, game, planet, player);
+        SleeperTokenHelper.addOrRemoveSleeper(event, game, planet, player);
         event.getMessage().delete().queue();
     }
 
@@ -1152,7 +1151,7 @@ public class ButtonHelperAbilities {
         String planetName = buttonID.split("_")[1];
         String unit = buttonID.split("_")[0];
         String message;
-        new SleeperToken().addOrRemoveSleeper(event, game, planetName, player);
+        SleeperTokenHelper.addOrRemoveSleeper(event, game, planetName, player);
         if ("mech".equalsIgnoreCase(unit)) {
             new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName + ", inf " + planetName, game);
             message = player.getFactionEmojiOrColor() + " replaced a Sleeper on " + Helper.getPlanetRepresentation(planetName, game) + " with a " + Emojis.mech + " and " + Emojis.infantry;

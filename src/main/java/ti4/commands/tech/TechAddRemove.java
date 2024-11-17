@@ -24,7 +24,7 @@ public abstract class TechAddRemove extends TechSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2nd Tech").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd Tech").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th Tech").setAutoComplete(true));
-        // addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction").setRequired(false));
+        // addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set techs").setAutoComplete(true));
 
     }
