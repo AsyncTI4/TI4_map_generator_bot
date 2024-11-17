@@ -19,7 +19,7 @@ import ti4.model.EventModel;
 class PlayEvent extends GameStateSubcommand {
 
     public PlayEvent() {
-        super(Constants.EVENT_PLAY, "Play an Event from your hand", true, false);
+        super(Constants.EVENT_PLAY, "Play an Event from your hand", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.EVENT_ID, "Event Card ID that is sent between () or Name/Part of Name").setRequired(true).setAutoComplete(true));
     }
 

@@ -12,7 +12,6 @@ class CommandGameStateHelper {
     private final boolean saveGame;
     private final boolean isPlayerCommand;
     private final ThreadLocal<Game> game = new ThreadLocal<>();
-    private final ThreadLocal<Long> gameLastModifiedDate = new ThreadLocal<>();
     private final ThreadLocal<Player> player = new ThreadLocal<>();
 
     public CommandGameStateHelper(boolean saveGame, boolean isPlayerCommand) {
@@ -27,7 +26,6 @@ class CommandGameStateHelper {
                     " in channel " + event.getChannel().getName());
         }
         game.set(GameManager.getGame(gameName));
-        gameLastModifiedDate.set(game.get().getLastModifiedDate());
 
         if (!isPlayerCommand) {
             return;
@@ -45,7 +43,6 @@ class CommandGameStateHelper {
             GameSaveLoadManager.saveGame(game.get(), event);
         }
         game.remove();
-        gameLastModifiedDate.remove();
         player.remove();
     }
 
