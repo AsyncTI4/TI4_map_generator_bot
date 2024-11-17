@@ -8,7 +8,11 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
@@ -113,5 +117,14 @@ public class ShowGame extends ti4.commands2.GameStateCommand {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
         }
         return channel;
+    }
+
+    @Override
+    public void register(CommandListUpdateAction commands) {
+        // Moderation commands with required options
+        commands.addCommands(
+            Commands.slash(getName(), "Shows selected map")
+                .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setAutoComplete(true)));
     }
 }
