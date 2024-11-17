@@ -129,7 +129,6 @@ public class MapGenerator implements AutoCloseable {
     private final int heightForGameInfo;
     private final boolean extraRow;
     private final boolean allEyesOnMe;
-    private final Map<String, Player> playerControlMap;
 
     private final List<WebsiteOverlay> websiteOverlays = new ArrayList<>();
     private int mapWidth;
@@ -153,7 +152,6 @@ public class MapGenerator implements AutoCloseable {
         this.game = game;
         this.displayType = defaultIfNull(displayType);
         this.event = event;
-        this.playerControlMap = game.getPlayerControlMap();
 
         String controlID = Mapper.getControlID("red");
         BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), 0.45f);
@@ -360,7 +358,6 @@ public class MapGenerator implements AutoCloseable {
         keys.removeAll(tilesToShow);
         for (String key : keys) {
             tilesToDisplay.remove(key);
-            playerControlMap.remove(key);
             if (fowPlayer != null) {
                 tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
             }
