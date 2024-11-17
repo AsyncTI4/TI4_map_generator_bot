@@ -1,4 +1,4 @@
-package ti4.commands.custom;
+package ti4.commands2.custom;
 
 import java.util.Map;
 

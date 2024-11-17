@@ -1,4 +1,4 @@
-package ti4.commands.custom;
+package ti4.commands2.custom;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -10,7 +10,6 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 class ChangeToBaseGame extends GameStateSubcommand {
@@ -36,7 +35,5 @@ class ChangeToBaseGame extends GameStateSubcommand {
         Helper.removePoKComponents(game, codex);
         SetDeck.setDeck(event, game, "agenda_deck", Mapper.getDecks().get("agendas_base_game"));
         MessageHelper.sendMessageToChannel(event.getChannel(), "Removed PoK components.");
-        GameSaveLoadManager.saveGame(game, event);
-
     }
 }
