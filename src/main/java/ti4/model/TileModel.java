@@ -90,6 +90,11 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
+    public int getNumPlanets() {
+        return getPlanets() == null ? 0 : getPlanets().size();
+    }
+
+    @JsonIgnore
     public boolean isEmpty() {
         return !hasPlanets();
     }
