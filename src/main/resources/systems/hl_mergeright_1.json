@@ -1,6 +1,7 @@
 {
     "id": "hl_mergeright_1",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "mergeright_1"
     ],
