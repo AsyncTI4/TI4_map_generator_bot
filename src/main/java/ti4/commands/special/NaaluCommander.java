@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -36,7 +37,7 @@ class NaaluCommander extends GameStateSubcommand {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
 
         // Top Agenda
-        sendTopAgendaToCardsInfoSkipCovert(game, player);
+        AgendaHelper.sendTopAgendaToCardsInfoSkipCovert(game, player);
 
         // Bottom Agenda
         MessageEmbed embed = null;
@@ -69,37 +70,5 @@ class NaaluCommander extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), player.getRepresentation() + " is using M'aban, the Naalu Commander, to look at the top & bottom agenda, and their neighbour's promissory notes.");
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
-    }
-
-    public static void sendTopAgendaToCardsInfoSkipCovert(Game game, Player player) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("__**Top Agenda:**__");
-        String agendaID = game.lookAtTopAgenda(0);
-        MessageEmbed embed = null;
-        if (game.getSentAgendas().get(agendaID) != null) {
-            if (game.getCurrentAgendaInfo().contains("_CL_") && game.getPhaseOfGame().startsWith("agenda")) {
-                sb.append("You are currently voting on Covert Legislation and the top agenda is in the speaker's hand.");
-                sb.append(" Showing the next agenda because that's how it should be by the RULEZ\n");
-                agendaID = game.lookAtTopAgenda(1);
-
-                if (game.getSentAgendas().get(agendaID) != null) {
-                    embed = AgendaModel.agendaIsInSomeonesHandEmbed();
-                } else if (agendaID != null) {
-                    embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
-                }
-            } else {
-                sb.append("The top agenda is currently in somebody's hand. As per the RULEZ, you should not be able to see the next agenda until they are finished deciding top/bottom/discard");
-            }
-        } else if (agendaID != null) {
-            embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
-        } else {
-            sb.append("Could not find agenda");
-        }
-        if (embed != null) {
-            MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
-        } else {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
-        }
-
     }
 }

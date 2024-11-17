@@ -4060,4 +4060,35 @@ public class AgendaHelper {
         ButtonHelperAgents.resolveArtunoCheck(player, game, player.getTg() - oldTg);
         ButtonHelperAbilities.pillageCheck(player, game);
     }
+
+    public static void sendTopAgendaToCardsInfoSkipCovert(Game game, Player player) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**Top Agenda:**__");
+        String agendaID = game.lookAtTopAgenda(0);
+        MessageEmbed embed = null;
+        if (game.getSentAgendas().get(agendaID) != null) {
+            if (game.getCurrentAgendaInfo().contains("_CL_") && game.getPhaseOfGame().startsWith("agenda")) {
+                sb.append("You are currently voting on Covert Legislation and the top agenda is in the speaker's hand.");
+                sb.append(" Showing the next agenda because that's how it should be by the RULEZ\n");
+                agendaID = game.lookAtTopAgenda(1);
+
+                if (game.getSentAgendas().get(agendaID) != null) {
+                    embed = AgendaModel.agendaIsInSomeonesHandEmbed();
+                } else if (agendaID != null) {
+                    embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
+                }
+            } else {
+                sb.append("The top agenda is currently in somebody's hand. As per the RULEZ, you should not be able to see the next agenda until they are finished deciding top/bottom/discard");
+            }
+        } else if (agendaID != null) {
+            embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
+        } else {
+            sb.append("Could not find agenda");
+        }
+        if (embed != null) {
+            MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
+        }
+    }
 }
