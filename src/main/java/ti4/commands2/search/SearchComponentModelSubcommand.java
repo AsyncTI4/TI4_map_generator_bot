@@ -1,4 +1,4 @@
-package ti4.commands.search;
+package ti4.commands2.search;
 
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;

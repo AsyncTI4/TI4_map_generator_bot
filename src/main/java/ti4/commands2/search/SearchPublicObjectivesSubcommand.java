@@ -1,6 +1,5 @@
-package ti4.commands.search;
+package ti4.commands2.search;
 
-import java.util.Comparator;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -8,13 +7,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.model.ExploreModel;
+import ti4.model.PublicObjectiveModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchExploresSubcommand extends SearchComponentModelSubcommand {
+public class SearchPublicObjectivesSubcommand extends SearchComponentModelSubcommand {
 
-    public SearchExploresSubcommand() {
-        super(Constants.SEARCH_EXPLORES, "List all explore cards the bot can use");
+    public SearchPublicObjectivesSubcommand() {
+        super(Constants.SEARCH_PUBLIC_OBJECTIVES, "List all public objectives the bot can use");
     }
 
     @Override
@@ -22,15 +21,15 @@ public class SearchExploresSubcommand extends SearchComponentModelSubcommand {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
-        if (Mapper.isValidExplore(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getExplore(searchString).getRepresentationEmbed(true, true)).queue();
+        if (Mapper.isValidPublicObjective(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getPublicObjective(searchString).getRepresentationEmbed(true)).queue();
             return;
         }
 
-        List<MessageEmbed> messageEmbeds = Mapper.getExplores().values().stream()
+        List<MessageEmbed> messageEmbeds = Mapper.getPublicObjectives().values().stream()
             .filter(model -> model.search(searchString, source))
-            .sorted(Comparator.comparing(ExploreModel::getName))
-            .map(model -> model.getRepresentationEmbed(true, true))
+            .sorted(PublicObjectiveModel.sortByPointsAndName)
+            .map(model -> model.getRepresentationEmbed(true))
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }

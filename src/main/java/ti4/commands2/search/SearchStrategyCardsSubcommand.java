@@ -1,5 +1,6 @@
-package ti4.commands.search;
+package ti4.commands2.search;
 
+import java.util.Comparator;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -7,13 +8,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.model.PublicObjectiveModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.StrategyCardModel;
 
-public class SearchPublicObjectivesSubcommand extends SearchComponentModelSubcommand {
+public class SearchStrategyCardsSubcommand extends SearchComponentModelSubcommand {
 
-    public SearchPublicObjectivesSubcommand() {
-        super(Constants.SEARCH_PUBLIC_OBJECTIVES, "List all public objectives the bot can use");
+    public SearchStrategyCardsSubcommand() {
+        super(Constants.SEARCH_STRATEGY_CARDS, "List all strategy cards the bot can use");
     }
 
     @Override
@@ -21,14 +22,14 @@ public class SearchPublicObjectivesSubcommand extends SearchComponentModelSubcom
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
-        if (Mapper.isValidPublicObjective(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getPublicObjective(searchString).getRepresentationEmbed(true)).queue();
+        if (Mapper.isValidStrategyCard(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getStrategyCard(searchString).getRepresentationEmbed(true)).queue();
             return;
         }
 
-        List<MessageEmbed> messageEmbeds = Mapper.getPublicObjectives().values().stream()
+        List<MessageEmbed> messageEmbeds = Mapper.getStrategyCards().values().stream()
             .filter(model -> model.search(searchString, source))
-            .sorted(PublicObjectiveModel.sortByPointsAndName)
+            .sorted(Comparator.comparing(StrategyCardModel::getInitiative))
             .map(model -> model.getRepresentationEmbed(true))
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);

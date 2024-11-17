@@ -1,4 +1,4 @@
-package ti4.commands.search;
+package ti4.commands2.search;
 
 import java.util.List;
 
@@ -7,12 +7,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchEventsSubcommand extends SearchComponentModelSubcommand {
+public class SearchSecretObjectivesSubcommand extends SearchComponentModelSubcommand {
 
-    public SearchEventsSubcommand() {
-        super(Constants.SEARCH_EVENTS, "List all events the bot can use");
+    public SearchSecretObjectivesSubcommand() {
+        super(Constants.SEARCH_SECRET_OBJECTIVES, "List all secret objectives the bot can use");
     }
 
     @Override
@@ -20,14 +21,15 @@ public class SearchEventsSubcommand extends SearchComponentModelSubcommand {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
-        if (Mapper.isValidEvent(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getEvent(searchString).getRepresentationEmbed(true, null)).queue();
+        if (Mapper.isValidSecretObjective(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getSecretObjective(searchString).getRepresentationEmbed(true)).queue();
             return;
         }
 
-        List<MessageEmbed> messageEmbeds = Mapper.getEvents().values().stream()
+        List<MessageEmbed> messageEmbeds = Mapper.getSecretObjectives().values().stream()
+            .sorted(SecretObjectiveModel.sortByPointsAndName)
             .filter(model -> model.search(searchString, source))
-            .map(model -> model.getRepresentationEmbed(true, null))
+            .map(model -> model.getRepresentationEmbed(true))
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }

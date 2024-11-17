@@ -1,4 +1,4 @@
-package ti4.commands.search;
+package ti4.commands2.search;
 
 import java.io.File;
 import java.util.ArrayList;

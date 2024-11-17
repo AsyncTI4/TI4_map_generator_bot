@@ -1,4 +1,4 @@
-package ti4.commands.search;
+package ti4.commands2.search;
 
 import java.util.Comparator;
 import java.util.List;
@@ -8,13 +8,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.model.RelicModel;
+import ti4.model.LeaderModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchRelicsSubcommand extends SearchComponentModelSubcommand {
+public class SearchLeadersSubcommand extends SearchComponentModelSubcommand {
 
-    public SearchRelicsSubcommand() {
-        super(Constants.SEARCH_RELICS, "List all relics the bot can use");
+    public SearchLeadersSubcommand() {
+        super(Constants.SEARCH_LEADERS, "List all leaders the bot can use");
     }
 
     @Override
@@ -22,15 +22,15 @@ public class SearchRelicsSubcommand extends SearchComponentModelSubcommand {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
-        if (Mapper.isValidRelic(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getRelic(searchString).getRepresentationEmbed(true, true)).queue();
+        if (Mapper.isValidLeader(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getLeader(searchString).getRepresentationEmbed(true, true, true, true)).queue();
             return;
         }
 
-        List<MessageEmbed> messageEmbeds = Mapper.getRelics().values().stream()
+        List<MessageEmbed> messageEmbeds = Mapper.getLeaders().values().stream()
             .filter(model -> model.search(searchString, source))
-            .sorted(Comparator.comparing(RelicModel::getName))
-            .map(model -> model.getRepresentationEmbed(true, true))
+            .sorted(Comparator.comparing(LeaderModel::getID))
+            .map(model -> model.getRepresentationEmbed(true, true, true, true))
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }

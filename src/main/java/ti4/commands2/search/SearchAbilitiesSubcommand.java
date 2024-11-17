@@ -1,4 +1,4 @@
-package ti4.commands.search;
+package ti4.commands2.search;
 
 import java.util.List;
 
@@ -9,10 +9,10 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.model.Source.ComponentSource;
 
-public class SearchAgendasSubcommand extends SearchComponentModelSubcommand {
+public class SearchAbilitiesSubcommand extends SearchComponentModelSubcommand {
 
-    public SearchAgendasSubcommand() {
-        super(Constants.SEARCH_AGENDAS, "List all agendas the bot can use");
+    public SearchAbilitiesSubcommand() {
+        super(Constants.SEARCH_ABILITIES, "List all abilities");
     }
 
     @Override
@@ -20,12 +20,12 @@ public class SearchAgendasSubcommand extends SearchComponentModelSubcommand {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
-        if (Mapper.isValidAgenda(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getAgenda(searchString).getRepresentationEmbed(true)).queue();
+        if (Mapper.isValidAbility(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getAbility(searchString).getRepresentationEmbed()).queue();
             return;
         }
 
-        List<MessageEmbed> messageEmbeds = Mapper.getAgendas().values().stream()
+        List<MessageEmbed> messageEmbeds = Mapper.getAbilities().values().stream()
             .filter(model -> model.search(searchString, source))
             .map(model -> model.getRepresentationEmbed(true))
             .toList();
