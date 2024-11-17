@@ -42,7 +42,7 @@ public class SetDeck extends GameSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
 
-        Map<String, DeckModel> changedDecks = new HashMap<>();
+        Map<DeckModel.DeckType, DeckModel> changedDecks = new HashMap<>();
 
         deckTypes.forEach(deckType -> {
             String value = event.getOption(deckType, null, OptionMapping::getAsString);
