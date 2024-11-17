@@ -1,8 +1,11 @@
 package ti4.commands.search;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.entities.User;
@@ -15,7 +18,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.GameProperties;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -55,42 +57,24 @@ public class SearchGames extends Subcommand {
         String searchFactions = event.getOption(Constants.SEARCH_FACTIONS, "", OptionMapping::getAsString).toLowerCase();
         User searchUser = event.getOption(Constants.SEARCH_USERS, null, OptionMapping::getAsUser);
 
-        List<Game> normalGames = new ArrayList<>();
-        List<Game> tIGLGames = new ArrayList<>();
-        List<Game> communityGames = new ArrayList<>();
-        List<Game> allianceGames = new ArrayList<>();
-        List<Game> foWGames = new ArrayList<>();
-        List<Game> absolGames = new ArrayList<>();
-        List<Game> miltyModGames = new ArrayList<>();
-        List<Game> dSGames = new ArrayList<>();
-        List<Game> frankenGames = new ArrayList<>();
-        List<Game> endedGames = new ArrayList<>();
-        List<Game> searchNameGames = new ArrayList<>();
-        List<Game> searchTagGames = new ArrayList<>();
-        List<Game> searchFactionGames = new ArrayList<>();
-        List<Game> searchUserGames = new ArrayList<>();
-
-        int currentPage = 0;
-        GameManager.PagedGames pagedGames;
-        do {
-            pagedGames = GameManager.getGamesPage(currentPage++);
-            normalGames.addAll(pagedGames.getGames().stream().filter(Game::isNormalGame).toList());
-            tIGLGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isCompetitiveTIGLGame).toList());
-            communityGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isCommunityMode).toList());
-            allianceGames.addAll(pagedGames.getGames().stream().filter(Game::isAllianceMode).toList());
-            foWGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isFowMode).toList());
-            absolGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isAbsolMode).toList());
-            miltyModGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isMiltyModMode).toList());
-            dSGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isDiscordantStarsMode).toList());
-            frankenGames.addAll(pagedGames.getGames().stream().filter(Game::isFrankenGame).toList());
-            endedGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isHasEnded).toList());
-            searchNameGames.addAll(pagedGames.getGames().stream().filter(map -> map.getCustomName().toLowerCase().contains(searchName)).toList());
-            searchTagGames.addAll(pagedGames.getGames().stream().filter(map -> map.getGameModesText().toLowerCase().contains(searchTags)).toList());
-            searchFactionGames.addAll(pagedGames.getGames().stream().filter(map -> map.getRealAndEliminatedPlayers().stream().map(p -> p.getFaction().toLowerCase()).anyMatch(s -> s.contains(searchFactions))).toList());
-            searchUserGames.addAll(pagedGames.getGames().stream().filter(map -> map.hasUser(searchUser)).toList());
-        } while (pagedGames.hasNextPage());
-
-        List<Game> filteredListOfMaps = new ArrayList<>();
+        Map<String, Game> games = GameManager.getGameNameToGame();
+        List<Entry<String, Game>> normalGames = games.entrySet().stream().filter(map -> map.getValue().isNormalGame()).toList();
+        List<Entry<String, Game>> tIGLGames = games.entrySet().stream().filter(map -> map.getValue().isCompetitiveTIGLGame()).toList();
+        List<Entry<String, Game>> communityGames = games.entrySet().stream().filter(map -> map.getValue().isCommunityMode()).toList();
+        List<Entry<String, Game>> allianceGames = games.entrySet().stream().filter(map -> map.getValue().isAllianceMode()).toList();
+        List<Entry<String, Game>> foWGames = games.entrySet().stream().filter(map -> map.getValue().isFowMode()).toList();
+        List<Entry<String, Game>> absolGames = games.entrySet().stream().filter(map -> map.getValue().isAbsolMode()).toList();
+        List<Entry<String, Game>> miltyModGames = games.entrySet().stream().filter(map -> map.getValue().isMiltyModMode()).toList();
+        List<Entry<String, Game>> dSGames = games.entrySet().stream().filter(map -> map.getValue().isDiscordantStarsMode()).toList();
+        List<Entry<String, Game>> frankenGames = games.entrySet().stream().filter(map -> map.getValue().isFrankenGame()).toList();
+        List<Entry<String, Game>> endedGames = games.entrySet().stream().filter(map -> map.getValue().isHasEnded()).toList();
+        List<Entry<String, Game>> searchNameGames = games.entrySet().stream().filter(map -> map.getValue().getCustomName().toLowerCase().contains(searchName)).toList();
+        List<Entry<String, Game>> searchTagGames = games.entrySet().stream().filter(map -> map.getValue().getGameModesText().toLowerCase().contains(searchTags)).toList();
+        List<Entry<String, Game>> searchFactionGames = games.entrySet().stream().filter(map -> map.getValue().getRealAndEliminatedPlayers().stream().map(p -> p.getFaction().toLowerCase()).anyMatch(s -> s.contains(searchFactions))).toList();
+        List<Entry<String, Game>> searchUserGames = games.entrySet().stream().filter(map -> map.getValue().hasUser(searchUser)).toList();
+        
+        
+        List<Entry<String, Game>> filteredListOfMaps = new ArrayList<>();
         if (includeNormalGames) filteredListOfMaps.addAll(normalGames);
         if (includeTIGLGames) filteredListOfMaps.addAll(tIGLGames);
         if (includeCommunityGames) filteredListOfMaps.addAll(communityGames);
@@ -104,14 +88,16 @@ public class SearchGames extends Subcommand {
         if (!searchTags.isEmpty()) filteredListOfMaps.addAll(searchTagGames);
         if (!searchFactions.isEmpty()) filteredListOfMaps.addAll(searchFactionGames);
         if (searchUser != null) filteredListOfMaps.addAll(searchUserGames);
-        if (!includeEndedGames) filteredListOfMaps.removeIf(GameProperties::isHasEnded);
+        if (!includeEndedGames) filteredListOfMaps.removeIf(g -> g.getValue().isHasEnded());
 
-        int totalGames = GameManager.getGameNames().size();
+        Set<Entry<String, Game>> filteredGames = new HashSet<>(filteredListOfMaps);
+
+        int totalGames = games.size();
 
         StringBuilder sb = new StringBuilder("__**Search Games:**__\n");
         sb.append("-# Statistics:\n");
         sb.append("-# > Total Games: `").append(totalGames).append("`\n");
-        sb.append("-# > Games Found: `").append(filteredListOfMaps.size()).append("`\n");
+        sb.append("-# > Games Found: `").append(filteredGames.size()).append("`\n");
         sb.append("-# > ").append(trueFalseEmoji(includeNormalGames)).append("includeNormalGames (").append(normalGames.size()).append("/").append(totalGames).append(")\n");
         sb.append("-# > ").append(trueFalseEmoji(includeTIGLGames)).append("includeTIGLGames (").append(tIGLGames.size()).append("/").append(totalGames).append(")\n");
         sb.append("-# > ").append(trueFalseEmoji(includeCommunityGames)).append("includeCommunityGames (").append(communityGames.size()).append("/").append(totalGames).append(")\n");
@@ -128,13 +114,13 @@ public class SearchGames extends Subcommand {
         sb.append("-# > ").append(trueFalseEmoji(!searchFactions.isEmpty())).append("gamesWithFaction `").append(searchFactions).append("` (").append(searchFactionGames.size()).append("/").append(totalGames).append(")\n");
         sb.append("-# > ").append(trueFalseEmoji(searchUser != null)).append("gamesWithUser `").append(searchUser != null ? searchUser.getEffectiveName() : "").append("` (").append(searchUserGames.size()).append("/").append(totalGames).append(")\n");
 
-        if (filteredListOfMaps.isEmpty()) {
+        if (filteredGames.isEmpty()) {
             sb.append("No games match the selected filters.");
         } else {
-            sb.append(filteredListOfMaps.stream()
-                .filter(game -> includeEndedGames || !game.isHasEnded())
-                .sorted(Comparator.comparing(Game::getName))
-                .map(this::getRepresentationText)
+            sb.append(filteredGames.stream()
+                .filter(map -> includeEndedGames || !map.getValue().isHasEnded())
+                .sorted(Map.Entry.comparingByKey())
+                .map(map -> getRepresentationText(games, map.getKey()))
                 .collect(Collectors.joining("\n")));
         }
 
@@ -147,8 +133,9 @@ public class SearchGames extends Subcommand {
         return bool ? "✅" : "❌";
     }
 
-    private String getRepresentationText(Game game) {
-        StringBuilder sb = new StringBuilder("- **" + game.getName() + "**").append(" ");
+    private String getRepresentationText(Map<String, Game> games, String mapName) {
+        Game game = games.get(mapName);
+        StringBuilder sb = new StringBuilder("- **" + mapName + "**").append(" ");
         sb.append("`").append(game.getCreationDate()).append("`-`");
         if (game.isHasEnded() && game.getEndedDate() > 100) {
             sb.append(Helper.getDateRepresentation(game.getEndedDate()));
