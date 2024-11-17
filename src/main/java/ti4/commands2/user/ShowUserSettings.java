@@ -30,8 +30,7 @@ class ShowUserSettings extends Subcommand {
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 event.getMessageChannel(),
                 null,
-                List.of(getSettingEmbed(event, UserSettingsManager.get(event.getUser().getId()))),
-                getUserSettingsButtons());
+                List.of(getSettingEmbed(event, UserSettingsManager.get(event.getUser().getId()))), getUserSettingsButtons());
     }
 
     private static MessageEmbed getSettingEmbed(GenericInteractionCreateEvent event, UserSettings userSettings) {
@@ -51,6 +50,6 @@ class ShowUserSettings extends Subcommand {
     }
 
     public static List<Button> getUserSettingsButtons() {
-        return List.of(SetPersonalPingInterval.OFFER_PING_OPTIONS_BUTTON, Buttons.DONE_DELETE_BUTTONS);
+        return List.of(Buttons.OFFER_PING_OPTIONS_BUTTON, Buttons.DONE_DELETE_BUTTONS);
     }
 }

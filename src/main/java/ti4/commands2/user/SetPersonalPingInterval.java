@@ -18,9 +18,6 @@ import ti4.users.UserSettingsManager;
 
 class SetPersonalPingInterval extends Subcommand {
 
-    // OFFER PING INTERVAL BUTTONS
-    private static final String OFFER_PING_OPTIONS = "playerPref_personalPingInterval";
-    public static final Button OFFER_PING_OPTIONS_BUTTON = Buttons.gray(OFFER_PING_OPTIONS, "Change Personal Ping Interval");
     // SET PING INTERVAL BUTTONS
     private static final String SET_PING_INTERVAL = "UserSetPersonalPingIntervalTo";
 
@@ -69,7 +66,7 @@ class SetPersonalPingInterval extends Subcommand {
         set(event, pingInterval);
     }
 
-    @ButtonHandler(OFFER_PING_OPTIONS)
+    @ButtonHandler("playerPref_personalPingInterval")
     public static void offerPersonalPingOptions(GenericInteractionCreateEvent event) {
         List<Button> buttons = getPersonalAutoPingButtons();
         UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
