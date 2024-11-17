@@ -28,7 +28,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
-    private boolean isHyperlane;
+    @JsonProperty("isHyperlane") private boolean hyperlane = false;
     @JsonProperty("isAsteroidField") private boolean asteroidField = false;
     @JsonProperty("isSuperNova") private boolean supernova = false;
     @JsonProperty("isNebula") private boolean nebula = false;
