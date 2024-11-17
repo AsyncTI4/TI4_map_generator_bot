@@ -20,10 +20,8 @@ import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.relic.RelicDraw;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddUnits;
-import ti4.commands2.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
@@ -37,6 +35,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -295,7 +294,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "dw" -> {
                 message = "Drew a " + Emojis.Relic + "Relic";
                 MessageHelper.sendMessageToEventChannel(event, message);
-                RelicDraw.drawRelicAndNotify(player, event, game);
+                RelicHelper.drawRelicAndNotify(player, event, game);
             }
             case "ms1", "ms2" -> {
                 message = "Replenished Commodities (" + player.getCommodities() + "->" + player.getCommoditiesTotal()

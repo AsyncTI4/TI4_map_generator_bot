@@ -11,6 +11,7 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.RelicHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -75,7 +76,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
 
 		boolean drawRelic = event.getOption(Constants.ALSO_DRAW_RELIC, false, OptionMapping::getAsBoolean);
 		if (drawRelic) {
-			RelicDraw.drawRelicAndNotify(activePlayer, event, game);
+			RelicHelper.drawRelicAndNotify(activePlayer, event, game);
 		}
 	}
 

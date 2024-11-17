@@ -1,12 +1,7 @@
 package ti4.commands2.bothelper;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -16,6 +11,7 @@ import ti4.commands2.Subcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.SortHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
@@ -101,30 +97,15 @@ class ListSlashCommandsUsed extends Subcommand {
         }
         StringBuilder longMsg = new StringBuilder("The number of button pressed so far recorded is " + buttonsPressed + ". The largest number of buttons pressed in a single game is " + largestAmountOfButtonsIn1Game + " in game " + largestGame + ". The number of slash commands used is " + slashCommandsUsed
             + ". The number of ACs Sabo'd is " + acsSabod + ". The following is the recorded frequency of slash commands \n");
-        Map<String, Integer> sortedMapAsc = sortByValue(slashCommands, false);
+        Map<String, Integer> sortedMapAsc = SortHelper.sortByValue(slashCommands, false);
         for (String command : sortedMapAsc.keySet()) {
             longMsg.append(command).append(": ").append(sortedMapAsc.get(command)).append(" \n");
         }
         longMsg.append("\n The number of times an AC has been Sabo'd is also being tracked. The following is their recorded frequency \n");
-        Map<String, Integer> sortedMapAscACs = sortByValue(actionCards, false);
+        Map<String, Integer> sortedMapAscACs = SortHelper.sortByValue(actionCards, false);
         for (String command : sortedMapAscACs.keySet()) {
             longMsg.append(command).append(": ").append(sortedMapAscACs.get(command)).append(" out of ").append(actionCardsPlayed.get(command)).append(" times played").append(" \n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
     }
-
-    public static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, boolean order) {
-        List<Entry<String, Integer>> list = new ArrayList<>(unsortMap.entrySet());
-
-        // Sorting the list based on values
-        list.sort((o1, o2) -> order ? o1.getValue().compareTo(o2.getValue()) == 0
-            ? o1.getKey().compareTo(o2.getKey())
-            : o1.getValue().compareTo(o2.getValue())
-            : o2.getValue().compareTo(o1.getValue()) == 0
-                ? o2.getKey().compareTo(o1.getKey())
-                : o2.getValue().compareTo(o1.getValue()));
-        return list.stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue, (a, b) -> b, LinkedHashMap::new));
-
-    }
-
 }

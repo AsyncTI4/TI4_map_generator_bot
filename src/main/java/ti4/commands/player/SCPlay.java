@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.buttons.Buttons;
-import ti4.commands.relic.RelicDraw;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ActionCardHelper;
@@ -30,6 +29,7 @@ import ti4.helpers.CryypterHelper;
 import ti4.helpers.Emojis;
 import ti4.helpers.EventHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RelicHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -596,7 +596,7 @@ public class SCPlay extends PlayerSubcommandData {
             return;
         }
         event.editButton(event.getButton().asDisabled()).queue();
-        RelicDraw.drawRelicAndNotify(player, event, game);
+        RelicHelper.drawRelicAndNotify(player, event, game);
         EventHelper.revealEvent(event, game, game.getMainGameChannel());
     }
 
