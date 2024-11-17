@@ -20,6 +20,7 @@ public class CustomCommand implements ParentCommand {
                     new SCAddToGame(),
                     new SCRemoveFromGame(),
                     new PoRemoveFromGame(),
+                    new PoSetDeck(),
                     new DiscardSpecificAgenda(),
                     new SetThreadName(),
                     new PeekAtObjectiveDeck(),
