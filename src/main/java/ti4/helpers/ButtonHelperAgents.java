@@ -1268,7 +1268,7 @@ public class ButtonHelperAgents {
                 ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                     && game.getPhaseOfGame().contains("agenda")) {
-                    PlanetRefresh.doAction(player, planetName, game);
+                    PlanetRefresh.doAction(player, planetName);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
                     AgendaHelper.listVoteCount(game, game.getMainGameChannel());
@@ -1308,7 +1308,7 @@ public class ButtonHelperAgents {
                 ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                     && game.getPhaseOfGame().contains("agenda")) {
-                    PlanetRefresh.doAction(player, planetName, game);
+                    PlanetRefresh.doAction(player, planetName);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
                     AgendaHelper.listVoteCount(game, game.getMainGameChannel());
@@ -1445,7 +1445,7 @@ public class ButtonHelperAgents {
     public static void resolveRefreshWithOlradinAgent(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planetName = buttonID.split("_")[1];
         Player p2 = player;
-        PlanetRefresh.doAction(p2, planetName, game);
+        PlanetRefresh.doAction(p2, planetName);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " readied " + Helper.getPlanetRepresentation(planetName, game)
                 + " with " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Baggil Wildpaw, the Olradin" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");

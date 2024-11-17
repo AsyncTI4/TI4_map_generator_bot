@@ -1,4 +1,4 @@
-package ti4.commands.uncategorized;
+package ti4.commands2.uncategorized;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,16 +6,10 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
-import ti4.commands.Command;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.cardsso.SOInfo;
-import ti4.generator.Mapper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -24,43 +18,36 @@ import ti4.helpers.Emojis;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class CardsInfo implements Command, InfoThreadCommand {
+public class CardsInfo extends ti4.commands2.GameStateCommand {
+
+    public CardsInfo() {
+        super(false, true);
+    }
 
     @Override
     public String getName() {
         return Constants.CARDS_INFO;
     }
 
+    @Override
+    public String getDescription() {
+        return "Send to your Cards Info thread: Scored & Unscored SOs, ACs, and PNs in both hand and Play Area";
+    }
+
+    @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getName());
+        return super.accept(event) &&
+            CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game game;
-        if (!GameManager.isUserWithActiveGame(userID)) {
-            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
-            return;
-        } else {
-            game = GameManager.getUserActiveGame(userID);
-            String color = CommandHelper.getColor(game, event);
-            if (!Mapper.isValidColor(color)) {
-                MessageHelper.replyToMessage(event, "Color/Faction not valid");
-                return;
-            }
-        }
-
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
+        Game game = getGame();
+        Player player = getPlayer();
         game.checkPromissoryNotes();
         PromissoryNoteHelper.checkAndAddPNs(game, player);
         sendCardsInfo(game, player, event);
@@ -70,7 +57,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
     public static void sendCardsInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         if (player == null)
             return;
-        String headerText = player.getRepresentationUnfogged() + CardsInfoHelper.getHeaderText(event);
+        String headerText = player.getRepresentationUnfogged() + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendCardsInfo(game, player);
     }
@@ -311,18 +298,4 @@ public class CardsInfo implements Command, InfoThreadCommand {
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
-
-    protected String getActionDescription() {
-        return "Send to your Cards Info thread: Scored & Unscored SOs, ACs, and PNs in both hand and Play Area";
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public void register(CommandListUpdateAction commands) {
-        // Moderation commands with required options
-        commands.addCommands(
-            Commands.slash(getName(), getActionDescription())
-                .addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text").setRequired(false)));
-    }
-
 }

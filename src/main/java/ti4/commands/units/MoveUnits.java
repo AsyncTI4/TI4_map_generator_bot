@@ -18,6 +18,7 @@ import ti4.ResourceHelper;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -58,7 +59,7 @@ public class MoveUnits extends AddRemoveUnits {
         } else { //USE TILE_FROM
             tileID = tile.getTileID();
         }
-        tile = getTile(event, tileID, game);
+        tile = TileHelper.getTile(event, tileID, game);
 
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Tile: " + tileID + " not found. Please try a different name or just use position coordinate");

@@ -837,7 +837,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             p2 = game.getPlayerFromColorOrFaction(faction);
         }
 
-        PlanetRefresh.doAction(p2, planetName, game);
+        PlanetRefresh.doAction(p2, planetName);
         List<ActionRow> actionRow2 = new ArrayList<>();
         for (ActionRow row : event.getMessage().getActionRows()) {
             List<ItemComponent> buttonRow = row.getComponents();

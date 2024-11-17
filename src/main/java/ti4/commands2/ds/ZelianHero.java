@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.special.StellarConverter;
-import ti4.commands.units.AddRemoveUnits;
 import ti4.commands2.GameStateSubcommand;
+import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -36,7 +36,7 @@ class ZelianHero extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String tileID = AliasHandler.resolveTile(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, getGame());
+        Tile tile = TileHelper.getTile(event, tileID, getGame());
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;

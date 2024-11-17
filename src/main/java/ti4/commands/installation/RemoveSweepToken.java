@@ -5,9 +5,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.units.AddRemoveUnits;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -33,7 +33,7 @@ public class RemoveSweepToken extends InstallationSubcommandData {
         OptionMapping option = event.getOption(Constants.TILE_NAME);
         String tileOption = option != null ? StringUtils.substringBefore(event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString).toLowerCase(), " ") : "nombox";
         String tileID = AliasHandler.resolveTile(tileOption);
-        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
+        Tile tile = TileHelper.getTile(event, tileID, game);
         if (tile == null) return;
 
         String sweepToken = Mapper.getSweepID(player.getColor());

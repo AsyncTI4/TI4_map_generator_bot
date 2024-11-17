@@ -16,6 +16,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
+import ti4.commands2.ParentCommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -100,6 +101,10 @@ public class SlashCommandListener extends ListenerAdapter {
         Command command = CommandManager.getCommand(event.getName());
         if (command.accept(event)) {
             try {
+                // TODO: remove this when commands are fully merged, commandmanager should have only ParentCommands
+                if (command instanceof ParentCommand parent) {
+                    parent.preExecute(event);
+                }
                 command.execute(event);
                 command.postExecute(event);
             } catch (Exception e) {

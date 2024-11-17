@@ -75,7 +75,7 @@ public class ExploreHelper {
         message += checkForMechOrRemoveInf(planetName, game, player);
         failed = message.contains("Please try again.");
         if (!failed) {
-            PlanetRefresh.doAction(player, planetName, game);
+            PlanetRefresh.doAction(player, planetName);
             planetName = Mapper.getPlanet(planetName) == null ? planetName : Mapper.getPlanet(planetName).getName();
             message += "Readied " + planetName;
             ButtonHelper.addReaction(event, false, false, message, "");

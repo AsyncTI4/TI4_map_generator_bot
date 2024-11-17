@@ -12,9 +12,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.combat.StartCombat;
-import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.generator.TileGenerator;
+import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -64,7 +64,7 @@ public class SystemInfo extends SpecialSubcommandData {
                 continue;
             }
             String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-            Tile tile = AddUnits.getTile(event, tileID, game);
+            Tile tile = TileHelper.getTile(event, tileID, game);
             if (tile == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Tile " + tileOption.getAsString() + " not found");
                 continue;

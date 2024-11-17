@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import ti4.ResourceHelper;
 import ti4.commands.tokens.AddFrontierTokens;
-import ti4.commands.uncategorized.ShowGame;
+import ti4.commands2.uncategorized.ShowGame;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;

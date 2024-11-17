@@ -3543,7 +3543,7 @@ public class ButtonHelper {
             ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
             if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                 && game.getPhaseOfGame().contains("agenda")) {
-                PlanetRefresh.doAction(player, planetName, game);
+                PlanetRefresh.doAction(player, planetName);
                 MessageHelper.sendMessageToChannel(event.getChannel(),
                     "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
                 AgendaHelper.listVoteCount(game, game.getMainGameChannel());

@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.units.AddRemoveUnits;
 import ti4.commands2.CommandHelper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
@@ -84,7 +83,7 @@ public class CombatRoll extends CombatSubcommandData {
 
         // Get tile info
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
+        Tile tile = TileHelper.getTile(event, tileID, game);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 "Tile " + tileOption.getAsString() + " not found");

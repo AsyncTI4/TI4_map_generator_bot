@@ -769,7 +769,7 @@ public class ButtonHelperHeroes {
         planetReal.addToken("token_dmz.png");
         unitHolder.removeAllUnits(player.getColor());
         if (player.getExhaustedPlanets().contains(planet)) {
-            PlanetRefresh.doAction(player, planet, game);
+            PlanetRefresh.doAction(player, planet);
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached Count Otto P'may, the Free Systems hero, to " + Helper.getPlanetRepresentation(planet, game));
@@ -855,7 +855,7 @@ public class ButtonHelperHeroes {
             MoveUnits.flipMallice(event, tile, game);
         }
         PlanetAdd.doAction(player, planetID, game, event, false);
-        PlanetRefresh.doAction(player, planetID, game);
+        PlanetRefresh.doAction(player, planetID);
         String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game);
         String msg = player.getFactionEmojiOrColor() + " claimed the planet " + planetRep + " using The Lord, a Ghemina hero.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
