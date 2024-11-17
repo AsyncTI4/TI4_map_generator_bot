@@ -1,7 +1,8 @@
 package ti4.commands.search;
 
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Objects;
+import java.util.List;
 import java.util.function.Predicate;
 
 import net.dv8tion.jda.api.entities.User;
@@ -12,11 +13,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.Subcommand;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class SearchMyGames extends Subcommand {
@@ -47,8 +50,7 @@ public class SearchMyGames extends Subcommand {
         searchGames(user, event, onlyMyTurn, includeEndedGames, showAverageTurnTime, showSecondaries, showGameModes, ignoreSpectate, ignoreAborted, false);
     }
 
-    public static int searchGames(User user, GenericInteractionCreateEvent event, boolean onlyMyTurn, boolean includeEndedGames, boolean showAverageTurnTime, boolean showSecondaries,
-        boolean showGameModes, boolean ignoreSpectate, boolean ignoreAborted, boolean wantNum) {
+    public static int searchGames(User user, GenericInteractionCreateEvent event, boolean onlyMyTurn, boolean includeEndedGames, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes, boolean ignoreSpectate, boolean ignoreAborted, boolean wantNum) {
         String userID = user.getId();
 
         Predicate<Game> ignoreSpectateFilter = ignoreSpectate ? game -> game.getRealPlayerIDs().contains(userID) : game -> game.getPlayerIDs().contains(userID);
@@ -60,20 +62,19 @@ public class SearchMyGames extends Subcommand {
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 
-        var games = GameManager.getGameNameToGame().values().stream()
+        List<Game> games = GameManager.getGameNameToGame().values().stream()
             .filter(allFilterPredicates)
             .sorted(mapSort)
             .toList();
 
+        int index = 1;
         if (wantNum) {
             return games.size();
         }
-
-        int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
-        for (var game : games) {
+        for (Game playerGame : games) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
-            sb.append(getGameListRepresentation(game, userID, showAverageTurnTime, showSecondaries, showGameModes));
+            sb.append(getPlayerMapListRepresentation(playerGame, userID, showAverageTurnTime, showSecondaries, showGameModes));
             sb.append("\n");
             index++;
         }
@@ -84,27 +85,40 @@ public class SearchMyGames extends Subcommand {
             MessageHelper.sendMessageToThread(butt.getChannel(), user.getName() + "'s Game List", sb.toString());
         }
         return games.size();
+
     }
 
-    public static String getGameListRepresentation(Game game, String userId, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameMode) {
-        var actionsChannel = game.getActionsChannel();
-        String gameChannelLink = actionsChannel == null ? "" : actionsChannel.getAsMention();
-
+    public static String getPlayerMapListRepresentation(Game game, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes) {
+        Player player = game.getPlayer(userID);
+        if (player == null) return "";
+        String gameChannelLink = game.getActionsChannel() == null ? "" : game.getActionsChannel().getAsMention();
         StringBuilder sb = new StringBuilder();
-        sb.append(Emojis.getFactionIconFromDiscord(game.getPlayer(userId).getFaction()));
+        if (Mapper.isValidFaction(player.getFaction())) sb.append(player.getFactionEmoji());
+        if (player.getColor() != null && !"null".equals(player.getColor())) sb.append(Emojis.getColorEmoji(player.getColor()));
         sb.append("**").append(game.getName()).append("**");
         sb.append(gameChannelLink);
-        if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(averageTurnLengthForGame(game, userId)).append("`]");
-        var player = game.getPlayer(userId);
-        if (game.getWinner().isPresent() && Objects.equals(player, game.getWinner().get())) sb.append(" **👑WINNER👑**");
-        if (game.getActivePlayerID() != null && game.getActivePlayerID().equals(userId) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
+        if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(playerAverageMapTurnLength(player)).append("`]");
+        if (game.getWinner().filter(winner -> winner.getUserID().equals(player.getUserID())).isPresent()) sb.append(" **👑WINNER👑**");
+        if (game.getActivePlayerID() != null && game.getActivePlayerID().equals(userID) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
+        if (showSecondaries && !game.isHasEnded()) {
+            List<String> secondaries = new ArrayList<>();
+            for (int sc : game.getPlayedSCs()) {
+                if (!player.hasFollowedSC(sc) && !player.getSCs().contains(sc)) {
+                    secondaries.add(Emojis.getSCBackEmojiFromInteger(sc));
+                }
+            }
+            if (!secondaries.isEmpty()) {
+                sb.append("\n> Please follow: ").append(String.join(" ", secondaries));
+            }
+        }
+        if (showGameModes) sb.append(" | Game Modes: ").append(game.getGameModesText());
         if (game.isHasEnded()) sb.append(" [GAME IS OVER]");
         return sb.toString();
     }
 
-    private static String averageTurnLengthForGame(Game game, String playerId) {
-        long totalMillis = game.getPlayer(playerId).getTotalTurnTime();
-        int numTurns = game.getPlayer(playerId).getNumberTurns();
+    private static String playerAverageMapTurnLength(Player player) {
+        long totalMillis = player.getTotalTurnTime();
+        int numTurns = player.getNumberTurns();
         if (numTurns == 0 || totalMillis == 0) {
             return String.format("%02dh:%02dm:%02ds", 0, 0, 0);
         }
