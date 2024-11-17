@@ -226,13 +226,13 @@ public class TileGenerator {
                 }
 
                 // ADD HEX BORDERS FOR CONTROL
-                Player controllingPlayer = game.getPlayerControlMap().get(tile.getPosition());
+                Player controllingPlayer = game.getPlayerThatControlsTile(tile);
 
                 if (!game.getHexBorderStyle().equals("off") && controllingPlayer != null && !isSpiral) {
                     int sideNum = 0;
-                    java.util.List<Integer> openSides = new ArrayList<>();
+                    List<Integer> openSides = new ArrayList<>();
                     for (String adj : PositionMapper.getAdjacentTilePositions(tile.getPosition())) {
-                        if (game.getPlayerControlMap().get(adj) == controllingPlayer) {
+                        if (game.getPlayerThatControlsTile(adj) == controllingPlayer) {
                             openSides.add(sideNum);
                         }
                         sideNum++;
