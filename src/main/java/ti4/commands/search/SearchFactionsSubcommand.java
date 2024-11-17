@@ -23,7 +23,7 @@ public class SearchFactionsSubcommand extends SearchComponentModelSubcommand {
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         
         if (Mapper.isValidFaction(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getFaction(searchString).getRepresentationEmbed(true, true)).queue();
+            event.getChannel().sendMessageEmbeds(Mapper.getFaction(searchString).getRepresentationEmbed(true, false)).queue();
             return;
         }
         

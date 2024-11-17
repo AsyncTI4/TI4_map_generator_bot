@@ -47,8 +47,6 @@ public class SearchEmojisSubcommand extends Subcommand {
 
     private static String getEmojiMessage(RichCustomEmoji emoji, boolean includeRAW) {
         if (!includeRAW) return "# " + emoji.getFormatted();
-        String sb = emoji.getFormatted() +
-                " `" + emoji.getFormatted() + "`";
-        return sb;
+        return emoji.getFormatted() + " `" + emoji.getFormatted() + "`";
     }
 }
