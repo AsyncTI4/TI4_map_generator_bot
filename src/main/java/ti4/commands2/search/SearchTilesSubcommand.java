@@ -30,9 +30,14 @@ import ti4.model.TileModel;
 
 class SearchTilesSubcommand extends SearchComponentModelSubcommand {
 
+    private final String MIN_NUM_PLANET = "min_num_planets";
+    private final String MAX_NUM_PLANET = "max_num_planets";
+
     public SearchTilesSubcommand() {
         super(Constants.SEARCH_TILES, "List all tiles");
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "True to also show the available aliases you can use"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "True to also show the available aliases you can use"),
+        new OptionData(OptionType.INTEGER, MIN_NUM_PLANET, "Minimum number of planets on tiles"),
+        new OptionData(OptionType.INTEGER, MAX_NUM_PLANET, "Maximum number of planets on tiles"));
     }
 
     @Override
@@ -40,6 +45,8 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
+        int min_planets = event.getOption(MIN_NUM_PLANET, 0, OptionMapping::getAsInt);
+        int max_planets = event.getOption(MAX_NUM_PLANET, Integer.MAX_VALUE, OptionMapping::getAsInt);
 
         List<Entry<TileModel, MessageEmbed>> tileEmbeds = new ArrayList<>();
         if (TileHelper.isValidTile(searchString)) {
@@ -48,6 +55,8 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
         } else {
             TileHelper.getAllTileModels().stream()
                 .filter(tile -> tile.search(searchString, source))
+                .filter(tile -> tile.getNumPlanets() <= max_planets)
+                .filter(tile -> tile.getNumPlanets() >= min_planets)
                 .sorted(Comparator.comparing(TileModel::getId))
                 .map(tile -> Map.entry(tile, tile.getHelpMessageEmbed(includeAliases)))
                 .forEach(tileEmbeds::add);
