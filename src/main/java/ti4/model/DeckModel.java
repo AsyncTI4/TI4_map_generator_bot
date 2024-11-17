@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
@@ -24,15 +25,15 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
     private ComponentSource source;
 
     public enum DeckType {
-        ACTION_CARD,
-        AGENDA,
-        EVENT,
-        EXPLORE,
-        PUBLIC_STAGE_1_OBJECTIVE,
-        PUBLIC_STAGE_2_OBJECTIVE,
-        RELIC,
-        SECRET_OBJECTIVE,
-        TECHNOLOGY,
+        @JsonProperty("action_card") ACTION_CARD,
+        @JsonProperty("agenda") AGENDA,
+        @JsonProperty("event") EVENT,
+        @JsonProperty("explore") EXPLORE,
+        @JsonProperty("public_stage_1_objective") PUBLIC_STAGE_1_OBJECTIVE,
+        @JsonProperty("public_stage_2_objective") PUBLIC_STAGE_2_OBJECTIVE,
+        @JsonProperty("relic") RELIC,
+        @JsonProperty("secret_objective") SECRET_OBJECTIVE,
+        @JsonProperty("technology") TECHNOLOGY,
         @JsonEnumDefaultValue OTHER
     }
 
