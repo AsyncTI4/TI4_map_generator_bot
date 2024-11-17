@@ -24,7 +24,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.statistics.GameStatisticFilterer;
+import ti4.commands2.statistics.GameStatisticFilterer;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;

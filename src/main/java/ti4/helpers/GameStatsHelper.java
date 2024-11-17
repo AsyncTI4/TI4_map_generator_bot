@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.statistics.GameStatisticFilterer;
+import ti4.commands2.statistics.GameStatisticFilterer;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
