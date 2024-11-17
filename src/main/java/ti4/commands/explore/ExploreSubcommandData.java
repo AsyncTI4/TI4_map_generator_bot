@@ -289,7 +289,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     game.drawSecretObjective(player.getUserID());
                     message = message + " Drew a second " + Emojis.SecretObjective + "Secret Objective due to Plausible Deniability.";
                 }
-                SOInfo.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
                 MessageHelper.sendMessageToEventChannel(event, message);
             }
             case "dw" -> {

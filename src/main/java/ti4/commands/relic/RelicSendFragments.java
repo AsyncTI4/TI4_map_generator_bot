@@ -17,7 +17,7 @@ class RelicSendFragments extends GameStateSubcommand {
 	public RelicSendFragments() {
 		super(Constants.SEND_FRAGMENT, "Send a number of relic fragments (default 1) to another player", true, true);
 		addOptions(
-			typeOption.setRequired(true),
+			new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true).setRequired(true),
 			new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true),
 			new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments (default 1)"));
 	}
