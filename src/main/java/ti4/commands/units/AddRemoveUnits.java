@@ -21,6 +21,7 @@ import ti4.commands.planet.PlanetAdd;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -85,23 +86,7 @@ abstract public class AddRemoveUnits implements Command {
     }
 
     public Tile getTileObject(SlashCommandInteractionEvent event, String tileID, Game game) {
-        return getTile(event, tileID, game);
-    }
-
-    public static Tile getTile(SlashCommandInteractionEvent event, String tileID, Game game) {
-        if (game.isTileDuplicated(tileID)) {
-            MessageHelper.replyToMessage(event, "Duplicate tile name `" + tileID + "` found, please use position coordinates");
-            return null;
-        }
-        Tile tile = game.getTile(tileID);
-        if (tile == null) {
-            tile = game.getTileByPosition(tileID);
-        }
-        if (tile == null) {
-            MessageHelper.replyToMessage(event, "Tile in map not found: " + tileID);
-            return null;
-        }
-        return tile;
+        return TileHelper.getTile(event, tileID, game);
     }
 
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game game) {
