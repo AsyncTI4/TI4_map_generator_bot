@@ -44,7 +44,7 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.ChangeColor;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
-import ti4.commands.user.UserSettingsManager;
+import ti4.commands2.user.UserSettingsManager;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.generator.DrawingUtil;

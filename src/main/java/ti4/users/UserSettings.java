@@ -1,4 +1,4 @@
-package ti4.commands.user;
+package ti4.users;
 
 import java.util.ArrayList;
 import java.util.HashMap;
