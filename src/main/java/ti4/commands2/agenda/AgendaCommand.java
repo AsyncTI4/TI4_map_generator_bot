@@ -47,7 +47,7 @@ public class AgendaCommand implements ParentCommand {
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return ParentCommand.super.accept(event) &&
-                CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
+            CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
     }
 
     @Override

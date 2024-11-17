@@ -11,6 +11,7 @@ import ti4.helpers.Emojis;
 import ti4.message.BotLogger;
 
 public class Buttons {
+
     public static final Button GET_A_TECH = green("acquireATech", "Get a Tech");
     public static final Button GET_A_UNIT_TECH_WITH_INF = green("acquireAUnitTechWithInf", "Get a Unit Tech");
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Tech");
@@ -33,6 +34,8 @@ public class Buttons {
     public static final Button REFRESH_ALL_UNIT_INFO = green(Constants.REFRESH_ALL_UNIT_INFO, "Show All Units");
     public static final Button REFRESH_TECH_INFO = green(Constants.REFRESH_TECH_INFO, "Tech Info");
     public static final Button REFRESH_PLANET_INFO = green(Constants.REFRESH_PLANET_INFO, "Planet Info", Emojis.SemLor);
+
+    public static final Button OFFER_PING_OPTIONS_BUTTON = Buttons.gray("playerPref_personalPingInterval", "Change Personal Ping Interval");
 
     public static final List<Button> REFRESH_INFO_BUTTONS = List.of(
         REFRESH_AC_INFO,

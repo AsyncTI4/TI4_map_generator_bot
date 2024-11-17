@@ -10,8 +10,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.collections4.CollectionUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.ds.DrawBlueBackTile;
-import ti4.commands.ds.DrawRedBackTile;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
@@ -22,6 +20,7 @@ import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
+import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -286,11 +285,11 @@ public class TechExhaust extends TechAddRemove {
                 if (d1.getResult() > 4) {
                     message = message + "blue backed tile";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                    DrawBlueBackTile.drawBlueBackTiles(event, game, player, 1);
+                    DiscordantStarsHelper.drawBlueBackTiles(event, game, player, 1);
                 } else {
                     message = message + "red backed tile";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                    DrawRedBackTile.drawRedBackTiles(event, game, player, 1);
+                    DiscordantStarsHelper.drawRedBackTiles(event, game, player, 1);
                 }
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
