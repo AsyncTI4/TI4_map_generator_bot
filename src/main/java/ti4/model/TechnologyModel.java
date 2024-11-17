@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
+import java.util.SortedSet;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,10 +17,11 @@ import ti4.model.Source.ComponentSource;
 
 @Data
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
+
     private String alias;
     private String name;
     private String shortName;
-    private List<TechnologyType> types;
+    private SortedSet<TechnologyType> types;
     private String requirements;
     private String faction;
     private String baseUpgrade;
@@ -31,7 +32,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private List<String> searchTags = new ArrayList<>();
 
     public enum TechnologyType {
-        PROPULSION, CYBERNETIC, WARFARE, BIOTIC, UNITUPGRADE, NONE;
+        PROPULSION, BIOTIC, CYBERNETIC, WARFARE, UNITUPGRADE, NONE;
 
         public String toString() {
             return super.toString().toLowerCase();
@@ -73,15 +74,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public TechnologyType getFirstType() {
-        List<TechnologyType> priority = List.of(
-            TechnologyType.PROPULSION,
-            TechnologyType.BIOTIC,
-            TechnologyType.CYBERNETIC,
-            TechnologyType.WARFARE,
-            TechnologyType.UNITUPGRADE);
-        for (TechnologyType t : priority)
-            if (types.contains(t)) return t;
-        return TechnologyType.NONE;
+        return types.getFirst();
     }
 
     @JsonIgnore
