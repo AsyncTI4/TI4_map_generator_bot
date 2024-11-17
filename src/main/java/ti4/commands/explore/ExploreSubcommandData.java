@@ -35,6 +35,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
