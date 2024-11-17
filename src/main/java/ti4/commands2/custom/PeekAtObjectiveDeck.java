@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 class PeekAtObjectiveDeck extends GameStateSubcommand {
 
     public PeekAtObjectiveDeck() {
-        super("peek_objective_decks", "Peek at stage 1 or 2 objective deck", true, false);
+        super("peek_objective_decks", "Peek at stage 1 or 2 objective deck", false, true);
         addOptions(new OptionData(OptionType.INTEGER, "stage", "Stage 1 or 2").setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, "count", "Number of objectives to peek at (default 1)"));
     }
@@ -24,7 +24,6 @@ class PeekAtObjectiveDeck extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        Player player = getPlayer();
         int count = event.getOption("count", 1, OptionMapping::getAsInt);
         int stage = event.getOption("stage", 1, OptionMapping::getAsInt);
         List<String> peakedObjectives = new ArrayList<>();
@@ -32,6 +31,7 @@ class PeekAtObjectiveDeck extends GameStateSubcommand {
         for (int i = 0; i < count && i < poDeck.size(); i++) {
             peakedObjectives.add(poDeck.get(i));
         }
+        Player player = getPlayer();
         StringBuilder sb = new StringBuilder()
             .append(player.getRepresentationUnfogged())
             .append(" **Stage ").append(stage).append(" Public Objectives**").append("\n");
