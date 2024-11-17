@@ -1,4 +1,4 @@
-package ti4.commands.relic;
+package ti4.commands2.relic;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;

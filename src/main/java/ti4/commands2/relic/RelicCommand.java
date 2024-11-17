@@ -1,4 +1,4 @@
-package ti4.commands.relic;
+package ti4.commands2.relic;
 
 import java.util.Map;
 import java.util.stream.Collectors;
