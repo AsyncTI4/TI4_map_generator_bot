@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 class ShowAllSOToAll extends GameStateSubcommand {
 
     public ShowAllSOToAll() {
-        super(Constants.SHOW_ALL_SO_TO_ALL, "Show all Secret Objectives to all players", true, false);
+        super(Constants.SHOW_ALL_SO_TO_ALL, "Show all Secret Objectives to all players", true, true);
     }
 
     @Override
