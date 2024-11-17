@@ -8,12 +8,13 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Emojis;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.message.MessageHelper;
 
-public class TIGLShowHeroes extends TIGLSubcommandData {
+public class TIGLShowHeroes extends Subcommand {
 
     public TIGLShowHeroes() {
         super("show_heroes", "Display a list of the reigning Heroes");
