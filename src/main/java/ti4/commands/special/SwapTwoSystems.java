@@ -4,9 +4,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.uncategorized.ShowGame;
-import ti4.commands.units.AddRemoveUnits;
+import ti4.commands2.uncategorized.ShowGame;
 import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -36,14 +36,14 @@ public class SwapTwoSystems extends SpecialSubcommandData {
             return;
         }
         String tile1ID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile1 = AddRemoveUnits.getTile(event, tile1ID, game);
+        Tile tile1 = TileHelper.getTile(event, tile1ID, game);
         if (tile1 == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tile1ID + "`. Tile not found");
             return;
         }
 
         String tile2ID = AliasHandler.resolveTile(tileOptionTo.getAsString().toLowerCase());
-        Tile tile2 = AddRemoveUnits.getTile(event, tile2ID, game);
+        Tile tile2 = TileHelper.getTile(event, tile2ID, game);
 
         String positionFrom = tile1.getPosition();
         String positionTo = tile2ID; //need to validate position

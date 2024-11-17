@@ -16,7 +16,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.relic.RelicSendFragments;
-import ti4.commands.uncategorized.CardsInfo;
+import ti4.commands2.uncategorized.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;

@@ -311,7 +311,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     return;
                 }
                 PlanetAdd.doAction(player, mirageID, game, null, false);
-                PlanetRefresh.doAction(player, mirageID, game);
+                PlanetRefresh.doAction(player, mirageID);
                 String exploreID = game.drawExplore(Constants.CULTURAL);
                 if (exploreID == null) {
                     MessageHelper.sendMessageToEventChannel(event, "Planet cannot be explored: " + mirageID + "\n> The Cultural deck may be empty");

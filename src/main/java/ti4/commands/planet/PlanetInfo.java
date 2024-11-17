@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -21,7 +20,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 
-public class PlanetInfo extends PlanetSubcommandData implements InfoThreadCommand {
+public class PlanetInfo extends PlanetSubcommandData {
     public PlanetInfo() {
         super(Constants.PLANET_INFO, "List Planets");
     }
@@ -34,10 +33,6 @@ public class PlanetInfo extends PlanetSubcommandData implements InfoThreadComman
 
     protected String getActionDescription() {
         return "Sends list of owned planets to your Cards-Info thread";
-    }
-
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, this.getName());
     }
 
     @Override

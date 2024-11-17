@@ -8,9 +8,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.units.AddRemoveUnits;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -42,7 +42,7 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
             return;
         }
         String tileID = AliasHandler.resolveTile(StringUtils.substringBefore(tileOption.getAsString().toLowerCase(), " "));
-        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
+        Tile tile = TileHelper.getTile(event, tileID, game);
         if (tile == null) {
             MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;

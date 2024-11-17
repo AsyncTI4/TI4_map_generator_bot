@@ -1,4 +1,4 @@
-package ti4.commands.uncategorized;
+package ti4.commands2.uncategorized;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,16 +14,18 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
-import ti4.commands.Command;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
-public class ShowGame implements Command {
+public class ShowGame extends ti4.commands2.GameStateCommand {
+
+    public ShowGame() {
+        super(false, false);
+    }
 
     @Override
     public String getName() {
@@ -31,37 +33,13 @@ public class ShowGame implements Command {
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(getName())) {
-            return false;
-        }
-        OptionMapping option = event.getOption(Constants.GAME_NAME);
-        if (option != null) {
-            String mapName = option.getAsString();
-            if (!GameManager.getGameNameToGame().containsKey(mapName)) {
-                MessageHelper.replyToMessage(event, "Game with such name does not exists, use /list_games");
-                return false;
-            }
-        } else {
-            Game userActiveGame = GameManager.getUserActiveGame(event.getUser().getId());
-            if (userActiveGame == null) {
-                MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
-                return false;
-            }
-        }
-        return true;
+    public String getDescription() {
+        return "Show selected map";
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game;
-        OptionMapping option = event.getOption(Constants.GAME_NAME);
-        if (option != null) {
-            String mapName = option.getAsString().toLowerCase();
-            game = GameManager.getGame(mapName);
-        } else {
-            game = GameManager.getUserActiveGame(event.getUser().getId());
-        }
+        Game game = getGame();
         DisplayType displayType = null;
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);
         if (statsOption != null) {
@@ -69,7 +47,7 @@ public class ShowGame implements Command {
             if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
                 MapRenderPipeline.render(game, event, displayType,
-                    fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
+                                fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
                 displayType = DisplayType.stats;
             } else {
                 for (DisplayType i : DisplayType.values()) {
@@ -103,7 +81,8 @@ public class ShowGame implements Command {
 
     public static boolean includeButtons(DisplayType displayType) {
         return switch (displayType) {
-            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments, shipless -> false;
+            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments,
+                 shipless -> false;
             default -> true;
         };
     }
@@ -122,26 +101,24 @@ public class ShowGame implements Command {
                 buttons.add(Buttons.gray("showGameAgain", "Show Game"));
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
-                MessageChannel channel = event.getMessageChannel();
-                if (!game.isFowMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
-                    channel = game.getBotMapUpdatesThread();
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
-                }
-
+                MessageChannel channel =sendMessage(game, event);
                 MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, null, buttons);
             } else {
-                MessageChannel channel = event.getMessageChannel();
-                if (!game.isFowMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
-                    channel = game.getBotMapUpdatesThread();
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
-                }
-
+                MessageChannel channel = sendMessage(game, event);
                 MessageHelper.sendFileUploadToChannel(channel, fileUpload);
             }
         });
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private static MessageChannel sendMessage(Game game, GenericInteractionCreateEvent event) {
+        MessageChannel channel = event.getMessageChannel();
+        if (!game.isFowMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
+            channel = game.getBotMapUpdatesThread();
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
+        }
+        return channel;
+    }
+
     @Override
     public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
