@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 class SOInfo extends GameStateSubcommand {
 
     public SOInfo() {
-        super(Constants.INFO, "Sent scored and unscored Secret Objectives to your Cards Info thread", true, false);
+        super(Constants.INFO, "Sent scored and unscored Secret Objectives to your Cards Info thread", true, true);
     }
 
     @Override
