@@ -337,7 +337,7 @@ public class TileGenerator {
                 if (isFoWPrivate && tile.hasFog(fowPlayer))
                     return tileOutput;
 
-                java.util.List<String> adj = game.getAdjacentTileOverrides(tile.getPosition());
+                List<String> adj = game.getAdjacentTileOverrides(tile.getPosition());
                 int direction = 0;
                 for (String secondaryTile : adj) {
                     if (secondaryTile != null) {
@@ -356,7 +356,7 @@ public class TileGenerator {
                 if (isFoWPrivate && tile.hasFog(fowPlayer))
                     return tileOutput;
 
-                java.util.List<Rectangle> rectangles = new ArrayList<>();
+                List<Rectangle> rectangles = new ArrayList<>();
                 Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
                 UnitHolder spaceUnitHolder = unitHolders.stream()
                     .filter(unitHolder -> unitHolder.getName().equals(Constants.SPACE)).findFirst().orElse(null);
@@ -386,7 +386,7 @@ public class TileGenerator {
                     if (prodInSystem == 11) {
                         textModifer = 0;
                     }
-                    java.util.List<String> problematicTiles = java.util.List.of("25", "26", "64"); // quann, lodor, atlas
+                    List<String> problematicTiles = java.util.List.of("25", "26", "64"); // quann, lodor, atlas
                     BufferedImage gearImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("production_representation.png"), 64, 64);
                     int xMod;
                     int yMod = -290;
@@ -656,11 +656,11 @@ public class TileGenerator {
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
                 String tilePos = tile.getPosition();
-                HashMap<Player, java.util.List<Integer>> pdsDice = new HashMap<>();
+                HashMap<Player, List<Integer>> pdsDice = new HashMap<>();
 
                 for (Player player : game.getRealPlayers()) {
-                    java.util.List<Integer> diceCount = new ArrayList<>();
-                    java.util.List<Integer> diceCountMirveda = new ArrayList<>();
+                    List<Integer> diceCount = new ArrayList<>();
+                    List<Integer> diceCountMirveda = new ArrayList<>();
                     int mod = (game.playerHasLeaderUnlockedOrAlliance(player, "kolumecommander") ? 1 : 0);
 
                     if (player.hasAbility("starfall_gunnery")) {
@@ -917,7 +917,7 @@ public class TileGenerator {
                 }
                 boolean anySkips = false;
                 for (Planet planet : tile.getPlanetUnitHolders()) {
-                    java.util.List<String> skips = planet.getTechSpeciality();
+                    List<String> skips = planet.getTechSpeciality();
                     if (!skips.contains(planet.getOriginalTechSpeciality())) {
                         skips.add(planet.getOriginalTechSpeciality());
                     }

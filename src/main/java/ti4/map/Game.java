@@ -3196,6 +3196,9 @@ public class Game extends GameProperties {
     }
 
     public Player getPlayerThatControlsTile(Tile tile) {
+        if (tile == null) {
+            return null;
+        }
         for (Player player : getRealPlayers()) {
             if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {
                 return player;
