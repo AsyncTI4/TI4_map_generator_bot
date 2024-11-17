@@ -1,4 +1,4 @@
-package ti4.commands.uncategorized;
+package ti4.commands2.uncategorized;
 
 import java.util.HashMap;
 import java.util.Map;

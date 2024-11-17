@@ -2,7 +2,7 @@ package ti4.commands.leaders;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.uncategorized.CardsInfo;
+import ti4.commands2.uncategorized.CardsInfo;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;

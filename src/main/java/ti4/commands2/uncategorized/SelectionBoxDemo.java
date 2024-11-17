@@ -1,4 +1,4 @@
-package ti4.commands.uncategorized;
+package ti4.commands2.uncategorized;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.ParentCommand;
