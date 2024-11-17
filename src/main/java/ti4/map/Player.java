@@ -44,7 +44,6 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.ChangeColor;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
-import ti4.commands.user.UserSettingsManager;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.generator.DrawingUtil;
@@ -73,6 +72,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.users.UserSettingsManager;
 
 public class Player {
 

@@ -32,7 +32,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.game.GameCreate;
-import ti4.commands.help.NewPlayerInfo;
+import ti4.commands2.help.NewPlayerInfo;
 import ti4.generator.MapGenerator;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
