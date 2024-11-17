@@ -1,4 +1,4 @@
-package ti4.commands.tigl;
+package ti4.commands2.tigl;
 
 import java.util.List;
 
