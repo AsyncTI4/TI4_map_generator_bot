@@ -170,7 +170,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "pass_on_abilities" -> ButtonHelper.addReaction(event, false, false, " Is " + event.getButton().getLabel(), "");
                 case "lastMinuteDeliberation" -> UnfiledButtonHandlers.lastMinuteDeliberation(event, player, game, actionsChannel);
                 case "declinePDS" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmojiOrColor() + " officially declines to fire PDS");
-                case "searchMyGames" -> SearchMyGames.searchGames(event.getUser(), event, false, false, false, true, true, false);
+                case "searchMyGames" -> SearchMyGames.searchGames(event.getUser(), event, false, false, false, true, false, true, false, false);
                 case "checkWHView" -> ButtonHelper.showFeatureType(event, game, DisplayType.wormholes);
                 case "checkAnomView" -> ButtonHelper.showFeatureType(event, game, DisplayType.anomalies);
                 case "checkLegendView" -> ButtonHelper.showFeatureType(event, game, DisplayType.legendaries);
