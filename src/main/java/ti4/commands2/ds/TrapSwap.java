@@ -1,13 +1,12 @@
-package ti4.commands.ds;
+package ti4.commands2.ds;
 
 import java.util.Map;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.Nullable;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -16,35 +15,24 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class TrapSwap extends DiscordantStarsSubcommandData {
+class TrapSwap extends GameStateSubcommand {
 
     public TrapSwap() {
-        super(Constants.LIZHO_SWAP_TRAP, "Select planets for which to swap traps");
+        super(Constants.LIZHO_SWAP_TRAP, "Select planets for which to swap traps", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET2, "Planet2").setRequired(true).setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
-
-        OptionMapping planetOption = event.getOption(Constants.PLANET);
-        OptionMapping planetOption2 = event.getOption(Constants.PLANET2);
-        if (planetOption == null || planetOption2 == null) {
-            return;
-        }
-        String planetName = planetOption.getAsString();
+        Game game = getGame();
+        String planetName = event.getOption(Constants.PLANET).getAsString();
         if (!game.getPlanets().contains(planetName)) {
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
         }
 
-        String planetName2 = planetOption2.getAsString();
+        String planetName2 = event.getOption(Constants.PLANET2).getAsString();
         if (!game.getPlanets().contains(planetName2)) {
             MessageHelper.replyToMessage(event, "Planet2 not found in map");
             return;
@@ -62,9 +50,9 @@ public class TrapSwap extends DiscordantStarsSubcommandData {
             return;
         }
 
+        Player player = getPlayer();
         if (unitHolder.getTokenList().contains(Constants.LIZHO_TRAP_PNG) &&
             unitHolder2.getTokenList().contains(Constants.LIZHO_TRAP_PNG)) {
-
             Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
             String trap1 = null;
             String trap2 = null;

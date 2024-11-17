@@ -15,8 +15,6 @@ import ti4.buttons.Buttons;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.custom.PeekAtStage1;
 import ti4.commands.custom.PeekAtStage2;
-import ti4.commands.ds.TrapReveal;
-import ti4.commands.ds.TrapToken;
 import ti4.commands.explore.ExplorePlanet;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
@@ -368,7 +366,7 @@ public class ButtonHelperAbilities {
         String trap = buttonID.split("_")[1];
         trap = translateNameIntoTrapIDOrReverse(trap);
         String planet = player.getTrapCardsPlanets().get(trap);
-        TrapReveal.revealTrapForPlanet(event, game, planet, trap, player, true);
+        DiscordantStarsHelper.revealTrapForPlanet(event, game, planet, trap, player, true);
         event.getMessage().delete().queue();
     }
 
@@ -377,7 +375,7 @@ public class ButtonHelperAbilities {
         String trap = buttonID.split("_")[1];
         trap = translateNameIntoTrapIDOrReverse(trap);
         String planet = player.getTrapCardsPlanets().get(trap);
-        TrapReveal.revealTrapForPlanet(event, game, planet, trap, player, false);
+        DiscordantStarsHelper.revealTrapForPlanet(event, game, planet, trap, player, false);
         event.getMessage().delete().queue();
     }
 
@@ -386,7 +384,7 @@ public class ButtonHelperAbilities {
         String planet = buttonID.split("_")[1];
         String trap = translateNameIntoTrapIDOrReverse(buttonID.split("_")[2]);
         event.getMessage().delete().queue();
-        new TrapToken().setTrapForPlanet(event, game, planet, trap, player);
+        DiscordantStarsHelper.setTrapForPlanet(event, game, planet, trap, player);
     }
 
     public static List<String> getPlanetsWithTraps(Game game) {

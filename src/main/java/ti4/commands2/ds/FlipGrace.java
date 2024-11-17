@@ -1,27 +1,20 @@
-package ti4.commands.ds;
+package ti4.commands2.ds;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class FlipGrace extends DiscordantStarsSubcommandData {
+class FlipGrace extends GameStateSubcommand {
 
     public FlipGrace() {
-        super(Constants.FLIP_GRACE, "Flip Grace (Edyn Faction Ability) to show it has been used");
+        super(Constants.FLIP_GRACE, "Flip Grace (Edyn Faction Ability) to show it has been used", true, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-
+        Player player = getPlayer();
         if (!player.hasAbility("grace")) {
             MessageHelper.sendMessageToEventChannel(event, "Player does not have Grace (Edyn Faction Ability)");
             return;

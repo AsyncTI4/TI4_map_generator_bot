@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
-import ti4.commands.ds.DrawBlueBackTile;
 import ti4.commands.leaders.ExhaustLeader;
 import ti4.commands.leaders.HeroPlay;
 import ti4.commands.player.TurnStart;
@@ -526,7 +525,7 @@ public class ComponentActionHelper {
             }
             case "doStarCharts" -> {
                 ButtonHelper.purge2StarCharters(p1);
-                DrawBlueBackTile.drawBlueBackTiles(event, game, p1, 1);
+                DiscordantStarsHelper.drawBlueBackTiles(event, game, p1, 1);
             }
         }
 
@@ -578,7 +577,7 @@ public class ComponentActionHelper {
             case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, event);
             case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(player, game, event);
             case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> ButtonHelperRelics.offerNanoforgeButtons(player, game, event);
-            case "decrypted_cartoglyph" -> DrawBlueBackTile.drawBlueBackTiles(event, game, player, 3);
+            case "decrypted_cartoglyph" -> DiscordantStarsHelper.drawBlueBackTiles(event, game, player, 3);
             case "throne_of_the_false_emperor" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("drawRelic", "Draw a relic"));
