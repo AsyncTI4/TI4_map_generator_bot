@@ -6,6 +6,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.generator.Mapper;
 import ti4.testUtils.BaseTi4Test;
+import ti4.model.DeckModel.DeckType;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -20,15 +21,14 @@ public class DeckModelTest extends BaseTi4Test {
 
     private static boolean validateCardIDs(DeckModel deckModel) {
         return switch (deckModel.getType()) {
-            case "technology" -> validateTechDeck(deckModel);
-            case "agenda" -> validateAgendaDeck(deckModel);
-            case "event" -> validateEventDeck(deckModel);
-            case "action_card" -> validateActionCardDeck(deckModel);
-            case "secret_objective" -> validateSecretObjectiveDeck(deckModel);
-            case "public_stage_1_objective", "public_stage_2_objective" -> validatePublicObjectiveDecks(deckModel);
-            case "relic" -> validateRelicDeck(deckModel);
-            case "explore" -> validateExploreDecks(deckModel);
-            case "template" -> true;
+            case DeckType.TECHNOLOGY -> validateTechDeck(deckModel);
+            case DeckType.AGENDA -> validateAgendaDeck(deckModel);
+            case DeckType.EVENT -> validateEventDeck(deckModel);
+            case DeckType.ACTION_CARD -> validateActionCardDeck(deckModel);
+            case DeckType.SECRET_OBJECTIVE -> validateSecretObjectiveDeck(deckModel);
+            case DeckType.PUBLIC_STAGE_1_OBJECTIVE, DeckType.PUBLIC_STAGE_2_OBJECTIVE -> validatePublicObjectiveDecks(deckModel);
+            case DeckType.RELIC -> validateRelicDeck(deckModel);
+            case DeckType.EXPLORE -> validateExploreDecks(deckModel);
             default -> false;
         };
     }
