@@ -1,10 +1,6 @@
 package ti4.commands.uncategorized;
 
-import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.player.AbilityInfo;
 import ti4.commands.player.UnitInfo;
@@ -24,15 +20,6 @@ public class AllInfo extends GameStateCommand {
 
     public AllInfo() {
         super(false, true);
-    }
-
-    @Override
-    public List<OptionData> getOptions() {
-        return List.of(
-                new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text")
-                        .setRequired(false),
-                new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also")
-                        .setRequired(false));
     }
 
     @Override

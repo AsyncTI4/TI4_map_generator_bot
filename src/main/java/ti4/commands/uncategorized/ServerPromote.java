@@ -1,7 +1,6 @@
 package ti4.commands.uncategorized;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -10,8 +9,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.ParentCommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -63,15 +60,6 @@ public class ServerPromote implements ParentCommand {
     @Override
     public String getDescription() {
         return "Server promotion";
-    }
-
-    @Override
-    public List<OptionData> getOptions() {
-        return List.of(
-                new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text")
-                        .setRequired(false),
-                new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also")
-                        .setRequired(false));
     }
 
     @Override
