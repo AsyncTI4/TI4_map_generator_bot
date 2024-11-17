@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.user.SetPersonalPingInterval;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -25,7 +24,7 @@ public class PlayerPreferenceHelper {
         buttons.add(Buttons.gray("playerPref_afkTimes", "Change AFK Times"));
         buttons.add(Buttons.gray("playerPref_tacticalAction", "Change Distance-Based Tactical Action Preference"));
         buttons.add(Buttons.gray("playerPref_autoNoWhensAfters", "Change Auto No Whens/Afters React", Emojis.Agenda));
-        buttons.add(SetPersonalPingInterval.OFFER_PING_OPTIONS_BUTTON);
+        buttons.add(Buttons.OFFER_PING_OPTIONS_BUTTON);
         buttons.add(Buttons.gray("playerPref_directHitManagement", "Tell The Bot What Units Not To Risk Direct Hit On"));
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " Choose the thing you wish to change", buttons);
     }

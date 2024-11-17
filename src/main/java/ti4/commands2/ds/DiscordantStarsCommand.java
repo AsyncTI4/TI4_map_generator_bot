@@ -1,4 +1,4 @@
-package ti4.commands2.event;
+package ti4.commands2.ds;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,34 +10,30 @@ import ti4.commands2.ParentCommand;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 
-public class EventCommand implements ParentCommand {
+public class DiscordantStarsCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new DrawEvent(),
-                    new PutEventTop(),
-                    new PutEventBottom(),
-                    new LookAtTopEvent(),
-                    new LookAtBottomEvent(),
-                    new RevealEvent(),
-                    new RevealSpecificEvent(),
-                    new AddEvent(),
-                    new RemoveEvent(),
-                    new ShowDiscardedEvents(),
-                    new ShuffleEvents(),
-                    new ResetEvents(),
-                    new PutDiscardBackIntoDeckEvents(),
-                    new EventInfo(),
-                    new PlayEvent())
+                    new ZelianHero(),
+                    new TrapToken(),
+                    new TrapReveal(),
+                    new TrapSwap(),
+                    new FlipGrace(),
+                    new SetPolicy(),
+                    new DrawBlueBackTile(),
+                    new DrawRedBackTile(),
+                    new AddOmenDie(),
+                    new KyroHero(),
+                    new ATS())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {
-        return Constants.EVENT;
+        return Constants.DS_COMMAND;
     }
 
     @Override
     public String getDescription() {
-        return "Event handling";
+        return "Discordant Stars Commands";
     }
 
     @Override
