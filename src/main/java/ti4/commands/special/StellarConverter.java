@@ -2,20 +2,17 @@ package ti4.commands.special;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
-import ti4.generator.TileGenerator;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
+import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -61,7 +58,7 @@ class StellarConverter extends GameStateSubcommand {
         }
 
         String message1 = (ThreadLocalRandom.current().nextInt(20) == 0 ? "# _Hey, Stellar!_" : "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
-        postTileInDisasterWatch(game, event, tile, 1, "Moments before disaster in game " + game.getName());
+        DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, "Moments before disaster in game " + game.getName());
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message1);
 
         for (Player p2 : game.getRealPlayers()) {
@@ -94,14 +91,6 @@ class StellarConverter extends GameStateSubcommand {
 
         message2.append(" by ");
         message2.append(game.getPlayer(event.getUser().getId()).getRepresentation());
-        postTileInDisasterWatch(game, event, tile, 0, message2.toString());
-    }
-
-    public static void postTileInDisasterWatch(Game game, GenericInteractionCreateEvent event, Tile tile, Integer rings, String message) {
-        if (!AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).isEmpty() && !game.isFowMode()) {
-            TextChannel watchParty = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).getFirst();
-            FileUpload systemWithContext = new TileGenerator(game, event, null, rings, tile.getPosition()).createFileUpload();
-            MessageHelper.sendMessageWithFile(watchParty, systemWithContext, message, false);
-        }
+        DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 0, message2.toString());
     }
 }

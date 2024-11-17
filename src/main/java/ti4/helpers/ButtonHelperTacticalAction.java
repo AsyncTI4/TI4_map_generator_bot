@@ -527,14 +527,14 @@ public class ButtonHelperTacticalAction {
     }
 
     public static void alternateWayOfOfferingTiles(Player player, Game game) {
-        Map<String, Integer> distances = CheckDistance.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
-        List<String> initialOffering = new ArrayList<>(CheckDistance.getAllTilesACertainDistanceAway(game, player, distances, 0));
+        Map<String, Integer> distances = CheckDistanceHelper.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
+        List<String> initialOffering = new ArrayList<>(CheckDistanceHelper.getAllTilesACertainDistanceAway(game, player, distances, 0));
         int maxDistance = 0;
         List<Button> buttons = new ArrayList<>();
         String message = "Doing a tactical action. Please select the tile you want to activate. Right now showing tiles ";
         if (initialOffering.size()
-            + CheckDistance.getAllTilesACertainDistanceAway(game, player, distances, 1).size() < 6) {
-            initialOffering.addAll(CheckDistance.getAllTilesACertainDistanceAway(game, player, distances, 1));
+            + CheckDistanceHelper.getAllTilesACertainDistanceAway(game, player, distances, 1).size() < 6) {
+            initialOffering.addAll(CheckDistanceHelper.getAllTilesACertainDistanceAway(game, player, distances, 1));
             maxDistance = 1;
             message = message + "0-1 tiles away";
         } else {
@@ -551,13 +551,13 @@ public class ButtonHelperTacticalAction {
     @ButtonHandler("getTilesThisFarAway_")
     public static void getTilesThisFarAway(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int desiredDistance = Integer.parseInt(buttonID.split("_")[1]);
-        Map<String, Integer> distances = CheckDistance.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
+        Map<String, Integer> distances = CheckDistanceHelper.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
         int maxDistance = desiredDistance;
         List<Button> buttons = new ArrayList<>();
         if (desiredDistance > 0) {
             buttons.add(Buttons.gray("getTilesThisFarAway_" + (maxDistance - 1), "Get Tiles " + (maxDistance - 1) + " Spaces Away"));
         }
-        for (String pos : CheckDistance.getAllTilesACertainDistanceAway(game, player, distances, desiredDistance)) {
+        for (String pos : CheckDistanceHelper.getAllTilesACertainDistanceAway(game, player, distances, desiredDistance)) {
             Tile tile = game.getTileByPosition(pos);
             String tileRepresentation = tile.getRepresentationForButtons(game, player);
             if (!tileRepresentation.contains("Hyperlane")) {
