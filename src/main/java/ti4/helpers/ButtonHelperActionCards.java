@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands2.cardsso.SOInfo;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.special.NaaluCommander;
@@ -897,7 +896,7 @@ public class ButtonHelperActionCards {
             game.drawSecretObjective(player.getUserID());
             message = message + " Drew a second SO due to Plausible Deniability.";
         }
-        SOInfo.sendSecretObjectiveInfo(game, player, event);
+        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation() + " Exhaust stuff to pay the 3 influence", buttons);

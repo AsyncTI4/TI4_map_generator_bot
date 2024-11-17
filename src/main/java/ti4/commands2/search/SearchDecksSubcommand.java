@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 import ti4.model.DeckModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchDecksSubcommand extends SearchComponentModelSubcommand {
+class SearchDecksSubcommand extends SearchComponentModelSubcommand {
 
     public SearchDecksSubcommand() {
         super(Constants.SEARCH_DECKS, "List all decks the bot can use");

@@ -21,11 +21,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands2.bothelper.ListSlashCommandsUsed;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.SortHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -395,7 +395,7 @@ public class GameStats extends StatisticsSubcommandData {
             }
         }
         StringBuilder longMsg = new StringBuilder("The number of games that finished in the last " + pastDays + " days is " + num + ". They are listed below based on the number of days it took to complete\n");
-        Map<String, Integer> sortedMapAsc = ListSlashCommandsUsed.sortByValue(endedGames, false);
+        Map<String, Integer> sortedMapAsc = SortHelper.sortByValue(endedGames, false);
         int num2 = 0;
         for (String command : sortedMapAsc.keySet()) {
             num2++;

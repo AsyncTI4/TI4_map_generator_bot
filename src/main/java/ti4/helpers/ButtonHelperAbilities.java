@@ -13,8 +13,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.combat.StartCombat;
-import ti4.commands.custom.PeekAtStage1;
-import ti4.commands.custom.PeekAtStage2;
 import ti4.commands.explore.ExplorePlanet;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
@@ -1452,9 +1450,9 @@ public class ButtonHelperAbilities {
     @ButtonHandler("augersPeak_")
     public static void handleAugursPeak(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
-            new PeekAtStage1().secondHalfOfPeak(event, game, player, 1);
+            ObjectiveHelper.secondHalfOfPeakStage1(game, player, 1);
         } else {
-            new PeekAtStage2().secondHalfOfPeak(event, game, player, 1);
+            ObjectiveHelper.secondHalfOfPeakStage2(game, player, 1);
         }
         ButtonHelper.deleteMessage(event);
     }

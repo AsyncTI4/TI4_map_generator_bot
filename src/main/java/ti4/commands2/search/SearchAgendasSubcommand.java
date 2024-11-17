@@ -9,7 +9,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.model.Source.ComponentSource;
 
-public class SearchAgendasSubcommand extends SearchComponentModelSubcommand {
+class SearchAgendasSubcommand extends SearchComponentModelSubcommand {
 
     public SearchAgendasSubcommand() {
         super(Constants.SEARCH_AGENDAS, "List all agendas the bot can use");

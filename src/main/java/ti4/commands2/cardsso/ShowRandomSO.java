@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -38,7 +39,7 @@ class ShowRandomSO extends GameStateSubcommand {
         String sb = "Game: " + game.getName() + "\n" +
             "Player: " + player.getUserName() + "\n" +
             "Showed Secret Objectives:" + "\n" +
-            SOInfo.getSecretObjectiveRepresentation(soID) + "\n";
+            SecretObjectiveHelper.getSecretObjectiveRepresentation(soID) + "\n";
 
         player.setSecret(soID);
 
@@ -49,7 +50,7 @@ class ShowRandomSO extends GameStateSubcommand {
         }
 
         MessageHelper.sendMessageToEventChannel(event, "SO shown to player");
-        SOInfo.sendSecretObjectiveInfo(game, player);
+        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer, game, sb);
     }
 }

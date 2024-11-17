@@ -9,7 +9,7 @@ import ti4.ResourceHelper;
 import ti4.commands2.Subcommand;
 import ti4.message.MessageHelper;
 
-public class Absol extends Subcommand {
+class Absol extends Subcommand {
 
     public Absol() {
         super("absol", "Show Helpful Absol stuff");

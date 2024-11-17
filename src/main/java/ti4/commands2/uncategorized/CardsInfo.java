@@ -9,13 +9,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands2.CommandHelper;
-import ti4.commands2.cardsso.SOInfo;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -63,7 +63,7 @@ public class CardsInfo extends ti4.commands2.GameStateCommand {
     }
 
     public static void sendCardsInfo(Game game, Player player) {
-        SOInfo.sendSecretObjectiveInfo(game, player);
+        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
         ActionCardHelper.sendActionCardInfo(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);

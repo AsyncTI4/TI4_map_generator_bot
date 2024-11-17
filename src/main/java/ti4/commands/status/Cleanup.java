@@ -9,11 +9,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.custom.SpinTilesInRings;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.SpinRingsHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -108,7 +108,7 @@ public class Cleanup extends StatusSubcommandData {
         game.removeStoredValue("PublicExecution");
         game.setHasHadAStatusPhase(true);
         if (game.isSpinMode()) {
-            SpinTilesInRings.spinRings(game);
+            SpinRingsHelper.spinRings(game);
         }
         if (!game.isFowMode() && game.getTableTalkChannel() != null) {
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");

@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.commands2.cardsso.SOInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tech.GetTechButton;
@@ -213,7 +212,6 @@ public class ButtonHelperSCs {
         if (game.getPhaseOfGame().contains("agenda")) {
             imperialHolder = game.getPlayer(game.getSpeakerUserID());
         }
-        String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
         String message = "Drew A Secret Objective";
@@ -224,7 +222,7 @@ public class ButtonHelperSCs {
                     game.drawSecretObjective(player.getUserID());
                     message = message + ". Drew a second SO due to Plausible Deniability";
                 }
-                SOInfo.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
                 break;
             }
             if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {

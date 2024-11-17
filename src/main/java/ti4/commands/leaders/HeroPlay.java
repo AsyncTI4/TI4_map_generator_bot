@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.relic.RelicDraw;
 import ti4.commands.special.KeleresHeroMentak;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.status.ListTurnOrder;
@@ -32,6 +31,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -153,7 +153,7 @@ public class HeroPlay extends LeaderAction {
         }
 
         switch (playerLeader.getId()) {
-            case "kollecchero" -> RelicDraw.drawWithAdvantage(player, event, game, game.getRealPlayers().size());
+            case "kollecchero" -> RelicHelper.drawWithAdvantage(player, game, game.getRealPlayers().size());
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();
                 if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
@@ -400,7 +400,7 @@ public class HeroPlay extends LeaderAction {
                     buttons);
             }
             case "naazhero" -> {
-                RelicDraw.drawRelicAndNotify(player, event, game);
+                RelicHelper.drawRelicAndNotify(player, event, game);
                 List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)

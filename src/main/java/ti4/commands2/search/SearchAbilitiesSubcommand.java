@@ -9,7 +9,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.model.Source.ComponentSource;
 
-public class SearchAbilitiesSubcommand extends SearchComponentModelSubcommand {
+class SearchAbilitiesSubcommand extends SearchComponentModelSubcommand {
 
     public SearchAbilitiesSubcommand() {
         super(Constants.SEARCH_ABILITIES, "List all abilities");

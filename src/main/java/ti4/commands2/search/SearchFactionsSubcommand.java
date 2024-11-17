@@ -11,7 +11,7 @@ import ti4.helpers.Constants;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchFactionsSubcommand extends SearchComponentModelSubcommand {
+class SearchFactionsSubcommand extends SearchComponentModelSubcommand {
 
     public SearchFactionsSubcommand() {
         super(Constants.SEARCH_FACTIONS, "List all factions the bot can use");

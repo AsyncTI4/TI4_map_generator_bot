@@ -54,7 +54,6 @@ import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.milty.MiltyDraftTile;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
-import ti4.commands2.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Units.UnitKey;
@@ -305,7 +304,7 @@ public class Helper {
                     game.drawSecretObjective(player.getUserID());
                     message = message + " Drew a second secret objective due to Plausible Deniability.";
                 }
-                SOInfo.sendSecretObjectiveInfo(game, player);
+                SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2,
                     game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);

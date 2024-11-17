@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 
-public class SearchTechsSubcommand extends SearchComponentModelSubcommand {
+class SearchTechsSubcommand extends SearchComponentModelSubcommand {
 
     public SearchTechsSubcommand() {
         super(Constants.SEARCH_TECHS, "List all techs the bot can use");

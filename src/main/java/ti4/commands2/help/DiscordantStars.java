@@ -9,7 +9,7 @@ import ti4.ResourceHelper;
 import ti4.commands2.Subcommand;
 import ti4.message.MessageHelper;
 
-public class DiscordantStars extends Subcommand {
+class DiscordantStars extends Subcommand {
 
     public DiscordantStars() {
         super("discordant_stars", "Display DS Help Text");

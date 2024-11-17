@@ -15,7 +15,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-public class AddSweepToken extends GameStateSubcommand {
+class AddSweepToken extends GameStateSubcommand {
 
     public AddSweepToken() {
         super(Constants.ADD_SWEEP_TOKEN, "Add a sweep token to the selected system", true, true);

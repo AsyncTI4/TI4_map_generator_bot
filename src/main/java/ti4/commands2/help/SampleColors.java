@@ -23,7 +23,7 @@ import ti4.helpers.Storage;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
 
-public class SampleColors extends Subcommand {
+class SampleColors extends Subcommand {
 
     public SampleColors() {
         super(Constants.SAMPLE_COLORS, "Show a sample image of dreadnoughts in various player colors.");

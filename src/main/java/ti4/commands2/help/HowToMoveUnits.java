@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.message.MessageHelper;
 
-public class HowToMoveUnits extends Subcommand {
+class HowToMoveUnits extends Subcommand {
 
     public HowToMoveUnits() {
         super(Constants.HOW_TO_MOVE_UNITS, "How to move units using the /move_units command");

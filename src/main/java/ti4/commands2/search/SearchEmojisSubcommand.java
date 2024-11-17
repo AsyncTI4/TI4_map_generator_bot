@@ -15,7 +15,7 @@ import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class SearchEmojisSubcommand extends Subcommand {
+class SearchEmojisSubcommand extends Subcommand {
 
     public SearchEmojisSubcommand() {
         super(Constants.SEARCH_EMOJIS, "List all emojis the bot can use");

@@ -28,7 +28,7 @@ import ti4.message.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 
-public class SearchTilesSubcommand extends SearchComponentModelSubcommand {
+class SearchTilesSubcommand extends SearchComponentModelSubcommand {
 
     public SearchTilesSubcommand() {
         super(Constants.SEARCH_TILES, "List all tiles");

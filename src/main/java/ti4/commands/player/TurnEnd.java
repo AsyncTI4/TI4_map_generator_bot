@@ -23,7 +23,6 @@ import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ListPlayerInfoButton;
 import ti4.commands2.CommandHelper;
-import ti4.commands2.cardsso.SOInfo;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -36,6 +35,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.async.RoundSummaryHelper;
@@ -265,7 +265,7 @@ public class TurnEnd extends PlayerSubcommandData {
         game.setPhaseOfGame("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
         for (Player player : game.getRealPlayers()) {
-            SOInfo.sendSecretObjectiveInfo(game, player);
+            SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
             List<String> relics = new ArrayList<>(player.getRelics());
             for (String relic : relics) {
                 if (player.getExhaustedRelics().contains(relic) && relic.contains("axisorder")) {

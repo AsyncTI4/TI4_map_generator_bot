@@ -15,6 +15,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -75,7 +76,7 @@ class DiscardSO extends GameStateSubcommand {
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "SO Discarded");
 
-        SOInfo.sendSecretObjectiveInfo(game, player);
+        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
         if (!soIDString.isEmpty()) {
             String msg = "You discarded the SO " + Mapper.getSecretObjective(soIDString).getName() + ". If this was an accident, you can get it back with the below button. This will tell everyone that you made a mistake discarding and are picking back up the secret.";
             List<Button> buttons = new ArrayList<>();
@@ -98,7 +99,7 @@ class DiscardSO extends GameStateSubcommand {
         }
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMsg);
         ButtonHelper.deleteMessage(event);
-        SOInfo.sendSecretObjectiveInfo(game, player);
+        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
     }
 
     private static void handleSecretObjectiveDrawOrder(Game game, Player player) {

@@ -7,7 +7,7 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 
-public class CommandGameStateHelper {
+class CommandGameStateHelper {
 
     private final boolean saveGame;
     private final boolean isPlayerCommand;

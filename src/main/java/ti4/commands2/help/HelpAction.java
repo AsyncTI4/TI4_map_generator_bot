@@ -5,7 +5,7 @@ import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class HelpAction extends Subcommand {
+class HelpAction extends Subcommand {
 
     public HelpAction() {
         super(Constants.HELP_DOCUMENTATION, "Show Help Documentation");

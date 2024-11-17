@@ -39,7 +39,6 @@ import ti4.commands.player.Pass;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
-import ti4.commands.relic.RelicDraw;
 import ti4.commands.special.FighterConscription;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.status.Cleanup;
@@ -49,7 +48,6 @@ import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
-import ti4.commands2.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.generator.TileGenerator;
 import ti4.helpers.ActionCardHelper;
@@ -74,6 +72,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.PlayerPreferenceHelper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -1245,7 +1244,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("get_so_discard_buttons")
     public static void getSODiscardButtons(ButtonInteractionEvent event, Player player, Game game) {
         String secretScoreMsg = "_ _\nClick a button below to discard your Secret Objective";
-        List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(player);
+        List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
         if (!soButtons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
         } else {
@@ -1340,7 +1339,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("get_so_score_buttons")
     public static void getSoScoreButtons(ButtonInteractionEvent event, Player player) {
         String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
-        List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveButtons(player);
+        List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveButtons(player);
         if (!soButtons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
         } else {
@@ -2164,14 +2163,14 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("drawRelicFromFrag")
     public static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Drew Relic");
-        RelicDraw.drawRelicAndNotify(player, event, game);
+        RelicHelper.drawRelicAndNotify(player, event, game);
         doAnotherAction(event, player, game);
     }
 
     @ButtonHandler("drawRelic")
     public static void drawRelic(ButtonInteractionEvent event, Player player, Game game) {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Drew Relic");
-        RelicDraw.drawRelicAndNotify(player, event, game);
+        RelicHelper.drawRelicAndNotify(player, event, game);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -3008,7 +3007,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             game.drawSecretObjective(player.getUserID());
             message += ". Drew a second SO due to Plausible Deniability";
         }
-        SOInfo.sendSecretObjectiveInfo(game, player, event);
+        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
         ButtonHelper.addReaction(event, false, false, message, "");
     }
 
@@ -3020,7 +3019,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             game.drawSecretObjective(player.getUserID());
             message += ". Drew a second SO due to Plausible Deniability";
         }
-        SOInfo.sendSecretObjectiveInfo(game, player, event);
+        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
         ButtonHelper.addReaction(event, false, false, message, "");
     }
 

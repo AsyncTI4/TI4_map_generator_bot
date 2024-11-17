@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -54,7 +55,7 @@ class ShowSOToAll extends GameStateSubcommand {
         } else {
             sb.append("Showed Secret Objectives:").append("\n");
         }
-        String info = SOInfo.getSecretObjectiveRepresentation(soID);
+        String info = SecretObjectiveHelper.getSecretObjectiveRepresentation(soID);
         if (onlyPhase) {
             info = Mapper.getSecretObjective(soID).getPhase();
         }

@@ -10,6 +10,7 @@ import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -40,7 +41,7 @@ class ShowSO extends GameStateSubcommand {
             return;
         }
 
-        String info = SOInfo.getSecretObjectiveRepresentation(soID);
+        String info = SecretObjectiveHelper.getSecretObjectiveRepresentation(soID);
         boolean onlyPhase = event.getOption(Constants.ONLY_PHASE, false, OptionMapping::getAsBoolean);
         if (onlyPhase) {
             info = Mapper.getSecretObjective(soID).getPhase();
@@ -60,7 +61,7 @@ class ShowSO extends GameStateSubcommand {
         }
 
         MessageHelper.sendMessageToEventChannel(event, "SO shown to player");
-        SOInfo.sendSecretObjectiveInfo(game, player);
+        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, game, sb);
     }
 }

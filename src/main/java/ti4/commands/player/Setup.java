@@ -21,8 +21,6 @@ import ti4.commands.tech.TechInfo;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands2.CommandHelper;
-import ti4.commands2.cardsso.SOInfo;
-import ti4.commands2.search.SearchMyTitles;
 import ti4.commands2.uncategorized.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -33,6 +31,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.SecretObjectiveHelper;
+import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -108,7 +108,7 @@ public class Setup extends PlayerSubcommandData {
         if (player.isRealPlayer() && player.getSo() > 0) {
             String message = player.getRepresentationNoPing() + "has SOs that would get lost to the void if they were setup again. If they wish to change color, use /player change_color. If they want to setup as another faction, they must discard their SOs first";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-            SOInfo.sendSecretObjectiveInfo(game, player);
+            SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
             return;
         }
 
@@ -347,7 +347,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         if (!game.isFowMode()) {
-            StringBuilder sb = new SearchMyTitles().getPlayerTitles(player.getUserID(), player.getUserName(), false);
+            StringBuilder sb = TitlesHelper.getPlayerTitles(player.getUserID(), player.getUserName(), false);
             if (!sb.toString().contains("No titles yet")) {
                 String msg = "In previous games, " + player.getUserName() + " has earned the titles of: \n" + sb;
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
