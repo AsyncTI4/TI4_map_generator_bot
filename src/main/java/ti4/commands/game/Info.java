@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands2.user.UserSettingsManager;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -16,6 +15,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.users.UserSettingsManager;
 
 public class Info extends GameSubcommandData {
     public static final String NEW_LINE = "\n";
