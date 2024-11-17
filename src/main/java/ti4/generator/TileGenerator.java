@@ -103,6 +103,19 @@ public class TileGenerator {
             tilesToDisplay.remove(tile_);
         }
 
+        // Resolve fog of war vision limitations
+        if (game.isFowMode() && event != null && event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
+            Set<String> tilesToShow = FoWHelper.fowFilter(game, fowPlayer);
+            Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
+            keys.removeAll(tilesToShow);
+            for (String key : keys) {
+                tilesToDisplay.remove(key);
+                if (fowPlayer != null) {
+                    tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
+                }
+            }
+       }
+      
         int width = TILE_WIDTH + (TILE_EXTRA_WIDTH * 2 * context) + EXTRA_X;
         int height = TILE_HEIGHT * (2 * context + 1) + EXTRA_Y;
         var mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
