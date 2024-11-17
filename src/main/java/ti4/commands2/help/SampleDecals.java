@@ -23,7 +23,7 @@ import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.message.MessageHelper;
 
-public class SampleDecals extends Subcommand {
+class SampleDecals extends Subcommand {
 
     public SampleDecals() {
         super(Constants.SAMPLE_DECALS, "Show a sample image of dreadnoughts with various decals.");

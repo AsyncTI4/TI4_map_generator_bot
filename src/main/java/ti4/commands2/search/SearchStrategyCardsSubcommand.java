@@ -11,7 +11,7 @@ import ti4.helpers.Constants;
 import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 
-public class SearchStrategyCardsSubcommand extends SearchComponentModelSubcommand {
+class SearchStrategyCardsSubcommand extends SearchComponentModelSubcommand {
 
     public SearchStrategyCardsSubcommand() {
         super(Constants.SEARCH_STRATEGY_CARDS, "List all strategy cards the bot can use");

@@ -11,7 +11,7 @@ import ti4.helpers.Constants;
 import ti4.model.RelicModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchRelicsSubcommand extends SearchComponentModelSubcommand {
+class SearchRelicsSubcommand extends SearchComponentModelSubcommand {
 
     public SearchRelicsSubcommand() {
         super(Constants.SEARCH_RELICS, "List all relics the bot can use");

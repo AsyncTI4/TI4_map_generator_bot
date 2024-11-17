@@ -4,14 +4,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.player.AbilityInfo;
 import ti4.commands.player.UnitInfo;
-import ti4.commands.relic.RelicInfo;
 import ti4.commands.tech.TechInfo;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateCommand;
-import ti4.commands2.cardsso.SOInfo;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.RelicHelper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -48,8 +48,8 @@ public class AllInfo extends GameStateCommand {
         UnitInfo.sendUnitInfo(game, player, false);
         LeaderInfo.sendLeadersInfo(game, player);
         TechInfo.sendTechInfo(game, player);
-        RelicInfo.sendRelicInfo(game, player);
-        SOInfo.sendSecretObjectiveInfo(game, player);
+        RelicHelper.sendRelicInfo(player);
+        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
         ActionCardHelper.sendActionCardInfo(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         CardsInfo.sendVariousAdditionalButtons(game, player);

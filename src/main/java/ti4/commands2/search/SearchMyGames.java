@@ -22,7 +22,7 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SearchMyGames extends Subcommand {
+class SearchMyGames extends Subcommand {
 
     public SearchMyGames() {
         super(Constants.SEARCH_MY_GAMES, "List all of your games you are currently in");

@@ -11,7 +11,7 @@ import ti4.helpers.Constants;
 import ti4.model.LeaderModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchLeadersSubcommand extends SearchComponentModelSubcommand {
+class SearchLeadersSubcommand extends SearchComponentModelSubcommand {
 
     public SearchLeadersSubcommand() {
         super(Constants.SEARCH_LEADERS, "List all leaders the bot can use");

@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -18,27 +18,21 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class RelicShowRemaining extends RelicSubcommandData {
+class RelicShowRemaining extends GameStateSubcommand {
 
     public RelicShowRemaining() {
-        super(Constants.RELIC_SHOW_REMAINING, "Show remaining relics in deck");
+        super(Constants.RELIC_SHOW_REMAINING, "Show remaining relics in deck", false, true);
         addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_FOW, "TRUE if override fog"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
         OptionMapping override = event.getOption(Constants.OVERRIDE_FOW);
         boolean over = false;
         if (override != null) {
             over = "TRUE".equalsIgnoreCase(override.getAsString());
         }
-        showRemaining(event, over, game, player);
+        showRemaining(event, over, getGame(), getPlayer());
     }
 
     public static void showRemaining(GenericInteractionCreateEvent event, boolean over, Game game, Player player) {

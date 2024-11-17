@@ -12,7 +12,7 @@ import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class SearchCommands extends Subcommand {
+class SearchCommands extends Subcommand {
 
     public SearchCommands() {
         super(Constants.SEARCH_COMMANDS, "List all of the bot's commands and subcommands");

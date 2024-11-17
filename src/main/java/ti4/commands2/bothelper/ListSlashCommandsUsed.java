@@ -21,7 +21,7 @@ import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 
-public class ListSlashCommandsUsed extends Subcommand {
+class ListSlashCommandsUsed extends Subcommand {
 
     public ListSlashCommandsUsed() {
         super(Constants.LIST_SLASH_COMMANDS_USED, "List the frequency with which slash commands are used");

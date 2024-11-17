@@ -9,7 +9,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.model.Source.ComponentSource;
 
-public class SearchPromissoryNotesSubcommand extends SearchComponentModelSubcommand {
+class SearchPromissoryNotesSubcommand extends SearchComponentModelSubcommand {
 
     public SearchPromissoryNotesSubcommand() {
         super(Constants.SEARCH_PROMISSORY_NOTES, "List all promissory notes the bot can use");

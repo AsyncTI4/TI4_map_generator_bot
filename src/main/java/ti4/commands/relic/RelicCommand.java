@@ -1,66 +1,51 @@
 package ti4.commands.relic;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.AsyncTI4DiscordBot;
+import ti4.commands2.CommandHelper;
+import ti4.commands2.ParentCommand;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 
-public class RelicCommand implements Command {
+public class RelicCommand implements ParentCommand {
 
-    private final Collection<RelicSubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+        new RelicInfo(),
+        new RelicDraw(),
+        new RelicPurge(),
+        new RelicExhaust(),
+        new RelicReady(),
+        new RelicDrawSpecific(),
+        new RelicLookAtTop(),
+        new RelicSend(),
+        new RelicShuffleBack(),
+        new RelicShowRemaining(),
+        new RelicAddBackIntoDeck(),
+        new RelicSendFragments(),
+        new RelicPurgeFragments()
+    ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {
         return Constants.RELIC;
     }
 
-    public String getActionDescription() {
-        return "Relic";
+    public String getDescription() {
+        return "Relic`";
     }
 
     @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        for (RelicSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                break;
-            }
-        }
-        String userID = event.getUser().getId();
-        Game game = GameManager.getUserActiveGame(userID);
-        GameSaveLoadManager.saveGame(game, event);
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return ParentCommand.super.accept(event) &&
+            CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.developerRoles);
     }
 
-    private Collection<RelicSubcommandData> getSubcommands() {
-        Collection<RelicSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new RelicInfo());
-        subcommands.add(new RelicDraw());
-        subcommands.add(new RelicPurge());
-        subcommands.add(new RelicExhaust());
-        subcommands.add(new RelicReady());
-        subcommands.add(new RelicDrawSpecific());
-        subcommands.add(new RelicLookAtTop());
-        subcommands.add(new RelicSend());
-        subcommands.add(new RelicShuffleBack());
-        subcommands.add(new RelicShowRemaining());
-        subcommands.add(new RelicAddBackIntoDeck());
-        subcommands.add(new RelicSendFragments());
-        subcommands.add(new RelicPurgeFragments());
+    @Override
+    public Map<String, Subcommand> getSubcommands() {
         return subcommands;
-    }
-
-    @Override
-    public void register(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getName(), getActionDescription()).addSubcommands(getSubcommands()));
     }
 }

@@ -16,6 +16,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -44,7 +45,7 @@ class DealSOToAll extends GameStateSubcommand {
                     game.drawSecretObjective(player.getUserID());
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " due to Plausible Deniability, you were dealt an extra SO. You must also discard an extra SO.");
                 }
-                SOInfo.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), count + Emojis.SecretObjective + " dealt to all players. Check your Cards-Info threads.");

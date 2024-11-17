@@ -9,7 +9,7 @@ import ti4.ResourceHelper;
 import ti4.commands2.Subcommand;
 import ti4.message.MessageHelper;
 
-public class NewPlayerInfo extends Subcommand {
+class NewPlayerInfo extends Subcommand {
 
     public NewPlayerInfo() {
         super("new_player_info", "Information for players new to AsyncTI4");

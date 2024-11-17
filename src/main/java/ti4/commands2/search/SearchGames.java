@@ -21,7 +21,7 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SearchGames extends Subcommand {
+class SearchGames extends Subcommand {
 
     public SearchGames() {
         super(Constants.SEARCH_GAMES, "List all games");

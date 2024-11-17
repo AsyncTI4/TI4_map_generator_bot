@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class SearchForGame extends GameStateSubcommand {
+class SearchForGame extends GameStateSubcommand {
 
     public SearchForGame() {
         super(Constants.SEARCH_FOR_GAME, "Get a specific games channels", false, false);

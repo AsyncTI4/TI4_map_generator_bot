@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchPublicObjectivesSubcommand extends SearchComponentModelSubcommand {
+class SearchPublicObjectivesSubcommand extends SearchComponentModelSubcommand {
 
     public SearchPublicObjectivesSubcommand() {
         super(Constants.SEARCH_PUBLIC_OBJECTIVES, "List all public objectives the bot can use");

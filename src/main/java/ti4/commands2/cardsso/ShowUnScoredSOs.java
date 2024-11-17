@@ -13,7 +13,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowUnScoredSOs extends GameStateSubcommand {
+class ShowUnScoredSOs extends GameStateSubcommand {
 
     public ShowUnScoredSOs() {
         super(Constants.SHOW_UNSCORED_SOS, "List any SOs that are not scored yet", true, false);
@@ -45,15 +45,15 @@ public class ShowUnScoredSOs extends GameStateSubcommand {
         sb.append("Unscored Action Phase Secrets: ").append("\n");
         int x = 1;
         for (String id : currentSecrets) {
-            if (SOInfo.getSecretObjectiveRepresentation(id).contains("Action Phase")) {
-                sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
+            if (SecretObjectiveHelper.getSecretObjectiveRepresentation(id).contains("Action Phase")) {
+                sb.append(x).append(SecretObjectiveHelper.getSecretObjectiveRepresentation(id));
                 x++;
             }
         }
         x = 1;
         sb.append("\n").append("Unscored Status Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
-            if (SOInfo.getSecretObjectiveRepresentation(id).contains("Status Phase")) {
+            if (SecretObjectiveHelper.getSecretObjectiveRepresentation(id).contains("Status Phase")) {
                 appendSecretObjectiveRepresentation(game, sb, id, x);
                 x++;
             }
@@ -61,7 +61,7 @@ public class ShowUnScoredSOs extends GameStateSubcommand {
         x = 1;
         sb.append("\n").append("Unscored Agenda Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
-            if (SOInfo.getSecretObjectiveRepresentation(id).contains("Agenda Phase")) {
+            if (SecretObjectiveHelper.getSecretObjectiveRepresentation(id).contains("Agenda Phase")) {
                 appendSecretObjectiveRepresentation(game, sb, id, x);
                 x++;
             }
@@ -71,7 +71,7 @@ public class ShowUnScoredSOs extends GameStateSubcommand {
 
     private static void appendSecretObjectiveRepresentation(Game game, StringBuilder sb, String id, int x) {
         if (ListPlayerInfoButton.getObjectiveThreshold(id, game) > 0) {
-            sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
+            sb.append(x).append(SecretObjectiveHelper.getSecretObjectiveRepresentation(id));
             sb.append("> ");
             for (Player player : game.getRealPlayers()) {
                 sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(id, game)).append(" ");
@@ -79,7 +79,7 @@ public class ShowUnScoredSOs extends GameStateSubcommand {
             sb.append("\n");
 
         } else {
-            sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
+            sb.append(x).append(SecretObjectiveHelper.getSecretObjectiveRepresentation(id));
         }
     }
 }

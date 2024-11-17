@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -16,28 +17,19 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 
-public class RelicSend extends RelicSubcommandData {
+class RelicSend extends GameStateSubcommand {
+
     public RelicSend() {
-        super(Constants.RELIC_SEND, "Send a relic to another Player");
+        super(Constants.RELIC_SEND, "Send a relic to another Player", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to send from Target to Source").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target Faction or Color").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source Faction or Color (default is you)").setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player1 = CommandHelper.getPlayerFromEvent(game, event);
-        if (player1 == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-
-        //resolve player2
+        Game game = getGame();
+        Player player1 = getPlayer();
         Player player2 = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (player2 == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player 2 could not be found");
-            return;
-        }
         if (player1.equals(player2)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "The two players provided are the same player");
             return;

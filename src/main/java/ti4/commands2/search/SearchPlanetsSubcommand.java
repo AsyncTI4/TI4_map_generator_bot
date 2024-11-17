@@ -14,7 +14,7 @@ import ti4.helpers.Constants;
 import ti4.model.PlanetModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchPlanetsSubcommand extends SearchComponentModelSubcommand {
+class SearchPlanetsSubcommand extends SearchComponentModelSubcommand {
 
     public SearchPlanetsSubcommand() {
         super(Constants.SEARCH_PLANETS, "List all planets");

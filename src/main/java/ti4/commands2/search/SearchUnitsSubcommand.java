@@ -13,7 +13,7 @@ import ti4.helpers.Constants;
 import ti4.model.Source.ComponentSource;
 import ti4.model.UnitModel;
 
-public class SearchUnitsSubcommand extends SearchComponentModelSubcommand {
+class SearchUnitsSubcommand extends SearchComponentModelSubcommand {
 
     public SearchUnitsSubcommand() {
         super(Constants.SEARCH_UNITS, "List all units");

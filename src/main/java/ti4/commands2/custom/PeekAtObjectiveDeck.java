@@ -13,7 +13,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PeekAtObjectiveDeck extends GameStateSubcommand {
+class PeekAtObjectiveDeck extends GameStateSubcommand {
 
     public PeekAtObjectiveDeck() {
         super("peek_objective_decks", "Peek at stage 1 or 2 objective deck", true, false);

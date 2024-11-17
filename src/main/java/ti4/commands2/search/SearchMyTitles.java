@@ -19,7 +19,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
-public class SearchMyTitles extends Subcommand {
+class SearchMyTitles extends Subcommand {
 
     public SearchMyTitles() {
         super(Constants.SEARCH_MY_TITLES, "List all the titles you've acquired");
