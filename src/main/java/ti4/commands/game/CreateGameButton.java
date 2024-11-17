@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands.search.SearchMyGames;
+import ti4.commands2.search.SearchMyGames;
 import ti4.helpers.Constants;
 import ti4.helpers.GameCreationHelper;
 import ti4.listeners.annotations.ButtonHandler;
