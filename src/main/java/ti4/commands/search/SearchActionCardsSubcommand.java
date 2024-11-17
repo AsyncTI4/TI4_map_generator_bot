@@ -7,13 +7,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.model.DeckModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchDecks extends SearchComponentModel {
+public class SearchActionCardsSubcommand extends SearchComponentModelSubcommand {
 
-    public SearchDecks() {
-        super(Constants.SEARCH_DECKS, "List all decks the bot can use");
+    public SearchActionCardsSubcommand() {
+        super(Constants.SEARCH_ACTION_CARDS, "List all action cards the bot can use");
     }
 
     @Override
@@ -21,14 +20,14 @@ public class SearchDecks extends SearchComponentModel {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
-        if (Mapper.isValidDeck(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getDeck(searchString).getRepresentationEmbed()).queue();
+        if (Mapper.isValidActionCard(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getActionCard(searchString).getRepresentationEmbed(true, true)).queue();
             return;
         }
 
-        List<MessageEmbed> messageEmbeds = Mapper.getDecks().values().stream()
+        List<MessageEmbed> messageEmbeds = Mapper.getActionCards().values().stream()
             .filter(model -> model.search(searchString, source))
-            .map(DeckModel::getRepresentationEmbed)
+            .map(model -> model.getRepresentationEmbed(true, true))
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }

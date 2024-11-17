@@ -11,11 +11,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class SearchEmojis extends SearchSubcommandData {
-    public SearchEmojis() {
+public class SearchEmojisSubcommand extends Subcommand {
+
+    public SearchEmojisSubcommand() {
         super(Constants.SEARCH_EMOJIS, "List all emojis the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_RAW_STRING, "Includes the raw emoji string for copy/paste"));
@@ -36,7 +38,7 @@ public class SearchEmojis extends SearchSubcommandData {
         String message = emojis.stream().map(e -> getEmojiMessage(e, includeRAW)).collect(Collectors.joining("\n"));
 
         if (emojis.size() > 3) {
-            String threadName = event.getFullCommandName() + " search: " + searchString;
+            String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
             MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -45,7 +47,8 @@ public class SearchEmojis extends SearchSubcommandData {
 
     private static String getEmojiMessage(RichCustomEmoji emoji, boolean includeRAW) {
         if (!includeRAW) return "# " + emoji.getFormatted();
-        return emoji.getFormatted() +
+        String sb = emoji.getFormatted() +
                 " `" + emoji.getFormatted() + "`";
+        return sb;
     }
 }

@@ -8,11 +8,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TechnologyModel;
 
-public class SearchEvents extends SearchComponentModel {
+public class SearchTechsSubcommand extends SearchComponentModelSubcommand {
 
-    public SearchEvents() {
-        super(Constants.SEARCH_EVENTS, "List all events the bot can use");
+    public SearchTechsSubcommand() {
+        super(Constants.SEARCH_TECHS, "List all techs the bot can use");
     }
 
     @Override
@@ -20,14 +21,16 @@ public class SearchEvents extends SearchComponentModel {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
-        if (Mapper.isValidEvent(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getEvent(searchString).getRepresentationEmbed(true, null)).queue();
+        if (Mapper.isValidTech(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getTech(searchString).getRepresentationEmbed(true, true)).queue();
             return;
         }
 
-        List<MessageEmbed> messageEmbeds = Mapper.getEvents().values().stream()
+        List<MessageEmbed> messageEmbeds = Mapper.getTechs().values().stream()
+            .sorted(TechnologyModel.sortByTechRequirements)
+            .sorted(TechnologyModel.sortByType)
             .filter(model -> model.search(searchString, source))
-            .map(model -> model.getRepresentationEmbed(true, null))
+            .map(model -> model.getRepresentationEmbed(true, true))
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.message.MessageHelper;
 
 public class SearchHelper {
+
     public static void sendSearchEmbedsToEventChannel(SlashCommandInteractionEvent event, List<MessageEmbed> messageEmbeds) {
         if (messageEmbeds.size() > 3) {
             String threadName = event.getCommandString();

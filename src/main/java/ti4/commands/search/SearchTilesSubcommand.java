@@ -28,9 +28,9 @@ import ti4.message.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 
-public class SearchTiles extends SearchComponentModel {
+public class SearchTilesSubcommand extends SearchComponentModelSubcommand {
 
-    public SearchTiles() {
+    public SearchTilesSubcommand() {
         super(Constants.SEARCH_TILES, "List all tiles");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "True to also show the available aliases you can use"));
     }

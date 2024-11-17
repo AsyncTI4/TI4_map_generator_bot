@@ -7,12 +7,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.model.PublicObjectiveModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchAgendas extends SearchComponentModel {
+public class SearchPublicObjectivesSubcommand extends SearchComponentModelSubcommand {
 
-    public SearchAgendas() {
-        super(Constants.SEARCH_AGENDAS, "List all agendas the bot can use");
+    public SearchPublicObjectivesSubcommand() {
+        super(Constants.SEARCH_PUBLIC_OBJECTIVES, "List all public objectives the bot can use");
     }
 
     @Override
@@ -20,13 +21,14 @@ public class SearchAgendas extends SearchComponentModel {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
-        if (Mapper.isValidAgenda(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getAgenda(searchString).getRepresentationEmbed(true)).queue();
+        if (Mapper.isValidPublicObjective(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getPublicObjective(searchString).getRepresentationEmbed(true)).queue();
             return;
         }
 
-        List<MessageEmbed> messageEmbeds = Mapper.getAgendas().values().stream()
+        List<MessageEmbed> messageEmbeds = Mapper.getPublicObjectives().values().stream()
             .filter(model -> model.search(searchString, source))
+            .sorted(PublicObjectiveModel.sortByPointsAndName)
             .map(model -> model.getRepresentationEmbed(true))
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);

@@ -4,15 +4,16 @@ import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.Command.Option;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.Command.Option;
-import net.dv8tion.jda.api.interactions.commands.Command.Subcommand;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class SearchCommands extends SearchSubcommandData {
+public class SearchCommands extends Subcommand {
+
     public SearchCommands() {
         super(Constants.SEARCH_COMMANDS, "List all of the bot's commands and subcommands");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_OPTIONS, "True to include command options"));
@@ -31,7 +32,7 @@ public class SearchCommands extends SearchSubcommandData {
 
         //COMMANDS
         for (Command command : commands) {
-            List<Subcommand> subcommands = command.getSubcommands();
+            var subcommands = command.getSubcommands();
             int subcommandCount = subcommands.size();
             List<Option> options = command.getOptions();
 
@@ -48,7 +49,7 @@ public class SearchCommands extends SearchSubcommandData {
             }
 
             //SUBCOMMANDS
-            for (Subcommand subcommand : subcommands) {
+            for (var subcommand : subcommands) {
                 String subcommandText = "> `/" + subcommand.getFullCommandName() + "` : " + subcommand.getDescription();
                 if (searchString == null || subcommandText.toLowerCase().contains(searchString.toLowerCase())) sb.append(subcommandText).append("\n");
                 subcommandCount++;

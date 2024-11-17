@@ -1,5 +1,6 @@
 package ti4.commands.search;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -11,14 +12,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.GameProperties;
 import ti4.message.MessageHelper;
 
-public class SearchMyTitles extends SearchSubcommandData {
+public class SearchMyTitles extends Subcommand {
 
     public SearchMyTitles() {
         super(Constants.SEARCH_MY_TITLES, "List all the titles you've acquired");
@@ -32,41 +33,35 @@ public class SearchMyTitles extends SearchSubcommandData {
         MessageHelper.sendMessageToThread(event.getChannel(), user.getName() + "'s Titles List", sb.toString());
     }
 
-    public StringBuilder getPlayerTitles(String userID, String userName, boolean gamesIncluded) {
-        Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
-        Predicate<Game> endedGamesFilter = GameProperties::isHasEnded;
-        Predicate<Game> allFilterPredicates = ignoreSpectateFilter.and(endedGamesFilter);
+    public StringBuilder getPlayerTitles(String userId, String userName, boolean gamesIncluded) {
+        HashMap<String, String> gameHistory = new HashMap<>();
+        Map<String, Integer> titles = new HashMap<>();
 
-        Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
-
+        Predicate<Game> thisPlayerIsInGame = game -> game.getPlayer(userId) != null;
         List<Game> games = GameManager.getGameNameToGame().values().stream()
-            .filter(allFilterPredicates)
-            .sorted(mapSort)
-            .toList();
-        HashMap<String, String> gameHist = new HashMap<>();
+                .filter(thisPlayerIsInGame.and(Game::isHasEnded))
+                .sorted(Comparator.comparing(Game::getGameNameForSorting))
+                .toList();
+
+        for (var managedGame : games) {
+            var game = GameManager.getGame(managedGame.getName());
+            String titlesForPlayer = game.getStoredValue("TitlesFor" + userId);
+            if (titlesForPlayer.isEmpty()) {
+                continue;
+            }
+            Arrays.stream(titlesForPlayer.split("_"))
+                    .forEach(title -> {
+                        titles.merge(title, 1, Integer::sum);
+                        gameHistory.merge(title, game.getName(), (existing, newName) -> existing + ", " + newName);
+                    });
+        }
+
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(userName).append("'s Titles__**\n");
-        Map<String, Integer> titles = new HashMap<>();
-        for (Game playerGame : games) {
-            String singularGameTiles = playerGame.getStoredValue("TitlesFor" + userID);
-            if (!singularGameTiles.isEmpty()) {
-                for (String title : singularGameTiles.split("_")) {
-                    if (titles.containsKey(title)) {
-                        int amount = titles.get(title) + 1;
-                        titles.put(title, amount);
-                        gameHist.put(title, gameHist.get(title) + ", " + playerGame.getName());
-                    } else {
-                        titles.put(title, 1);
-                        gameHist.put(title, playerGame.getName());
-                    }
-
-                }
-            }
-        }
         for (String title : titles.keySet()) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
             if (gamesIncluded) {
-                sb.append("**").append(title).append("** x").append(titles.get(title)).append(" (").append(gameHist.get(title)).append(")");
+                sb.append("**").append(title).append("** x").append(titles.get(title)).append(" (").append(gameHistory.get(title)).append(")");
             } else {
                 sb.append("**").append(title).append("** x").append(titles.get(title));
             }

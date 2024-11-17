@@ -1,11 +1,8 @@
 package ti4.commands.search;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.entities.User;
@@ -13,14 +10,16 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.GameProperties;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SearchGames extends SearchSubcommandData {
+public class SearchGames extends Subcommand {
 
     public SearchGames() {
         super(Constants.SEARCH_GAMES, "List all games");
@@ -41,7 +40,6 @@ public class SearchGames extends SearchSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map<String, Game> mapList = GameManager.getGameNameToGame();
         boolean includeNormalGames = event.getOption(Constants.NORMAL_GAME, false, OptionMapping::getAsBoolean);
         boolean includeTIGLGames = event.getOption(Constants.TIGL_GAME, false, OptionMapping::getAsBoolean);
         boolean includeCommunityGames = event.getOption(Constants.COMMUNITY_MODE, false, OptionMapping::getAsBoolean);
@@ -57,23 +55,42 @@ public class SearchGames extends SearchSubcommandData {
         String searchFactions = event.getOption(Constants.SEARCH_FACTIONS, "", OptionMapping::getAsString).toLowerCase();
         User searchUser = event.getOption(Constants.SEARCH_USERS, null, OptionMapping::getAsUser);
 
-        List<Entry<String, Game>> normalGames = mapList.entrySet().stream().filter(map -> map.getValue().isNormalGame()).toList();
-        List<Entry<String, Game>> tIGLGames = mapList.entrySet().stream().filter(map -> map.getValue().isCompetitiveTIGLGame()).toList();
-        List<Entry<String, Game>> communityGames = mapList.entrySet().stream().filter(map -> map.getValue().isCommunityMode()).toList();
-        List<Entry<String, Game>> allianceGames = mapList.entrySet().stream().filter(map -> map.getValue().isAllianceMode()).toList();
-        List<Entry<String, Game>> foWGames = mapList.entrySet().stream().filter(map -> map.getValue().isFowMode()).toList();
-        List<Entry<String, Game>> absolGames = mapList.entrySet().stream().filter(map -> map.getValue().isAbsolMode()).toList();
-        List<Entry<String, Game>> miltyModGames = mapList.entrySet().stream().filter(map -> map.getValue().isMiltyModMode()).toList();
-        List<Entry<String, Game>> dSGames = mapList.entrySet().stream().filter(map -> map.getValue().isDiscordantStarsMode()).toList();
-        List<Entry<String, Game>> frankenGames = mapList.entrySet().stream().filter(map -> map.getValue().isFrankenGame()).toList();
-        List<Entry<String, Game>> endedGames = mapList.entrySet().stream().filter(map -> map.getValue().isHasEnded()).toList();
-        List<Entry<String, Game>> searchNameGames = mapList.entrySet().stream().filter(map -> map.getValue().getCustomName().toLowerCase().contains(searchName)).toList();
-        List<Entry<String, Game>> searchTagGames = mapList.entrySet().stream().filter(map -> map.getValue().getGameModesText().toLowerCase().contains(searchTags)).toList();
-        List<Entry<String, Game>> searchFactionGames = mapList.entrySet().stream().filter(map -> map.getValue().getRealAndEliminatedPlayers().stream().map(p -> p.getFaction().toLowerCase()).anyMatch(s -> s.contains(searchFactions))).toList();
-        List<Entry<String, Game>> searchUserGames = mapList.entrySet().stream().filter(map -> map.getValue().hasUser(searchUser)).toList();
-        
-        
-        List<Entry<String, Game>> filteredListOfMaps = new ArrayList<>();
+        List<Game> normalGames = new ArrayList<>();
+        List<Game> tIGLGames = new ArrayList<>();
+        List<Game> communityGames = new ArrayList<>();
+        List<Game> allianceGames = new ArrayList<>();
+        List<Game> foWGames = new ArrayList<>();
+        List<Game> absolGames = new ArrayList<>();
+        List<Game> miltyModGames = new ArrayList<>();
+        List<Game> dSGames = new ArrayList<>();
+        List<Game> frankenGames = new ArrayList<>();
+        List<Game> endedGames = new ArrayList<>();
+        List<Game> searchNameGames = new ArrayList<>();
+        List<Game> searchTagGames = new ArrayList<>();
+        List<Game> searchFactionGames = new ArrayList<>();
+        List<Game> searchUserGames = new ArrayList<>();
+
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getGamesPage(currentPage++);
+            normalGames.addAll(pagedGames.getGames().stream().filter(Game::isNormalGame).toList());
+            tIGLGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isCompetitiveTIGLGame).toList());
+            communityGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isCommunityMode).toList());
+            allianceGames.addAll(pagedGames.getGames().stream().filter(Game::isAllianceMode).toList());
+            foWGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isFowMode).toList());
+            absolGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isAbsolMode).toList());
+            miltyModGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isMiltyModMode).toList());
+            dSGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isDiscordantStarsMode).toList());
+            frankenGames.addAll(pagedGames.getGames().stream().filter(Game::isFrankenGame).toList());
+            endedGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isHasEnded).toList());
+            searchNameGames.addAll(pagedGames.getGames().stream().filter(map -> map.getCustomName().toLowerCase().contains(searchName)).toList());
+            searchTagGames.addAll(pagedGames.getGames().stream().filter(map -> map.getGameModesText().toLowerCase().contains(searchTags)).toList());
+            searchFactionGames.addAll(pagedGames.getGames().stream().filter(map -> map.getRealAndEliminatedPlayers().stream().map(p -> p.getFaction().toLowerCase()).anyMatch(s -> s.contains(searchFactions))).toList());
+            searchUserGames.addAll(pagedGames.getGames().stream().filter(map -> map.hasUser(searchUser)).toList());
+        } while (pagedGames.hasNextPage());
+
+        List<Game> filteredListOfMaps = new ArrayList<>();
         if (includeNormalGames) filteredListOfMaps.addAll(normalGames);
         if (includeTIGLGames) filteredListOfMaps.addAll(tIGLGames);
         if (includeCommunityGames) filteredListOfMaps.addAll(communityGames);
@@ -87,16 +104,14 @@ public class SearchGames extends SearchSubcommandData {
         if (!searchTags.isEmpty()) filteredListOfMaps.addAll(searchTagGames);
         if (!searchFactions.isEmpty()) filteredListOfMaps.addAll(searchFactionGames);
         if (searchUser != null) filteredListOfMaps.addAll(searchUserGames);
-        if (!includeEndedGames) filteredListOfMaps.removeIf(g -> g.getValue().isHasEnded());
+        if (!includeEndedGames) filteredListOfMaps.removeIf(GameProperties::isHasEnded);
 
-        Set<Entry<String, Game>> filteredSetOfMaps = new HashSet<>(filteredListOfMaps);
-
-        int totalGames = mapList.size();
+        int totalGames = GameManager.getGameNames().size();
 
         StringBuilder sb = new StringBuilder("__**Search Games:**__\n");
         sb.append("-# Statistics:\n");
         sb.append("-# > Total Games: `").append(totalGames).append("`\n");
-        sb.append("-# > Games Found: `").append(filteredSetOfMaps.size()).append("`\n");
+        sb.append("-# > Games Found: `").append(filteredListOfMaps.size()).append("`\n");
         sb.append("-# > ").append(trueFalseEmoji(includeNormalGames)).append("includeNormalGames (").append(normalGames.size()).append("/").append(totalGames).append(")\n");
         sb.append("-# > ").append(trueFalseEmoji(includeTIGLGames)).append("includeTIGLGames (").append(tIGLGames.size()).append("/").append(totalGames).append(")\n");
         sb.append("-# > ").append(trueFalseEmoji(includeCommunityGames)).append("includeCommunityGames (").append(communityGames.size()).append("/").append(totalGames).append(")\n");
@@ -113,13 +128,13 @@ public class SearchGames extends SearchSubcommandData {
         sb.append("-# > ").append(trueFalseEmoji(!searchFactions.isEmpty())).append("gamesWithFaction `").append(searchFactions).append("` (").append(searchFactionGames.size()).append("/").append(totalGames).append(")\n");
         sb.append("-# > ").append(trueFalseEmoji(searchUser != null)).append("gamesWithUser `").append(searchUser != null ? searchUser.getEffectiveName() : "").append("` (").append(searchUserGames.size()).append("/").append(totalGames).append(")\n");
 
-        if (filteredSetOfMaps.isEmpty()) {
+        if (filteredListOfMaps.isEmpty()) {
             sb.append("No games match the selected filters.");
         } else {
-            sb.append(filteredSetOfMaps.stream()
-                .filter(map -> includeEndedGames || !map.getValue().isHasEnded())
-                .sorted(Map.Entry.comparingByKey())
-                .map(map -> getRepresentationText(mapList, map.getKey()))
+            sb.append(filteredListOfMaps.stream()
+                .filter(game -> includeEndedGames || !game.isHasEnded())
+                .sorted(Comparator.comparing(Game::getName))
+                .map(this::getRepresentationText)
                 .collect(Collectors.joining("\n")));
         }
 
@@ -132,9 +147,8 @@ public class SearchGames extends SearchSubcommandData {
         return bool ? "✅" : "❌";
     }
 
-    private String getRepresentationText(Map<String, Game> mapList, String mapName) {
-        Game game = mapList.get(mapName);
-        StringBuilder sb = new StringBuilder("- **" + mapName + "**").append(" ");
+    private String getRepresentationText(Game game) {
+        StringBuilder sb = new StringBuilder("- **" + game.getName() + "**").append(" ");
         sb.append("`").append(game.getCreationDate()).append("`-`");
         if (game.isHasEnded() && game.getEndedDate() > 100) {
             sb.append(Helper.getDateRepresentation(game.getEndedDate()));

@@ -11,9 +11,9 @@ import ti4.helpers.Constants;
 import ti4.model.ExploreModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchExplores extends SearchComponentModel {
+public class SearchExploresSubcommand extends SearchComponentModelSubcommand {
 
-    public SearchExplores() {
+    public SearchExploresSubcommand() {
         super(Constants.SEARCH_EXPLORES, "List all explore cards the bot can use");
     }
 

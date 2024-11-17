@@ -1,6 +1,5 @@
 package ti4.commands.search;
 
-import java.util.Comparator;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -8,13 +7,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.model.RelicModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchRelics extends SearchComponentModel {
+public class SearchAgendasSubcommand extends SearchComponentModelSubcommand {
 
-    public SearchRelics() {
-        super(Constants.SEARCH_RELICS, "List all relics the bot can use");
+    public SearchAgendasSubcommand() {
+        super(Constants.SEARCH_AGENDAS, "List all agendas the bot can use");
     }
 
     @Override
@@ -22,15 +20,14 @@ public class SearchRelics extends SearchComponentModel {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
-        if (Mapper.isValidRelic(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getRelic(searchString).getRepresentationEmbed(true, true)).queue();
+        if (Mapper.isValidAgenda(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getAgenda(searchString).getRepresentationEmbed(true)).queue();
             return;
         }
 
-        List<MessageEmbed> messageEmbeds = Mapper.getRelics().values().stream()
+        List<MessageEmbed> messageEmbeds = Mapper.getAgendas().values().stream()
             .filter(model -> model.search(searchString, source))
-            .sorted(Comparator.comparing(RelicModel::getName))
-            .map(model -> model.getRepresentationEmbed(true, true))
+            .map(model -> model.getRepresentationEmbed(true))
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }

@@ -1,5 +1,6 @@
 package ti4.commands.search;
 
+import java.util.Comparator;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -7,26 +8,28 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchActionCards extends SearchComponentModel {
+public class SearchFactionsSubcommand extends SearchComponentModelSubcommand {
 
-    public SearchActionCards() {
-        super(Constants.SEARCH_ACTION_CARDS, "List all action cards the bot can use");
+    public SearchFactionsSubcommand() {
+        super(Constants.SEARCH_FACTIONS, "List all factions the bot can use");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
-
-        if (Mapper.isValidActionCard(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getActionCard(searchString).getRepresentationEmbed(true, true)).queue();
+        
+        if (Mapper.isValidFaction(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getFaction(searchString).getRepresentationEmbed(true, true)).queue();
             return;
         }
-
-        List<MessageEmbed> messageEmbeds = Mapper.getActionCards().values().stream()
+        
+        List<MessageEmbed> messageEmbeds = Mapper.getFactions().stream()
             .filter(model -> model.search(searchString, source))
+            .sorted(Comparator.comparing(FactionModel::getAlias))
             .map(model -> model.getRepresentationEmbed(true, true))
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
