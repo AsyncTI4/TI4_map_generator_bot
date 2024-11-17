@@ -48,12 +48,12 @@ public class CombatRoll extends CombatSubcommandData {
             .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET,
             "(optional) Planet to have combat on. Default is space combat.").setAutoComplete(true)
-                .setRequired(false));
+                );
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_ROLL_TYPE,
             "switch to afb/bombardment/spacecannonoffence")
-                .setRequired(false));
+                );
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "roll for player (default you)")
-            .setAutoComplete(true).setRequired(false));
+            .setAutoComplete(true));
     }
 
     @Override

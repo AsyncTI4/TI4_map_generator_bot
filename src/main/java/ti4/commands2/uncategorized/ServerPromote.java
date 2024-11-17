@@ -164,7 +164,7 @@ public class ServerPromote implements ParentCommand {
         commands.addCommands(
             Commands.slash(getName(), "Promotes Authorised User On Any Async Server")
                 .addOptions(new OptionData(OptionType.STRING, Constants.PROMOTE_TARGET, "Target Server").setRequired(true).setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.PROMOTE_RANK, "Rank").setRequired(false).setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.PROMOTE_DEMOTE, "Demote").setRequired(false).setAutoComplete(true)));
+                .addOptions(new OptionData(OptionType.STRING, Constants.PROMOTE_RANK, "Rank").setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.PROMOTE_DEMOTE, "Demote").setAutoComplete(true)));
     }
 }

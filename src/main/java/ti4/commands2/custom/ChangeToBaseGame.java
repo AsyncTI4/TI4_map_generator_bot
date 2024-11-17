@@ -16,7 +16,7 @@ class ChangeToBaseGame extends GameStateSubcommand {
 
     public ChangeToBaseGame() {
         super(Constants.CHANGE_TO_BASE_GAME, "Remove PoK ACs/SOs/POs/Agendas", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.REMOVE_CODEX_AC, "Remove Codex AC too? (y/n)").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.REMOVE_CODEX_AC, "Remove Codex AC too? (y/n)"));
     }
 
     @Override
