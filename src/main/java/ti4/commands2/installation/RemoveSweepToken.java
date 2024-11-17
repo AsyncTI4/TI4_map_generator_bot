@@ -11,7 +11,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Tile;
 
-public class RemoveSweepToken extends GameStateSubcommand {
+class RemoveSweepToken extends GameStateSubcommand {
 
     public RemoveSweepToken() {
         super(Constants.REMOVE_SWEEP_TOKEN, "Remove a sweep token from the selected system", true, true);

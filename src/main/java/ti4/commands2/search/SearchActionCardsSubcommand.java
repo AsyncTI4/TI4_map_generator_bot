@@ -9,7 +9,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.model.Source.ComponentSource;
 
-public class SearchActionCardsSubcommand extends SearchComponentModelSubcommand {
+class SearchActionCardsSubcommand extends SearchComponentModelSubcommand {
 
     public SearchActionCardsSubcommand() {
         super(Constants.SEARCH_ACTION_CARDS, "List all action cards the bot can use");

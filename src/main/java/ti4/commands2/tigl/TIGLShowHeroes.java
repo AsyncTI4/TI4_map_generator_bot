@@ -14,7 +14,7 @@ import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.message.MessageHelper;
 
-public class TIGLShowHeroes extends Subcommand {
+class TIGLShowHeroes extends Subcommand {
 
     public TIGLShowHeroes() {
         super("show_heroes", "Display a list of the reigning Heroes");

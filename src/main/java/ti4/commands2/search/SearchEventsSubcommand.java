@@ -9,7 +9,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.model.Source.ComponentSource;
 
-public class SearchEventsSubcommand extends SearchComponentModelSubcommand {
+class SearchEventsSubcommand extends SearchComponentModelSubcommand {
 
     public SearchEventsSubcommand() {
         super(Constants.SEARCH_EVENTS, "List all events the bot can use");

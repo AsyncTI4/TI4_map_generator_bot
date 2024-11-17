@@ -8,7 +8,7 @@ import ti4.ResourceHelper;
 import ti4.commands2.Subcommand;
 import ti4.message.MessageHelper;
 
-public class WhatsTIGL extends Subcommand {
+class WhatsTIGL extends Subcommand {
 
     public WhatsTIGL() {
         super("what_is_tigl", "Quick description of what TIGL is");

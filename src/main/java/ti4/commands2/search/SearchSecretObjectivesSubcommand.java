@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchSecretObjectivesSubcommand extends SearchComponentModelSubcommand {
+class SearchSecretObjectivesSubcommand extends SearchComponentModelSubcommand {
 
     public SearchSecretObjectivesSubcommand() {
         super(Constants.SEARCH_SECRET_OBJECTIVES, "List all secret objectives the bot can use");

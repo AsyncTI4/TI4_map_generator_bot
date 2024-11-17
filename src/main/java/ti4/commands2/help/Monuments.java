@@ -9,7 +9,7 @@ import ti4.ResourceHelper;
 import ti4.commands2.Subcommand;
 import ti4.message.MessageHelper;
 
-public class Monuments extends Subcommand {
+class Monuments extends Subcommand {
 
     public Monuments() {
         super("monuments", "Show Helpful Monuments stuff");

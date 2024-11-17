@@ -61,7 +61,6 @@ import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.Setup;
 import ti4.commands.player.TurnStart;
-import ti4.commands.relic.RelicShowRemaining;
 import ti4.commands.special.CheckDistance;
 import ti4.commands.special.DiploSystem;
 import ti4.commands.tech.TechShowDeck;
@@ -72,7 +71,6 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.CommandHelper;
-import ti4.commands2.cardsso.ShowUnScoredSOs;
 import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -657,8 +655,8 @@ public class ButtonHelper {
         switch (deck) {
             case "ac" -> ActionCardHelper.showDiscard(game, event, false);
             case "agenda" -> AgendaHelper.showDiscards(game, event);
-            case "relic" -> RelicShowRemaining.showRemaining(event, false, game, player);
-            case "unscoredSO" -> ShowUnScoredSOs.showUnscored(game, event);
+            case "relic" -> RelicHelper.showRemaining(event, false, game, player);
+            case "unscoredSO" -> SecretObjectiveHelper.showUnscored(game, event);
             case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC, Constants.UNIT_UPGRADE -> TechShowDeck.displayTechDeck(game, event, deck);
             case Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER, "all" -> {
                 List<String> types = new ArrayList<>();
