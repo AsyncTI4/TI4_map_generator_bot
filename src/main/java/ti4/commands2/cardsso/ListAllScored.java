@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 class ListAllScored extends GameStateSubcommand {
 
     public ListAllScored() {
-        super(Constants.SO_LIST_SCORED, "Displays scored secret objectives", true, false);
+        super(Constants.SO_LIST_SCORED, "Displays scored secret objectives", true, true);
     }
 
     @Override
