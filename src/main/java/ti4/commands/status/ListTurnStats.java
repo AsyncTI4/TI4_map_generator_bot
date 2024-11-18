@@ -1,20 +1,22 @@
 package ti4.commands.status;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ListTurnStats extends StatusSubcommandData {
+class ListTurnStats extends GameStateSubcommand {
+
     public ListTurnStats() {
-        super(Constants.TURN_STATS, "List average amount of time players take on their turns");
+        super(Constants.TURN_STATS, "List average amount of time players take on their turns", false, false);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         if (FoWHelper.isPrivateGame(event)) {
             MessageHelper.replyToMessage(event, "This command is not available in fog of war private channels.");
             return;
@@ -56,10 +58,5 @@ public class ListTurnStats extends StatusSubcommandData {
         return "> " + player.getUserName() + ": `" +
             String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis) +
             "` (" + numTurns + " turns)";
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        //We reply in execute command
     }
 }

@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.status.ScorePublic;
 import ti4.commands.tech.GetTechButton;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -23,6 +22,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
+import ti4.service.ScorePublicObjectiveService;
 
 public class ButtonHelperSCs {
 
@@ -140,7 +140,7 @@ public class ButtonHelperSCs {
             return;
         }
         ButtonHelperFactionSpecific.KeleresIIHQCCGainCheck(player, game);
-        ScorePublic.scorePO(event, player.getCorrectChannel(), game, player, 0);
+        ScorePublicObjectiveService.scorePO(event, player.getCorrectChannel(), game, player, 0);
     }
 
     @ButtonHandler("sc_trade_follow")

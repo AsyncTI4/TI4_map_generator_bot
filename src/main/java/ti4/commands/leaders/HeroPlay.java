@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.status.ListTurnOrder;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.RemoveCC;
@@ -43,6 +42,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.LeaderModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.ListTurnOrderService;
 
 public class HeroPlay extends LeaderAction {
     public HeroPlay() {
@@ -185,7 +185,7 @@ public class HeroPlay extends LeaderAction {
                 game.setStoredValue("kyroHeroSC", dieResult + "");
                 game.setStoredValue("kyroHeroPlayer", player.getFaction());
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getSCName(dieResult, game) + " has been marked with Speygh, the Kyro hero, and the faction that played the hero as " + player.getFaction());
-                ListTurnOrder.turnOrder(event, game);
+                ListTurnOrderService.turnOrder(event, game);
             }
             case "ghotihero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
