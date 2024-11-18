@@ -49,10 +49,10 @@ public class UnitInfo extends GameStateSubcommand {
     public static void sendUnitInfo(Game game, Player player, GenericInteractionCreateEvent event, boolean showAllUnits) {
         String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
-        sendUnitInfo(game, player, showAllUnits);
+        sendUnitInfo(player, showAllUnits);
     }
 
-    public static void sendUnitInfo(Game game, Player player, boolean showAllUnits) {
+    public static void sendUnitInfo(Player player, boolean showAllUnits) {
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
             player.getCardsInfoThread(),
             "__**Unit Info:**__",

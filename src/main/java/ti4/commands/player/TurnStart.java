@@ -16,8 +16,8 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.fow.Whisper;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands2.GameStateSubcommand;
+import ti4.commands2.uncategorized.CardsInfo;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -113,15 +113,14 @@ public class TurnStart extends GameStateSubcommand {
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
                     getMissedSCFollowsText(game, player));
             }
-            Player privatePlayer = player;
-            if (privatePlayer.getStasisInfantry() > 0) {
-                if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
-                    MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
-                        ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
+            if (player.getGenSynthesisInfantry() > 0) {
+                if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                        "Use buttons to revive infantry. You have " + player.getGenSynthesisInfantry() + " infantry left to revive.",
+                        ButtonHelper.getPlaceStatusInfButtons(game, player));
                 } else {
-                    privatePlayer.setStasisInfantry(0);
-                    MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
+                    player.setStasisInfantry(0);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
                         + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
 
                 }
@@ -146,15 +145,14 @@ public class TurnStart extends GameStateSubcommand {
                 && !"".equalsIgnoreCase(getMissedSCFollowsText(game, player))) {
                 MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(game, player));
             }
-            Player privatePlayer = player;
-            if (privatePlayer.getGenSynthesisInfantry() > 0) {
-                if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
-                    MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
-                        ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
+            if (player.getGenSynthesisInfantry() > 0) {
+                if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                        "Use buttons to revive infantry. You have " + player.getGenSynthesisInfantry() + " infantry left to revive.",
+                        ButtonHelper.getPlaceStatusInfButtons(game, player));
                 } else {
-                    privatePlayer.setStasisInfantry(0);
-                    MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
+                    player.setStasisInfantry(0);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
                         + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
 
                 }
@@ -267,7 +265,6 @@ public class TurnStart extends GameStateSubcommand {
         }
         String finChecker = player.getFinsFactionCheckerPrefix();
         game.setDominusOrb(false);
-        Player p1 = player;
         List<Button> startButtons = new ArrayList<>();
         boolean hadAnyUnplayedSCs = false;
         if (!doneActionThisTurn || confirmed2ndAction) {
@@ -296,7 +293,7 @@ public class TurnStart extends GameStateSubcommand {
                 }
             }
             String prefix = "componentActionRes_";
-            for (Leader leader : p1.getLeaders()) {
+            for (Leader leader : player.getLeaders()) {
                 if (!leader.isExhausted() && !leader.isLocked()) {
                     String leaderID = leader.getId();
                     LeaderModel leaderModel = Mapper.getLeader(leaderID);
@@ -309,7 +306,7 @@ public class TurnStart extends GameStateSubcommand {
                     if ("ACTION:".equalsIgnoreCase(leaderAbilityWindow) || leaderName.contains("Ssruu")) {
                         if (leaderName.contains("Ssruu")) {
                             String led = "naaluagent";
-                            if (p1.hasExternalAccessToLeader(led)) {
+                            if (player.hasExternalAccessToLeader(led)) {
                                 Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Naalu Agent", factionEmoji);
                                 startButtons.add(lButton);
                             }
@@ -319,8 +316,8 @@ public class TurnStart extends GameStateSubcommand {
                                 startButtons.add(lButton);
                             }
                         }
-                    } else if ("mahactcommander".equalsIgnoreCase(leaderID) && p1.getTacticalCC() > 0
-                        && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
+                    } else if ("mahactcommander".equalsIgnoreCase(leaderID) && player.getTacticalCC() > 0
+                        && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty()) {
                         Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use Mahact Commander", factionEmoji);
                         startButtons.add(lButton);
                     }

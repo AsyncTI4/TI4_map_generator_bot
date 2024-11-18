@@ -41,7 +41,6 @@ import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.player.ChangeColor;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
 import ti4.draft.DraftBag;
@@ -51,6 +50,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -2961,10 +2961,10 @@ public class Player {
 
     @JsonIgnore
     public String getNextAvailableColorIgnoreCurrent() {
-        Predicate<ColorModel> nonExclusive = cm -> !ChangeColor.colorIsExclusive(cm.getAlias(), this);
+        Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
         String color = UserSettingsManager.get(getUserID()).getPreferredColourList().stream()
             .filter(c -> getGame().getUnusedColors().stream().anyMatch(col -> col.getName().equals(c)))
-            .filter(c -> !ChangeColor.colorIsExclusive(c, this))
+            .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
             .findFirst()
             .orElse(getGame().getUnusedColors().stream().filter(nonExclusive).findFirst().map(ColorModel::getName).orElse(null));
         return Mapper.getColorName(color);
