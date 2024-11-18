@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.commands.combat.StartCombat;
 import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.RefreshLeader;
@@ -45,6 +44,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.StartCombatService;
 
 public class ButtonHelperFactionSpecific {
 
@@ -700,7 +700,7 @@ public class ButtonHelperFactionSpecific {
         // Actually roll for each unit
         int totalHits = 0;
         StringBuilder resultBuilder = new StringBuilder(result);
-        Map<UnitModel, Integer> playerUnits = CombatHelper.GetUnitsInCombat(tile, space, player, event,
+        Map<UnitModel, Integer> playerUnits = CombatHelper.getUnitsInCombat(tile, space, player, event,
             CombatRollType.combatround, game);
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();
@@ -767,7 +767,7 @@ public class ButtonHelperFactionSpecific {
                 + Helper.getPlanetRepresentation(planet, game) + " using Tnelis mech deploy ability");
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, game.getTileFromPlanet(planet), planet);
         if (players.size() > 1) {
-            StartCombat.startGroundCombat(players.get(0), players.get(1), game, event,
+            StartCombatService.startGroundCombat(players.get(0), players.get(1), game, event,
                 ButtonHelper.getUnitHolderFromPlanetName(planet, game), game.getTileFromPlanet(planet));
         }
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");

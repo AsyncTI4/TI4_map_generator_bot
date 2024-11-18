@@ -16,8 +16,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
-import ti4.commands.combat.CombatRoll;
-import ti4.commands.combat.StartCombat;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
@@ -37,6 +35,8 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollService;
+import ti4.service.combat.StartCombatService;
 
 public class ButtonHelperModifyUnits {
 
@@ -158,8 +158,8 @@ public class ButtonHelperModifyUnits {
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         int count = 0;
         while (haveGroundForces) {
-            int hitP1 = CombatRoll.secondHalfOfCombatRoll(p1, game, event, tile, planet, CombatRollType.combatround, true);
-            int hitP2 = CombatRoll.secondHalfOfCombatRoll(p2, game, event, tile, planet, CombatRollType.combatround, true);
+            int hitP1 = CombatRollService.secondHalfOfCombatRoll(p1, game, event, tile, planet, CombatRollType.combatround, true);
+            int hitP2 = CombatRollService.secondHalfOfCombatRoll(p2, game, event, tile, planet, CombatRollType.combatround, true);
 
             if (p1.hasTech("vpw") && hitP2 > 0) {
                 hitP1++;
@@ -196,7 +196,7 @@ public class ButtonHelperModifyUnits {
         String pos = tile.getPosition();
         FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
         MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
-        List<Button> buttons = StartCombat.getGeneralCombatButtons(game, pos, p1, p2, "ground", event);
+        List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, "ground", event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
     }
 
@@ -904,7 +904,7 @@ public class ButtonHelperModifyUnits {
                 }
             }
             if (player != player2 && players.contains(player)) {
-                StartCombat.startGroundCombat(player, player2, game, event, unitHolder, tile);
+                StartCombatService.startGroundCombat(player, player2, game, event, unitHolder, tile);
                 int mechCount = unitHolder.getUnitCount(UnitType.Mech, player2.getColor());
                 if (player2.ownsUnit("keleres_mech") && mechCount > 0) {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");

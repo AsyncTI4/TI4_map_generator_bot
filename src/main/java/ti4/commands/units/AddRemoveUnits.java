@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands.Command;
-import ti4.commands.combat.StartCombat;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands2.CommandHelper;
@@ -36,6 +35,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.combat.StartCombatService;
 
 abstract public class AddRemoveUnits implements Command {
 
@@ -242,9 +242,9 @@ abstract public class AddRemoveUnits implements Command {
                 }
                 if (player1 != player2 && !tile.getPosition().equalsIgnoreCase("nombox") && !player1.getAllianceMembers().contains(player2.getFaction())) {
                     if ("ground".equals(combatType)) {
-                        StartCombat.startGroundCombat(player1, player2, game, event, tile.getUnitHolderFromPlanet(planetName), tile);
+                        StartCombatService.startGroundCombat(player1, player2, game, event, tile.getUnitHolderFromPlanet(planetName), tile);
                     } else {
-                        StartCombat.startSpaceCombat(game, player1, player2, tile, event);
+                        StartCombatService.startSpaceCombat(game, player1, player2, tile, event);
                     }
                 }
             }

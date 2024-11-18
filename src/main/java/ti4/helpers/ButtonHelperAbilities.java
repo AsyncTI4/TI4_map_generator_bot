@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.combat.StartCombat;
 import ti4.commands.explore.ExplorePlanet;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
@@ -32,6 +31,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.service.combat.StartCombatService;
 
 public class ButtonHelperAbilities {
 
@@ -1345,7 +1345,7 @@ public class ButtonHelperAbilities {
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
         if (players.size() > 1) {
-            StartCombat.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
+            StartCombatService.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
         }
 
         event.getMessage().delete().queue();

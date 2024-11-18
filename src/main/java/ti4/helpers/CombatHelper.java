@@ -34,7 +34,7 @@ import ti4.model.UnitModel;
 
 public class CombatHelper {
 
-    public static Map<UnitModel, Integer> GetAllUnits(UnitHolder unitHolder, Player player) {
+    public static Map<UnitModel, Integer> getAllUnits(UnitHolder unitHolder, Player player) {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().flatMap(
@@ -63,7 +63,7 @@ public class CombatHelper {
         return output;
     }
 
-    public static Map<UnitModel, Integer> GetUnitsInCombat(Tile tile, UnitHolder unitHolder, Player player,
+    public static Map<UnitModel, Integer> getUnitsInCombat(Tile tile, UnitHolder unitHolder, Player player,
         GenericInteractionCreateEvent event, CombatRollType roleType, Game game) {
         Planet unitHolderPlanet = null;
         if (unitHolder instanceof Planet) {
@@ -72,7 +72,7 @@ public class CombatHelper {
         return switch (roleType) {
             case combatround -> GetUnitsInCombatRound(unitHolder, player, event, tile);
             case AFB -> GetUnitsInAFB(tile, player, event);
-            case bombardment -> GetUnitsInBombardment(tile, player, event);
+            case bombardment -> getUnitsInBombardment(tile, player, event);
             case SpaceCannonOffence -> getUnitsInSpaceCannonOffense(tile, player, event, game);
             case SpaceCannonDefence -> getUnitsInSpaceCannonDefence(unitHolderPlanet, player, event);
         };
@@ -171,7 +171,7 @@ public class CombatHelper {
         }
     }
 
-    public static Map<UnitModel, Integer> GetUnitsInBombardment(Tile tile, Player player,
+    public static Map<UnitModel, Integer> getUnitsInBombardment(Tile tile, Player player,
         GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
