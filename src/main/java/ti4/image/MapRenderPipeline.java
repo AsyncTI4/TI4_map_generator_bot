@@ -1,4 +1,4 @@
-package ti4.generator;
+package ti4.image;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;

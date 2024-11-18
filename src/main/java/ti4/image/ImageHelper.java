@@ -1,4 +1,4 @@
-package ti4.helpers;
+package ti4.image;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;

@@ -1,4 +1,4 @@
-package ti4.generator;
+package ti4.image;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

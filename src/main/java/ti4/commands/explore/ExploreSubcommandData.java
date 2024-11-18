@@ -22,7 +22,7 @@ import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddUnits;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;

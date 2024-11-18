@@ -1,4 +1,4 @@
-package ti4.generator;
+package ti4.image;
 
 public enum TileStep {
     Setup, Tile, Extras, Units, Distance, Wormholes, Anomalies, Aetherstream,

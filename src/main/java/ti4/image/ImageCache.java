@@ -1,4 +1,4 @@
-package ti4.helpers;
+package ti4.image;
 
 import java.awt.image.BufferedImage;
 import java.util.concurrent.TimeUnit;
@@ -7,6 +7,7 @@ import java.util.function.Function;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import ti4.cron.LogCacheStatsCron;
+import ti4.helpers.GlobalSettings;
 import ti4.message.BotLogger;
 
 public class ImageCache {

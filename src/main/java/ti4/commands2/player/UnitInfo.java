@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;

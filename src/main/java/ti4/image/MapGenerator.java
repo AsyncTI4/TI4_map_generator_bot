@@ -1,4 +1,4 @@
-package ti4.generator;
+package ti4.image;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -55,7 +55,6 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
-import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
@@ -87,7 +86,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.website.WebsiteOverlay;
 
-import static ti4.helpers.ImageHelper.writeCompressedFormat;
+import static ti4.image.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator implements AutoCloseable {
 

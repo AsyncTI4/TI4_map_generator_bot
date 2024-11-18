@@ -1,4 +1,4 @@
-package ti4.generator;
+package ti4.image;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -34,7 +34,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;

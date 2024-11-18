@@ -12,7 +12,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;

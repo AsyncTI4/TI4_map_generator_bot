@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.model.CombatModifierModel;

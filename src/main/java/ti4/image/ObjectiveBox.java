@@ -1,10 +1,9 @@
-package ti4.generator;
+package ti4.image;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import ti4.helpers.ImageHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;

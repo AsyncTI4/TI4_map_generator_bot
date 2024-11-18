@@ -1,4 +1,4 @@
-package ti4.generator;
+package ti4.image;
 
 public class PlanetHelper {
     public static String getPlanetName(String planet) {

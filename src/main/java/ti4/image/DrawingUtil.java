@@ -1,4 +1,4 @@
-package ti4.generator;
+package ti4.image;
 
 import java.awt.*;
 import java.awt.font.GlyphVector;
@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
-import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.map.Player;
 import ti4.message.BotLogger;

@@ -1,4 +1,4 @@
-package ti4.generator;
+package ti4.image;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +14,7 @@ import ti4.model.PublicObjectiveModel;
 
 public record Objective(
 	String key,
-	ti4.generator.Objective.Type type,
+	ti4.image.Objective.Type type,
 	Integer index, Boolean revealed,
 	List<String> scoredPlayerIDs,
 	List<String> peekPlayerIDs) {

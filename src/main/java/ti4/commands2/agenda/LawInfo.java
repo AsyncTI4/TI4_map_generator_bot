@@ -2,7 +2,7 @@ package ti4.commands2.agenda;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 
 class LawInfo extends GameStateSubcommand {

@@ -9,7 +9,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @Data

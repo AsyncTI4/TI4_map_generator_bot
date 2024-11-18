@@ -1,8 +1,8 @@
 package ti4.model;
 
 import org.junit.jupiter.api.Test;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.testUtils.BaseTi4Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;

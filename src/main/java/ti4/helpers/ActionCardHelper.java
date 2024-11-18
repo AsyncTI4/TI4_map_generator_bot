@@ -21,7 +21,7 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.player.TurnStart;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
