@@ -30,7 +30,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private Set<WormholeModel.Wormhole> wormholes;
     @JsonProperty("isHyperlane") private boolean hyperlane = false;
     @JsonProperty("isAsteroidField") private boolean asteroidField = false;
-    @JsonProperty("isSuperNova") private boolean supernova = false;
+    @JsonProperty("isSupernova") private boolean supernova = false;
     @JsonProperty("isNebula") private boolean nebula = false;
     @JsonProperty("isGravityRift") private boolean gravityRift = false;
     private String imageURL;
