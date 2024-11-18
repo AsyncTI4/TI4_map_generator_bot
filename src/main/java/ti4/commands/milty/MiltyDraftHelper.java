@@ -49,7 +49,7 @@ public class MiltyDraftHelper {
         MapTemplateModel mapTemplate = Mapper.getMapTemplate(manager.getMapTemplate());
 
         int sliceCount = slices.size();
-        int spanW = (int) (Math.ceil(Math.sqrt(sliceCount)) + 0.01);
+        int spanW = (int) Math.ceil(Math.sqrt(sliceCount));
         int spanH = (sliceCount + spanW - 1) / spanW;
 
         float scale = 1f;
@@ -90,7 +90,7 @@ public class MiltyDraftHelper {
                 deltaX = 0;
             }
 
-            if (!desc.toString().isBlank()) desc.append(";\n");
+            if (!desc.isEmpty()) desc.append(";\n");
             desc.append(slice.ttsString());
         }
 
