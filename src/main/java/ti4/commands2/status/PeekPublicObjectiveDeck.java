@@ -1,4 +1,4 @@
-package ti4.commands.status;
+package ti4.commands2.status;
 
 import java.util.ArrayList;
 import java.util.List;

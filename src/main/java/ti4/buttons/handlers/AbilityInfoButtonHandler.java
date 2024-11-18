@@ -8,7 +8,7 @@ import ti4.map.Player;
 import ti4.service.AbilityInfoService;
 
 @UtilityClass
-public class AbilityInfoButtonHandler {
+class AbilityInfoButtonHandler {
 
     @ButtonHandler("refreshAbilityInfo")
     public static void sendAbilityInfo(Game game, Player player, GenericInteractionCreateEvent event) {
