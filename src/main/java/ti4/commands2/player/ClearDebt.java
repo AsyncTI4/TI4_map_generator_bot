@@ -22,7 +22,7 @@ class ClearDebt extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         int debtCountToClear = event.getOption(Constants.DEBT_COUNT).getAsInt();
-        if (debtCountToClear <= 1) {
+        if (debtCountToClear <= 0) {
             MessageHelper.sendMessageToEventChannel(event, "Debt count must be a positive integer");
             return;
         }

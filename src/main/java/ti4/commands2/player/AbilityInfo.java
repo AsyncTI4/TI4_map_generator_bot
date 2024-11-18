@@ -3,7 +3,7 @@ package ti4.commands2.player;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.service.AbilityInfoService;
+import ti4.service.info.AbilityInfoService;
 
 public class AbilityInfo extends GameStateSubcommand {
 
