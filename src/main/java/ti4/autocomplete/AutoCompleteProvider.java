@@ -21,7 +21,6 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.franken.StartFrankenDraft.FrankenDraftMode;
 import ti4.commands.game.Undo;
 import ti4.commands.map.Preset;
 import ti4.commands2.CommandHelper;
@@ -61,6 +60,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.UnitDecalService;
+import ti4.service.franken.FrankenDraftMode;
 
 public class AutoCompleteProvider {
 
