@@ -267,7 +267,7 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
         if ("dspncymi".equalsIgnoreCase(id)) {
-            ActionCardHelper.pickACardFromDiscardStep1(event, game, player);
+            ActionCardHelper.pickACardFromDiscardStep1(game, player);
         }
         if ("dspnkort".equalsIgnoreCase(id)) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "kortalipn");

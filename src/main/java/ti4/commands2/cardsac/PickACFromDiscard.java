@@ -28,7 +28,7 @@ class PickACFromDiscard extends GameStateSubcommand {
 
     @ButtonHandler("codexCardPick_")
     public static void pickACardFromDiscardStep1(GenericInteractionCreateEvent event, Game game, Player player) {
-        ActionCardHelper.pickACardFromDiscardStep1(event, game, player);
+        ActionCardHelper.pickACardFromDiscardStep1(game, player);
     }
 
     @ButtonHandler("pickFromDiscard_")

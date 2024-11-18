@@ -3,7 +3,6 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1002,20 +1001,6 @@ public class ActionCardHelper {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb.toString());
     }
 
-    public static void showDiscard(Game game, GenericInteractionCreateEvent event, boolean showFullText) {
-        StringBuilder sb = new StringBuilder();
-        List<Map.Entry<String, Integer>> discards = game.getDiscardActionCards().entrySet().stream().toList();
-
-        Button showFullTextButton = null;
-        if (showFullText) {
-            sb.append(actionCardListFullText(discards, "Action card discard list"));
-        } else {
-            sb.append(discardListCondensed(discards, "Action card discard list"));
-            showFullTextButton = Buttons.green("ACShowDiscardFullText", "Show Full Text");
-        }
-        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), sb.toString(), showFullTextButton);
-    }
-
     public static String actionCardListCondensedNoIds(List<String> discards, String title) {
         StringBuilder sb = new StringBuilder();
         if (title != null) sb.append("**__").append(title).append(":__**");
@@ -1036,63 +1021,7 @@ public class ActionCardHelper {
         return sb.toString();
     }
 
-    private static String actionCardListFullText(List<Map.Entry<String, Integer>> discards, String title) {
-        // Set up the entry list
-        List<Map.Entry<String, Integer>> aclist = new ArrayList<>(discards);
-        Collections.reverse(aclist);
-        Map<String, List<Map.Entry<String, Integer>>> cardsByName = new LinkedHashMap<>();
-        aclist.forEach(ac -> {
-            String name = Mapper.getActionCard(ac.getKey()).getName();
-            if (!cardsByName.containsKey(name)) cardsByName.put(name, new ArrayList<>());
-            cardsByName.get(name).addFirst(ac);
-        });
-        List<Map.Entry<String, List<Map.Entry<String, Integer>>>> entries = new ArrayList<>(cardsByName.entrySet());
-        Collections.reverse(entries);
-
-        // Build the string
-        StringBuilder sb = new StringBuilder("**__").append(title).append(":__**");
-        int index = 1;
-
-        for (Map.Entry<String, List<Map.Entry<String, Integer>>> acEntryList : entries) {
-            List<String> ids = acEntryList.getValue().stream().map(i -> "`(" + i.getValue() + ")`").toList();
-            sb.append("\n").append(index).append(". ");
-            sb.append(Emojis.ActionCard.repeat(ids.size()));
-            sb.append(" **").append(acEntryList.getKey()).append("** - ");
-            sb.append(Mapper.getActionCard(acEntryList.getValue().getFirst().getKey()).getRepresentationJustText());
-            index++;
-        }
-        return sb.toString();
-    }
-
-    public static String discardListCondensed(List<Map.Entry<String, Integer>> discards, String title) {
-        // Set up the entry list
-        List<Map.Entry<String, Integer>> aclist = new ArrayList<>(discards);
-        Collections.reverse(aclist);
-        Map<String, List<Map.Entry<String, Integer>>> cardsByName = new LinkedHashMap<>();
-        aclist.forEach(ac -> {
-            String name = Mapper.getActionCard(ac.getKey()).getName();
-            if (!cardsByName.containsKey(name)) cardsByName.put(name, new ArrayList<>());
-            cardsByName.get(name).addFirst(ac);
-        });
-        List<Map.Entry<String, List<Map.Entry<String, Integer>>>> entries = new ArrayList<>(cardsByName.entrySet());
-        Collections.reverse(entries);
-
-        // Build the string
-        StringBuilder sb = new StringBuilder("**__").append(title).append(":__**");
-        int index = 1;
-        int pad = cardsByName.size() > 99 ? 4 : (cardsByName.size() > 9 ? 3 : 2);
-        for (Map.Entry<String, List<Map.Entry<String, Integer>>> acEntryList : entries) {
-            List<String> ids = acEntryList.getValue().stream().map(i -> "`(" + i.getValue() + ")`").toList();
-            sb.append("\n`").append(Helper.leftpad(index + ".", pad)).append("` - ");
-            sb.append(Emojis.ActionCard.repeat(ids.size()));
-            sb.append(" **").append(acEntryList.getKey()).append("**");
-            sb.append(String.join(",", ids));
-            index++;
-        }
-        return sb.toString();
-    }
-
-    public static void pickACardFromDiscardStep1(GenericInteractionCreateEvent event, Game game, Player player) {
+    public static void pickACardFromDiscardStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String acStringID : game.getDiscardActionCards().keySet()) {
             buttons.add(Buttons.green("pickFromDiscard_" + acStringID, Mapper.getActionCard(acStringID).getName()));
