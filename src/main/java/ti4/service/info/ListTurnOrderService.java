@@ -1,4 +1,4 @@
-package ti4.service;
+package ti4.service.info;
 
 import java.util.Collections;
 import java.util.HashMap;

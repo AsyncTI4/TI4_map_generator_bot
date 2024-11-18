@@ -47,7 +47,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
-import ti4.service.ListPlayerInfoService;
+import ti4.service.info.ListPlayerInfoService;
 
 public class TurnEnd extends GameStateSubcommand {
 

@@ -1,4 +1,4 @@
-package ti4.service;
+package ti4.service.objectives;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +20,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.info.ListPlayerInfoService;
 
 @UtilityClass
 public class ScorePublicObjectiveService {

@@ -2,22 +2,25 @@ package ti4.commands.franken;
 
 import java.util.Objects;
 
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.helpers.Constants;
-import ti4.helpers.FrankenDraftHelper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.franken.FrankenDraftBagService;
 
-public class FrankenEdit extends FrankenSubcommandData {
+class FrankenEdit extends GameStateSubcommand {
+
     public FrankenEdit() {
-        super(Constants.FRANKEN_EDIT, "Frankendraft Edit Commands");
+        super(Constants.FRANKEN_EDIT, "Frankendraft Edit Commands", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_EDIT_ACTION, "add/remove/swap/view")
             .addChoice("Force Bag Swap", "forceSwap")
             .addChoice("Add Card To Bag", "addBag").addChoice("Remove Card From Bag", "removeBag")
@@ -36,7 +39,7 @@ public class FrankenEdit extends FrankenSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         OptionMapping editOption = event.getOption(Constants.FRANKEN_EDIT_ACTION);
         OptionMapping card1 = event.getOption(Constants.FRANKEN_ITEM + "1");
         OptionMapping card2 = event.getOption(Constants.FRANKEN_ITEM + "2");
@@ -44,17 +47,17 @@ public class FrankenEdit extends FrankenSubcommandData {
 
         if ("viewAll".equals(command)) {
             MessageHelper.sendMessageToUser("====================\n" + game.getName() +
-                " Frankendraft Status\n====================", getUser());
+                " Frankendraft Status\n====================", event.getUser());
             for (var player : game.getRealPlayers()) {
-                dmPlayerBag(game, player, player.getCurrentDraftBag(), "Held Bag");
-                dmPlayerBag(game, player, player.getDraftHand(), "Hand");
-                dmPlayerBag(game, player, player.getDraftQueue(), "Queue");
+                dmPlayerBag(game, player, player.getCurrentDraftBag(), "Held Bag", event.getUser());
+                dmPlayerBag(game, player, player.getDraftHand(), "Hand", event.getUser());
+                dmPlayerBag(game, player, player.getDraftQueue(), "Queue", event.getUser());
             }
             return;
         }
 
         if ("forceSwap".equals(command)) {
-            FrankenDraftHelper.passBags(game);
+            FrankenDraftBagService.passBags(game);
             GameSaveLoadManager.saveGame(game, event);
             return;
         }
@@ -97,19 +100,19 @@ public class FrankenEdit extends FrankenSubcommandData {
                 }
             }
 
-            dmPlayerBag(game, editingPlayer, editingBag, bagName);
+            dmPlayerBag(game, editingPlayer, editingBag, bagName, event.getUser());
         }
 
         GameSaveLoadManager.saveGame(game, event);
     }
 
-    private void dmPlayerBag(Game game, Player player, DraftBag bag, String bagName) {
+    private void dmPlayerBag(Game game, Player player, DraftBag bag, String bagName, User user) {
         StringBuilder sb = new StringBuilder();
         sb.append(game.getName()).append(" ").append(player.getUserName()).append(" Current ").append(bagName).append(":\n");
         for (DraftItem item : bag.Contents) {
             sb.append(item.getAlias());
             sb.append("\n");
         }
-        MessageHelper.sendMessageToUser(sb.toString(), getUser());
+        MessageHelper.sendMessageToUser(sb.toString(), user);
     }
 }

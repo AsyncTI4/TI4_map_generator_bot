@@ -7,27 +7,27 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.commands.franken.AbilityAdd;
-import ti4.commands.franken.AbilityRemove;
-import ti4.commands.franken.FactionTechAdd;
-import ti4.commands.franken.FactionTechRemove;
-import ti4.commands.franken.LeaderAdd;
-import ti4.commands.franken.LeaderRemove;
-import ti4.commands.franken.PNAdd;
-import ti4.commands.franken.PNRemove;
-import ti4.commands.franken.UnitAdd;
-import ti4.commands.franken.UnitRemove;
 import ti4.commands.tech.TechAdd;
 import ti4.commands.tech.TechRemove;
 import ti4.commands2.player.Stats;
+import ti4.draft.BagDraft;
+import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.draft.items.CommoditiesDraftItem;
 import ti4.generator.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
+import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
+import ti4.service.franken.FrankenAbilityService;
+import ti4.service.franken.FrankenDraftBagService;
+import ti4.service.franken.FrankenFactionTechService;
+import ti4.service.franken.FrankenLeaderService;
+import ti4.service.franken.FrankenPromissoryService;
+import ti4.service.franken.FrankenUnitService;
 
 @UtilityClass
 class FrankenButtonHandler {
@@ -91,30 +91,26 @@ class FrankenButtonHandler {
     private static void applyFrankenItemToPlayer(GenericInteractionCreateEvent event, DraftItem draftItem, Player player) {
         String itemID = draftItem.ItemId;
         switch (draftItem.ItemCategory) {
-            case ABILITY -> AbilityAdd.addAbilities(event, player, List.of(itemID));
-            case TECH -> FactionTechAdd.addFactionTechs(event, player, List.of(itemID));
-            case AGENT, COMMANDER, HERO -> LeaderAdd.addLeaders(event, player, List.of(itemID));
-            case MECH, FLAGSHIP -> UnitAdd.addUnits(event, player, List.of(itemID));
+            case ABILITY -> FrankenAbilityService.addAbilities(event, player, List.of(itemID));
+            case TECH -> FrankenFactionTechService.addFactionTechs(event, player, List.of(itemID));
+            case AGENT, COMMANDER, HERO -> FrankenLeaderService.addLeaders(event, player, List.of(itemID));
+            case MECH, FLAGSHIP -> FrankenUnitService.addUnits(event, player, List.of(itemID));
             case COMMODITIES -> Stats.setTotalCommodities(event, player, (player.getCommoditiesTotal() + ((CommoditiesDraftItem) draftItem).getCommodities()));
-            case PN -> PNAdd.addPromissoryNotes(event, player.getGame(), player, List.of(itemID));
+            case PN -> FrankenPromissoryService.addPromissoryNotes(event, player.getGame(), player, List.of(itemID));
             case STARTINGTECH -> addStartingTech(event, player, itemID);
-            default -> {
-            }
         }
     }
 
     private static void removeFrankenItemFromPlayer(GenericInteractionCreateEvent event, DraftItem draftItem, Player player) {
         String itemID = draftItem.ItemId;
         switch (draftItem.ItemCategory) {
-            case ABILITY -> AbilityRemove.removeAbilities(event, player, List.of(itemID));
-            case TECH -> FactionTechRemove.removeFactionTechs(event, player, List.of(itemID));
-            case AGENT, COMMANDER, HERO -> LeaderRemove.removeLeaders(event, player, List.of(itemID));
-            case MECH, FLAGSHIP -> UnitRemove.removeUnits(event, player, List.of(itemID));
+            case ABILITY -> FrankenAbilityService.removeAbilities(event, player, List.of(itemID));
+            case TECH -> FrankenFactionTechService.removeFactionTechs(event, player, List.of(itemID));
+            case AGENT, COMMANDER, HERO -> FrankenLeaderService.removeLeaders(event, player, List.of(itemID));
+            case MECH, FLAGSHIP -> FrankenUnitService.removeUnits(event, player, List.of(itemID));
             case COMMODITIES -> Stats.setTotalCommodities(event, player, (player.getCommoditiesTotal() - ((CommoditiesDraftItem) draftItem).getCommodities()));
-            case PN -> PNRemove.removePromissoryNotes(event, player, List.of(itemID));
+            case PN -> FrankenPromissoryService.removePromissoryNotes(event, player, List.of(itemID));
             case STARTINGTECH -> removeStartingTech(event, player, itemID);
-            default -> {
-            }
         }
     }
 
@@ -134,5 +130,76 @@ class FrankenButtonHandler {
         for (String tech : startingTech) {
             TechRemove.removeTech(event, player, tech);
         }
+    }
+
+    @ButtonHandler("frankenDraftAction")
+    public static void resolveFrankenDraftAction(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String action = buttonID.split(";")[1];
+        BagDraft draft = game.getActiveBagDraft();
+
+        if (!action.contains(":")) {
+            switch (action) {
+                case "reset_queue" -> {
+                    player.getCurrentDraftBag().Contents.addAll(player.getDraftQueue().Contents);
+                    player.resetDraftQueue();
+                    FrankenDraftBagService.showPlayerBag(game, player);
+                    GameSaveLoadManager.saveGame(game, player.getUserName() + " reset their draft queue");
+                    return;
+                }
+                case "confirm_draft" -> {
+                    player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
+                    player.resetDraftQueue();
+                    draft.setPlayerReadyToPass(player, true);
+                    GameSaveLoadManager.saveGame(game, player.getUserName() + " confirmed their draft picks");
+
+                    // Clear out all existing messages
+                    draft.findExistingBagChannel(player).getHistory().retrievePast(100).queue(m -> {
+                        if (!m.isEmpty()) {
+                            draft.findExistingBagChannel(player).deleteMessages(m).queue();
+                        }
+                    });
+                    MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + FrankenDraftBagService.getBagReceipt(player.getCurrentDraftBag()));
+                    FrankenDraftBagService.displayPlayerHand(game, player);
+                    if (draft.isDraftStageComplete()) {
+                        MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands.");
+                        FrankenDraftBagService.applyDraftBags(event, game);
+                        return;
+                    }
+                    int passCounter = 0;
+                    while (draft.allPlayersReadyToPass()) {
+                        FrankenDraftBagService.passBags(game);
+                        passCounter++;
+                        if (passCounter > game.getRealPlayers().size()) {
+                            MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " an error has occurred where nobody is able to draft any cards, but there are cards still in the bag. Please notify @developer");
+                            break;
+                        }
+                    }
+                    return;
+                }
+                case "show_bag" -> {
+                    FrankenDraftBagService.showPlayerBag(game, player);
+                    return;
+                }
+            }
+        }
+        DraftBag currentBag = player.getCurrentDraftBag();
+        DraftItem selectedItem = DraftItem.generateFromAlias(action);
+
+        if (!selectedItem.isDraftable(player)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Something went wrong. You are not allowed to draft " + selectedItem.getShortDescription() + " right now. Please select another item.");
+            return;
+        }
+        currentBag.Contents.removeIf((DraftItem bagItem) -> bagItem.getAlias().equals(action));
+        player.queueDraftItem(DraftItem.generateFromAlias(action));
+
+        if (!draft.playerHasDraftableItemInBag(player) && !draft.playerHasItemInQueue(player)) {
+            draft.setPlayerReadyToPass(player, true);
+        }
+
+        FrankenDraftBagService.showPlayerBag(game, player);
+
+        GameSaveLoadManager.saveGame(game, player.getUserName() + " did something");
+        event.getMessage().delete().queue();
     }
 }

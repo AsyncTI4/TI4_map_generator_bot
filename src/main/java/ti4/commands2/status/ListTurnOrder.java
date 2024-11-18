@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.service.ListTurnOrderService;
+import ti4.service.info.ListTurnOrderService;
 
 class ListTurnOrder extends GameStateSubcommand {
 
