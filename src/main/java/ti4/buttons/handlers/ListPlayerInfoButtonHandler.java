@@ -3,6 +3,7 @@ package ti4.buttons.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -19,6 +20,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.ListPlayerInfoService;
 
+@UtilityClass
 class ListPlayerInfoButtonHandler {
 
     @ButtonHandler("gameInfoButtons")
