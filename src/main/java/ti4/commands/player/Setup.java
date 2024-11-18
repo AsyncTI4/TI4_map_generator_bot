@@ -24,7 +24,6 @@ import ti4.commands2.GameStateSubcommand;
 import ti4.commands2.uncategorized.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
-import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -331,9 +330,19 @@ public class Setup extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }
 
-        var managedPlayer = GameManager.getManagedPlayer(player.getUserID());
-        player.setHoursThatPlayerIsAFK(managedPlayer.getAfkHours());
-        player.setPreferenceForDistanceBasedTacticalActions(managedPlayer.isDistanceBasedTacticalActions());
+        Map<String, Game> mapList = GameManager.getGameNameToGame();
+        for (Game game2 : mapList.values()) {
+            for (Player player2 : game2.getRealPlayers()) {
+                if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                    if (!player2.getHoursThatPlayerIsAFK().isEmpty()) {
+                        player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
+                    }
+                    if (player2.doesPlayerPreferDistanceBasedTacticalActions()) {
+                        player.setPreferenceForDistanceBasedTacticalActions(true);
+                    }
+                }
+            }
+        }
 
         if (!game.isFowMode()) {
             StringBuilder sb = TitlesHelper.getPlayerTitles(player.getUserID(), player.getUserName(), false);
@@ -376,8 +385,7 @@ public class Setup extends GameStateSubcommand {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
             UnitKey unitID = Mapper.getUnitKey(unit, color);
-            String unitPath = TileHelper.getUnitPath(unitID, false);
-            if (unitPath == null) {
+            if (unitID == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Unit: " + unit + " is not valid and not supported.");
                 continue;
@@ -385,7 +393,7 @@ public class Setup extends GameStateSubcommand {
             if (unitInfoTokenizer.hasMoreTokens()) {
                 planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
             }
-            planetName = AddRemoveUnits.getPlanet(tile, planetName);
+            planetName = AddRemoveUnits.getPlanet(event, tile, planetName);
             tile.addUnit(planetName, unitID, count);
         }
     }
