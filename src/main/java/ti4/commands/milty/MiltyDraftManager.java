@@ -44,7 +44,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 
 @Data
-class MiltyDraftManager {
+public class MiltyDraftManager {
 
     private final List<MiltyDraftTile> all = new ArrayList<>();
     private final List<MiltyDraftTile> blue = new ArrayList<>();
@@ -131,7 +131,7 @@ class MiltyDraftManager {
         draftIndex++;
     }
 
-    public void replacePlayer(Game game, String oldUID, String newUID) {
+    public void replacePlayer(String oldUID, String newUID) {
         // Update player list
         List<String> newPlayers = new ArrayList<>();
         players.forEach(p -> newPlayers.add(p.equals(oldUID) ? newUID : p));
