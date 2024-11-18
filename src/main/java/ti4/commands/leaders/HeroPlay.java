@@ -18,7 +18,6 @@ import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
-import ti4.generator.Mapper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -32,6 +31,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -463,7 +463,7 @@ public class HeroPlay extends LeaderAction {
             }
             case "keleresheroharka" -> resolveKeleresHeroMentak(game, player, event);
         }
-        TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.LEADER,
+        TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.LEADER,
             playerLeader.getId(), player.getNumberTurns());
         if (posssibleCombatMod != null) {
             player.addNewTempCombatMod(posssibleCombatMod);
@@ -516,7 +516,7 @@ public class HeroPlay extends LeaderAction {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), acDrawMessage.toString());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "All non-component action cards have been reshuffled back into the deck.");
         ActionCardHelper.sendActionCardInfo(game, player);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
         if (noMoreComponentActionCards) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**All action cards in the deck have been revealed. __No component action cards remain.__**");
         }

@@ -22,7 +22,7 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.draft.items.StartingFleetDraftItem;
 import ti4.draft.items.StartingTechDraftItem;
 import ti4.draft.items.TechDraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;

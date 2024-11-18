@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.CommandHelper;
-import ti4.generator.PositionMapper;
+import ti4.image.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;

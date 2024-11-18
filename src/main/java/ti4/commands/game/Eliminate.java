@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GameCreationHelper;

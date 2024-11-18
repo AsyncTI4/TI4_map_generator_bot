@@ -25,7 +25,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.statistics.GameStatisticFilterer;
-import ti4.generator.MapRenderPipeline;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -33,10 +32,10 @@ import ti4.helpers.Emojis;
 import ti4.helpers.GameStatsHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
-import ti4.helpers.RematchHelper;
 import ti4.helpers.RepositoryDispatchEvent;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.async.RoundSummaryHelper;
+import ti4.image.MapRenderPipeline;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -44,6 +43,7 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.RematchService;
 
 import static ti4.helpers.StringHelper.ordinal;
 
@@ -195,7 +195,7 @@ public class GameEnd extends GameSubcommandData {
         }
 
         if (rematch) {
-            RematchHelper.secondHalfOfRematch(event, game);
+            RematchService.secondHalfOfRematch(event, game);
         }
     }
 

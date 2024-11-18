@@ -22,7 +22,7 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;

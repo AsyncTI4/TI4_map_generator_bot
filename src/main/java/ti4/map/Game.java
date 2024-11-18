@@ -53,7 +53,7 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.milty.MiltyDraftManager;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;

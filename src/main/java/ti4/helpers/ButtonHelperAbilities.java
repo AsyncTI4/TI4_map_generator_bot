@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.combat.StartCombat;
 import ti4.commands.explore.ExplorePlanet;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
@@ -20,10 +19,10 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.player.TurnStart;
-import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -32,6 +31,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.service.combat.StartCombatService;
 
 public class ButtonHelperAbilities {
 
@@ -228,7 +228,7 @@ public class ButtonHelperAbilities {
         int count = Integer.parseInt(buttonID.split("_")[1]);
         game.drawActionCard(player.getUserID(), count);
         ActionCardHelper.sendActionCardInfo(game, player, event);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
     }
 
     public static List<String> getTrapNames() {
@@ -506,7 +506,7 @@ public class ButtonHelperAbilities {
 
     public static void autoneticMemoryStep3a(Game game, Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
-        ActionCardHelper.pickACardFromDiscardStep1(event, game, player);
+        ActionCardHelper.pickACardFromDiscardStep1(game, player);
     }
 
     public static void addOmenDie(Game game, int omenDie) {
@@ -1345,7 +1345,7 @@ public class ButtonHelperAbilities {
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
         if (players.size() > 1) {
-            StartCombat.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
+            StartCombatService.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
         }
 
         event.getMessage().delete().queue();

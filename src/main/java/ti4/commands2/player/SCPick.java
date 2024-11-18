@@ -23,7 +23,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.MapGenerator;
+import ti4.image.MapGenerator;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;

@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
-import ti4.generator.TileHelper;
+import ti4.image.TileHelper;
 import ti4.helpers.Constants;
 import ti4.message.BotLogger;
 import ti4.model.Source.ComponentSource;

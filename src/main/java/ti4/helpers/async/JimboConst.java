@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import ti4.generator.TileHelper;
+import ti4.image.TileHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 

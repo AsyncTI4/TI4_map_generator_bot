@@ -2,7 +2,7 @@ package ti4.commands2.admin;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.Subcommand;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 
 class ReloadMapperObjects extends Subcommand {

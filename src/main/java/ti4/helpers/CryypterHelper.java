@@ -46,7 +46,7 @@ public class CryypterHelper {
             player.getRepresentationUnfogged() + " use buttons to discard 1 of the " + draw + " cards just drawn.",
             ActionCardHelper.getDiscardActionCardButtons(player, false));
 
-        ButtonHelper.checkACLimit(game, null, player);
+        ButtonHelper.checkACLimit(game, player);
         if (addScheming && player.hasAbility("scheming")) ActionCardHelper.sendDiscardActionCardButtons(player, false);
         if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
             CommanderUnlockCheck.checkPlayer(player, "yssaril");

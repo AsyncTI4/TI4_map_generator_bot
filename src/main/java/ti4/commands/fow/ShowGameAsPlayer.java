@@ -6,11 +6,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.commands2.CommandHelper;
-import ti4.commands2.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.ShowGameService;
 
 public class ShowGameAsPlayer extends FOWSubcommandData {
 
@@ -35,7 +35,7 @@ public class ShowGameAsPlayer extends FOWSubcommandData {
             return;
         }
 
-        ShowGame.simpleShowGame(game, new SlashCommandCustomUserWrapper(event, showMapAsPlayer.getUser()));
+        ShowGameService.simpleShowGame(game, new SlashCommandCustomUserWrapper(event, showMapAsPlayer.getUser()));
     }
 
     public static class SlashCommandCustomUserWrapper extends SlashCommandInteractionEvent {

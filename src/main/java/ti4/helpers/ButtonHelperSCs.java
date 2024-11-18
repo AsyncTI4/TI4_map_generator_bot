@@ -702,7 +702,7 @@ public class ButtonHelperSCs {
                 game.drawActionCard(player.getUserID());
             }
             ActionCardHelper.sendActionCardInfo(game, player, event);
-            ButtonHelper.checkACLimit(game, event, player);
+            ButtonHelper.checkACLimit(game, player);
         }
 
         ButtonHelper.addReaction(event, false, false, message, "");

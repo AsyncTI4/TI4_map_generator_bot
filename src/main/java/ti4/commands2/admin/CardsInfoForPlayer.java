@@ -4,9 +4,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
-import ti4.commands2.uncategorized.CardsInfo;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.service.info.CardsInfoService;
 
 class CardsInfoForPlayer extends GameStateSubcommand {
 
@@ -17,7 +17,7 @@ class CardsInfoForPlayer extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        CardsInfo.sendCardsInfo(getGame(), getPlayer(), event);
+        CardsInfoService.sendCardsInfo(getGame(), getPlayer(), event);
         MessageHelper.sendMessageToEventChannel(event, "Cards Info sent");
     }
 }

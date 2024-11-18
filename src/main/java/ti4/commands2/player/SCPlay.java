@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.buttons.Buttons;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -36,6 +36,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
+import ti4.service.strategycard.TradeStrategyCardService;
 
 public class SCPlay extends GameStateSubcommand {
 
@@ -273,7 +274,7 @@ public class SCPlay extends GameStateSubcommand {
 
         // Trade Primary
         if (scModel.usesAutomationForSCID("pok5trade")) {
-            ButtonHelper.tradePrimary(game, event, player);
+            TradeStrategyCardService.doPrimary(game, event, player);
         }
 
         // Politics Assign Speaker Buttons
