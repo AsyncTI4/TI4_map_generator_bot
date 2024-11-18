@@ -1,4 +1,4 @@
-package ti4.helpers;
+package ti4.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +18,10 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.game.GameCreate;
+import ti4.commands.game.GameEnd;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
+import ti4.helpers.RegexHelper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
@@ -25,7 +29,12 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class RematchHelper {
+public class RematchService {
+
+    public static void rematch(Game game, GenericInteractionCreateEvent event) {
+        GameEnd.gameEndStuff(game, event, true);
+        secondHalfOfRematch(event, game);
+    }
 
     public static void secondHalfOfRematch(GenericInteractionCreateEvent event, Game game) {
         String name = game.getName();
@@ -156,7 +165,6 @@ public class RematchHelper {
             "> `/game replace` to replace a player in the game with a new one\n";
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
         MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + newName);
-        // ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
 
         List<Button> buttons2 = new ArrayList<>();
         buttons2.add(Buttons.green("getHomebrewButtons", "Yes, have homebrew"));
