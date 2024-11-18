@@ -10,16 +10,11 @@ import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.SentACRandom;
-import ti4.commands.cardsso.SOInfo;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.special.NaaluCommander;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
@@ -43,8 +38,7 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperActionCards {
 
-    public static List<Button> getTilesToScuttle(Player player, Game game, GenericInteractionCreateEvent event,
-        int tgAlready) {
+    public static List<Button> getTilesToScuttle(Player player, Game game, int tgAlready) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
@@ -60,8 +54,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static List<Button> getTilesToLuckyShot(Player player, Game game,
-        GenericInteractionCreateEvent event) {
+    public static List<Button> getTilesToLuckyShot(Player player, Game game) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
@@ -88,8 +81,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static List<Button> getUnitsToScuttle(Player player, Game game, GenericInteractionCreateEvent event,
-        Tile tile, int tgAlready) {
+    public static List<Button> getUnitsToScuttle(Player player, Tile tile, int tgAlready) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier,
             UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun);
@@ -142,8 +134,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static List<Button> getUnitsToLuckyShot(Player player, Game game, GenericInteractionCreateEvent event,
-        Tile tile) {
+    public static List<Button> getUnitsToLuckyShot(Player player, Game game, Tile tile) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Dreadnought);
 
@@ -201,7 +192,7 @@ public class ButtonHelperActionCards {
     @ButtonHandler("startToScuttleAUnit_")
     public static void resolveScuttleStart(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int tgAlready = Integer.parseInt(buttonID.split("_")[1]);
-        List<Button> buttons = getTilesToScuttle(player, game, event, tgAlready);
+        List<Button> buttons = getTilesToScuttle(player, game, tgAlready);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
             player.getRepresentationUnfogged() + " Use buttons to select a system to Scuttle in", buttons);
         ButtonHelper.deleteMessage(event);
@@ -209,7 +200,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("startToLuckyShotAUnit_")
     public static void resolveLuckyShotStart(Player player, Game game, ButtonInteractionEvent event) {
-        List<Button> buttons = getTilesToLuckyShot(player, game, event);
+        List<Button> buttons = getTilesToLuckyShot(player, game);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged()
                 + " no systems to Lucky Shot in found. Remember you can't Lucky Shot yourself. Report bug if in error. If not an error, please take a different action");
@@ -260,7 +251,7 @@ public class ButtonHelperActionCards {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         int tgAlready = Integer.parseInt(buttonID.split("_")[2]);
-        List<Button> buttons = getUnitsToScuttle(player, game, event, tile, tgAlready);
+        List<Button> buttons = getUnitsToScuttle(player, tile, tgAlready);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
             player.getRepresentationUnfogged() + " Use buttons to select which unit to Scuttle", buttons);
         ButtonHelper.deleteMessage(event);
@@ -270,7 +261,7 @@ public class ButtonHelperActionCards {
     public static void resolveLuckyShotTileSelection(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
-        List<Button> buttons = getUnitsToLuckyShot(player, game, event, tile);
+        List<Button> buttons = getUnitsToLuckyShot(player, game, tile);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
             player.getRepresentationUnfogged() + " Use buttons to select which unit to Lucky Shot", buttons);
         ButtonHelper.deleteMessage(event);
@@ -904,7 +895,7 @@ public class ButtonHelperActionCards {
             game.drawSecretObjective(player.getUserID());
             message = message + " Drew a second SO due to Plausible Deniability.";
         }
-        SOInfo.sendSecretObjectiveInfo(game, player, event);
+        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation() + " Exhaust stuff to pay the 3 influence", buttons);
@@ -1083,7 +1074,7 @@ public class ButtonHelperActionCards {
     @ButtonHandler("spyStep3_")
     public static void resolveSpyStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        new SentACRandom().sendRandomACPart2(event, game, player, p2);
+        ActionCardHelper.sendRandomACPart2(event, game, player, p2);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1108,7 +1099,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveInsiderInformation")
     public static void resolveInsiderInformation(Player player, Game game, ButtonInteractionEvent event) {
-        NaaluCommander.sendTopAgendaToCardsInfoSkipCovert(game, player);
+        AgendaHelper.sendTopAgendaToCardsInfoSkipCovert(game, player);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Sent top agenda info to " + player.getFactionEmojiOrColor() + " cards info");
         ButtonHelper.deleteMessage(event);
     }
@@ -1952,7 +1943,7 @@ public class ButtonHelperActionCards {
                     Mapper.getActionCard(acStringID).getRepresentation() + "\n";
                 MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
-                ACInfo.sendActionCardInfo(game, player);
+                ActionCardHelper.sendActionCardInfo(game, player);
             }
         }
         ButtonHelper.deleteMessage(event);

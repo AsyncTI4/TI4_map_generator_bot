@@ -15,8 +15,8 @@ import java.util.Set;
 public class SCTradeGoods extends StatusSubcommandData {
     public SCTradeGoods() {
         super(Constants.SC_TRADE_GOODS, "Add Trade goods to Strategy Cards");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Cards number").setRequired(false));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count on card").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Cards number"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count on card"));
     }
 
     @Override

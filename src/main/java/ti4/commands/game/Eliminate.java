@@ -13,14 +13,14 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.commands.cardsac.PlayAC;
-import ti4.commands.cardspn.PNInfo;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.generator.Mapper;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GameCreationHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -94,7 +94,7 @@ public class Eliminate extends AddRemovePlayer {
                         Player p2 = game.getPlayerFromColorOrFaction(pn.getOwner());
                         player.removePromissoryNote(pnID);
                         p2.setPromissoryNote(pnID);
-                        PNInfo.sendPromissoryNoteInfo(game, p2, false);
+                        PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
                     }
                 }
 
@@ -105,7 +105,7 @@ public class Eliminate extends AddRemovePlayer {
                         PromissoryNoteModel pn = promissoryNotes.get(pnID);
                         if (pn != null && (pn.getOwner().equalsIgnoreCase(player.getColor()) || pn.getOwner().equalsIgnoreCase(player.getFaction()))) {
                             p2.removePromissoryNote(pnID);
-                            PNInfo.sendPromissoryNoteInfo(game, p2, false);
+                            PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
                         }
                     }
                 }
@@ -123,7 +123,7 @@ public class Eliminate extends AddRemovePlayer {
                     String sb = "Player: " + player.getUserName() + " - " + "Discarded Action Card:" + "\n" + Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
                     MessageHelper.sendMessageToChannel(event.getChannel(), sb);
                 }
-                PlayAC.serveReverseEngineerButtons(game, player, new ArrayList<>(acs.keySet()));
+                ActionCardHelper.serveReverseEngineerButtons(game, player, new ArrayList<>(acs.keySet()));
 
                 //unscore all of a players SOs
                 acs = new LinkedHashMap<>(player.getSecretsScored());

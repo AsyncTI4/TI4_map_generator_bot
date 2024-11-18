@@ -14,10 +14,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.ShowAllAC;
-import ti4.commands.cardspn.ShowAllPN;
-import ti4.commands.cardsso.ShowAllSO;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.tokens.AddCC;
@@ -145,7 +141,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " use buttons to discard",
-            ACInfo.getDiscardActionCardButtons(player, false));
+            ActionCardHelper.getDiscardActionCardButtons(player, false));
         event.getMessage().delete().queue();
     }
 
@@ -496,15 +492,15 @@ public class ButtonHelperCommanders {
         String message = "";
         String type = buttonID.split("_")[0];
         if ("ac".equalsIgnoreCase(type)) {
-            ShowAllAC.showAll(enemy, player, game);
+            ActionCardHelper.showAll(enemy, player, game);
             message = " used So Ata, the Yssaril commander, to look at ACs";
         }
         if ("so".equalsIgnoreCase(type)) {
-            new ShowAllSO().showAll(enemy, player, game);
+            SecretObjectiveHelper.showAll(enemy, player, game);
             message = " used So Ata, the Yssaril commander, to look at SOs";
         }
         if ("pn".equalsIgnoreCase(type)) {
-            new ShowAllPN().showAll(enemy, player, game, false);
+            PromissoryNoteHelper.showAll(enemy, player, game);
             message = " used So Ata, the Yssaril commander, to look at PNs ";
         }
         message = message + " of " + enemy.getRepresentation(false, false);

@@ -24,12 +24,10 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.franken.StartFrankenDraft.FrankenDraftMode;
 import ti4.commands.game.Undo;
 import ti4.commands.map.Preset;
-import ti4.commands.milty.ForcePick;
-import ti4.commands.player.ChangeUnitDecal;
-import ti4.commands.statistics.GameStats.GameStatistics;
-import ti4.commands.statistics.PlayerStats;
-import ti4.commands.uncategorized.ServerPromote;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.statistics.GameStatTypes;
+import ti4.commands2.statistics.PlayerStatTypes;
+import ti4.commands2.uncategorized.ServerPromote;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
@@ -62,6 +60,7 @@ import ti4.model.TechSpecialtyModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
+import ti4.service.UnitDecalService;
 
 public class AutoCompleteProvider {
 
@@ -421,7 +420,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Mapper.getDecals().stream()
                     .filter(value -> value.contains(enteredValue) || Mapper.getDecalName(value).toLowerCase().contains(enteredValue))
-                    .filter(decalID -> ChangeUnitDecal.userMayUseDecal(userId, decalID))
+                    .filter(decalID -> UnitDecalService.userMayUseDecal(userId, decalID))
                     .limit(25)
                     .map(value -> new Command.Choice(Mapper.getDecalName(value), value))
                     .collect(Collectors.toList());
@@ -771,22 +770,22 @@ public class AutoCompleteProvider {
             }
             case Constants.GAME_STATISTIC -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<GameStatistics> stats = Arrays.asList(GameStatistics.values());
+                List<GameStatTypes> stats = Arrays.asList(GameStatTypes.values());
                 List<Command.Choice> options = stats.stream()
                     .filter(stat -> stat.search(enteredValue))
                     .limit(25)
-                    .sorted(Comparator.comparing(GameStatistics::getAutoCompleteName))
+                    .sorted(Comparator.comparing(GameStatTypes::getAutoCompleteName))
                     .map(stat -> new Command.Choice(stat.getAutoCompleteName(), stat.toString()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
             case Constants.PLAYER_STATISTIC -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<PlayerStats.PlayerStatistics> stats = Arrays.asList(PlayerStats.PlayerStatistics.values());
+                List<PlayerStatTypes> stats = Arrays.asList(PlayerStatTypes.values());
                 List<Command.Choice> options = stats.stream()
                     .filter(stat -> stat.search(enteredValue))
                     .limit(25)
-                    .sorted(Comparator.comparing(PlayerStats.PlayerStatistics::getAutoCompleteName))
+                    .sorted(Comparator.comparing(PlayerStatTypes::getAutoCompleteName))
                     .map(stat -> new Command.Choice(stat.getAutoCompleteName(), stat.toString()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
@@ -830,7 +829,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case ForcePick.PICK -> {
+            case "draft_pick" -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 if (game == null) {
                     event.replyChoices(Collections.emptyList()).queue();

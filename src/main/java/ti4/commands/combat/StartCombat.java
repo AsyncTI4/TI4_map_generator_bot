@@ -47,7 +47,7 @@ public class StartCombat extends CombatSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile to move units from")
             .setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_TYPE,
-            "Type of combat to start 'space' or 'ground' - Default: space").setRequired(false)
+            "Type of combat to start 'space' or 'ground' - Default: space")
                 .setAutoComplete(true));
     }
 

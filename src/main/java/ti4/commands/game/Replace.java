@@ -29,9 +29,9 @@ public class Replace extends GameSubcommandData {
 
     public Replace() {
         super(Constants.REPLACE, "Replace player in game");
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player being replaced @playerName").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction being replaced").setRequired(false).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Replacement player @playerName").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player being replaced @playerName"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction being replaced").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Replacement player @playerName"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setAutoComplete(true));
     }
 
@@ -160,6 +160,5 @@ public class Replace extends GameSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
         }
-
     }
 }

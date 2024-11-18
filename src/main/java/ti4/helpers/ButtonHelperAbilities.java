@@ -12,23 +12,14 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.PickACFromDiscard;
-import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
-import ti4.commands.custom.PeekAtStage1;
-import ti4.commands.custom.PeekAtStage2;
-import ti4.commands.ds.TrapReveal;
-import ti4.commands.ds.TrapToken;
 import ti4.commands.explore.ExplorePlanet;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.player.ClearDebt;
-import ti4.commands.player.TurnStart;
-import ti4.commands.special.SleeperToken;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
+import ti4.commands2.player.TurnStart;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -61,7 +52,7 @@ public class ButtonHelperAbilities {
         Map<UnitKey, Integer> units = unitHolder.getUnits();
         String msg = player.getRepresentation() + " choose the opponent ship you wish to build using " + Emojis.influence + " influence";
         if (player.getPromissoryNotes().containsKey("dspnmort") && !player.getPromissoryNotesOwned().contains("dspnmort")) {
-            PlayPN.resolvePNPlay("dspnmort", player, game, event);
+            PromissoryNoteHelper.resolvePNPlay("dspnmort", player, game, event);
         }
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -220,7 +211,7 @@ public class ButtonHelperAbilities {
         pillageCheck(vaden, game);
         player.setTg(player.getTg() - 1);
         int amount = Math.min(2, vaden.getDebtTokenCount(player.getColor()));
-        ClearDebt.clearDebt(vaden, player, amount);
+        vaden.clearDebt(player, amount);
         String msg = player.getFactionEmojiOrColor() + " paid 1TG to "
             + vaden.getFactionEmojiOrColor()
             + "to get 2 debt tokens cleared via the binding debts ability";
@@ -236,7 +227,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
         int count = Integer.parseInt(buttonID.split("_")[1]);
         game.drawActionCard(player.getUserID(), count);
-        ACInfo.sendActionCardInfo(game, player, event);
+        ActionCardHelper.sendActionCardInfo(game, player, event);
         ButtonHelper.checkACLimit(game, event, player);
     }
 
@@ -371,7 +362,7 @@ public class ButtonHelperAbilities {
         String trap = buttonID.split("_")[1];
         trap = translateNameIntoTrapIDOrReverse(trap);
         String planet = player.getTrapCardsPlanets().get(trap);
-        TrapReveal.revealTrapForPlanet(event, game, planet, trap, player, true);
+        DiscordantStarsHelper.revealTrapForPlanet(event, game, planet, trap, player, true);
         event.getMessage().delete().queue();
     }
 
@@ -380,7 +371,7 @@ public class ButtonHelperAbilities {
         String trap = buttonID.split("_")[1];
         trap = translateNameIntoTrapIDOrReverse(trap);
         String planet = player.getTrapCardsPlanets().get(trap);
-        TrapReveal.revealTrapForPlanet(event, game, planet, trap, player, false);
+        DiscordantStarsHelper.revealTrapForPlanet(event, game, planet, trap, player, false);
         event.getMessage().delete().queue();
     }
 
@@ -389,7 +380,7 @@ public class ButtonHelperAbilities {
         String planet = buttonID.split("_")[1];
         String trap = translateNameIntoTrapIDOrReverse(buttonID.split("_")[2]);
         event.getMessage().delete().queue();
-        new TrapToken().setTrapForPlanet(event, game, planet, trap, player);
+        DiscordantStarsHelper.setTrapForPlanet(event, game, planet, trap, player);
     }
 
     public static List<String> getPlanetsWithTraps(Game game) {
@@ -494,7 +485,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
         int count = Integer.parseInt(buttonID.split("_")[1]);
         game.drawActionCard(player.getUserID(), count - 1);
-        ACInfo.sendActionCardInfo(game, player, event);
+        ActionCardHelper.sendActionCardInfo(game, player, event);
         String msg2 = player.getFactionEmoji() + " is choosing to resolve their Autonetic Memory ability";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         List<Button> buttons = new ArrayList<>();
@@ -515,7 +506,7 @@ public class ButtonHelperAbilities {
 
     public static void autoneticMemoryStep3a(Game game, Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
-        PickACFromDiscard.pickACardFromDiscardStep1(event, game, player);
+        ActionCardHelper.pickACardFromDiscardStep1(event, game, player);
     }
 
     public static void addOmenDie(Game game, int omenDie) {
@@ -762,7 +753,7 @@ public class ButtonHelperAbilities {
         String planet = buttonID;
         String message = player.getFactionEmojiOrColor() + " put a Sleeper on " + Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        new SleeperToken().addOrRemoveSleeper(event, game, planet, player);
+        SleeperTokenHelper.addOrRemoveSleeper(event, game, planet, player);
         event.getMessage().delete().queue();
     }
 
@@ -1149,7 +1140,7 @@ public class ButtonHelperAbilities {
         String planet = buttonID;
         String message = player.getFactionEmojiOrColor() + " removed a Sleeper from " + planet;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        new SleeperToken().addOrRemoveSleeper(event, game, planet, player);
+        SleeperTokenHelper.addOrRemoveSleeper(event, game, planet, player);
         event.getMessage().delete().queue();
     }
 
@@ -1159,7 +1150,7 @@ public class ButtonHelperAbilities {
         String planetName = buttonID.split("_")[1];
         String unit = buttonID.split("_")[0];
         String message;
-        new SleeperToken().addOrRemoveSleeper(event, game, planetName, player);
+        SleeperTokenHelper.addOrRemoveSleeper(event, game, planetName, player);
         if ("mech".equalsIgnoreCase(unit)) {
             new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName + ", inf " + planetName, game);
             message = player.getFactionEmojiOrColor() + " replaced a Sleeper on " + Helper.getPlanetRepresentation(planetName, game) + " with a " + Emojis.mech + " and " + Emojis.infantry;
@@ -1457,9 +1448,9 @@ public class ButtonHelperAbilities {
     @ButtonHandler("augersPeak_")
     public static void handleAugursPeak(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
-            new PeekAtStage1().secondHalfOfPeak(event, game, player, 1);
+            ObjectiveHelper.secondHalfOfPeakStage1(game, player, 1);
         } else {
-            new PeekAtStage2().secondHalfOfPeak(event, game, player, 1);
+            ObjectiveHelper.secondHalfOfPeakStage2(game, player, 1);
         }
         ButtonHelper.deleteMessage(event);
     }

@@ -48,12 +48,10 @@ import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
-import ti4.commands.cardsso.SOInfo;
-import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.game.SetOrder;
 import ti4.commands.leaders.UnlockLeader;
-import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.milty.MiltyDraftTile;
+import ti4.commands2.milty.MiltyDraftManager;
+import ti4.commands2.milty.MiltyDraftTile;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
@@ -306,7 +304,7 @@ public class Helper {
                     game.drawSecretObjective(player.getUserID());
                     message = message + " Drew a second secret objective due to Plausible Deniability.";
                 }
-                SOInfo.sendSecretObjectiveInfo(game, player);
+                SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2,
                     game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -359,7 +357,7 @@ public class Helper {
                 if (game.getStoredValue(key2b).contains(player.getFaction() + "*")) {
                     int soIndex = Integer
                         .parseInt(game.getStoredValue(player.getFaction() + "queuedSOScore"));
-                    ScoreSO.scoreSO(event, game, player, soIndex, player.getCorrectChannel());
+                    SecretObjectiveHelper.scoreSO(event, game, player, soIndex, player.getCorrectChannel());
                     game.setStoredValue(key2b,
                         game.getStoredValue(key2b).replace(player.getFaction() + "*", ""));
                     game.setStoredValue(key3b,
@@ -401,7 +399,7 @@ public class Helper {
             if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                 int soIndex = Integer
                     .parseInt(game.getStoredValue(player.getFaction() + "queuedSOScore"));
-                ScoreSO.scoreSO(event, game, player, soIndex, game.getMainGameChannel());
+                SecretObjectiveHelper.scoreSO(event, game, player, soIndex, game.getMainGameChannel());
                 game.setStoredValue(key2,
                     game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                 game.setStoredValue(key3,
@@ -1886,8 +1884,7 @@ public class Helper {
     }
 
     @Deprecated
-    public static String getLeaderRepresentation(Leader leader, boolean includeTitle, boolean includeAbility,
-        boolean includeUnlockCondition) {
+    public static String getLeaderRepresentation(Leader leader, boolean includeTitle, boolean includeAbility, boolean includeUnlockCondition) {
         String leaderID = leader.getId();
 
         LeaderModel leaderModel = Mapper.getLeader(leaderID);
@@ -2653,17 +2650,6 @@ public class Helper {
         long hours = totalMinutes / 60; // total hours (truncates)
 
         return String.format("%02dh:%02dm:%02ds", hours, minutes, seconds);
-    }
-
-    public static String getTimeRepresentationToMillis(long totalMillis) {
-        long millis = totalMillis % 1000;
-        long totalSeconds = totalMillis / 1000; // total seconds (truncates)
-        long seconds = totalSeconds % 60;
-        long totalMinutes = totalSeconds / 60; // total minutes (truncates)
-        long minutes = totalMinutes % 60;
-        long hours = totalMinutes / 60; // total hours (truncates)
-
-        return String.format("%02dh:%02dm:%02ds:%03d", hours, minutes, seconds, millis);
     }
 
     public static String getTimeRepresentationNanoSeconds(long totalNanoSeconds) {

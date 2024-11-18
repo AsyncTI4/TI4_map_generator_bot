@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import ti4.buttons.Buttons;
 import ti4.commands.franken.ApplyDraftBags;
-import ti4.commands.player.Setup;
+import ti4.commands2.player.Setup;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;

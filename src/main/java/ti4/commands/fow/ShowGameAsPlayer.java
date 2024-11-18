@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.uncategorized.ShowGame;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;

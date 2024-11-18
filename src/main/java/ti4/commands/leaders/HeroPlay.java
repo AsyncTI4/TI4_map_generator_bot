@@ -2,6 +2,7 @@ package ti4.commands.leaders;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -11,17 +12,15 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.relic.RelicDraw;
-import ti4.commands.special.KeleresHeroMentak;
-import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.status.ListTurnOrder;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
+import ti4.generator.Mapper;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -32,6 +31,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -40,6 +40,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.model.LeaderModel;
 import ti4.model.TemporaryCombatModifierModel;
 
@@ -153,13 +154,13 @@ public class HeroPlay extends LeaderAction {
         }
 
         switch (playerLeader.getId()) {
-            case "kollecchero" -> RelicDraw.drawWithAdvantage(player, event, game, game.getRealPlayers().size());
+            case "kollecchero" -> RelicHelper.drawWithAdvantage(player, game, game.getRealPlayers().size());
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();
                 if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
                     t.addToken("attachment_titanshero.png", "elysium");
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attachment added to Elysium and it has been readied");
-                    PlanetRefresh.doAction(player, "elysium", game);
+                    PlanetRefresh.doAction(player, "elysium");
                 } else {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         "`Use the following command to add the attachment: /add_token token:titanshero`");
@@ -241,7 +242,7 @@ public class HeroPlay extends LeaderAction {
             case "olradinhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getRepresentationUnfogged() + " added 1 infantry to each planet");
-                RiseOfMessiah.doRise(player, event, game);
+                ActionCardHelper.doRise(player, event, game);
                 ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
             }
             case "argenthero" -> {
@@ -400,7 +401,7 @@ public class HeroPlay extends LeaderAction {
                     buttons);
             }
             case "naazhero" -> {
-                RelicDraw.drawRelicAndNotify(player, event, game);
+                RelicHelper.drawRelicAndNotify(player, event, game);
                 List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
@@ -450,7 +451,7 @@ public class HeroPlay extends LeaderAction {
                         continue;
                     }
                     List<Button> buttons = new ArrayList<>(
-                        ACInfo.getYssarilHeroActionCardButtons(player, p2));
+                        ActionCardHelper.getYssarilHeroActionCardButtons(player, p2));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                         p2.getRepresentationUnfogged()
                             + " Kyver, Blade and Key, the Yssaril hero, has been played.  Use buttons to select which AC you will offer to them.",
@@ -460,7 +461,7 @@ public class HeroPlay extends LeaderAction {
                     player.getRepresentation(true, showFlavourText)
                         + " sent everyone a ping in their private threads with buttons to send you 1 AC");
             }
-            case "keleresheroharka" -> KeleresHeroMentak.resolveKeleresHeroMentak(game, player, event);
+            case "keleresheroharka" -> resolveKeleresHeroMentak(game, player, event);
         }
         TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.LEADER,
             playerLeader.getId(), player.getNumberTurns());
@@ -468,6 +469,56 @@ public class HeroPlay extends LeaderAction {
             player.addNewTempCombatMod(posssibleCombatMod);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Combat modifier will be applied next time you push the combat roll button.");
+        }
+    }
+
+    private static void resolveKeleresHeroMentak(Game game, Player player, GenericInteractionCreateEvent event) {
+        int originalACDeckCount = game.getActionCards().size();
+        StringBuilder acRevealMessage = new StringBuilder("The following non-component action cards were revealed before drawing three component action cards:\n");
+        StringBuilder acDrawMessage = new StringBuilder("The following component action cards were drawn into their hand:\n");
+        List<String> cardsToShuffleBackIntoDeck = new ArrayList<>();
+        int componentActionACCount = 0;
+        int index = 1;
+        boolean noMoreComponentActionCards = false;
+        while (componentActionACCount < 3) {
+            Integer acID = null;
+            String acKey = null;
+            for (Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(game.drawActionCard(player.getUserID())).entrySet()) {
+                acID = ac.getValue();
+                acKey = ac.getKey();
+            }
+            ActionCardModel actionCard = Mapper.getActionCard(acKey);
+            String acName = actionCard.getName();
+            String acWindow = actionCard.getWindow();
+            if ("Action".equalsIgnoreCase(acWindow)) {
+                acDrawMessage.append("> `").append(String.format("%02d", index)).append(".` ").append(actionCard.getRepresentation());
+                componentActionACCount++;
+            } else {
+                acRevealMessage.append("> `").append(String.format("%02d", index)).append(".` ").append(Emojis.ActionCard).append(" ").append(acName).append("\n");
+                game.discardActionCard(player.getUserID(), acID);
+                cardsToShuffleBackIntoDeck.add(acKey);
+            }
+            index++;
+            if (index >= originalACDeckCount) {
+                if (index > originalACDeckCount * 2) {
+                    noMoreComponentActionCards = true;
+                    break;
+                }
+            }
+        }
+        for (String card : cardsToShuffleBackIntoDeck) {
+            Integer cardID = game.getDiscardActionCards().get(card);
+            game.shuffleActionCardBackIntoDeck(cardID);
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.KeleresHeroHarka);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " uses Harka Leeds, the Keleres (Mentak) hero, to reveal " + Emojis.ActionCard + "action cards, until drawing 3 component action cards.\n");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), acRevealMessage.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), acDrawMessage.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "All non-component action cards have been reshuffled back into the deck.");
+        ActionCardHelper.sendActionCardInfo(game, player);
+        ButtonHelper.checkACLimit(game, event, player);
+        if (noMoreComponentActionCards) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**All action cards in the deck have been revealed. __No component action cards remain.__**");
         }
     }
 }

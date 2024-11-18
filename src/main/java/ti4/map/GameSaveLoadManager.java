@@ -39,8 +39,8 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
-import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.uncategorized.CardsInfo;
+import ti4.commands2.milty.MiltyDraftManager;
+import ti4.commands2.uncategorized.CardsInfo;
 import ti4.draft.BagDraft;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;

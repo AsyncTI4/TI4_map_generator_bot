@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ti4.commands.milty.MiltyDraftHelper;
-import ti4.commands.milty.MiltyDraftManager;
+import ti4.commands2.milty.MiltyDraftHelper;
+import ti4.commands2.milty.MiltyDraftManager;
 import ti4.draft.items.AbilityDraftItem;
 import ti4.draft.items.AgentDraftItem;
 import ti4.draft.items.BlueTileDraftItem;

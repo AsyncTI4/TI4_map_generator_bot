@@ -17,15 +17,13 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsso.SOInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.relic.RelicDraw;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -37,6 +35,8 @@ import ti4.helpers.Emojis;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RelicHelper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -267,13 +267,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     if (game.isFowMode()) {
                         FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 ACs");
                     }
-                    ACInfo.sendActionCardInfo(game, player, event);
+                    ActionCardHelper.sendActionCardInfo(game, player, event);
                 }
 
                 if (hasSchemingAbility) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                         player.getRepresentationUnfogged() + " use buttons to discard",
-                        ACInfo.getDiscardActionCardButtons(player, false));
+                        ActionCardHelper.getDiscardActionCardButtons(player, false));
                 }
                 MessageHelper.sendMessageToEventChannel(event, message);
                 ButtonHelper.checkACLimit(game, event, player);
@@ -289,13 +289,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     game.drawSecretObjective(player.getUserID());
                     message = message + " Drew a second " + Emojis.SecretObjective + "Secret Objective due to Plausible Deniability.";
                 }
-                SOInfo.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
                 MessageHelper.sendMessageToEventChannel(event, message);
             }
             case "dw" -> {
                 message = "Drew a " + Emojis.Relic + "Relic";
                 MessageHelper.sendMessageToEventChannel(event, message);
-                RelicDraw.drawRelicAndNotify(player, event, game);
+                RelicHelper.drawRelicAndNotify(player, event, game);
             }
             case "ms1", "ms2" -> {
                 message = "Replenished Commodities (" + player.getCommodities() + "->" + player.getCommoditiesTotal()
@@ -311,7 +311,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     return;
                 }
                 PlanetAdd.doAction(player, mirageID, game, null, false);
-                PlanetRefresh.doAction(player, mirageID, game);
+                PlanetRefresh.doAction(player, mirageID);
                 String exploreID = game.drawExplore(Constants.CULTURAL);
                 if (exploreID == null) {
                     MessageHelper.sendMessageToEventChannel(event, "Planet cannot be explored: " + mirageID + "\n> The Cultural deck may be empty");

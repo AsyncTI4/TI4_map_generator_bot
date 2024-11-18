@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
@@ -47,17 +46,7 @@ class CreateFOWGameChannels extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         //GAME NAME
-        OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
-        String gameName;
-        if (gameNameOption != null) {
-            gameName = gameNameOption.getAsString();
-            if (GameCreationHelper.gameOrRoleAlreadyExists(gameName)) {
-                MessageHelper.sendMessageToEventChannel(event, "Role or Game: **" + gameName + "** already exists accross all supported servers. Try again with a new name.");
-                return;
-            }
-        } else {
-            gameName = getNextFOWGameName();
-        }
+        String gameName = getNextFOWGameName();
 
         //CHECK IF GIVEN CATEGORY IS VALID
         Guild guild = event.getGuild();
@@ -138,18 +127,19 @@ class CreateFOWGameChannels extends Subcommand {
         Category category = guild.createCategory(gameName).addRolePermissionOverride(everyone.getIdLong(), 0, permission2).addRolePermissionOverride(roleGM.getIdLong(), permission2, 0).complete();
 
         //CREATE CHANNELS
-        String newChatChannelName = gameName + "-gm-room";
+        String newGMChannelName = gameName + "-gm-room";
         String newActionsChannelName = gameName + "-anonymous-announcements-private";
         long gameRoleID = role.getIdLong();
         long gameRoleGMID = roleGM.getIdLong();
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
         // CREATE GM CHANNEL
-        TextChannel chatChannel = guild.createTextChannel(newChatChannelName, category)
+        TextChannel gmChannel = guild.createTextChannel(newGMChannelName, category)
             .syncPermissionOverrides()
             .addRolePermissionOverride(gameRoleGMID, permission, 0)
             .complete();
-        MessageHelper.sendMessageToChannel(chatChannel, roleGM.getAsMention() + " - gm room");
+        MessageHelper.sendMessageToChannel(gmChannel, roleGM.getAsMention() + " - gm room");
+        GameCreationHelper.offerGameHomebrewButtons(gmChannel);
 
         // CREATE Anon Announcements CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
@@ -174,7 +164,7 @@ class CreateFOWGameChannels extends Subcommand {
         }
 
         String message = "Role and Channels have been set up:\n" + "> " + role.getName() + "\n" +
-            "> " + chatChannel.getAsMention() + "\n" +
+            "> " + gmChannel.getAsMention() + "\n" +
             "> " + actionsChannel.getAsMention() + "\n";
         MessageHelper.sendMessageToEventChannel(event, message);
 

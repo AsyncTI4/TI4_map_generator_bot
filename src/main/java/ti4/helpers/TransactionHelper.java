@@ -13,13 +13,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardspn.PlayPN;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.player.ClearDebt;
-import ti4.commands.relic.RelicSendFragments;
-import ti4.commands.uncategorized.CardsInfo;
+import ti4.commands2.uncategorized.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
@@ -792,7 +787,7 @@ public class TransactionHelper {
                 MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
             }
             case "PNs" -> {
-                PNInfo.sendPromissoryNoteInfo(game, p1, false);
+                PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
                 String message = p1.getRepresentationUnfogged() + " Click the PN you would like to send.";
 
                 for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
@@ -877,7 +872,7 @@ public class TransactionHelper {
                 message2 = ident + " sent " + tgAmount + " TGs to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
-                    ClearDebt.clearDebt(p2, p1, amount);
+                    p2.clearDebt(p1, amount);
                     message2 = message2 + "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident;
                 }
             }
@@ -902,10 +897,9 @@ public class TransactionHelper {
                 message2 = ident + " sent " + tgAmount + " Commodities to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
-                    ClearDebt.clearDebt(p2, p1, amount);
+                    p2.clearDebt(p1, amount);
                     message2 = message2 + "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident;
                 }
-
             }
             case "WashComms" -> {
                 int oldP1Tg = p1.getTg();
@@ -976,8 +970,8 @@ public class TransactionHelper {
                 p1.removeActionCard(acNum);
                 p2.setActionCard(acID);
                 ButtonHelper.checkACLimit(game, event, p2);
-                ACInfo.sendActionCardInfo(game, p2);
-                ACInfo.sendActionCardInfo(game, p1);
+                ActionCardHelper.sendActionCardInfo(game, p2);
+                ActionCardHelper.sendActionCardInfo(game, p1);
                 if (!p1.hasAbility("arbiters") && !p2.hasAbility("arbiters")) {
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
@@ -1015,7 +1009,7 @@ public class TransactionHelper {
                 p1.removePromissoryNote(id);
                 p2.setPromissoryNote(id);
                 if (id.contains("dspnveld")) {
-                    PlayPN.resolvePNPlay(id, p2, game, event);
+                    PromissoryNoteHelper.resolvePNPlay(id, p2, game, event);
                 }
                 boolean sendSftT = false;
                 boolean sendAlliance = false;
@@ -1033,9 +1027,9 @@ public class TransactionHelper {
                         }
                     }
                 }
-                PNInfo.sendPromissoryNoteInfo(game, p1, false);
+                PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
                 CardsInfo.sendVariousAdditionalButtons(game, p1);
-                PNInfo.sendPromissoryNoteInfo(game, p2, false);
+                PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
                 CardsInfo.sendVariousAdditionalButtons(game, p2);
                 String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
                 message2 = p1.getRepresentation() + " sent " + Emojis.PN + text + "PN to " + ident2;
@@ -1052,7 +1046,7 @@ public class TransactionHelper {
                     case "URF" -> "frontier";
                     default -> "";
                 };
-                new RelicSendFragments().sendFrags(event, p1, p2, trait, fragNum, game);
+                RelicHelper.sendFrags(event, p1, p2, trait, fragNum, game);
                 message2 = "";
             }
         }

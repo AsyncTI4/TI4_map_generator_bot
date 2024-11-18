@@ -1,6 +1,8 @@
 package ti4.helpers;
 
 import java.awt.image.BufferedImage;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,7 +34,6 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.game.GameCreate;
-import ti4.commands.help.NewPlayerInfo;
 import ti4.generator.MapGenerator;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -264,7 +265,7 @@ public class GameCreationHelper {
 					for (Player p : newPlayers) {
 						msg.append(p.getRepresentation());
 					}
-					msg.append(NewPlayerInfo.getNewPlayerInfoText());
+					msg.append(getNewPlayerInfoText());
 					String message = msg.toString();
 					if (botThread != null) {
 						message = message.replace("the bot-map-updates thread", botThread.getJumpUrl());
@@ -597,5 +598,14 @@ public class GameCreationHelper {
 		homebrewButtons.add(Buttons.green("getHomebrewButtons", "Yes, use Homebrew"));
 		homebrewButtons.add(Buttons.red("deleteButtons", "No Homebrew"));
 		MessageHelper.sendMessageToChannel(channel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons. 4/4/4 is a type of homebrew btw", homebrewButtons);
+	}
+
+	public static String getNewPlayerInfoText() {
+		String path = ResourceHelper.getInstance().getHelpFile("NewPlayerIntro.txt");
+		try {
+			return new String(Files.readAllBytes(Paths.get(path)));
+		} catch (Exception e) {
+			return "NewPlayerIntro HELP FILE IS BLANK";
+		}
 	}
 }

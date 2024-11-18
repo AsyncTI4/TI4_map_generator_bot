@@ -5,7 +5,6 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.cardsac.ACInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetRefresh;
@@ -76,7 +75,7 @@ public class ExploreHelper {
         message += checkForMechOrRemoveInf(planetName, game, player);
         failed = message.contains("Please try again.");
         if (!failed) {
-            PlanetRefresh.doAction(player, planetName, game);
+            PlanetRefresh.doAction(player, planetName);
             planetName = Mapper.getPlanet(planetName) == null ? planetName : Mapper.getPlanet(planetName).getName();
             message += "Readied " + planetName;
             ButtonHelper.addReaction(event, false, false, message, "");
@@ -179,11 +178,11 @@ public class ExploreHelper {
                     message = player.getFactionEmoji() + " Drew 2 ACs with Scheming. Please discard 1 AC with the blue buttons.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                         player.getRepresentationUnfogged() + " use buttons to discard",
-                        ACInfo.getDiscardActionCardButtons(player, false));
+                        ActionCardHelper.getDiscardActionCardButtons(player, false));
                 } else {
                     game.drawActionCard(player.getUserID());
                     message = player.getFactionEmoji() + " Drew 1 AC";
-                    ACInfo.sendActionCardInfo(game, player, event);
+                    ActionCardHelper.sendActionCardInfo(game, player, event);
                 }
                 CommanderUnlockCheck.checkPlayer(player, "yssaril");
             } else {

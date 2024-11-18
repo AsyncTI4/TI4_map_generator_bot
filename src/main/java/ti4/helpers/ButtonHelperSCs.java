@@ -13,8 +13,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsso.SOInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tech.GetTechButton;
@@ -214,7 +212,6 @@ public class ButtonHelperSCs {
         if (game.getPhaseOfGame().contains("agenda")) {
             imperialHolder = game.getPlayer(game.getSpeakerUserID());
         }
-        String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
         String message = "Drew A Secret Objective";
@@ -225,7 +222,7 @@ public class ButtonHelperSCs {
                     game.drawSecretObjective(player.getUserID());
                     message = message + ". Drew a second SO due to Plausible Deniability";
                 }
-                SOInfo.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
                 break;
             }
             if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
@@ -704,7 +701,7 @@ public class ButtonHelperSCs {
             for (int i = 0; i < count; i++) {
                 game.drawActionCard(player.getUserID());
             }
-            ACInfo.sendActionCardInfo(game, player, event);
+            ActionCardHelper.sendActionCardInfo(game, player, event);
             ButtonHelper.checkACLimit(game, event, player);
         }
 
@@ -712,7 +709,7 @@ public class ButtonHelperSCs {
         if (hasSchemingAbility) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(player, false));
+                ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
         CommanderUnlockCheck.checkPlayer(player, "yssaril");
         if (player.hasAbility("contagion")) {

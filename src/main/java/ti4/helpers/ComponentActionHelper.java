@@ -10,14 +10,10 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardspn.PlayPN;
-import ti4.commands.ds.DrawBlueBackTile;
 import ti4.commands.leaders.ExhaustLeader;
 import ti4.commands.leaders.HeroPlay;
-import ti4.commands.player.TurnStart;
 import ti4.commands.units.AddUnits;
+import ti4.commands2.player.TurnStart;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
@@ -197,7 +193,7 @@ public class ComponentActionHelper {
             if (prom == null) {
                 MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentationUnfogged()
                     + " you have a null PN. Please use /pn purge after reporting it " + pn);
-                PNInfo.sendPromissoryNoteInfo(game, p1, false);
+                PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
             }
         }
 
@@ -307,7 +303,7 @@ public class ComponentActionHelper {
                 }
             }
             case "relic" -> resolveRelicComponentAction(game, p1, event, buttonID);
-            case "pn" -> PlayPN.resolvePNPlay(buttonID, p1, game, event);
+            case "pn" -> PromissoryNoteHelper.resolvePNPlay(buttonID, p1, game, event);
             case "ability" -> {
                 if ("starForge".equalsIgnoreCase(buttonID)) {
 
@@ -414,7 +410,7 @@ public class ComponentActionHelper {
                 } else if ("stallTactics".equalsIgnoreCase(buttonID)) {
                     String secretScoreMsg = "_ _\n" + p1.getRepresentationUnfogged()
                         + " Click a button below to discard an Action Card";
-                    List<Button> acButtons = ACInfo.getDiscardActionCardButtons(p1, true);
+                    List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
                         p1.getRepresentation() + " is resolving their Stall Tactics ability");
                     if (!acButtons.isEmpty()) {
@@ -517,7 +513,7 @@ public class ComponentActionHelper {
             }
             case "actionCards" -> {
                 String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
-                List<Button> acButtons = ACInfo.getActionPlayActionCardButtons(p1);
+                List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
                 if (!acButtons.isEmpty()) {
                     List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
                     ThreadChannel cardsInfoThreadChannel = p1.getCardsInfoThread();
@@ -529,7 +525,7 @@ public class ComponentActionHelper {
             }
             case "doStarCharts" -> {
                 ButtonHelper.purge2StarCharters(p1);
-                DrawBlueBackTile.drawBlueBackTiles(event, game, p1, 1);
+                DiscordantStarsHelper.drawBlueBackTiles(event, game, p1, 1);
             }
         }
 
@@ -581,7 +577,7 @@ public class ComponentActionHelper {
             case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, event);
             case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(player, game, event);
             case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> ButtonHelperRelics.offerNanoforgeButtons(player, game, event);
-            case "decrypted_cartoglyph" -> DrawBlueBackTile.drawBlueBackTiles(event, game, player, 3);
+            case "decrypted_cartoglyph" -> DiscordantStarsHelper.drawBlueBackTiles(event, game, player, 3);
             case "throne_of_the_false_emperor" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("drawRelic", "Draw a relic"));

@@ -21,11 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import lombok.Data;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -49,13 +44,13 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.ShowDiscardActionCards;
-import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardsso.ShowUnScoredSOs;
 import ti4.commands.combat.CombatRoll;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.explore.ExploreInfo;
@@ -63,12 +58,6 @@ import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.player.SendDebt;
-import ti4.commands.player.Setup;
-import ti4.commands.player.TurnStart;
-import ti4.commands.relic.RelicShowRemaining;
-import ti4.commands.special.CheckDistance;
-import ti4.commands.special.DiploSystem;
 import ti4.commands.tech.TechShowDeck;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddToken;
@@ -77,6 +66,9 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.player.SendDebt;
+import ti4.commands2.player.Setup;
+import ti4.commands2.player.TurnStart;
 import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -659,10 +651,10 @@ public class ButtonHelper {
     public static void resolveDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
         String deck = buttonID.replace("showDeck_", "");
         switch (deck) {
-            case "ac" -> ShowDiscardActionCards.showDiscard(game, event, false);
+            case "ac" -> ActionCardHelper.showDiscard(game, event, false);
             case "agenda" -> AgendaHelper.showDiscards(game, event);
-            case "relic" -> RelicShowRemaining.showRemaining(event, false, game, player);
-            case "unscoredSO" -> ShowUnScoredSOs.showUnscored(game, event);
+            case "relic" -> RelicHelper.showRemaining(event, false, game, player);
+            case "unscoredSO" -> SecretObjectiveHelper.showUnscored(game, event);
             case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC, Constants.UNIT_UPGRADE -> TechShowDeck.displayTechDeck(game, event, deck);
             case Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER, "all" -> {
                 List<String> types = new ArrayList<>();
@@ -773,12 +765,12 @@ public class ButtonHelper {
             message = "Drew " + amount + " AC." + message;
         }
 
-        ACInfo.sendActionCardInfo(game, player, event);
+        ActionCardHelper.sendActionCardInfo(game, player, event);
         CommanderUnlockCheck.checkPlayer(player, "yssaril");
         if (player.hasAbility("scheming")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(player, false));
+                ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
 
         addReaction(event, true, false, message, "");
@@ -1103,8 +1095,8 @@ public class ButtonHelper {
                     } else {
                         player.removePromissoryNote(pn);
                         nonActivePlayer.setPromissoryNote(pn);
-                        PNInfo.sendPromissoryNoteInfo(game, nonActivePlayer, false);
-                        PNInfo.sendPromissoryNoteInfo(game, player, false);
+                        PromissoryNoteHelper.sendPromissoryNoteInfo(game, nonActivePlayer, false);
+                        PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
                         MessageHelper.sendMessageToChannel(channel,
                             nonActivePlayer.getFactionEmoji() + " " + pnModel.getName() + " was returned");
                         if (pn.endsWith("_an") && nonActivePlayer.hasLeaderUnlocked("bentorcommander")) {
@@ -1310,7 +1302,7 @@ public class ButtonHelper {
                 ident + " you are exceeding the AC hand limit of " + limit
                     + ". Please discard down to the limit. Check your cards info thread for the blue discard buttons. ");
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                ident + " use buttons to discard", ACInfo.getDiscardActionCardButtons(player, false));
+                ident + " use buttons to discard", ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
     }
 
@@ -3547,7 +3539,7 @@ public class ButtonHelper {
             ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
             if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                 && game.getPhaseOfGame().contains("agenda")) {
-                PlanetRefresh.doAction(player, planetName, game);
+                PlanetRefresh.doAction(player, planetName);
                 MessageHelper.sendMessageToChannel(event.getChannel(),
                     "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
                 AgendaHelper.listVoteCount(game, game.getMainGameChannel());
@@ -4382,9 +4374,9 @@ public class ButtonHelper {
                     UnitModel uni = player.getUnitByBaseType(unit);
                     if (activeSystem != null && uni != null && uni.getIsShip()
                         && !uni.getBaseType().equalsIgnoreCase("fighter")) {
-                        int distance = CheckDistance.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
+                        int distance = CheckDistanceHelper.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
                             game.getActiveSystem(), true);
-                        int riftDistance = CheckDistance.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
+                        int riftDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
                             game.getActiveSystem(), false);
                         int moveValue = uni.getMoveValue();
                         if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasTech("absol_amd")) {
@@ -6349,7 +6341,7 @@ public class ButtonHelper {
             String message = player.getFactionEmoji() + " chose to use the mahact PN in the tile " + tile.getRepresentation();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         } else {
-            if (!DiploSystem.diploSystem(event, game, player, planet.toLowerCase())) {
+            if (!DiploSystemHelper.diploSystem(event, game, player, planet.toLowerCase())) {
                 return;
             }
             String message = player.getFactionEmoji() + " chose to diplo the system containing "
@@ -6511,14 +6503,14 @@ public class ButtonHelper {
             message = p2.getFactionEmoji() + " Drew 2 ACs with Scheming. Please discard 1 AC with the blue buttons";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                 p2.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(p2, false));
+                ActionCardHelper.getDiscardActionCardButtons(p2, false));
         } else if (p2.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, p2, 1);
             message = p2.getFactionEmoji() + " Triggered Autonetic Memory Option";
         } else {
             game.drawActionCard(p2.getUserID());
             message = p2.getFactionEmoji() + " Drew 1 AC";
-            ACInfo.sendActionCardInfo(game, p2, event);
+            ActionCardHelper.sendActionCardInfo(game, p2, event);
         }
         return message;
     }

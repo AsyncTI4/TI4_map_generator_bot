@@ -40,9 +40,9 @@ public class ExplorePlanet extends ExploreSubcommandData {
     public ExplorePlanet() {
         super(Constants.PLANET, "Explore a specific planet.");
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Planet trait to explore").setRequired(false).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Planet trait to explore").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ, "Override ownership requirement. Enter YES if so").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ, "Override ownership requirement. Enter YES if so"));
     }
 
     @Override
@@ -133,7 +133,7 @@ public class ExplorePlanet extends ExploreSubcommandData {
             if (Helper.mechCheck(planetName, game, player)) {
                 if (!NRACheck) {
                     if (player.hasTech("pfa")) { //Pre-Fab Arcologies
-                        PlanetRefresh.doAction(player, planetName, game);
+                        PlanetRefresh.doAction(player, planetName);
                         MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab Arcologies.");
                     }
                     String message = "Please decide whether or not to use your " + Emojis.Naaz + "**Distant Suns** (explore twice) ability.";
@@ -231,7 +231,7 @@ public class ExplorePlanet extends ExploreSubcommandData {
         }
         resolveExplore(event, cardID, tile, planetName, messageText, player, game);
         if (player.hasTech("pfa")) { //Pre-Fab Arcologies
-            PlanetRefresh.doAction(player, planetName, game);
+            PlanetRefresh.doAction(player, planetName);
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab Arcologies.");
         }
         if (ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord", player, tile)) {
@@ -239,7 +239,7 @@ public class ExplorePlanet extends ExploreSubcommandData {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Infantry added due to presence of The Lord (a Ghemina flagship) . Technically happens after exploring.");
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && game.getPhaseOfGame().contains("agenda")) {
-            PlanetRefresh.doAction(player, planetName, game);
+            PlanetRefresh.doAction(player, planetName);
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
             AgendaHelper.listVoteCount(game, game.getMainGameChannel());
         }

@@ -12,14 +12,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsso.SOInfo;
-import ti4.commands.player.Stats;
-import ti4.commands.player.UnitInfo;
+import ti4.commands2.player.Stats;
+import ti4.commands2.player.UnitInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -308,9 +308,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
     }
 
     public static String representScoring(Game game, String objID, int x, boolean secret) {
-        StringBuilder representation = new StringBuilder();
+        StringBuilder representation;
         if (secret) {
-            representation = new StringBuilder(x + ". " + SOInfo.getSecretObjectiveRepresentation(objID) + "> ");
+            representation = new StringBuilder(x + ". " + SecretObjectiveHelper.getSecretObjectiveRepresentation(objID) + "> ");
         } else {
             PublicObjectiveModel model = Mapper.getPublicObjective(objID);
             if (x > 0) {

@@ -73,7 +73,7 @@ public class SetDeck extends GameSubcommandData {
     }
 
     private void addDefaultOption(String constantName, String descName) {
-        addOptions(new OptionData(OptionType.STRING, constantName, descName + " deck").setRequired(false).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, constantName, descName + " deck").setAutoComplete(true));
         deckTypes.add(constantName);
     }
 

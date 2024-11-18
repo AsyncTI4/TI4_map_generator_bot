@@ -147,7 +147,7 @@ public class CommandHelper {
         if (hasRole(event, acceptedRoles)) {
             return true;
         }
-        var acceptRolesStr = acceptedRoles.stream().map(Role::getName).collect(Collectors.joining(", "));
+        var acceptRolesStr = acceptedRoles.stream().map(Role::getName).distinct().collect(Collectors.joining(", "));
         MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have one of the following roles: " + acceptRolesStr);
         return false;
     }

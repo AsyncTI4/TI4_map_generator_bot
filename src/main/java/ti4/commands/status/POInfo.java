@@ -19,7 +19,7 @@ import ti4.model.PublicObjectiveModel;
 public class POInfo extends StatusSubcommandData {
     public POInfo() {
         super("po_info", "Show Public Objectives");
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_SCORED, "Also display which players have scored each objective").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_SCORED, "Also display which players have scored each objective"));
     }
 
     @Override
