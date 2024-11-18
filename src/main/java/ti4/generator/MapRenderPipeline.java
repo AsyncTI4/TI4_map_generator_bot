@@ -67,7 +67,7 @@ public class MapRenderPipeline {
                 mapGenerator.uploadToWebsite();
             }
         } catch (Exception e) {
-            BotLogger.log("Render event threw an exception. Game '" + renderEvent.game + "'", e);
+            BotLogger.log("Render event threw an exception. Game '" + renderEvent.game.getName() + "'", e);
         }
     }
 
