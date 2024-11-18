@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.amazonaws.util.CollectionUtils;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -13,7 +16,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import org.apache.commons.lang3.StringUtils;
 import ti4.commands.Command;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.leaders.CommanderUnlockCheck;
@@ -48,10 +50,10 @@ abstract public class AddRemoveUnits implements Command {
         }
         Game game = GameManager.getUserActiveGame(userID);
         Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
+        // if (player == null) {
+        //     MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+        //     return;
+        // }
 
         String color = CommandHelper.getColor(game, event);
         if (!Mapper.isValidColor(color)) {
