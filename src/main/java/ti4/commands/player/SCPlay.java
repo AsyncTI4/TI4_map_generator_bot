@@ -164,28 +164,26 @@ public class SCPlay extends GameStateSubcommand {
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
 
         // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
-        if (scModel != null && scModel.hasImageFile()) {
+        if (scModel.hasImageFile()) {
             MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToPlay, game));
-        } else if (scModel != null) {
+        } else {
             baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
         }
         baseMessageObject.addContent(message.toString());
 
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero));
-        if (scModel != null && scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
+        if (scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
             scButtons.add(Buttons.gray("nekroFollowTech", "Get CCs", Emojis.Nekro));
         }
 
-        if (scModel != null && scModel.usesAutomationForSCID("pok4construction") && !game.isFowMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
+        if (scModel.usesAutomationForSCID("pok4construction") && !game.isFowMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
             scButtons.add(Buttons.gray("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf", Emojis.Titans));
         }
         scButtons.add(Buttons.gray("requestAllFollow_" + scToPlay, "Request All Resolve Now"));
 
         // set the action rows
-        if (!scButtons.isEmpty()) {
-            baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
-        }
+        baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
         player.setWhetherPlayerShouldBeTenMinReminded(true);
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
 
