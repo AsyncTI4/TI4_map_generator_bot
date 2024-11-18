@@ -15,24 +15,25 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsso.SOInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechInfo;
 import ti4.commands.tokens.AddToken;
-import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands2.GameStateSubcommand;
+import ti4.commands2.uncategorized.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
@@ -99,14 +100,14 @@ public class Setup extends GameStateSubcommand {
             }
         }
 
-        if (ChangeColor.colorIsExclusive(color, player)) {
+        if (ColorChangeHelper.colorIsExclusive(color, player)) {
             color = player.getNextAvailableColorIgnoreCurrent();
         }
 
         if (player.isRealPlayer() && player.getSo() > 0) {
             String message = player.getRepresentationNoPing() + "has SOs that would get lost to the void if they were setup again. If they wish to change color, use /player change_color. If they want to setup as another faction, they must discard their SOs first";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-            SOInfo.sendSecretObjectiveInfo(game, player);
+            SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
             return;
         }
 
@@ -117,13 +118,13 @@ public class Setup extends GameStateSubcommand {
         player.getTechs().clear();
         player.getFactionTechs().clear();
 
-        FactionModel setupInfo = player.getFactionSetupInfo();
+        FactionModel factionModel = player.getFactionSetupInfo();
 
         if (game.isBaseGameMode()) {
             player.setLeaders(new ArrayList<>());
         }
 
-        if (ComponentSource.miltymod.equals(setupInfo.getSource()) && !game.isMiltyModMode()) {
+        if (ComponentSource.miltymod.equals(factionModel.getSource()) && !game.isMiltyModMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
             return;
         }
@@ -134,7 +135,7 @@ public class Setup extends GameStateSubcommand {
             return;
         }
 
-        String hsTile = AliasHandler.resolveTile(setupInfo.getHomeSystem());
+        String hsTile = AliasHandler.resolveTile(factionModel.getHomeSystem());
         Tile tile = new Tile(hsTile, positionHS);
         if (!StringUtils.isBlank(hsTile)) {
             game.setTile(tile);
@@ -151,10 +152,10 @@ public class Setup extends GameStateSubcommand {
         }
 
         // STARTING COMMODITIES
-        player.setCommoditiesTotal(setupInfo.getCommodities());
+        player.setCommoditiesTotal(factionModel.getCommodities());
 
         // STARTING PLANETS
-        for (String planet : setupInfo.getHomePlanets()) {
+        for (String planet : factionModel.getHomePlanets()) {
             if (planet.isEmpty()) {
                 continue;
             }
@@ -166,12 +167,12 @@ public class Setup extends GameStateSubcommand {
         player.getExhaustedPlanets().clear();
 
         // STARTING UNITS
-        addUnits(setupInfo, tile, color, event);
+        addUnits(factionModel, tile, color, event);
 
         // STARTING TECH
-        List<String> startingTech = setupInfo.getStartingTech();
+        List<String> startingTech = factionModel.getStartingTech();
         if (startingTech != null) {
-            for (String tech : setupInfo.getStartingTech()) {
+            for (String tech : factionModel.getStartingTech()) {
                 if (tech.trim().isEmpty()) {
                     continue;
                 }
@@ -191,7 +192,7 @@ public class Setup extends GameStateSubcommand {
             }
         }
 
-        for (String tech : setupInfo.getFactionTech()) {
+        for (String tech : factionModel.getFactionTech()) {
             if (tech.trim().isEmpty()) {
                 continue;
             }
@@ -206,7 +207,7 @@ public class Setup extends GameStateSubcommand {
         // STARTING PNs
         player.initPNs();
         Set<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
-        playerPNs.addAll(setupInfo.getPromissoryNotes());
+        playerPNs.addAll(factionModel.getPromissoryNotes());
         player.setPromissoryNotesOwned(playerPNs);
         if (game.isBaseGameMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
@@ -227,7 +228,7 @@ public class Setup extends GameStateSubcommand {
         }
 
         // STARTING OWNED UNITS
-        Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
+        Set<String> playerOwnedUnits = new HashSet<>(factionModel.getUnits());
         player.setUnitsOwned(playerOwnedUnits);
 
         // Don't do special stuff if Franken Faction
@@ -249,8 +250,8 @@ public class Setup extends GameStateSubcommand {
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, getTech);
             } else {
                 // STARTING TECH OPTIONS
-                Integer bonusOptions = setupInfo.getStartingTechAmount();
-                List<String> startingTechOptions = setupInfo.getStartingTechOptions();
+                Integer bonusOptions = factionModel.getStartingTechAmount();
+                List<String> startingTechOptions = factionModel.getStartingTechOptions();
                 if (startingTechOptions != null && bonusOptions != null && bonusOptions > 0) {
                     List<TechnologyModel> techs = new ArrayList<>();
                     if (!startingTechOptions.isEmpty()) {
