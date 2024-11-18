@@ -28,7 +28,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private String tileId;
     private String name;
     private String shortName;
-    private List<String> aliases;
+    private List<String> aliases = new ArrayList<>();
     private Point positionInTile;
     private int resources;
     private int influence;
@@ -53,9 +53,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     public boolean isValid() {
         return id != null
             && name != null
-            && source != null
-            && aliases != null
-            && aliases.contains(name.toLowerCase().replace(" ", "")); // Alias list must contain the lowercase'd name
+            && source != null;
     }
 
     @JsonIgnore

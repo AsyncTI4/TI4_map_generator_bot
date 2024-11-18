@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 class ShowSOToAll extends GameStateSubcommand {
 
     public ShowSOToAll() {
-        super(Constants.SHOW_SO_TO_ALL, "Show a Secret Objective to all players", true, false);
+        super(Constants.SHOW_SO_TO_ALL, "Show a Secret Objective to all players", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ONLY_PHASE, "Show only the phase of the SO (action/agenda/status). Default false"));
     }

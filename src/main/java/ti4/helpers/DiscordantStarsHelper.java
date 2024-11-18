@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.milty.MiltyDraftTile;
+import ti4.commands2.milty.MiltyDraftTile;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;

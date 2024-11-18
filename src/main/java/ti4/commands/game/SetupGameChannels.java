@@ -15,39 +15,39 @@ public class SetupGameChannels extends GameSubcommandData {
     public SetupGameChannels() {
         super(Constants.GAME_CHANNEL_SETUP, "Setup channels and roles for non-standard games");
         addOptions(new OptionData(OptionType.CHANNEL, Constants.MAIN_GAME_CHANNEL, "Main game channel").setRequired(true));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.TABLE_TALK_CHANNEL, "Table talk channel").setRequired(false));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.TABLE_TALK_CHANNEL, "Table talk channel"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE1, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL1, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Main player for Community/Fog mode"));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE1, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL1, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE2, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL2, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Main player for Community/Fog mode"));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE2, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL2, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE3, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL3, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Main player for Community/Fog mode"));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE3, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL3, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE4, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL4, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Main player for Community/Fog mode"));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE4, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL4, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE5, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL5, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Main player for Community/Fog mode"));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE5, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL5, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE6, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL6, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Main player for Community/Fog mode"));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE6, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL6, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Main player for Community/Fog mode").setRequired(false));
-        //addOptions(new OptionData(OptionType.ROLE, Constants.ROLE7, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL7, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Main player for Community/Fog mode"));
+        //addOptions(new OptionData(OptionType.ROLE, Constants.ROLE7, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL7, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Main player for Community/Fog mode").setRequired(false));
-        //addOptions(new OptionData(OptionType.ROLE, Constants.ROLE8, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL8, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Main player for Community/Fog mode"));
+        //addOptions(new OptionData(OptionType.ROLE, Constants.ROLE8, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL8, "Private channel for player/role"));
     }
 
     @Override

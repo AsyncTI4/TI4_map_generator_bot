@@ -50,10 +50,9 @@ import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.commands.game.SetOrder;
 import ti4.commands.leaders.UnlockLeader;
-import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.milty.MiltyDraftTile;
-import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
+import ti4.commands2.milty.MiltyDraftManager;
+import ti4.commands2.milty.MiltyDraftTile;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Units.UnitKey;
@@ -76,6 +75,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.objectives.ScorePublicObjectiveService;
 
 public class Helper {
 
@@ -345,7 +345,7 @@ public class Helper {
                 if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                     int poIndex = Integer
                         .parseInt(game.getStoredValue(player.getFaction() + "queuedPOScore"));
-                    ScorePublic.scorePO(event, player.getCorrectChannel(), game, player, poIndex);
+                    ScorePublicObjectiveService.scorePO(event, player.getCorrectChannel(), game, player, poIndex);
                     game.setStoredValue(key2,
                         game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                     game.setStoredValue(key3,

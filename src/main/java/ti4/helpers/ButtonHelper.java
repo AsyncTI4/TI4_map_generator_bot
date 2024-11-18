@@ -21,6 +21,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import lombok.Data;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -44,10 +49,6 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -58,11 +59,6 @@ import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.player.SendDebt;
-import ti4.commands.player.Setup;
-import ti4.commands.player.TurnStart;
-import ti4.commands.special.CheckDistance;
-import ti4.commands.special.DiploSystem;
 import ti4.commands.tech.TechShowDeck;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddToken;
@@ -71,6 +67,9 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.player.SendDebt;
+import ti4.commands2.player.Setup;
+import ti4.commands2.player.TurnStart;
 import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -858,11 +857,21 @@ public class ButtonHelper {
                             buttons2.add(hacanButton);
                             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                                 "Reminder you may use Minister of Peace.", buttons2);
-                            event.getHook().sendMessage(player.getRepresentation() + " Reminder you should really check in with the Minister of Peace if this activation has the possibility of being relevant. If you proceed over their window, a rollback may be required.").queue();
+                            event.getHook().sendMessage(player.getRepresentation() + " Reminder you should really check in with the Minister of Peace if this activation has the possibility of being relevant. If you proceed over their window, a rollback may be required.").setEphemeral(true).queue();
                         }
                     }
                 }
             }
+        }
+        if (doesPlayerHaveFSHere("arborec_flagship", player, activeSystem)) {
+            Button arboCommander = Buttons.green(
+                player.getFinsFactionCheckerPrefix() + "umbatTile_" + activeSystem.getPosition(),
+                "Build 5 Units With Arborec FS");
+            Button decline = Buttons.red("deleteButtons", "Decline Build");
+            List<Button> buttons = List.of(arboCommander, decline);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                player.getRepresentation() + " use buttons to resolve the Arborec Flagship Build.", buttons);
+
         }
 
         for (Player nonActivePlayer : game.getPlayers().values()) {
@@ -990,16 +999,7 @@ public class ButtonHelper {
                         ident + " use buttons to resolve Dirzuga Rophal, the Arborec commander.", buttons);
                 }
             }
-            if (doesPlayerHaveFSHere("arborec_flagship", player, activeSystem)) {
-                Button arboCommander = Buttons.green(
-                    fincheckerForNonActive + "umbatTile_" + activeSystem.getPosition(),
-                    "Build 5 Units With Arborec FS");
-                Button decline = Buttons.red("deleteButtons", "Decline Build");
-                List<Button> buttons = List.of(arboCommander, decline);
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    ident + " use buttons to resolve the Arborec Flagship Build.", buttons);
 
-            }
             if (nonActivePlayer.hasLeaderUnlocked("celdaurihero")
                 && FoWHelper.playerHasPlanetsInSystem(nonActivePlayer, activeSystem)
                 && !activeSystem.isMecatol()) {
@@ -4376,9 +4376,9 @@ public class ButtonHelper {
                     UnitModel uni = player.getUnitByBaseType(unit);
                     if (activeSystem != null && uni != null && uni.getIsShip()
                         && !uni.getBaseType().equalsIgnoreCase("fighter")) {
-                        int distance = CheckDistance.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
+                        int distance = CheckDistanceHelper.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
                             game.getActiveSystem(), true);
-                        int riftDistance = CheckDistance.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
+                        int riftDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
                             game.getActiveSystem(), false);
                         int moveValue = uni.getMoveValue();
                         if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasTech("absol_amd")) {
@@ -4748,7 +4748,8 @@ public class ButtonHelper {
             playerUnitsByQuantity.put(unitModel, 0);
             for (String thalnosUnit : game.getThalnosUnits().keySet()) {
                 int amount = game.getSpecificThalnosUnit(thalnosUnit);
-                String unitName = unitModel.getAsyncId();
+
+                String unitName = unitModel.getBaseType();
                 thalnosUnit = thalnosUnit.split("_")[2].replace("damaged", "");
                 if (thalnosUnit.equals(unitName)) {
                     playerUnitsByQuantity.put(unitModel, amount + playerUnitsByQuantity.get(unitModel));
@@ -6343,7 +6344,7 @@ public class ButtonHelper {
             String message = player.getFactionEmoji() + " chose to use the mahact PN in the tile " + tile.getRepresentation();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         } else {
-            if (!DiploSystem.diploSystem(event, game, player, planet.toLowerCase())) {
+            if (!DiploSystemHelper.diploSystem(event, game, player, planet.toLowerCase())) {
                 return;
             }
             String message = player.getFactionEmoji() + " chose to diplo the system containing "
