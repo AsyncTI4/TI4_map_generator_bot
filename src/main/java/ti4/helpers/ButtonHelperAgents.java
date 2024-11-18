@@ -30,7 +30,7 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.player.TurnStart;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
@@ -802,7 +802,7 @@ public class ButtonHelperAgents {
             } else {
                 game.drawActionCard(p2.getUserID());
             }
-            ButtonHelper.checkACLimit(game, event, p2);
+            ButtonHelper.checkACLimit(game, p2);
             String headerText2 = p2.getRepresentationUnfogged() + " you got 1AC due to "
                 + ssruuClever + "Skhot Unit X-12, the Cymiae" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToPlayerCardsInfoThread(p2, game, headerText2);
@@ -850,8 +850,8 @@ public class ButtonHelperAgents {
                 game.drawActionCard(p2.getUserID());
             }
 
-            ButtonHelper.checkACLimit(game, event, player);
-            ButtonHelper.checkACLimit(game, event, p2);
+            ButtonHelper.checkACLimit(game, player);
+            ButtonHelper.checkACLimit(game, p2);
             String headerText = player.getRepresentationUnfogged() + " you got 1AC from "
                 + ssruuClever + "Suffi An, the Mentak" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);

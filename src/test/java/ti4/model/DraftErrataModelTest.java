@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -18,7 +18,7 @@ import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;

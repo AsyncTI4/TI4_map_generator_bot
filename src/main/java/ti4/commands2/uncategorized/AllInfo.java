@@ -15,6 +15,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.info.AbilityInfoService;
+import ti4.service.info.CardsInfoService;
 
 public class AllInfo extends GameStateCommand {
 
@@ -52,6 +53,6 @@ public class AllInfo extends GameStateCommand {
         SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
         ActionCardHelper.sendActionCardInfo(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
-        CardsInfo.sendVariousAdditionalButtons(game, player);
+        CardsInfoService.sendVariousAdditionalButtons(game, player);
     }
 }

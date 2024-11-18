@@ -7,7 +7,7 @@ import java.util.Set;
 
 import lombok.experimental.UtilityClass;
 import ti4.commands.leaders.RefreshLeader;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SpinRingsHelper;
 import ti4.map.Game;

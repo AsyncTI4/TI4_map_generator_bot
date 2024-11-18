@@ -6,7 +6,7 @@ import java.util.Set;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;

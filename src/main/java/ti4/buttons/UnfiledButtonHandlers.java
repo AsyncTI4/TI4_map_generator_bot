@@ -25,7 +25,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.combat.StartCombat;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.explore.ExplorePlanet;
 import ti4.commands.explore.ExploreSubcommandData;
@@ -42,8 +41,6 @@ import ti4.commands2.player.Pass;
 import ti4.commands2.player.SCPlay;
 import ti4.commands2.player.TurnEnd;
 import ti4.commands2.player.TurnStart;
-import ti4.generator.Mapper;
-import ti4.generator.TileGenerator;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -70,6 +67,8 @@ import ti4.helpers.RelicHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.image.TileGenerator;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
@@ -87,6 +86,7 @@ import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.StatusCleanupService;
+import ti4.service.combat.StartCombatService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 
@@ -820,7 +820,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String groundOrSpace = rest.split("_")[3];
         FileUpload systemWithContext = new TileGenerator(game, event, null, 0, pos).createFileUpload();
         MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
-        List<Button> buttons = StartCombat.getGeneralCombatButtons(game, pos, p1, p2, groundOrSpace, event);
+        List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, groundOrSpace, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
     }
 
@@ -1278,29 +1278,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("mahactBenedictionFrom_")
-    public static void mahactBenedictionFrom(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        ButtonHelperHeroes.mahactBenediction(buttonID, event, game, player);
-        String pos1 = buttonID.split("_")[1];
-        String pos2 = buttonID.split("_")[2];
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmojiOrColor() + " moved all units in space from "
-                + game.getTileByPosition(pos1).getRepresentationForButtons(game, player) + " to "
-                + game.getTileByPosition(pos2).getRepresentationForButtons(game, player)
-                + " using Airo Shir Aur, the Mahact hero. If they moved themselves and wish to move ground forces, they may do so either with slash command or modify units button.");
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("benedictionStep1_")
-    public static void benedictionStep1(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String pos1 = buttonID.split("_")[1];
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            player.getRepresentationUnfogged() + " choose the tile you wish to send the ships in "
-                + game.getTileByPosition(pos1).getRepresentationForButtons(game, player) + " to.",
-            ButtonHelperHeroes.getBenediction2ndTileOptions(player, game, pos1));
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("nullificationField_")
     public static void nullificationField(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.split("_")[1];
@@ -1472,7 +1449,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (drawReplacement) {
                     ActionCardHelper.drawActionCards(game, player, 1, true);
                 }
-                ButtonHelper.checkACLimit(game, event, player);
+                ButtonHelper.checkACLimit(game, player);
                 ButtonHelper.deleteMessage(event);
                 if (player.hasUnexhaustedLeader("cymiaeagent")) {
                     List<Button> buttons2 = new ArrayList<>();
@@ -1932,33 +1909,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
-    public static boolean checkForASpecificPlayerReact(String messageId, Player player, Game game) {
-        boolean foundReact = false;
-        try {
-            if (game.getStoredValue(messageId) != null
-                && game.getStoredValue(messageId).contains(player.getFaction())) {
-                return true;
-            }
-            game.getMainGameChannel().retrieveMessageById(messageId).queue(mainMessage -> {
-                Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-                if (game.isFowMode()) {
-                    int index = 0;
-                    for (Player player_ : game.getPlayers().values()) {
-                        if (player_ == player)
-                            break;
-                        index++;
-                    }
-                    reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
-                }
-                MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-            });
-        } catch (Exception e) {
-            game.removeMessageIDForSabo(messageId);
-            return true;
-        }
-        return foundReact;
-    }
-
     private static void respondAllPlayersReacted(ButtonInteractionEvent event, Game game) {
         String buttonID = event.getButton().getId();
         if (game == null || buttonID == null) {
@@ -1973,7 +1923,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             event.getInteraction().getMessage().reply("All players have reacted to '" + buttonText + "'").queue();
         }
         switch (buttonID) {
-            case Constants.SC_FOLLOW, "sc_no_follow", "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so", "sc_trade_follow" -> {
+            case Constants.SC_FOLLOW, "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so", "sc_trade_follow" -> {
                 String message = "All players have reacted to this Strategy Card";
                 if (game.isFowMode()) {
                     event.getInteraction().getMessage().reply(message).queueAfter(1, TimeUnit.SECONDS);
@@ -2598,7 +2548,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             ActionCardHelper.getDiscardActionCardButtons(player, false));
 
         ButtonHelper.deleteMessage(event);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
     }
 
     @ButtonHandler("draw_1_ACDelete")
@@ -2615,7 +2565,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         ButtonHelper.addReaction(event, true, false, message, "");
         ButtonHelper.deleteMessage(event);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
     }
 
     @ButtonHandler("draw_1_AC")
@@ -2631,7 +2581,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             message = "Drew 1 AC";
         }
         ButtonHelper.addReaction(event, true, false, message, "");
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
     }
 
     @ButtonHandler("confirm_cc")
@@ -2854,7 +2804,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         CommanderUnlockCheck.checkPlayer(player, "yssaril");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -2887,7 +2837,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         player.checkCommanderUnlock("yssaril");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -3036,7 +2986,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 game.drawActionCard(player.getUserID());
             }
             ActionCardHelper.sendActionCardInfo(game, player, event);
-            ButtonHelper.checkACLimit(game, event, player);
+            ButtonHelper.checkACLimit(game, player);
         }
 
         ButtonHelper.addReaction(event, false, false, message, "");
@@ -3296,7 +3246,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("applytempcombatmod__" + Constants.AC + "__")
     public static void applytempcombatmodAC(ButtonInteractionEvent event, Player player, String buttonID) {
         String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
-        TemporaryCombatModifierModel combatModAC = CombatTempModHelper.GetPossibleTempModifier(Constants.AC,
+        TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(Constants.AC,
             acAlias,
             player.getNumberTurns());
         if (combatModAC != null) {
@@ -3310,7 +3260,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("applytempcombatmod__" + "tech" + "__")
     public static void applytempcombatmodtech(ButtonInteractionEvent event, Player player) {
         String acAlias = "sc";
-        TemporaryCombatModifierModel combatModAC = CombatTempModHelper.GetPossibleTempModifier("tech", acAlias,
+        TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier("tech", acAlias,
             player.getNumberTurns());
         if (combatModAC != null) {
             player.addNewTempCombatMod(combatModAC);
@@ -3452,7 +3402,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             for (int i = 0; i < count2; i++) {
                 game.drawActionCard(player.getUserID());
             }
-            ButtonHelper.checkACLimit(game, event, player);
+            ButtonHelper.checkACLimit(game, player);
             ActionCardHelper.sendActionCardInfo(game, player, event);
         }
 

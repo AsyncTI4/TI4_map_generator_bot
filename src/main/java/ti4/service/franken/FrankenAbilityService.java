@@ -5,7 +5,7 @@ import java.util.Map;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;

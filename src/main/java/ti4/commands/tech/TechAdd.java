@@ -3,7 +3,7 @@ package ti4.commands.tech;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;

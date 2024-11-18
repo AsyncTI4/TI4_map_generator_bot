@@ -11,8 +11,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -26,6 +26,7 @@ import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollType;
 
 public class CombatModHelper {
 
@@ -39,7 +40,7 @@ public class CombatModHelper {
         return false;
     }
 
-    public static List<NamedCombatModifierModel> GetModifiers(Player player, Player opponent,
+    public static List<NamedCombatModifierModel> getModifiers(Player player, Player opponent,
         Map<UnitModel, Integer> unitsByQuantity,
         TileModel tile,
         Game game,
@@ -176,7 +177,7 @@ public class CombatModHelper {
         return new ArrayList<>(set);
     }
 
-    public static Integer GetCombinedModifierForUnit(UnitModel unit, Integer numOfUnit,
+    public static Integer getCombinedModifierForUnit(UnitModel unit, Integer numOfUnit,
         List<NamedCombatModifierModel> modifiers, Player player,
         Player opponent, Game game, List<UnitModel> playerUnits, List<UnitModel> opponentUnits,
         CombatRollType rollType, Tile tile) {
@@ -184,7 +185,7 @@ public class CombatModHelper {
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
             if (modifier.isInScopeForUnit(unit, playerUnits, rollType, game, player)) {
-                Integer modValue = GetVariableModValue(modifier, player, opponent, game, opponentUnits, unit, tile);
+                Integer modValue = getVariableModValue(modifier, player, opponent, game, opponentUnits, unit, tile);
                 Integer perUnitCount = 1;
                 if (modifier.getApplyEachForQuantity()) {
                     perUnitCount = numOfUnit;
@@ -374,12 +375,12 @@ public class CombatModHelper {
     /// like how many fragments you have
     /// or how many POs the opponent has scored that you haven't etc.
     ///
-    public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
+    public static Integer getVariableModValue(CombatModifierModel mod, Player player, Player opponent,
         Game game, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit) {
-        return GetVariableModValue(mod, player, opponent, game, opponentUnitsInCombat, origUnit, null);
+        return getVariableModValue(mod, player, opponent, game, opponentUnitsInCombat, origUnit, null);
     }
 
-    public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
+    public static Integer getVariableModValue(CombatModifierModel mod, Player player, Player opponent,
         Game game, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit, Tile activeSystem) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;

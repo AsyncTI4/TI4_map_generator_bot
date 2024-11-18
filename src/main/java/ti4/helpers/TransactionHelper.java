@@ -14,15 +14,15 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands2.uncategorized.CardsInfo;
-import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.info.CardsInfoService;
 
 public class TransactionHelper {
 
@@ -969,7 +969,7 @@ public class TransactionHelper {
                 }
                 p1.removeActionCard(acNum);
                 p2.setActionCard(acID);
-                ButtonHelper.checkACLimit(game, event, p2);
+                ButtonHelper.checkACLimit(game, p2);
                 ActionCardHelper.sendActionCardInfo(game, p2);
                 ActionCardHelper.sendActionCardInfo(game, p1);
                 if (!p1.hasAbility("arbiters") && !p2.hasAbility("arbiters")) {
@@ -1028,9 +1028,9 @@ public class TransactionHelper {
                     }
                 }
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
-                CardsInfo.sendVariousAdditionalButtons(game, p1);
+                CardsInfoService.sendVariousAdditionalButtons(game, p1);
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
-                CardsInfo.sendVariousAdditionalButtons(game, p2);
+                CardsInfoService.sendVariousAdditionalButtons(game, p2);
                 String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
                 message2 = p1.getRepresentation() + " sent " + Emojis.PN + text + "PN to " + ident2;
                 Helper.checkEndGame(game, p2);

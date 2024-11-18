@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
