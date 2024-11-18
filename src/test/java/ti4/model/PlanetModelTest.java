@@ -8,6 +8,7 @@ import ti4.testUtils.BaseTi4Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PlanetModelTest extends BaseTi4Test {
+
     @Test
     public void testPlanets() {
         for (PlanetModel model : TileHelper.getAllPlanetModels()) {
