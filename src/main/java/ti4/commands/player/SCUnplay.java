@@ -7,30 +7,24 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SCUnplay extends PlayerSubcommandData {
+public class SCUnplay extends GameStateSubcommand {
+
     public SCUnplay() {
-        super(Constants.SC_UNPLAY, "Unplay a Strategy Card");
+        super(Constants.SC_UNPLAY, "Unplay a Strategy Card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card #"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game.");
-            return;
-        }
-
+        Player player = getPlayer();
         Set<Integer> playersSCs = player.getSCs();
         if (playersSCs.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No strategy card has been selected.");
@@ -43,6 +37,7 @@ public class SCUnplay extends PlayerSubcommandData {
         }
 
         Integer scToUnplay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
+        Game game = getGame();
         game.setSCPlayed(scToUnplay, false);
 
         //fix sc reminders for all players

@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -24,15 +24,15 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 
-public class Stats extends PlayerSubcommandData {
+public class Stats extends GameStateSubcommand {
+
     public Stats() {
-        super(Constants.STATS, "Player Stats: CC,TG,Commodities");
+        super(Constants.STATS, "Player Stats: CC,TG,Commodities", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.CC, "CC's Example: 3/3/2 or +1/-1/+0"))
             .addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactical command counter count - can use +1/-1 etc. to add/subtract"))
             .addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet command counter count - can use +1/-1 etc. to add/subtract"))
@@ -52,19 +52,12 @@ public class Stats extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
+        Game game = getGame();
+        Player player = getPlayer();
 
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
         List<OptionMapping> optionMappings = event.getOptions();
-        optionMappings.remove(playerOption);
-        optionMappings.remove(factionColorOption);
+        optionMappings.remove(event.getOption(Constants.PLAYER));
+        optionMappings.remove(event.getOption(Constants.FACTION_COLOR));
         // NO OPTIONS SELECTED, JUST DISPLAY STATS
         if (optionMappings.isEmpty()) {
             if (game.isFowMode()) {
@@ -140,7 +133,6 @@ public class Stats extends PlayerSubcommandData {
             } else if (player.getTg() > oldTg) {
                 ButtonHelperAbilities.pillageCheck(player, game);
             }
-
         }
 
         OptionMapping optionC = event.getOption(Constants.COMMODITIES);
@@ -163,12 +155,13 @@ public class Stats extends PlayerSubcommandData {
         OptionMapping optionPref = event.getOption(Constants.PREFERS_DISTANCE);
         if (optionPref != null) {
             player.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
-            Map<String, Game> mapList = GameManager.getGameNameToGame();
-            for (Game activeGame2 : mapList.values()) {
-                for (Player player2 : activeGame2.getRealPlayers()) {
-                    if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                        player2.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
-                        GameSaveLoadManager.saveGame(activeGame2, event);
+            for (var managedGame : GameManager.getGameNameToGame().values()) {
+                if (!managedGame.isHasEnded()) {
+                    var gameToUpdate = GameManager.getGame(managedGame.getName());
+                    for (Player playerToUpdate : gameToUpdate.getRealPlayers()) {
+                        if (playerToUpdate.getUserID().equalsIgnoreCase(player.getUserID())) {
+                            playerToUpdate.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
+                        }
                     }
                 }
             }
@@ -181,7 +174,6 @@ public class Stats extends PlayerSubcommandData {
 
         Integer turnCount = event.getOption(Constants.TURN_COUNT, null, OptionMapping::getAsInt);
         if (turnCount != null) {
-
             player.setTurnCount(turnCount);
             String message = ">  set **Turn Count** to " + turnCount;
             MessageHelper.sendMessageToEventChannel(event, message);
@@ -231,7 +223,6 @@ public class Stats extends PlayerSubcommandData {
                         .append(Emojis.getSCBackEmojiFromInteger(sc)).append(" (played)");
                 } else {
                     game.setSCPlayed(sc, false);
-
                     for (Player player_ : game.getPlayers().values()) {
                         if (!player_.isRealPlayer()) {
                             continue;
@@ -257,12 +248,11 @@ public class Stats extends PlayerSubcommandData {
             player.setDummy(value);
             MessageHelper.sendMessageToEventChannel(event, getGeneralMessage(event, player, optionDummy));
         }
-
     }
 
     public static void setTotalCommodities(GenericInteractionCreateEvent event, Player player, Integer commoditiesTotalCount) {
         if (commoditiesTotalCount < 1 || commoditiesTotalCount > 10) {
-            MessageHelper.sendMessageToEventChannel(event, "# " + player.getRepresentation() + "**Warning:** Total Commodities count seems like a wrong value:");
+            MessageHelper.sendMessageToEventChannel(event, "**Warning:** Total Commodities count seems like a wrong value:");
         }
         player.setCommoditiesTotal(commoditiesTotalCount);
         String message = ">  set **Total Commodities** to " + commoditiesTotalCount + Emojis.comm;
@@ -317,14 +307,7 @@ public class Stats extends PlayerSubcommandData {
         sb.append("> Total Unit Combat Expected Hits: ").append("💥").append("`").append(player.getTotalCombatValueOfUnits("both")).append("`\n");
         sb.append("> Total Unit Ability Expected Hits: ").append(Emojis.UnitUpgradeTech).append("`").append(player.getTotalUnitAbilityValueOfUnits()).append("`\n");
         sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
-
-        // Guild guild = game.getGuild();
-        // if (guild != null && game.isFrankenGame() && guild.getThreadChannelById(player.getBagInfoThreadID()) != null) {
-        //     sb.append("> Bag Draft Thread: ").append(guild.getThreadChannelById(player.getBagInfoThreadID()).getAsMention()).append("\n");
-        // }
-
         sb.append("\n");
-
         return sb.toString();
     }
 

@@ -21,7 +21,6 @@ import ti4.commands.leaders.HeroPlay;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SCPlay;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
@@ -1794,13 +1793,12 @@ public class ButtonHelperHeroes {
             if (vaden.getDebtTokenCount(target.getColor()) > 0) {
                 Button button;
                 String prefix = "vadenHeroClearDebt";
-                Player player = target;
-                String faction = player.getFaction();
+                String faction = target.getFaction();
                 if (!game.isFowMode() && !faction.contains("franken")) {
                     button = Buttons.gray(prefix + "_" + faction, " ");
-                    button = button.withEmoji(Emoji.fromFormatted(player.getFactionEmoji()));
+                    button = button.withEmoji(Emoji.fromFormatted(target.getFactionEmoji()));
                 } else {
-                    button = Buttons.gray(prefix + "_" + player.getColor(), player.getColor());
+                    button = Buttons.gray(prefix + "_" + target.getColor(), target.getColor());
                 }
                 buttons.add(button);
             }
@@ -1819,7 +1817,7 @@ public class ButtonHelperHeroes {
             buttons.add(Buttons.gray("sendVadenHeroSomething_" + vaden.getFaction() + "_comms", "Send 2 Commodities"));
         }
         buttons.add(Buttons.red("sendVadenHeroSomething_" + vaden.getFaction() + "_pn", "Send 1 PN"));
-        ClearDebt.clearDebt(vaden, target, 1);
+        vaden.clearDebt(target, 1);
         MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(),
             vaden.getRepresentation() + " returned 1 debt tokens owned by " + target.getRepresentation(false, true)
                 + " using Putriv Sirvonsk, the Vaden hero. Buttons have been sent to their cards info to resolve.");

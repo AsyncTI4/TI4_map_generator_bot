@@ -248,7 +248,7 @@ public class PromissoryNoteHelper {
             ButtonHelperFactionSpecific.offerBentorPNButtons(player, game, event);
         }
         if ("dspngled".equalsIgnoreCase(id)) {
-            ButtonHelperFactionSpecific.offerGledgeBaseButtons(player, game, event);
+            ButtonHelperFactionSpecific.offerGledgeBaseButtons(player, game);
         }
         if ("iff".equalsIgnoreCase(id)) {
             List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());

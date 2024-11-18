@@ -23,7 +23,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ListTurnOrder;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.MapGenerator;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
@@ -41,9 +41,10 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SCPick extends PlayerSubcommandData {
+public class SCPick extends GameStateSubcommand {
+
     public SCPick() {
-        super(Constants.SC_PICK, "Pick a Strategy Card");
+        super(Constants.SC_PICK, "Pick a Strategy Card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card #").setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC2, "2nd choice"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC3, "3rd"));
@@ -56,12 +57,7 @@ public class SCPick extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Game game = getGame();
 
         Collection<Player> activePlayers = game.getRealPlayers();
         if (activePlayers.isEmpty()) {
@@ -72,6 +68,7 @@ public class SCPick extends PlayerSubcommandData {
         int maxSCsPerPlayer = game.getStrategyCardsPerPlayer();
         if (maxSCsPerPlayer <= 0) maxSCsPerPlayer = 1;
 
+        Player player = getPlayer();
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
             MessageHelper.sendMessageToEventChannel(event, "Player may not pick another strategy card. Max strategy cards per player for this game is " + maxSCsPerPlayer + ".");
@@ -122,11 +119,8 @@ public class SCPick extends PlayerSubcommandData {
                     && p2.getActionCards().containsKey("disgrace")) {
                     ActionCardHelper.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
                     game.setStoredValue("Public Disgrace", "");
-                    Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
-                    int scNumber = scpick;
-                    Integer tgCount = scTradeGoods.get(scNumber);
                     String msg = player.getRepresentationUnfogged() +
-                        "\n> Picked: " + Helper.getSCRepresentation(game, scNumber);
+                        "\n> Picked: " + Helper.getSCRepresentation(game, scpick);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -431,33 +425,31 @@ public class SCPick extends PlayerSubcommandData {
             if (allPicked) {
                 ListTurnOrder.turnOrder(event, game);
             }
-            if (!msgExtra.isEmpty()) {
-                if (!allPicked) {
-                    game.updateActivePlayer(privatePlayer);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra + "\nUse buttons to pick your strategy card.", Helper.getRemainingSCButtons(event, game, privatePlayer));
-                    game.setPhaseOfGame("strategy");
-                } else {
-                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
-                    privatePlayer.setTurnCount(privatePlayer.getTurnCount() + 1);
-                    if (game.isShowBanners()) {
-                        MapGenerator.drawBanner(privatePlayer);
-                    }
-                    MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.",
-                        TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
-                    if (privatePlayer.getGenSynthesisInfantry() > 0) {
-                        if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
-                            MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                                "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
-                                ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
-                        } else {
-                            privatePlayer.setStasisInfantry(0);
-                            MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                                + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
-
-                        }
-                    }
-                    game.setPhaseOfGame("action");
+            if (!allPicked) {
+                game.updateActivePlayer(privatePlayer);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra + "\nUse buttons to pick your strategy card.", Helper.getRemainingSCButtons(event, game, privatePlayer));
+                game.setPhaseOfGame("strategy");
+            } else {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
+                privatePlayer.setTurnCount(privatePlayer.getTurnCount() + 1);
+                if (game.isShowBanners()) {
+                    MapGenerator.drawBanner(privatePlayer);
                 }
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.",
+                    TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
+                if (privatePlayer.getGenSynthesisInfantry() > 0) {
+                    if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
+                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
+                            "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
+                            ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
+                    } else {
+                        privatePlayer.setStasisInfantry(0);
+                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
+                            + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+
+                    }
+                }
+                game.setPhaseOfGame("action");
             }
         }
         if (allPicked) {

@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.player.AbilityInfo;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
@@ -17,6 +16,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.AbilityInfoService;
 
 class SetPolicy extends GameStateSubcommand {
 
@@ -185,7 +185,7 @@ class SetPolicy extends GameStateSubcommand {
         Game game = getGame();
         DiscordantStarsHelper.checkOlradinMech(game);
 
-        AbilityInfo.sendAbilityInfo(game, player, event);
+        AbilityInfoService.sendAbilityInfo(game, player, event);
         MessageHelper.sendMessageEmbedsToCardsInfoThread(game, player, "", List.of(unitModel.getRepresentationEmbed(false)));
     }
 

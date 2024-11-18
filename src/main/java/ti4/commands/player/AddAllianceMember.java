@@ -4,23 +4,25 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class AddAllianceMember extends PlayerSubcommandData {
+class AddAllianceMember extends GameStateSubcommand {
+
     public AddAllianceMember() {
-        super(Constants.ADD_ALLIANCE_MEMBER, "Add an alliance member");
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color with which you are in an alliance").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
+        super(Constants.ADD_ALLIANCE_MEMBER, "Add an alliance member", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR,
+            "Faction or Color with which you are in an alliance").setAutoComplete(true).setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null || player.isNotRealPlayer()) {
+        Game game = getGame();
+        Player player = getPlayer();
+        if (player.isNotRealPlayer()) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }

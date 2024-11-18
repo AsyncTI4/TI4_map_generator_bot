@@ -41,7 +41,6 @@ import ti4.buttons.Buttons;
 import ti4.commands.fow.FOWOptions;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
-import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SCPlay;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
@@ -1285,7 +1284,7 @@ public class AgendaHelper {
     public static void erase1DebtTo(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String tgOrDebt = buttonID.split("_")[2];
-        ClearDebt.clearDebt(p2, player, 1);
+        p2.clearDebt(player, 1);
         String msg = "1 debt owed by " + player.getRepresentation() + " to " + p2.getRepresentation() + " was cleared. " + p2.getDebtTokenCount(player.getColor()) + " debt remains.";
         if (tgOrDebt.equalsIgnoreCase("tg")) {
             player.setTg(player.getTg() - 1);

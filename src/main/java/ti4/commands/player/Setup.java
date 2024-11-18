@@ -20,13 +20,14 @@ import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechInfo;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddRemoveUnits;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.commands2.uncategorized.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -42,10 +43,12 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
+import ti4.service.AbilityInfoService;
 
-public class Setup extends PlayerSubcommandData {
+public class Setup extends GameStateSubcommand {
+
     public Setup() {
-        super(Constants.SETUP, "Player initialisation: Faction and Color");
+        super(Constants.SETUP, "Player initialisation: Faction and Color", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position (Creuss choose position of gate)").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setAutoComplete(true));
@@ -55,7 +58,7 @@ public class Setup extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         String faction = event.getOption(Constants.FACTION, null, OptionMapping::getAsString);
         if (faction != null) {
             faction = StringUtils.substringBefore(faction.toLowerCase().replace("the ", ""), " ");
@@ -67,11 +70,7 @@ public class Setup extends PlayerSubcommandData {
             return;
         }
 
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Player player = getPlayer();
 
         String color = AliasHandler.resolveColor(event.getOption(Constants.COLOR, player.getNextAvailableColour(), OptionMapping::getAsString).toLowerCase());
         if (!Mapper.isValidColor(color)) {
@@ -101,7 +100,7 @@ public class Setup extends PlayerSubcommandData {
             }
         }
 
-        if (ChangeColor.colorIsExclusive(color, player)) {
+        if (ColorChangeHelper.colorIsExclusive(color, player)) {
             color = player.getNextAvailableColorIgnoreCurrent();
         }
 
@@ -239,7 +238,7 @@ public class Setup extends PlayerSubcommandData {
 
         // SEND STUFF
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, factionModel.getFactionSheetMessage());
-        AbilityInfo.sendAbilityInfo(game, player, event);
+        AbilityInfoService.sendAbilityInfo(game, player, event);
         TechInfo.sendTechInfo(game, player, event);
         LeaderInfo.sendLeadersInfo(game, player, event);
         UnitInfo.sendUnitInfo(game, player, event, false);
@@ -332,6 +331,7 @@ public class Setup extends PlayerSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }
+
         Map<String, Game> mapList = GameManager.getGameNameToGame();
         for (Game game2 : mapList.values()) {
             for (Player player2 : game2.getRealPlayers()) {

@@ -25,7 +25,6 @@ import ti4.commands.franken.StartFrankenDraft.FrankenDraftMode;
 import ti4.commands.game.Undo;
 import ti4.commands.map.Preset;
 import ti4.commands.milty.ForcePick;
-import ti4.commands.player.ChangeUnitDecal;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.statistics.GameStatTypes;
 import ti4.commands2.statistics.PlayerStatTypes;
@@ -62,6 +61,7 @@ import ti4.model.TechSpecialtyModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
+import ti4.service.UnitDecalService;
 
 public class AutoCompleteProvider {
 
@@ -421,7 +421,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Mapper.getDecals().stream()
                     .filter(value -> value.contains(enteredValue) || Mapper.getDecalName(value).toLowerCase().contains(enteredValue))
-                    .filter(decalID -> ChangeUnitDecal.userMayUseDecal(userId, decalID))
+                    .filter(decalID -> UnitDecalService.userMayUseDecal(userId, decalID))
                     .limit(25)
                     .map(value -> new Command.Choice(Mapper.getDecalName(value), value))
                     .collect(Collectors.toList());
