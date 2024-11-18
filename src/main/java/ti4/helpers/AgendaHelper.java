@@ -41,8 +41,6 @@ import ti4.buttons.Buttons;
 import ti4.commands.fow.FOWOptions;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
-import ti4.commands.status.RevealStage1;
-import ti4.commands.status.RevealStage2;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.player.SCPlay;
 import ti4.generator.MapGenerator;
@@ -65,6 +63,7 @@ import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.service.RevealPublicObjectiveService;
 
 public class AgendaHelper {
 
@@ -786,8 +785,7 @@ public class AgendaHelper {
                         game.setSpeakerUserID(playerWL.getUserID());
                         message.append(playerWL.getRepresentation()).append(" was made speaker and owes everyone who voted for them a PN\n");
                         for (Player p2 : getWinningVoters(winner, game)) {
-                            if (p2 == playerWL) {
-                            } else {
+                            if (p2 != playerWL) {
                                 MessageHelper.sendMessageToChannel(playerWL.getCardsInfoThread(), "You owe " + p2.getRepresentation() + "a PN", ButtonHelper.getForcedPNSendButtons(game, p2, playerWL));
                             }
                         }
@@ -816,9 +814,9 @@ public class AgendaHelper {
             }
             if ("incentive".equalsIgnoreCase(agID)) {
                 if ("for".equalsIgnoreCase(winner)) {
-                    new RevealStage1().revealS1(event, actionsChannel);
+                    RevealPublicObjectiveService.revealS1(game, event, actionsChannel);
                 } else {
-                    new RevealStage2().revealS2(event, actionsChannel);
+                    RevealPublicObjectiveService.revealS2(game, event, actionsChannel);
                 }
             }
             if ("unconventional".equalsIgnoreCase(agID)) {
