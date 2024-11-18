@@ -328,7 +328,7 @@ abstract public class AddRemoveUnits implements Command {
         if (tile.isSpaceHolderValid(planetName))
             return planetName;
         return tile.getUnitHolders().keySet().stream()
-            .filter(id -> !Constants.SPACE.equals(planetName))
+            .filter(id -> !Constants.SPACE.equals(id))
             .filter(unitHolderID -> unitHolderID.startsWith(planetName))
             .findFirst().orElse(planetName);
     }
