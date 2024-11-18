@@ -236,6 +236,7 @@ public class Setup extends GameStateSubcommand {
         }
 
         // SEND STUFF
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, factionModel.getFactionSheetMessage());
         AbilityInfo.sendAbilityInfo(game, player, event);
         TechInfo.sendTechInfo(game, player, event);
         LeaderInfo.sendLeadersInfo(game, player, event);
