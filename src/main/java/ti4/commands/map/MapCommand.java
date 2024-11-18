@@ -47,7 +47,6 @@ public class MapCommand implements Command {
         subcommands.add(new RemoveTile());
         subcommands.add(new AddBorderAnomaly());
         subcommands.add(new RemoveBorderAnomaly());
-        //subcommands.add(new InteractiveBuilder());
         subcommands.add(new Preset());
         subcommands.add(new ShowMapSetup());
         subcommands.add(new ShowMapString());
