@@ -48,7 +48,7 @@ public class ObjectiveBox {
 		displayScoreMarkers(game, graphics, generator, objective);
 	}
 
-	public static Integer GetMaxTextWidth(Game game, Graphics graphics, List<Objective> objectives) {
+	public static Integer getMaxTextWidth(Game game, Graphics graphics, List<Objective> objectives) {
 		int maxTextWidth = 0;
 		for (Objective objective : objectives) {
 			maxTextWidth = Math.max(maxTextWidth, graphics.getFontMetrics().stringWidth(objective.getDisplayText(game)));
@@ -56,15 +56,15 @@ public class ObjectiveBox {
 		return maxTextWidth;
 	}
 
-	public static Integer GetMinimumBoxWidth(Game game) {
+	public static Integer getMinimumBoxWidth(Game game) {
 		return game.isRedTapeMode() ? 800 : 400;
 	}
 
-	public static Integer GetBoxWidth(Game game, Integer maxTextWidth, Integer scoreTokenWidth) {
-		return Math.max(GetMinimumBoxWidth(game), Math.min(MapGenerator.getMaxObjectWidth(game), getMaxLengthOfTokens(game, maxTextWidth, scoreTokenWidth)));
+	public static Integer getBoxWidth(Game game, Integer maxTextWidth, Integer scoreTokenWidth) {
+		return Math.max(getMinimumBoxWidth(game), Math.min(MapGenerator.getMaxObjectWidth(game), getMaxLengthOfTokens(game, maxTextWidth, scoreTokenWidth)));
 	}
 
-	public static Integer GetVerticalSpacing() {
+	public static Integer getVerticalSpacing() {
 		return objectiveBoxHeight + spacingBetweenBoxes;
 	}
 

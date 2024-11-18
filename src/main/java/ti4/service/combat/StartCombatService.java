@@ -16,16 +16,15 @@ import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.tokens.AddCC;
-import ti4.image.TileGenerator;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
-import ti4.helpers.CombatHelper;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
+import ti4.image.TileGenerator;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -468,7 +467,7 @@ public class StartCombatService {
     private static void sendAFBButtonsToThread(GenericInteractionCreateEvent event, ThreadChannel threadChannel, Game game, List<Player> combatPlayers, Tile tile) {
         boolean thereAreAFBUnits = false;
         for (Player player : combatPlayers) {
-            if (!CombatHelper.GetUnitsInAFB(tile, player, event).isEmpty())
+            if (!CombatRollService.getUnitsInAFB(tile, player, event).isEmpty())
                 thereAreAFBUnits = true;
         }
         if (!thereAreAFBUnits)

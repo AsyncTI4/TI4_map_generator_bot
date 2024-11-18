@@ -9,13 +9,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -100,7 +100,7 @@ class PlayPN extends GameStateSubcommand {
             ButtonHelper.deleteMessage(event);
         }
 
-        var possibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID, player.getNumberTurns());
+        var possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID, player.getNumberTurns());
         if (possibleCombatMod != null) {
             player.addNewTempCombatMod(possibleCombatMod);
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Combat modifier will be applied next time you push the combat roll button.");

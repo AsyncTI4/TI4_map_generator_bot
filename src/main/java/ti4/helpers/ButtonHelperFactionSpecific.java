@@ -29,10 +29,10 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.player.SendDebt;
 import ti4.commands2.player.TurnStart;
-import ti4.image.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -44,6 +44,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 
@@ -701,7 +702,7 @@ public class ButtonHelperFactionSpecific {
         // Actually roll for each unit
         int totalHits = 0;
         StringBuilder resultBuilder = new StringBuilder(result);
-        Map<UnitModel, Integer> playerUnits = CombatHelper.getUnitsInCombat(tile, space, player, event,
+        Map<UnitModel, Integer> playerUnits = CombatRollService.getUnitsInCombat(tile, space, player, event,
             CombatRollType.combatround, game);
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();

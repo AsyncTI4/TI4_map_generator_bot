@@ -18,8 +18,6 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.units.RemoveUnits;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -34,6 +32,8 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -133,10 +133,10 @@ public class CombatRollService {
         Map<UnitModel, Integer> opponentUnitsByQuantity = getUnitsInCombat(tile, combatOnHolder, opponent, event, rollType, game);
 
         TileModel tileModel = TileHelper.getTileById(tile.getTileID());
-        List<NamedCombatModifierModel> modifiers = CombatModHelper.GetModifiers(player, opponent,
+        List<NamedCombatModifierModel> modifiers = CombatModHelper.getModifiers(player, opponent,
             playerUnitsByQuantity, tileModel, game, rollType, Constants.COMBAT_MODIFIERS);
 
-        List<NamedCombatModifierModel> extraRolls = CombatModHelper.GetModifiers(player, opponent,
+        List<NamedCombatModifierModel> extraRolls = CombatModHelper.getModifiers(player, opponent,
             playerUnitsByQuantity, tileModel, game, rollType, Constants.COMBAT_EXTRA_ROLLS);
 
         // Check for temp mods
@@ -378,10 +378,10 @@ public class CombatRollService {
             int numOfUnit = entry.getValue();
 
             int toHit = unitModel.getCombatDieHitsOnForAbility(rollType, player, game);
-            int modifierToHit = CombatModHelper.GetCombinedModifierForUnit(unitModel, numOfUnit, mods, player, opponent,
+            int modifierToHit = CombatModHelper.getCombinedModifierForUnit(unitModel, numOfUnit, mods, player, opponent,
                 game,
                 playerUnitsList, opponentUnitsList, rollType, activeSystem);
-            int extraRollsForUnit = CombatModHelper.GetCombinedModifierForUnit(unitModel, numOfUnit, extraRolls, player,
+            int extraRollsForUnit = CombatModHelper.getCombinedModifierForUnit(unitModel, numOfUnit, extraRolls, player,
                 opponent,
                 game, playerUnitsList, opponentUnitsList, rollType, activeSystem);
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player, game);
@@ -573,7 +573,7 @@ public class CombatRollService {
         }
         return switch (roleType) {
             case combatround -> getUnitsInCombatRound(unitHolder, player, event, tile);
-            case AFB -> GetUnitsInAFB(tile, player, event);
+            case AFB -> getUnitsInAFB(tile, player, event);
             case bombardment -> getUnitsInBombardment(tile, player, event);
             case SpaceCannonOffence -> getUnitsInSpaceCannonOffense(tile, player, event, game);
             case SpaceCannonDefence -> getUnitsInSpaceCannonDefence(unitHolderPlanet, player, event);
@@ -635,7 +635,7 @@ public class CombatRollService {
         return output;
     }
 
-    public static Map<UnitModel, Integer> GetUnitsInAFB(Tile tile, Player player,
+    public static Map<UnitModel, Integer> getUnitsInAFB(Tile tile, Player player,
         GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
 
