@@ -1,4 +1,4 @@
-package ti4.commands.franken;
+package ti4.commands2.franken;
 
 import java.util.List;
 
@@ -7,14 +7,14 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.service.franken.FrankenAbilityService;
 
-class AbilityRemove extends AbilityAddRemove {
+class AbilityAdd extends AbilityAddRemove {
 
-    public AbilityRemove() {
-        super(Constants.ABILITY_REMOVE, "Remove an ability from your faction");
+    public AbilityAdd() {
+        super(Constants.ABILITY_ADD, "Add an ability to your faction");
     }
 
     @Override
     public void doAction(Player player, List<String> abilityIDs, SlashCommandInteractionEvent event) {
-        FrankenAbilityService.removeAbilities(event, player, abilityIDs);
+        FrankenAbilityService.addAbilities(event, player, abilityIDs);
     }
 }

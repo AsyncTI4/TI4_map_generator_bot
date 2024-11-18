@@ -1,4 +1,4 @@
-package ti4.commands.franken;
+package ti4.commands2.franken;
 
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;

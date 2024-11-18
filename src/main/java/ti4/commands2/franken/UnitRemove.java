@@ -1,4 +1,4 @@
-package ti4.commands.franken;
+package ti4.commands2.franken;
 
 import java.util.List;
 

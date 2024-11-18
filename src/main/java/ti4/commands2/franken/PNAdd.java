@@ -1,4 +1,4 @@
-package ti4.commands.franken;
+package ti4.commands2.franken;
 
 import java.util.List;
 
@@ -7,14 +7,14 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.service.franken.FrankenPromissoryService;
 
-class PNRemove extends PNAddRemove {
+class PNAdd extends PNAddRemove {
 
-    public PNRemove() {
-        super(Constants.PN_REMOVE, "Remove an Promissory Note from your faction's owned notes");
+    public PNAdd() {
+        super(Constants.PN_ADD, "Add a Promissory Note to your faction's owned notes");
     }
 
     @Override
     public void doAction(Player player, List<String> pnIDs, SlashCommandInteractionEvent event) {
-        FrankenPromissoryService.removePromissoryNotes(event, player, pnIDs);
+        FrankenPromissoryService.addPromissoryNotes(event, getGame(), player, pnIDs);
     }
 }

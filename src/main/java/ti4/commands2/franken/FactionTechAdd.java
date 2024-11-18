@@ -1,4 +1,4 @@
-package ti4.commands.franken;
+package ti4.commands2.franken;
 
 import java.util.List;
 
@@ -7,14 +7,14 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.service.franken.FrankenFactionTechService;
 
-class FactionTechRemove extends FactionTechAddRemove {
+class FactionTechAdd extends FactionTechAddRemove {
 
-    public FactionTechRemove() {
-        super(Constants.FACTION_TECH_REMOVE, "Remove a faction tech from your faction");
+    public FactionTechAdd() {
+        super(Constants.FACTION_TECH_ADD, "Add a faction tech to your faction");
     }
-    
+
     @Override
     public void doAction(Player player, List<String> techIDs, SlashCommandInteractionEvent event) {
-        FrankenFactionTechService.removeFactionTechs(event, player, techIDs);
+        FrankenFactionTechService.addFactionTechs(event, player, techIDs);
     }
 }
