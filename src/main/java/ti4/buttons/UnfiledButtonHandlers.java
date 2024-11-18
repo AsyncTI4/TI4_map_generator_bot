@@ -1278,29 +1278,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("mahactBenedictionFrom_")
-    public static void mahactBenedictionFrom(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        ButtonHelperHeroes.mahactBenediction(buttonID, event, game, player);
-        String pos1 = buttonID.split("_")[1];
-        String pos2 = buttonID.split("_")[2];
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmojiOrColor() + " moved all units in space from "
-                + game.getTileByPosition(pos1).getRepresentationForButtons(game, player) + " to "
-                + game.getTileByPosition(pos2).getRepresentationForButtons(game, player)
-                + " using Airo Shir Aur, the Mahact hero. If they moved themselves and wish to move ground forces, they may do so either with slash command or modify units button.");
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("benedictionStep1_")
-    public static void benedictionStep1(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String pos1 = buttonID.split("_")[1];
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            player.getRepresentationUnfogged() + " choose the tile you wish to send the ships in "
-                + game.getTileByPosition(pos1).getRepresentationForButtons(game, player) + " to.",
-            ButtonHelperHeroes.getBenediction2ndTileOptions(player, game, pos1));
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("nullificationField_")
     public static void nullificationField(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.split("_")[1];
@@ -1932,33 +1909,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
-    public static boolean checkForASpecificPlayerReact(String messageId, Player player, Game game) {
-        boolean foundReact = false;
-        try {
-            if (game.getStoredValue(messageId) != null
-                && game.getStoredValue(messageId).contains(player.getFaction())) {
-                return true;
-            }
-            game.getMainGameChannel().retrieveMessageById(messageId).queue(mainMessage -> {
-                Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-                if (game.isFowMode()) {
-                    int index = 0;
-                    for (Player player_ : game.getPlayers().values()) {
-                        if (player_ == player)
-                            break;
-                        index++;
-                    }
-                    reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
-                }
-                MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-            });
-        } catch (Exception e) {
-            game.removeMessageIDForSabo(messageId);
-            return true;
-        }
-        return foundReact;
-    }
-
     private static void respondAllPlayersReacted(ButtonInteractionEvent event, Game game) {
         String buttonID = event.getButton().getId();
         if (game == null || buttonID == null) {
@@ -1973,7 +1923,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             event.getInteraction().getMessage().reply("All players have reacted to '" + buttonText + "'").queue();
         }
         switch (buttonID) {
-            case Constants.SC_FOLLOW, "sc_no_follow", "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so", "sc_trade_follow" -> {
+            case Constants.SC_FOLLOW, "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so", "sc_trade_follow" -> {
                 String message = "All players have reacted to this Strategy Card";
                 if (game.isFowMode()) {
                     event.getInteraction().getMessage().reply(message).queueAfter(1, TimeUnit.SECONDS);

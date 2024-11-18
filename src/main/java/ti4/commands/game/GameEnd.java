@@ -43,6 +43,7 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.RematchService;
 
 import static ti4.helpers.StringHelper.ordinal;
 
@@ -194,7 +195,7 @@ public class GameEnd extends GameSubcommandData {
         }
 
         if (rematch) {
-            RematchHelper.secondHalfOfRematch(event, game);
+            RematchService.secondHalfOfRematch(event, game);
         }
     }
 
