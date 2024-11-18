@@ -15,12 +15,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.status.ListPlayerInfoButton;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
+import ti4.service.ListPlayerInfoService;
 
 public class SecretObjectiveHelper {
 
@@ -37,9 +37,9 @@ public class SecretObjectiveHelper {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }
-            if (ListPlayerInfoButton.getObjectiveThreshold(entry.getKey(), game) > 0) {
+            if (ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game) > 0) {
                 message.append(getSecretObjectiveRepresentationNoNewLine(entry.getKey()));
-                message.append(" (").append(ListPlayerInfoButton.getPlayerProgressOnObjective(entry.getKey(), game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(entry.getKey(), game)).append(")\n");
+                message.append(" (").append(ListPlayerInfoService.getPlayerProgressOnObjective(entry.getKey(), game, player)).append("/").append(ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game)).append(")\n");
             } else {
                 message.append(getSecretObjectiveRepresentation(entry.getKey()));
             }
@@ -223,9 +223,9 @@ public class SecretObjectiveHelper {
                     Integer idValue = so.getValue();
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + idValue, 4)).append(")`");
 
-                    if (ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game) > 0) {
+                    if (ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game) > 0) {
                         sb.append(getSecretObjectiveRepresentationNoNewLine(so.getKey()));
-                        sb.append(" (").append(ListPlayerInfoButton.getPlayerProgressOnObjective(so.getKey(), game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game)).append(")\n");
+                        sb.append(" (").append(ListPlayerInfoService.getPlayerProgressOnObjective(so.getKey(), game, player)).append("/").append(ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game)).append(")\n");
                     } else {
                         sb.append(getSecretObjectiveRepresentation(so.getKey()));
                     }
@@ -331,14 +331,14 @@ public class SecretObjectiveHelper {
     }
 
     private static void appendSecretObjectiveRepresentation(Game game, StringBuilder sb, String id, int x) {
-        if (ListPlayerInfoButton.getObjectiveThreshold(id, game) > 0) {
+        if (ListPlayerInfoService.getObjectiveThreshold(id, game) > 0) {
             sb.append(x).append(getSecretObjectiveRepresentation(id));
             sb.append("> ");
             for (Player player : game.getRealPlayers()) {
-                sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(id, game)).append(" ");
+                sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player))
+                    .append("/").append(ListPlayerInfoService.getObjectiveThreshold(id, game)).append(" ");
             }
             sb.append("\n");
-
         } else {
             sb.append(x).append(getSecretObjectiveRepresentation(id));
         }

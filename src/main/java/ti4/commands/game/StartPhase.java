@@ -13,9 +13,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.status.Cleanup;
-import ti4.commands.status.ListPlayerInfoButton;
-import ti4.commands.status.ListTurnOrder;
 import ti4.commands2.player.TurnEnd;
 import ti4.commands2.player.TurnStart;
 import ti4.generator.MapGenerator;
@@ -45,6 +42,9 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.ListPlayerInfoService;
+import ti4.service.ListTurnOrderService;
+import ti4.service.StatusCleanupService;
 
 public class StartPhase extends GameSubcommandData {
     public StartPhase() {
@@ -66,8 +66,8 @@ public class StartPhase extends GameSubcommandData {
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
             // case "P1Special" -> new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", "1082164664844169256")).sendEvent();
             case "shuffleDecks" -> game.shuffleDecks();
-            case "publicObj" -> ListPlayerInfoButton.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
-            case "publicObjAll" -> ListPlayerInfoButton.displayerScoringProgression(game, false, event.getMessageChannel(), "1");
+            case "publicObj" -> ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
+            case "publicObjAll" -> ListPlayerInfoService.displayerScoringProgression(game, false, event.getMessageChannel(), "1");
             case "ixthian" -> AgendaHelper.rollIxthian(game, false);
             case "gameTitles" -> PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
             case "giveAgendaButtonsBack" -> Helper.giveMeBackMyAgendaButtons(game);
@@ -342,7 +342,7 @@ public class StartPhase extends GameSubcommandData {
         }
 
         if (playersWithSCs > 0) {
-            new Cleanup().runStatusCleanup(game);
+            StatusCleanupService.runStatusCleanup(game);
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
                 MapRenderPipeline.render(game, event, DisplayType.map,
@@ -534,7 +534,7 @@ public class StartPhase extends GameSubcommandData {
             if (game.isShowBanners()) {
                 MapGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
             }
-            ListTurnOrder.turnOrder(event, game);
+            ListTurnOrderService.turnOrder(event, game);
             if (!msgExtra.isEmpty()) {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.", TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
