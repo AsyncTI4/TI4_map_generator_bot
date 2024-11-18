@@ -44,6 +44,8 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -102,6 +104,7 @@ import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
 import ti4.service.combat.CombatRollService;
+import ti4.service.combat.CombatRollType;
 
 public class ButtonHelper {
 
@@ -2580,7 +2583,7 @@ public class ButtonHelper {
                 // new AddUnits().unitParsing(event, player.getColor(), tile, "sd
                 // "+capChecker.getName(), game);
             }
-            Map<UnitModel, Integer> unitsByQuantity = CombatHelper.getAllUnits(capChecker, player);
+            Map<UnitModel, Integer> unitsByQuantity = getAllUnits(capChecker, player);
             for (UnitModel unit : unitsByQuantity.keySet()) {
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
                     capacity += unit.getCapacityValue() * unitsByQuantity.get(unit);
@@ -2602,7 +2605,7 @@ public class ButtonHelper {
             }
             for (Player p2 : game.getRealPlayers()) {
                 if (player.getAllianceMembers().contains(p2.getFaction())) {
-                    Map<UnitModel, Integer> unitsByQuantity2 = CombatHelper.getAllUnits(capChecker, p2);
+                    Map<UnitModel, Integer> unitsByQuantity2 = getAllUnits(capChecker, p2);
                     for (UnitModel unit : unitsByQuantity2.keySet()) {
                         if ("space".equalsIgnoreCase(capChecker.getName())) {
                             capacity += unit.getCapacityValue() * unitsByQuantity2.get(unit);
@@ -2631,7 +2634,7 @@ public class ButtonHelper {
         // System.out.println(fightersIgnored);
         UnitHolder combatOnHolder = tile.getUnitHolders().get("space");
         List<String> unitTypesCounted = new ArrayList<>();
-        Map<UnitModel, Integer> unitsByQuantity = CombatHelper.getAllUnits(combatOnHolder, player);
+        Map<UnitModel, Integer> unitsByQuantity = getAllUnits(combatOnHolder, player);
         for (UnitModel unit : unitsByQuantity.keySet()) {
             if (!unitTypesCounted.contains(unit.getBaseType())) {
                 if ("fighter".equalsIgnoreCase(unit.getBaseType()) || "infantry".equalsIgnoreCase(unit.getBaseType())
@@ -2737,7 +2740,7 @@ public class ButtonHelper {
         List<Tile> tiles = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             for (UnitHolder capChecker : tile.getUnitHolders().values()) {
-                Map<UnitModel, Integer> unitsByQuantity = CombatHelper.getAllUnits(capChecker, player);
+                Map<UnitModel, Integer> unitsByQuantity = getAllUnits(capChecker, player);
                 for (UnitModel unit : unitsByQuantity.keySet()) {
                     if (unit.getProductionValue() > 0) {
                         if (!tiles.contains(tile)) {
@@ -4739,7 +4742,7 @@ public class ButtonHelper {
             return;
         }
         CombatRollType rollType = CombatRollType.combatround;
-        Map<UnitModel, Integer> playerUnitsByQuantity = CombatHelper.getUnitsInCombat(tile, combatOnHolder, player,
+        Map<UnitModel, Integer> playerUnitsByQuantity = CombatRollService.getUnitsInCombat(tile, combatOnHolder, player,
             event, rollType, game);
         List<UnitModel> units = new ArrayList<>(playerUnitsByQuantity.keySet());
         for (UnitModel unitModel : units) {
@@ -4767,11 +4770,11 @@ public class ButtonHelper {
         }
         game.setStoredValue("thalnosPlusOne", "true");
         List<UnitHolder> combatHoldersForOpponent = new ArrayList<>(List.of(combatOnHolder));
-        Player opponent = CombatHelper.GetOpponent(player, combatHoldersForOpponent, game);
+        Player opponent = CombatRollService.getOpponent(player, combatHoldersForOpponent, game);
         if (opponent == null) {
             opponent = player;
         }
-        Map<UnitModel, Integer> opponentUnitsByQuantity = CombatHelper.getUnitsInCombat(tile, combatOnHolder, opponent,
+        Map<UnitModel, Integer> opponentUnitsByQuantity = CombatRollService.getUnitsInCombat(tile, combatOnHolder, opponent,
             event, rollType, game);
 
         TileModel tileModel = TileHelper.getTileById(tile.getTileID());
@@ -4787,13 +4790,13 @@ public class ButtonHelper {
         List<NamedCombatModifierModel> tempMods = new ArrayList<>(
             CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(player, tileModel,
                 combatOnHolder, false, rollType));
-        List<NamedCombatModifierModel> tempOpponentMods = new ArrayList<>();
+        List<NamedCombatModifierModel> tempOpponentMods;
         tempOpponentMods = CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(opponent, tileModel,
             combatOnHolder, true, rollType);
         tempMods.addAll(tempOpponentMods);
 
         String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
-        message += CombatHelper.RollForUnits(playerUnitsByQuantity, opponentUnitsByQuantity, extraRolls, modifiers,
+        message += CombatRollService.rollForUnits(playerUnitsByQuantity, opponentUnitsByQuantity, extraRolls, modifiers,
             tempMods, player, opponent, game, rollType, event, tile);
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*", "");
@@ -6554,5 +6557,34 @@ public class ButtonHelper {
             }
         }
         return assignSpeakerButtons;
+    }
+
+    public static Map<UnitModel, Integer> getAllUnits(UnitHolder unitHolder, Player player) {
+        String colorID = Mapper.getColorID(player.getColor());
+        Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+        Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().flatMap(
+                entry -> player.getUnitsByAsyncID(entry.getKey()).stream()
+                    .map(x -> new ImmutablePair<>(x, entry.getValue())))
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+
+        HashMap<UnitModel, Integer> output;
+
+        output = new HashMap<>(unitsInCombat.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+
+        Set<String> duplicates = new HashSet<>();
+        List<String> dupes = output.keySet().stream()
+            .filter(unit -> !duplicates.add(unit.getAsyncId()))
+            .map(UnitModel::getBaseType)
+            .toList();
+        for (String dupe : dupes) {
+            for (UnitModel mod : output.keySet()) {
+                if (mod.getBaseType().equalsIgnoreCase(dupe) && !mod.getId().contains("2")) {
+                    output.put(mod, 0);
+                    break;
+                }
+            }
+        }
+        return output;
     }
 }

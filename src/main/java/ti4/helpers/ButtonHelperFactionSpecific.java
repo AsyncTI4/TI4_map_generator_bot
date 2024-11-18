@@ -44,6 +44,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 
 public class ButtonHelperFactionSpecific {

@@ -21,6 +21,7 @@ import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollType;
 
 public class CombatMessageHelper {
     public static void displayDuplicateUnits(GenericInteractionCreateEvent event, List<String> dupes) {

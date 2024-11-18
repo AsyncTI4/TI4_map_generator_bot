@@ -26,6 +26,7 @@ import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollType;
 
 public class CombatModHelper {
 

@@ -11,6 +11,7 @@ import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.TileModel;
+import ti4.service.combat.CombatRollType;
 
 public class CombatTempModHelper {
 

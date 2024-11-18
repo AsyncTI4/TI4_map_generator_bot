@@ -22,7 +22,6 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CombatHelper;
-import ti4.helpers.CombatRollType;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;

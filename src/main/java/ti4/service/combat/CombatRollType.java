@@ -1,5 +1,8 @@
-package ti4.helpers;
+package ti4.service.combat;
 
+import lombok.Getter;
+
+@Getter
 public enum CombatRollType {
     combatround("Combat round"), AFB("Anti-fighter barrage"), bombardment("Bombardment"), SpaceCannonOffence("Space cannon offence"),SpaceCannonDefence("Space cannon defence");
 
@@ -9,7 +12,4 @@ public enum CombatRollType {
         this.value = value;
     }
 
-    public String getValue() {
-        return value;
-    }
 }
