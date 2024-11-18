@@ -66,7 +66,7 @@ public class SendCommodities extends GameStateSubcommand {
         ButtonHelperAbilities.pillageCheck(player, game);
 
         if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
-            ClearDebt.clearDebt(targetPlayer, player, sendCommodities);
+            targetPlayer.clearDebt(player, sendCommodities);
             MessageHelper.sendMessageToEventChannel(event, targetPlayer.getRepresentation() + " cleared " + sendCommodities + " debt tokens owned by " + player.getRepresentation());
         }
 

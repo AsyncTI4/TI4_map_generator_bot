@@ -51,7 +51,7 @@ public class SendTG extends GameStateSubcommand {
         MessageHelper.sendMessageToEventChannel(event, message);
 
         if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
-            ClearDebt.clearDebt(targetPlayer, player, sendTG);
+            targetPlayer.clearDebt(player, sendTG);
             MessageHelper.sendMessageToEventChannel(event, targetPlayer.getRepresentation() + " cleared " + sendTG + " debt tokens owned by " + player.getRepresentation());
         }
 

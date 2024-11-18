@@ -35,12 +35,7 @@ class ClearDebt extends GameStateSubcommand {
             return;
         }
 
-        clearDebt(clearingPlayer, clearedPlayer, debtCountToClear);
+        clearingPlayer.clearDebt(clearedPlayer, debtCountToClear);
         MessageHelper.sendMessageToEventChannel(event, clearingPlayer.getRepresentation() + " cleared " + debtCountToClear + " debt tokens owned by " + clearedPlayer.getRepresentation());
-    }
-
-    public static void clearDebt(Player clearingPlayer, Player clearedPlayer, int debtCountToClear) {
-        String clearedPlayerColor = clearedPlayer.getColor();
-        clearingPlayer.removeDebtTokens(clearedPlayerColor, debtCountToClear);
     }
 }

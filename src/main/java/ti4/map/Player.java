@@ -3149,4 +3149,9 @@ public class Player {
     public boolean isActivePlayer() {
         return this.equals(getGame().getActivePlayer());
     }
+
+    public void clearDebt(Player player, int count) {
+        String clearedPlayerColor = player.getColor();
+        removeDebtTokens(clearedPlayerColor, count);
+    }
 }

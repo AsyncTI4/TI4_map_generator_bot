@@ -43,6 +43,7 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
+import ti4.service.AbilityInfoService;
 
 public class Setup extends GameStateSubcommand {
 
@@ -237,7 +238,7 @@ public class Setup extends GameStateSubcommand {
 
         // SEND STUFF
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, factionModel.getFactionSheetMessage());
-        AbilityInfo.sendAbilityInfo(game, player, event);
+        AbilityInfoService.sendAbilityInfo(game, player, event);
         TechInfo.sendTechInfo(game, player, event);
         LeaderInfo.sendLeadersInfo(game, player, event);
         UnitInfo.sendUnitInfo(game, player, event, false);
