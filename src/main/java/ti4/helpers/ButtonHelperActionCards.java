@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.special.NaaluCommander;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
@@ -1100,7 +1099,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveInsiderInformation")
     public static void resolveInsiderInformation(Player player, Game game, ButtonInteractionEvent event) {
-        NaaluCommander.sendTopAgendaToCardsInfoSkipCovert(game, player);
+        AgendaHelper.sendTopAgendaToCardsInfoSkipCovert(game, player);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Sent top agenda info to " + player.getFactionEmojiOrColor() + " cards info");
         ButtonHelper.deleteMessage(event);
     }

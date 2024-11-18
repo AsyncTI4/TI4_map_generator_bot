@@ -15,7 +15,7 @@ import ti4.model.EventModel;
 class LookAtBottomEvent extends GameStateSubcommand {
 
     public LookAtBottomEvent() {
-        super(Constants.LOOK_AT_BOTTOM, "Look at bottom Event from deck", true, false);
+        super(Constants.LOOK_AT_BOTTOM, "Look at bottom Event from deck", true, true);
         addOption(OptionType.INTEGER, Constants.COUNT, "Number of events to look at");
     }
 

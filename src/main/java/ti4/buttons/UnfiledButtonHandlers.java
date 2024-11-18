@@ -35,19 +35,13 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.player.Pass;
-import ti4.commands.player.SCPlay;
-import ti4.commands.player.TurnEnd;
-import ti4.commands.player.TurnStart;
-import ti4.commands.special.FighterConscription;
-import ti4.commands.special.RiseOfMessiah;
-import ti4.commands.status.Cleanup;
-import ti4.commands.status.RevealStage1;
-import ti4.commands.status.RevealStage2;
-import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
+import ti4.commands2.player.Pass;
+import ti4.commands2.player.SCPlay;
+import ti4.commands2.player.TurnEnd;
+import ti4.commands2.player.TurnStart;
 import ti4.generator.Mapper;
 import ti4.generator.TileGenerator;
 import ti4.helpers.ActionCardHelper;
@@ -92,6 +86,9 @@ import ti4.model.FactionModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.StatusCleanupService;
+import ti4.service.objectives.RevealPublicObjectiveService;
+import ti4.service.objectives.ScorePublicObjectiveService;
 
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
@@ -1111,11 +1108,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String stage = buttonID.replace("reveal_stage_", "");
         if (!game.isRedTapeMode()) {
             if ("2".equalsIgnoreCase(stage)) {
-                new RevealStage2().revealS2(event, event.getChannel());
+                RevealPublicObjectiveService.revealS2(game, event, event.getChannel());
             } else if ("2x2".equalsIgnoreCase(stage)) {
-                new RevealStage2().revealTwoStage2(event, event.getChannel());
+                RevealPublicObjectiveService.revealTwoStage2(game, event, event.getChannel());
             } else {
-                new RevealStage1().revealS1(event, event.getChannel());
+                RevealPublicObjectiveService.revealS1(game, event, event.getChannel());
             }
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "In Red Tape, no objective is revealed at this stage");
@@ -1126,7 +1123,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 }
             }
             if (playersWithSCs > 0) {
-                new Cleanup().runStatusCleanup(game);
+                StatusCleanupService.runStatusCleanup(game);
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                     game.getPing() + " **Status Cleanup Run!**");
             }
@@ -1193,7 +1190,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
                     String poID = buttonID.replace(Constants.PO_SCORING, "");
                     int poIndex = Integer.parseInt(poID);
-                    ScorePublic.scorePO(event, privateChannel, game, player, poIndex);
+                    ScorePublicObjectiveService.scorePO(event, privateChannel, game, player, poIndex);
                     ButtonHelper.addReaction(event, false, false, null, "");
                     if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
                         game.setStoredValue(key3, game.getStoredValue(key3)
@@ -1231,7 +1228,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             String poID = buttonID.replace(Constants.PO_SCORING, "");
             try {
                 int poIndex = Integer.parseInt(poID);
-                ScorePublic.scorePO(event, privateChannel, game, player, poIndex);
+                ScorePublicObjectiveService.scorePO(event, privateChannel, game, player, poIndex);
                 ButtonHelper.addReaction(event, false, false, null, "");
             } catch (Exception e) {
                 BotLogger.log(event, "Could not parse PO ID: " + poID, e);
@@ -2402,7 +2399,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("scoreAnObjective")
     public static void scoreAnObjective(ButtonInteractionEvent event, Player player, Game game) {
-        List<Button> poButtons = TurnEnd.getScoreObjectiveButtons(event, game, player.getFinsFactionCheckerPrefix());
+        List<Button> poButtons = TurnEnd.getScoreObjectiveButtons(game, player.getFinsFactionCheckerPrefix());
         poButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         MessageChannel channel = event.getMessageChannel();
         if (game.isFowMode()) {
@@ -2551,7 +2548,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("run_status_cleanup")
     public static void runStatusCleanup(ButtonInteractionEvent event, Game game) {
-        new Cleanup().runStatusCleanup(game);
+        StatusCleanupService.runStatusCleanup(game);
         ButtonHelper.deleteTheOneButton(event);
         ButtonHelper.addReaction(event, false, true, "Running Status Cleanup. ", "Status Cleanup Run!");
     }
@@ -2671,13 +2668,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("fighterConscription")
     public static void fighterConscription(ButtonInteractionEvent event, Player player, Game game) {
-        FighterConscription.doFfCon(event, player, game);
+        ActionCardHelper.doFfCon(event, player, game);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("riseOfAMessiah")
     public static void riseOfAMessiah(ButtonInteractionEvent event, Player player, Game game) {
-        RiseOfMessiah.doRise(player, event, game);
+        ActionCardHelper.doRise(player, event, game);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -3504,7 +3501,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             ButtonHelper.offerSpeakerButtons(game, player);
             return;
         }
-        RevealStage1.revealTwoStage1(event, game.getMainGameChannel());
+        RevealPublicObjectiveService.revealTwoStage1(game);
         StartPhase.startStrategyPhase(event, game);
         PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
         ButtonHelper.deleteMessage(event);
