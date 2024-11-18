@@ -37,7 +37,7 @@ import ti4.commands.franken.FrankenCommand;
 import ti4.commands.game.GameCommand;
 import ti4.commands.leaders.LeaderCommand;
 import ti4.commands.map.MapCommand;
-import ti4.commands.milty.MiltyCommand;
+import ti4.commands2.milty.MiltyCommand;
 import ti4.commands.planet.PlanetCommand;
 import ti4.commands.status.StatusCommand;
 import ti4.commands.tech.TechCommand;
