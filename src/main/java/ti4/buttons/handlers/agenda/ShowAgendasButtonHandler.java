@@ -1,4 +1,4 @@
-package ti4.buttons.handlers.decks;
+package ti4.buttons.handlers.agenda;
 
 import java.util.ArrayList;
 import java.util.List;
