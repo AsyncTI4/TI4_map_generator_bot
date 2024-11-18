@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.milty.MiltyDraftTile;
+import ti4.commands2.milty.MiltyDraftManager;
+import ti4.commands2.milty.MiltyDraftTile;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;

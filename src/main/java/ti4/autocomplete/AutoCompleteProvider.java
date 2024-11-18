@@ -24,7 +24,6 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.franken.StartFrankenDraft.FrankenDraftMode;
 import ti4.commands.game.Undo;
 import ti4.commands.map.Preset;
-import ti4.commands.milty.ForcePick;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.statistics.GameStatTypes;
 import ti4.commands2.statistics.PlayerStatTypes;
@@ -830,7 +829,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case ForcePick.PICK -> {
+            case "draft_pick" -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 if (game == null) {
                     event.replyChoices(Collections.emptyList()).queue();

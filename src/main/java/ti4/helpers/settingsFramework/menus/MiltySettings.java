@@ -11,7 +11,7 @@ import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.milty.StartMilty;
+import ti4.commands2.milty.StartMilty;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
