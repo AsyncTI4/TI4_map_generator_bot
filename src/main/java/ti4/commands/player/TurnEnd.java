@@ -22,7 +22,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ListPlayerInfoButton;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -49,24 +49,20 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
-public class TurnEnd extends PlayerSubcommandData {
+public class TurnEnd extends GameStateSubcommand {
 
     public TurnEnd() {
-        super(Constants.TURN_END, "End Turn");
+        super(Constants.TURN_END, "End Turn", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "In FoW, confirm with YES if you are not the active player"));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "In FoW, confirm with YES if you are not the active player").setRequired(false));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player mainPlayer = CommandHelper.getPlayerFromEvent(game, event);
-        if (mainPlayer == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + game.getName());
-            return;
-        }
+        Game game = getGame();
+        Player player = getPlayer();
 
-        if (game.isFowMode() && !mainPlayer.equals(game.getActivePlayer())) {
+        if (game.isFowMode() && !player.equals(game.getActivePlayer())) {
             OptionMapping confirm = event.getOption(Constants.CONFIRM);
             if (confirm == null || !"YES".equals(confirm.getAsString())) {
                 MessageHelper.sendMessageToEventChannel(event, "You are not the active player. Confirm End Turn with YES.");
@@ -74,8 +70,8 @@ public class TurnEnd extends PlayerSubcommandData {
             }
         }
 
-        pingNextPlayer(event, game, mainPlayer);
-        mainPlayer.resetOlradinPolicyFlags();
+        pingNextPlayer(event, game, player);
+        player.resetOlradinPolicyFlags();
     }
 
     @ButtonHandler("turnEnd")

@@ -16,7 +16,6 @@ import ti4.commands.combat.StartCombat;
 import ti4.commands.explore.ExplorePlanet;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.player.ClearDebt;
 import ti4.commands.player.TurnStart;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
@@ -212,7 +211,7 @@ public class ButtonHelperAbilities {
         pillageCheck(vaden, game);
         player.setTg(player.getTg() - 1);
         int amount = Math.min(2, vaden.getDebtTokenCount(player.getColor()));
-        ClearDebt.clearDebt(vaden, player, amount);
+        vaden.clearDebt(player, amount);
         String msg = player.getFactionEmojiOrColor() + " paid 1TG to "
             + vaden.getFactionEmojiOrColor()
             + "to get 2 debt tokens cleared via the binding debts ability";

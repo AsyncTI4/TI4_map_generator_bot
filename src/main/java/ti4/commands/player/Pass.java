@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
@@ -15,19 +15,16 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class Pass extends PlayerSubcommandData {
+public class Pass extends GameStateSubcommand {
+
     public Pass() {
-        super(Constants.PASS, "Pass");
+        super(Constants.PASS, "Pass", true, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game");
-            return;
-        }
+        Game game = getGame();
+        Player player = getPlayer();
 
         if (!game.getPlayedSCs().containsAll(player.getSCs())) {
             MessageHelper.sendMessageToEventChannel(event, "You have not played your strategy cards, you cannot pass.");

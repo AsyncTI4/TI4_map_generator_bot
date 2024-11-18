@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.player.ClearDebt;
 import ti4.commands2.uncategorized.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
@@ -873,7 +872,7 @@ public class TransactionHelper {
                 message2 = ident + " sent " + tgAmount + " TGs to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
-                    ClearDebt.clearDebt(p2, p1, amount);
+                    p2.clearDebt(p1, amount);
                     message2 = message2 + "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident;
                 }
             }
@@ -898,10 +897,9 @@ public class TransactionHelper {
                 message2 = ident + " sent " + tgAmount + " Commodities to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
-                    ClearDebt.clearDebt(p2, p1, amount);
+                    p2.clearDebt(p1, amount);
                     message2 = message2 + "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident;
                 }
-
             }
             case "WashComms" -> {
                 int oldP1Tg = p1.getTg();
