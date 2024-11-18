@@ -3,32 +3,27 @@ package ti4.commands.player;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands2.CommandHelper;
-import ti4.commands2.uncategorized.ShowGame;
+import ti4.commands.CommandHelper;
+import ti4.commands.uncategorized.ShowGame;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ChangeUnitDecal extends PlayerSubcommandData {
+class ChangeUnitDecal extends GameStateSubcommand {
+
     public ChangeUnitDecal() {
-        super(Constants.CHANGE_UNIT_DECAL, "Player Change Unit Decals");
+        super(Constants.CHANGE_UNIT_DECAL, "Player Change Unit Decals", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.DECAL_SET, "Decals for units. Enter 'none' to remove current decals.").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Player player = getPlayer();
 
         String newDecalSet = event.getOption(Constants.DECAL_SET).getAsString().toLowerCase();
         if ("none".equals(newDecalSet)) {
@@ -66,7 +61,7 @@ public class ChangeUnitDecal extends PlayerSubcommandData {
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getUserActiveGame(userID);
+        Game game = CommandHelper.getGameName(event);
         GameSaveLoadManager.saveGame(game, event);
         ShowGame.simpleShowGame(game, event);
     }

@@ -16,8 +16,8 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.fow.Whisper;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands2.CommandHelper;
-import ti4.commands2.uncategorized.CardsInfo;
+import ti4.commands.uncategorized.CardsInfo;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -36,9 +36,10 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 
-public class TurnStart extends PlayerSubcommandData {
+public class TurnStart extends GameStateSubcommand {
+
     public TurnStart() {
-        super(Constants.TURN_START, "Start Turn");
+        super(Constants.TURN_START, "Start Turn", true, true);
         addOptions(
             new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
                 .setAutoComplete(true));
@@ -46,14 +47,10 @@ public class TurnStart extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player mainPlayer = CommandHelper.getPlayerFromEvent(game, event);
-        if (mainPlayer == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + game.getName());
-            return;
-        }
-        mainPlayer.setTurnCount(mainPlayer.getTurnCount() - 1);
-        turnStart(event, game, mainPlayer);
+        Game game = getGame();
+        Player player = getPlayer();
+        player.setTurnCount(player.getTurnCount() - 1);
+        turnStart(event, game, player);
     }
 
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
@@ -117,10 +114,10 @@ public class TurnStart extends PlayerSubcommandData {
                     getMissedSCFollowsText(game, player));
             }
             Player privatePlayer = player;
-            if (privatePlayer.getGenSynthesisInfantry() > 0) {
+            if (privatePlayer.getStasisInfantry() > 0) {
                 if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
+                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
                         ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                 } else {
                     privatePlayer.setStasisInfantry(0);

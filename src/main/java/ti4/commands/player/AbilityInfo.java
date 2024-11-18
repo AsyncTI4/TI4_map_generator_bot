@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.listeners.annotations.ButtonHandler;
@@ -16,20 +17,15 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 
-public class AbilityInfo extends PlayerSubcommandData {
+class AbilityInfo extends GameStateSubcommand {
+
     public AbilityInfo() {
-        super(Constants.ABILITY_INFO, "Send faction abilities information to your Cards Info channel");
+        super(Constants.ABILITY_INFO, "Send faction abilities information to your Cards Info channel", false, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-        sendAbilityInfo(game, player, event);
+        sendAbilityInfo(getGame(), getPlayer(), event);
     }
 
     @ButtonHandler("refreshAbilityInfo")

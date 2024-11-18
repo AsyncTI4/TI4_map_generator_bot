@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.buttons.Buttons;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
@@ -37,33 +37,26 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 
-public class SCPlay extends PlayerSubcommandData {
+public class SCPlay extends GameStateSubcommand {
+
     public SCPlay() {
-        super(Constants.SC_PLAY, "Play a Strategy Card");
+        super(Constants.SC_PLAY, "Play a Strategy Card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD,
             "Which strategy card to play. If you have more than 1 strategy card, this is mandatory"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player"));
         addOptions(
-            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
                 .setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-
         Helper.checkThreadLimitAndArchive(event.getGuild());
 
         MessageChannel eventChannel = event.getChannel();
-        MessageChannel mainGameChannel = game.getMainGameChannel() == null ? eventChannel
-            : game.getMainGameChannel();
-
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game");
-            return;
-        }
-
+        Game game = getGame();
+        MessageChannel mainGameChannel = game.getMainGameChannel() == null ? eventChannel : game.getMainGameChannel();
+        Player player = getPlayer();
         Set<Integer> playersSCs = player.getSCs();
         if (playersSCs.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No strategy card has been selected.");
@@ -171,26 +164,28 @@ public class SCPlay extends PlayerSubcommandData {
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
 
         // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
-        if (scModel.hasImageFile()) {
+        if (scModel != null && scModel.hasImageFile()) {
             MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToPlay, game));
-        } else {
+        } else if (scModel != null) {
             baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
         }
         baseMessageObject.addContent(message.toString());
 
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero));
-        if (scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
+        if (scModel != null && scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
             scButtons.add(Buttons.gray("nekroFollowTech", "Get CCs", Emojis.Nekro));
         }
 
-        if (scModel.usesAutomationForSCID("pok4construction") && !game.isFowMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
+        if (scModel != null && scModel.usesAutomationForSCID("pok4construction") && !game.isFowMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
             scButtons.add(Buttons.gray("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf", Emojis.Titans));
         }
         scButtons.add(Buttons.gray("requestAllFollow_" + scToPlay, "Request All Resolve Now"));
 
         // set the action rows
-        baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
+        if (!scButtons.isEmpty()) {
+            baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
+        }
         player.setWhetherPlayerShouldBeTenMinReminded(true);
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
 
@@ -242,9 +237,8 @@ public class SCPlay extends PlayerSubcommandData {
                 ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
                 threadChannel.queue(m5 -> {
-                    ThreadChannel threadChannel_ = m5;
                     if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
-                        MessageHelper.sendFileToChannel(threadChannel_, Helper.getSCImageFile(scToPlay, game));
+                        MessageHelper.sendFileToChannel(m5, Helper.getSCImageFile(scToPlay, game));
                     }
 
                     if (scModel.usesAutomationForSCID("pok5trade")) {
@@ -253,7 +247,7 @@ public class SCPlay extends PlayerSubcommandData {
                         scButtons.add(Buttons.green("sendTradeHolder_tg_" + player.getFaction(), "Send 1TG"));
                         scButtons.add(Buttons.gray("sendTradeHolder_debt_" + player.getFaction(), "Send 1 debt"));
                     }
-                    MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "These buttons will work inside the thread", scButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(m5, "These buttons will work inside the thread", scButtons);
 
                     // Trade Neighbour Message
                     if (scModel.usesAutomationForSCID("pok5trade")) {
@@ -270,8 +264,8 @@ public class SCPlay extends PlayerSubcommandData {
                             }
                         }
                         if (!player.getPromissoryNotesInPlayArea().contains("convoys") && !player.hasAbility("guild_ships")) {
-                            MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg.toString());
-                            MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg2.toString());
+                            MessageHelper.sendMessageToChannel(m5, neighborsMsg.toString());
+                            MessageHelper.sendMessageToChannel(m5, neighborsMsg2.toString());
                         }
                     }
 
@@ -419,11 +413,6 @@ public class SCPlay extends PlayerSubcommandData {
         }
     }
 
-    /**
-     * These buttons are only the buttons to be attached to the SC play itself, for all players to use - any additional buttons for the Primary SC holder should add specific logic to {@link SCPlay scPlay}
-     * 
-     * @return Buttons for the SCPlay message only (for all players to use)
-     */
     private static List<Button> getSCButtons(int sc, Game game, boolean winnuHero) {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (scModel == null) {
@@ -433,8 +422,8 @@ public class SCPlay extends PlayerSubcommandData {
         String scAutomationID = scModel.getBotSCAutomationID();
 
         // Handle Special Cases
-        switch (scAutomationID) {
-            case "pok8imperial" -> handleSOQueueing(game, winnuHero);
+        if (scAutomationID.equals("pok8imperial")) {
+            handleSOQueueing(game, winnuHero);
         }
 
         // Return Buttons

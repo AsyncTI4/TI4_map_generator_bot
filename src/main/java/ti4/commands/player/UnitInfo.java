@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.listeners.annotations.ButtonHandler;
@@ -20,20 +21,17 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 
-public class UnitInfo extends PlayerSubcommandData {
+public class UnitInfo extends GameStateSubcommand {
+
     public UnitInfo() {
-        super(Constants.UNIT_INFO, "Send special unit information to your Cards Info channel");
+        super(Constants.UNIT_INFO, "Send special unit information to your Cards Info channel", false, true);
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_ALL_UNITS, "'True' also show basic (non-faction) units (Default: False)"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Game game = getGame();
+        Player player = getPlayer();
         boolean showAllUnits = event.getOption(Constants.SHOW_ALL_UNITS, false, OptionMapping::getAsBoolean);
         sendUnitInfo(game, player, event, showAllUnits);
     }

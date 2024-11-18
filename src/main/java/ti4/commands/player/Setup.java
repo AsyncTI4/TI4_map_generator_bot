@@ -15,15 +15,17 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
+import ti4.commands.cardsso.SOInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechInfo;
 import ti4.commands.tokens.AddToken;
+import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.units.AddRemoveUnits;
-import ti4.commands2.CommandHelper;
-import ti4.commands2.uncategorized.CardsInfo;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -31,7 +33,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
@@ -43,9 +44,10 @@ import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 
-public class Setup extends PlayerSubcommandData {
+public class Setup extends GameStateSubcommand {
+
     public Setup() {
-        super(Constants.SETUP, "Player initialisation: Faction and Color");
+        super(Constants.SETUP, "Player initialisation: Faction and Color", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position (Creuss choose position of gate)").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setAutoComplete(true));
@@ -55,7 +57,7 @@ public class Setup extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         String faction = event.getOption(Constants.FACTION, null, OptionMapping::getAsString);
         if (faction != null) {
             faction = StringUtils.substringBefore(faction.toLowerCase().replace("the ", ""), " ");
@@ -67,11 +69,7 @@ public class Setup extends PlayerSubcommandData {
             return;
         }
 
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Player player = getPlayer();
 
         String color = AliasHandler.resolveColor(event.getOption(Constants.COLOR, player.getNextAvailableColour(), OptionMapping::getAsString).toLowerCase());
         if (!Mapper.isValidColor(color)) {
@@ -108,7 +106,7 @@ public class Setup extends PlayerSubcommandData {
         if (player.isRealPlayer() && player.getSo() > 0) {
             String message = player.getRepresentationNoPing() + "has SOs that would get lost to the void if they were setup again. If they wish to change color, use /player change_color. If they want to setup as another faction, they must discard their SOs first";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-            SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
+            SOInfo.sendSecretObjectiveInfo(game, player);
             return;
         }
 
@@ -119,13 +117,13 @@ public class Setup extends PlayerSubcommandData {
         player.getTechs().clear();
         player.getFactionTechs().clear();
 
-        FactionModel factionModel = player.getFactionSetupInfo();
+        FactionModel setupInfo = player.getFactionSetupInfo();
 
         if (game.isBaseGameMode()) {
             player.setLeaders(new ArrayList<>());
         }
 
-        if (ComponentSource.miltymod.equals(factionModel.getSource()) && !game.isMiltyModMode()) {
+        if (ComponentSource.miltymod.equals(setupInfo.getSource()) && !game.isMiltyModMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
             return;
         }
@@ -136,7 +134,7 @@ public class Setup extends PlayerSubcommandData {
             return;
         }
 
-        String hsTile = AliasHandler.resolveTile(factionModel.getHomeSystem());
+        String hsTile = AliasHandler.resolveTile(setupInfo.getHomeSystem());
         Tile tile = new Tile(hsTile, positionHS);
         if (!StringUtils.isBlank(hsTile)) {
             game.setTile(tile);
@@ -153,10 +151,10 @@ public class Setup extends PlayerSubcommandData {
         }
 
         // STARTING COMMODITIES
-        player.setCommoditiesTotal(factionModel.getCommodities());
+        player.setCommoditiesTotal(setupInfo.getCommodities());
 
         // STARTING PLANETS
-        for (String planet : factionModel.getHomePlanets()) {
+        for (String planet : setupInfo.getHomePlanets()) {
             if (planet.isEmpty()) {
                 continue;
             }
@@ -168,12 +166,12 @@ public class Setup extends PlayerSubcommandData {
         player.getExhaustedPlanets().clear();
 
         // STARTING UNITS
-        addUnits(factionModel, tile, color, event);
+        addUnits(setupInfo, tile, color, event);
 
         // STARTING TECH
-        List<String> startingTech = factionModel.getStartingTech();
+        List<String> startingTech = setupInfo.getStartingTech();
         if (startingTech != null) {
-            for (String tech : factionModel.getStartingTech()) {
+            for (String tech : setupInfo.getStartingTech()) {
                 if (tech.trim().isEmpty()) {
                     continue;
                 }
@@ -193,7 +191,7 @@ public class Setup extends PlayerSubcommandData {
             }
         }
 
-        for (String tech : factionModel.getFactionTech()) {
+        for (String tech : setupInfo.getFactionTech()) {
             if (tech.trim().isEmpty()) {
                 continue;
             }
@@ -208,7 +206,7 @@ public class Setup extends PlayerSubcommandData {
         // STARTING PNs
         player.initPNs();
         Set<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
-        playerPNs.addAll(factionModel.getPromissoryNotes());
+        playerPNs.addAll(setupInfo.getPromissoryNotes());
         player.setPromissoryNotesOwned(playerPNs);
         if (game.isBaseGameMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
@@ -229,7 +227,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         // STARTING OWNED UNITS
-        Set<String> playerOwnedUnits = new HashSet<>(factionModel.getUnits());
+        Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         player.setUnitsOwned(playerOwnedUnits);
 
         // Don't do special stuff if Franken Faction
@@ -238,7 +236,6 @@ public class Setup extends PlayerSubcommandData {
         }
 
         // SEND STUFF
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, factionModel.getFactionSheetMessage());
         AbilityInfo.sendAbilityInfo(game, player, event);
         TechInfo.sendTechInfo(game, player, event);
         LeaderInfo.sendLeadersInfo(game, player, event);
@@ -252,8 +249,8 @@ public class Setup extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, getTech);
             } else {
                 // STARTING TECH OPTIONS
-                Integer bonusOptions = factionModel.getStartingTechAmount();
-                List<String> startingTechOptions = factionModel.getStartingTechOptions();
+                Integer bonusOptions = setupInfo.getStartingTechAmount();
+                List<String> startingTechOptions = setupInfo.getStartingTechOptions();
                 if (startingTechOptions != null && bonusOptions != null && bonusOptions > 0) {
                     List<TechnologyModel> techs = new ArrayList<>();
                     if (!startingTechOptions.isEmpty()) {
@@ -332,19 +329,10 @@ public class Setup extends PlayerSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }
-        Map<String, Game> mapList = GameManager.getGameNameToGame();
-        for (Game game2 : mapList.values()) {
-            for (Player player2 : game2.getRealPlayers()) {
-                if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                    if (!player2.getHoursThatPlayerIsAFK().isEmpty()) {
-                        player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
-                    }
-                    if (player2.doesPlayerPreferDistanceBasedTacticalActions()) {
-                        player.setPreferenceForDistanceBasedTacticalActions(true);
-                    }
-                }
-            }
-        }
+
+        var managedPlayer = GameManager.getManagedPlayer(player.getUserID());
+        player.setHoursThatPlayerIsAFK(managedPlayer.getAfkHours());
+        player.setPreferenceForDistanceBasedTacticalActions(managedPlayer.isDistanceBasedTacticalActions());
 
         if (!game.isFowMode()) {
             StringBuilder sb = TitlesHelper.getPlayerTitles(player.getUserID(), player.getUserName(), false);
@@ -387,7 +375,8 @@ public class Setup extends PlayerSubcommandData {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
             UnitKey unitID = Mapper.getUnitKey(unit, color);
-            if (unitID == null) {
+            String unitPath = TileHelper.getUnitPath(unitID, false);
+            if (unitPath == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Unit: " + unit + " is not valid and not supported.");
                 continue;
@@ -395,7 +384,7 @@ public class Setup extends PlayerSubcommandData {
             if (unitInfoTokenizer.hasMoreTokens()) {
                 planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
             }
-            planetName = AddRemoveUnits.getPlanet(event, tile, planetName);
+            planetName = AddRemoveUnits.getPlanet(tile, planetName);
             tile.addUnit(planetName, unitID, count);
         }
     }

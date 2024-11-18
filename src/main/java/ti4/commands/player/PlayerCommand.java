@@ -1,23 +1,45 @@
 package ti4.commands.player;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
-import ti4.generator.MapRenderPipeline;
+import ti4.commands2.CommandHelper;
+import ti4.commands2.ParentCommand;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.SlashCommandAcceptanceHelper;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 
-public class PlayerCommand implements Command {
+public class PlayerCommand implements ParentCommand {
 
-    private final Collection<PlayerSubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+            new Stats(),
+            new Setup(),
+            new SCPlay(),
+            new SCUnplay(),
+            new Pass(),
+            new AbilityInfo(),
+            new TurnEnd(),
+            new TurnStart(),
+            new SCPick(),
+            new SCUnpick(),
+            new Speaker(),
+            new SendTG(),
+            new SendCommodities(),
+            new SendDebt(),
+            new ClearDebt(),
+            new ChangeColor(),
+            new CorrectFaction(),
+            new ChangeUnitDecal(),
+            new UnitInfo(),
+            new AddAllianceMember(),
+            new RemoveAllianceMember(),
+            new AddTeamMate(),
+            new RemoveTeamMate(),
+            new SetStatsAnchor(),
+            new CCsButton()
+    ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+
 
     @Override
     public String getName() {
@@ -25,75 +47,18 @@ public class PlayerCommand implements Command {
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getName(), event);
-    }
-
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        PlayerSubcommandData executedCommand = null;
-        for (PlayerSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                executedCommand = subcommand;
-                break;
-            }
-        }
-        if (executedCommand == null) {
-            reply(event);
-        } else {
-            executedCommand.reply(event);
-        }
-    }
-
-    public static void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game game = GameManager.getUserActiveGame(userID);
-        GameSaveLoadManager.saveGame(game, event);
-
-        MapRenderPipeline.renderToWebsiteOnly(game, event);
-    }
-
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Player";
     }
 
-    private Collection<PlayerSubcommandData> getSubcommands() {
-        Collection<PlayerSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new Stats());
-        subcommands.add(new Setup());
-        subcommands.add(new SCPlay());
-        subcommands.add(new SCUnplay());
-        subcommands.add(new Pass());
-        subcommands.add(new AbilityInfo());
-        subcommands.add(new TurnEnd());
-        subcommands.add(new TurnStart());
-        subcommands.add(new SCPick());
-        subcommands.add(new SCUnpick());
-        subcommands.add(new Speaker());
-        subcommands.add(new SendTG());
-        subcommands.add(new SendCommodities());
-        subcommands.add(new SendDebt());
-        subcommands.add(new ClearDebt());
-        subcommands.add(new ChangeColor());
-        subcommands.add(new CorrectFaction());
-        subcommands.add(new ChangeUnitDecal());
-        subcommands.add(new UnitInfo());
-        subcommands.add(new AddAllianceMember());
-        subcommands.add(new RemoveAllianceMember());
-        subcommands.add(new AddTeamMate());
-        subcommands.add(new RemoveTeamMate());
-        subcommands.add(new SetStatsAnchor());
-        subcommands.add(new CCsButton());
-        return subcommands;
+    @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return ParentCommand.super.accept(event) &&
+            CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
     }
 
     @Override
-    public void register(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getName(), getActionDescription())
-                .addSubcommands(getSubcommands()));
+    public Map<String, Subcommand> getSubcommands() {
+        return subcommands;
     }
 }
