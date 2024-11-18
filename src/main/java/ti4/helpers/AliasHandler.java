@@ -165,6 +165,7 @@ public class AliasHandler {
     public static void addNewPlanetAliases(PlanetModel planetModel) {
         Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>())
             .forEach(alias -> allPlanetAliases.put(alias.toLowerCase(), planetModel.getId()));
+        allPlanetAliases.put(planetModel.getId(), planetModel.getId()); // add the planet itself to aliashandler
     }
 
     public static void addNewTileAliases(TileModel tileModel) {
