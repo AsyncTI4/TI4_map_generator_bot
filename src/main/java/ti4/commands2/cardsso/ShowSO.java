@@ -8,9 +8,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.SecretObjectiveHelper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -20,7 +20,8 @@ class ShowSO extends GameStateSubcommand {
     public ShowSO() {
         super(Constants.SHOW_SO, "Show a Secret Objective to a player", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target faction or color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (defaults to you)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ONLY_PHASE, "Show only the phase of the SO (action/agenda/status). Default false"));
 
     }
@@ -54,7 +55,7 @@ class ShowSO extends GameStateSubcommand {
 
         player.setSecret(soID);
 
-        Player targetPlayer = CommandHelper.getPlayerFromEvent(game, event);
+        Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (targetPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player not found");
             return;
