@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
@@ -33,56 +34,20 @@ import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 
-public class StartMilty extends MiltySubcommandData {
-
-    public static final int SLICE_GENERATION_CYCLES = 1000;
+public class StartMilty extends GameStateSubcommand {
 
     public StartMilty() {
-        super(Constants.QUICKSTART, "Start Milty Draft with default settings");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count (default = players + 1)"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.FACTION_COUNT, "Faction Count (default = players + 1)").setRequiredRange(1, 25));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_FACTIONS, "Include Discordant Stars Factions"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_TILES, "Include Uncharted Space Tiles (ds)"));
-    }
-
-    @Data
-    private static class DraftSpec {
-        Game game;
-        List<String> playerIDs, bannedFactions, priorityFactions, playerDraftOrder;
-        MapTemplateModel template;
-        List<ComponentSource> tileSources, factionSources;
-        Integer numSlices, numFactions;
-
-        // slice generation settings
-        Boolean anomaliesCanTouch = false, extraWHs = true;
-        Double minRes = 2.0, minInf = 3.0;
-        Integer minTot = 9, maxTot = 13;
-        Integer minLegend = 1, maxLegend = 2;
-
-        //other
-        List<MiltyDraftSlice> presetSlices = null;
-
-        public DraftSpec(Game game) {
-            this.game = game;
-            playerIDs = new ArrayList<>(game.getPlayerIDs());
-            bannedFactions = new ArrayList<>();
-            priorityFactions = new ArrayList<>();
-
-            tileSources = new ArrayList<>();
-            tileSources.add(ComponentSource.base);
-            tileSources.add(ComponentSource.pok);
-            tileSources.add(ComponentSource.codex1);
-            tileSources.add(ComponentSource.codex2);
-            tileSources.add(ComponentSource.codex3);
-            factionSources = new ArrayList<>(tileSources);
-        }
+        super(Constants.QUICKSTART, "Start Milty Draft with default settings", true, false);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count (default = players + 1)").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.FACTION_COUNT, "Faction Count (default = players + 1)").setRequired(false).setRequiredRange(1, 25));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_FACTIONS, "Include Discordant Stars Factions").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_TILES, "Include Uncharted Space Tiles (ds)").setRequired(false));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        DraftSpec specs = new DraftSpec(getActiveGame());
-
-        Game game = getActiveGame();
+        Game game = getGame();
+        DraftSpec specs = new DraftSpec(game);
 
         // Map Template ---------------------------------------------------------------------------
         MapTemplateModel template = getMapTemplateFromOption(event, game);
@@ -110,16 +75,14 @@ public class StartMilty extends MiltySubcommandData {
         OptionMapping sliceOption = event.getOption(Constants.SLICE_COUNT);
         int presliceCount = game.getPlayerCountForMap() + 1;
         if (sliceOption != null) presliceCount = sliceOption.getAsInt();
-        int sliceCount = presliceCount;
-        specs.numSlices = sliceCount;
+        specs.numSlices = presliceCount;
 
         boolean anomaliesCanTouch = false;
         OptionMapping anomaliesCanTouchOption = event.getOption(Constants.ANOMALIES_CAN_TOUCH);
         if (anomaliesCanTouchOption != null) {
             anomaliesCanTouch = anomaliesCanTouchOption.getAsBoolean();
         }
-        boolean anomalies = anomaliesCanTouch;
-        specs.anomaliesCanTouch = anomalies;
+        specs.anomaliesCanTouch = anomaliesCanTouch;
 
         // Players ---
         specs.playerIDs = new ArrayList<>(game.getPlayerIDs());
@@ -471,5 +434,38 @@ public class StartMilty extends MiltySubcommandData {
             return null;
         }
         return useTemplate;
+    }
+
+    @Data
+    private static class DraftSpec {
+        Game game;
+        List<String> playerIDs, bannedFactions, priorityFactions, playerDraftOrder;
+        MapTemplateModel template;
+        List<ComponentSource> tileSources, factionSources;
+        Integer numSlices, numFactions;
+
+        // slice generation settings
+        Boolean anomaliesCanTouch = false, extraWHs = true;
+        Double minRes = 2.0, minInf = 3.0;
+        Integer minTot = 9, maxTot = 13;
+        Integer minLegend = 1, maxLegend = 2;
+
+        //other
+        List<MiltyDraftSlice> presetSlices = null;
+
+        public DraftSpec(Game game) {
+            this.game = game;
+            playerIDs = new ArrayList<>(game.getPlayerIDs());
+            bannedFactions = new ArrayList<>();
+            priorityFactions = new ArrayList<>();
+
+            tileSources = new ArrayList<>();
+            tileSources.add(ComponentSource.base);
+            tileSources.add(ComponentSource.pok);
+            tileSources.add(ComponentSource.codex1);
+            tileSources.add(ComponentSource.codex2);
+            tileSources.add(ComponentSource.codex3);
+            factionSources = new ArrayList<>(tileSources);
+        }
     }
 }

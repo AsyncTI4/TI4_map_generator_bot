@@ -44,7 +44,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 
 @Data
-public class MiltyDraftManager {
+class MiltyDraftManager {
 
     private final List<MiltyDraftTile> all = new ArrayList<>();
     private final List<MiltyDraftTile> blue = new ArrayList<>();
@@ -131,7 +131,7 @@ public class MiltyDraftManager {
         draftIndex++;
     }
 
-    public void replacePlayer(String oldUID, String newUID) {
+    public void replacePlayer(Game game, String oldUID, String newUID) {
         // Update player list
         List<String> newPlayers = new ArrayList<>();
         players.forEach(p -> newPlayers.add(p.equals(oldUID) ? newUID : p));
@@ -481,7 +481,7 @@ public class MiltyDraftManager {
         if (current.getPosition() != null) return "You have already picked speaker order. Try again.";
         try {
             Integer draftedSpeakerOrder = Integer.parseInt(order);
-            if (isOrderTaken(draftedSpeakerOrder)) return "The item you chose is already taken. Try again.";
+            if (draftedSpeakerOrder != null && isOrderTaken(draftedSpeakerOrder)) return "The item you chose is already taken. Try again.";
 
             // Success
             current.setPosition(draftedSpeakerOrder);
@@ -782,8 +782,7 @@ public class MiltyDraftManager {
     }
 
     private MiltyDraftTile findTile(String tileId) {
-        MiltyDraftTile result = null;
-        result = all.stream().filter(t -> t.getTile().getTileID().equals(tileId)).findFirst().orElse(null);
+        MiltyDraftTile result = all.stream().filter(t -> t.getTile().getTileID().equals(tileId)).findFirst().orElse(null);
         if (result == null) {
             TileModel tileRequested = TileHelper.getTileById(tileId);
             Set<ComponentSource> currentsources = all.stream()

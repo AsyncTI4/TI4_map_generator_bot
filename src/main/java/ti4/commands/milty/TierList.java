@@ -1,5 +1,8 @@
 package ti4.commands.milty;
 
+import lombok.Getter;
+
+@Getter
 public enum TierList {
     high("high"), mid("mid"), low("low"), red("red"), anomaly("anomaly");
 
@@ -7,10 +10,6 @@ public enum TierList {
 
     TierList(String value) {
         this.value = value;
-    }
-
-    public String getValue() {
-        return value;
     }
 
     public boolean isBlue() {

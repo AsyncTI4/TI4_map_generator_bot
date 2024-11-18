@@ -6,6 +6,7 @@ import ti4.map.Tile;
 
 @Data
 public class MiltyDraftTile {
+
     private Tile tile;
     private TierList tierList;
     private int resources;

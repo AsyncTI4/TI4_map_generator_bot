@@ -49,7 +49,7 @@ public class MiltyDraftHelper {
         MapTemplateModel mapTemplate = Mapper.getMapTemplate(manager.getMapTemplate());
 
         int sliceCount = slices.size();
-        int spanW = (int) Math.ceil(Math.sqrt(sliceCount));
+        int spanW = (int) (Math.ceil(Math.sqrt(sliceCount)) + 0.01);
         int spanH = (sliceCount + spanW - 1) / spanW;
 
         float scale = 1f;
@@ -90,9 +90,7 @@ public class MiltyDraftHelper {
                 deltaX = 0;
             }
 
-            if (!desc.isEmpty()) {
-                desc.append(";\n");
-            }
+            if (!desc.toString().isBlank()) desc.append(";\n");
             desc.append(slice.ttsString());
         }
 
@@ -311,7 +309,9 @@ public class MiltyDraftHelper {
     private static boolean isInvalid(TileModel tileModel) {
         if (tileModel.getTileBackOption().isPresent()) {
             String back = tileModel.getTileBackOption().orElse("");
-            if (!back.equals("red") && !back.equals("blue")) {
+            if (back.equals("red") || back.equals("blue")) {
+                //good
+            } else {
                 return true;
             }
         }

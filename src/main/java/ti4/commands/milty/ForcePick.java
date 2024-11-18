@@ -4,18 +4,18 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ForcePick extends MiltySubcommandData {
+class ForcePick extends GameStateSubcommand {
 
-    public static final String commandName = "force_pick";
     public static final String PICK = "draft_pick";
 
     public ForcePick() {
-        super(commandName, "Pick for the active player in milty draft");
+        super("force_pick", "Pick for the active player in milty draft", true, false);
         addOptions(new OptionData(OptionType.STRING, PICK, "What should be picked").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
@@ -23,12 +23,12 @@ public class ForcePick extends MiltySubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
-        if (option == null || !"YES".equals(option.getAsString())) {
+        if (!"YES".equals(option.getAsString())) {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
 
-        Game game = getActiveGame();
+        Game game = getGame();
         MiltyDraftManager manager = game.getMiltyDraftManager();
         Player player = manager.getCurrentDraftPlayer(game);
         if (player == null) {
