@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.player.TurnStart;
-import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
@@ -19,6 +18,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
@@ -29,6 +29,7 @@ import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 
 public class GetTechButton extends TechSubcommandData {
+
     public GetTechButton() {
         super(Constants.BUTTON, "Force the add tech button to display");
     }

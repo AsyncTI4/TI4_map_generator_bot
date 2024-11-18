@@ -114,7 +114,7 @@ public abstract class DraftItem implements ModelInterface {
         return items;
     }
 
-    public static List<DraftItem> GetAlwaysIncludeItems(Category type) {
+    public static List<DraftItem> getAlwaysIncludeItems(Category type) {
         List<DraftItem> alwaysInclude = new ArrayList<>();
         var frankenErrata = Mapper.getFrankenErrata().values();
         for (DraftErrataModel errataItem : frankenErrata) {

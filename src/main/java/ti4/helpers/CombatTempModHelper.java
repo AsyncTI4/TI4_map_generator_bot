@@ -71,7 +71,7 @@ public class CombatTempModHelper {
         return currentRoundResults;
     }
 
-    public static TemporaryCombatModifierModel GetPossibleTempModifier(String relatedType, String relatedID,
+    public static TemporaryCombatModifierModel getPossibleTempModifier(String relatedType, String relatedID,
         int currentTurnCount) {
         TemporaryCombatModifierModel result = null;
         var combatModifiers = Mapper.getCombatModifiers();

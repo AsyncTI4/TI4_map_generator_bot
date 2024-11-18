@@ -70,14 +70,14 @@ import ti4.commands2.CommandHelper;
 import ti4.commands2.player.SendDebt;
 import ti4.commands2.player.Setup;
 import ti4.commands2.player.TurnStart;
+import ti4.helpers.DiceHelper.Die;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
-import ti4.helpers.DiceHelper.Die;
-import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitType;
 import ti4.listeners.ButtonListener;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -4764,10 +4764,10 @@ public class ButtonHelper {
             event, rollType, game);
 
         TileModel tileModel = TileHelper.getTileById(tile.getTileID());
-        List<NamedCombatModifierModel> modifiers = CombatModHelper.GetModifiers(player, opponent,
+        List<NamedCombatModifierModel> modifiers = CombatModHelper.getModifiers(player, opponent,
             playerUnitsByQuantity, tileModel, game, rollType, Constants.COMBAT_MODIFIERS);
 
-        List<NamedCombatModifierModel> extraRolls = CombatModHelper.GetModifiers(player, opponent,
+        List<NamedCombatModifierModel> extraRolls = CombatModHelper.getModifiers(player, opponent,
             playerUnitsByQuantity, tileModel, game, rollType, Constants.COMBAT_EXTRA_ROLLS);
 
         // Check for temp mods

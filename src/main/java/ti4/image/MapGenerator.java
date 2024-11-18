@@ -3775,8 +3775,8 @@ public class MapGenerator implements AutoCloseable {
         int maxY = y;
 
         List<Objective> objectives = Objective.retrieve(game);
-        int maxTextWidth = ObjectiveBox.GetMaxTextWidth(game, graphics, objectives);
-        int boxWidth = ObjectiveBox.GetBoxWidth(game, maxTextWidth, scoreTokenWidth);
+        int maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
+        int boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenWidth);
         Objective.Type lastType = Objective.Type.Stage1;
 
         for (Objective objective : objectives) {
@@ -3788,7 +3788,7 @@ public class MapGenerator implements AutoCloseable {
             }
             ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenWidth);
             box.Display(game, graphics, this, objective);
-            y += ObjectiveBox.GetVerticalSpacing();
+            y += ObjectiveBox.getVerticalSpacing();
         }
 
         return maxY + 15;
