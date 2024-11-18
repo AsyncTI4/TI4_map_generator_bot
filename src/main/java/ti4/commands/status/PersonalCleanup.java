@@ -1,21 +1,29 @@
 package ti4.commands.status;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.RefreshLeader;
+import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Leader;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-import java.util.*;
-
-public class PersonalCleanup extends StatusSubcommandData {
+class PersonalCleanup extends GameStateSubcommand {
 
     public PersonalCleanup() {
-        super(Constants.PERSONAL_CLEANUP, "Status phase cleanup");
+        super(Constants.PERSONAL_CLEANUP, "Status phase cleanup", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
 
@@ -26,14 +34,14 @@ public class PersonalCleanup extends StatusSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        Game game = getActiveGame();
+        Game game = getGame();
         runStatusCleanup(game);
+        MessageHelper.replyToMessage(event, "Player has completed status phase.");
     }
 
-    public void runStatusCleanup(Game game) {
-
+    private void runStatusCleanup(Game game) {
         Map<String, Tile> tileMap = game.getTileMap();
-        Player player = game.getPlayer(getUser().getId());
+        Player player = getPlayer();
         String color = player.getColor();
         String ccID = Mapper.getCCID(color);
 
@@ -74,10 +82,5 @@ public class PersonalCleanup extends StatusSubcommandData {
                 }
             }
         }
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        StatusCommand.reply(event, "Player has completed status phase.");
     }
 }

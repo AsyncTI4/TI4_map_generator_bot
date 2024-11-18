@@ -22,7 +22,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.status.ListTurnOrder;
 import ti4.commands2.GameStateSubcommand;
 import ti4.generator.MapGenerator;
 import ti4.helpers.ActionCardHelper;
@@ -40,6 +39,7 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.ListTurnOrderService;
 
 public class SCPick extends GameStateSubcommand {
 
@@ -423,7 +423,7 @@ public class SCPick extends GameStateSubcommand {
 
         } else {
             if (allPicked) {
-                ListTurnOrder.turnOrder(event, game);
+                ListTurnOrderService.turnOrder(event, game);
             }
             if (!allPicked) {
                 game.updateActivePlayer(privatePlayer);

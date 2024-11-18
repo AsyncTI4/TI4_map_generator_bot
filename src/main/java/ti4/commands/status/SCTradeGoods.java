@@ -1,27 +1,30 @@
 package ti4.commands.status;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.helpers.Constants;
-import ti4.map.*;
-import ti4.message.MessageHelper;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class SCTradeGoods extends StatusSubcommandData {
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
+import ti4.helpers.Constants;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.message.MessageHelper;
+
+class SCTradeGoods extends GameStateSubcommand {
+
     public SCTradeGoods() {
-        super(Constants.SC_TRADE_GOODS, "Add Trade goods to Strategy Cards");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Cards number"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count on card"));
+        super(Constants.SC_TRADE_GOODS, "Add trade goods to strategy cards", true, false);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Cards number").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count on card").setRequired(false));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         OptionMapping scOption = event.getOption(Constants.STRATEGY_CARD);
         OptionMapping tgOption = event.getOption(Constants.TG);

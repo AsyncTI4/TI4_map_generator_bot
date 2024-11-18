@@ -21,7 +21,6 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.status.ListPlayerInfoButton;
 import ti4.commands2.GameStateSubcommand;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
@@ -48,6 +47,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.ListPlayerInfoService;
 
 public class TurnEnd extends GameStateSubcommand {
 
@@ -192,11 +192,11 @@ public class TurnEnd extends GameStateSubcommand {
 
     }
 
-    public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game game) {
-        return getScoreObjectiveButtons(event, game, "");
+    public static List<Button> getScoreObjectiveButtons(Game game) {
+        return getScoreObjectiveButtons(game, "");
     }
 
-    public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game game, String prefix) {
+    public static List<Button> getScoreObjectiveButtons(Game game, String prefix) {
         Map<String, Integer> revealedPublicObjectives = game.getRevealedPublicObjectives();
         Map<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
         Map<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
@@ -281,7 +281,7 @@ public class TurnEnd extends GameStateSubcommand {
                 }
             }
         }
-        List<Button> poButtons = getScoreObjectiveButtons(event, game);
+        List<Button> poButtons = getScoreObjectiveButtons(game);
         Button noPOScoring = Buttons.red(Constants.PO_NO_SCORING, "No PO Scored");
         Button noSOScoring = Buttons.red(Constants.SO_NO_SCORING, "No SO Scored");
         poButtons.add(noPOScoring);
@@ -323,14 +323,7 @@ public class TurnEnd extends GameStateSubcommand {
                     player.getRepresentationUnfogged() + " you gained " + numScoredSOs + " TG" + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
             }
         }
-        // if(maxVP+4 > game.getVp()){
-        //     String msg = "You may use these buttons to force scoring to go in iniative order";
-        //     List<Button> buttons = new ArrayList<>();
-        //     buttons.add(Buttons.blue("forceACertainScoringOrder", "Force Scoring in Order"));
-        //     buttons.add(Buttons.red("deleteButtons", "Decline to force order"));
-        //     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg, buttons);
-        // }
-        // return beginning of status phase PNs
+
         Map<String, Player> players = game.getPlayers();
         for (Player player : players.values()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
@@ -389,8 +382,8 @@ public class TurnEnd extends GameStateSubcommand {
             for (String obbie : game.getRevealedPublicObjectives().keySet()) {
                 List<String> scoredPlayerList = game.getScoredPublicObjectives().computeIfAbsent(obbie, key -> new ArrayList<>());
                 if (player.isRealPlayer() && !scoredPlayerList.contains(player.getUserID()) && Mapper.getPublicObjective(obbie) != null) {
-                    int threshold = ListPlayerInfoButton.getObjectiveThreshold(obbie, game);
-                    int playerProgress = ListPlayerInfoButton.getPlayerProgressOnObjective(obbie, game, player);
+                    int threshold = ListPlayerInfoService.getObjectiveThreshold(obbie, game);
+                    int playerProgress = ListPlayerInfoService.getPlayerProgressOnObjective(obbie, game, player);
                     if (playerProgress >= threshold) {
                         if (message2b.toString().equalsIgnoreCase("none")) {
                             message2b = new StringBuilder(Mapper.getPublicObjective(obbie).getName());
@@ -406,7 +399,9 @@ public class TurnEnd extends GameStateSubcommand {
             int count = 0;
             StringBuilder message3a = new StringBuilder(player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following secret objectives:");
             for (String soID : player.getSecretsUnscored().keySet()) {
-                if (ListPlayerInfoButton.getObjectiveThreshold(soID, game) > 0 && ListPlayerInfoButton.getPlayerProgressOnObjective(soID, game, player) > (ListPlayerInfoButton.getObjectiveThreshold(soID, game) - 1) && !soID.equalsIgnoreCase("dp")) {
+                if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0 &&
+                        ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player) > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1) &&
+                        !soID.equalsIgnoreCase("dp")) {
                     message3a.append(" ").append(Mapper.getSecretObjective(soID).getName());
                     count++;
                 }
@@ -461,21 +456,22 @@ public class TurnEnd extends GameStateSubcommand {
         }
         Player solPlayer = Helper.getPlayerFromUnit(game, "sol_flagship");
 
-        if (solPlayer != null) {
-            String colorID = Mapper.getColorID(solPlayer.getColor());
-            UnitKey infKey = Mapper.getUnitKey("gf", colorID);
-            for (Tile tile : game.getTileMap().values()) {
-                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    if (unitHolder.getUnits() != null) {
-                        if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
-                            unitHolder.addUnit(infKey, 1);
-                            String genesisMessage = solPlayer.getRepresentationUnfogged()
-                                + " 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
-                            if (game.isFowMode()) {
-                                MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
-                            } else {
-                                MessageHelper.sendMessageToChannel(gameChannel, genesisMessage);
-                            }
+        if (solPlayer == null) {
+            return;
+        }
+        String colorID = Mapper.getColorID(solPlayer.getColor());
+        UnitKey infKey = Mapper.getUnitKey("gf", colorID);
+        for (Tile tile : game.getTileMap().values()) {
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                if (unitHolder.getUnits() != null) {
+                    if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
+                        unitHolder.addUnit(infKey, 1);
+                        String genesisMessage = solPlayer.getRepresentationUnfogged()
+                            + " 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
+                        if (game.isFowMode()) {
+                            MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
+                        } else {
+                            MessageHelper.sendMessageToChannel(gameChannel, genesisMessage);
                         }
                     }
                 }

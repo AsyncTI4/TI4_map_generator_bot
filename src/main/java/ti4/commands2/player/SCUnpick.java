@@ -10,13 +10,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.status.ListTurnOrder;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.ListTurnOrderService;
 
 public class SCUnpick extends GameStateSubcommand {
 
@@ -118,7 +118,7 @@ public class SCUnpick extends GameStateSubcommand {
             MessageHelper.sendPrivateMessageToPlayer(privatePlayer, game, event, msgExtra, fail, success);
         } else {
             if (allPicked) {
-                ListTurnOrder.turnOrder(event, game);
+                ListTurnOrderService.turnOrder(event, game);
             }
             if (!msgExtra.isEmpty()) {
                 MessageHelper.sendMessageToEventChannel(event, msgExtra);
