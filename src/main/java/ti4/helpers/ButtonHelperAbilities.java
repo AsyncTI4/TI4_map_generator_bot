@@ -228,7 +228,7 @@ public class ButtonHelperAbilities {
         int count = Integer.parseInt(buttonID.split("_")[1]);
         game.drawActionCard(player.getUserID(), count);
         ActionCardHelper.sendActionCardInfo(game, player, event);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
     }
 
     public static List<String> getTrapNames() {

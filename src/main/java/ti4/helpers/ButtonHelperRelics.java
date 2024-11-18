@@ -62,7 +62,7 @@ public class ButtonHelperRelics {
             CommanderUnlockCheck.checkPlayer(player, "yssaril");
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-            ButtonHelper.checkACLimit(game, event, player);
+            ButtonHelper.checkACLimit(game, player);
             ButtonHelper.deleteTheOneButton(event);
         } else {
             String msg = " exhausted the Prophet's Tears";

@@ -1971,7 +1971,7 @@ public class ButtonHelperFactionSpecific {
             "# " + player2.getRepresentationUnfogged() + " Lost " + acID + " to a players ability");
         ActionCardHelper.sendActionCardInfo(game, player2);
         ActionCardHelper.sendActionCardInfo(game, player);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
         CommanderUnlockCheck.checkPlayer(player, "yssaril");
         event.getMessage().delete().queue();
     }

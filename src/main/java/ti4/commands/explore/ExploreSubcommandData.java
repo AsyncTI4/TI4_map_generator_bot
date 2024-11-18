@@ -276,7 +276,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         ActionCardHelper.getDiscardActionCardButtons(player, false));
                 }
                 MessageHelper.sendMessageToEventChannel(event, message);
-                ButtonHelper.checkACLimit(game, event, player);
+                ButtonHelper.checkACLimit(game, player);
                 CommanderUnlockCheck.checkPlayer(player, "yssaril");
             }
             case "dv1", "dv2" -> {

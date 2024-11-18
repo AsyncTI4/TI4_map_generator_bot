@@ -1472,7 +1472,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (drawReplacement) {
                     ActionCardHelper.drawActionCards(game, player, 1, true);
                 }
-                ButtonHelper.checkACLimit(game, event, player);
+                ButtonHelper.checkACLimit(game, player);
                 ButtonHelper.deleteMessage(event);
                 if (player.hasUnexhaustedLeader("cymiaeagent")) {
                     List<Button> buttons2 = new ArrayList<>();
@@ -2598,7 +2598,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             ActionCardHelper.getDiscardActionCardButtons(player, false));
 
         ButtonHelper.deleteMessage(event);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
     }
 
     @ButtonHandler("draw_1_ACDelete")
@@ -2615,7 +2615,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         ButtonHelper.addReaction(event, true, false, message, "");
         ButtonHelper.deleteMessage(event);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
     }
 
     @ButtonHandler("draw_1_AC")
@@ -2631,7 +2631,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             message = "Drew 1 AC";
         }
         ButtonHelper.addReaction(event, true, false, message, "");
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
     }
 
     @ButtonHandler("confirm_cc")
@@ -2854,7 +2854,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         CommanderUnlockCheck.checkPlayer(player, "yssaril");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -2887,7 +2887,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         player.checkCommanderUnlock("yssaril");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -3036,7 +3036,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 game.drawActionCard(player.getUserID());
             }
             ActionCardHelper.sendActionCardInfo(game, player, event);
-            ButtonHelper.checkACLimit(game, event, player);
+            ButtonHelper.checkACLimit(game, player);
         }
 
         ButtonHelper.addReaction(event, false, false, message, "");
@@ -3452,7 +3452,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             for (int i = 0; i < count2; i++) {
                 game.drawActionCard(player.getUserID());
             }
-            ButtonHelper.checkACLimit(game, event, player);
+            ButtonHelper.checkACLimit(game, player);
             ActionCardHelper.sendActionCardInfo(game, player, event);
         }
 

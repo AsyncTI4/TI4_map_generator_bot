@@ -327,7 +327,7 @@ public class AgendaHelper {
                             "Discarded 1 random AC of each player");
                     } else {
                         for (Player playerWL : game.getRealPlayers()) {
-                            ButtonHelper.checkACLimit(game, event, playerWL);
+                            ButtonHelper.checkACLimit(game, playerWL);
                         }
                     }
                 }
@@ -847,7 +847,7 @@ public class AgendaHelper {
                             }
                         }
                         CommanderUnlockCheck.checkPlayer(playerWL, "yssaril");
-                        ButtonHelper.checkACLimit(game, event, playerWL);
+                        ButtonHelper.checkACLimit(game, playerWL);
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                         "Drew 2 ACs for each of the players who voted for");
@@ -875,7 +875,7 @@ public class AgendaHelper {
                         }
 
                         CommanderUnlockCheck.checkPlayer(playerWL, "yssaril");
-                        ButtonHelper.checkACLimit(game, event, playerWL);
+                        ButtonHelper.checkACLimit(game, playerWL);
                     }
                     for (Player p2 : getLosingVoters(winner, game)) {
                         p2.setStrategicCC(p2.getStrategicCC());
@@ -2315,7 +2315,7 @@ public class AgendaHelper {
                                         winningR.getRepresentationUnfogged() + " use buttons to discard",
                                         ActionCardHelper.getDiscardActionCardButtons(winningR, false));
                                 }
-                                ButtonHelper.checkACLimit(game, event, winningR);
+                                ButtonHelper.checkACLimit(game, winningR);
                                 ActionCardHelper.sendActionCardInfo(game, winningR, event);
                             }
 
@@ -2341,7 +2341,7 @@ public class AgendaHelper {
                                 game.drawActionCard(winningR.getUserID());
                                 game.drawActionCard(winningR.getUserID());
                                 game.drawActionCard(winningR.getUserID());
-                                ButtonHelper.checkACLimit(game, event, winningR);
+                                ButtonHelper.checkACLimit(game, winningR);
                                 ActionCardHelper.sendActionCardInfo(game, winningR, event);
                             }
                             if (winningR.hasAbility("scheming")) {

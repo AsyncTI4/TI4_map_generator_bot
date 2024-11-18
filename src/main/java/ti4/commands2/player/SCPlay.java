@@ -36,6 +36,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
+import ti4.service.strategycard.TradeStrategyCardService;
 
 public class SCPlay extends GameStateSubcommand {
 
@@ -273,7 +274,7 @@ public class SCPlay extends GameStateSubcommand {
 
         // Trade Primary
         if (scModel.usesAutomationForSCID("pok5trade")) {
-            ButtonHelper.tradePrimary(game, event, player);
+            TradeStrategyCardService.doPrimary(game, event, player);
         }
 
         // Politics Assign Speaker Buttons

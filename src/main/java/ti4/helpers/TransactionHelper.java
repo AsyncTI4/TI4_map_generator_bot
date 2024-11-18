@@ -969,7 +969,7 @@ public class TransactionHelper {
                 }
                 p1.removeActionCard(acNum);
                 p2.setActionCard(acID);
-                ButtonHelper.checkACLimit(game, event, p2);
+                ButtonHelper.checkACLimit(game, p2);
                 ActionCardHelper.sendActionCardInfo(game, p2);
                 ActionCardHelper.sendActionCardInfo(game, p1);
                 if (!p1.hasAbility("arbiters") && !p2.hasAbility("arbiters")) {

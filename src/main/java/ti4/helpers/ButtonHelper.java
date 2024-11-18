@@ -777,7 +777,7 @@ public class ButtonHelper {
         }
 
         addReaction(event, true, false, message, "");
-        checkACLimit(game, event, player);
+        checkACLimit(game, player);
         game.setCurrentACDrawStatusInfo(game.getCurrentACDrawStatusInfo() + "_" + player.getFaction());
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
         ButtonHelperActionCards.checkForPlayingManipulateInvestments(game, player);
@@ -1293,7 +1293,7 @@ public class ButtonHelper {
         return limit;
     }
 
-    public static void checkACLimit(Game game, GenericInteractionCreateEvent event, Player player) {
+    public static void checkACLimit(Game game, Player player) {
         int limit = getACLimit(game, player);
         if (isPlayerOverLimit(game, player)) {
             MessageChannel channel = game.getMainGameChannel();
@@ -1311,20 +1311,6 @@ public class ButtonHelper {
 
     public static void updateMap(Game game, GenericInteractionCreateEvent event) {
         updateMap(game, event, "");
-    }
-
-    @ButtonHandler("trade_primary")
-    public static void tradePrimary(Game game, GenericInteractionCreateEvent event, Player player) {
-        boolean reacted = false;
-        if (event instanceof ButtonInteractionEvent e) {
-            reacted = true;
-            String msg = " gained 3" + Emojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(3) + " and replenished commodities (" + player.getCommodities() + " -> " + player.getCommoditiesTotal() + Emojis.comm + ")";
-            ButtonHelper.addReaction(e, false, false, msg, "");
-        }
-        CommanderUnlockCheck.checkPlayer(player, "hacan");
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
-        ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperStats.replenishComms(event, game, player, reacted);
     }
 
     public static void updateMap(Game game, GenericInteractionCreateEvent event, String message) {

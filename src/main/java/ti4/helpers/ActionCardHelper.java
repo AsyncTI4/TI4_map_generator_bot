@@ -302,7 +302,7 @@ public class ActionCardHelper {
         game.drawActionCard(player.getUserID(), count);
 
         sendActionCardInfo(game, player);
-        ButtonHelper.checkACLimit(game, null, player);
+        ButtonHelper.checkACLimit(game, player);
         if (resolveAbilities && player.hasAbility("scheming")) sendDiscardActionCardButtons(player, false);
         CommanderUnlockCheck.checkPlayer(player, "yssaril");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -945,7 +945,7 @@ public class ActionCardHelper {
 
     public static void sendActionCard(GenericInteractionCreateEvent event, Game game, Player player, Player p2, String acID) {
         Integer handIndex = player.getActionCards().get(acID);
-        ButtonHelper.checkACLimit(game, event, p2);
+        ButtonHelper.checkACLimit(game, p2);
         if (acID == null || handIndex == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find AC in your hand.");
             return;
@@ -976,7 +976,7 @@ public class ActionCardHelper {
         player.removeActionCard(actionCardsMap.get(acID));
         player_.setActionCard(acID);
         sendActionCardInfo(game, player_);
-        ButtonHelper.checkACLimit(game, event, player_);
+        ButtonHelper.checkACLimit(game, player_);
         sendActionCardInfo(game, player);
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "# " + player.getRepresentation() + " you lost the AC " + Mapper.getActionCard(acID).getName());
         MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), "# " + player_.getRepresentation() + " you gained the AC " + Mapper.getActionCard(acID).getName());
