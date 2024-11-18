@@ -63,7 +63,7 @@ import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
-import ti4.service.RevealPublicObjectiveService;
+import ti4.service.objectives.RevealPublicObjectiveService;
 
 public class AgendaHelper {
 

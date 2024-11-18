@@ -86,9 +86,9 @@ import ti4.model.FactionModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
-import ti4.service.RevealPublicObjectiveService;
-import ti4.service.ScorePublicObjectiveService;
 import ti4.service.StatusCleanupService;
+import ti4.service.objectives.RevealPublicObjectiveService;
+import ti4.service.objectives.ScorePublicObjectiveService;
 
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate

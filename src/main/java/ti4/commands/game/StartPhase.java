@@ -42,9 +42,9 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
-import ti4.service.ListPlayerInfoService;
-import ti4.service.ListTurnOrderService;
 import ti4.service.StatusCleanupService;
+import ti4.service.info.ListPlayerInfoService;
+import ti4.service.info.ListTurnOrderService;
 
 public class StartPhase extends GameSubcommandData {
     public StartPhase() {

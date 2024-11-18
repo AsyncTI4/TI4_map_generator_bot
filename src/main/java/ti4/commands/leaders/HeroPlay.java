@@ -42,7 +42,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.LeaderModel;
 import ti4.model.TemporaryCombatModifierModel;
-import ti4.service.ListTurnOrderService;
+import ti4.service.info.ListTurnOrderService;
 
 public class HeroPlay extends LeaderAction {
     public HeroPlay() {

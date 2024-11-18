@@ -30,7 +30,7 @@ import ti4.message.BotLogger;
 
 public class AnnotationHandler {
 
-    private static <H extends Annotation> List<Class<?>> classesToCheck(Class<H> handlerClass) {
+    private static List<Class<?>> classesToCheck() {
         return AsyncTI4DiscordBot.getAllClasses();
     }
 
@@ -209,7 +209,7 @@ public class AnnotationHandler {
                 return consumers;
             }
 
-            for (Class<?> klass : classesToCheck(handlerClass)) {
+            for (Class<?> klass : classesToCheck()) {
                 for (Method method : klass.getDeclaredMethods()) {
                     method.setAccessible(true);
                     List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));

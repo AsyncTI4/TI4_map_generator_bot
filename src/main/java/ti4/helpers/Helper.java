@@ -75,7 +75,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
-import ti4.service.ScorePublicObjectiveService;
+import ti4.service.objectives.ScorePublicObjectiveService;
 
 public class Helper {
 

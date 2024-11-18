@@ -22,7 +22,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
-import ti4.service.ScorePublicObjectiveService;
+import ti4.service.objectives.ScorePublicObjectiveService;
 
 public class ButtonHelperSCs {
 

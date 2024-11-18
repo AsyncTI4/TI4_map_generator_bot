@@ -18,7 +18,7 @@ import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.service.ListPlayerInfoService;
+import ti4.service.info.ListPlayerInfoService;
 
 @UtilityClass
 class ListPlayerInfoButtonHandler {
