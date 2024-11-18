@@ -1,4 +1,4 @@
-package ti4.commands.milty;
+package ti4.commands2.milty;
 
 import java.util.Map;
 import java.util.stream.Collectors;

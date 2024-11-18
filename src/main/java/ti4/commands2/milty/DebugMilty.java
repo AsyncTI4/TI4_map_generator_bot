@@ -1,4 +1,4 @@
-package ti4.commands.milty;
+package ti4.commands2.milty;
 
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;

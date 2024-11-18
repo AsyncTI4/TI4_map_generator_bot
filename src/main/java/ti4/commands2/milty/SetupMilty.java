@@ -1,4 +1,4 @@
-package ti4.commands.milty;
+package ti4.commands2.milty;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
