@@ -1,4 +1,4 @@
-package ti4.commands.player;
+package ti4.commands2.player;
 
 import java.util.ArrayList;
 import java.util.List;

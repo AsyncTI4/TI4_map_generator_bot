@@ -27,7 +27,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.map.AddTileList;
-import ti4.commands.player.Setup;
+import ti4.commands2.player.Setup;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
