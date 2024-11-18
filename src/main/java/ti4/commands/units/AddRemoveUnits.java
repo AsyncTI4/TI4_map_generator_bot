@@ -18,9 +18,6 @@ import ti4.commands.Command;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands2.CommandHelper;
-import ti4.commands2.uncategorized.ShowGame;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -28,6 +25,8 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -35,6 +34,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.ShowGameService;
 import ti4.service.combat.StartCombatService;
 
 abstract public class AddRemoveUnits implements Command {
@@ -79,7 +79,7 @@ abstract public class AddRemoveUnits implements Command {
 
         boolean generateMap = !event.getOption(Constants.NO_MAPGEN, false, OptionMapping::getAsBoolean);
         if (generateMap) {
-            ShowGame.simpleShowGame(game, event);
+            ShowGameService.simpleShowGame(game, event);
         } else {
             MessageHelper.replyToMessage(event, "Map update completed");
         }

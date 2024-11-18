@@ -33,7 +33,7 @@ public class MapCommand implements Command {
         String userID = event.getUser().getId();
         Game game = GameManager.getUserActiveGame(userID);
         if (game == null) return;
-        ShowGame.simpleShowGame(game, event);
+        ShowGameService.simpleShowGame(game, event);
     }
 
     protected String getActionDescription() {

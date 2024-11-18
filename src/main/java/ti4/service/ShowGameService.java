@@ -1,4 +1,4 @@
-package ti4.helpers;
+package ti4.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,12 +8,17 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class ShowGameHelper {
+public class ShowGameService {
+
+    public static void simpleShowGame(Game game, GenericInteractionCreateEvent event) {
+        simpleShowGame(game, event, DisplayType.all);
+    }
 
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         MapRenderPipeline.render(game, event, displayType, fileUpload -> {

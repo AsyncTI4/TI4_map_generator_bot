@@ -6,7 +6,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.service.strategycard.TradeStrategyCardService;
 
-public class TradeStrategyCardButtonHandler {
+class TradeStrategyCardButtonHandler {
 
     @ButtonHandler("trade_primary")
     public static void tradePrimary(Game game, GenericInteractionCreateEvent event, Player player) {

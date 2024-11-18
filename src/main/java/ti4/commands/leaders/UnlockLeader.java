@@ -2,7 +2,6 @@ package ti4.commands.leaders;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands2.uncategorized.CardsInfo;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -11,6 +10,7 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.service.info.CardsInfoService;
 
 public class UnlockLeader extends LeaderAction {
     public UnlockLeader() {
@@ -52,7 +52,7 @@ public class UnlockLeader extends LeaderAction {
         }
         if (leaderID.contains("naalucommander")) {
             //PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
-            CardsInfo.sendVariousAdditionalButtons(game, player);
+            CardsInfoService.sendVariousAdditionalButtons(game, player);
             MessageHelper.sendMessageToChannel(channel, player.getRepresentationUnfogged() + " you may use M'aban, the Naalu Commander, via button in your cards info thread");
 
         }

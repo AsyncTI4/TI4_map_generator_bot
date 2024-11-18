@@ -1,20 +1,17 @@
 package ti4.commands2.uncategorized;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.image.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.ShowGameHelper;
-import ti4.listeners.annotations.ButtonHandler;
+import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.service.ShowGameService;
 
 public class ShowGame extends ti4.commands2.GameStateCommand {
 
@@ -56,27 +53,11 @@ public class ShowGame extends ti4.commands2.GameStateCommand {
         if (displayType == null) {
             displayType = DisplayType.all;
         }
-        ShowGameHelper.simpleShowGame(game, event, displayType);
-    }
-
-    @ButtonHandler("showGameAgain")
-    public static void simpleShowGame(Game game, GenericInteractionCreateEvent event) {
-        ShowGameHelper.simpleShowGame(game, event, DisplayType.all);
-    }
-
-    @ButtonHandler("showMap")
-    public static void showMap(Game game, ButtonInteractionEvent event) {
-        MapRenderPipeline.render(game, event, DisplayType.map, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
-    }
-
-    @ButtonHandler("showPlayerAreas")
-    public static void showPlayArea(Game game, ButtonInteractionEvent event) {
-        MapRenderPipeline.render(game, event, DisplayType.stats, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
+        ShowGameService.simpleShowGame(game, event, displayType);
     }
 
     @Override
     public void register(CommandListUpdateAction commands) {
-        // Moderation commands with required options
         commands.addCommands(
             Commands.slash(getName(), "Shows selected map")
                 .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true))

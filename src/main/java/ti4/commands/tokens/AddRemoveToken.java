@@ -12,16 +12,16 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands2.CommandHelper;
-import ti4.commands2.uncategorized.ShowGame;
-import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.ShowGameService;
 
 abstract public class AddRemoveToken implements Command {
 
@@ -88,7 +88,7 @@ abstract public class AddRemoveToken implements Command {
             parsingForTile(event, colors, tile, game);
         }
         GameSaveLoadManager.saveGame(game, event);
-        ShowGame.simpleShowGame(game, event);
+        ShowGameService.simpleShowGame(game, event);
     }
 
     abstract void parsingForTile(SlashCommandInteractionEvent event, List<String> color, Tile tile, Game game);

@@ -21,9 +21,6 @@ import ti4.commands.tech.TechInfo;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands2.GameStateSubcommand;
-import ti4.commands2.uncategorized.CardsInfo;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -35,6 +32,8 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units.UnitKey;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -44,6 +43,7 @@ import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.service.info.AbilityInfoService;
+import ti4.service.info.CardsInfoService;
 
 public class Setup extends GameStateSubcommand {
 
@@ -323,7 +323,7 @@ public class Setup extends GameStateSubcommand {
                 player.getRepresentationUnfogged()
                     + " you may peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN. Don't do this until after secrets are dealt and discarded.");
         }
-        CardsInfo.sendVariousAdditionalButtons(game, player);
+        CardsInfoService.sendVariousAdditionalButtons(game, player);
 
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
