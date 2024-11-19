@@ -7,9 +7,9 @@ import java.util.Objects;
 
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import ti4.helpers.CombatRollType;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.service.combat.CombatRollType;
 
 @Data
 public class CombatModifierModel implements ModelInterface {

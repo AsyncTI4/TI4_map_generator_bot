@@ -7,12 +7,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.SecretObjectiveHelper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.info.SecretObjectiveInfoService;
 
 class MakeSecretIntoPO extends GameStateSubcommand {
 
@@ -57,7 +57,7 @@ class MakeSecretIntoPO extends GameStateSubcommand {
             Mapper.getSecretObjectivesJustNames().get(soName) + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
-        SecretObjectiveHelper.sendSecretObjectiveInfo(game, playerWithSO, event);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, playerWithSO, event);
 
     }
 }

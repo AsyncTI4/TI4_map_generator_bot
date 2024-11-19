@@ -12,18 +12,15 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.combat.StartCombat;
-import ti4.commands.explore.ExplorePlanet;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.player.TurnStart;
-import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -32,6 +29,9 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.service.combat.StartCombatService;
+import ti4.service.explore.ExploreService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelperAbilities {
 
@@ -228,7 +228,7 @@ public class ButtonHelperAbilities {
         int count = Integer.parseInt(buttonID.split("_")[1]);
         game.drawActionCard(player.getUserID(), count);
         ActionCardHelper.sendActionCardInfo(game, player, event);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, player);
     }
 
     public static List<String> getTrapNames() {
@@ -506,7 +506,7 @@ public class ButtonHelperAbilities {
 
     public static void autoneticMemoryStep3a(Game game, Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
-        ActionCardHelper.pickACardFromDiscardStep1(event, game, player);
+        ActionCardHelper.pickACardFromDiscardStep1(game, player);
     }
 
     public static void addOmenDie(Game game, int omenDie) {
@@ -953,7 +953,7 @@ public class ButtonHelperAbilities {
             player.getRepresentationUnfogged() + " acquired " + Mapper.getRelic(relicName).getName()
                 + " and paid " + lostComms + " commodities (" + oldComms + "->" + player.getCommodities()
                 + ")");
-        CommanderUnlockCheck.checkPlayer(player, "axis");
+        CommanderUnlockCheckService.checkPlayer(player, "axis");
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -1002,7 +1002,7 @@ public class ButtonHelperAbilities {
             game.purgeExplore(cardID);
         }
 
-        CommanderUnlockCheck.checkPlayer(player, "kollecc");
+        CommanderUnlockCheckService.checkPlayer(player, "kollecc");
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
         event.getMessage().delete().queue();
@@ -1157,7 +1157,7 @@ public class ButtonHelperAbilities {
         } else {
             new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planetName)), "pds " + planetName, game);
             message = player.getFactionEmojiOrColor() + " replaced a Sleeper on " + Helper.getPlanetRepresentation(planetName, game) + " with a " + Emojis.pds;
-            CommanderUnlockCheck.checkPlayer(player, "titans");
+            CommanderUnlockCheckService.checkPlayer(player, "titans");
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         event.getMessage().delete().queue();
@@ -1345,7 +1345,7 @@ public class ButtonHelperAbilities {
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
         if (players.size() > 1) {
-            StartCombat.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
+            StartCombatService.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
         }
 
         event.getMessage().delete().queue();
@@ -1397,7 +1397,7 @@ public class ButtonHelperAbilities {
             }
         }
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        CommanderUnlockCheck.checkPlayer(player, "yin");
+        CommanderUnlockCheckService.checkPlayer(player, "yin");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
                 + Helper.getPlanetRepresentation(planet, game) + " using indoctrination");
@@ -1415,10 +1415,10 @@ public class ButtonHelperAbilities {
         if ("decline".equalsIgnoreCase(info[0])) {
             message = player.getFactionEmoji() + " declined to use their Distant Suns ability";
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
-            new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
+            ExploreService.explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, game, 1, false);
         } else {
-            new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
+            ExploreService.explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, game, 2, false);
         }
 
@@ -1433,7 +1433,7 @@ public class ButtonHelperAbilities {
         if ("decline".equalsIgnoreCase(info[0])) {
             message = player.getFactionEmoji() + " declined to use their Deep Mining ability";
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
-            new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
+            ExploreService.explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, game, 1, false);
         } else {
             message = player.getFactionEmoji() + " used their Deep Mining ability to gain 1TG " + player.gainTG(1);

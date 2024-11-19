@@ -13,15 +13,15 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
 import ti4.commands.Command;
-import ti4.commands2.uncategorized.ShowGame;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.ShowGameService;
 
 public class AddFrontierTokens implements Command {
 
@@ -61,14 +61,13 @@ public class AddFrontierTokens implements Command {
             Game game = GameManager.getUserActiveGame(userID);
             parsingForTile(event, game);
             GameSaveLoadManager.saveGame(game, event);
-            ShowGame.simpleShowGame(game, event);
+            ShowGameService.simpleShowGame(game, event);
         }
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void register(CommandListUpdateAction commands) {
-        // Moderation commands with required options
         commands.addCommands(
             Commands.slash(getName(), "Add Frontier tokens to all possible tiles")
                 .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")

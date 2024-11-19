@@ -10,12 +10,10 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.ExhaustLeader;
-import ti4.commands.leaders.HeroPlay;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.player.TurnStart;
-import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -26,6 +24,8 @@ import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
+import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.PlayHeroService;
 
 public class ComponentActionHelper {
 
@@ -292,14 +292,14 @@ public class ComponentActionHelper {
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
                         if ("fogallianceagent".equalsIgnoreCase(buttonID)) {
-                            ExhaustLeader.exhaustLeader(event, game, p1, p1.getLeader(buttonID).orElse(null));
+                            ExhaustLeaderService.exhaustLeader(game, p1, p1.getLeader(buttonID).orElse(null));
                             ButtonHelperAgents.exhaustAgent("fogallianceagent", event, game, p1);
                         } else {
                             ButtonHelperAgents.exhaustAgent(buttonID, event, game, p1);
                         }
                     }
                 } else if (buttonID.contains("hero")) {
-                    HeroPlay.playHero(event, game, p1, p1.getLeader(buttonID).orElse(null));
+                    PlayHeroService.playHero(event, game, p1, p1.getLeader(buttonID).orElse(null));
                 }
             }
             case "relic" -> resolveRelicComponentAction(game, p1, event, buttonID);

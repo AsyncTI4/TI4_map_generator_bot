@@ -5,16 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ti4.commands2.milty.MiltyDraftHelper;
-import ti4.commands2.milty.MiltyDraftManager;
 import ti4.draft.items.BlueTileDraftItem;
 import ti4.draft.items.HomeSystemDraftItem;
 import ti4.draft.items.RedTileDraftItem;
 import ti4.draft.items.SpeakerOrderDraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
+import ti4.service.milty.MiltyDraftHelper;
+import ti4.service.milty.MiltyDraftManager;
 
 public class StandardBagDraft extends BagDraft {
     public StandardBagDraft(Game owner) {

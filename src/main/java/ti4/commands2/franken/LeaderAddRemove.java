@@ -8,13 +8,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.leaders.LeaderInfo;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.info.LeaderInfoService;
 
 abstract class LeaderAddRemove extends GameStateSubcommand {
 
@@ -49,7 +49,7 @@ abstract class LeaderAddRemove extends GameStateSubcommand {
 
         doAction(player, leaderIDs, event);
 
-        LeaderInfo.sendLeadersInfo(game, player, event);
+        LeaderInfoService.sendLeadersInfo(game, player, event);
     }
 
     public abstract void doAction(Player player, List<String> leaderIDs, SlashCommandInteractionEvent event);

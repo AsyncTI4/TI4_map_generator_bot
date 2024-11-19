@@ -8,10 +8,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands2.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.service.ShowGameService;
 
 public class MapCommand implements Command {
     private final Collection<MapSubcommandData> subcommandData = getSubcommands();
@@ -33,7 +33,7 @@ public class MapCommand implements Command {
         String userID = event.getUser().getId();
         Game game = GameManager.getUserActiveGame(userID);
         if (game == null) return;
-        ShowGame.simpleShowGame(game, event);
+        ShowGameService.simpleShowGame(game, event);
     }
 
     protected String getActionDescription() {
@@ -47,7 +47,6 @@ public class MapCommand implements Command {
         subcommands.add(new RemoveTile());
         subcommands.add(new AddBorderAnomaly());
         subcommands.add(new RemoveBorderAnomaly());
-        //subcommands.add(new InteractiveBuilder());
         subcommands.add(new Preset());
         subcommands.add(new ShowMapSetup());
         subcommands.add(new ShowMapString());

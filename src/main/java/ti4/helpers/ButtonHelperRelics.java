@@ -9,12 +9,12 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelperRelics {
 
@@ -59,10 +59,10 @@ public class ButtonHelperRelics {
                 message = player.getFactionEmoji() + " Drew 1 AC";
                 ActionCardHelper.sendActionCardInfo(game, player, event);
             }
-            CommanderUnlockCheck.checkPlayer(player, "yssaril");
+            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-            ButtonHelper.checkACLimit(game, event, player);
+            ButtonHelper.checkACLimit(game, player);
             ButtonHelper.deleteTheOneButton(event);
         } else {
             String msg = " exhausted the Prophet's Tears";

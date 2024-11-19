@@ -14,12 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
-import ti4.commands.fow.Whisper;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.GameStateSubcommand;
-import ti4.commands2.uncategorized.CardsInfo;
-import ti4.generator.MapGenerator;
-import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
@@ -29,12 +24,17 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.image.MapGenerator;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.service.fow.WhisperService;
+import ti4.service.info.CardsInfoService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class TurnStart extends GameStateSubcommand {
 
@@ -56,7 +56,7 @@ public class TurnStart extends GameStateSubcommand {
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         player.setTurnCount(player.getTurnCount() + 1);
-        CommanderUnlockCheck.checkPlayer(player, "hacan");
+        CommanderUnlockCheckService.checkPlayer(player, "hacan");
         Map<String, String> maps = new HashMap<>(game.getMessagesThatICheckedForAllReacts());
         for (String id : maps.keySet()) {
             if (id.contains("combatRoundTracker")) {
@@ -73,7 +73,7 @@ public class TurnStart extends GameStateSubcommand {
         game.setStoredValue("planetsTakenThisRound", "");
         game.setStoredValue("absolLux", "");
         game.setStoredValue("mentakHero", "");
-        CardsInfo.sendVariousAdditionalButtons(game, player);
+        CardsInfoService.sendVariousAdditionalButtons(game, player);
         boolean goingToPass = false;
         if (game.getStoredValue("Pre Pass " + player.getFaction()) != null
             && game.getStoredValue("Pre Pass " + player.getFaction())
@@ -175,7 +175,7 @@ public class TurnStart extends GameStateSubcommand {
                     .getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction());
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                     p2.getRepresentationUnfogged() + " your future message got delivered");
-                Whisper.sendWhisper(game, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
+                WhisperService.sendWhisper(game, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
                 game.setStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction(), "");
             }
         }

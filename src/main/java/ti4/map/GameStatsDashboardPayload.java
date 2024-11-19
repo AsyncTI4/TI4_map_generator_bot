@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awssdk.utils.StringUtils;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.message.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
