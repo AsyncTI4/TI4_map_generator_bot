@@ -15,8 +15,8 @@ import java.util.StringTokenizer;
 
 import lombok.Getter;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.message.BotLogger;
 import ti4.model.ColorModel;
 import ti4.model.PlanetModel;
@@ -165,6 +165,7 @@ public class AliasHandler {
     public static void addNewPlanetAliases(PlanetModel planetModel) {
         Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>())
             .forEach(alias -> allPlanetAliases.put(alias.toLowerCase(), planetModel.getId()));
+        allPlanetAliases.put(planetModel.getId(), planetModel.getId()); // add the planet itself to aliashandler
     }
 
     public static void addNewTileAliases(TileModel tileModel) {

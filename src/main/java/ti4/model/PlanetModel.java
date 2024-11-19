@@ -14,8 +14,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.sticker.Sticker;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.generator.TileHelper;
-import ti4.generator.UnitTokenPosition;
+import ti4.image.TileHelper;
+import ti4.image.UnitTokenPosition;
 import ti4.helpers.Emojis;
 import ti4.helpers.Stickers;
 import ti4.model.PlanetTypeModel.PlanetType;
@@ -28,7 +28,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private String tileId;
     private String name;
     private String shortName;
-    private List<String> aliases;
+    private List<String> aliases = new ArrayList<>();
     private Point positionInTile;
     private int resources;
     private int influence;
@@ -53,9 +53,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     public boolean isValid() {
         return id != null
             && name != null
-            && source != null
-            && aliases != null
-            && aliases.contains(name.toLowerCase().replace(" ", "")); // Alias list must contain the lowercase'd name
+            && source != null;
     }
 
     @JsonIgnore

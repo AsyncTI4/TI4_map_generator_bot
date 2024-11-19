@@ -10,9 +10,9 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
+import ti4.image.TileHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.message.BotLogger;

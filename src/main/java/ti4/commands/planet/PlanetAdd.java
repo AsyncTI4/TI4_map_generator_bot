@@ -8,9 +8,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.leaders.UnlockLeader;
-import ti4.generator.Mapper;
+import ti4.commands2.leaders.UnlockLeader;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -18,6 +16,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -25,6 +24,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class PlanetAdd extends PlanetAddRemove {
     public PlanetAdd() {
@@ -321,10 +321,10 @@ public class PlanetAdd extends PlanetAddRemove {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
         }
-        CommanderUnlockCheck.checkPlayer(player, "sol", "vaylerian", "olradin", "xxcha", "sardakk");
-        CommanderUnlockCheck.checkAllPlayersInGame(game, "freesystems");
+        CommanderUnlockCheckService.checkPlayer(player, "sol", "vaylerian", "olradin", "xxcha", "sardakk");
+        CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
         if (Constants.MECATOLS.contains(planet.toLowerCase()) && player.controlsMecatol(true)) {
-            CommanderUnlockCheck.checkPlayer(player, "winnu");
+            CommanderUnlockCheckService.checkPlayer(player, "winnu");
         }
     }
 }

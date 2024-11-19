@@ -3,24 +3,22 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.status.ListPlayerInfoButton;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
+import ti4.service.info.ListPlayerInfoService;
+import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class SecretObjectiveHelper {
 
@@ -37,13 +35,12 @@ public class SecretObjectiveHelper {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }
-            if (ListPlayerInfoButton.getObjectiveThreshold(entry.getKey(), game) > 0) {
-                message.append(getSecretObjectiveRepresentationNoNewLine(entry.getKey()));
-                message.append(" (").append(ListPlayerInfoButton.getPlayerProgressOnObjective(entry.getKey(), game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(entry.getKey(), game)).append(")\n");
+            if (ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game) > 0) {
+                message.append(SecretObjectiveInfoService.getSecretObjectiveRepresentationNoNewLine(entry.getKey()));
+                message.append(" (").append(ListPlayerInfoService.getPlayerProgressOnObjective(entry.getKey(), game, player)).append("/").append(ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game)).append(")\n");
             } else {
-                message.append(getSecretObjectiveRepresentation(entry.getKey()));
+                message.append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(entry.getKey()));
             }
-            //message.append(getSecretObjectiveRepresentation(entry.getKey())).append("\n");
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
@@ -66,7 +63,7 @@ public class SecretObjectiveHelper {
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                     }
 
-                    CommanderUnlockCheck.checkAllPlayersInGame(game, "lanefir");
+                    CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
 
                     String message2 = player.getRepresentation() + " purged fragments: " + fragmentsToPurge;
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
@@ -112,9 +109,9 @@ public class SecretObjectiveHelper {
         }
         String headerText = player.getRepresentation();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
-        sendSecretObjectiveInfo(game, player);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         Helper.checkIfHeroUnlocked(game, player);
-        CommanderUnlockCheck.checkPlayer(player, "nomad");
+        CommanderUnlockCheckService.checkPlayer(player, "nomad");
         Helper.checkEndGame(game, player);
     }
 
@@ -126,114 +123,10 @@ public class SecretObjectiveHelper {
         List<String> secrets = new ArrayList<>(player.getSecrets().keySet());
         Collections.shuffle(secrets);
         for (String id : secrets) {
-            sb.append(getSecretObjectiveRepresentation(id)).append("\n");
+            sb.append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id)).append("\n");
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb.toString());
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "All SOs shown to player");
-    }
-
-    public static void sendSecretObjectiveInfo(Game game, Player player, SlashCommandInteractionEvent event) {
-        String headerText = player.getRepresentationUnfogged() + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
-        sendSecretObjectiveInfo(game, player);
-    }
-
-    public static void sendSecretObjectiveInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentationUnfogged() + " used something";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
-        sendSecretObjectiveInfo(game, player);
-    }
-
-    public static void sendSecretObjectiveInfo(Game game, Player player) {
-        //SO INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getSecretObjectiveCardInfo(game, player));
-
-        if (player.getSecretsUnscored().isEmpty()) return;
-
-        // SCORE/DISCARD BUTTONS
-        String secretMsg = "_ _\nClick a button to either score or discard a secret objective";
-        List<Button> buttons = new ArrayList<>();
-        Button scoreB = Buttons.blue("get_so_score_buttons", "Score an SO");
-        Button discardB = Buttons.red("get_so_discard_buttons", "Discard an SO");
-        ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
-        buttons.add(scoreB);
-        buttons.add(discardB);
-        MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);
-    }
-
-    public static String getSecretObjectiveRepresentationShort(String soID) {
-        StringBuilder sb = new StringBuilder();
-        SecretObjectiveModel so = Mapper.getSecretObjective(soID);
-        String soName = so.getName();
-        sb.append(Emojis.SecretObjective).append("__").append(soName).append("__").append("\n");
-        return sb.toString();
-    }
-
-    public static String getSecretObjectiveRepresentation(String soID) {
-        return getSecretObjectiveRepresentation(soID, true);
-    }
-
-    public static String getSecretObjectiveRepresentationNoNewLine(String soID) {
-        return getSecretObjectiveRepresentation(soID, false);
-    }
-
-    private static String getSecretObjectiveRepresentation(String soID, boolean newLine) {
-        StringBuilder sb = new StringBuilder();
-        SecretObjectiveModel so = Mapper.getSecretObjective(soID);
-        String soName = so.getName();
-        String soPhase = so.getPhase();
-        String soDescription = so.getText();
-        if (newLine) {
-            sb.append(Emojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
-        } else {
-            sb.append(Emojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription);
-        }
-        return sb.toString();
-    }
-
-    private static String getSecretObjectiveCardInfo(Game game, Player player) {
-        Map<String, Integer> secretObjective = player.getSecrets();
-        Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(player.getSecretsScored());
-        for (String id : game.getSoToPoList()) {
-            scoredSecretObjective.remove(id);
-        }
-        StringBuilder sb = new StringBuilder();
-        int index = 1;
-
-        //SCORED SECRET OBJECTIVES
-        sb.append("**Scored Secret Objectives (").append(player.getSoScored()).append("/").append(player.getMaxSOCount()).append("):**").append("\n");
-        if (scoredSecretObjective.isEmpty()) {
-            sb.append("> None");
-        } else {
-            for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
-                sb.append("`").append(index).append(".").append(Helper.leftpad("(" + so.getValue(), 4)).append(")`");
-                sb.append(getSecretObjectiveRepresentationShort(so.getKey()));
-                index++;
-            }
-        }
-        sb.append("\n");
-
-        //UNSCORED SECRET OBJECTIVES
-        sb.append("**Unscored Secret Objectives:**").append("\n");
-        if (secretObjective != null) {
-            if (secretObjective.isEmpty()) {
-                sb.append("> None");
-            } else {
-                for (Map.Entry<String, Integer> so : secretObjective.entrySet()) {
-                    Integer idValue = so.getValue();
-                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + idValue, 4)).append(")`");
-
-                    if (ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game) > 0) {
-                        sb.append(getSecretObjectiveRepresentationNoNewLine(so.getKey()));
-                        sb.append(" (").append(ListPlayerInfoButton.getPlayerProgressOnObjective(so.getKey(), game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game)).append(")\n");
-                    } else {
-                        sb.append(getSecretObjectiveRepresentation(so.getKey()));
-                    }
-                    index++;
-                }
-            }
-        }
-        return sb.toString();
     }
 
     public static List<Button> getUnscoredSecretObjectiveButtons(Player player) {
@@ -306,15 +199,15 @@ public class SecretObjectiveHelper {
         sb.append("Unscored Action Phase Secrets: ").append("\n");
         int x = 1;
         for (String id : currentSecrets) {
-            if (getSecretObjectiveRepresentation(id).contains("Action Phase")) {
-                sb.append(x).append(getSecretObjectiveRepresentation(id));
+            if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Action Phase")) {
+                sb.append(x).append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id));
                 x++;
             }
         }
         x = 1;
         sb.append("\n").append("Unscored Status Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
-            if (getSecretObjectiveRepresentation(id).contains("Status Phase")) {
+            if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Status Phase")) {
                 appendSecretObjectiveRepresentation(game, sb, id, x);
                 x++;
             }
@@ -322,7 +215,7 @@ public class SecretObjectiveHelper {
         x = 1;
         sb.append("\n").append("Unscored Agenda Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
-            if (getSecretObjectiveRepresentation(id).contains("Agenda Phase")) {
+            if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Agenda Phase")) {
                 appendSecretObjectiveRepresentation(game, sb, id, x);
                 x++;
             }
@@ -331,16 +224,16 @@ public class SecretObjectiveHelper {
     }
 
     private static void appendSecretObjectiveRepresentation(Game game, StringBuilder sb, String id, int x) {
-        if (ListPlayerInfoButton.getObjectiveThreshold(id, game) > 0) {
-            sb.append(x).append(getSecretObjectiveRepresentation(id));
+        if (ListPlayerInfoService.getObjectiveThreshold(id, game) > 0) {
+            sb.append(x).append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id));
             sb.append("> ");
             for (Player player : game.getRealPlayers()) {
-                sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(id, game)).append(" ");
+                sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player))
+                    .append("/").append(ListPlayerInfoService.getObjectiveThreshold(id, game)).append(" ");
             }
             sb.append("\n");
-
         } else {
-            sb.append(x).append(getSecretObjectiveRepresentation(id));
+            sb.append(x).append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id));
         }
     }
 }

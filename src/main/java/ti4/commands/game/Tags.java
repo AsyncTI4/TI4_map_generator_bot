@@ -41,7 +41,7 @@ public class Tags extends GameSubcommandData {
         TextInput tags = TextInput.create(fieldID, "Edit Tags", TextInputStyle.SHORT)
             .setPlaceholder("Add tags here, separated by semicolons. Leave blank to delete all tags.")
             .setValue(currentTags)
-            .setRequired(false)
+            
             .build();
         Modal modal = Modal.create(modalId, "Tags for Game " + game.getName()).addActionRow(tags).build();
         event.replyModal(modal).queue();

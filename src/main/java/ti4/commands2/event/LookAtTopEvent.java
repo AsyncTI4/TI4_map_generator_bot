@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -15,7 +15,7 @@ import ti4.model.EventModel;
 class LookAtTopEvent extends GameStateSubcommand {
 
     public LookAtTopEvent() {
-        super(Constants.LOOK_AT_TOP, "Look at top Event from deck", true, false);
+        super(Constants.LOOK_AT_TOP, "Look at top Event from deck", true, true);
         addOption(OptionType.INTEGER, Constants.COUNT, "Number of events to look at");
     }
 

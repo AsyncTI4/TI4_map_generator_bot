@@ -20,7 +20,6 @@ public class ResourceHelper {
     private final Map<String, String> factionCache = new HashMap<>();
     private final Map<String, String> generalCache = new HashMap<>();
     private final Map<String, String> planetCache = new HashMap<>();
-    private final Map<String, String> paCache = new HashMap<>();
 
     private ResourceHelper() {
     }

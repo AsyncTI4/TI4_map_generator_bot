@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.apache.commons.collections4.ListUtils;
 import ti4.commands2.CommandHelper;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Emojis;
 import ti4.map.Game;

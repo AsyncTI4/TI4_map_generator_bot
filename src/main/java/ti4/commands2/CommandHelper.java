@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -147,7 +147,7 @@ public class CommandHelper {
         if (hasRole(event, acceptedRoles)) {
             return true;
         }
-        var acceptRolesStr = acceptedRoles.stream().map(Role::getName).collect(Collectors.joining(", "));
+        var acceptRolesStr = acceptedRoles.stream().map(Role::getName).distinct().collect(Collectors.joining(", "));
         MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have one of the following roles: " + acceptRolesStr);
         return false;
     }

@@ -1,7 +1,7 @@
 package ti4.commands.planet;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Planet;

@@ -40,17 +40,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.player.ChangeColor;
-import ti4.commands.player.TurnEnd;
-import ti4.commands.player.TurnStart;
+import ti4.commands2.player.TurnEnd;
+import ti4.commands2.player.TurnStart;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
-import ti4.generator.DrawingUtil;
-import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -58,6 +55,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.DrawingUtil;
+import ti4.image.Mapper;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
@@ -72,6 +71,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.users.UserSettingsManager;
 
 public class Player {
@@ -2961,10 +2961,10 @@ public class Player {
 
     @JsonIgnore
     public String getNextAvailableColorIgnoreCurrent() {
-        Predicate<ColorModel> nonExclusive = cm -> !ChangeColor.colorIsExclusive(cm.getAlias(), this);
+        Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
         String color = UserSettingsManager.get(getUserID()).getPreferredColourList().stream()
             .filter(c -> getGame().getUnusedColors().stream().anyMatch(col -> col.getName().equals(c)))
-            .filter(c -> !ChangeColor.colorIsExclusive(c, this))
+            .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
             .findFirst()
             .orElse(getGame().getUnusedColors().stream().filter(nonExclusive).findFirst().map(ColorModel::getName).orElse(null));
         return Mapper.getColorName(color);
@@ -3135,7 +3135,7 @@ public class Player {
     }
 
     public void checkCommanderUnlock(String factionToCheck) {
-        CommanderUnlockCheck.checkPlayer(this, factionToCheck);
+        CommanderUnlockCheckService.checkPlayer(this, factionToCheck);
     }
 
     @JsonIgnore
@@ -3148,5 +3148,10 @@ public class Player {
     @JsonIgnore
     public boolean isActivePlayer() {
         return this.equals(getGame().getActivePlayer());
+    }
+
+    public void clearDebt(Player player, int count) {
+        String clearedPlayerColor = player.getColor();
+        removeDebtTokens(clearedPlayerColor, count);
     }
 }
