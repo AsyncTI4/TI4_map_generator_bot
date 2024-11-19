@@ -53,9 +53,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
-import ti4.commands.explore.ExploreFrontier;
-import ti4.commands.explore.ExploreInfo;
-import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechShowDeck;
 import ti4.commands.tokens.AddCC;
@@ -105,6 +102,7 @@ import ti4.service.PlanetService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.decks.ShowActionCardsService;
+import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelper {
@@ -674,7 +672,7 @@ public class ButtonHelper {
                 } else {
                     types.add(deck);
                 }
-                ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false);
+                ExploreService.secondHalfOfExpInfo(types, event, player, game, false);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);
@@ -691,10 +689,10 @@ public class ButtonHelper {
             types.add(Constants.INDUSTRIAL);
             types.add(Constants.HAZARDOUS);
             types.add(Constants.FRONTIER);
-            ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(types, event, player, game, false, true);
         } else {
             types.add(type);
-            ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(types, event, player, game, false, true);
         }
         deleteMessage(event);
     }
@@ -3446,7 +3444,7 @@ public class ButtonHelper {
                 msg2 = msg2 + name1 + ": " + card.getText() + "\n";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             } else {
-                new ExploreFrontier().expFront(event, tile, game, player);
+                ExploreService.expFront(event, tile, game, player);
             }
 
             if (player.hasAbility("migrant_fleet")) {
@@ -3527,7 +3525,7 @@ public class ButtonHelper {
             Tile tile = game.getTileFromPlanet(planetName);
             String messageText = player.getRepresentation() + " explored " + Emojis.getEmojiFromDiscord(drawColor) + "Planet "
                 + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile " + tile.getPosition() + ")*:";
-            ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
+            ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
             if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                 && game.getPhaseOfGame().contains("agenda")) {
                 PlanetService.refreshPlanet(player, planetName);

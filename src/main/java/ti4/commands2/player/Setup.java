@@ -18,7 +18,6 @@ import ti4.buttons.Buttons;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechInfo;
 import ti4.commands.tokens.AddToken;
-import ti4.commands.units.AddRemoveUnits;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -41,6 +40,7 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
+import ti4.service.PlanetService;
 import ti4.service.info.AbilityInfoService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.info.LeaderInfoService;
@@ -395,7 +395,7 @@ public class Setup extends GameStateSubcommand {
             if (unitInfoTokenizer.hasMoreTokens()) {
                 planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
             }
-            planetName = AddRemoveUnits.getPlanet(event, tile, planetName);
+            planetName = PlanetService.getPlanet(tile, planetName);
             tile.addUnit(planetName, unitID, count);
         }
     }

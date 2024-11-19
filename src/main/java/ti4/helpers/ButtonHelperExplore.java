@@ -8,12 +8,12 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.commands.explore.ExploreFrontier;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelperExplore {
@@ -21,7 +21,7 @@ public class ButtonHelperExplore {
     @ButtonHandler("exploreFront_")
     public static void exploreFront(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("exploreFront_", "");
-        new ExploreFrontier().expFront(event, game.getTileByPosition(pos), game, player);
+        ExploreService.expFront(event, game.getTileByPosition(pos), game, player);
         List<ActionRow> actionRow2 = new ArrayList<>();
         String exhaustedMessage = event.getMessage().getContentRaw();
         for (ActionRow row : event.getMessage().getActionRows()) {

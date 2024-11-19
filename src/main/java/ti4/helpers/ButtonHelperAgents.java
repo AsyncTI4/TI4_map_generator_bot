@@ -18,8 +18,6 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.explore.ExploreFrontier;
-import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
@@ -41,6 +39,7 @@ import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
 import ti4.service.PlanetService;
+import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
@@ -1254,7 +1253,7 @@ public class ButtonHelperAgents {
             if (buttonID.contains("frontier")) {
                 String cardChosen = buttonID.split("_")[3];
                 String pos = buttonID.split("_")[4];
-                new ExploreFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player,
+                ExploreService.expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player,
                     cardChosen);
             } else {
                 String drawColor = buttonID.split("_")[2];
@@ -1265,7 +1264,7 @@ public class ButtonHelperAgents {
                     Emojis.getEmojiFromDiscord(drawColor) +
                     "Planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile "
                     + tile.getPosition() + ")*:";
-                ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
+                ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                     && game.getPhaseOfGame().contains("agenda")) {
                     PlanetService.refreshPlanet(player, planetName);
@@ -1294,7 +1293,7 @@ public class ButtonHelperAgents {
                 String name = card.getName();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Found a " + name + " in " + game.getTileByPosition(pos).getRepresentation());
-                new ExploreFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player,
+                ExploreService.expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player,
                     cardChosen);
             } else {
                 String drawColor = buttonID.split("_")[2];
@@ -1305,7 +1304,7 @@ public class ButtonHelperAgents {
                     Emojis.getEmojiFromDiscord(drawColor) +
                     "Planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile "
                     + tile.getPosition() + ")*:";
-                ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
+                ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                     && game.getPhaseOfGame().contains("agenda")) {
                     PlanetService.refreshPlanet(player, planetName);

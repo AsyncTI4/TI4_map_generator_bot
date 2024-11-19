@@ -1,22 +1,25 @@
 package ti4.commands.explore;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.image.Mapper;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-public class ExploreDiscardFromDeck extends ExploreSubcommandData {
+class ExploreDiscardFromDeck extends GameStateSubcommand {
 
     public ExploreDiscardFromDeck() {
-        super(Constants.DISCARD_FROM_DECK, "Discard an Exploration Card from the deck.");
-        addOptions(idOption.setRequired(true));
+        super(Constants.DISCARD_FROM_DECK, "Discard an Exploration Card from the deck.", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card ids. May include multiple comma-separated ids.").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         String ids = event.getOption(Constants.EXPLORE_CARD_ID).getAsString().replaceAll(" ", "");
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();

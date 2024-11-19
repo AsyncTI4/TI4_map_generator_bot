@@ -4,34 +4,30 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.image.Mapper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-public class ExploreDrawAndDiscard extends ExploreSubcommandData {
+class ExploreDrawAndDiscard extends GameStateSubcommand {
+
     public ExploreDrawAndDiscard() {
-        super(Constants.DRAW_AND_DISCARD, "Draw from a specified Exploration Deck.");
+        super(Constants.DRAW_AND_DISCARD, "Draw from a specified Exploration Deck.", true, true);
         addOptions(
-            typeOption.setRequired(true),
-            new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of cards to draw (default 1)"));
+                new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true),
+                new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of cards to draw (default 1)"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping countOpt = event.getOption(Constants.COUNT);
-        int count;
-        if (countOpt != null) {
-            count = countOpt.getAsInt();
-        } else {
-            count = 1;
-        }
+        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
+        count = Math.max(count, 1);
+
         StringBuilder sb = new StringBuilder();
+        Game game = getGame();
         for (int i = 0; i < count; i++) {
-            String userID = event.getUser().getId();
-            Game game = GameManager.getUserActiveGame(userID);
             String cardID = game.drawExplore(event.getOption(Constants.TRAIT).getAsString().toLowerCase());
             ExploreModel explore = Mapper.getExplore(cardID);
             sb.append(explore.textRepresentation()).append(System.lineSeparator());

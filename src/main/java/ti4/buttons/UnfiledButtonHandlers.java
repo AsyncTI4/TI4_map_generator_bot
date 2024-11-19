@@ -25,9 +25,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.explore.ExploreFrontier;
-import ti4.commands.explore.ExplorePlanet;
-import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.game.StartPhase;
 import ti4.commands.game.Swap;
 import ti4.commands.planet.PlanetExhaust;
@@ -86,6 +83,7 @@ import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.PlanetService;
 import ti4.service.StatusCleanupService;
 import ti4.service.combat.StartCombatService;
+import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
@@ -236,7 +234,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void garboziaAbilityExhaust(ButtonInteractionEvent event, Player player, Game game) {
         String planet = "garbozia";
         player.exhaustPlanetAbility(planet);
-        new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player, true, game, 1, false);
+        ExploreService.explorePlanet(event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player, true, game, 1, false);
     }
 
     @ButtonHandler("planetAbilityExhaust_")
@@ -558,7 +556,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String pos = stuff[1];
         String cardRefused = stuff[2];
         game.addExplore(cardRefused);
-        new ExploreFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player, cardChosen);
+        ExploreService.expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player, cardChosen);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -856,23 +854,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
-    @ButtonHandler("resolve_explore_")
-    public static void resolveExplore(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String bID = buttonID.replace("resolve_explore_", "");
-        String[] info = bID.split("_");
-        String cardID = info[0];
-        String planetName = info[1];
-        Tile tile = game.getTileFromPlanet(planetName);
-        String tileName = tile == null ? "no tile" : tile.getPosition();
-        String messageText = player.getRepresentation() + " explored " + "Planet "
-            + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile " + tileName + ")*:";
-        if (buttonID.contains("_distantSuns")) {
-            messageText = player.getFactionEmoji() + " chose to resolve: ";
-        }
-        ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
-        ButtonHelper.deleteMessage(event);
-    }
-
     // @ButtonHandler("strategicAction_")
     public static void strategicAction(ButtonInteractionEvent event, Player player, String buttonID, Game game, MessageChannel mainGameChannel) {
         int scNum = Integer.parseInt(buttonID.replace("strategicAction_", ""));
@@ -1057,8 +1038,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         String[] info = bID.split("_");
         Tile tile = game.getTileFromPlanet(info[1]);
-        new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game,
-            1, false);
+        ExploreService.explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, false);
         if (dsdihmy) {
             player.exhaustPlanet(info[1]);
             MessageHelper.sendMessageToChannel(mainGameChannel,

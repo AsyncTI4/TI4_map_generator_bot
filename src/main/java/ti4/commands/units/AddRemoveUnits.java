@@ -33,6 +33,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.PlanetService;
 import ti4.service.ShowGameService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -172,7 +173,7 @@ abstract public class AddRemoveUnits implements Command {
             } else {
                 planetName = Constants.SPACE;
             }
-            planetName = getPlanet(event, tile, planetName);
+            planetName = PlanetService.getPlanet(tile, planetName);
 
             boolean isValidCount = count > 0;
             boolean isValidUnit = unitID != null;
@@ -324,15 +325,6 @@ abstract public class AddRemoveUnits implements Command {
         }
     }
 
-    public static String getPlanet(GenericInteractionCreateEvent event, Tile tile, String planetName) {
-        if (tile.isSpaceHolderValid(planetName))
-            return planetName;
-        return tile.getUnitHolders().keySet().stream()
-            .filter(id -> !Constants.SPACE.equals(id))
-            .filter(unitHolderID -> unitHolderID.startsWith(planetName))
-            .findFirst().orElse(planetName);
-    }
-
     abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName,
         UnitKey unitID, String color, Game game);
 
@@ -350,7 +342,6 @@ abstract public class AddRemoveUnits implements Command {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void register(CommandListUpdateAction commands) {
-        // Moderation commands with required options
         commands.addCommands(
             Commands.slash(getName(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
