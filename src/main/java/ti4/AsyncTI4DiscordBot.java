@@ -29,57 +29,6 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import ti4.commands.CommandManager;
-import ti4.commands.capture.CaptureCommand;
-import ti4.commands.fow.FOWCommand;
-import ti4.commands.game.GameCommand;
-import ti4.commands.map.MapCommand;
-import ti4.commands.planet.PlanetCommand;
-import ti4.commands.tech.TechCommand;
-import ti4.commands.tokens.AddCC;
-import ti4.commands.tokens.AddFrontierTokens;
-import ti4.commands.tokens.AddToken;
-import ti4.commands.tokens.RemoveAllCC;
-import ti4.commands.tokens.RemoveCC;
-import ti4.commands.tokens.RemoveToken;
-import ti4.commands.units.AddUnitDamage;
-import ti4.commands.units.AddUnits;
-import ti4.commands.units.ModifyUnits;
-import ti4.commands.units.MoveUnits;
-import ti4.commands.units.RemoveAllUnitDamage;
-import ti4.commands.units.RemoveAllUnits;
-import ti4.commands.units.RemoveUnitDamage;
-import ti4.commands.units.RemoveUnits;
-import ti4.commands2.admin.AdminCommand;
-import ti4.commands2.agenda.AgendaCommand;
-import ti4.commands2.bothelper.BothelperCommand;
-import ti4.commands2.button.GenericButtonCommand;
-import ti4.commands2.cardsac.ACCardsCommand;
-import ti4.commands2.cardspn.PNCardsCommand;
-import ti4.commands2.cardsso.SOCardsCommand;
-import ti4.commands2.combat.CombatCommand;
-import ti4.commands2.custom.CustomCommand;
-import ti4.commands2.developer.DeveloperCommand;
-import ti4.commands2.ds.DiscordantStarsCommand;
-import ti4.commands2.event.EventCommand;
-import ti4.commands2.explore.ExploreCommand;
-import ti4.commands2.franken.FrankenCommand;
-import ti4.commands2.help.HelpCommand;
-import ti4.commands2.installation.InstallationCommand;
-import ti4.commands2.leaders.LeaderCommand;
-import ti4.commands2.milty.MiltyCommand;
-import ti4.commands2.player.PlayerCommand;
-import ti4.commands2.relic.RelicCommand;
-import ti4.commands2.search.SearchCommand;
-import ti4.commands2.special.SpecialCommand;
-import ti4.commands2.statistics.StatisticsCommand;
-import ti4.commands2.status.StatusCommand;
-import ti4.commands2.tigl.TIGLCommand;
-import ti4.commands2.uncategorized.AllInfo;
-import ti4.commands2.uncategorized.CardsInfo;
-import ti4.commands2.uncategorized.SelectionBoxDemo;
-import ti4.commands2.uncategorized.ShowDistances;
-import ti4.commands2.uncategorized.ShowGame;
-import ti4.commands2.user.UserCommand;
 import ti4.cron.AutoPingCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.UploadStatsCron;
@@ -173,62 +122,6 @@ public class AsyncTI4DiscordBot {
         guildPrimaryID = args[2];
 
         MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
-
-        CommandManager.addCommand(new AddUnits());
-        CommandManager.addCommand(new RemoveUnits());
-        CommandManager.addCommand(new RemoveAllUnits());
-        CommandManager.addCommand(new AllInfo());
-        CommandManager.addCommand(new CardsInfo());
-        CommandManager.addCommand(new ShowGame());
-        CommandManager.addCommand(new ShowDistances());
-        CommandManager.addCommand(new AddCC());
-        CommandManager.addCommand(new RemoveCC());
-        CommandManager.addCommand(new RemoveAllCC());
-        CommandManager.addCommand(new AddFrontierTokens());
-        CommandManager.addCommand(new MoveUnits());
-        CommandManager.addCommand(new ModifyUnits());
-        CommandManager.addCommand(new RemoveToken());
-        CommandManager.addCommand(new AddToken());
-        CommandManager.addCommand(new AddUnitDamage());
-        CommandManager.addCommand(new RemoveUnitDamage());
-        CommandManager.addCommand(new RemoveAllUnitDamage());
-
-        CommandManager.addCommand(new MapCommand());
-        CommandManager.addCommand(new HelpCommand());
-        CommandManager.addCommand(new SearchCommand());
-        CommandManager.addCommand(new ExploreCommand());
-        CommandManager.addCommand(new RelicCommand());
-
-        CommandManager.addCommand(new AdminCommand());
-        CommandManager.addCommand(new DeveloperCommand());
-        CommandManager.addCommand(new BothelperCommand());
-        CommandManager.addCommand(new PlayerCommand());
-        CommandManager.addCommand(new GameCommand());
-
-        CommandManager.addCommand(new ACCardsCommand());
-        CommandManager.addCommand(new PNCardsCommand());
-        CommandManager.addCommand(new SOCardsCommand());
-        CommandManager.addCommand(new StatusCommand());
-        CommandManager.addCommand(new AgendaCommand());
-        CommandManager.addCommand(new EventCommand());
-
-        CommandManager.addCommand(new SpecialCommand());
-        CommandManager.addCommand(new LeaderCommand());
-        CommandManager.addCommand(new CombatCommand());
-        CommandManager.addCommand(new CustomCommand());
-        CommandManager.addCommand(new FOWCommand());
-        CommandManager.addCommand(new InstallationCommand());
-        CommandManager.addCommand(new MiltyCommand());
-        CommandManager.addCommand(new FrankenCommand());
-        CommandManager.addCommand(new CaptureCommand());
-        CommandManager.addCommand(new GenericButtonCommand());
-        CommandManager.addCommand(new DiscordantStarsCommand());
-        CommandManager.addCommand(new StatisticsCommand());
-        CommandManager.addCommand(new TechCommand());
-        CommandManager.addCommand(new PlanetCommand());
-        CommandManager.addCommand(new SelectionBoxDemo());
-        CommandManager.addCommand(new UserCommand());
-        CommandManager.addCommand(new TIGLCommand());
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);
@@ -457,7 +350,6 @@ public class AsyncTI4DiscordBot {
                 .filter(c -> c.getPackageName().startsWith("ti4"))
                 .forEach(classes::add);
         }
-        // classes.sort(Comparator.comparing(Class<?>::getName));
         return classes;
     }
 }

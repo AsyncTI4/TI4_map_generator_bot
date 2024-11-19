@@ -1,4 +1,4 @@
-package ti4.buttons.handlers.hero;
+package ti4.buttons.handlers.leader.hero;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
