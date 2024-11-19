@@ -71,7 +71,7 @@ class PickStrategyCardButtonHandler {
         if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
             secondHalfOfSCPickWhenChecksNBalances(event, player, game, scPick);
         } else {
-            boolean pickSuccessful = SCPick.secondHalfOfPickSC(event, game, player, scPick);
+            boolean pickSuccessful = SCPick.attemptToPickSC(event, game, player, scPick);
             if (pickSuccessful) {
                 StrategyCardPickService.secondHalfOfSCPick(event, player, game, scPick);
                 ButtonHelper.deleteMessage(event);
@@ -86,7 +86,7 @@ class PickStrategyCardButtonHandler {
         String factionPicked = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(factionPicked);
 
-        SCPick.secondHalfOfPickSC(event, game, p2, scpick);
+        SCPick.attemptToPickSC(event, game, p2, scpick);
 
         String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scpick, game)
             + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");

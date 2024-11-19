@@ -73,19 +73,20 @@ public class SCPick extends GameStateSubcommand {
         int scPicked = event.getOption(Constants.STRATEGY_CARD, 0, OptionMapping::getAsInt);
 
 
-        boolean pickSuccessful = pickSC(event, game, player, event.getOption(Constants.STRATEGY_CARD));
+        boolean pickSuccessful = attemptToPickSC(event, game, player, scPicked);
         Set<Integer> playerSCs = player.getSCs();
-        if (!pickSuccessful) {
-            if (game.isFowMode()) {
-                String[] scs = { Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6 };
-                int c = 0;
-                while (playerSCs.isEmpty() && c < 5 && !pickSuccessful) {
-                    if (event.getOption(scs[c]) != null) {
-                        pickSuccessful = pickSC(event, game, player, event.getOption(scs[c]));
-                    }
-                    playerSCs = player.getSCs();
-                    c++;
+
+        // If FoW, try to use additional choices
+        if (!pickSuccessful && game.isFowMode()) {
+            String[] scs = { Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6 };
+            int c = 0;
+            while (playerSCs.isEmpty() && c < 5 && !pickSuccessful) {
+                OptionMapping scOption = event.getOption(scs[c]);
+                if (scOption != null) {
+                    pickSuccessful = attemptToPickSC(event, game, player, scOption.getAsInt());
                 }
+                playerSCs = player.getSCs();
+                c++;
             }
             if (!pickSuccessful) {
                 return;
@@ -96,10 +97,10 @@ public class SCPick extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "No strategy card picked.");
             return;
         }
-        secondHalfOfSCPick(event, player, game, scPicked);
+        doAdditionalStuffAfterPickingSC(event, player, game, scPicked);
     }
 
-    public static void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game game, int scPicked) {
+    public static void doAdditionalStuffAfterPickingSC(GenericInteractionCreateEvent event, Player player, Game game, int scPicked) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
 
         String msgExtra = "";
@@ -291,10 +292,10 @@ public class SCPick extends GameStateSubcommand {
             return false;
         }
         int scNumber = optionSC.getAsInt();
-        return secondHalfOfPickSC(event, game, player, scNumber);
+        return attemptToPickSC(event, game, player, scNumber);
     }
 
-    public static boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game game, Player player, int scNumber) {
+    public static boolean attemptToPickSC(GenericInteractionCreateEvent event, Game game, Player player, int scNumber) {
         Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
         if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Can only pick strategy card if both faction and color have been picked.");
