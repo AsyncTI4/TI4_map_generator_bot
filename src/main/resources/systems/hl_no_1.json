@@ -1,6 +1,7 @@
 {
     "id": "hl_no_1",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "no_1"
     ],
