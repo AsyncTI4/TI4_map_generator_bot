@@ -115,7 +115,6 @@ abstract public class AddRemoveUnits implements Command {
         }
 
         commonUnitParsing(event, color, tile, unitList, game);
-        actionAfterAll(event, tile, color, game);
     }
 
     protected String recheckColorForUnit(String unit, String color, GenericInteractionCreateEvent event) {
