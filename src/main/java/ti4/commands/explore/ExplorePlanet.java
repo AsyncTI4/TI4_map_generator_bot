@@ -23,9 +23,9 @@ class ExplorePlanet extends GameStateSubcommand {
     public ExplorePlanet() {
         super(Constants.PLANET, "Explore a specific planet.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Planet trait to explore").setRequired(false).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Planet trait to explore").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ, "Override ownership requirement. Enter YES if so").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ, "Override ownership requirement. Enter YES if so"));
     }
 
     @Override
