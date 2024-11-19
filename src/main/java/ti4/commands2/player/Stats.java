@@ -209,7 +209,7 @@ public class Stats extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, message.toString());
         }
 
-        pickSC(event, game, player, event.getOption(Constants.STRATEGY_CARD));
+        SCPick.pickSC(event, game, player, event.getOption(Constants.STRATEGY_CARD));
 
         OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
         if (optionSCPlayed != null) {
@@ -309,75 +309,6 @@ public class Stats extends GameStateSubcommand {
         sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
         sb.append("\n");
         return sb.toString();
-    }
-
-    public static boolean pickSC(GenericInteractionCreateEvent event, Game game, Player player, OptionMapping optionSC) {
-        if (optionSC == null) {
-            return false;
-        }
-        int scNumber = optionSC.getAsInt();
-        return secondHalfOfPickSC(event, game, player, scNumber);
-    }
-
-    public static boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game game, Player player, int scNumber) {
-        Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
-        if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Can only pick strategy card if both faction and color have been picked.");
-            return false;
-        }
-        if (!scTradeGoods.containsKey(scNumber)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Strategy Card must be from possible ones in Game: " + scTradeGoods.keySet());
-            return false;
-        }
-
-        Map<String, Player> players = game.getPlayers();
-        for (Player playerStats : players.values()) {
-            if (playerStats.getSCs().contains(scNumber)) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getSCName(scNumber, game) + " is already picked.");
-                return false;
-            }
-        }
-
-        player.addSC(scNumber);
-        if (game.isFowMode()) {
-            String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " picked " + Helper.getSCName(scNumber, game);
-            FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
-        }
-
-        StrategyCardModel scModel = game.getStrategyCardModelByInitiative(scNumber).orElse(null);
-
-        // WARNING IF PICKING TRADE WHEN PLAYER DOES NOT HAVE THEIR TRADE AGREEMENT
-        if (scModel != null && scModel.usesAutomationForSCID("pok5trade") && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
-            String message = player.getRepresentationUnfogged() + " heads up, you just picked Trade but don't currently hold your Trade Agreement";
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentationUnfogged())
-            .append("\n> Picked: " + Helper.getSCRepresentation(game, scNumber));
-
-        Integer tgCountOnSC = scTradeGoods.get(scNumber);
-        if (tgCountOnSC == null || tgCountOnSC != 0) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
-        } else {
-            String gainTG = player.gainTG(tgCountOnSC);
-            sb.append(" gaining ").append(Emojis.tg(tgCountOnSC)).append(gainTG);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
-
-            if (game.isFowMode()) {
-                String fowMessage = player.getFactionEmojiOrColor() + " gained " + Emojis.tg(tgCountOnSC) + " " + gainTG + " from picking " + Helper.getSCRepresentation(game, scNumber);
-                FoWHelper.pingAllPlayersWithFullStats(game, event, player, fowMessage);
-            }
-
-            CommanderUnlockCheckService.checkPlayer(player, "hacan");
-            ButtonHelperAbilities.pillageCheck(player, game);
-            if (scNumber == 2 && game.isRedTapeMode()) {
-                for (int x = 0; x < tgCountOnSC; x++) {
-                    ButtonHelper.offerRedTapeButtons(game, player);
-                }
-            }
-        }
-        return true;
     }
 
     public void setValue(SlashCommandInteractionEvent event, Game game, Player player, OptionMapping option,

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import lombok.experimental.UtilityClass;
@@ -13,7 +12,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.game.StartPhase;
-import ti4.commands2.player.Stats;
+import ti4.commands2.player.SCPick;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -72,7 +71,7 @@ class PickStrategyCardButtonHandler {
         if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
             secondHalfOfSCPickWhenChecksNBalances(event, player, game, scPick);
         } else {
-            boolean pickSuccessful = Stats.secondHalfOfPickSC(event, game, player, scPick);
+            boolean pickSuccessful = SCPick.secondHalfOfPickSC(event, game, player, scPick);
             if (pickSuccessful) {
                 StrategyCardPickService.secondHalfOfSCPick(event, player, game, scPick);
                 ButtonHelper.deleteMessage(event);
@@ -87,7 +86,7 @@ class PickStrategyCardButtonHandler {
         String factionPicked = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(factionPicked);
 
-        Stats.secondHalfOfPickSC(event, game, p2, scpick);
+        SCPick.secondHalfOfPickSC(event, game, p2, scpick);
 
         String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scpick, game)
             + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");
