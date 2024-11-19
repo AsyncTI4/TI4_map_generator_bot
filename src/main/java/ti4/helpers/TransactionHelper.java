@@ -994,12 +994,10 @@ public class TransactionHelper {
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "# " + p1.getRepresentation() + " heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
                     return;
                 }
-                if (id == null) {
-                    for (Map.Entry<String, Integer> pn : p1.getPromissoryNotes().entrySet()) {
-                        if (pn.getValue().equals(pnIndex)) {
-                            id = pn.getKey();
-                            break;
-                        }
+                for (Map.Entry<String, Integer> pn : p1.getPromissoryNotes().entrySet()) {
+                    if (pn.getValue().equals(pnIndex)) {
+                        id = pn.getKey();
+                        break;
                     }
                 }
                 if (id == null) {

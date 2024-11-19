@@ -888,7 +888,7 @@ public class AgendaHelper {
                 BotLogger.log("Could not find next in line", e);
             }
             if (nextInLine == null) {
-                BotLogger.log("`startTheVoting` " + nextInLine + " is **null**");
+                BotLogger.log("`startTheVoting` is **null**");
                 return;
             }
             String realIdentity = nextInLine.getRepresentationUnfogged();

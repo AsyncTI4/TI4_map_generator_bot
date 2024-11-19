@@ -1523,7 +1523,6 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(zealots.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
             return;
         }
-        List<Tile> tiles = new ArrayList<>();
         List<Button> buttons = new ArrayList<>();
 
         for (String planet : player.getPlanetsAllianceMode()) {
@@ -1532,10 +1531,8 @@ public class ButtonHelperAgents {
             }
             Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             Tile tile = game.getTileFromPlanet(p.getName());
-            if (tile != null && !tiles.contains(tile)
-                && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
-                && ButtonHelper.checkForTechSkips(game, planet)
-                || tile.isHomeSystem()) {
+            if (tile != null && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game) && ButtonHelper.checkForTechSkips(game, planet)
+                    || tile.isHomeSystem()) {
                 buttons.add(Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_ZealotsAgent",
                     tile.getRepresentationForButtons(game, player)));
             }

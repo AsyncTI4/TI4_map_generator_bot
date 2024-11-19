@@ -120,9 +120,7 @@ class SCUnpick extends GameStateSubcommand {
             if (allPicked) {
                 ListTurnOrderService.turnOrder(event, game);
             }
-            if (!msgExtra.isEmpty()) {
-                MessageHelper.sendMessageToEventChannel(event, msgExtra);
-            }
+            MessageHelper.sendMessageToEventChannel(event, msgExtra);
         }
     }
 }
