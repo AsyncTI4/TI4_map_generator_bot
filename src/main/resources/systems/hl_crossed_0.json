@@ -1,6 +1,7 @@
 {
     "id": "hl_crossed_0",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "crossed_0"
     ],

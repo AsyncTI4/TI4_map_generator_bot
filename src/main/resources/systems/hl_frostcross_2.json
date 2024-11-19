@@ -1,6 +1,7 @@
 {
     "id": "hl_frostcross_2",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "frostcross_2"
     ],
