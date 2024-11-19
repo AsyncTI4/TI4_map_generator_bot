@@ -1,4 +1,4 @@
-package ti4.commands2.milty;
+package ti4.service.milty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,13 +28,13 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.map.AddTileList;
 import ti4.commands2.player.Setup;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.StringHelper;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;

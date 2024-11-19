@@ -1,4 +1,4 @@
-package ti4.commands.explore;
+package ti4.commands2.explore;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package ti4.commands.explore;
+package ti4.commands2.explore;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

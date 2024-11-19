@@ -1,4 +1,4 @@
-package ti4.commands2.milty;
+package ti4.service.milty;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -12,16 +12,15 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
-import ti4.commands2.milty.MiltyDraftManager.PlayerDraft;
+import ti4.helpers.Emojis;
+import ti4.helpers.MapTemplateHelper;
+import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
+import ti4.image.ImageHelper;
 import ti4.image.MapGenerator;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.helpers.Emojis;
-import ti4.image.ImageHelper;
-import ti4.helpers.MapTemplateHelper;
-import ti4.helpers.Storage;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -34,6 +33,7 @@ import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.model.WormholeModel;
+import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 
 public class MiltyDraftHelper {
 

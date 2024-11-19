@@ -1,4 +1,4 @@
-package ti4.commands.explore;
+package ti4.commands2.explore;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -10,10 +10,10 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-class ExploreRemoveFromGame extends GameStateSubcommand {
+class ExploreDiscardFromDeck extends GameStateSubcommand {
 
-    public ExploreRemoveFromGame() {
-        super(Constants.REMOVE, "Remove an Exploration card from the game.", true, true);
+    public ExploreDiscardFromDeck() {
+        super(Constants.DISCARD_FROM_DECK, "Discard an Exploration Card from the deck.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card ids. May include multiple comma-separated ids.").setRequired(true));
     }
 
@@ -25,11 +25,11 @@ class ExploreRemoveFromGame extends GameStateSubcommand {
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
             ExploreModel explore = Mapper.getExplore(id);
-            game.purgeExplore(id);
             if (explore != null) {
-                sb.append("Exploration card removed: ").append(explore.textRepresentation()).append(System.lineSeparator());
+                game.discardExplore(id);
+                sb.append("Card discarded: ").append(explore.textRepresentation()).append(System.lineSeparator());
             } else {
-                sb.append("Removed id without matching card: ").append(id).append(System.lineSeparator());
+                sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

@@ -50,7 +50,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.planet.PlanetRemove;
-import ti4.commands2.milty.MiltyDraftManager;
 import ti4.draft.BagDraft;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -86,6 +85,7 @@ import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.milty.MiltyDraftManager;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 

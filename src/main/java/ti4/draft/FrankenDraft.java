@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ti4.commands2.milty.MiltyDraftHelper;
-import ti4.commands2.milty.MiltyDraftManager;
 import ti4.draft.items.AbilityDraftItem;
 import ti4.draft.items.AgentDraftItem;
 import ti4.draft.items.BlueTileDraftItem;
@@ -26,6 +24,8 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
+import ti4.service.milty.MiltyDraftHelper;
+import ti4.service.milty.MiltyDraftManager;
 
 public class FrankenDraft extends BagDraft {
     public FrankenDraft(Game owner) {

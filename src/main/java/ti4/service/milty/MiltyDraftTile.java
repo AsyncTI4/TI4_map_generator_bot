@@ -1,4 +1,4 @@
-package ti4.commands2.milty;
+package ti4.service.milty;
 
 import lombok.Data;
 import ti4.map.Planet;

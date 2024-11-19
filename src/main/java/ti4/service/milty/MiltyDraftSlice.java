@@ -1,4 +1,4 @@
-package ti4.commands2.milty;
+package ti4.service.milty;
 
 import java.util.ArrayList;
 import java.util.List;

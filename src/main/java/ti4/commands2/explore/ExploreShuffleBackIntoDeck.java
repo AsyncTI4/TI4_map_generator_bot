@@ -1,4 +1,4 @@
-package ti4.commands.explore;
+package ti4.commands2.explore;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -10,11 +10,11 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-class ExploreDiscardFromDeck extends GameStateSubcommand {
+class ExploreShuffleBackIntoDeck extends GameStateSubcommand {
 
-    public ExploreDiscardFromDeck() {
-        super(Constants.DISCARD_FROM_DECK, "Discard an Exploration Card from the deck.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card ids. May include multiple comma-separated ids.").setRequired(true));
+    public ExploreShuffleBackIntoDeck() {
+        super(Constants.SHUFFLE_BACK_INTO_DECK, "Shuffle an Exploration card back into the deck, including purged cards", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card ID sent between ()").setRequired(true));
     }
 
     @Override
@@ -26,8 +26,8 @@ class ExploreDiscardFromDeck extends GameStateSubcommand {
         for (String id : idList) {
             ExploreModel explore = Mapper.getExplore(id);
             if (explore != null) {
-                game.discardExplore(id);
-                sb.append("Card discarded: ").append(explore.textRepresentation()).append(System.lineSeparator());
+                game.addExplore(id);
+                sb.append("Card shuffled into exploration deck: ").append(explore.textRepresentation()).append(System.lineSeparator());
             } else {
                 sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());
             }
