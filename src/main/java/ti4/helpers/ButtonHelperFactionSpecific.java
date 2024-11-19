@@ -26,7 +26,6 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.player.SendDebt;
 import ti4.commands2.player.TurnStart;
-import ti4.commands2.tech.TechExhaust;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -47,6 +46,7 @@ import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.tech.PlayerTechService;
 
 public class ButtonHelperFactionSpecific {
 
@@ -67,7 +67,7 @@ public class ButtonHelperFactionSpecific {
         ButtonHelper.deleteTheOneButton(event);
     }
 
-    public static void resolveVadenTgForSpeed(Player player, Game game, GenericInteractionCreateEvent event) {
+    public static void resolveVadenTgForSpeed(Player player, GenericInteractionCreateEvent event) {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " is paying TGs to boost their non-fighter ships.");
         List<Button> buttons = new ArrayList<>();
@@ -100,7 +100,7 @@ public class ButtonHelperFactionSpecific {
         buttons.add(doneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             "Click how many TGs you want to spend", buttons);
-        TechExhaust.deleteTheOneButtonIfButtonEvent(event);
+        PlayerTechService.deleteTheOneButtonIfButtonEvent(event);
     }
 
     @ButtonHandler("resolveVadenMech_")
@@ -567,7 +567,7 @@ public class ButtonHelperFactionSpecific {
             techs2);
     }
 
-    public static void offerArgentStartingTech(Player player, Game game) {
+    public static void offerArgentStartingTech(Player player) {
         List<String> techToGain = new ArrayList<>();
         techToGain.add("st");
         techToGain.add("nm");
@@ -589,7 +589,7 @@ public class ButtonHelperFactionSpecific {
             techs2);
     }
 
-    public static void offerWinnuStartingTech(Player player, Game game) {
+    public static void offerWinnuStartingTech(Player player) {
         List<String> techToGain = new ArrayList<>();
         techToGain.add("st");
         techToGain.add("nm");

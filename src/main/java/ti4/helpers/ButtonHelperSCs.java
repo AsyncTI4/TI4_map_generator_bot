@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.commands2.tech.GetTechButton;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -24,6 +23,7 @@ import ti4.model.StrategyCardModel;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.ScorePublicObjectiveService;
+import ti4.service.tech.PlayerTechService;
 
 public class ButtonHelperSCs {
 
@@ -586,7 +586,7 @@ public class ButtonHelperSCs {
         if (setStatus) {
             player.addFollowedSC(scNum, event);
             if (scNum == 7 || scNum / 10 == 7) {
-                GetTechButton.postTechSummary(game);
+                PlayerTechService.postTechSummary(game);
             }
         }
         ButtonHelper.addReaction(event, false, false, "Not Following", "");

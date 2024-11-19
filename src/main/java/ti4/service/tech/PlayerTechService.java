@@ -203,7 +203,7 @@ public class PlayerTechService {
                     List.of(Buttons.REDISTRIBUTE_CCs, deleteButton));
             }
             case "dsvadeb" -> {
-                ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, game, event);
+                ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
             }
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
