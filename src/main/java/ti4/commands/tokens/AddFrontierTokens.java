@@ -68,7 +68,6 @@ public class AddFrontierTokens implements Command {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void register(CommandListUpdateAction commands) {
-        // Moderation commands with required options
         commands.addCommands(
             Commands.slash(getName(), "Add Frontier tokens to all possible tiles")
                 .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")

@@ -39,7 +39,6 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
-import ti4.commands2.milty.MiltyDraftManager;
 import ti4.draft.BagDraft;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -60,6 +59,7 @@ import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.info.CardsInfoService;
+import ti4.service.milty.MiltyDraftManager;
 
 public class GameSaveLoadManager {
 

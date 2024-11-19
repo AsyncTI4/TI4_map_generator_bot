@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 
-public abstract class SearchComponentModelSubcommand extends Subcommand {
+abstract class SearchComponentModelSubcommand extends Subcommand {
 
     public SearchComponentModelSubcommand(String name, String description) {
         super(name, description);

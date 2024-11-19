@@ -5,10 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.amazonaws.util.CollectionUtils;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -16,8 +13,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.Command;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.AliasHandler;
@@ -36,8 +33,10 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.PlanetService;
 import ti4.service.ShowGameService;
 import ti4.service.combat.StartCombatService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 abstract public class AddRemoveUnits implements Command {
 
@@ -174,7 +173,7 @@ abstract public class AddRemoveUnits implements Command {
             } else {
                 planetName = Constants.SPACE;
             }
-            planetName = getPlanet(event, tile, planetName);
+            planetName = PlanetService.getPlanet(tile, planetName);
 
             boolean isValidCount = count > 0;
             boolean isValidUnit = unitID != null;
@@ -286,7 +285,7 @@ abstract public class AddRemoveUnits implements Command {
                 return;
             }
             ButtonHelper.checkFleetAndCapacity(player, game, tile, event);
-            CommanderUnlockCheck.checkPlayer(player, "naalu", "cabal");
+            CommanderUnlockCheckService.checkPlayer(player, "naalu", "cabal");
         }
     }
 
@@ -326,15 +325,6 @@ abstract public class AddRemoveUnits implements Command {
         }
     }
 
-    public static String getPlanet(GenericInteractionCreateEvent event, Tile tile, String planetName) {
-        if (tile.isSpaceHolderValid(planetName))
-            return planetName;
-        return tile.getUnitHolders().keySet().stream()
-            .filter(id -> !Constants.SPACE.equals(id))
-            .filter(unitHolderID -> unitHolderID.startsWith(planetName))
-            .findFirst().orElse(planetName);
-    }
-
     abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName,
         UnitKey unitID, String color, Game game);
 
@@ -352,7 +342,6 @@ abstract public class AddRemoveUnits implements Command {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void register(CommandListUpdateAction commands) {
-        // Moderation commands with required options
         commands.addCommands(
             Commands.slash(getName(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")

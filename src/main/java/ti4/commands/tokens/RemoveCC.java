@@ -8,16 +8,17 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 public class RemoveCC extends AddRemoveToken {
+
     @Override
     void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
         for (String color : colors) {
@@ -37,7 +38,6 @@ public class RemoveCC extends AddRemoveToken {
     }
 
     public static void removeCC(GenericInteractionCreateEvent event, String color, Tile tile, Game game) {
-
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
@@ -48,7 +48,6 @@ public class RemoveCC extends AddRemoveToken {
             FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a token in the system");
         }
         tile.removeCC(ccID);
-
     }
 
     @Override
@@ -63,7 +62,6 @@ public class RemoveCC extends AddRemoveToken {
 
     @Override
     public void register(CommandListUpdateAction commands) {
-        // Moderation commands with required options
         commands.addCommands(
             Commands.slash(getName(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))

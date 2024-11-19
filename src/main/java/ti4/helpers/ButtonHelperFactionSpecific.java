@@ -20,8 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.commands.game.StartPhase;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechExhaust;
 import ti4.commands.tokens.AddCC;
@@ -47,6 +45,8 @@ import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
+import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.RefreshLeaderService;
 
 public class ButtonHelperFactionSpecific {
 
@@ -373,7 +373,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 ident + " already had a " + color + " CC in their fleet pool");
         }
-        CommanderUnlockCheck.checkPlayer(player, "mahact");
+        CommanderUnlockCheckService.checkPlayer(player, "mahact");
 
         if (ButtonHelper.isLawInPlay(game, "regulations")
             && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
@@ -1271,7 +1271,7 @@ public class ButtonHelperFactionSpecific {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
                 SendDebt.sendDebt(player, p2, 1);
-                CommanderUnlockCheck.checkPlayer(p2, "vaden");
+                CommanderUnlockCheckService.checkPlayer(p2, "vaden");
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " you sent 1 debt token to "
                         + p2.getFactionEmojiOrColor() + " due to their fine print ability");
@@ -1973,7 +1973,7 @@ public class ButtonHelperFactionSpecific {
         ActionCardHelper.sendActionCardInfo(game, player2);
         ActionCardHelper.sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, player);
-        CommanderUnlockCheck.checkPlayer(player, "yssaril");
+        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         event.getMessage().delete().queue();
     }
 
@@ -1986,7 +1986,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached terraform to " + Helper.getPlanetRepresentation(planet, game));
         game.setStoredValue("terraformedPlanet", planet);
-        CommanderUnlockCheck.checkPlayer(player, "sol");
+        CommanderUnlockCheckService.checkPlayer(player, "sol");
         event.getMessage().delete().queue();
     }
 
@@ -2037,7 +2037,7 @@ public class ButtonHelperFactionSpecific {
             "Attached branch office to " + Helper.getPlanetRepresentation(planet, game));
         if (game.getPNOwner(pnID).getLeaderIDs().contains("veldyrcommander")
             && !game.getPNOwner(pnID).hasLeaderUnlocked("veldyrcommander")) {
-            CommanderUnlockCheck.checkPlayer(game.getPNOwner(pnID), "veldyr");
+            CommanderUnlockCheckService.checkPlayer(game.getPNOwner(pnID), "veldyr");
         }
         event.getMessage().delete().queue();
     }
@@ -2142,7 +2142,7 @@ public class ButtonHelperFactionSpecific {
         }
         String msg = sb.toString();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        CommanderUnlockCheck.checkPlayer(player, "nivyn");
+        CommanderUnlockCheckService.checkPlayer(player, "nivyn");
         event.getMessage().delete().queue();
     }
 
@@ -2273,7 +2273,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
         for (Player p2 : game.getRealPlayers()) {
-            CommanderUnlockCheck.checkPlayer(p2, "ghost");
+            CommanderUnlockCheckService.checkPlayer(p2, "ghost");
         }
         event.getMessage().delete().queue();
     }
@@ -2361,7 +2361,7 @@ public class ButtonHelperFactionSpecific {
             }
             return;
         }
-        RefreshLeader.refreshLeader(p2, playerLeader, game);
+        RefreshLeaderService.refreshLeader(p2, playerLeader, game);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " exhausted TCS tech to ready " + agent + ", owned by "

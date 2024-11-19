@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -28,6 +27,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class Stats extends GameStateSubcommand {
 
@@ -144,7 +144,7 @@ public class Stats extends GameStateSubcommand {
                     player.getRepresentationUnfogged() + " you have the opportunity to buy axis orders",
                     ButtonHelperAbilities.getBuyableAxisOrders(player, game));
             }
-            CommanderUnlockCheck.checkPlayer(player, "mykomentori");
+            CommanderUnlockCheckService.checkPlayer(player, "mykomentori");
         }
 
         OptionMapping optionMedian = event.getOption(Constants.AUTO_SABO_PASS_MEDIAN);
@@ -370,7 +370,7 @@ public class Stats extends GameStateSubcommand {
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);
-            CommanderUnlockCheck.checkPlayer(player, "hacan");
+            CommanderUnlockCheckService.checkPlayer(player, "hacan");
             ButtonHelperAbilities.pillageCheck(player, game);
             if (scNumber == 2 && game.isRedTapeMode()) {
                 for (int x = 0; x < tgCount; x++) {

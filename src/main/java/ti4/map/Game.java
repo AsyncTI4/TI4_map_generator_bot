@@ -49,11 +49,8 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands2.milty.MiltyDraftManager;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
-import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -71,6 +68,7 @@ import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
+import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -86,6 +84,8 @@ import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.milty.MiltyDraftManager;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
@@ -4192,7 +4192,7 @@ public class Game extends GameProperties {
     }
 
     public void checkCommanderUnlocks(String factionToCheck) {
-        CommanderUnlockCheck.checkAllPlayersInGame(this, factionToCheck);
+        CommanderUnlockCheckService.checkAllPlayersInGame(this, factionToCheck);
     }
 
     /**

@@ -11,13 +11,14 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.RelicModel;
+import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
 public class RelicHelper {
@@ -93,7 +94,7 @@ public class RelicHelper {
                     game.drawSecretObjective(player.getUserID());
                     helpMessage.append(" Drew a second SO due to Plausible Deniability.");
                 }
-                SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
             }
             case "shard" -> {
                 Integer poIndex = game.addCustomPO("Shard of the Throne", 1);
@@ -177,7 +178,7 @@ public class RelicHelper {
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
         }
-        CommanderUnlockCheck.checkPlayer(receiver, "kollecc", "bentor");
+        CommanderUnlockCheckService.checkPlayer(receiver, "kollecc", "bentor");
 
         if (game.isFowMode()) {
             String fail = "User for faction not found. Report to ADMIN";
@@ -188,7 +189,7 @@ public class RelicHelper {
             FoWHelper.pingPlayersTransaction(game, event, sender, receiver, fragString, null);
         }
         TransactionHelper.checkTransactionLegality(game, sender, receiver);
-        CommanderUnlockCheck.checkPlayer(receiver, "kollecc");
+        CommanderUnlockCheckService.checkPlayer(receiver, "kollecc");
     }
 
     public static void showRemaining(GenericInteractionCreateEvent event, boolean over, Game game, Player player) {

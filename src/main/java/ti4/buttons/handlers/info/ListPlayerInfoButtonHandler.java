@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands2.player.Stats;
-import ti4.commands2.player.UnitInfo;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -19,6 +18,7 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.info.ListPlayerInfoService;
+import ti4.service.info.UnitInfoService;
 
 @UtilityClass
 class ListPlayerInfoButtonHandler {
@@ -147,7 +147,7 @@ class ListPlayerInfoButtonHandler {
                         }
                     }
                 }
-                case "units" -> messageEmbeds.addAll(UnitInfo.getUnitMessageEmbeds(p2, false));
+                case "units" -> messageEmbeds.addAll(UnitInfoService.getUnitMessageEmbeds(p2, false));
             }
         }
 

@@ -5,13 +5,13 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.leaders.UnlockLeader;
+import ti4.commands2.leaders.UnlockLeader;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class CryypterHelper {
 
@@ -49,7 +49,7 @@ public class CryypterHelper {
         ButtonHelper.checkACLimit(game, player);
         if (addScheming && player.hasAbility("scheming")) ActionCardHelper.sendDiscardActionCardButtons(player, false);
         if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-            CommanderUnlockCheck.checkPlayer(player, "yssaril");
+            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
     }

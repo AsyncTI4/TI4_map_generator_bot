@@ -7,7 +7,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.explore.ExploreInfo;
 import ti4.commands.tech.TechShowDeck;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
@@ -18,6 +17,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.decks.ShowActionCardsService;
+import ti4.service.explore.ExploreService;
 
 import static ti4.helpers.ButtonHelper.deleteMessage;
 
@@ -47,7 +47,7 @@ class ShowAgendasButtonHandler {
                 } else {
                     types.add(deck);
                 }
-                ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false);
+                ExploreService.secondHalfOfExpInfo(types, event, player, game, false);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);

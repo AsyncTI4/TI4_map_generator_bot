@@ -3,11 +3,11 @@ package ti4.commands2.special;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
 
@@ -21,6 +21,6 @@ class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
             player.addMahactCC(color);
             Helper.isCCCountCorrect(event, game, color);
         }
-        CommanderUnlockCheck.checkPlayer(player, "mahact");
+        CommanderUnlockCheckService.checkPlayer(player, "mahact");
     }
 }
