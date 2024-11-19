@@ -3,20 +3,19 @@ package ti4.commands.fow;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class CheckChannels extends FOWSubcommandData {
+class CheckChannels extends GameStateSubcommand {
 
     public CheckChannels() {
-        super(Constants.CHECK_CHANNELS, "Ping each channel that is set up");
+        super(Constants.CHECK_CHANNELS, "Ping each channel that is set up", true, false);
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
         if (FoWHelper.isPrivateGame(event)) {
             MessageHelper.replyToMessage(event, "This command is not available in fog of war private channels.");
             return;
@@ -25,7 +24,7 @@ public class CheckChannels extends FOWSubcommandData {
         StringBuilder output = new StringBuilder();
         output.append("**__Currently set channels:__**\n>>> ");
         boolean first = true;
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : getGame().getPlayers().values()) {
             if (!first) output.append("\n");
             first = false;
 
@@ -47,9 +46,5 @@ public class CheckChannels extends FOWSubcommandData {
         }
 
         MessageHelper.replyToMessage(event, output.toString());
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
     }
 }

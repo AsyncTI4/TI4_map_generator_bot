@@ -1,26 +1,23 @@
 package ti4.commands.fow;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class AddAdjacencyOverrideList extends FOWSubcommandData {
+class AddAdjacencyOverrideList extends GameStateSubcommand {
+
   public AddAdjacencyOverrideList() {
-    super(Constants.ADD_ADJACENCY_OVERRIDE_LIST, "Add Custom Adjacent Tiles as a List. ");
+    super(Constants.ADD_ADJACENCY_OVERRIDE_LIST, "Add Custom Adjacent Tiles as a List.", true, true);
     addOptions(new OptionData(OptionType.STRING, Constants.ADJACENCY_OVERRIDES_LIST, "Primary:Direction:Secondary 101:nw:202")
-      .setRequired(true));
+        .setRequired(true));
   }
 
   @Override
   public void execute(SlashCommandInteractionEvent event) {
-    Game game = getActiveGame();
-    OptionMapping adjacencyList = event.getOption(Constants.ADJACENCY_OVERRIDES_LIST);
-
-    String[] adjacencyListOptions = adjacencyList.getAsString().toLowerCase().split(" ");
+    String[] adjacencyListOptions = event.getOption(Constants.ADJACENCY_OVERRIDES_LIST).getAsString().toLowerCase().split(" ");
     for (String adjacencyOption : adjacencyListOptions) {
       String[] adjacencyTile = adjacencyOption.split(":");
       if (adjacencyTile.length < 3) {
@@ -48,7 +45,7 @@ public class AddAdjacencyOverrideList extends FOWSubcommandData {
         return;
       }
 
-      game.addAdjacentTileOverride(primaryTile, direction, secondaryTile);
+      getGame().addAdjacentTileOverride(primaryTile, direction, secondaryTile);
     }
   }
 }

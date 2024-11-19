@@ -9,16 +9,17 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class Whisper extends FOWSubcommandData {
+class Whisper extends GameStateSubcommand {
 
     public Whisper() {
-        super(Constants.WHISPER, "Send a private message to a player in fog mode");
+        super(Constants.WHISPER, "Send a private message to a player in fog mode", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to which you send the message").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.MSG, "Message to send").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ANON, "Send anonymously").setAutoComplete(true));
@@ -26,32 +27,21 @@ public class Whisper extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
+        Game game = getGame();
+        if (!game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game is not fog mode, and should not use this command. Instead whisper by beginning your message with to[color] or to[faction] from inside your cards info thread (for instance saying toblue hi)");
             return;
         }
+
         Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (otherPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to send message to could not be found");
             return;
         }
-        if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game is not fog mode, and should not use this command. Instead whisper by beginning your message with to[color] or to[faction] from inside your cards info thread (for instance saying toblue hi)");
-            return;
-        }
-        OptionMapping whisperms = event.getOption(Constants.MSG);
-        OptionMapping anon = event.getOption(Constants.ANON);
-        String msg = "";
-        if (whisperms != null) {
-            msg = whisperms.getAsString();
-        }
-        String anonY = "";
-        if (anon != null) {
-            anonY = anon.getAsString();
-        }
-        sendWhisper(game, player, otherPlayer, msg, anonY, event.getMessageChannel(), event.getGuild());
+
+        String msg = event.getOption(Constants.MSG).getAsString();
+        String anonY = event.getOption(Constants.ANON, "", OptionMapping::getAsString);
+        sendWhisper(game, getPlayer(), otherPlayer, msg, anonY, event.getMessageChannel(), event.getGuild());
     }
 
     public static void sendWhisper(Game game, Player player, Player player_, String msg, String anonY, MessageChannel feedbackChannel, Guild guild) {
@@ -115,9 +105,4 @@ public class Whisper extends FOWSubcommandData {
             MessageHelper.sendPrivateMessageToPlayer(player_, game, feedbackChannel, message, fail, success);
         }
     }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-    }
-
 }

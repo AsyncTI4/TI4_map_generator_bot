@@ -3,55 +3,38 @@ package ti4.commands.fow;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands2.CommandHelper;
-import ti4.image.PositionMapper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.image.PositionMapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PingSystem extends FOWSubcommandData {
+class PingSystem extends GameStateSubcommand {
+
     public PingSystem() {
-        super(Constants.PING_SYSTEM, "Alert players adjacent to a system with a message.");
+        super(Constants.PING_SYSTEM, "Alert players adjacent to a system with a message.", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.MESSAGE, "Message to send").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-
-        MessageChannel channel = event.getChannel();
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(channel, "You're not a player of this game");
-            return;
-        }
-
-        OptionMapping positionMapping = event.getOption(Constants.POSITION);
-        if (positionMapping == null) {
-            MessageHelper.replyToMessage(event, "Specify position");
-            return;
-        }
-
-        OptionMapping messageMapping = event.getOption(Constants.MESSAGE);
-        String message = messageMapping == null ? "" : messageMapping.getAsString();
-
-        String position = positionMapping.getAsString().toLowerCase();
+        String position = event.getOption(Constants.POSITION).getAsString().toLowerCase();
         if (!PositionMapper.isTilePositionValid(position)) {
             MessageHelper.replyToMessage(event, "Tile position is not allowed");
             return;
         }
 
         //get players adjacent
+        Game game = getGame();
         List<Player> players = FoWHelper.getAdjacentPlayers(game, position, true);
         List<Player> failList = new ArrayList<>();
+        String message = event.getOption(Constants.MESSAGE).getAsString();
         int successfulCount = 0;
         for (Player player_ : players) {
             String playerMessage = player_.getRepresentationUnfogged() + " - System " + position + " has been pinged:\n> " + message;
@@ -72,9 +55,5 @@ public class PingSystem extends FOWSubcommandData {
         } else {
             MessageHelper.replyToMessage(event, "Successfully sent all pings.");
         }
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
     }
 }

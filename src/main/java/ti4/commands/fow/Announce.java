@@ -5,45 +5,38 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class Announce extends FOWSubcommandData {
+class Announce extends GameStateSubcommand {
 
     public Announce() {
-        super(Constants.ANNOUNCE, "Send a message to the main channel");
+        super(Constants.ANNOUNCE, "Send a message to the main channel", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.MSG, "Message to send").setRequired(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ANON, "True to send anonomously (default = True)"));
+        addOptions(new OptionData(OptionType.STRING, Constants.ANON, "Send anonymously").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
-            return;
-        }
-
-        String message = event.getOption(Constants.MSG, null, OptionMapping::getAsString);
-        boolean anon = event.getOption(Constants.ANON, true, OptionMapping::getAsBoolean);
-
-        StringBuilder sb = new StringBuilder();
-        if (anon) {
-            sb.append("[REDACTED]");
+        var player = getPlayer();
+        String msg = event.getOption(Constants.MSG).getAsString();
+        String message;
+        OptionMapping anon = event.getOption(Constants.ANON);
+        if (anon == null) {
+            message = player.getRepresentation() + " announces: " + msg;
         } else {
-            sb.append(player.getRepresentation());
+            String anonY = anon.getAsString();
+
+            if (anonY.compareToIgnoreCase("y") == 0) {
+                message = "[REDACTED] announces: " + msg;
+            } else {
+                message = player.getRepresentation() + " announces: " + msg;
+            }
         }
-        sb.append(" announces: ").append(message);
 
-        MessageChannel channel = game.getMainGameChannel() == null ? event.getChannel() : game.getMainGameChannel();
-        MessageHelper.sendMessageToChannel(channel, sb.toString());
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
+        var game = getGame();
+        MessageChannel mainGameChannel = game.getMainGameChannel() == null ? event.getChannel() : game.getMainGameChannel();
+        MessageHelper.sendMessageToChannel(mainGameChannel, message);
     }
 }
