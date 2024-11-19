@@ -153,10 +153,10 @@ public class AutoCompleteProvider {
                     {
                         put("RED", "Reds");
                         put("GRAY", "Grays");
-                        put("GRAY", "Greys");
-                        put("GRAY", "Blacks");
+                        //put("GRAY", "Greys");// TODO duplicate keys
+                        //put("GRAY", "Blacks");
                         put("ORANGE", "Oranges");
-                        put("ORANGE", "Browns");
+                        //put("ORANGE", "Browns");
                         put("YELLOW", "Yellows");
                         put("GREEN", "Greens");
                         put("BLUE", "Blues");
@@ -618,7 +618,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Map<String, DeckModel> decks = Mapper.getDecks();
                 List<Command.Choice> options = decks.values().stream()
-                    .filter(deckModel -> deckModel.getType().equals(Constants.ACTION_CARD))
+                    .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.ACTION_CARD)
                     .filter(value -> value.getAlias().contains(enteredValue))
                     .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
                     .limit(25)
@@ -627,56 +627,56 @@ public class AutoCompleteProvider {
             }
             case Constants.SO_DECK -> {
                 List<DeckModel> secretDecks = Mapper.getDecks().values().stream()
-                    .filter(deckModel -> deckModel.getType().equals(Constants.SECRET_OBJECTIVE))
+                    .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.SECRET_OBJECTIVE)
                     .toList();
                 List<Command.Choice> options = searchModels(event, secretDecks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.STAGE_1_PUBLIC_DECK -> {
                 List<DeckModel> public1Decks = Mapper.getDecks().values().stream()
-                    .filter(deckModel -> deckModel.getType().equals(Constants.STAGE_1_PUBLIC))
+                    .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.PUBLIC_STAGE_1_OBJECTIVE)
                     .toList();
                 List<Command.Choice> options = searchModels(event, public1Decks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.STAGE_2_PUBLIC_DECK -> {
                 List<DeckModel> public2Decks = Mapper.getDecks().values().stream()
-                    .filter(deckModel -> deckModel.getType().equals(Constants.STAGE_2_PUBLIC))
+                    .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.PUBLIC_STAGE_2_OBJECTIVE)
                     .toList();
                 List<Command.Choice> options = searchModels(event, public2Decks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.RELIC_DECK -> {
                 List<DeckModel> relicDecks = Mapper.getDecks().values().stream()
-                    .filter(deckModel -> deckModel.getType().equals(Constants.RELIC))
+                    .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.RELIC)
                     .toList();
                 List<Command.Choice> options = searchModels(event, relicDecks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.AGENDA_DECK -> {
                 List<DeckModel> agendaDecks = Mapper.getDecks().values().stream()
-                    .filter(deckModel -> deckModel.getType().equals(Constants.AGENDA))
+                    .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.AGENDA)
                     .toList();
                 List<Command.Choice> options = searchModels(event, agendaDecks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.EVENT_DECK -> {
                 List<DeckModel> eventDecks = Mapper.getDecks().values().stream()
-                    .filter(deckModel -> deckModel.getType().equals(Constants.EVENT))
+                    .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.EVENT)
                     .toList();
                 List<Command.Choice> options = searchModels(event, eventDecks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.EXPLORATION_DECKS -> {
                 List<DeckModel> exploreDecks = Mapper.getDecks().values().stream()
-                    .filter(deckModel -> deckModel.getType().equals(Constants.EXPLORE))
+                    .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.EXPLORE)
                     .toList();
                 List<Command.Choice> options = searchModels(event, exploreDecks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.TECHNOLOGY_DECK -> {
                 List<DeckModel> techDecks = Mapper.getDecks().values().stream()
-                    .filter(deckModel -> deckModel.getType().equals(Constants.TECHNOLOGY))
+                    .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.TECHNOLOGY)
                     .toList();
                 List<Command.Choice> options = searchModels(event, techDecks, null);
                 event.replyChoices(options).queue();
