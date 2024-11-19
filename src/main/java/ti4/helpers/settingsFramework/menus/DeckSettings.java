@@ -6,11 +6,10 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
-import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.map.Game;
+import ti4.image.Mapper;
 import ti4.model.DeckModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardSetModel;
@@ -34,8 +33,8 @@ public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private ChoiceSetting<DeckModel> deckChoice(String id, String name, String deckType, String emoji) {
-        List<DeckModel> decks = Mapper.getDecks().values().stream().filter(deck -> deck.getType().equals(deckType)).toList();
+    private ChoiceSetting<DeckModel> deckChoice(String id, String name, DeckModel.DeckType deckType, String emoji) {
+        List<DeckModel> decks = Mapper.getDecks().values().stream().filter(deck -> deck.getType() == deckType).toList();
         String defaultDeck = decks.stream().filter(x -> x.getSource() == ComponentSource.pok).findFirst().map(DeckModel::getAlias).orElse("");
 
         ChoiceSetting<DeckModel> choice = new ChoiceSetting<>(id, name, defaultDeck);
@@ -45,18 +44,18 @@ public class DeckSettings extends SettingsMenu {
         return choice;
     }
 
-    protected DeckSettings(Game game, JsonNode json, SettingsMenu parent) {
+    protected DeckSettings(JsonNode json, SettingsMenu parent) {
         super("decks", "Card Decks", "Manually adjust which decks your game will use. This should be automatic, for the most part", parent);
 
         // Initialize deck settings to default values
-        stage1 = deckChoice("Stg1Deck", "Stage 1 Deck", "public_stage_1_objective", Emojis.Public1);
-        stage2 = deckChoice("Stg2Deck", "Stage 2 Deck", "public_stage_2_objective", Emojis.Public2);
-        secrets = deckChoice("SecretDeck", "Secrets Deck", "secret_objective", Emojis.SecretObjective);
-        actionCards = deckChoice("ACs", "Action Card Deck", "action_card", Emojis.ActionCard);
-        agendas = deckChoice("Agendas", "Agenda Deck", "agenda", Emojis.Agenda);
-        techs = deckChoice("Techs", "Technology Deck", "technology", Emojis.NonUnitTechSkip);
-        relics = deckChoice("Relics", "Relic Deck", "relic", Emojis.Relic);
-        explores = deckChoice("Explores", "Explore Decks", "explore", Emojis.Frontier);
+        stage1 = deckChoice("Stg1Deck", "Stage 1 Deck", DeckModel.DeckType.PUBLIC_STAGE_1_OBJECTIVE, Emojis.Public1);
+        stage2 = deckChoice("Stg2Deck", "Stage 2 Deck", DeckModel.DeckType.PUBLIC_STAGE_2_OBJECTIVE, Emojis.Public2);
+        secrets = deckChoice("SecretDeck", "Secrets Deck", DeckModel.DeckType.SECRET_OBJECTIVE, Emojis.SecretObjective);
+        actionCards = deckChoice("ACs", "Action Card Deck", DeckModel.DeckType.ACTION_CARD, Emojis.ActionCard);
+        agendas = deckChoice("Agendas", "Agenda Deck", DeckModel.DeckType.AGENDA, Emojis.Agenda);
+        techs = deckChoice("Techs", "Technology Deck", DeckModel.DeckType.TECHNOLOGY, Emojis.NonUnitTechSkip);
+        relics = deckChoice("Relics", "Relic Deck", DeckModel.DeckType.RELIC, Emojis.Relic);
+        explores = deckChoice("Explores", "Explore Decks", DeckModel.DeckType.EXPLORE, Emojis.Frontier);
         //scenarios = deckChoice("Scenarios", "Scenario Deck", "scenario", null);
 
         // Initialize strat cards to default values

@@ -601,8 +601,6 @@ public class Constants {
     public static final String ACTION_CARD = "action_card";
     public static final String AC_DECK = "ac_deck";
     public static final String STAGE_1_PUBLIC_DECK = "s1_public_deck";
-    public static final String STAGE_1_PUBLIC = "public_stage_1_objective";
-    public static final String STAGE_2_PUBLIC = "public_stage_2_objective";
     public static final String STAGE_2_PUBLIC_DECK = "s2_public_deck";
     public static final String EXPLORATION_DECKS = "exploration_decks";
     public static final String AC_DISCARDED = "action_cards_discarded";
