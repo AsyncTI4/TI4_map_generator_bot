@@ -295,7 +295,7 @@ public class FrankenDraftBagService {
             if (!Mapper.isValidFaction(faction) || !PositionMapper.isTilePositionValid(tempHomeSystemLocation)) {
                 continue;
             }
-            Setup.secondHalfOfPlayerSetup(player, game, player.getNextAvailableColour(), faction, tempHomeSystemLocation, event, false);
+            MiltyService.secondHalfOfPlayerSetup(player, game, player.getNextAvailableColour(), faction, tempHomeSystemLocation, event, false);
             sb.append("\n> ").append(player.getRepresentationNoPing());
             index++;
         }

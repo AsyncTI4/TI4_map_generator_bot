@@ -17,7 +17,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.info.TechInfoService;
 import ti4.service.info.UnitInfoService;
 
-public class AllInfo extends GameStateCommand {
+class AllInfo extends GameStateCommand {
 
     public AllInfo() {
         super(false, true);

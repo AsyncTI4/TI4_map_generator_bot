@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
-import ti4.commands2.player.TurnStart;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
@@ -39,6 +38,7 @@ import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.turn.StartTurnService;
 
 @UtilityClass
 public class PlayerTechService {
@@ -468,7 +468,7 @@ public class PlayerTechService {
             if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
                 buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];
             }
-            List<Button> buttons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+            List<Button> buttons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), buttonText, buttons);
         }

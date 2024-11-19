@@ -16,7 +16,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
 
-public class SendTG extends GameStateSubcommand {
+class SendTG extends GameStateSubcommand {
 
     public SendTG() {
         super(Constants.SEND_TG, "Sent TG(s) to player/faction", true, true);

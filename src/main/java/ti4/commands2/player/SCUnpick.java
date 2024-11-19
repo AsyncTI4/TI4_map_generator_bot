@@ -18,7 +18,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.info.ListTurnOrderService;
 
-public class SCUnpick extends GameStateSubcommand {
+class SCUnpick extends GameStateSubcommand {
 
     public SCUnpick() {
         super(Constants.SC_UNPICK, "Unpick a Strategy Card", true, true);

@@ -61,8 +61,6 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.CommandHelper;
-import ti4.commands2.player.SendDebt;
-import ti4.commands2.player.Setup;
 import ti4.commands2.player.TurnStart;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -103,7 +101,9 @@ import ti4.service.combat.CombatRollType;
 import ti4.service.decks.ShowActionCardsService;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.milty.MiltyService;
 import ti4.service.tech.ShowTechDeckService;
+import ti4.service.transaction.SendDebtService;
 
 public class ButtonHelper {
 
@@ -3501,7 +3501,7 @@ public class ButtonHelper {
                 return;
             }
         } else {
-            SendDebt.sendDebt(player, tradeHolder, 1);
+            SendDebtService.sendDebt(player, tradeHolder, 1);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
@@ -4949,14 +4949,14 @@ public class ButtonHelper {
         for (Player player : players) {
             if (x < 9) {
                 switch (x) {
-                    case 1 -> Setup.secondHalfOfPlayerSetup(player, game, "black", "franken1", "201", event, false);
-                    case 2 -> Setup.secondHalfOfPlayerSetup(player, game, "green", "franken2", "202", event, false);
-                    case 3 -> Setup.secondHalfOfPlayerSetup(player, game, "purple", "franken3", "203", event, false);
-                    case 4 -> Setup.secondHalfOfPlayerSetup(player, game, "orange", "franken4", "204", event, false);
-                    case 5 -> Setup.secondHalfOfPlayerSetup(player, game, "pink", "franken5", "205", event, false);
-                    case 6 -> Setup.secondHalfOfPlayerSetup(player, game, "yellow", "franken6", "206", event, false);
-                    case 7 -> Setup.secondHalfOfPlayerSetup(player, game, "red", "franken7", "207", event, false);
-                    case 8 -> Setup.secondHalfOfPlayerSetup(player, game, "blue", "franken8", "208", event, false);
+                    case 1 -> MiltyService.secondHalfOfPlayerSetup(player, game, "black", "franken1", "201", event, false);
+                    case 2 -> MiltyService.secondHalfOfPlayerSetup(player, game, "green", "franken2", "202", event, false);
+                    case 3 -> MiltyService.secondHalfOfPlayerSetup(player, game, "purple", "franken3", "203", event, false);
+                    case 4 -> MiltyService.secondHalfOfPlayerSetup(player, game, "orange", "franken4", "204", event, false);
+                    case 5 -> MiltyService.secondHalfOfPlayerSetup(player, game, "pink", "franken5", "205", event, false);
+                    case 6 -> MiltyService.secondHalfOfPlayerSetup(player, game, "yellow", "franken6", "206", event, false);
+                    case 7 -> MiltyService.secondHalfOfPlayerSetup(player, game, "red", "franken7", "207", event, false);
+                    case 8 -> MiltyService.secondHalfOfPlayerSetup(player, game, "blue", "franken8", "208", event, false);
                     default -> {
 
                     }
@@ -5494,9 +5494,9 @@ public class ButtonHelper {
             color = player.getNextAvailableColour();
         if (buttonID.split("_").length == 6 || speaker != null) {
             if (speaker != null) {
-                Setup.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event, false);
+                MiltyService.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event, false);
             } else {
-                Setup.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event,
+                MiltyService.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event,
                     "yes".equalsIgnoreCase(buttonID.split("_")[5]));
             }
         } else {

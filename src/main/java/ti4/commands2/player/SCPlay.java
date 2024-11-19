@@ -34,7 +34,7 @@ import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.service.strategycard.TradeStrategyCardService;
 
-public class SCPlay extends GameStateSubcommand {
+class SCPlay extends GameStateSubcommand {
 
     public SCPlay() {
         super(Constants.SC_PLAY, "Play a Strategy Card", true, true);
@@ -94,7 +94,7 @@ public class SCPlay extends GameStateSubcommand {
                         continue;
                     }
                     ActionCardHelper.playAC(event, game, p2, "coup", game.getMainGameChannel());
-                    List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+                    List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                     game.setJustPlayedComponentAC(true);
                     String message = "Use buttons to end turn, or (if Coup is Sabo'd) play your strategy card.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);

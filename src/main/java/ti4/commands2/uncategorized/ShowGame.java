@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.commands2.GameStateCommand;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
@@ -13,7 +14,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 
-public class ShowGame extends ti4.commands2.GameStateCommand {
+public class ShowGame extends GameStateCommand {
 
     public ShowGame() {
         super(false, false);

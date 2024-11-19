@@ -24,8 +24,6 @@ import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.commands2.player.SendDebt;
-import ti4.commands2.player.TurnStart;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -47,6 +45,8 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.tech.PlayerTechService;
+import ti4.service.transaction.SendDebtService;
+import ti4.service.turn.StartTurnService;
 
 public class ButtonHelperFactionSpecific {
 
@@ -325,7 +325,7 @@ public class ButtonHelperFactionSpecific {
             "Use buttons to decide on whom to use Clever Clever JR-XS455-O, the Relic/Yssaril agent.", buttons2);
         event.getMessage().delete().queue();
         String message = "Use buttons to end turn or do another action.";
-        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
     }
 
@@ -1271,7 +1271,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveVadenSCDebt(Player player, int sc, Game game, GenericInteractionCreateEvent event) {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
-                SendDebt.sendDebt(player, p2, 1);
+                SendDebtService.sendDebt(player, p2, 1);
                 CommanderUnlockCheckService.checkPlayer(p2, "vaden");
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " you sent 1 debt token to "

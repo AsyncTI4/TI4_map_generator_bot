@@ -15,7 +15,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class Pass extends GameStateSubcommand {
+class Pass extends GameStateSubcommand {
 
     public Pass() {
         super(Constants.PASS, "Pass", true, true);

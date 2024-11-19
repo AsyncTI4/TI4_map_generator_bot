@@ -1,4 +1,4 @@
-package ti4.commands2.statistics;
+package ti4.service.stats;
 
 import java.util.ArrayList;
 import java.util.List;

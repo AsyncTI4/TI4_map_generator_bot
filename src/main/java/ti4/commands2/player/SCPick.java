@@ -30,8 +30,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.turn.StartTurnService;
 
-public class SCPick extends GameStateSubcommand {
+class SCPick extends GameStateSubcommand {
 
     public SCPick() {
         super(Constants.SC_PICK, "Pick a Strategy Card", true, true);
@@ -215,7 +216,7 @@ public class SCPick extends GameStateSubcommand {
                     MapGenerator.drawBanner(privatePlayer);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.",
-                    TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
+                    StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
                 if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
@@ -246,7 +247,7 @@ public class SCPick extends GameStateSubcommand {
                     MapGenerator.drawBanner(privatePlayer);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.",
-                    TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
+                    StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
                 if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),

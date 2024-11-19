@@ -2,13 +2,14 @@ package ti4.commands2.uncategorized;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateCommand;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.service.info.CardsInfoService;
 
-public class CardsInfo extends ti4.commands2.GameStateCommand {
+class CardsInfo extends GameStateCommand {
 
     public CardsInfo() {
         super(false, true);

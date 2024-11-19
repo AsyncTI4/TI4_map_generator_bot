@@ -29,7 +29,7 @@ import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.service.leader.CommanderUnlockCheckService;
 
-public class Stats extends GameStateSubcommand {
+class Stats extends GameStateSubcommand {
 
     public Stats() {
         super(Constants.STATS, "Player Stats: CC,TG,Commodities", true, true);

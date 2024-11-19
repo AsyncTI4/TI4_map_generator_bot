@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.service.info.CardsInfoService;
 
-public class UnlockLeader extends GameStateSubcommand {
+class UnlockLeader extends GameStateSubcommand {
 
     public UnlockLeader() {
         super(Constants.UNLOCK_LEADER, "Unlock leader", true, true);
