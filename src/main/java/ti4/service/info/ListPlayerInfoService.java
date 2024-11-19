@@ -240,7 +240,7 @@ public class ListPlayerInfoService {
             case "make_history", "become_legend" -> {
                 int counter = 0;
                 for (Tile tile : game.getTileMap().values()) {
-                    boolean tileCounts = tile.isMecatol() || tile.isAnomaly(game) || ButtonHelper.isTileLegendary(tile, game);
+                    boolean tileCounts = tile.isMecatol() || tile.isAnomaly(game) || ButtonHelper.isTileLegendary(tile);
                     if (FoWHelper.playerHasUnitsInSystem(player, tile) && tileCounts) {
                         counter++;
                     }

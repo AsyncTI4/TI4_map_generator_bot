@@ -9,20 +9,20 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands2.player.TurnStart;
-import ti4.image.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.TransactionHelper;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
+import ti4.service.turn.StartTurnService;
 
 public class PlanetExhaustAbility extends PlanetAddRemove {
     public PlanetExhaustAbility() {
@@ -150,7 +150,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech with the same number of prerequisites", Buttons.GET_A_FREE_TECH);
         event.getMessage().delete().queue();
         String message2 = "Use buttons to end turn or do another action.";
-        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, systemButtons);
     }
 

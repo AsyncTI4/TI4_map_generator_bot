@@ -14,10 +14,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands2.player.TurnEnd;
-import ti4.commands2.player.TurnStart;
-import ti4.image.MapGenerator;
-import ti4.image.MapRenderPipeline;
-import ti4.image.Mapper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -32,6 +28,9 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.image.MapGenerator;
+import ti4.image.MapRenderPipeline;
+import ti4.image.Mapper;
 import ti4.listeners.UserJoinServerListener;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
@@ -45,6 +44,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.service.StatusCleanupService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.turn.StartTurnService;
 
 public class StartPhase extends GameSubcommandData {
     public StartPhase() {
@@ -517,7 +517,7 @@ public class StartPhase extends GameSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick a strategy card.", Helper.getRemainingSCButtons(event, game, privatePlayer));
             } else {
 
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.", TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
+                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.", StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
 
                 if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
@@ -537,7 +537,7 @@ public class StartPhase extends GameSubcommandData {
             ListTurnOrderService.turnOrder(event, game);
             if (!msgExtra.isEmpty()) {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
-                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.", TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.", StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
 
                 if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {

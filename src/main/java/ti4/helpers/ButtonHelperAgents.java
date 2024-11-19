@@ -23,7 +23,6 @@ import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.commands2.player.TurnStart;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -43,6 +42,7 @@ import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.turn.StartTurnService;
 
 public class ButtonHelperAgents {
 
@@ -1076,7 +1076,7 @@ public class ButtonHelperAgents {
                     exhaustAgent("exhaustAgent_edynagent", event, game, edyn2);
                     game.setStoredValue("edynAgentPreset", "");
                     game.setStoredValue("edynAgentInAction", newActivePlayer.getFaction() + "_" + edyn2.getFaction() + "_" + upNextPlayer.getFaction());
-                    List<Button> buttons = TurnStart.getStartOfTurnButtons(newActivePlayer, game, true, event);
+                    List<Button> buttons = StartTurnService.getStartOfTurnButtons(newActivePlayer, game, true, event);
                     MessageHelper.sendMessageToChannel(newActivePlayer.getCorrectChannel(),
                         newActivePlayer.getRepresentationUnfogged()
                             + " you may take 1 action now due to " + (edyn.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")

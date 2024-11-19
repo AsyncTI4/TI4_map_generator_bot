@@ -16,7 +16,6 @@ import ti4.commands.planet.PlanetAdd;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.commands2.player.TurnStart;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -32,6 +31,7 @@ import ti4.model.ExploreModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.turn.StartTurnService;
 
 public class ButtonHelperAbilities {
 
@@ -118,7 +118,7 @@ public class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game) || tile.isHomeSystem()
-                || ButtonHelper.isTileLegendary(tile, game) || tile.isMecatol()) {
+                || ButtonHelper.isTileLegendary(tile) || tile.isMecatol()) {
                 continue;
             }
             buttons.add(Buttons.green("rallyToTheCauseStep2_" + tile.getPosition(),
@@ -1109,7 +1109,7 @@ public class ButtonHelperAbilities {
                 + player.getTg() + "). This is technically an optional gain");
         pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 4);
-        List<Button> buttons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> buttons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         String message = "Use buttons to end turn or do another action";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
@@ -1210,7 +1210,7 @@ public class ButtonHelperAbilities {
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
 
-        List<Button> buttons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> buttons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         if ("destroyer".equals(unit)) {
             new AddUnits().unitParsing(event, player.getColor(), tile, "1 destroyer", game);
             successMessage = "Produced 1 " + Emojis.destroyer + " in tile "

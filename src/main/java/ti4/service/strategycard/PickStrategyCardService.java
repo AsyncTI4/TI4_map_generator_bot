@@ -150,7 +150,7 @@ public class PickStrategyCardService {
                     MapGenerator.drawBanner(privatePlayer);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.",
-                    TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
+                    StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
                 if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
@@ -181,7 +181,7 @@ public class PickStrategyCardService {
                     MapGenerator.drawBanner(privatePlayer);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.",
-                    TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
+                    StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
                 if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),

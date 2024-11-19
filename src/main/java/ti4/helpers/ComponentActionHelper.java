@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
 import ti4.commands.units.AddUnits;
-import ti4.commands2.player.TurnStart;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -26,6 +25,7 @@ import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.turn.StartTurnService;
 
 public class ComponentActionHelper {
 
@@ -337,7 +337,7 @@ public class ComponentActionHelper {
                         Emojis.Muaat + Emojis.flagship + "The Inferno");
                     List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship);
                     Tile tile = tiles.getFirst();
-                    List<Button> buttons = TurnStart.getStartOfTurnButtons(p1, game, true, event);
+                    List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
                     new AddUnits().unitParsing(event, p1.getColor(), tile, "1 cruiser", game);
                     successMessage = successMessage + "Produced 1 " + Emojis.cruiser + " in tile "
                         + tile.getRepresentationForButtons(game, p1) + ".";
@@ -376,7 +376,7 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2,
                         purgeFragButtons);
                     String message = "Use buttons to end turn or do an action";
-                    List<Button> systemButtons = TurnStart.getStartOfTurnButtons(p1, game, true, event);
+                    List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, systemButtons);
 
                 } else if ("fabrication".equalsIgnoreCase(buttonID)) {
@@ -441,7 +441,7 @@ public class ComponentActionHelper {
                     }
                     String message = "Select the tech you would like to ready";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message, ButtonHelper.getAllTechsToReady(game, p1));
-                    List<Button> buttons = TurnStart.getStartOfTurnButtons(p1, game, true, event);
+                    List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
                     String message2 = "Use buttons to end turn or do another action";
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 }
@@ -575,7 +575,7 @@ public class ComponentActionHelper {
         // SPECIFIC HANDLING //TODO: Move this shite to RelicPurge
         switch (relicID) {
             case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, event);
-            case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(player, game, event);
+            case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(event);
             case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> ButtonHelperRelics.offerNanoforgeButtons(player, game, event);
             case "decrypted_cartoglyph" -> DiscordantStarsHelper.drawBlueBackTiles(event, game, player, 3);
             case "throne_of_the_false_emperor" -> {
@@ -620,7 +620,7 @@ public class ComponentActionHelper {
 
     public static void serveNextComponentActionButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         String message = "Use buttons to end turn or do another action.";
-        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, systemButtons);
     }
 }

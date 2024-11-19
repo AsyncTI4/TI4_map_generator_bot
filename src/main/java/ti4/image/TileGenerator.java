@@ -550,7 +550,7 @@ public class TileGenerator {
 
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
-                boolean isLegendary = ButtonHelper.isTileLegendary(tile, game) || tile.isMecatol();
+                boolean isLegendary = ButtonHelper.isTileLegendary(tile) || tile.isMecatol();
 
                 if (!isLegendary) {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));

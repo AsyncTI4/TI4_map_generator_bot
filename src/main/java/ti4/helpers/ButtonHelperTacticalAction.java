@@ -13,7 +13,6 @@ import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.commands2.player.TurnStart;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -27,6 +26,7 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.turn.StartTurnService;
 
 public class ButtonHelperTacticalAction {
 
@@ -319,7 +319,7 @@ public class ButtonHelperTacticalAction {
         game.setL1Hero(false);
         game.setStoredValue("vaylerianHeroActive", "");
         String message = player.getRepresentationUnfogged() + " Use buttons to end turn or do another action.";
-        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageChannel channel = event.getMessageChannel();
         if (game.isFowMode()) {
             channel = player.getPrivateChannel();
@@ -380,7 +380,7 @@ public class ButtonHelperTacticalAction {
             if (!game.getMovedUnitsFromCurrentActivation().isEmpty()) {
                 ButtonHelper.resolveEmpyCommanderCheck(player, game, tile, event);
                 ButtonHelper.sendEBSWarning(player, game, tile.getPosition());
-                ButtonHelper.checkForIonStorm(game, tile, player);
+                ButtonHelper.checkForIonStorm(tile, player);
                 for (Player nonActivePlayer : game.getRealPlayers()) {
                     if (player == nonActivePlayer) {
                         continue;

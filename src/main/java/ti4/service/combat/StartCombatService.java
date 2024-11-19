@@ -440,7 +440,7 @@ public class StartCombatService {
             boolean techOrLegendary = false;
             for (UnitHolder planet : tile.getPlanetUnitHolders()) {
                 if (ButtonHelper.checkForTechSkips(game, planet.getName())
-                    || ButtonHelper.isTileLegendary(tile, game)) {
+                    || ButtonHelper.isTileLegendary(tile)) {
                     techOrLegendary = true;
                 }
             }

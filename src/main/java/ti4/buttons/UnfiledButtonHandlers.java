@@ -34,7 +34,6 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.player.Pass;
 import ti4.commands2.player.TurnEnd;
-import ti4.commands2.player.TurnStart;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -88,6 +87,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.turn.StartTurnService;
 
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
@@ -543,7 +543,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("finishComponentAction_")
     public static void finishComponentAction(ButtonInteractionEvent event, Player player, Game game) {
         String message = "Use buttons to end turn or do another action.";
-        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         ButtonHelper.deleteMessage(event);
@@ -1424,7 +1424,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                         "mech", "placeOneNDone_skipbuild"));
                     buttons.add(Buttons.red("deleteButtons", "Decline to drop Mech"));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message3, buttons);
-                    List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+                    List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 }
                 if (drawReplacement) {
@@ -1764,7 +1764,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
                 String message = player.getRepresentationUnfogged()
                     + " Use buttons to end turn or do another action.";
-                List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+                List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message, systemButtons);
                 player.resetOlradinPolicyFlags();
@@ -2150,7 +2150,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("finishComponentAction")
     public static void doAnotherAction(ButtonInteractionEvent event, Player player, Game game) {
         String message = "Use buttons to end turn or do another action.";
-        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         ButtonHelper.deleteMessage(event);
     }

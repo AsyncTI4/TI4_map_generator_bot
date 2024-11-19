@@ -255,7 +255,7 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
                 if (game.getTile(onTile.getId()) != null) {
-                    if (ButtonHelper.isTileLegendary(game.getTile(onTile.getId()), game)) {
+                    if (ButtonHelper.isTileLegendary(game.getTile(onTile.getId()))) {
                         meetsCondition = true;
                     }
                 }

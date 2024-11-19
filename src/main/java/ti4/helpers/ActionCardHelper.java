@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
-import ti4.commands2.player.TurnStart;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -32,6 +31,7 @@ import ti4.model.PlanetModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.turn.StartTurnService;
 
 @UtilityClass
 public class ActionCardHelper {
@@ -819,7 +819,7 @@ public class ActionCardHelper {
             if ("Action".equalsIgnoreCase(actionCardWindow)) {
                 String message = "Use buttons to end turn or do another action.";
                 game.setJustPlayedComponentAC(true);
-                List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+                List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
                     String message2 = player.getRepresentationUnfogged() + " you may unlock Suffi An, your commander, by paying 1TG (if the AC isn't Sabo'd).";
