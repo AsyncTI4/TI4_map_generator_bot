@@ -1,6 +1,7 @@
 {
     "id": "hl_roundabout2_2",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "roundabout2_2"
     ],

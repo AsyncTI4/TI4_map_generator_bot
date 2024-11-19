@@ -1,6 +1,7 @@
 {
     "id": "84b240",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "84b4"
     ],

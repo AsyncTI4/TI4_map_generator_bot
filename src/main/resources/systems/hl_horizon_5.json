@@ -1,6 +1,7 @@
 {
     "id": "hl_horizon_5",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "horizon_5"
     ],
