@@ -54,7 +54,7 @@ public class TurnEnd extends GameStateSubcommand {
     public TurnEnd() {
         super(Constants.TURN_END, "End Turn", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "In FoW, confirm with YES if you are not the active player").);
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "In FoW, confirm with YES if you are not the active player"));
     }
 
     @Override

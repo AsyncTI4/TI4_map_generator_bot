@@ -21,7 +21,7 @@ class POInfo extends GameStateSubcommand {
 
     public POInfo() {
         super("po_info", "Show Public Objectives", false, true);
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_SCORED, "Also display which players have scored each objective").);
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_SCORED, "Also display which players have scored each objective"));
     }
 
     @Override

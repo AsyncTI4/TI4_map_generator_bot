@@ -1,7 +1,6 @@
 package ti4.commands2.uncategorized;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.tech.TechInfo;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateCommand;
@@ -16,6 +15,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.info.AbilityInfoService;
 import ti4.service.info.CardsInfoService;
+import ti4.service.info.LeaderInfoService;
 
 public class AllInfo extends GameStateCommand {
 
@@ -47,7 +47,7 @@ public class AllInfo extends GameStateCommand {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         AbilityInfoService.sendAbilityInfo(game, player);
         UnitInfo.sendUnitInfo(player, false);
-        LeaderInfo.sendLeadersInfo(game, player);
+        LeaderInfoService.sendLeadersInfo(game, player);
         TechInfo.sendTechInfo(game, player);
         RelicHelper.sendRelicInfo(player);
         SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);

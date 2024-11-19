@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.HeroPlay;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.units.AddUnits;
@@ -43,6 +42,7 @@ import ti4.model.UnitModel;
 import ti4.service.PlanetService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.franken.FrankenLeaderService;
+import ti4.service.leader.PlayHeroService;
 
 public class ButtonHelperHeroes {
 
@@ -1942,7 +1942,7 @@ public class ButtonHelperHeroes {
     @ButtonHandler("mykoheroSteal_")
     public static void resolveMykoHero(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String hero = buttonID.split("_")[1];
-        HeroPlay.playHero(event, game, player, player.unsafeGetLeader("mykomentorihero"));
+        PlayHeroService.playHero(event, game, player, player.unsafeGetLeader("mykomentorihero"));
         player.addLeader(hero);
         UnlockLeader.unlockLeader(hero, game, player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), FrankenLeaderService.getAddLeaderText(player, hero));

@@ -12,7 +12,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.ExhaustLeaderService;
 
-public class ExhaustLeader extends GameStateSubcommand {
+class ExhaustLeader extends GameStateSubcommand {
 
 	public ExhaustLeader() {
 		super(Constants.EXHAUST_LEADER, "Exhaust leader", true, true);

@@ -2,7 +2,10 @@ package ti4.commands.leaders;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.uncategorized.CardsInfo;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -11,15 +14,20 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.service.info.CardsInfoService;
 
-public class UnlockLeader extends LeaderAction {
+public class UnlockLeader extends GameStateSubcommand {
+
     public UnlockLeader() {
-        super(Constants.UNLOCK_LEADER, "Unlock leader");
+        super(Constants.UNLOCK_LEADER, "Unlock leader", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leaderID, Game game, Player player) {
-        unlockLeader(leaderID, game, player);
+    public void execute(SlashCommandInteractionEvent event) {
+        String leaderID = event.getOption(Constants.LEADER, null, OptionMapping::getAsString);
+        unlockLeader(leaderID, getGame(), getPlayer());
     }
 
     public static void unlockLeader(String leaderID, Game game, Player player) {
@@ -52,7 +60,7 @@ public class UnlockLeader extends LeaderAction {
         }
         if (leaderID.contains("naalucommander")) {
             //PNInfo.sendPromissoryNoteInfo(game, player, false);
-            CardsInfo.sendVariousAdditionalButtons(game, player);
+            CardsInfoService.sendVariousAdditionalButtons(game, player);
             MessageHelper.sendMessageToChannel(channel, player.getRepresentationUnfogged() + " you may use M'aban, the Naalu Commander, via button in your cards info thread");
 
         }

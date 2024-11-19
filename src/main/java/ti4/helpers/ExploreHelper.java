@@ -5,7 +5,6 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.units.AddUnits;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
@@ -19,6 +18,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.PlanetService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.RefreshLeaderService;
 
 public class ExploreHelper {
 
@@ -190,7 +190,7 @@ public class ExploreHelper {
                 if (playerLeader == null) {
                     return;
                 }
-                RefreshLeader.refreshLeader(player, playerLeader, game);
+                RefreshLeaderService.refreshLeader(player, playerLeader, game);
                 message += " Refreshed " + Mapper.getLeader(acOrAgent).getName();
             }
             ButtonHelper.addReaction(event, false, false, message, "");

@@ -13,7 +13,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.PlayHeroService;
 
-public class HeroPlay extends GameStateSubcommand {
+class HeroPlay extends GameStateSubcommand {
 
     public HeroPlay() {
         super(Constants.ACTIVE_LEADER, "Play Hero", true, true);

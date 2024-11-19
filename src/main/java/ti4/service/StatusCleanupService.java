@@ -6,10 +6,9 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.experimental.UtilityClass;
-import ti4.commands.leaders.RefreshLeader;
-import ti4.image.Mapper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SpinRingsHelper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -18,6 +17,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.info.ListPlayerInfoService;
+import ti4.service.leader.RefreshLeaderService;
 
 @UtilityClass
 public class StatusCleanupService {
@@ -68,7 +68,7 @@ public class StatusCleanupService {
                     if (leader.isActive() && !leader.getId().equalsIgnoreCase("zealotshero")) {
                         player.removeLeader(leader.getId());
                     } else {
-                        RefreshLeader.refreshLeader(player, leader, game);
+                        RefreshLeaderService.refreshLeader(player, leader, game);
                     }
                 }
             }

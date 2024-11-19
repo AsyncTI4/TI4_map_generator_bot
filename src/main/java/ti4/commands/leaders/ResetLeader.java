@@ -3,28 +3,21 @@ package ti4.commands.leaders;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ResetLeader extends LeaderSubcommandData {
+class ResetLeader extends GameStateSubcommand {
+
     public ResetLeader() {
-        super(Constants.RESET, "Reset all leaders");
+        super(Constants.RESET, "Reset all leaders", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayerFromEvent(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Player player = getPlayer();
         player.initLeaders();
         MessageHelper.sendMessageToEventChannel(event, "Leaders were reset: " + player.getLeaderIDs());
     }

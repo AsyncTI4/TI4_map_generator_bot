@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.commands.game.StartPhase;
-import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechExhaust;
 import ti4.commands.tokens.AddCC;
@@ -47,6 +46,7 @@ import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.RefreshLeaderService;
 
 public class ButtonHelperFactionSpecific {
 
@@ -2361,7 +2361,7 @@ public class ButtonHelperFactionSpecific {
             }
             return;
         }
-        RefreshLeader.refreshLeader(p2, playerLeader, game);
+        RefreshLeaderService.refreshLeader(p2, playerLeader, game);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " exhausted TCS tech to ready " + agent + ", owned by "

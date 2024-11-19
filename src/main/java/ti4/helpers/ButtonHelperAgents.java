@@ -20,10 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.explore.ExploreSubcommandData;
-import ti4.commands.leaders.ExhaustLeader;
-import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetExhaustAbility;
-import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
@@ -43,7 +40,10 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
+import ti4.service.PlanetService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.RefreshLeaderService;
 
 public class ButtonHelperAgents {
 
@@ -280,7 +280,7 @@ public class ButtonHelperAgents {
             }
             return;
         }
-        RefreshLeader.refreshLeader(player, playerLeader, game);
+        RefreshLeaderService.refreshLeader(player, playerLeader, game);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " used " + Emojis.BioticTech + "Hypermetabolism" + Emojis.Absol + " to spend a strategy CC and ready " + agent);
     }
@@ -506,7 +506,7 @@ public class ButtonHelperAgents {
             return;
         }
 
-        ExhaustLeader.exhaustLeader(game, player, playerLeader);
+        ExhaustLeaderService.exhaustLeader(game, player, playerLeader);
 
         MessageChannel channel = player.getCorrectChannel();
         String message = "";
