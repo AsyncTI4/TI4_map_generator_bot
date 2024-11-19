@@ -25,7 +25,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.player.StatsService;
+import ti4.service.player.PlayerStatsService;
 import ti4.service.strategycard.PickStrategyCardService;
 
 @UtilityClass
@@ -72,7 +72,7 @@ class PickStrategyCardButtonHandler {
         if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
             secondHalfOfSCPickWhenChecksNBalances(event, player, game, scpick);
         } else {
-            boolean pickSuccessful = StatsService.secondHalfOfPickSC(event, game, player, scpick);
+            boolean pickSuccessful = PlayerStatsService.secondHalfOfPickSC(event, game, player, scpick);
             if (pickSuccessful) {
                 PickStrategyCardService.secondHalfOfSCPick(event, player, game, scpick);
                 ButtonHelper.deleteMessage(event);
@@ -87,7 +87,7 @@ class PickStrategyCardButtonHandler {
         String factionPicked = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(factionPicked);
 
-        StatsService.secondHalfOfPickSC(event, game, p2, scpick);
+        PlayerStatsService.secondHalfOfPickSC(event, game, p2, scpick);
 
         String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scpick, game)
             + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");

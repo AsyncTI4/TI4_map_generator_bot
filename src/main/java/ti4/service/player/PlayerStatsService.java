@@ -22,7 +22,7 @@ import ti4.model.StrategyCardModel;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
-public class StatsService {
+public class PlayerStatsService {
 
     public String getPlayersCurrentStatsText(Player player, Game game) {
         StringBuilder sb = new StringBuilder(player.getFactionEmoji() + " player's current stats:\n");

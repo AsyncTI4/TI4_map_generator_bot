@@ -17,7 +17,7 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.service.player.StatsService;
+import ti4.service.player.PlayerStatsService;
 
 @UtilityClass
 class ChecksAndBalancesButtonHandler {
@@ -29,7 +29,7 @@ class ChecksAndBalancesButtonHandler {
         String factionPicked = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(factionPicked);
 
-        StatsService.secondHalfOfPickSC(event, game, p2, scpick);
+        PlayerStatsService.secondHalfOfPickSC(event, game, p2, scpick);
 
         String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scpick, game)
             + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");

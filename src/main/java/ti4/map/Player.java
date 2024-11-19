@@ -2911,7 +2911,7 @@ public class Player {
     public float getTotalResourceValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkValuesOfUnits(this, getGame(), tile, type);
+            count = count + ButtonHelper.checkValuesOfUnits(this, tile, type);
         }
         return count;
     }
@@ -2920,7 +2920,7 @@ public class Player {
     public int getTotalHPValueOfUnits(String type) {
         int count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkHPOfUnits(this, getGame(), tile, type);
+            count = count + ButtonHelper.checkHPOfUnits(this, tile, type);
         }
         return count;
     }
@@ -2929,7 +2929,7 @@ public class Player {
     public float getTotalCombatValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkCombatValuesOfUnits(this, getGame(), tile, type);
+            count = count + ButtonHelper.checkCombatValuesOfUnits(this, tile, type);
         }
         return Math.round(count * 10) / (float) 10.0;
     }

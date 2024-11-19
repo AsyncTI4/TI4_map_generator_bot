@@ -19,7 +19,7 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.player.StatsService;
+import ti4.service.player.PlayerStatsService;
 
 class Stats extends GameStateSubcommand {
 
@@ -54,9 +54,9 @@ class Stats extends GameStateSubcommand {
         if (optionMappings.isEmpty()) {
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
-                    StatsService.getPlayersCurrentStatsText(player, game));
+                    PlayerStatsService.getPlayersCurrentStatsText(player, game));
             } else {
-                MessageHelper.sendMessageToEventChannel(event, StatsService.getPlayersCurrentStatsText(player, game));
+                MessageHelper.sendMessageToEventChannel(event, PlayerStatsService.getPlayersCurrentStatsText(player, game));
             }
             return;
         }
@@ -78,11 +78,11 @@ class Stats extends GameStateSubcommand {
                     MessageHelper.sendMessageToEventChannel(event, "Wrong format for tokens count. Must be 3/3/3");
                 } else {
                     try {
-                        StatsService.setValue(event, game, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC,
+                        PlayerStatsService.setValue(event, game, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC,
                             tokenizer.nextToken(), true);
-                        StatsService.setValue(event, game, player, "Fleet CC", player::setFleetCC, player::getFleetCC,
+                        PlayerStatsService.setValue(event, game, player, "Fleet CC", player::setFleetCC, player::getFleetCC,
                             tokenizer.nextToken(), true);
-                        StatsService.setValue(event, game, player, "Strategy CC", player::setStrategicCC,
+                        PlayerStatsService.setValue(event, game, player, "Strategy CC", player::setStrategicCC,
                             player::getStrategicCC, tokenizer.nextToken(), true);
                     } catch (Exception e) {
                         MessageHelper.sendMessageToEventChannel(event, "Not number entered, check CC count again");
@@ -91,13 +91,13 @@ class Stats extends GameStateSubcommand {
                 Helper.isCCCountCorrect(event, game, player.getColor());
             }
             if (optionT != null) {
-                StatsService.setValue(event, game, player, optionT, player::setTacticalCC, player::getTacticalCC, true);
+                PlayerStatsService.setValue(event, game, player, optionT, player::setTacticalCC, player::getTacticalCC, true);
             }
             if (optionF != null) {
-                StatsService.setValue(event, game, player, optionF, player::setFleetCC, player::getFleetCC, true);
+                PlayerStatsService.setValue(event, game, player, optionF, player::setFleetCC, player::getFleetCC, true);
             }
             if (optionS != null) {
-                StatsService.setValue(event, game, player, optionS, player::setStrategicCC, player::getStrategicCC, true);
+                PlayerStatsService.setValue(event, game, player, optionS, player::setStrategicCC, player::getStrategicCC, true);
             }
             if (optionT != null || optionF != null || optionS != null || optionCC != null) {
                 String newCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
@@ -119,7 +119,7 @@ class Stats extends GameStateSubcommand {
         OptionMapping optionTG = event.getOption(Constants.TG);
         if (optionTG != null) {
             int oldTg = player.getTg();
-            StatsService.setValue(event, game, player, optionTG, player::setTg, player::getTg);
+            PlayerStatsService.setValue(event, game, player, optionTG, player::setTg, player::getTg);
             if (optionTG.getAsString().contains("+")) {
                 ButtonHelperAbilities.pillageCheck(player, game);
             } else if (player.getTg() > oldTg) {
@@ -129,7 +129,7 @@ class Stats extends GameStateSubcommand {
 
         OptionMapping optionC = event.getOption(Constants.COMMODITIES);
         if (optionC != null) {
-            StatsService.setValue(event, game, player, optionC, player::setCommodities, player::getCommodities);
+            PlayerStatsService.setValue(event, game, player, optionC, player::setCommodities, player::getCommodities);
             if (player.hasAbility("military_industrial_complex")
                 && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -161,7 +161,7 @@ class Stats extends GameStateSubcommand {
 
         Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);
         if (commoditiesTotalCount != null) {
-            StatsService.setTotalCommodities(event, player, commoditiesTotalCount);
+            PlayerStatsService.setTotalCommodities(event, player, commoditiesTotalCount);
         }
 
         Integer turnCount = event.getOption(Constants.TURN_COUNT, null, OptionMapping::getAsInt);
@@ -201,7 +201,7 @@ class Stats extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, message.toString());
         }
 
-        StatsService.pickSC(event, game, player, event.getOption(Constants.STRATEGY_CARD));
+        PlayerStatsService.pickSC(event, game, player, event.getOption(Constants.STRATEGY_CARD));
 
         OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
         if (optionSCPlayed != null) {

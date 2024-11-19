@@ -30,6 +30,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.player.PlayerStatsService;
 import ti4.service.turn.StartTurnService;
 
 class SCPick extends GameStateSubcommand {
@@ -69,7 +70,7 @@ class SCPick extends GameStateSubcommand {
         OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
         int scPicked = option.getAsInt();
 
-        boolean pickSuccessful = Stats.pickSC(event, game, player, option);
+        boolean pickSuccessful = PlayerStatsService.pickSC(event, game, player, option);
         Set<Integer> playerSCs = player.getSCs();
         if (!pickSuccessful) {
             if (game.isFowMode()) {
@@ -77,7 +78,7 @@ class SCPick extends GameStateSubcommand {
                 int c = 0;
                 while (playerSCs.isEmpty() && c < 5 && !pickSuccessful) {
                     if (event.getOption(scs[c]) != null) {
-                        pickSuccessful = Stats.pickSC(event, game, player, event.getOption(scs[c]));
+                        pickSuccessful = PlayerStatsService.pickSC(event, game, player, event.getOption(scs[c]));
                     }
                     playerSCs = player.getSCs();
                     c++;
