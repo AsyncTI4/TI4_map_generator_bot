@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.commands.game.StartPhase;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.tech.TechExhaust;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
@@ -47,6 +46,7 @@ import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.tech.PlayerTechService;
 
 public class ButtonHelperFactionSpecific {
 
@@ -67,7 +67,7 @@ public class ButtonHelperFactionSpecific {
         ButtonHelper.deleteTheOneButton(event);
     }
 
-    public static void resolveVadenTgForSpeed(Player player, Game game, GenericInteractionCreateEvent event) {
+    public static void resolveVadenTgForSpeed(Player player, GenericInteractionCreateEvent event) {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " is paying TGs to boost their non-fighter ships.");
         List<Button> buttons = new ArrayList<>();
@@ -100,7 +100,7 @@ public class ButtonHelperFactionSpecific {
         buttons.add(doneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             "Click how many TGs you want to spend", buttons);
-        TechExhaust.deleteTheOneButtonIfButtonEvent(event);
+        PlayerTechService.deleteTheOneButtonIfButtonEvent(event);
     }
 
     @ButtonHandler("resolveVadenMech_")
@@ -389,24 +389,25 @@ public class ButtonHelperFactionSpecific {
         String trueIdentity = player.getRepresentation();
         String faction = buttonID.replace("nekroStealTech_", "");
         Player p2 = game.getPlayerFromColorOrFaction(faction);
-        if (p2 != null) {
-            List<String> potentialTech = new ArrayList<>();
-            game.setComponentAction(true);
-            potentialTech = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, potentialTech,
-                game);
-            List<Button> buttons = ButtonHelperAbilities.getButtonsForPossibleTechForNekro(player, potentialTech, game);
-            if (p2.getPromissoryNotesInPlayArea().contains("antivirus")) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    trueIdentity + " the other player has antivirus, so you cannot gain tech from this combat.");
-            } else if (!buttons.isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    trueIdentity + " get enemy tech using the buttons", buttons);
-            } else {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    trueIdentity + " there are no techs available to gain.");
-            }
-            ButtonHelper.deleteTheOneButton(event);
+        if (p2 == null) {
+            return;
         }
+        List<String> potentialTech = new ArrayList<>();
+        game.setComponentAction(true);
+        potentialTech = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, potentialTech,
+            game);
+        List<Button> buttons = ButtonHelperAbilities.getButtonsForPossibleTechForNekro(player, potentialTech, game);
+        if (p2.getPromissoryNotesInPlayArea().contains("antivirus")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                trueIdentity + " the other player has antivirus, so you cannot gain tech from this combat.");
+        } else if (!buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                trueIdentity + " get enemy tech using the buttons", buttons);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                trueIdentity + " there are no techs available to gain.");
+        }
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("titansConstructionMechDeployStep2_")
@@ -567,7 +568,7 @@ public class ButtonHelperFactionSpecific {
             techs2);
     }
 
-    public static void offerArgentStartingTech(Player player, Game game) {
+    public static void offerArgentStartingTech(Player player) {
         List<String> techToGain = new ArrayList<>();
         techToGain.add("st");
         techToGain.add("nm");
@@ -589,7 +590,7 @@ public class ButtonHelperFactionSpecific {
             techs2);
     }
 
-    public static void offerWinnuStartingTech(Player player, Game game) {
+    public static void offerWinnuStartingTech(Player player) {
         List<String> techToGain = new ArrayList<>();
         techToGain.add("st");
         techToGain.add("nm");
@@ -1317,19 +1318,18 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void resolveMykoMechCheck(Player player, Game game) {
-        if (player.hasUnit("mykomentori_mech")) {
-            if (!game.getStoredValue("mykoMech").isEmpty()) {
-                int amount = Integer.parseInt(game.getStoredValue("mykoMech"));
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("resolveMykoMech", "Replace Infantry With Mech"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                if (amount > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + " you have " + amount
-                            + " mech" + (amount == 1 ? "" : "s") + " that may replace infantry.",
-                        buttons);
-                }
-            }
+        if (!player.hasUnit("mykomentori_mech") || game.getStoredValue("mykoMech").isEmpty()) {
+            return;
+        }
+        int amount = Integer.parseInt(game.getStoredValue("mykoMech"));
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("resolveMykoMech", "Replace Infantry With Mech"));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        if (amount > 0) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " you have " + amount
+                    + " mech" + (amount == 1 ? "" : "s") + " that may replace infantry.",
+                buttons);
         }
     }
 

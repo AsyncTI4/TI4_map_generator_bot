@@ -22,8 +22,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
-import ti4.image.TileHelper;
 import ti4.helpers.Constants;
+import ti4.image.TileHelper;
 import ti4.message.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
@@ -82,11 +82,11 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
                 .filter(tile -> tile.getNumPlanets() >= min_planets)
                 .filter(tile -> include_draft || tile.getSource() != ComponentSource.draft)
                 .filter(tile -> include_hyperlanes || !tile.isHyperlane())
-                .filter(tile -> with_anomalies == null ? true : with_anomalies == tile.isAnomaly())
-                .filter(tile -> with_asteroids == null ? true : with_asteroids == tile.isAsteroidField())
-                .filter(tile -> with_grifts == null ? true : with_grifts == tile.isGravityRift())
-                .filter(tile -> with_nebula == null ? true : with_nebula == tile.isNebula())
-                .filter(tile -> with_supernova == null ? true : with_supernova == tile.isSupernova())
+                .filter(tile -> with_anomalies == null || with_anomalies == tile.isAnomaly())
+                .filter(tile -> with_asteroids == null || with_asteroids == tile.isAsteroidField())
+                .filter(tile -> with_grifts == null || with_grifts == tile.isGravityRift())
+                .filter(tile -> with_nebula == null || with_nebula == tile.isNebula())
+                .filter(tile -> with_supernova == null || with_supernova == tile.isSupernova())
                 .sorted(Comparator.comparing(TileModel::getId))
                 .map(tile -> Map.entry(tile, tile.getHelpMessageEmbed(includeAliases)))
                 .forEach(tileEmbeds::add);

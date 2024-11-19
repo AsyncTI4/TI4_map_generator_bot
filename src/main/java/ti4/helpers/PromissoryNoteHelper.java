@@ -289,7 +289,7 @@ public class PromissoryNoteHelper {
                 player.getRepresentation() + " drew an extra SO due to Tnelis PN. Please discard an extra SO");
         }
         if ("dspnvade".equalsIgnoreCase(id)) {
-            ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, game, event);
+            ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
         }
         if ("crucible".equalsIgnoreCase(id)) {
             game.setStoredValue("crucibleBoost", "2");

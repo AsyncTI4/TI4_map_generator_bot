@@ -8,13 +8,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.tech.TechInfo;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
-import ti4.map.Game;
+import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.info.TechInfoService;
 
 abstract class FactionTechAddRemove extends GameStateSubcommand {
     
@@ -43,12 +42,11 @@ abstract class FactionTechAddRemove extends GameStateSubcommand {
             return;
         }
 
-        Game game = getGame();
         Player player = getPlayer();
 
         doAction(player, techIDs, event);
 
-        TechInfo.sendTechInfo(game, player, event);
+        TechInfoService.sendTechInfo(getGame(), player, event);
     }
 
     public abstract void doAction(Player player, List<String> leaderIDs, SlashCommandInteractionEvent event);

@@ -8,7 +8,7 @@ import ti4.map.Player;
 import ti4.service.info.CardsInfoService;
 
 @UtilityClass
-public class CardsInfoButtonHandler {
+class CardsInfoButtonHandler {
 
     @ButtonHandler("cardsInfo")
     public static void sendCardsInfo(Game game, Player player, GenericInteractionCreateEvent event) {

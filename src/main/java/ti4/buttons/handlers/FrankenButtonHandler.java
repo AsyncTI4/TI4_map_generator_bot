@@ -7,8 +7,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.commands.tech.TechAdd;
-import ti4.commands.tech.TechRemove;
 import ti4.commands2.player.Stats;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
@@ -28,6 +26,7 @@ import ti4.service.franken.FrankenFactionTechService;
 import ti4.service.franken.FrankenLeaderService;
 import ti4.service.franken.FrankenPromissoryService;
 import ti4.service.franken.FrankenUnitService;
+import ti4.service.tech.PlayerTechService;
 
 @UtilityClass
 class FrankenButtonHandler {
@@ -119,7 +118,7 @@ class FrankenButtonHandler {
         List<String> startingTech = faction.getStartingTech();
         if (startingTech == null) return;
         for (String tech : startingTech) {
-            TechAdd.addTech(event, player.getGame(), player, tech);
+            PlayerTechService.addTech(event, player.getGame(), player, tech);
         }
     }
 
@@ -128,7 +127,7 @@ class FrankenButtonHandler {
         List<String> startingTech = faction.getStartingTech();
         if (startingTech == null) return;
         for (String tech : startingTech) {
-            TechRemove.removeTech(event, player, tech);
+            PlayerTechService.removeTech(event, player, tech);
         }
     }
 
