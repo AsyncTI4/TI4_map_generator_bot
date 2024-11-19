@@ -1,6 +1,7 @@
 {
     "id": "hl_mergeleft_0",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "mergeleft_0"
     ],
