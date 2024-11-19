@@ -9,6 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.turn.EndTurnService;
 
 class TurnEnd extends GameStateSubcommand {
 
@@ -31,7 +32,7 @@ class TurnEnd extends GameStateSubcommand {
             }
         }
 
-        pingNextPlayer(event, game, player);
+        EndTurnService.pingNextPlayer(event, game, player);
         player.resetOlradinPolicyFlags();
     }
 }
