@@ -1,4 +1,4 @@
-package ti4.commands.fow;
+package ti4.commands2.fow;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

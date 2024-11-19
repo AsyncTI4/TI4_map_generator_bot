@@ -1,13 +1,12 @@
-package ti4.commands.fow;
+package ti4.commands2.fow;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.jetbrains.annotations.NotNull;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.service.ShowGameService;
+import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 
 class ShowGameAsPlayer extends GameStateSubcommand {
 
@@ -18,21 +17,6 @@ class ShowGameAsPlayer extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        ShowGameService.simpleShowGame(getGame(), new SlashCommandCustomUserWrapper(event, getPlayer().getUser()));
-    }
-
-    private static class SlashCommandCustomUserWrapper extends SlashCommandInteractionEvent {
-        private final User overriddenUser;
-        
-        public SlashCommandCustomUserWrapper(SlashCommandInteractionEvent event, User overriddenUser) {
-            super(event.getJDA(), event.getResponseNumber(), event.getInteraction());
-            this.overriddenUser = overriddenUser;
-        }
-
-        @NotNull
-        @Override
-        public User getUser() {
-            return overriddenUser;
-        }
+        ShowGameService.simpleShowGame(getGame(), new UserOverridenSlashCommandInteractionEvent(event, getPlayer().getUser()));
     }
 }

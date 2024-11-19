@@ -1,4 +1,4 @@
-package ti4.commands.fow;
+package ti4.commands2.fow;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -8,10 +8,10 @@ import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 
-class FOWOptions extends GameStateSubcommand {
+import static ti4.service.fow.FowConstants.HIDE_NAMES;
+import static ti4.service.fow.FowConstants.HIDE_TOTAL_VOTES;
 
-    public static final String HIDE_NAMES = "hide_player_names";
-    public static final String HIDE_TOTAL_VOTES = "hide_total_votes";
+class FOWOptions extends GameStateSubcommand {
 
     public FOWOptions() {
         super(Constants.FOW_OPTIONS, "Change options for FoW game", true, true);

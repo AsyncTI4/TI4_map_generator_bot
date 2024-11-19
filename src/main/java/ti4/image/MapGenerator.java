@@ -42,8 +42,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
-import ti4.commands.fow.FOWOptions;
-import ti4.commands.fow.ShowGameAsPlayer;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -84,6 +82,8 @@ import ti4.model.RelicModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.fow.FowConstants;
+import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 import ti4.website.WebsiteOverlay;
 
 import static ti4.image.ImageHelper.writeCompressedFormat;
@@ -366,7 +366,7 @@ public class MapGenerator implements AutoCloseable {
     private boolean isFowModeActive() {
         return game.isFowMode() && event != null &&
             (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) ||
-                event instanceof ShowGameAsPlayer.SlashCommandCustomUserWrapper);
+                event instanceof UserOverridenSlashCommandInteractionEvent);
     }
 
     public boolean shouldConvertToGeneric(Player player) {
@@ -645,7 +645,7 @@ public class MapGenerator implements AutoCloseable {
                 // PAINT AVATAR AND USERNAME
                 StringBuilder userName = new StringBuilder();
                 String playerName = player.getUserName();
-                boolean fowHidePlayerNames = Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_NAMES));
+                boolean fowHidePlayerNames = Boolean.parseBoolean(game.getFowOption(FowConstants.HIDE_NAMES));
                 if (!fowHidePlayerNames) {
                     graphics.drawImage(DrawingUtil.getPlayerDiscordAvatar(player), x, y + 5, null);
                     userName.append(" ").append(playerName, 0, Math.min(playerName.length(), 20));
@@ -3026,7 +3026,7 @@ public class MapGenerator implements AutoCloseable {
             graphics.setFont(Storage.getFont32());
             String userName = player.getUserName();
             point = PositionMapper.getPlayerStats("newuserName");
-            if (!Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_NAMES))) {
+            if (!Boolean.parseBoolean(game.getFowOption(FowConstants.HIDE_NAMES))) {
                 String name = userName.substring(0, Math.min(userName.length(), 15));
                 DrawingUtil.superDrawString(graphics, name, statTileMid.x + point.x, statTileMid.y + point.y, Color.WHITE, center, null, stroke5, Color.BLACK);
             }
@@ -3598,7 +3598,7 @@ public class MapGenerator implements AutoCloseable {
 
         // PAINT USERNAME
         Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
-        if (!Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_NAMES))) {
+        if (!Boolean.parseBoolean(game.getFowOption(FowConstants.HIDE_NAMES))) {
             graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX,
                 point.y + deltaY);
         }

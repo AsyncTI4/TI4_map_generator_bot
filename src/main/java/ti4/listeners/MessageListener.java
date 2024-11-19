@@ -1,5 +1,6 @@
 package ti4.listeners;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -7,10 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-
-import javax.annotation.Nonnull;
-
-import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -24,14 +21,14 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.fow.Whisper;
-import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.GameCreationHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.async.RoundSummaryHelper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -39,6 +36,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.fow.WhisperService;
 
 public class MessageListener extends ListenerAdapter {
 
@@ -273,7 +271,7 @@ public class MessageListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found.");
                         return;
                     }
-                    Whisper.sendWhisper(game, player, player_, messageContent, "n", event.getChannel(), event.getGuild());
+                    WhisperService.sendWhisper(game, player, player_, messageContent, "n", event.getChannel(), event.getGuild());
                 } else if (messageToMyself) {
                     String previousThoughts = "";
                     if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {

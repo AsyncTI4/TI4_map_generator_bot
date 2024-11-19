@@ -27,7 +27,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
-import ti4.commands.fow.ShowGameAsPlayer;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -46,6 +45,7 @@ import ti4.message.BotLogger;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.UnitModel;
+import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 
 public class TileGenerator {
 
@@ -90,7 +90,7 @@ public class TileGenerator {
     private boolean isFowModeActive() {
         return game.isFowMode() && event != null &&
             (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) ||
-                event instanceof ShowGameAsPlayer.SlashCommandCustomUserWrapper);
+                event instanceof UserOverridenSlashCommandInteractionEvent);
     }
 
     public FileUpload createFileUpload() {
