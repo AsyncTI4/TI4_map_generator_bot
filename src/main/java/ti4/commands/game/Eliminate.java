@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.commands.tokens.RemoveCC;
+import ti4.commands2.tokens.RemoveCC;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
