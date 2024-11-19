@@ -15,11 +15,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechInfo;
 import ti4.commands.tokens.AddToken;
-import ti4.commands.units.AddRemoveUnits;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -29,7 +27,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
@@ -42,8 +39,12 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
+import ti4.service.PlanetService;
 import ti4.service.info.AbilityInfoService;
 import ti4.service.info.CardsInfoService;
+import ti4.service.info.LeaderInfoService;
+import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.info.UnitInfoService;
 
 public class Setup extends GameStateSubcommand {
 
@@ -107,7 +108,7 @@ public class Setup extends GameStateSubcommand {
         if (player.isRealPlayer() && player.getSo() > 0) {
             String message = player.getRepresentationNoPing() + "has SOs that would get lost to the void if they were setup again. If they wish to change color, use /player change_color. If they want to setup as another faction, they must discard their SOs first";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-            SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
+            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
             return;
         }
 
@@ -240,8 +241,8 @@ public class Setup extends GameStateSubcommand {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, factionModel.getFactionSheetMessage());
         AbilityInfoService.sendAbilityInfo(game, player, event);
         TechInfo.sendTechInfo(game, player, event);
-        LeaderInfo.sendLeadersInfo(game, player, event);
-        UnitInfo.sendUnitInfo(game, player, event, false);
+        LeaderInfoService.sendLeadersInfo(game, player, event);
+        UnitInfoService.sendUnitInfo(game, player, event, false);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false, event);
 
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
@@ -395,7 +396,7 @@ public class Setup extends GameStateSubcommand {
             if (unitInfoTokenizer.hasMoreTokens()) {
                 planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
             }
-            planetName = AddRemoveUnits.getPlanet(event, tile, planetName);
+            planetName = PlanetService.getPlanet(tile, planetName);
             tile.addUnit(planetName, unitID, count);
         }
     }

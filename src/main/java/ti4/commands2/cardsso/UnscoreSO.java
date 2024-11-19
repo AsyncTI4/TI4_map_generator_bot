@@ -7,10 +7,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.SecretObjectiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.info.SecretObjectiveInfoService;
 
 class UnscoreSO extends GameStateSubcommand {
 
@@ -29,7 +29,7 @@ class UnscoreSO extends GameStateSubcommand {
         boolean scored = game.unscoreSecretObjective(player.getUserID(), soId);
         if (!scored) {
             List<String> scoredSOs = player.getSecretsScored().entrySet().stream()
-                .map(e -> "> (" + e.getValue() + ") " + SecretObjectiveHelper.getSecretObjectiveRepresentationShort(e.getKey()))
+                .map(e -> "> (" + e.getValue() + ") " + SecretObjectiveInfoService.getSecretObjectiveRepresentationShort(e.getKey()))
                 .toList();
             StringBuilder sb = new StringBuilder("Secret Objective ID found - please retry.\nYour current scored SOs are:\n");
             scoredSOs.forEach(sb::append);
@@ -39,6 +39,6 @@ class UnscoreSO extends GameStateSubcommand {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Unscored SO " + soId);
-        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
     }
 }

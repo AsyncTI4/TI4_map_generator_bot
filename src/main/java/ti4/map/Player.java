@@ -40,13 +40,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.player.TurnEnd;
 import ti4.commands2.player.TurnStart;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
-import ti4.image.DrawingUtil;
-import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -58,6 +55,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.DrawingUtil;
+import ti4.image.Mapper;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
@@ -72,6 +71,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.users.UserSettingsManager;
 
 public class Player {
@@ -3135,7 +3135,7 @@ public class Player {
     }
 
     public void checkCommanderUnlock(String factionToCheck) {
-        CommanderUnlockCheck.checkPlayer(this, factionToCheck);
+        CommanderUnlockCheckService.checkPlayer(this, factionToCheck);
     }
 
     @JsonIgnore

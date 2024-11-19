@@ -3,13 +3,13 @@ package ti4.commands2.player;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class SendDebt extends GameStateSubcommand {
 
@@ -32,7 +32,7 @@ public class SendDebt extends GameStateSubcommand {
         Player sendingPlayer = getPlayer();
         Player receivingPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
-        CommanderUnlockCheck.checkPlayer(receivingPlayer, "vaden");
+        CommanderUnlockCheckService.checkPlayer(receivingPlayer, "vaden");
         MessageHelper.sendMessageToEventChannel(event, sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation());
     }
 

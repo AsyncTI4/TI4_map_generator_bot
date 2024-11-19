@@ -10,14 +10,13 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.player.TurnStart;
-import ti4.image.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -27,6 +26,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelperTacticalAction {
 
@@ -461,12 +461,12 @@ public class ButtonHelperTacticalAction {
         if (systemButtons.size() == landingButtons || game.isL1Hero()) {
             systemButtons = ButtonHelper.landAndGetBuildButtons(player, game, event, tile);
         }
-        CommanderUnlockCheck.checkPlayer(player, "nivyn");
-        CommanderUnlockCheck.checkPlayer(player, "ghoti");
-        CommanderUnlockCheck.checkPlayer(player, "zelian");
-        CommanderUnlockCheck.checkPlayer(player, "gledge");
-        CommanderUnlockCheck.checkPlayer(player, "mortheus");
-        CommanderUnlockCheck.checkAllPlayersInGame(game, "empyrean");
+        CommanderUnlockCheckService.checkPlayer(player, "nivyn");
+        CommanderUnlockCheckService.checkPlayer(player, "ghoti");
+        CommanderUnlockCheckService.checkPlayer(player, "zelian");
+        CommanderUnlockCheckService.checkPlayer(player, "gledge");
+        CommanderUnlockCheckService.checkPlayer(player, "mortheus");
+        CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         if (needPDSCheck && !game.isL1Hero() && !playersWithPds2.isEmpty()) {
             StartCombatService.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game,

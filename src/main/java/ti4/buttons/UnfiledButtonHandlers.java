@@ -25,15 +25,10 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.explore.ExploreFrontier;
-import ti4.commands.explore.ExplorePlanet;
-import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.game.StartPhase;
 import ti4.commands.game.Swap;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
-import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
@@ -85,8 +80,12 @@ import ti4.model.FactionModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.PlanetService;
 import ti4.service.StatusCleanupService;
 import ti4.service.combat.StartCombatService;
+import ti4.service.explore.ExploreService;
+import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 
@@ -143,7 +142,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("unlockCommander_")
     public static void unlockCommander(ButtonInteractionEvent event, Player player, String buttonID) {
         ButtonHelper.deleteTheOneButton(event);
-        CommanderUnlockCheck.checkPlayer(player, buttonID.split("_")[1]);
+        CommanderUnlockCheckService.checkPlayer(player, buttonID.split("_")[1]);
     }
 
     @ButtonHandler("fogAllianceAgentStep3_")
@@ -236,7 +235,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void garboziaAbilityExhaust(ButtonInteractionEvent event, Player player, Game game) {
         String planet = "garbozia";
         player.exhaustPlanetAbility(planet);
-        new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player, true, game, 1, false);
+        ExploreService.explorePlanet(event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player, true, game, 1, false);
     }
 
     @ButtonHandler("planetAbilityExhaust_")
@@ -407,7 +406,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("arboAgentIn_")
     public static void arboAgentIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.substring(buttonID.indexOf("_") + 1);
-        List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, game, event, game.getTileByPosition(pos));
+        List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, game.getTileByPosition(pos));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentationUnfogged() + " select which unit you'd like to replace", buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -415,7 +414,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("ghotiHeroIn_")
     public static void ghotiHeroIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.substring(buttonID.indexOf("_") + 1);
-        List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, game, event, game.getTileByPosition(pos));
+        List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, game.getTileByPosition(pos));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentationUnfogged() + " select which unit you'd like to replace", buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -558,7 +557,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String pos = stuff[1];
         String cardRefused = stuff[2];
         game.addExplore(cardRefused);
-        new ExploreFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player, cardChosen);
+        ExploreService.expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player, cardChosen);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -833,7 +832,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             p2 = game.getPlayerFromColorOrFaction(faction);
         }
 
-        PlanetRefresh.doAction(p2, planetName);
+        PlanetService.refreshPlanet(p2, planetName);
         List<ActionRow> actionRow2 = new ArrayList<>();
         for (ActionRow row : event.getMessage().getActionRows()) {
             List<ItemComponent> buttonRow = row.getComponents();
@@ -854,23 +853,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (!actionRow2.isEmpty()) {
             event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue();
         }
-    }
-
-    @ButtonHandler("resolve_explore_")
-    public static void resolveExplore(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String bID = buttonID.replace("resolve_explore_", "");
-        String[] info = bID.split("_");
-        String cardID = info[0];
-        String planetName = info[1];
-        Tile tile = game.getTileFromPlanet(planetName);
-        String tileName = tile == null ? "no tile" : tile.getPosition();
-        String messageText = player.getRepresentation() + " explored " + "Planet "
-            + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile " + tileName + ")*:";
-        if (buttonID.contains("_distantSuns")) {
-            messageText = player.getFactionEmoji() + " chose to resolve: ";
-        }
-        ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
-        ButtonHelper.deleteMessage(event);
     }
 
     // @ButtonHandler("strategicAction_")
@@ -1057,8 +1039,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         String[] info = bID.split("_");
         Tile tile = game.getTileFromPlanet(info[1]);
-        new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game,
-            1, false);
+        ExploreService.explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, false);
         if (dsdihmy) {
             player.exhaustPlanet(info[1]);
             MessageHelper.sendMessageToChannel(mainGameChannel,
@@ -2538,7 +2519,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         } else {
             game.drawActionCard(player.getUserID());
             game.drawActionCard(player.getUserID());
-            CommanderUnlockCheck.checkPlayer(player, "yssaril");
+            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             ActionCardHelper.sendActionCardInfo(game, player, event);
             message = "Drew 2 ACs With Scheming. Please Discard 1 AC.";
         }
@@ -2559,7 +2540,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
         } else {
             game.drawActionCard(player.getUserID());
-            CommanderUnlockCheck.checkPlayer(player, "yssaril");
+            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             ActionCardHelper.sendActionCardInfo(game, player, event);
             message = "Drew 1 AC";
         }
@@ -2576,7 +2557,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
         } else {
             game.drawActionCard(player.getUserID());
-            CommanderUnlockCheck.checkPlayer(player, "yssaril");
+            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             ActionCardHelper.sendActionCardInfo(game, player, event);
             message = "Drew 1 AC";
         }
@@ -2665,7 +2646,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String message = playerRep + " exhausted Mallice ability and gained 2TGs " + player.gainTG(2) + ".";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 2);
-        CommanderUnlockCheck.checkPlayer(player, "hacan");
+        CommanderUnlockCheckService.checkPlayer(player, "hacan");
         if (!game.isFowMode() && event.getMessageChannel() != game.getMainGameChannel()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
         }
@@ -2802,7 +2783,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             ActionCardHelper.sendActionCardInfo(game, player, event);
             message = player.getFactionEmoji() + " Drew 1 AC";
         }
-        CommanderUnlockCheck.checkPlayer(player, "yssaril");
+        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.checkACLimit(game, player);
         ButtonHelper.deleteTheOneButton(event);
@@ -2954,7 +2935,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             game.drawSecretObjective(player.getUserID());
             message += ". Drew a second SO due to Plausible Deniability";
         }
-        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
         ButtonHelper.addReaction(event, false, false, message, "");
     }
 
@@ -2966,7 +2947,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             game.drawSecretObjective(player.getUserID());
             message += ". Drew a second SO due to Plausible Deniability";
         }
-        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
         ButtonHelper.addReaction(event, false, false, message, "");
     }
 
@@ -2995,7 +2976,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 player.getRepresentationUnfogged() + " use buttons to discard",
                 ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
-        CommanderUnlockCheck.checkPlayer(player, "yssaril");
+        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -3406,7 +3387,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             ActionCardHelper.sendActionCardInfo(game, player, event);
         }
 
-        CommanderUnlockCheck.checkPlayer(player, "yssaril");
+        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
 
         if (hasSchemingAbility) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),

@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.tokens.AddCC;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -31,6 +30,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
 public class StartCombatService {
@@ -168,8 +168,8 @@ public class StartCombatService {
             }
         }
         if (tile.isMecatol()) {
-            CommanderUnlockCheck.checkPlayer(player1, "winnu");
-            CommanderUnlockCheck.checkPlayer(player2, "winnu");
+            CommanderUnlockCheckService.checkPlayer(player1, "winnu");
+            CommanderUnlockCheckService.checkPlayer(player2, "winnu");
         }
 
         int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);

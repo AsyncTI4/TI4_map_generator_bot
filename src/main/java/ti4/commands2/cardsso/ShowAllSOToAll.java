@@ -9,9 +9,9 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.SecretObjectiveHelper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.info.SecretObjectiveInfoService;
 
 class ShowAllSOToAll extends GameStateSubcommand {
 
@@ -39,13 +39,13 @@ class ShowAllSOToAll extends GameStateSubcommand {
         sb.append("**Secret Objectives:**").append("\n");
         int index = 1;
         for (String so : secretObjectives) {
-            sb.append(index).append(" - ").append(SecretObjectiveHelper.getSecretObjectiveRepresentation(so)).append("\n");
+            sb.append(index).append(" - ").append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so)).append("\n");
             player.setSecret(so);
             index++;
         }
         sb.append("\n").append("**Scored Secret Objectives:**").append("\n");
         for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
-            sb.append(index).append(". (").append(so.getValue()).append(") - ").append(SecretObjectiveHelper.getSecretObjectiveRepresentation(so.getKey())).append("\n");
+            sb.append(index).append(". (").append(so.getValue()).append(") - ").append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so.getKey())).append("\n");
             index++;
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

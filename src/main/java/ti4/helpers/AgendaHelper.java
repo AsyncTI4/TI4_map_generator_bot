@@ -58,6 +58,7 @@ import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.service.info.SecretObjectiveInfoService;
 
 public class AgendaHelper {
 
@@ -1342,7 +1343,7 @@ public class AgendaHelper {
                                 game.drawSecretObjective(winningR.getUserID());
                                 message = message + " Drew a second SO due to **Plausible Deniability**.";
                             }
-                            SecretObjectiveHelper.sendSecretObjectiveInfo(game, winningR, event);
+                            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, winningR, event);
                             MessageHelper.sendMessageToChannel(winningR.getCorrectChannel(), message);
                         }
                         if (specificVote.contains("Kyro Rider")) {

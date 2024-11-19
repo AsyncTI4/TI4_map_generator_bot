@@ -14,7 +14,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Emojis;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.helpers.SecretObjectiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -32,7 +31,7 @@ public class CardsInfoService {
     }
 
     public static void sendCardsInfo(Game game, Player player) {
-        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         ActionCardHelper.sendActionCardInfo(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);

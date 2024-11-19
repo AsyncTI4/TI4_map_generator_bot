@@ -6,13 +6,12 @@ import java.util.Set;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.image.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -146,7 +145,7 @@ public class ListPlayerInfoService {
     public static String representScoring(Game game, String objID, int x, boolean secret) {
         StringBuilder representation;
         if (secret) {
-            representation = new StringBuilder(x + ". " + SecretObjectiveHelper.getSecretObjectiveRepresentation(objID) + "> ");
+            representation = new StringBuilder(x + ". " + SecretObjectiveInfoService.getSecretObjectiveRepresentation(objID) + "> ");
         } else {
             PublicObjectiveModel model = Mapper.getPublicObjective(objID);
             if (x > 0) {

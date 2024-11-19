@@ -92,7 +92,7 @@
         "name": "Covert Legislation",
         "category": "agenda",
         "type": "Directive",
-        "target": "When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other Elect Players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect Elect Player, etc.); the other Elect Players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects.",
+        "target": "When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other Elect Players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect Elect Player, etc); the other Elect Players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects.",
         "text1": "",
         "source": "ignis_aurora"
     },

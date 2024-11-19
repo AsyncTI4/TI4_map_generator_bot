@@ -45,7 +45,6 @@ public class RemoveAllCC implements Command {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void register(CommandListUpdateAction commands) {
-        // Moderation commands with required options
         commands.addCommands(
             Commands.slash(getName(), "Remove all CCs from entire map")
                 .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")

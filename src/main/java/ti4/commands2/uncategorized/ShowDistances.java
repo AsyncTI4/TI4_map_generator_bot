@@ -8,12 +8,12 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateCommand;
-import ti4.image.MapRenderPipeline;
-import ti4.image.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.image.MapRenderPipeline;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -66,7 +66,6 @@ public class ShowDistances extends GameStateCommand {
 
     @Override
     public void register(CommandListUpdateAction commands) {
-        // Moderation commands with required options
         commands.addCommands(
             Commands.slash(getName(), "Shows map with distances to each tile from specified tile")
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))

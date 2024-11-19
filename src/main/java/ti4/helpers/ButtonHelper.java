@@ -53,12 +53,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
-import ti4.commands.explore.ExploreFrontier;
-import ti4.commands.explore.ExploreInfo;
-import ti4.commands.explore.ExploreSubcommandData;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.tech.TechShowDeck;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddToken;
@@ -103,9 +98,12 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
+import ti4.service.PlanetService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.decks.ShowActionCardsService;
+import ti4.service.explore.ExploreService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelper {
 
@@ -674,7 +672,7 @@ public class ButtonHelper {
                 } else {
                     types.add(deck);
                 }
-                ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false);
+                ExploreService.secondHalfOfExpInfo(types, event, player, game, false);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);
@@ -691,10 +689,10 @@ public class ButtonHelper {
             types.add(Constants.INDUSTRIAL);
             types.add(Constants.HAZARDOUS);
             types.add(Constants.FRONTIER);
-            ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(types, event, player, game, false, true);
         } else {
             types.add(type);
-            ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(types, event, player, game, false, true);
         }
         deleteMessage(event);
     }
@@ -770,7 +768,7 @@ public class ButtonHelper {
         }
 
         ActionCardHelper.sendActionCardInfo(game, player, event);
-        CommanderUnlockCheck.checkPlayer(player, "yssaril");
+        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         if (player.hasAbility("scheming")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
@@ -1254,7 +1252,7 @@ public class ButtonHelper {
             last = buttonID.replace("tech_", "");
             player.refreshTech(last);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied tech: " + Mapper.getTech(last).getRepresentation(false));
-            CommanderUnlockCheck.checkPlayer(player, "kolume");
+            CommanderUnlockCheckService.checkPlayer(player, "kolume");
         } else {
             player.refreshPlanet(last);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied planet: " + Helper.getPlanetRepresentation(last, game));
@@ -2682,7 +2680,7 @@ public class ButtonHelper {
             }
         }
         if (numOfCapitalShips > 8 && !fleetSupplyViolated) {
-            CommanderUnlockCheck.checkPlayer(player, "letnev");
+            CommanderUnlockCheckService.checkPlayer(player, "letnev");
         }
         if (player.hasAbility("flotilla")) {
             int numInf = tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor());
@@ -3446,7 +3444,7 @@ public class ButtonHelper {
                 msg2 = msg2 + name1 + ": " + card.getText() + "\n";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             } else {
-                new ExploreFrontier().expFront(event, tile, game, player);
+                ExploreService.expFront(event, tile, game, player);
             }
 
             if (player.hasAbility("migrant_fleet")) {
@@ -3527,10 +3525,10 @@ public class ButtonHelper {
             Tile tile = game.getTileFromPlanet(planetName);
             String messageText = player.getRepresentation() + " explored " + Emojis.getEmojiFromDiscord(drawColor) + "Planet "
                 + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile " + tile.getPosition() + ")*:";
-            ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
+            ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
             if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                 && game.getPhaseOfGame().contains("agenda")) {
-                PlanetRefresh.doAction(player, planetName);
+                PlanetService.refreshPlanet(player, planetName);
                 MessageHelper.sendMessageToChannel(event.getChannel(),
                     "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
                 AgendaHelper.listVoteCount(game, game.getMainGameChannel());
@@ -4177,7 +4175,7 @@ public class ButtonHelper {
         }
         Button concludeMove = Buttons.red(finChecker + "doneLanding_" + tile.getPosition(), "Done landing troops");
         buttons.add(concludeMove);
-        CommanderUnlockCheck.checkPlayer(player, "naaz", "empyrean", "ghost");
+        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost");
 
         return buttons;
     }
@@ -4493,7 +4491,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Added ionstorm beta to " + tile.getRepresentation());
         }
         deleteMessage(event);
-        CommanderUnlockCheck.checkPlayer(player, "ghost");
+        CommanderUnlockCheckService.checkPlayer(player, "ghost");
     }
 
     public static void checkForIonStorm(Game game, Tile tile, Player player) {

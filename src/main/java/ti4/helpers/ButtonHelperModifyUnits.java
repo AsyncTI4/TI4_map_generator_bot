@@ -16,15 +16,14 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.image.Mapper;
-import ti4.image.TileGenerator;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.image.TileGenerator;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -38,6 +37,7 @@ import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelperModifyUnits {
 
@@ -874,7 +874,7 @@ public class ButtonHelperModifyUnits {
         }
         Button concludeMove = Buttons.gray(finChecker + "deleteButtons", "Done Retreating troops");
         buttons.add(concludeMove);
-        CommanderUnlockCheck.checkPlayer(player, "naaz", "empyrean");
+        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean");
         return buttons;
     }
 
@@ -929,7 +929,7 @@ public class ButtonHelperModifyUnits {
         }
         List<Button> systemButtons = ButtonHelper.landAndGetBuildButtons(player, game, event, tile);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-        CommanderUnlockCheck.checkPlayer(player, "cheiran");
+        CommanderUnlockCheckService.checkPlayer(player, "cheiran");
         event.getMessage().delete().queue();
     }
 
@@ -993,7 +993,7 @@ public class ButtonHelperModifyUnits {
         String devoteOrNo = buttonID.split("_")[3];
         if (devoteOrNo.equalsIgnoreCase("devote")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
-            CommanderUnlockCheck.checkPlayer(player, "yin");
+            CommanderUnlockCheckService.checkPlayer(player, "yin");
         }
     }
 
@@ -1271,7 +1271,7 @@ public class ButtonHelperModifyUnits {
                 successMessage = "Placed 1 " + Emojis.spacedock + " on "
                     + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
-            CommanderUnlockCheck.checkPlayer(player, "cabal");
+            CommanderUnlockCheckService.checkPlayer(player, "cabal");
             if (player.hasAbility("industrious") && !FoWHelper.otherPlayersHaveShipsInSystem(player,
                 game.getTile(AliasHandler.resolveTile(planetName)), game)) {
                 Button replace = Buttons.green("FFCC_" + player.getFaction() + "_rohdhnaIndustrious_"
@@ -1482,20 +1482,20 @@ public class ButtonHelperModifyUnits {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
             }
         }
-        CommanderUnlockCheck.checkPlayer(player, "titans");
-        CommanderUnlockCheck.checkPlayer(player, "saar");
-        CommanderUnlockCheck.checkPlayer(player, "rohdhna");
-        CommanderUnlockCheck.checkPlayer(player, "cheiran");
-        CommanderUnlockCheck.checkPlayer(player, "celdauri");
-        CommanderUnlockCheck.checkPlayer(player, "gledge");
+        CommanderUnlockCheckService.checkPlayer(player, "titans");
+        CommanderUnlockCheckService.checkPlayer(player, "saar");
+        CommanderUnlockCheckService.checkPlayer(player, "rohdhna");
+        CommanderUnlockCheckService.checkPlayer(player, "cheiran");
+        CommanderUnlockCheckService.checkPlayer(player, "celdauri");
+        CommanderUnlockCheckService.checkPlayer(player, "gledge");
         if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
         if ("warsun".equalsIgnoreCase(unitLong)) {
-            CommanderUnlockCheck.checkPlayer(player, "muaat");
+            CommanderUnlockCheckService.checkPlayer(player, "muaat");
         }
-        CommanderUnlockCheck.checkPlayer(player, "mentak", "l1z1x", "tnelis", "cymiae", "kyro", "ghemina", "argent", "naaz", "arborec");
+        CommanderUnlockCheckService.checkPlayer(player, "mentak", "l1z1x", "tnelis", "cymiae", "kyro", "ghemina", "argent", "naaz", "arborec");
     }
 
     @ButtonHandler("cloakedFleets_")
@@ -1652,11 +1652,11 @@ public class ButtonHelperModifyUnits {
                 }
 
             }
-            CommanderUnlockCheck.checkPlayer(player, "l1z1x");
-            CommanderUnlockCheck.checkPlayer(player, "cymiae");
-            CommanderUnlockCheck.checkPlayer(player, "kyro");
-            CommanderUnlockCheck.checkPlayer(player, "ghemina");
-            CommanderUnlockCheck.checkPlayer(player, "tnelis");
+            CommanderUnlockCheckService.checkPlayer(player, "l1z1x");
+            CommanderUnlockCheckService.checkPlayer(player, "cymiae");
+            CommanderUnlockCheckService.checkPlayer(player, "kyro");
+            CommanderUnlockCheckService.checkPlayer(player, "ghemina");
+            CommanderUnlockCheckService.checkPlayer(player, "tnelis");
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             playerRep + " " + successMessage);
@@ -1701,32 +1701,32 @@ public class ButtonHelperModifyUnits {
             }
         }
 
-        CommanderUnlockCheck.checkPlayer(player, "titans");
+        CommanderUnlockCheckService.checkPlayer(player, "titans");
         if ("sd".equalsIgnoreCase(unitID)) {
             Tile tile = game.getTileFromPlanet(planetName);
             if (tile != null) {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
             }
         }
-        CommanderUnlockCheck.checkPlayer(player, "saar");
-        CommanderUnlockCheck.checkPlayer(player, "rohdhna");
-        CommanderUnlockCheck.checkPlayer(player, "cheiran");
-        CommanderUnlockCheck.checkPlayer(player, "celdauri");
+        CommanderUnlockCheckService.checkPlayer(player, "saar");
+        CommanderUnlockCheckService.checkPlayer(player, "rohdhna");
+        CommanderUnlockCheckService.checkPlayer(player, "cheiran");
+        CommanderUnlockCheckService.checkPlayer(player, "celdauri");
         if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
-        CommanderUnlockCheck.checkPlayer(player, "mentak");
-        CommanderUnlockCheck.checkPlayer(player, "l1z1x");
-        CommanderUnlockCheck.checkPlayer(player, "tnelis");
-        CommanderUnlockCheck.checkPlayer(player, "cymiae");
-        CommanderUnlockCheck.checkPlayer(player, "kyro");
-        CommanderUnlockCheck.checkPlayer(player, "ghemina");
+        CommanderUnlockCheckService.checkPlayer(player, "mentak");
+        CommanderUnlockCheckService.checkPlayer(player, "l1z1x");
+        CommanderUnlockCheckService.checkPlayer(player, "tnelis");
+        CommanderUnlockCheckService.checkPlayer(player, "cymiae");
+        CommanderUnlockCheckService.checkPlayer(player, "kyro");
+        CommanderUnlockCheckService.checkPlayer(player, "ghemina");
         if ("warsun".equalsIgnoreCase(unitLong)) {
-            CommanderUnlockCheck.checkPlayer(player, "muaat");
+            CommanderUnlockCheckService.checkPlayer(player, "muaat");
         }
-        CommanderUnlockCheck.checkPlayer(player, "argent");
-        CommanderUnlockCheck.checkPlayer(player, "naaz");
-        CommanderUnlockCheck.checkPlayer(player, "arborec");
+        CommanderUnlockCheckService.checkPlayer(player, "argent");
+        CommanderUnlockCheckService.checkPlayer(player, "naaz");
+        CommanderUnlockCheckService.checkPlayer(player, "arborec");
 
         event.getMessage().delete().queue();
     }

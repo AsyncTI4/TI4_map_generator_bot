@@ -9,7 +9,6 @@ import java.util.Objects;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -18,12 +17,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.MapGenerator;
-import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -34,27 +29,28 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.async.RoundSummaryHelper;
-import ti4.listeners.annotations.ButtonHandler;
+import ti4.image.MapGenerator;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.info.ListPlayerInfoService;
+import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class TurnEnd extends GameStateSubcommand {
 
     public TurnEnd() {
         super(Constants.TURN_END, "End Turn", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "In FoW, confirm with YES if you are not the active player").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "In FoW, confirm with YES if you are not the active player"));
     }
 
     @Override
@@ -74,18 +70,7 @@ public class TurnEnd extends GameStateSubcommand {
         player.resetOlradinPolicyFlags();
     }
 
-    @ButtonHandler("turnEnd")
-    public static void turnEnd(ButtonInteractionEvent event, Game game, Player player) {
-        if (game.isFowMode() && !player.isActivePlayer()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not the active player. Force End Turn with /player turn_end.");
-            return;
-        }
-        CommanderUnlockCheck.checkPlayer(player, "hacan");
-        TurnEnd.pingNextPlayer(event, game, player);
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
 
-        ButtonHelper.updateMap(game, event, "End of Turn " + player.getTurnCount() + ", Round " + game.getRound() + " for " + player.getFactionEmoji());
-    }
 
     public static Player findNextUnpassedPlayer(Game game, Player currentPlayer) {
         int startingInitiative = game.getPlayersTurnSCInitiative(currentPlayer);
@@ -119,7 +104,7 @@ public class TurnEnd extends GameStateSubcommand {
         game.setStoredValue("endTurnWhenSCFinished", "");
         game.setStoredValue("fleetLogWhenSCFinished", "");
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
-        CommanderUnlockCheck.checkPlayer(mainPlayer, "sol", "hacan");
+        CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
                 if (player_ == player) {
@@ -179,7 +164,7 @@ public class TurnEnd extends GameStateSubcommand {
         if (mainPlayer != nextPlayer) {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }
-        CommanderUnlockCheck.checkPlayer(nextPlayer, "sol");
+        CommanderUnlockCheckService.checkPlayer(nextPlayer, "sol");
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
                 TurnStart.turnStart(event, game, nextPlayer);
@@ -261,7 +246,7 @@ public class TurnEnd extends GameStateSubcommand {
         game.setPhaseOfGame("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
         for (Player player : game.getRealPlayers()) {
-            SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
+            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
             List<String> relics = new ArrayList<>(player.getRelics());
             for (String relic : relics) {
                 if (player.getExhaustedRelics().contains(relic) && relic.contains("axisorder")) {

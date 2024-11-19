@@ -7,15 +7,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.RelicHelper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 class RelicPurgeFragments extends GameStateSubcommand {
 
@@ -64,7 +64,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
 			game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
 		}
 
-		CommanderUnlockCheck.checkAllPlayersInGame(game, "lanefir");
+		CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
 
 		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
 		MessageHelper.sendMessageToEventChannel(event, message);

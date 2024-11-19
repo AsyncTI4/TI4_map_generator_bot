@@ -1,19 +1,19 @@
 package ti4.commands.tokens;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.commands.units.AddRemoveUnits;
-import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
+import ti4.service.PlanetService;
 
 public class AddControl extends AddRemoveToken {
     @Override
@@ -43,7 +43,7 @@ public class AddControl extends AddRemoveToken {
         StringTokenizer planetTokenizer = new StringTokenizer(planetInfo, ",");
         while (planetTokenizer.hasMoreTokens()) {
             String planet = planetTokenizer.nextToken();
-            planet = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planet));
+            planet = PlanetService.getPlanet(tile, AliasHandler.resolvePlanet(planet));
             if (!tile.isSpaceHolderValid(planet)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planet + " is not valid and not supported.");
                 continue;

@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.ButtonHelperAbilities;
@@ -15,6 +14,7 @@ import ti4.helpers.TransactionHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class SendTG extends GameStateSubcommand {
 
@@ -45,7 +45,7 @@ public class SendTG extends GameStateSubcommand {
 
         String p1 = player.getRepresentation();
         String p2 = targetPlayer.getRepresentation();
-        CommanderUnlockCheck.checkPlayer(player, "hacan");
+        CommanderUnlockCheckService.checkPlayer(player, "hacan");
         String tgString = sendTG + " " + Emojis.getTGorNomadCoinEmoji(game) + " trade goods";
         String message = p1 + " sent " + tgString + " to " + p2;
         MessageHelper.sendMessageToEventChannel(event, message);
