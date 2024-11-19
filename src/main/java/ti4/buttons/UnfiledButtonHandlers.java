@@ -697,13 +697,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
         }
         if (whatIsItFor.contains("tech") && player.hasAbility("ancient_knowledge")) {
-            String planet = planetName;
-            if ((Mapper.getPlanet(planet).getTechSpecialties() != null
-                && !Mapper.getPlanet(planet).getTechSpecialties().isEmpty())
-                || ButtonHelper.checkForTechSkips(game, planet)) {
+            if ((Mapper.getPlanet(planetName).getTechSpecialties() != null
+                && !Mapper.getPlanet(planetName).getTechSpecialties().isEmpty())
+                || ButtonHelper.checkForTechSkips(game, planetName)) {
                 String msg = player.getRepresentation()
                     + " due to your ancient knowledge ability, you may be eligible to receive a tech here if you exhausted this planet ("
-                    + planet
+                    + planetName
                     + ") for its tech skip";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.blue("gain_1_comms", "Gain 1 Commodity", Emojis.comm));
@@ -955,11 +954,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void cancelSpaceHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        Player opponent = player;
-        String msg = "\n" + opponent.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
+        String msg = "\n" + player.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
-        String finChecker = "FFCC_" + opponent.getFaction() + "_";
+        String finChecker = "FFCC_" + player.getFaction() + "_";
         buttons.add(Buttons.green(finChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
             "Auto-assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(

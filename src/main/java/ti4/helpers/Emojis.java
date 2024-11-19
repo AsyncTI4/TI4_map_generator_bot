@@ -119,10 +119,6 @@ public class Emojis {
         return new ArrayList<>(); // TODO (Jazz): fill this in when we get the JDA update
     }
 
-    private static void deleteApplicationEmoji(String name) {
-        // TODO (Jazz): fill this in when we get the JDA update
-    }
-
     private static EmojiUnion createApplicationEmoji(File emoji) {
         return null; // TODO (Jazz): fill this in when we get the JDA update
     }

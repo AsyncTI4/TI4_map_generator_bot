@@ -552,10 +552,9 @@ public class ButtonHelperTacticalAction {
     public static void getTilesThisFarAway(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int desiredDistance = Integer.parseInt(buttonID.split("_")[1]);
         Map<String, Integer> distances = CheckDistanceHelper.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
-        int maxDistance = desiredDistance;
         List<Button> buttons = new ArrayList<>();
         if (desiredDistance > 0) {
-            buttons.add(Buttons.gray("getTilesThisFarAway_" + (maxDistance - 1), "Get Tiles " + (maxDistance - 1) + " Spaces Away"));
+            buttons.add(Buttons.gray("getTilesThisFarAway_" + (desiredDistance - 1), "Get Tiles " + (desiredDistance - 1) + " Spaces Away"));
         }
         for (String pos : CheckDistanceHelper.getAllTilesACertainDistanceAway(game, player, distances, desiredDistance)) {
             Tile tile = game.getTileByPosition(pos);
@@ -564,7 +563,7 @@ public class ButtonHelperTacticalAction {
                 buttons.add(Buttons.green("ringTile_" + pos, tileRepresentation));
             }
         }
-        buttons.add(Buttons.gray("getTilesThisFarAway_" + (maxDistance + 1), "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
+        buttons.add(Buttons.gray("getTilesThisFarAway_" + (desiredDistance + 1), "Get Tiles " + (desiredDistance + 1) + " Spaces Away"));
 
         String message = "Doing a tactical action. Please select the tile you want to activate";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);

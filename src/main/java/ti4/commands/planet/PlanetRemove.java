@@ -1,8 +1,8 @@
 package ti4.commands.planet;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -20,10 +20,9 @@ public class PlanetRemove extends PlanetAddRemove {
         removePlayerControlToken(player, unitHolder);
 
         if (Constants.MECATOLS.contains(planet) && player.hasCustodiaVigilia()) {
-            Planet mecatolRex = unitHolder;
-            if (mecatolRex != null) {
-                mecatolRex.setSpaceCannonDieCount(0);
-                mecatolRex.setSpaceCannonHitsOn(0);
+            if (unitHolder != null) {
+                unitHolder.setSpaceCannonDieCount(0);
+                unitHolder.setSpaceCannonHitsOn(0);
             }
         }
     }

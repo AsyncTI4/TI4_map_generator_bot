@@ -476,11 +476,12 @@ public class Player {
         mahactCC.remove(cc);
     }
 
+    @Nullable
     public String getRoleIDForCommunity() {
         return roleIDForCommunity;
     }
 
-    public void setRoleIDForCommunity(String roleIDForCommunity) {
+    public void setRoleIDForCommunity(@Nullable String roleIDForCommunity) {
         this.roleIDForCommunity = roleIDForCommunity;
     }
 
@@ -495,11 +496,12 @@ public class Player {
         return null;
     }
 
+    @Nullable
     public String getPrivateChannelID() {
         return privateChannelID;
     }
 
-    public void setPrivateChannelID(String privateChannelID) {
+    public void setPrivateChannelID(@Nullable String privateChannelID) {
         this.privateChannelID = privateChannelID;
     }
 
@@ -515,10 +517,12 @@ public class Player {
 
     }
 
+    @Nullable
     public String getCardsInfoThreadID() {
         return cardsInfoThreadID;
     }
 
+    @Nullable
     public String getBagInfoThreadID() {
         return bagInfoThreadID;
     }
@@ -574,11 +578,11 @@ public class Player {
         return false;
     }
 
-    public void setCardsInfoThreadID(String cardsInfoThreadID) {
+    public void setCardsInfoThreadID(@Nullable String cardsInfoThreadID) {
         this.cardsInfoThreadID = cardsInfoThreadID;
     }
 
-    public void setBagInfoThreadID(String bagInfoThreadID) {
+    public void setBagInfoThreadID(@Nullable String bagInfoThreadID) {
         this.bagInfoThreadID = bagInfoThreadID;
     }
 

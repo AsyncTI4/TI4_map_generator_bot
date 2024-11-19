@@ -51,7 +51,7 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
         Game game = GameManager.getGame(mapName);
 
         User user = event.getUser();
-        action(event, game, user);
+        action(event, game);
         Helper.fixGameChannelPermissions(event.getGuild(), game);
         GameSaveLoadManager.saveGame(game, event);
         MessageHelper.replyToMessage(event, getResponseMessage(game, user));
@@ -59,5 +59,5 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
 
     abstract protected String getResponseMessage(Game game, User user);
 
-    abstract protected void action(SlashCommandInteractionEvent event, Game game, User user);
+    abstract protected void action(SlashCommandInteractionEvent event, Game game);
 }

@@ -991,7 +991,6 @@ public class ActionCardHelper {
         Map<String, List<String>> cardsByName = discards.stream()
             .collect(Collectors.groupingBy(ac -> Mapper.getActionCard(ac).getName()));
         int index = 1;
-        int pad = cardsByName.size() > 99 ? 4 : (cardsByName.size() > 9 ? 3 : 2);
 
         List<Map.Entry<String, List<String>>> displayOrder = new ArrayList<>(cardsByName.entrySet());
         displayOrder.sort(Map.Entry.comparingByKey());

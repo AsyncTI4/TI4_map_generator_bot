@@ -1257,11 +1257,10 @@ public class ButtonHelperAbilities {
             for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
                 Tile tile2 = game.getTileByPosition(pos2);
                 for (Planet planetUnit2 : tile2.getPlanetUnitHolders()) {
-                    Planet planetReal2 = planetUnit2;
-                    String planet2 = planetReal2.getName();
+                    String planet2 = planetUnit2.getName();
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
                     if (!player.getPlanetsAllianceMode().contains(planet2) && !planetRepresentation2.contains("Mecatol")
-                        && (planetReal2.getUnits() == null || planetReal2.getUnits().isEmpty())
+                        && (planetUnit2.getUnits() == null || planetUnit2.getUnits().isEmpty())
                         && !planetsChecked.contains(planet2)) {
                         buttons.add(Buttons.green(finChecker + "peaceAccords_" + planet2, planetRepresentation2, Emojis.Xxcha));
                         planetsChecked.add(planet2);
@@ -1281,8 +1280,7 @@ public class ButtonHelperAbilities {
                 false)) {
                 Tile tile2 = game.getTileByPosition(pos2);
                 for (Planet planetUnit2 : tile2.getPlanetUnitHolders()) {
-                    Planet planetReal2 = planetUnit2;
-                    String planet2 = planetReal2.getName();
+                    String planet2 = planetUnit2.getName();
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
                     if (!planetsChecked.contains(planet2)) {
                         buttons.add(Buttons.green(finChecker + "contagion_" + planet2, planetRepresentation2, Emojis.Xxcha));
@@ -1291,8 +1289,7 @@ public class ButtonHelperAbilities {
                 }
             }
             for (Planet planetUnit2 : tile.getPlanetUnitHolders()) {
-                Planet planetReal2 = planetUnit2;
-                String planet2 = planetReal2.getName();
+                String planet2 = planetUnit2.getName();
                 String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
                 if (!planetsChecked.contains(planet2)) {
                     buttons.add(Buttons.green(finChecker + "contagion_" + planet2, planetRepresentation2, Emojis.Xxcha));

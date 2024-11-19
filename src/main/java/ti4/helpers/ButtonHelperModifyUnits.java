@@ -953,8 +953,7 @@ public class ButtonHelperModifyUnits {
                 if (!allowedUnits.contains(unitKey.getUnitType())) {
                     continue;
                 }
-                Player p2 = player;
-                UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
+                UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
                 String unitName = unitKey.unitName();
                 EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
@@ -983,9 +982,8 @@ public class ButtonHelperModifyUnits {
         List<Button> buttons = getOpposingUnitsToHit(player, game, event, tile, false);
         String msg = player.getRepresentation() + " choose which opposing unit to hit";
         String unit = buttonID.split("_")[2];
-        Player p2 = player;
-        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColor());
-        new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, p2.getColor(), false, game);
+        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
+        new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, player.getColor(), false, game);
         String msg2 = player.getRepresentation() + "used devotion to destroy one of their " + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile " + tile.getRepresentation();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
         event.getMessage().delete().queue();

@@ -1318,8 +1318,7 @@ public class ButtonHelperAgents {
     @ButtonHandler("refreshWithOlradinAgent_")
     public static void resolveRefreshWithOlradinAgent(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planetName = buttonID.split("_")[1];
-        Player p2 = player;
-        PlanetService.refreshPlanet(p2, planetName);
+        PlanetService.refreshPlanet(player, planetName);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " readied " + Helper.getPlanetRepresentation(planetName, game)
                 + " with " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Baggil Wildpaw, the Olradin" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
@@ -1619,16 +1618,15 @@ public class ButtonHelperAgents {
         }
         String msg = player.getFactionEmojiOrColor() + " replenished commodities due to " + (kyro.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Tox, the Kyro" + (kyro.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
-        Player p2 = player;
-        p2.setCommodities(p2.getCommoditiesTotal());
-        ButtonHelper.resolveMinisterOfCommerceCheck(game, p2, event);
-        cabalAgentInitiation(game, p2);
+        player.setCommodities(player.getCommoditiesTotal());
+        ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
+        cabalAgentInitiation(game, player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFowMode() && kyro != player) {
             MessageHelper.sendMessageToChannel(kyro.getCorrectChannel(), msg);
         }
 
-        int infAmount = p2.getCommoditiesTotal() - 1;
+        int infAmount = player.getCommoditiesTotal() - 1;
         List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, infAmount + "gf", "placeOneNDone_skipbuild"));
         String message = kyro.getRepresentationUnfogged() + "Use buttons to drop " + infAmount + " infantry on a planet";
         MessageHelper.sendMessageToChannelWithButtons(kyro.getCorrectChannel(), message, buttons);

@@ -27,13 +27,13 @@ import ti4.commands2.CommandHelper;
 import ti4.commands2.statistics.GameStatTypes;
 import ti4.commands2.statistics.PlayerStatTypes;
 import ti4.commands2.uncategorized.ServerPromote;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.listeners.SlashCommandListener;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -82,9 +82,9 @@ public class AutoCompleteProvider {
             case Constants.DEVELOPER -> resolveDeveloperCommandAutoComplete(event, subCommandName, optionName);
             case Constants.SEARCH -> resolveSearchCommandAutoComplete(event, subCommandName, optionName);
             case Constants.CARDS_AC -> resolveActionCardAutoComplete(event, subCommandName, optionName, game);
-            case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName, game);
+            case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName);
             case Constants.MAP -> resolveMapAutoComplete(event, subCommandName, optionName, game);
-            case Constants.EVENT -> resolveEventAutoComplete(event, subCommandName, optionName, game, player);
+            case Constants.EVENT -> resolveEventAutoComplete(event, subCommandName, optionName, player);
             case Constants.EXPLORE -> resolveExploreAutoComplete(event, subCommandName, optionName, game);
         }
 
@@ -924,7 +924,7 @@ public class AutoCompleteProvider {
         }
     }
 
-    private static void resolveFrankenAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Game game) {
+    private static void resolveFrankenAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
         switch (subCommandName) {
             case Constants.FACTION_TECH_ADD, Constants.FACTION_TECH_REMOVE -> {
                 switch (optionName) {
@@ -998,7 +998,7 @@ public class AutoCompleteProvider {
         }
     }
 
-    private static void resolveEventAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Game game, Player player) {
+    private static void resolveEventAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Player player) {
         if (subCommandName.equals(Constants.EVENT_PLAY)) {
             if (optionName.equals(Constants.EVENT_ID)) {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();

@@ -682,9 +682,8 @@ public class MiltyService {
             AddToken.addToken(event, tile, Constants.FRONTIER, game);
         }
         if (game.getStoredValue("removeSupports").equalsIgnoreCase("true")) {
-            Player p2 = player;
-            p2.removeOwnedPromissoryNoteByID(p2.getColor() + "_sftt");
-            p2.removePromissoryNote(p2.getColor() + "_sftt");
+            player.removeOwnedPromissoryNoteByID(player.getColor() + "_sftt");
+            player.removePromissoryNote(player.getColor() + "_sftt");
         }
     }
 

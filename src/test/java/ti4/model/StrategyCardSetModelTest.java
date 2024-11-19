@@ -28,7 +28,6 @@ public class StrategyCardSetModelTest extends BaseTi4Test {
             .map(Mapper::getStrategyCard)
             .map(StrategyCardModel::getInitiative)
             .distinct()
-            .count() == scSetModel.getScIDs().stream()
-                .count();
+            .count() == (long) scSetModel.getScIDs().size();
     }
 }

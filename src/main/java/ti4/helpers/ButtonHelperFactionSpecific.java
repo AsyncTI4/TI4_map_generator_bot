@@ -1554,13 +1554,12 @@ public class ButtonHelperFactionSpecific {
                 buttons2);
         }
         if (player.getPromissoryNotes().containsKey("dspnkoll") && !player.ownsPromissoryNote("dspnkoll")) {
-            Player p2 = player;
-            String msg = p2.getRepresentationUnfogged() + " use the button to play AI Survey if you want";
+            String msg = player.getRepresentationUnfogged() + " use the button to play AI Survey if you want";
             Button transact = Buttons.green("resolvePNPlay_dspnkoll", "Play AI Survey");
             List<Button> buttons = new ArrayList<>();
             buttons.add(transact);
             buttons.add(Buttons.red("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
     }
 
@@ -1819,10 +1818,8 @@ public class ButtonHelperFactionSpecific {
         List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti");
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            Planet unitHolder = game.getPlanetsInfo().get(planet);
-            Planet planetReal = unitHolder;
-            boolean oneOfThree = planetReal != null
-                && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
+            boolean oneOfThree = game.getPlanetsInfo().get(planet) != null
+                && List.of("industrial", "cultural", "hazardous").contains(game.getPlanetsInfo().get(planet).getOriginalPlanetType());
             if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
                 buttons.add(Buttons.green("automatonsPlanet_" + planet,
                     Helper.getPlanetRepresentation(planet, game)));
@@ -1836,10 +1833,8 @@ public class ButtonHelperFactionSpecific {
         List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti");
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            Planet unitHolder = game.getPlanetsInfo().get(planet);
-            Planet planetReal = unitHolder;
-            boolean oneOfThree = planetReal != null
-                && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
+            boolean oneOfThree = game.getPlanetsInfo().get(planet) != null
+                && List.of("industrial", "cultural", "hazardous").contains(game.getPlanetsInfo().get(planet).getOriginalPlanetType());
             if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
                 buttons.add(Buttons.green("bentorPNPlanet_" + planet,
                     Helper.getPlanetRepresentation(planet, game)));
@@ -1979,9 +1974,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("terraformPlanet_")
     public static void terraformPlanet(Player player, String buttonID, ButtonInteractionEvent event, Game game) {
         String planet = buttonID.replace("terraformPlanet_", "");
-        Planet unitHolder = game.getPlanetsInfo().get(planet);
-        Planet planetReal = unitHolder;
-        planetReal.addToken(Constants.ATTACHMENT_TITANSPN_PNG);
+        game.getPlanetsInfo().get(planet).addToken(Constants.ATTACHMENT_TITANSPN_PNG);
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached terraform to " + Helper.getPlanetRepresentation(planet, game));
         game.setStoredValue("terraformedPlanet", planet);
@@ -1992,9 +1985,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("automatonsPlanet_")
     public static void automatonsPlanet(String buttonID, ButtonInteractionEvent event, Game game) {
         String planet = buttonID.replace("automatonsPlanet_", "");
-        Planet unitHolder = game.getPlanetsInfo().get(planet);
-        Planet planetReal = unitHolder;
-        planetReal.addToken("attachment_automatons.png");
+        game.getPlanetsInfo().get(planet).addToken("attachment_automatons.png");
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached automatons to " + Helper.getPlanetRepresentation(planet, game));
         event.getMessage().delete().queue();

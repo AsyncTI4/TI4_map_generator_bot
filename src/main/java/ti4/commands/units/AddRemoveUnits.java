@@ -48,11 +48,6 @@ abstract public class AddRemoveUnits implements Command {
             return;
         }
         Game game = GameManager.getUserActiveGame(userID);
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        // if (player == null) {
-        //     MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-        //     return;
-        // }
 
         String color = CommandHelper.getColor(game, event);
         if (!Mapper.isValidColor(color)) {
@@ -107,7 +102,7 @@ abstract public class AddRemoveUnits implements Command {
         }
 
         commonUnitParsing(event, color, tile, unitList, game);
-        actionAfterAll((GenericInteractionCreateEvent) event, tile, color, game);
+        actionAfterAll(event, tile, color, game);
     }
 
     public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game game) {
@@ -332,10 +327,6 @@ abstract public class AddRemoveUnits implements Command {
         UnitKey unitID, String color, Game game);
 
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Game game) {
-        // do nothing, overriden by child classes
-    }
-
-    protected void actionAfterAll(GenericInteractionCreateEvent event, Tile tile, String color, Game game) {
         // do nothing, overriden by child classes
     }
 

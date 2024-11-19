@@ -57,10 +57,9 @@ public class PlanetAdd extends PlanetAddRemove {
 
         List<String> mecatols = Constants.MECATOLS;
         if (mecatols.contains(planet) && player.hasTech("iihq")) {
-            Planet mecatolRex = unitHolder;
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
-            mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
-            mecatolRex.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
+            unitHolder.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
+            unitHolder.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
         }
         String color = player.getColor();
         boolean moveTitanPN = false;
@@ -188,8 +187,7 @@ public class PlanetAdd extends PlanetAddRemove {
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setup) {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {
-                Planet planetReal = unitHolder;
-                List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
+                List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
                 if (event != null && buttons != null && !buttons.isEmpty()) {
                     String message = player.getFactionEmoji() + " Click button to explore "
                         + Helper.getPlanetRepresentation(planet, game);
@@ -293,8 +291,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
 
         if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !game.isBaseGameMode()) {
-            Planet planetReal = unitHolder;
-            List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
+            List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
             if (event != null && buttons != null && !buttons.isEmpty()) {
                 String message = player.getFactionEmoji() + " Click button to explore "
                     + Helper.getPlanetRepresentation(planet, game);

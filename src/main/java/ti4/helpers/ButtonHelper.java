@@ -273,8 +273,7 @@ public class ButtonHelper {
             if (unitHolder == null)
                 continue;
 
-            Planet planetReal = unitHolder;
-            types.addAll(planetReal.getPlanetTypes());
+            types.addAll(unitHolder.getPlanetTypes());
         }
         return types;
     }
@@ -1407,8 +1406,7 @@ public class ButtonHelper {
                 if (plan.getName().contains("mallice")) {
                     continue;
                 }
-                Planet planet = plan;
-                if (planet.isLegendary()) {
+                if (plan.isLegendary()) {
                     continue;
                 }
                 boolean unowned = true;
@@ -2162,10 +2160,8 @@ public class ButtonHelper {
             if (onlyReady && player.getExhaustedPlanets().contains(plan)) {
                 continue;
             }
-            Planet planetUnit = game.getPlanetsInfo().get(plan);
-            Planet planetReal = planetUnit;
-            if (planetReal != null && planetReal.getOriginalPlanetType() != null) {
-                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
+            if (game.getPlanetsInfo().get(plan) != null && game.getPlanetsInfo().get(plan).getOriginalPlanetType() != null) {
+                List<Button> planetButtons = getPlanetExplorationButtons(game, game.getPlanetsInfo().get(plan), player);
                 buttons.addAll(planetButtons);
             }
         }
@@ -2318,15 +2314,14 @@ public class ButtonHelper {
     public static void findOrCreateThreadWithMessage(Game game, String threadName, String message) {
         TextChannel channel = game.getMainGameChannel();
         Helper.checkThreadLimitAndArchive(game.getGuild());
-        TextChannel textChannel = channel;
         // Use existing thread, if it exists
-        for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
+        for (ThreadChannel threadChannel_ : channel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
                 MessageHelper.sendMessageToChannel(threadChannel_, message);
                 return;
             }
         }
-        List<ThreadChannel> hiddenThreadChannels = textChannel.retrieveArchivedPublicThreadChannels().complete();
+        List<ThreadChannel> hiddenThreadChannels = channel.retrieveArchivedPublicThreadChannels().complete();
         for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
                 MessageHelper.sendMessageToChannel(threadChannel_, message);
@@ -2340,7 +2335,7 @@ public class ButtonHelper {
             if (threadName.contains("undo-log"))
                 duration = ThreadChannel.AutoArchiveDuration.TIME_1_HOUR;
 
-            ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, m.getId());
+            ThreadChannelAction threadChannel = channel.createThreadChannel(threadName, m.getId());
             threadChannel = threadChannel.setAutoArchiveDuration(duration);
             threadChannel.queue(tc -> MessageHelper.sendMessageToChannel(tc, message + game.getPing()));
         });
@@ -3445,11 +3440,10 @@ public class ButtonHelper {
                 for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
                     Tile tile2 = game.getTileByPosition(pos);
                     for (Planet uH : tile2.getPlanetUnitHolders()) {
-                        Planet planetReal = uH;
-                        String planet = planetReal.getName();
-                        if (planetReal.getOriginalPlanetType() != null
+                        String planet = uH.getName();
+                        if (uH.getOriginalPlanetType() != null
                             && player.getPlanetsAllianceMode().contains(planet)) {
-                            List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
+                            List<Button> planetButtons = getPlanetExplorationButtons(game, uH, player);
                             buttons.addAll(planetButtons);
                         }
 
@@ -3762,8 +3756,7 @@ public class ButtonHelper {
         Planet unitHolder = game.getPlanetsInfo().get(planet);
         if (unitHolder == null)
             return new HashSet<>();
-        Planet planetReal = unitHolder;
-        return planetReal.getPlanetTypes();
+        return unitHolder.getPlanetTypes();
     }
 
     public static void offerBuildOrRemove(Player player, Game game, GenericInteractionCreateEvent event, Tile tile) {
@@ -5009,11 +5002,10 @@ public class ButtonHelper {
         String newName = name + "clone";
         Guild guild = game.getGuild();
         Role gameRole = null;
-        String gameName = newName;
         String gameFunName = game.getCustomName();
-        String newChatChannelName = gameName + "-" + gameFunName;
-        String newActionsChannelName = gameName + Constants.ACTIONS_CHANNEL_SUFFIX;
-        String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
+        String newChatChannelName = newName + "-" + gameFunName;
+        String newActionsChannelName = newName + Constants.ACTIONS_CHANNEL_SUFFIX;
+        String newBotThreadName = newName + Constants.BOT_CHANNEL_SUFFIX;
 
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
@@ -5811,7 +5803,6 @@ public class ButtonHelper {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
         String msg;
         String msgExtra = "";
-        Player privatePlayer = player;
 
         // INFORM FIRST PLAYER IS UP FOR ACTION
         if (player != null) {
@@ -5829,29 +5820,29 @@ public class ButtonHelper {
         msg = "";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         if (isFowPrivateGame) {
-            if (privatePlayer == null) {
+            if (player == null) {
                 BotLogger.log(event, "`ButtonHelper.startMyTurn` privatePlayer is null");
                 return;
             }
-            msgExtra = privatePlayer.getRepresentationUnfogged() + " UP NEXT";
+            msgExtra = player.getRepresentationUnfogged() + " UP NEXT";
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
-            MessageHelper.sendPrivateMessageToPlayer(privatePlayer, game, event, msgExtra, fail, success);
-            game.updateActivePlayer(privatePlayer);
+            MessageHelper.sendPrivateMessageToPlayer(player, game, event, msgExtra, fail, success);
+            game.updateActivePlayer(player);
 
-            MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(),
+            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(),
                 msgExtra + "\n Use Buttons to do turn.",
-                StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
+                StartTurnService.getStartOfTurnButtons(player, game, false, event));
 
-            if (privatePlayer.getGenSynthesisInfantry() > 0) {
-                if (!getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
-                    MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry()
+            if (player.getGenSynthesisInfantry() > 0) {
+                if (!getPlaceStatusInfButtons(game, player).isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                        "Use buttons to revive infantry. You have " + player.getGenSynthesisInfantry()
                             + " infantry left to revive.",
-                        getPlaceStatusInfButtons(game, privatePlayer));
+                        getPlaceStatusInfButtons(game, player));
                 } else {
-                    privatePlayer.setStasisInfantry(0);
-                    MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer
+                    player.setStasisInfantry(0);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                         .getRepresentation()
                         + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether");
 
@@ -5863,17 +5854,17 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
                     "\n Use Buttons to do turn.",
-                    StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
+                    StartTurnService.getStartOfTurnButtons(player, game, false, event));
 
-                if (privatePlayer.getGenSynthesisInfantry() > 0) {
-                    if (!getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
-                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                            "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry()
+                if (player.getGenSynthesisInfantry() > 0) {
+                    if (!getPlaceStatusInfButtons(game, player).isEmpty()) {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                            "Use buttons to revive infantry. You have " + player.getGenSynthesisInfantry()
                                 + " infantry left to revive.",
-                            getPlaceStatusInfButtons(game, privatePlayer));
+                            getPlaceStatusInfButtons(game, player));
                     } else {
-                        privatePlayer.setStasisInfantry(0);
-                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer
+                        player.setStasisInfantry(0);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                             .getRepresentation()
                             + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
 

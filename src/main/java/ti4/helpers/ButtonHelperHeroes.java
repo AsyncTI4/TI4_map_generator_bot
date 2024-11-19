@@ -535,12 +535,11 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
         String planet = buttonID.split("_")[1];
         String attachment = buttonID.replace("attachAttachment_" + planet + "_", "");
-        String planetID = planet;
         Tile tile = game.getTileFromPlanet(planet);
-        PlanetModel planetInfo = Mapper.getPlanet(planetID);
+        PlanetModel planetInfo = Mapper.getPlanet(planet);
         if (Optional.ofNullable(planetInfo).isPresent()) {
             if (!Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).isEmpty()
-                || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetID)) {
+                || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planet)) {
                 if ((attachment.equals(Constants.WARFARE) ||
                     attachment.equals(Constants.PROPULSION) ||
                     attachment.equals(Constants.CYBERNETIC) ||
@@ -744,12 +743,10 @@ public class ButtonHelperHeroes {
     public static void offerFreeSystemsButtons(Player player, Game game, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            Planet unitHolder = game.getPlanetsInfo().get(planet);
-            Planet planetReal = unitHolder;
-            boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null
-                && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
-                    || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType())
-                    || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
+            boolean oneOfThree = game.getPlanetsInfo().get(planet) != null && game.getPlanetsInfo().get(planet).getOriginalPlanetType() != null
+                && ("industrial".equalsIgnoreCase(game.getPlanetsInfo().get(planet).getOriginalPlanetType())
+                    || "cultural".equalsIgnoreCase(game.getPlanetsInfo().get(planet).getOriginalPlanetType())
+                    || "hazardous".equalsIgnoreCase(game.getPlanetsInfo().get(planet).getOriginalPlanetType()));
             if (oneOfThree || planet.contains("custodiavigilia") || planet.contains("ghoti")) {
                 buttons.add(Buttons.green("freeSystemsHeroPlanet_" + planet,
                     Helper.getPlanetRepresentation(planet, game)));
@@ -764,8 +761,7 @@ public class ButtonHelperHeroes {
         Player player) {
         String planet = buttonID.split("_")[1];
         Planet unitHolder = game.getPlanetsInfo().get(planet);
-        Planet planetReal = unitHolder;
-        planetReal.addToken("token_dmz.png");
+        unitHolder.addToken("token_dmz.png");
         unitHolder.removeAllUnits(player.getColor());
         if (player.getExhaustedPlanets().contains(planet)) {
             PlanetService.refreshPlanet(player, planet);
@@ -1090,12 +1086,11 @@ public class ButtonHelperHeroes {
             unitHolder.removeAllUnits(color);
             unitHolder.removeAllUnitDamage(color);
         }
-        Planet planetHolder = unitHolder;
         int oldTg = player.getTg();
-        int count = planetHolder.getResources() + planetHolder.getInfluence();
+        int count = unitHolder.getResources() + unitHolder.getInfluence();
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " gained " + count + "TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ") from selecting the planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetHolder.getName(), game));
+            player.getFactionEmoji() + " gained " + count + "TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ") from selecting the planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(unitHolder.getName(), game));
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
         game.setComponentAction(true);

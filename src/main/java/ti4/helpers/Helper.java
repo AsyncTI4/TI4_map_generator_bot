@@ -717,17 +717,16 @@ public class Helper {
         planetID = planetID.replace("'", "");
         planetID = planetID.replace("-", "");
         Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
-        Planet planet2 = unitHolder;
-        if (planet2 == null) {
+        if (unitHolder == null) {
             return planetID + " bot error. Tell fin";
         }
         boolean containsDMZ = unitHolder.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
         if (containsDMZ) {
-            return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planetID)) + " (" + planet2.getResources()
-                + "/" + planet2.getInfluence() + ") [DMZ]";
+            return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planetID)) + " (" + unitHolder.getResources()
+                + "/" + unitHolder.getInfluence() + ") [DMZ]";
         }
-        return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planetID)) + " (" + planet2.getResources()
-            + "/" + planet2.getInfluence() + ")";
+        return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planetID)) + " (" + unitHolder.getResources()
+            + "/" + unitHolder.getInfluence() + ")";
     }
 
     public static String getPlanetRepresentationPlusEmojiPlusResourceInfluence(String planetID, Game game) {
@@ -735,7 +734,6 @@ public class Helper {
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
-            Planet planet = unitHolder;
             String techType = "";
             String techEmoji = "";
             if (Mapper.getPlanet(planetID) != null && Mapper.getPlanet(planetID).getTechSpecialties() != null
@@ -752,8 +750,8 @@ public class Helper {
                     case "biotic" -> techEmoji = Emojis.BioticTech;
                 }
             }
-            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getResourceEmoji(planet.getResources())
-                + Emojis.getInfluenceEmoji(planet.getInfluence()) + techEmoji;
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getResourceEmoji(unitHolder.getResources())
+                + Emojis.getInfluenceEmoji(unitHolder.getInfluence()) + techEmoji;
         }
     }
 
@@ -762,8 +760,7 @@ public class Helper {
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
-            Planet planet = unitHolder;
-            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getInfluenceEmoji(planet.getInfluence());
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getInfluenceEmoji(unitHolder.getInfluence());
         }
     }
 
@@ -772,7 +769,6 @@ public class Helper {
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
-            Planet planet = unitHolder;
             String techType = "";
             String techEmoji = "";
             if (Mapper.getPlanet(planetID).getTechSpecialties() != null
@@ -789,7 +785,7 @@ public class Helper {
                     case "biotic" -> techEmoji = Emojis.BioticTech;
                 }
             }
-            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getResourceEmoji(planet.getResources())
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getResourceEmoji(unitHolder.getResources())
                 + techEmoji;
         }
     }
@@ -1177,44 +1173,43 @@ public class Helper {
                     }
                     msg.append(thing).append("\n");
                 } else {
-                    Planet planet = unitHolder;
-                    Tile t = game.getTileFromPlanet(planet.getName());
+                    Tile t = game.getTileFromPlanet(unitHolder.getName());
                     if (t != null && !t.isHomeSystem()) {
-                        if (planet.getResources() > bestRes) {
-                            bestRes = planet.getResources();
+                        if (unitHolder.getResources() > bestRes) {
+                            bestRes = unitHolder.getResources();
                         }
                     }
                     if ("res".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxchaHero) {
                             msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game)).append("\n");
-                            res += planet.getSumResourcesInfluence();
+                            res += unitHolder.getSumResourcesInfluence();
                         } else {
                             msg.append(getPlanetRepresentationPlusEmojiPlusResources(thing, game)).append("\n");
-                            res += planet.getResources();
+                            res += unitHolder.getResources();
                         }
                     } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxchaHero) {
                             msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game)).append("\n");
-                            inf += planet.getSumResourcesInfluence();
+                            inf += unitHolder.getSumResourcesInfluence();
                         } else {
                             msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game)).append("\n");
-                            inf += planet.getInfluence();
+                            inf += unitHolder.getInfluence();
                         }
                     } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
                         msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game)).append("\n");
                         if (xxchaHero) {
-                            res += planet.getSumResourcesInfluence();
+                            res += unitHolder.getSumResourcesInfluence();
                         } else {
-                            res += planet.getMaxResInf();
+                            res += unitHolder.getMaxResInf();
                         }
                     } else {
                         msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game)).append("\n");
                         if (xxchaHero) {
-                            inf += planet.getSumResourcesInfluence();
-                            res += planet.getSumResourcesInfluence();
+                            inf += unitHolder.getSumResourcesInfluence();
+                            res += unitHolder.getSumResourcesInfluence();
                         } else {
-                            inf += planet.getInfluence();
-                            res += planet.getResources();
+                            inf += unitHolder.getInfluence();
+                            res += unitHolder.getResources();
                         }
                     }
                 }
@@ -2663,7 +2658,6 @@ public class Helper {
         long nanoSeconds = totalNanoSeconds % 1000;
         long microSeconds = totalMicroSeconds % 1000;
         long milleSeconds = totalMilliSeconds % 1000;
-        long seconds = totalSeconds;
         // long minutes = totalMinutes % 60;
         // long hours = totalHours % 24;
         // long days = totalDays;
@@ -2672,7 +2666,7 @@ public class Helper {
         // sb.append(String.format("%02dh:", hours));
         // sb.append(String.format("%02dm:", minutes));
 
-        return String.format("%02ds:", seconds) +
+        return String.format("%02ds:", totalSeconds) +
             String.format("%03d:", milleSeconds) +
             String.format("%03d:", microSeconds) +
             String.format("%03d", nanoSeconds);
