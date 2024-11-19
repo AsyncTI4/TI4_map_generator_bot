@@ -40,7 +40,7 @@ public class Eliminate extends AddRemovePlayer {
     }
 
     @Override
-    protected void action(SlashCommandInteractionEvent event, Game game, User user) {
+    protected void action(SlashCommandInteractionEvent event, Game game) {
         sb = new StringBuilder();
         removeUser(event, game, Constants.PLAYER1);
         removeUser(event, game, Constants.PLAYER2);
@@ -56,22 +56,7 @@ public class Eliminate extends AddRemovePlayer {
         OptionMapping option;
         option = event.getOption(playerID);
 
-        // OptionMapping option2 = event.getOption(Constants.CONFIRM);
-        // if(!option2.getAsString().equalsIgnoreCase("yes"))
-        // {
-        //     MessageHelper.sendMessageToChannel(event.getChannel(), "Please confirm with yes");
-        //     return;
-        // }
         if (option != null) {
-
-            // OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
-
-            // if (removeOption == null) {
-            //     MessageHelper.replyToMessage(event, "Specify player to remove and replacement");
-            //     return;
-            // }
-
-            // Player player = CommandHelper.getPlayerFromEvent(game, event);
             User extraUser = option.getAsUser();
             Player player = game.getPlayer(extraUser.getId());
             Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();

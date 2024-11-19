@@ -27,6 +27,7 @@ import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
 public class CreateGameButton extends GameSubcommandData {
+
     public CreateGameButton() {
         super(Constants.CREATE_GAME_BUTTON, "Create Game Creation Button");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel").setRequired(true));
