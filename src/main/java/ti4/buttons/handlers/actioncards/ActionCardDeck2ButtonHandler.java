@@ -397,7 +397,7 @@ class ActionCardDeck2ButtonHandler {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
 
         event.getMessage().delete().queue();
-        ButtonHelperFactionSpecific.offerWinnuStartingTech(player, game);
+        ButtonHelperFactionSpecific.offerWinnuStartingTech(player);
     }
 
     @ButtonHandler("brutalOccupation")

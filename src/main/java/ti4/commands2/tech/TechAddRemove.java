@@ -1,4 +1,4 @@
-package ti4.commands.tech;
+package ti4.commands2.tech;
 
 import java.util.List;
 import java.util.Map;
@@ -7,40 +7,44 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.image.Mapper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.map.Game;
+import ti4.image.Mapper;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
+import ti4.service.leader.CommanderUnlockCheckService;
 
-public class TechChangeType extends TechSubcommandData {
-    public TechChangeType() {
-        super(Constants.CHANGE_TYPE, "Change what color a tech displays as");
+abstract class TechAddRemove extends GameStateSubcommand {
+
+    public TechAddRemove(String id, String description) {
+        super(id, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Tech").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH_TYPE, "The type you're setting the tech to").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2nd Tech").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd Tech").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th Tech").setAutoComplete(true));
-        // addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
 
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        parseParameter(event, event.getOption(Constants.TECH), event.getOption(Constants.TECH_TYPE), game);
-        parseParameter(event, event.getOption(Constants.TECH2), event.getOption(Constants.TECH_TYPE), game);
-        parseParameter(event, event.getOption(Constants.TECH3), event.getOption(Constants.TECH_TYPE), game);
-        parseParameter(event, event.getOption(Constants.TECH4), event.getOption(Constants.TECH_TYPE), game);
+        Player player = getPlayer();
 
+        parseParameter(event, player, event.getOption(Constants.TECH));
+        parseParameter(event, player, event.getOption(Constants.TECH2));
+        parseParameter(event, player, event.getOption(Constants.TECH3));
+        parseParameter(event, player, event.getOption(Constants.TECH4));
+
+        CommanderUnlockCheckService.checkPlayer(player, "nekro", "jolnar");
     }
 
-    private void parseParameter(SlashCommandInteractionEvent event, OptionMapping techOption, OptionMapping techType, Game game) {
-        if (techOption != null && techType != null) {
+    private void parseParameter(SlashCommandInteractionEvent event, Player player, OptionMapping techOption) {
+        if (techOption != null) {
             String techID = AliasHandler.resolveTech(techOption.getAsString());
             if (Mapper.isValidTech(techID)) {
-                game.setStoredValue("colorChange" + techID, techType.getAsString());
+                doAction(player, techID, event);
             } else {
                 Map<String, TechnologyModel> techs = Mapper.getTechs();
                 List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().getName().toLowerCase().contains(techID))
@@ -52,10 +56,11 @@ public class TechChangeType extends TechSubcommandData {
                     MessageHelper.sendMessageToEventChannel(event, "More that one matching Tech found");
                     return;
                 }
-                game.setStoredValue("colorChange" + techID, techType.getAsString());
+                doAction(player, possibleTechs.getFirst(), event);
 
             }
         }
     }
 
+    public abstract void doAction(Player player, String techID, SlashCommandInteractionEvent event);
 }

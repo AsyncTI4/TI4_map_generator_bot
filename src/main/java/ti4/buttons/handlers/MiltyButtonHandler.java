@@ -7,7 +7,7 @@ import ti4.map.Game;
 import ti4.service.milty.MiltyService;
 
 @UtilityClass
-public class MiltyButtonHandler {
+class MiltyButtonHandler {
 
     @ButtonHandler("miltySetup")
     public static void miltySetup(GenericInteractionCreateEvent event, Game game) {

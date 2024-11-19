@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.tech.GetTechButton;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
@@ -25,6 +24,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.StrategyCardModel;
 import ti4.service.PlayerReactService;
+import ti4.service.tech.PlayerTechService;
 import ti4.users.UserSettingsManager;
 
 import static java.util.function.Predicate.not;
@@ -143,7 +143,7 @@ public class AutoPingCron {
         if (!game.getStoredValue(key2).isEmpty() && !game.getStoredValue(key2).equalsIgnoreCase("0")) {
             game.setStoredValue(key2, (Integer.parseInt(game.getStoredValue(key2)) - 1) + "");
             if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
-                GetTechButton.postTechSummary(game);
+                PlayerTechService.postTechSummary(game);
             }
         }
     }
