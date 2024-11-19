@@ -11,11 +11,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.commands.combat.StartCombat;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.Mapper;
-import ti4.generator.TileGenerator;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.TileGenerator;
+import ti4.image.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -31,6 +30,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.combat.StartCombatService;
 
 class SystemInfo extends GameStateSubcommand {
 
@@ -167,7 +167,7 @@ class SystemInfo extends GameStateSubcommand {
                     if (player2 == player) {
                         player2 = players.get(1);
                     }
-                    List<Button> buttons = StartCombat.getGeneralCombatButtons(game, tile.getPosition(), player, player2, "space", event);
+                    List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, tile.getPosition(), player, player2, "space", event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                     return;
                 } else {
@@ -175,7 +175,7 @@ class SystemInfo extends GameStateSubcommand {
                         if (unitHolder instanceof Planet) {
                             if (ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName()).size() > 1) {
                                 List<Player> listP = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
-                                List<Button> buttons = StartCombat.getGeneralCombatButtons(game, tile.getPosition(), listP.get(0), listP.get(1), "ground", event);
+                                List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, tile.getPosition(), listP.get(0), listP.get(1), "ground", event);
                                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                                 return;
                             }

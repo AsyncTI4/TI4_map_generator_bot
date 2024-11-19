@@ -13,16 +13,17 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.units.AddRemoveUnits;
-import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.PlanetService;
 
 public class RemoveToken extends AddRemoveToken {
+
     @Override
     void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
 
@@ -82,7 +83,7 @@ public class RemoveToken extends AddRemoveToken {
         StringTokenizer planetTokenizer = new StringTokenizer(unitHolder, ",");
         while (planetTokenizer.hasMoreTokens()) {
             String planet = planetTokenizer.nextToken();
-            planet = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planet));
+            planet = PlanetService.getPlanet(tile, AliasHandler.resolvePlanet(planet));
             if (!tile.isSpaceHolderValid(planet)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planet + " is not valid and not supported.");
                 continue;
@@ -110,7 +111,6 @@ public class RemoveToken extends AddRemoveToken {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void register(CommandListUpdateAction commands) {
-        // Moderation commands with required options
         commands.addCommands(
             Commands.slash(getName(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TOKEN, "Token name").setRequired(true).setAutoComplete(true))

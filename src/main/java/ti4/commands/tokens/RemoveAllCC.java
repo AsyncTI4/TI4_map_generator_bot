@@ -8,13 +8,13 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands2.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.ShowGameService;
 
 public class RemoveAllCC implements Command {
 
@@ -38,14 +38,13 @@ public class RemoveAllCC implements Command {
             Game game = GameManager.getUserActiveGame(userID);
             parsingForTile(game);
             GameSaveLoadManager.saveGame(game, event);
-            ShowGame.simpleShowGame(game, event);
+            ShowGameService.simpleShowGame(game, event);
         }
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void register(CommandListUpdateAction commands) {
-        // Moderation commands with required options
         commands.addCommands(
             Commands.slash(getName(), "Remove all CCs from entire map")
                 .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")

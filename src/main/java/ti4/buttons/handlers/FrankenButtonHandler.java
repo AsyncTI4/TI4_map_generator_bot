@@ -14,7 +14,7 @@ import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.draft.items.CommoditiesDraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;

@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.TileModel;
+import ti4.service.combat.CombatRollType;
 
 public class CombatTempModHelper {
 
@@ -70,7 +71,7 @@ public class CombatTempModHelper {
         return currentRoundResults;
     }
 
-    public static TemporaryCombatModifierModel GetPossibleTempModifier(String relatedType, String relatedID,
+    public static TemporaryCombatModifierModel getPossibleTempModifier(String relatedType, String relatedID,
         int currentTurnCount) {
         TemporaryCombatModifierModel result = null;
         var combatModifiers = Mapper.getCombatModifiers();

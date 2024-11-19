@@ -3,8 +3,9 @@ package ti4.commands2.milty;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.GameStateSubcommand;
 import ti4.map.Game;
+import ti4.service.milty.MiltyDraftManager;
 
-public class ShowMilty extends GameStateSubcommand {
+class ShowMilty extends GameStateSubcommand {
 
     private static final String show = "show";
 

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.experimental.UtilityClass;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.UnitHolder;

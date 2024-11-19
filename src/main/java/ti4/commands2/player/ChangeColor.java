@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;

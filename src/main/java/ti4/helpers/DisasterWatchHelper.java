@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
-import ti4.generator.TileGenerator;
+import ti4.image.TileGenerator;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;

@@ -15,8 +15,8 @@ import java.util.StringTokenizer;
 
 import lombok.Getter;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.message.BotLogger;
 import ti4.model.ColorModel;
 import ti4.model.PlanetModel;

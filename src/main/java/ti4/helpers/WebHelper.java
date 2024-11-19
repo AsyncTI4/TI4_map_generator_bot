@@ -32,7 +32,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.website.WebsiteOverlay;
 
-import static ti4.helpers.ImageHelper.writeCompressedFormat;
+import static ti4.image.ImageHelper.writeCompressedFormat;
 
 public class WebHelper {
 

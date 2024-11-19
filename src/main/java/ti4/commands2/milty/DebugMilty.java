@@ -8,6 +8,7 @@ import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.service.milty.MiltyDraftManager;
 
 class DebugMilty extends GameStateSubcommand {
 

@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;

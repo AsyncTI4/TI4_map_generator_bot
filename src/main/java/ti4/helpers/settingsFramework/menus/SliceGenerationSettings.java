@@ -17,8 +17,6 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import ti4.buttons.Buttons;
-import ti4.commands2.milty.MiltyDraftHelper;
-import ti4.commands2.milty.MiltyDraftSlice;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
@@ -26,6 +24,8 @@ import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.model.Source.ComponentSource;
+import ti4.service.milty.MiltyDraftHelper;
+import ti4.service.milty.MiltyDraftSlice;
 
 // This is a sub-menu
 @Getter

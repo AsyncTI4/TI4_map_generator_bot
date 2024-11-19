@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;

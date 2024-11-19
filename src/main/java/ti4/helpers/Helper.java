@@ -47,16 +47,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
-import ti4.buttons.UnfiledButtonHandlers;
 import ti4.commands.game.SetOrder;
-import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.tokens.AddCC;
-import ti4.commands2.milty.MiltyDraftManager;
-import ti4.commands2.milty.MiltyDraftTile;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
+import ti4.commands2.leaders.UnlockLeader;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Leader;
@@ -75,6 +72,10 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.PlayerReactService;
+import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.milty.MiltyDraftManager;
+import ti4.service.milty.MiltyDraftTile;
 import ti4.service.objectives.ScorePublicObjectiveService;
 
 public class Helper {
@@ -304,7 +305,7 @@ public class Helper {
                     game.drawSecretObjective(player.getUserID());
                     message = message + " Drew a second secret objective due to Plausible Deniability.";
                 }
-                SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2,
                     game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -470,7 +471,7 @@ public class Helper {
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
         List<String> messageIDs = new ArrayList<>(game.getMessageIDsForSabo());
         for (String messageID : messageIDs) {
-            if (!UnfiledButtonHandlers.checkForASpecificPlayerReact(messageID, player, game)) {
+            if (!PlayerReactService.checkForASpecificPlayerReact(messageID, player, game)) {
                 game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
                     Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
                     if (game.isFowMode()) {

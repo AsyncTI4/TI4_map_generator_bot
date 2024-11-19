@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
-import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperStats;
@@ -136,8 +135,6 @@ public class ButtonListener extends ListenerAdapter {
             game.getMiltyDraftManager().repostDraftInformation(game);
         } else if (player != null && buttonID.startsWith("miltyFactionInfo_")) {
             UnfiledButtonHandlers.miltyFactionInfo(player, buttonID, game);
-        } else if (buttonID.startsWith("agendaResolution_")) {
-            AgendaHelper.resolveAgenda(game, buttonID, event);
         } else if (buttonID.startsWith("jmfA_") || buttonID.startsWith("jmfN_")) {
             game.initializeMiltySettings().parseButtonInput(event);
             // Don't add anymore if/else startWith statements - use @ButtonHandler

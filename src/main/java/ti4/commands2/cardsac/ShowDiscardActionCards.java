@@ -1,15 +1,13 @@
 package ti4.commands2.cardsac;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
-import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
-import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.service.decks.ShowActionCardsService;
 
 class ShowDiscardActionCards extends GameStateSubcommand {
 
@@ -22,11 +20,6 @@ class ShowDiscardActionCards extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         boolean showFullText = event.getOption(Constants.SHOW_FULL_TEXT, false, OptionMapping::getAsBoolean);
-        ActionCardHelper.showDiscard(game, event, showFullText);
-    }
-
-    @ButtonHandler("ACShowDiscardFullText")
-    public static void showDiscardFullText(GenericInteractionCreateEvent event, Game game) {
-        ActionCardHelper.showDiscard(game, event, true);
+        ShowActionCardsService.showDiscard(game, event, showFullText);
     }
 }

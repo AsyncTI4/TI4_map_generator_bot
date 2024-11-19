@@ -12,9 +12,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.game.StartPhase;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.units.AddUnits;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -22,6 +21,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.Source;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
 public class PromissoryNoteHelper {
@@ -267,7 +267,7 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
         if ("dspncymi".equalsIgnoreCase(id)) {
-            ActionCardHelper.pickACardFromDiscardStep1(event, game, player);
+            ActionCardHelper.pickACardFromDiscardStep1(game, player);
         }
         if ("dspnkort".equalsIgnoreCase(id)) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "kortalipn");
@@ -314,7 +314,7 @@ public class PromissoryNoteHelper {
         }
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
-            CommanderUnlockCheck.checkPlayer(player, "mirveda");
+            CommanderUnlockCheckService.checkPlayer(player, "mirveda");
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired War Sun tech");
             owner.setFleetCC(owner.getFleetCC() - 1);
             ButtonHelper.checkFleetInEveryTile(owner, game, event);
@@ -458,7 +458,7 @@ public class PromissoryNoteHelper {
         if (pn.getText().toLowerCase().contains("action:") && !"acq".equalsIgnoreCase(id)) {
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         }
-        TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pn.getAlias(), player.getNumberTurns());
+        TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.PROMISSORY_NOTES, pn.getAlias(), player.getNumberTurns());
         if (possibleCombatMod != null) {
             player.addNewTempCombatMod(possibleCombatMod);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Combat modifier will be applied next time you push the combat roll button.");

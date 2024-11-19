@@ -10,7 +10,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 

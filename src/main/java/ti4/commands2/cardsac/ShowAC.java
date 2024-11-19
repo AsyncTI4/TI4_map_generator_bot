@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;

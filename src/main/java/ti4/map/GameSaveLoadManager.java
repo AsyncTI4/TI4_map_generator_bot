@@ -39,11 +39,7 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
-import ti4.commands2.milty.MiltyDraftManager;
-import ti4.commands2.uncategorized.CardsInfo;
 import ti4.draft.BagDraft;
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
@@ -55,11 +51,15 @@ import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
 import ti4.json.ObjectMapperFactory;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.info.CardsInfoService;
+import ti4.service.milty.MiltyDraftManager;
 
 public class GameSaveLoadManager {
 
@@ -209,7 +209,7 @@ public class GameSaveLoadManager {
                     for (Player p1 : loadedGame.getRealPlayers()) {
                         Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
                         if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
-                            CardsInfo.sendCardsInfo(loadedGame, p1);
+                            CardsInfoService.sendCardsInfo(loadedGame, p1);
                         }
                     }
                     GameManager.deleteGame(game.getName());

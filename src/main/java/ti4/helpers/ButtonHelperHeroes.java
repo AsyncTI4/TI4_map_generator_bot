@@ -15,18 +15,15 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.combat.StartCombat;
-import ti4.commands.leaders.HeroPlay;
-import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
+import ti4.commands2.leaders.UnlockLeader;
 import ti4.commands2.player.SCPlay;
-import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -42,7 +39,10 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
+import ti4.service.PlanetService;
+import ti4.service.combat.StartCombatService;
 import ti4.service.franken.FrankenLeaderService;
+import ti4.service.leader.PlayHeroService;
 
 public class ButtonHelperHeroes {
 
@@ -768,7 +768,7 @@ public class ButtonHelperHeroes {
         planetReal.addToken("token_dmz.png");
         unitHolder.removeAllUnits(player.getColor());
         if (player.getExhaustedPlanets().contains(planet)) {
-            PlanetRefresh.doAction(player, planet);
+            PlanetService.refreshPlanet(player, planet);
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached Count Otto P'may, the Free Systems hero, to " + Helper.getPlanetRepresentation(planet, game));
@@ -854,7 +854,7 @@ public class ButtonHelperHeroes {
             MoveUnits.flipMallice(event, tile, game);
         }
         PlanetAdd.doAction(player, planetID, game, event, false);
-        PlanetRefresh.doAction(player, planetID);
+        PlanetService.refreshPlanet(player, planetID);
         String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game);
         String msg = player.getFactionEmojiOrColor() + " claimed the planet " + planetRep + " using The Lord, a Ghemina hero.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -1566,7 +1566,7 @@ public class ButtonHelperHeroes {
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
         if (players.size() > 1) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Reminder that Dannel of the Tenth, the Yin hero, skips space cannon fire.");
-            StartCombat.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
+            StartCombatService.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -1758,8 +1758,7 @@ public class ButtonHelperHeroes {
             }
         }
         if (player != player2) {
-
-            StartCombat.startSpaceCombat(game, player, player2, tile2, event, "-benediction");
+            StartCombatService.startSpaceCombat(game, player, player2, tile2, event, "-benediction");
         }
 
     }
@@ -1943,7 +1942,7 @@ public class ButtonHelperHeroes {
     @ButtonHandler("mykoheroSteal_")
     public static void resolveMykoHero(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String hero = buttonID.split("_")[1];
-        HeroPlay.playHero(event, game, player, player.unsafeGetLeader("mykomentorihero"));
+        PlayHeroService.playHero(event, game, player, player.unsafeGetLeader("mykomentorihero"));
         player.addLeader(hero);
         UnlockLeader.unlockLeader(hero, game, player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), FrankenLeaderService.getAddLeaderText(player, hero));

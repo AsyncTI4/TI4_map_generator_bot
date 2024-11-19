@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Game;

@@ -6,18 +6,18 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.RelicModel;
+import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
 public class RelicHelper {
@@ -93,7 +93,7 @@ public class RelicHelper {
                     game.drawSecretObjective(player.getUserID());
                     helpMessage.append(" Drew a second SO due to Plausible Deniability.");
                 }
-                SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
             }
             case "shard" -> {
                 Integer poIndex = game.addCustomPO("Shard of the Throne", 1);
@@ -113,33 +113,6 @@ public class RelicHelper {
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), helpMessage.toString());
         Helper.checkEndGame(game, player);
-    }
-
-    public static void sendRelicInfo(Player player) {
-        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-            player.getCardsInfoThread(),
-            null,
-            getRelicEmbeds(player),
-            getRelicButtons());
-    }
-
-    private static List<MessageEmbed> getRelicEmbeds(Player player) {
-        List<MessageEmbed> messageEmbeds = new ArrayList<>();
-        for (String relicID : player.getRelics()) {
-            RelicModel relicModel = Mapper.getRelic(relicID);
-            if (relicModel != null) {
-                MessageEmbed representationEmbed = relicModel.getRepresentationEmbed();
-                messageEmbeds.add(representationEmbed);
-            }
-        }
-        return messageEmbeds;
-
-    }
-
-    private static List<Button> getRelicButtons() {
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.REFRESH_RELIC_INFO);
-        return buttons;
     }
 
     public void sendFrags(GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game game) {
@@ -177,7 +150,7 @@ public class RelicHelper {
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
         }
-        CommanderUnlockCheck.checkPlayer(receiver, "kollecc", "bentor");
+        CommanderUnlockCheckService.checkPlayer(receiver, "kollecc", "bentor");
 
         if (game.isFowMode()) {
             String fail = "User for faction not found. Report to ADMIN";
@@ -188,7 +161,7 @@ public class RelicHelper {
             FoWHelper.pingPlayersTransaction(game, event, sender, receiver, fragString, null);
         }
         TransactionHelper.checkTransactionLegality(game, sender, receiver);
-        CommanderUnlockCheck.checkPlayer(receiver, "kollecc");
+        CommanderUnlockCheckService.checkPlayer(receiver, "kollecc");
     }
 
     public static void showRemaining(GenericInteractionCreateEvent event, boolean over, Game game, Player player) {

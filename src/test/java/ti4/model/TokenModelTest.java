@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 import org.junit.jupiter.api.Test;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

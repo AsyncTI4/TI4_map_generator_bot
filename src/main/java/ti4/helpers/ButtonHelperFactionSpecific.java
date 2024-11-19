@@ -19,10 +19,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.commands.combat.StartCombat;
 import ti4.commands.game.StartPhase;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechExhaust;
 import ti4.commands.tokens.AddCC;
@@ -30,10 +27,10 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.player.SendDebt;
 import ti4.commands2.player.TurnStart;
-import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -45,6 +42,11 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollService;
+import ti4.service.combat.CombatRollType;
+import ti4.service.combat.StartCombatService;
+import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.RefreshLeaderService;
 
 public class ButtonHelperFactionSpecific {
 
@@ -371,7 +373,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 ident + " already had a " + color + " CC in their fleet pool");
         }
-        CommanderUnlockCheck.checkPlayer(player, "mahact");
+        CommanderUnlockCheckService.checkPlayer(player, "mahact");
 
         if (ButtonHelper.isLawInPlay(game, "regulations")
             && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
@@ -700,7 +702,7 @@ public class ButtonHelperFactionSpecific {
         // Actually roll for each unit
         int totalHits = 0;
         StringBuilder resultBuilder = new StringBuilder(result);
-        Map<UnitModel, Integer> playerUnits = CombatHelper.GetUnitsInCombat(tile, space, player, event,
+        Map<UnitModel, Integer> playerUnits = CombatRollService.getUnitsInCombat(tile, space, player, event,
             CombatRollType.combatround, game);
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();
@@ -767,7 +769,7 @@ public class ButtonHelperFactionSpecific {
                 + Helper.getPlanetRepresentation(planet, game) + " using Tnelis mech deploy ability");
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, game.getTileFromPlanet(planet), planet);
         if (players.size() > 1) {
-            StartCombat.startGroundCombat(players.get(0), players.get(1), game, event,
+            StartCombatService.startGroundCombat(players.get(0), players.get(1), game, event,
                 ButtonHelper.getUnitHolderFromPlanetName(planet, game), game.getTileFromPlanet(planet));
         }
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
@@ -1269,7 +1271,7 @@ public class ButtonHelperFactionSpecific {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
                 SendDebt.sendDebt(player, p2, 1);
-                CommanderUnlockCheck.checkPlayer(p2, "vaden");
+                CommanderUnlockCheckService.checkPlayer(p2, "vaden");
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " you sent 1 debt token to "
                         + p2.getFactionEmojiOrColor() + " due to their fine print ability");
@@ -1970,8 +1972,8 @@ public class ButtonHelperFactionSpecific {
             "# " + player2.getRepresentationUnfogged() + " Lost " + acID + " to a players ability");
         ActionCardHelper.sendActionCardInfo(game, player2);
         ActionCardHelper.sendActionCardInfo(game, player);
-        ButtonHelper.checkACLimit(game, event, player);
-        CommanderUnlockCheck.checkPlayer(player, "yssaril");
+        ButtonHelper.checkACLimit(game, player);
+        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         event.getMessage().delete().queue();
     }
 
@@ -1984,7 +1986,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached terraform to " + Helper.getPlanetRepresentation(planet, game));
         game.setStoredValue("terraformedPlanet", planet);
-        CommanderUnlockCheck.checkPlayer(player, "sol");
+        CommanderUnlockCheckService.checkPlayer(player, "sol");
         event.getMessage().delete().queue();
     }
 
@@ -2035,7 +2037,7 @@ public class ButtonHelperFactionSpecific {
             "Attached branch office to " + Helper.getPlanetRepresentation(planet, game));
         if (game.getPNOwner(pnID).getLeaderIDs().contains("veldyrcommander")
             && !game.getPNOwner(pnID).hasLeaderUnlocked("veldyrcommander")) {
-            CommanderUnlockCheck.checkPlayer(game.getPNOwner(pnID), "veldyr");
+            CommanderUnlockCheckService.checkPlayer(game.getPNOwner(pnID), "veldyr");
         }
         event.getMessage().delete().queue();
     }
@@ -2140,7 +2142,7 @@ public class ButtonHelperFactionSpecific {
         }
         String msg = sb.toString();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        CommanderUnlockCheck.checkPlayer(player, "nivyn");
+        CommanderUnlockCheckService.checkPlayer(player, "nivyn");
         event.getMessage().delete().queue();
     }
 
@@ -2271,7 +2273,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
         for (Player p2 : game.getRealPlayers()) {
-            CommanderUnlockCheck.checkPlayer(p2, "ghost");
+            CommanderUnlockCheckService.checkPlayer(p2, "ghost");
         }
         event.getMessage().delete().queue();
     }
@@ -2359,7 +2361,7 @@ public class ButtonHelperFactionSpecific {
             }
             return;
         }
-        RefreshLeader.refreshLeader(p2, playerLeader, game);
+        RefreshLeaderService.refreshLeader(p2, playerLeader, game);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " exhausted TCS tech to ready " + agent + ", owned by "

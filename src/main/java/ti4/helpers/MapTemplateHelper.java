@@ -11,11 +11,8 @@ import java.util.Map.Entry;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.commands.map.AddTile;
 import ti4.commands.map.AddTileList;
-import ti4.commands2.milty.MiltyDraftManager;
-import ti4.commands2.milty.MiltyDraftManager.PlayerDraft;
-import ti4.commands2.milty.MiltyDraftSlice;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -23,6 +20,9 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
+import ti4.service.milty.MiltyDraftManager;
+import ti4.service.milty.MiltyDraftManager.PlayerDraft;
+import ti4.service.milty.MiltyDraftSlice;
 
 public class MapTemplateHelper {
 

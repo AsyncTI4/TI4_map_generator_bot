@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.function.Function;
 
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.generator.DrawingUtil;
-import ti4.generator.MapGenerator;
-import ti4.generator.MapGenerator.HorizontalAlign;
-import ti4.generator.MapGenerator.VerticalAlign;
-import ti4.generator.Mapper;
-import ti4.helpers.ImageHelper;
+import ti4.image.DrawingUtil;
+import ti4.image.MapGenerator;
+import ti4.image.MapGenerator.HorizontalAlign;
+import ti4.image.MapGenerator.VerticalAlign;
+import ti4.image.Mapper;
+import ti4.image.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.model.BorderAnomalyModel.BorderAnomalyType;
 import ti4.model.TileModel;

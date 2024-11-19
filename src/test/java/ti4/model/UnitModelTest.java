@@ -3,7 +3,7 @@ package ti4.model;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 

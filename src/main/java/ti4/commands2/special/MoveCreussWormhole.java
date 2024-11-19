@@ -7,17 +7,17 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 class MoveCreussWormhole extends GameStateSubcommand {
 
@@ -57,7 +57,7 @@ class MoveCreussWormhole extends GameStateSubcommand {
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
-        CommanderUnlockCheck.checkPlayer(player, "ghost");
+        CommanderUnlockCheckService.checkPlayer(player, "ghost");
     }
 
     private boolean isValidCreussWormhole(String tokenName) {
