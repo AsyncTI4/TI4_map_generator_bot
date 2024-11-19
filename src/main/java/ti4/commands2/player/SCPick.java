@@ -65,10 +65,10 @@ public class SCPick extends GameStateSubcommand {
             return;
         }
 
-        OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
-        int scPicked = option.getAsInt();
+        int scPicked = event.getOption(Constants.STRATEGY_CARD, 0, OptionMapping::getAsInt);
 
-        boolean pickSuccessful = Stats.pickSC(event, game, player, option);
+
+        boolean pickSuccessful = Stats.pickSC(event, game, player, event.getOption(Constants.STRATEGY_CARD));
         Set<Integer> playerSCs = player.getSCs();
         if (!pickSuccessful) {
             if (game.isFowMode()) {
