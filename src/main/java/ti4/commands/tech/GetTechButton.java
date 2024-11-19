@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.player.TurnStart;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -27,6 +26,7 @@ import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class GetTechButton extends TechSubcommandData {
 
@@ -58,7 +58,7 @@ public class GetTechButton extends TechSubcommandData {
             .append(techM.getRepresentation(false));
 
         if (techM.getRequirements().isPresent() && techM.getRequirements().get().length() > 1) {
-            CommanderUnlockCheck.checkPlayer(player, "zealots");
+            CommanderUnlockCheckService.checkPlayer(player, "zealots");
         }
         player.addTech(techID);
         if (techM.isUnitUpgrade()) {
@@ -144,7 +144,7 @@ public class GetTechButton extends TechSubcommandData {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), buttonText, buttons);
         }
-        CommanderUnlockCheck.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
+        CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
 
         if (game.isComponentAction() || !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());

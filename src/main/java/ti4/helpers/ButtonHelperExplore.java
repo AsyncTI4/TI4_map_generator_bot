@@ -9,12 +9,12 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.explore.ExploreFrontier;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelperExplore {
 
@@ -84,7 +84,7 @@ public class ButtonHelperExplore {
             game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
         }
 
-        CommanderUnlockCheck.checkAllPlayersInGame(game, "lanefir");
+        CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
 
         String message = player.getRepresentation() + " purged fragments: "
             + fragmentsToPurge;

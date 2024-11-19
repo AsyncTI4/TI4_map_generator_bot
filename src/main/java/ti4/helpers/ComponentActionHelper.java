@@ -14,8 +14,8 @@ import ti4.commands.leaders.ExhaustLeader;
 import ti4.commands.leaders.HeroPlay;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.player.TurnStart;
-import ti4.image.Mapper;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -292,7 +292,7 @@ public class ComponentActionHelper {
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
                         if ("fogallianceagent".equalsIgnoreCase(buttonID)) {
-                            ExhaustLeader.exhaustLeader(event, game, p1, p1.getLeader(buttonID).orElse(null));
+                            ExhaustLeader.exhaustLeader(game, p1, p1.getLeader(buttonID).orElse(null));
                             ButtonHelperAgents.exhaustAgent("fogallianceagent", event, game, p1);
                         } else {
                             ButtonHelperAgents.exhaustAgent(buttonID, event, game, p1);

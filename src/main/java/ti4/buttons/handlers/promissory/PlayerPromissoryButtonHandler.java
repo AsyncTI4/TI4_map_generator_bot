@@ -2,7 +2,6 @@ package ti4.buttons.handlers.promissory;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
@@ -15,6 +14,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
 class PlayerPromissoryButtonHandler {
@@ -36,7 +36,7 @@ class PlayerPromissoryButtonHandler {
                 game.setStoredValue(key, game.getStoredValue(key) + "." + tech);
             }
             ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
-            CommanderUnlockCheck.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
+            CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
         PromissoryNoteHelper.resolvePNPlay(pnID, player, game, event);

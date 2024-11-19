@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.fow.Whisper;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -35,6 +34,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.service.info.CardsInfoService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class TurnStart extends GameStateSubcommand {
 
@@ -56,7 +56,7 @@ public class TurnStart extends GameStateSubcommand {
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         player.setTurnCount(player.getTurnCount() + 1);
-        CommanderUnlockCheck.checkPlayer(player, "hacan");
+        CommanderUnlockCheckService.checkPlayer(player, "hacan");
         Map<String, String> maps = new HashMap<>(game.getMessagesThatICheckedForAllReacts());
         for (String id : maps.keySet()) {
             if (id.contains("combatRoundTracker")) {

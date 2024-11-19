@@ -5,12 +5,10 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.RefreshLeader;
-import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.units.AddUnits;
-import ti4.image.Mapper;
 import ti4.helpers.Units.UnitKey;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -19,6 +17,8 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.PlanetService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ExploreHelper {
 
@@ -75,7 +75,7 @@ public class ExploreHelper {
         message += checkForMechOrRemoveInf(planetName, game, player);
         failed = message.contains("Please try again.");
         if (!failed) {
-            PlanetRefresh.doAction(player, planetName);
+            PlanetService.refreshPlanet(player, planetName);
             planetName = Mapper.getPlanet(planetName) == null ? planetName : Mapper.getPlanet(planetName).getName();
             message += "Readied " + planetName;
             ButtonHelper.addReaction(event, false, false, message, "");
@@ -184,7 +184,7 @@ public class ExploreHelper {
                     message = player.getFactionEmoji() + " Drew 1 AC";
                     ActionCardHelper.sendActionCardInfo(game, player, event);
                 }
-                CommanderUnlockCheck.checkPlayer(player, "yssaril");
+                CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             } else {
                 Leader playerLeader = player.getLeader(acOrAgent).orElse(null);
                 if (playerLeader == null) {

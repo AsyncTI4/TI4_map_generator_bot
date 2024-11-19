@@ -1,5 +1,7 @@
-package ti4.commands.leaders;
+package ti4.service.leader;
 
+import lombok.experimental.UtilityClass;
+import ti4.commands.leaders.UnlockLeader;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -12,24 +14,15 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 
-public class CommanderUnlockCheck {
+@UtilityClass
+public class CommanderUnlockCheckService {
 
-    /**
-     * Will run {@link CommanderUnlockCheck#checkPlayer()} on all players within the game
-     * 
-     * @param game - the {@link Game} to check
-     * @param factionToCheck - the factions of the leader to check the unlock conditions of
-     */
     public static void checkAllPlayersInGame(Game game, String factionToCheck) {
         for (Player player : game.getRealPlayers()) {
             checkPlayer(player, factionToCheck);
         }
     }
 
-    /**
-     * @param player - the {@link Player} to check
-     * @param factionsToCheck - the faction IDs of the leader to check the unlock conditions of e.g. "sol" will check for "solcommander"
-     */
     public static void checkPlayer(Player player, String... factionsToCheck) {
         for (String factionToCheck : factionsToCheck) {
             if (player != null &&

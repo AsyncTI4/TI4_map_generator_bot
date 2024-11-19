@@ -14,13 +14,13 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.info.ListPlayerInfoService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class SecretObjectiveHelper {
 
@@ -66,7 +66,7 @@ public class SecretObjectiveHelper {
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                     }
 
-                    CommanderUnlockCheck.checkAllPlayersInGame(game, "lanefir");
+                    CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
 
                     String message2 = player.getRepresentation() + " purged fragments: " + fragmentsToPurge;
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
@@ -114,7 +114,7 @@ public class SecretObjectiveHelper {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendSecretObjectiveInfo(game, player);
         Helper.checkIfHeroUnlocked(game, player);
-        CommanderUnlockCheck.checkPlayer(player, "nomad");
+        CommanderUnlockCheckService.checkPlayer(player, "nomad");
         Helper.checkEndGame(game, player);
     }
 

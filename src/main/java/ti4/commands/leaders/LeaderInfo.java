@@ -10,10 +10,11 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands2.CommandHelper;
-import ti4.image.Mapper;
+import ti4.commands.CommandHelper;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -22,16 +23,17 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
 public class LeaderInfo extends LeaderSubcommandData {
+
     public LeaderInfo() {
         super(Constants.INFO, "Send Leader info to your Cards-Info thread");
     }
 
     public void execute(SlashCommandInteractionEvent event) {
         event.deferReply();
-        Game game = getActiveGame();
+        Game game = getGame();
         User user = getUser();
         Player player = game.getPlayer(user.getId());
-        player = CommandHelper.getPlayerFromEvent(game, event);
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;

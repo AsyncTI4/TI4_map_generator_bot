@@ -17,12 +17,9 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddUnits;
-import ti4.image.Mapper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -39,6 +36,7 @@ import ti4.helpers.RelicHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Leader;
@@ -51,6 +49,8 @@ import ti4.model.AttachmentModel;
 import ti4.model.ExploreModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
+import ti4.service.PlanetService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public abstract class ExploreSubcommandData extends SubcommandData {
 
@@ -196,7 +196,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     game.purgeExplore(ogID);
                     AttachmentModel aModel = Mapper.getAttachmentInfo(attachment);
                     message = "Attachment " + aModel.getName() + " added to " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game);
-                    CommanderUnlockCheck.checkPlayer(player, "sol", "xxcha");
+                    CommanderUnlockCheckService.checkPlayer(player, "sol", "xxcha");
                 }
             }
             case Constants.TOKEN -> {
@@ -277,7 +277,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
                 MessageHelper.sendMessageToEventChannel(event, message);
                 ButtonHelper.checkACLimit(game, player);
-                CommanderUnlockCheck.checkPlayer(player, "yssaril");
+                CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             }
             case "dv1", "dv2" -> {
                 message = "Drew a " + Emojis.SecretObjective + "Secret Objective";
@@ -311,7 +311,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     return;
                 }
                 PlanetAdd.doAction(player, mirageID, game, null, false);
-                PlanetRefresh.doAction(player, mirageID);
+                PlanetService.refreshPlanet(player, mirageID);
                 String exploreID = game.drawExplore(Constants.CULTURAL);
                 if (exploreID == null) {
                     MessageHelper.sendMessageToEventChannel(event, "Planet cannot be explored: " + mirageID + "\n> The Cultural deck may be empty");
@@ -443,7 +443,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                     default -> message = "";
                 }
-                CommanderUnlockCheck.checkPlayer(player, "hacan");
+                CommanderUnlockCheckService.checkPlayer(player, "hacan");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 message += "\n" + player.getRepresentationUnfogged() + " your current CCs are " + player.getCCRepresentation()
                     + ". Use buttons to gain " + ccsToGain + " CC" + (ccsToGain > 1 ? "s" : "");
@@ -533,7 +533,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
 
         }
-        CommanderUnlockCheck.checkPlayer(player, "hacan");
+        CommanderUnlockCheckService.checkPlayer(player, "hacan");
 
         if (player.hasAbility("fortune_seekers") && game.getStoredValue("fortuneSeekers").isEmpty()) {
             List<Button> gainComm = new ArrayList<>();
@@ -546,7 +546,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             game.setStoredValue("fortuneSeekers", "Used");
         }
 
-        CommanderUnlockCheck.checkPlayer(player, "kollecc", "bentor", "ghost");
+        CommanderUnlockCheckService.checkPlayer(player, "kollecc", "bentor", "ghost");
         if (player.getPlanets().contains(planetID)) {
             ButtonHelperAbilities.offerOrladinPlunderButtons(player, game, planetID);
         }
