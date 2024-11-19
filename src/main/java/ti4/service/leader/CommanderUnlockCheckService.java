@@ -329,7 +329,7 @@ public class CommanderUnlockCheckService {
             // missing: yin, ghost, naalu, letnev
         }
         if (shouldBeUnlocked) {
-            UnlockLeader.unlockLeader(faction + "commander", game, player);
+            UnlockLeaderService.unlockLeader(faction + "commander", game, player);
         }
     }
 }

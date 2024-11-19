@@ -27,7 +27,7 @@ import ti4.message.MessageHelper;
 import ti4.service.info.ListTurnOrderService;
 
 @UtilityClass
-public class StrategyCardPickService {
+public class PickStrategyCardService {
 
     public static void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game game, int scPicked) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);

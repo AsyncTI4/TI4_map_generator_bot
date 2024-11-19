@@ -19,8 +19,6 @@ import ti4.commands.planet.PlanetAdd;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.commands2.leaders.UnlockLeader;
-import ti4.commands2.player.SCPlay;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -43,6 +41,8 @@ import ti4.service.PlanetService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.franken.FrankenLeaderService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.leader.UnlockLeaderService;
+import ti4.service.strategycard.PlayStrategyCardService;
 
 public class ButtonHelperHeroes {
 
@@ -1896,7 +1896,7 @@ public class ButtonHelperHeroes {
     @ButtonHandler("winnuHero_")
     public static void resolveWinnuHeroSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Integer sc = Integer.parseInt(buttonID.split("_")[1]);
-        SCPlay.playSC(event, sc, game, game.getMainGameChannel(), player, true);
+        PlayStrategyCardService.playSC(event, sc, game, game.getMainGameChannel(), player, true);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing()
             + " reminder that the Winnu player has to allow you to follow this, and that when you do follow, you must pay strategy CCs like normal. ");
         ButtonHelper.deleteMessage(event);
@@ -1944,7 +1944,7 @@ public class ButtonHelperHeroes {
         String hero = buttonID.split("_")[1];
         PlayHeroService.playHero(event, game, player, player.unsafeGetLeader("mykomentorihero"));
         player.addLeader(hero);
-        UnlockLeader.unlockLeader(hero, game, player);
+        UnlockLeaderService.unlockLeader(hero, game, player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), FrankenLeaderService.getAddLeaderText(player, hero));
         ButtonHelper.deleteMessage(event);
 

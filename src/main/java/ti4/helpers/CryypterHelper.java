@@ -5,13 +5,13 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands2.leaders.UnlockLeader;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.UnlockLeaderService;
 
 public class CryypterHelper {
 
@@ -24,10 +24,10 @@ public class CryypterHelper {
 
     @ButtonHandler("cryypterSC3Draw")
     public static void resolveCryypterSC3Draw(ButtonInteractionEvent event, Game game, Player player) {
-        drawXPickYActionCards(game, player, 3, 1, true);
+        drawXPickYActionCards(game, player, 3, true);
     }
 
-    private static void drawXPickYActionCards(Game game, Player player, int draw, int discard, boolean addScheming) {
+    private static void drawXPickYActionCards(Game game, Player player, int draw, boolean addScheming) {
         if (draw > 10) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
             return;
@@ -61,7 +61,7 @@ public class CryypterHelper {
         for (Player player : game.getRealPlayers()) {
             Leader envoy = player.getLeaderByType("envoy").orElse(null);
             if (envoy != null && envoy.isLocked()) {
-                UnlockLeader.unlockLeader(envoy.getId(), game, player);
+                UnlockLeaderService.unlockLeader(envoy.getId(), game, player);
             }
         }
     }

@@ -33,7 +33,6 @@ import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.player.Pass;
-import ti4.commands2.player.SCPlay;
 import ti4.commands2.player.TurnEnd;
 import ti4.commands2.player.TurnStart;
 import ti4.helpers.ActionCardHelper;
@@ -88,6 +87,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
+import ti4.service.strategycard.PlayStrategyCardService;
 
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
@@ -858,7 +858,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     // @ButtonHandler("strategicAction_")
     public static void strategicAction(ButtonInteractionEvent event, Player player, String buttonID, Game game, MessageChannel mainGameChannel) {
         int scNum = Integer.parseInt(buttonID.replace("strategicAction_", ""));
-        SCPlay.playSC(event, scNum, game, mainGameChannel, player);
+        PlayStrategyCardService.playSC(event, scNum, game, mainGameChannel, player);
         ButtonHelper.deleteMessage(event);
     }
 

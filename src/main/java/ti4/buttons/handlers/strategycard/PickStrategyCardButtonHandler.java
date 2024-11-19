@@ -26,7 +26,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.strategycard.StrategyCardPickService;
+import ti4.service.strategycard.PickStrategyCardService;
 
 @UtilityClass
 class PickStrategyCardButtonHandler {
@@ -74,7 +74,7 @@ class PickStrategyCardButtonHandler {
         } else {
             boolean pickSuccessful = Stats.secondHalfOfPickSC(event, game, player, scpick);
             if (pickSuccessful) {
-                StrategyCardPickService.secondHalfOfSCPick(event, player, game, scpick);
+                PickStrategyCardService.secondHalfOfSCPick(event, player, game, scpick);
                 ButtonHelper.deleteMessage(event);
             }
         }
