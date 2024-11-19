@@ -29,7 +29,6 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
-import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
@@ -40,6 +39,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 
@@ -109,7 +109,7 @@ class AgendaResolveButtonHandler {
                     if (player2.hasAbility("plausible_deniability")) {
                         game.drawSecretObjective(player2.getUserID());
                     }
-                    SecretObjectiveHelper.sendSecretObjectiveInfo(game, player2, event);
+                    SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player2, event);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Drew elected 2 SOs and set their SO info as public");
                 }
@@ -329,7 +329,7 @@ class AgendaResolveButtonHandler {
                         Mapper.getSecretObjectivesJustNames().get(winner) + "\n";
                     MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
-                    SecretObjectiveHelper.sendSecretObjectiveInfo(game, playerWithSO, event);
+                    SecretObjectiveInfoService.sendSecretObjectiveInfo(game, playerWithSO, event);
 
                 }
             }
@@ -346,7 +346,7 @@ class AgendaResolveButtonHandler {
                         game.drawSecretObjective(player2.getUserID());
                         message = message + " Drew a second SO due to Plausible Deniability";
                     }
-                    SecretObjectiveHelper.sendSecretObjectiveInfo(game, player2, event);
+                    SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player2, event);
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
                 }
                 if ("standardization".equalsIgnoreCase(agID)) {

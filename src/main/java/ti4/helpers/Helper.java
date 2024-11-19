@@ -73,6 +73,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.PlayerReactService;
+import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.objectives.ScorePublicObjectiveService;
@@ -304,7 +305,7 @@ public class Helper {
                     game.drawSecretObjective(player.getUserID());
                     message = message + " Drew a second secret objective due to Plausible Deniability.";
                 }
-                SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2,
                     game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);

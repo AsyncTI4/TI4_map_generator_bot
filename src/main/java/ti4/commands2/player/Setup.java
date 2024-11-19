@@ -27,7 +27,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
@@ -44,6 +43,8 @@ import ti4.service.PlanetService;
 import ti4.service.info.AbilityInfoService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.info.LeaderInfoService;
+import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.info.UnitInfoService;
 
 public class Setup extends GameStateSubcommand {
 
@@ -107,7 +108,7 @@ public class Setup extends GameStateSubcommand {
         if (player.isRealPlayer() && player.getSo() > 0) {
             String message = player.getRepresentationNoPing() + "has SOs that would get lost to the void if they were setup again. If they wish to change color, use /player change_color. If they want to setup as another faction, they must discard their SOs first";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-            SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
+            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
             return;
         }
 
@@ -241,7 +242,7 @@ public class Setup extends GameStateSubcommand {
         AbilityInfoService.sendAbilityInfo(game, player, event);
         TechInfo.sendTechInfo(game, player, event);
         LeaderInfoService.sendLeadersInfo(game, player, event);
-        UnitInfo.sendUnitInfo(game, player, event, false);
+        UnitInfoService.sendUnitInfo(game, player, event, false);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false, event);
 
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {

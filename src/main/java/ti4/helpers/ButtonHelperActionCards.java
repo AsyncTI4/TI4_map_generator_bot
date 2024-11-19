@@ -34,6 +34,7 @@ import ti4.model.ExploreModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.explore.ExploreService;
+import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelperActionCards {
@@ -895,7 +896,7 @@ public class ButtonHelperActionCards {
             game.drawSecretObjective(player.getUserID());
             message = message + " Drew a second SO due to Plausible Deniability.";
         }
-        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation() + " Exhaust stuff to pay the 3 influence", buttons);

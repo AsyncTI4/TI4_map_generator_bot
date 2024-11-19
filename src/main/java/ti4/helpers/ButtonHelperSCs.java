@@ -21,6 +21,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
+import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 
@@ -222,7 +223,7 @@ public class ButtonHelperSCs {
                     game.drawSecretObjective(player.getUserID());
                     message = message + ". Drew a second SO due to Plausible Deniability";
                 }
-                SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
                 break;
             }
             if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {

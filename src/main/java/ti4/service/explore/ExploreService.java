@@ -35,7 +35,6 @@ import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
-import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -50,6 +49,7 @@ import ti4.model.ExploreModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
 import ti4.service.PlanetService;
+import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
@@ -449,7 +449,7 @@ public class ExploreService {
                     game.drawSecretObjective(player.getUserID());
                     message = message + " Drew a second " + Emojis.SecretObjective + "Secret Objective due to Plausible Deniability.";
                 }
-                SecretObjectiveHelper.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
                 MessageHelper.sendMessageToEventChannel(event, message);
             }
             case "dw" -> {
