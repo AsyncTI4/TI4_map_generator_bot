@@ -7,10 +7,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
-import ti4.commands2.player.Stats;
 import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.stats.StatsService;
 
 class StasisInfantry extends GameStateSubcommand {
 
@@ -37,13 +37,13 @@ class StasisInfantry extends GameStateSubcommand {
             String explanation = "";
             if (setValue) {
                 consumer.accept(number);
-                String messageToSend = Stats.getSetValueMessage(event, player, Constants.COUNT, number, existingNumber, explanation);
+                String messageToSend = StatsService.getSetValueMessage(event, player, Constants.COUNT, number, existingNumber, explanation);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageToSend);
             } else {
                 int newNumber = existingNumber + number;
                 newNumber = Math.max(newNumber, 0);
                 consumer.accept(newNumber);
-                String messageToSend = Stats.getChangeValueMessage(event, player, Constants.COUNT, number, existingNumber, newNumber, explanation);
+                String messageToSend = StatsService.getChangeValueMessage(event, player, Constants.COUNT, number, existingNumber, newNumber, explanation);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageToSend);
             }
         } catch (Exception e) {
