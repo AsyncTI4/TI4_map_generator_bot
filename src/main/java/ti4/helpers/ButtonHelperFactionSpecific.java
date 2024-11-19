@@ -389,24 +389,25 @@ public class ButtonHelperFactionSpecific {
         String trueIdentity = player.getRepresentation();
         String faction = buttonID.replace("nekroStealTech_", "");
         Player p2 = game.getPlayerFromColorOrFaction(faction);
-        if (p2 != null) {
-            List<String> potentialTech = new ArrayList<>();
-            game.setComponentAction(true);
-            potentialTech = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, potentialTech,
-                game);
-            List<Button> buttons = ButtonHelperAbilities.getButtonsForPossibleTechForNekro(player, potentialTech, game);
-            if (p2.getPromissoryNotesInPlayArea().contains("antivirus")) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    trueIdentity + " the other player has antivirus, so you cannot gain tech from this combat.");
-            } else if (!buttons.isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    trueIdentity + " get enemy tech using the buttons", buttons);
-            } else {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    trueIdentity + " there are no techs available to gain.");
-            }
-            ButtonHelper.deleteTheOneButton(event);
+        if (p2 == null) {
+            return;
         }
+        List<String> potentialTech = new ArrayList<>();
+        game.setComponentAction(true);
+        potentialTech = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, potentialTech,
+            game);
+        List<Button> buttons = ButtonHelperAbilities.getButtonsForPossibleTechForNekro(player, potentialTech, game);
+        if (p2.getPromissoryNotesInPlayArea().contains("antivirus")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                trueIdentity + " the other player has antivirus, so you cannot gain tech from this combat.");
+        } else if (!buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                trueIdentity + " get enemy tech using the buttons", buttons);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                trueIdentity + " there are no techs available to gain.");
+        }
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("titansConstructionMechDeployStep2_")
@@ -1317,19 +1318,18 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void resolveMykoMechCheck(Player player, Game game) {
-        if (player.hasUnit("mykomentori_mech")) {
-            if (!game.getStoredValue("mykoMech").isEmpty()) {
-                int amount = Integer.parseInt(game.getStoredValue("mykoMech"));
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("resolveMykoMech", "Replace Infantry With Mech"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                if (amount > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + " you have " + amount
-                            + " mech" + (amount == 1 ? "" : "s") + " that may replace infantry.",
-                        buttons);
-                }
-            }
+        if (!player.hasUnit("mykomentori_mech") || game.getStoredValue("mykoMech").isEmpty()) {
+            return;
+        }
+        int amount = Integer.parseInt(game.getStoredValue("mykoMech"));
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("resolveMykoMech", "Replace Infantry With Mech"));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        if (amount > 0) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " you have " + amount
+                    + " mech" + (amount == 1 ? "" : "s") + " that may replace infantry.",
+                buttons);
         }
     }
 
