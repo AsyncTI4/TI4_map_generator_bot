@@ -10,8 +10,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 
 class PoSetDeck extends GameStateSubcommand {
@@ -27,7 +27,7 @@ class PoSetDeck extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         String stage1Ids = event.getOption(Constants.SET_PO_DECK_STAGE1_LIST, null, OptionMapping::getAsString);
         String stage2Ids = event.getOption(Constants.SET_PO_DECK_STAGE2_LIST, null, OptionMapping::getAsString);
-        boolean shuffle = event.getOption(Constants.SET_PO_DECK_SHUFFLE, false, OptionMapping::getAsBoolean);;
+        boolean shuffle = event.getOption(Constants.SET_PO_DECK_SHUFFLE, false, OptionMapping::getAsBoolean);
 
         List<String> stage1IdList = parseIds(stage1Ids);
         List<String> stage2IdList = parseIds(stage2Ids);
