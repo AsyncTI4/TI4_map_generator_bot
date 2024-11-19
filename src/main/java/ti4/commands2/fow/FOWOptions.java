@@ -1,27 +1,27 @@
-package ti4.commands.fow;
+package ti4.commands2.fow;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 
-public class FOWOptions extends FOWSubcommandData {
+import static ti4.service.fow.FowConstants.HIDE_NAMES;
+import static ti4.service.fow.FowConstants.HIDE_TOTAL_VOTES;
 
-    public static final String HIDE_NAMES = "hide_player_names";
-    public static final String HIDE_TOTAL_VOTES = "hide_total_votes";
+class FOWOptions extends GameStateSubcommand {
 
     public FOWOptions() {
-        super(Constants.FOW_OPTIONS, "Change options for FoW game");
+        super(Constants.FOW_OPTIONS, "Change options for FoW game", true, true);
         addOptions(new OptionData(OptionType.BOOLEAN, HIDE_NAMES, "Completely hide player discord names - Default: false"));
         addOptions(new OptionData(OptionType.BOOLEAN, HIDE_TOTAL_VOTES, "Don't show total votes amount in agenda - Default: false"));
     }
 
      @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-
+        Game game = getGame();
         Boolean hideNames = event.getOption(HIDE_NAMES, null, OptionMapping::getAsBoolean);
         if (hideNames != null) {
             game.setFowOption(HIDE_NAMES, Boolean.toString(hideNames));

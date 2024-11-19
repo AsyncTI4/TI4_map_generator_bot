@@ -37,7 +37,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands.fow.FOWOptions;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.units.AddUnits;
 import ti4.helpers.DiceHelper.Die;
@@ -58,6 +57,7 @@ import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.service.fow.FowConstants;
 import ti4.service.info.SecretObjectiveInfoService;
 
 public class AgendaHelper {
@@ -2826,7 +2826,7 @@ public class AgendaHelper {
             votes = votes + getTotalVoteCount(game, player);
         }
         StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: "
-            + (Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_TOTAL_VOTES)) ? "???" : votes));
+            + (Boolean.parseBoolean(game.getFowOption(FowConstants.HIDE_TOTAL_VOTES)) ? "???" : votes));
         sb.append("):__**\n");
         int itemNo = 1;
         for (Player player : orderList) {

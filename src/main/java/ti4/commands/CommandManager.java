@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ti4.commands.capture.CaptureCommand;
-import ti4.commands.fow.FOWCommand;
 import ti4.commands.game.GameCommand;
 import ti4.commands.map.MapCommand;
 import ti4.commands.planet.PlanetCommand;
@@ -38,6 +37,7 @@ import ti4.commands2.developer.DeveloperCommand;
 import ti4.commands2.ds.DiscordantStarsCommand;
 import ti4.commands2.event.EventCommand;
 import ti4.commands2.explore.ExploreCommand;
+import ti4.commands2.fow.FOWCommand;
 import ti4.commands2.franken.FrankenCommand;
 import ti4.commands2.help.HelpCommand;
 import ti4.commands2.installation.InstallationCommand;

@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
-import ti4.commands.fow.Whisper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -33,6 +32,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
@@ -175,7 +175,7 @@ public class TurnStart extends GameStateSubcommand {
                     .getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction());
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                     p2.getRepresentationUnfogged() + " your future message got delivered");
-                Whisper.sendWhisper(game, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
+                WhisperService.sendWhisper(game, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
                 game.setStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction(), "");
             }
         }
