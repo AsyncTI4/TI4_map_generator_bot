@@ -3,7 +3,6 @@ package ti4.commands2.player;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -20,7 +19,7 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.stats.StatsService;
+import ti4.service.player.StatsService;
 
 class Stats extends GameStateSubcommand {
 
@@ -162,7 +161,7 @@ class Stats extends GameStateSubcommand {
 
         Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);
         if (commoditiesTotalCount != null) {
-            setTotalCommodities(event, player, commoditiesTotalCount);
+            StatsService.setTotalCommodities(event, player, commoditiesTotalCount);
         }
 
         Integer turnCount = event.getOption(Constants.TURN_COUNT, null, OptionMapping::getAsInt);
@@ -241,15 +240,6 @@ class Stats extends GameStateSubcommand {
             player.setDummy(value);
             MessageHelper.sendMessageToEventChannel(event, getGeneralMessage(optionDummy));
         }
-    }
-
-    public static void setTotalCommodities(GenericInteractionCreateEvent event, Player player, Integer commoditiesTotalCount) {
-        if (commoditiesTotalCount < 1 || commoditiesTotalCount > 10) {
-            MessageHelper.sendMessageToEventChannel(event, "**Warning:** Total Commodities count seems like a wrong value:");
-        }
-        player.setCommoditiesTotal(commoditiesTotalCount);
-        String message = ">  set **Total Commodities** to " + commoditiesTotalCount + Emojis.comm;
-        MessageHelper.sendMessageToEventChannel(event, message);
     }
 
     private static String getGeneralMessage(OptionMapping option) {

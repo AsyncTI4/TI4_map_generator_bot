@@ -32,8 +32,6 @@ import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
-import ti4.commands2.player.Pass;
-import ti4.commands2.player.TurnEnd;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -87,6 +85,8 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.turn.EndTurnService;
+import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 
 /*
@@ -2330,7 +2330,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("scoreAnObjective")
     public static void scoreAnObjective(ButtonInteractionEvent event, Player player, Game game) {
-        List<Button> poButtons = TurnEnd.getScoreObjectiveButtons(game, player.getFinsFactionCheckerPrefix());
+        List<Button> poButtons = EndTurnService.getScoreObjectiveButtons(game, player.getFinsFactionCheckerPrefix());
         poButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         MessageChannel channel = event.getMessageChannel();
         if (game.isFowMode()) {
@@ -3127,7 +3127,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("passForRound")
     public static void passForRound(ButtonInteractionEvent event, Player player, Game game) {
-        Pass.passPlayerForRound(event, game, player);
+        PassService.passPlayerForRound(event, game, player);
         ButtonHelper.deleteMessage(event);
     }
 

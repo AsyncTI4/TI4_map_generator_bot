@@ -1,4 +1,4 @@
-package ti4.service.stats;
+package ti4.service.player;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -171,7 +171,7 @@ public class StatsService {
             int existingNumber = supplier.get();
             if (setValue) {
                 consumer.accept(number);
-                String messageToSend = getSetValueMessage(event, player, optionName, number, existingNumber,
+                String messageToSend = getSetValueMessage(optionName, number, existingNumber,
                     explanation);
                 if (!suppressMessage)
                     MessageHelper.sendMessageToEventChannel(event, messageToSend);
@@ -182,7 +182,7 @@ public class StatsService {
                 int newNumber = existingNumber + number;
                 newNumber = Math.max(newNumber, 0);
                 consumer.accept(newNumber);
-                String messageToSend = getChangeValueMessage(event, player, optionName, number, existingNumber,
+                String messageToSend = getChangeValueMessage(optionName, number, existingNumber,
                     newNumber, explanation);
                 if (!suppressMessage)
                     MessageHelper.sendMessageToEventChannel(event, messageToSend);
@@ -195,7 +195,7 @@ public class StatsService {
         }
     }
 
-    public static String getSetValueMessage(SlashCommandInteractionEvent event, Player player, String optionName,
+    public static String getSetValueMessage(String optionName,
         Integer setToNumber, Integer existingNumber, String explanation) {
         if (explanation == null || "".equalsIgnoreCase(explanation)) {
             return "> set **" + optionName + "** to **" + setToNumber + "**   _(was "
@@ -209,7 +209,7 @@ public class StatsService {
 
     }
 
-    public static String getChangeValueMessage(SlashCommandInteractionEvent event, Player player, String optionName,
+    public static String getChangeValueMessage(String optionName,
         Integer changeNumber, Integer existingNumber, Integer newNumber, String explanation) {
         String changeDescription = "changed";
         if (changeNumber > 0) {
@@ -224,6 +224,14 @@ public class StatsService {
             return "> " + changeDescription + " **" + optionName + "** by " + changeNumber + "   _(was "
                 + existingNumber + ", now **" + newNumber + "**)_ for the reason of: " + explanation;
         }
+    }
 
+    public static void setTotalCommodities(GenericInteractionCreateEvent event, Player player, Integer commoditiesTotalCount) {
+        if (commoditiesTotalCount < 1 || commoditiesTotalCount > 10) {
+            MessageHelper.sendMessageToEventChannel(event, "**Warning:** Total Commodities count seems like a wrong value:");
+        }
+        player.setCommoditiesTotal(commoditiesTotalCount);
+        String message = ">  set **Total Commodities** to " + commoditiesTotalCount + Emojis.comm;
+        MessageHelper.sendMessageToEventChannel(event, message);
     }
 }

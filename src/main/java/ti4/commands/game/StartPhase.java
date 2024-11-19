@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands2.player.TurnEnd;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -44,6 +43,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.service.StatusCleanupService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 
 public class StartPhase extends GameSubcommandData {
@@ -75,7 +75,7 @@ public class StartPhase extends GameSubcommandData {
             case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(game);
             case "finFixSecrets" -> game.fixScrewedSOs();
             case "statusScoring" -> {
-                TurnEnd.showPublicObjectivesWhenAllPassed(event, game, game.getMainGameChannel());
+                EndTurnService.showPublicObjectivesWhenAllPassed(event, game, game.getMainGameChannel());
                 game.updateActivePlayer(null);
             }
             case "endOfGameSummary" -> {

@@ -25,7 +25,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.stats.StatsService;
+import ti4.service.player.StatsService;
 import ti4.service.strategycard.PickStrategyCardService;
 
 @UtilityClass
