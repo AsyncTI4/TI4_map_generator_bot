@@ -115,9 +115,12 @@ class DiceLuck extends Subcommand {
         AtomicInteger index = new AtomicInteger(1);
         sb.append("## __**Dice Luck**__\n");
         for (User user : users) {
-            Entry<Double, Integer> userTurnCountTotalTime = playerDiceLucks.get(user.getId());
-            double expectedHits = userTurnCountTotalTime.getKey();
-            int actualHits = userTurnCountTotalTime.getValue();
+            if (!playerDiceLucks.containsKey(user.getId())) {
+                continue;
+            }
+            Entry<Double, Integer> userDiceLuck = playerDiceLucks.get(user.getId());
+            double expectedHits = userDiceLuck.getKey();
+            int actualHits = userDiceLuck.getValue();
 
             if (expectedHits != 0 && actualHits != 0) {
                 appendDiceLuck(sb, index, user, expectedHits, actualHits);

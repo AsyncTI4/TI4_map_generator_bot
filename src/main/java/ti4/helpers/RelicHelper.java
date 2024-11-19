@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
@@ -114,33 +113,6 @@ public class RelicHelper {
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), helpMessage.toString());
         Helper.checkEndGame(game, player);
-    }
-
-    public static void sendRelicInfo(Player player) {
-        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-            player.getCardsInfoThread(),
-            null,
-            getRelicEmbeds(player),
-            getRelicButtons());
-    }
-
-    private static List<MessageEmbed> getRelicEmbeds(Player player) {
-        List<MessageEmbed> messageEmbeds = new ArrayList<>();
-        for (String relicID : player.getRelics()) {
-            RelicModel relicModel = Mapper.getRelic(relicID);
-            if (relicModel != null) {
-                MessageEmbed representationEmbed = relicModel.getRepresentationEmbed();
-                messageEmbeds.add(representationEmbed);
-            }
-        }
-        return messageEmbeds;
-
-    }
-
-    private static List<Button> getRelicButtons() {
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.REFRESH_RELIC_INFO);
-        return buttons;
     }
 
     public void sendFrags(GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game game) {
