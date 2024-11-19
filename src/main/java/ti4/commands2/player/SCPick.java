@@ -341,18 +341,20 @@ public class SCPick extends GameStateSubcommand {
     private static void doEndOfStrategyPhaseReminders(Game game, GenericInteractionCreateEvent event) {
         for (Player p2 : game.getRealPlayers()) {
             ButtonHelperActionCards.checkForAssigningCoup(game, p2);
-            naaluGiftReminder(game, event, p2);
-
+            naaluApplyPresetGift(game, event, p2);
             hacanQDNReminder(p2);
             imperialArbiterReminder(game, p2);
         }
     }
 
-    private static void naaluGiftReminder(Game game, GenericInteractionCreateEvent event, Player p2) {
-        if (game.getStoredValue("Play Naalu PN") != null && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {
-            if (!p2.getPromissoryNotesInPlayArea().contains("gift") && p2.getPromissoryNotes().containsKey("gift")) {
-                PromissoryNoteHelper.resolvePNPlay("gift", p2, game, event);
-            }
+    /** If Gift is Preset via {@link ButtonHelper#resolvePreAssignment} via {@link ButtonHelperFactionSpecific#checkForNaaluPN}, play it now */
+    private static void naaluApplyPresetGift(Game game, GenericInteractionCreateEvent event, Player p2) {
+        if (game.getStoredValue("Play Naalu PN") != null &&
+            game.getStoredValue("Play Naalu PN").contains(p2.getFaction()) &&
+            !p2.getPromissoryNotesInPlayArea().contains("gift") &&
+            p2.getPromissoryNotes().containsKey("gift")) {
+
+            PromissoryNoteHelper.resolvePNPlay("gift", p2, game, event);
         }
     }
 
