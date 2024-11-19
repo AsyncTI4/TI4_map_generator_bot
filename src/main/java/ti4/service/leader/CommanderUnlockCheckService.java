@@ -1,7 +1,7 @@
 package ti4.service.leader;
 
 import lombok.experimental.UtilityClass;
-import ti4.commands.leaders.UnlockLeader;
+import ti4.commands2.leaders.UnlockLeader;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;

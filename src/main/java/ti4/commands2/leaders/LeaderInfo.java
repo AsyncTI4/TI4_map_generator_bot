@@ -1,24 +1,21 @@
-package ti4.commands.leaders;
+package ti4.commands2.leaders;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.map.Player;
-import ti4.message.MessageHelper;
+import ti4.service.info.LeaderInfoService;
 
-class ResetLeader extends GameStateSubcommand {
+class LeaderInfo extends GameStateSubcommand {
 
-    public ResetLeader() {
-        super(Constants.RESET, "Reset all leaders", true, true);
+    public LeaderInfo() {
+        super(Constants.INFO, "Send Leader info to your Cards-Info thread", false, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Player player = getPlayer();
-        player.initLeaders();
-        MessageHelper.sendMessageToEventChannel(event, "Leaders were reset: " + player.getLeaderIDs());
+        LeaderInfoService.sendLeadersInfo(getGame(), getPlayer(), event);
     }
 }
