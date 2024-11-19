@@ -12,13 +12,14 @@ import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 public class TechAdd extends TechAddRemove {
+
     public TechAdd() {
         super(Constants.TECH_ADD, "Add Tech");
     }
 
     @Override
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
-        addTech(event, getActiveGame(), player, techID);
+        addTech(event, getGame(), player, techID);
     }
 
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {

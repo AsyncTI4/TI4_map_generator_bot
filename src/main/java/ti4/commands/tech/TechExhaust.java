@@ -36,13 +36,14 @@ import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 
 public class TechExhaust extends TechAddRemove {
+
     public TechExhaust() {
         super(Constants.TECH_EXHAUST, "Exhaust Tech");
     }
 
     @Override
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
-        exhaustTechAndResolve(event, getActiveGame(), player, techID);
+        exhaustTechAndResolve(event, getGame(), player, techID);
         checkAndApplyCombatMods(event, player, techID);
     }
 
@@ -344,8 +345,7 @@ public class TechExhaust extends TechAddRemove {
         }
     }
 
-    private static void sendNextActionButtonsIfButtonEvent(GenericInteractionCreateEvent event, Game game,
-        Player player) {
+    private static void sendNextActionButtonsIfButtonEvent(GenericInteractionCreateEvent event, Game game, Player player) {
         if (event instanceof ButtonInteractionEvent) {
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         }
