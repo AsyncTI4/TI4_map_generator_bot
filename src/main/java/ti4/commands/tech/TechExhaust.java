@@ -12,7 +12,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
-import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -26,6 +25,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -329,7 +329,7 @@ public class TechExhaust extends TechAddRemove {
     }
 
     private static void checkAndApplyCombatMods(GenericInteractionCreateEvent event, Player player, String techID) {
-        TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.TECH,
+        TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.TECH,
             techID, player.getNumberTurns());
         if (possibleCombatMod != null) {
             player.addNewTempCombatMod(possibleCombatMod);

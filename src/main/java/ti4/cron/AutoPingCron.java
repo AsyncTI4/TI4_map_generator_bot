@@ -11,18 +11,20 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.buttons.UnfiledButtonHandlers;
 import ti4.commands.tech.GetTechButton;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.model.StrategyCardModel;
+import ti4.service.PlayerReactService;
 import ti4.users.UserSettingsManager;
 
 import static java.util.function.Predicate.not;
@@ -76,14 +78,14 @@ public class AutoPingCron {
                 boolean shouldDoIt2 = result2 == highNum2;
                 if (shouldDoIt2) {
                     String whensID = game.getLatestWhenMsg();
-                    if (!AgendaHelper.doesPlayerHaveAnyWhensOrAfters(player)
-                            && !UnfiledButtonHandlers.checkForASpecificPlayerReact(whensID, player, game)) {
+                    if (!doesPlayerHaveAnyWhensOrAfters(player)
+                            && !PlayerReactService.checkForASpecificPlayerReact(whensID, player, game)) {
                         String message = game.isFowMode() ? "No whens" : null;
                         ButtonHelper.addReaction(player, false, false, message, null, whensID, game);
                     }
                     String aftersID = game.getLatestAfterMsg();
-                    if (!AgendaHelper.doesPlayerHaveAnyWhensOrAfters(player)
-                            && !UnfiledButtonHandlers.checkForASpecificPlayerReact(aftersID, player, game)) {
+                    if (!doesPlayerHaveAnyWhensOrAfters(player)
+                            && !PlayerReactService.checkForASpecificPlayerReact(aftersID, player, game)) {
                         String message = game.isFowMode() ? "No afters" : null;
                         ButtonHelper.addReaction(player, false, false, message, null, aftersID, game);
                     }
@@ -113,7 +115,7 @@ public class AutoPingCron {
             return false;
         }
         if (player.getAc() == 0) {
-            return !UnfiledButtonHandlers.checkForASpecificPlayerReact(messageID, player, game);
+            return !PlayerReactService.checkForASpecificPlayerReact(messageID, player, game);
         }
         if (player.isAFK()) {
             return false;
@@ -121,7 +123,7 @@ public class AutoPingCron {
         if (player.getAutoSaboPassMedian() == 0) {
             return false;
         }
-        return !UnfiledButtonHandlers.checkForASpecificPlayerReact(messageID, player, game);
+        return !PlayerReactService.checkForASpecificPlayerReact(messageID, player, game);
     }
 
     private static boolean playerHasSabotage(Player player) {
@@ -506,5 +508,36 @@ public class AutoPingCron {
                     + " Rumors of the bot running out of stamina are greatly exaggerated. The bot will win this stare-down, it is simply a matter of time.";
         }
         return ping;
+    }
+
+    private static boolean doesPlayerHaveAnyWhensOrAfters(Player player) {
+        if (!player.doesPlayerAutoPassOnWhensAfters()) {
+            return true;
+        }
+        if (player.hasAbility("quash") || player.ownsPromissoryNote("rider")
+            || player.getPromissoryNotes().containsKey("riderm")
+            || player.hasAbility("radiance") || player.hasAbility("galactic_threat")
+            || player.hasAbility("conspirators")
+            || player.ownsPromissoryNote("riderx")
+            || player.ownsPromissoryNote("riderm") || player.ownsPromissoryNote("ridera")) {
+            return true;
+        }
+        for (String acID : player.getActionCards().keySet()) {
+            ActionCardModel actionCard = Mapper.getActionCard(acID);
+            String actionCardWindow = actionCard.getWindow();
+            if (actionCardWindow.contains("When an agenda is revealed")
+                || actionCardWindow.contains("After an agenda is revealed")) {
+                return true;
+            }
+        }
+        for (String pnID : player.getPromissoryNotes().keySet()) {
+            if (player.ownsPromissoryNote(pnID)) {
+                continue;
+            }
+            if (pnID.endsWith("_ps") && !pnID.contains("absol_")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

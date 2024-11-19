@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -19,7 +19,7 @@ import ti4.model.EventModel;
 class PlayEvent extends GameStateSubcommand {
 
     public PlayEvent() {
-        super(Constants.EVENT_PLAY, "Play an Event from your hand", true, false);
+        super(Constants.EVENT_PLAY, "Play an Event from your hand", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.EVENT_ID, "Event Card ID that is sent between () or Name/Part of Name").setRequired(true).setAutoComplete(true));
     }
 

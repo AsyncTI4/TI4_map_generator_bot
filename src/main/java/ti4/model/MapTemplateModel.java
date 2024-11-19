@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
-import ti4.generator.PositionMapper;
+import ti4.image.PositionMapper;
 
 @Data
 public class MapTemplateModel implements ModelInterface {

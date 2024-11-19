@@ -11,12 +11,12 @@ import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.milty.StartMilty;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.model.Source.ComponentSource;
+import ti4.service.milty.MiltyService;
 
 @Getter
 public class MiltySettings extends SettingsMenu {
@@ -136,6 +136,6 @@ public class MiltySettings extends SettingsMenu {
     }
 
     protected String startMilty(GenericInteractionCreateEvent event) {
-        return StartMilty.startFromSettings(event, this);
+        return MiltyService.startFromSettings(event, this);
     }
 }

@@ -49,11 +49,8 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
-import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -71,6 +68,7 @@ import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
+import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -86,6 +84,8 @@ import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.milty.MiltyDraftManager;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
@@ -3191,24 +3191,20 @@ public class Game extends GameProperties {
             .count() > 1;
     }
 
-    @JsonIgnore
-    public Map<String, Player> getPlayerControlMap() {
-        Map<String, Player> controlMap = new HashMap<>();
-        for (Tile tile : getTileMap().values()) {
-            Player controllingPlayer = null;
-            for (Player p : getRealPlayers()) {
-                if (FoWHelper.playerHasActualShipsInSystem(p, tile)) {
-                    if (controllingPlayer == null) {
-                        controllingPlayer = p;
-                    } else {
-                        controllingPlayer = null;
-                        break;
-                    }
-                }
-            }
-            controlMap.put(tile.getPosition(), controllingPlayer);
+    public Player getPlayerThatControlsTile(String tileId) {
+        return getPlayerThatControlsTile(tileMap.get(tileId));
+    }
+
+    public Player getPlayerThatControlsTile(Tile tile) {
+        if (tile == null) {
+            return null;
         }
-        return controlMap;
+        for (Player player : getRealPlayers()) {
+            if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                return player;
+            }
+        }
+        return null;
     }
 
     public void addPlayer(String id, String name) {
@@ -4196,7 +4192,7 @@ public class Game extends GameProperties {
     }
 
     public void checkCommanderUnlocks(String factionToCheck) {
-        CommanderUnlockCheck.checkAllPlayersInGame(this, factionToCheck);
+        CommanderUnlockCheckService.checkAllPlayersInGame(this, factionToCheck);
     }
 
     /**

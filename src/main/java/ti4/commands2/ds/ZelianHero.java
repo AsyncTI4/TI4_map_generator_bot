@@ -4,19 +4,16 @@ import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.special.StellarConverter;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
+import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.Helper;
-import ti4.listeners.annotations.ButtonHandler;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -47,7 +44,7 @@ class ZelianHero extends GameStateSubcommand {
 
     public static void secondHalfOfCelestialImpact(Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
         String message1 = "Moments before disaster in game " + game.getName();
-        StellarConverter.postTileInDisasterWatch(game, event, tile, 1, message1);
+        DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, message1);
 
         //Remove all other players ground force units from the tile in question
         for (Player player_ : game.getPlayers().values()) {
@@ -83,7 +80,7 @@ class ZelianHero extends GameStateSubcommand {
         String message2 = tile.getRepresentation() +
                 " has been celestially impacted by " +
                 player.getRepresentation();
-        StellarConverter.postTileInDisasterWatch(game, event, asteroidTile, 1, message2);
+        DisasterWatchHelper.postTileInDisasterWatch(game, event, asteroidTile, 1, message2);
 
         if (player.hasLeaderUnlocked("zelianhero")) {
             Leader playerLeader = player.getLeader("zelianhero").orElse(null);
@@ -95,11 +92,5 @@ class ZelianHero extends GameStateSubcommand {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Zelian R, the Zelian heRo, was not purged - something went wrong");
             }
         }
-    }
-
-    @ButtonHandler("celestialImpact_")
-    public static void celestialImpact(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        secondHalfOfCelestialImpact(player, event, game.getTileByPosition(buttonID.split("_")[1]), game);
-        ButtonHelper.deleteTheOneButton(event);
     }
 }

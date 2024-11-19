@@ -13,15 +13,15 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
-import ti4.commands.player.ChangeUnitDecal;
 import ti4.commands2.Subcommand;
-import ti4.generator.DrawingUtil;
-import ti4.generator.MapGenerator;
-import ti4.generator.Mapper;
+import ti4.image.DrawingUtil;
+import ti4.image.MapGenerator;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.ImageHelper;
+import ti4.image.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.message.MessageHelper;
+import ti4.service.UnitDecalService;
 
 class SampleDecals extends Subcommand {
 
@@ -33,20 +33,21 @@ class SampleDecals extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         List<String> decals = Mapper.getDecals().stream()
-            .filter(decalID -> ChangeUnitDecal.userMayUseDecal(event.getUser().getId(), decalID))
+            .filter(decalID -> UnitDecalService.userMayUseDecal(event.getUser().getId(), decalID))
             .collect(Collectors.toList());
 
         OptionMapping input = event.getOption(Constants.DECAL_HUE);
-        if (input == null || input.getAsString().equals("ALL") || input.getAsString().isEmpty()) {
-        } else if (input.getAsString().equals("Other")) {
-            List<String> others = List.of("cb_10", "cb_11", "cb_52", "cb_81");
-            decals = decals.stream()
-                .filter(others::contains)
-                .collect(Collectors.toList());
-        } else {
-            decals = decals.stream()
-                .filter(decalID -> Mapper.getDecalName(decalID).contains(input.getAsString()))
-                .collect(Collectors.toList());
+        if (input != null && !input.getAsString().equals("ALL") && !input.getAsString().isEmpty()) {
+            if (input.getAsString().equals("Other")) {
+                List<String> others = List.of("cb_10", "cb_11", "cb_52", "cb_81");
+                decals = decals.stream()
+                    .filter(others::contains)
+                    .collect(Collectors.toList());
+            } else {
+                decals = decals.stream()
+                    .filter(decalID -> Mapper.getDecalName(decalID).contains(input.getAsString()))
+                    .collect(Collectors.toList());
+            }
         }
         Collections.sort(decals);
         if (decals.isEmpty()) {

@@ -20,9 +20,8 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.combat.StartCombat;
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -34,6 +33,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
+import ti4.service.combat.StartCombatService;
 
 public class FoWHelper {
 
@@ -794,7 +794,7 @@ public class FoWHelper {
 				success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
 				MessageChannel channel = player_.getPrivateChannel();
 				MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
-					StartCombat.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
+					StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
 			}
 			successfulCount += success ? 1 : 0;
 		}

@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 
@@ -87,6 +87,11 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public boolean hasPlanets() {
         return getPlanets() != null && !getPlanets().isEmpty();
+    }
+
+    @JsonIgnore
+    public int getNumPlanets() {
+        return getPlanets() == null ? 0 : getPlanets().size();
     }
 
     @JsonIgnore

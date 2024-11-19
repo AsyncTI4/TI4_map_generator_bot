@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @Data

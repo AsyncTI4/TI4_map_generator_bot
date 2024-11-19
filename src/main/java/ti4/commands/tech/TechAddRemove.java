@@ -7,15 +7,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands2.CommandHelper;
-import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public abstract class TechAddRemove extends TechSubcommandData {
     public TechAddRemove(String id, String description) {
@@ -24,7 +24,7 @@ public abstract class TechAddRemove extends TechSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2nd Tech").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd Tech").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th Tech").setAutoComplete(true));
-        // addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction").setRequired(false));
+        // addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set techs").setAutoComplete(true));
 
     }
@@ -43,7 +43,7 @@ public abstract class TechAddRemove extends TechSubcommandData {
         parseParameter(event, player, event.getOption(Constants.TECH3));
         parseParameter(event, player, event.getOption(Constants.TECH4));
 
-        CommanderUnlockCheck.checkPlayer(player, "nekro", "jolnar");
+        CommanderUnlockCheckService.checkPlayer(player, "nekro", "jolnar");
 
     }
 

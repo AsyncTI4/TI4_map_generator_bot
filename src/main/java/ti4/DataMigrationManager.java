@@ -20,10 +20,10 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.player.ChangeColor;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Game;
@@ -624,7 +624,7 @@ public class DataMigrationManager {
         if (game.getPlayerFromColorOrFaction(newColor) != null) return false;
         String oldColor = rift.getColor();
         MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), rift.getRepresentation(false, false) + " has had their color changed to " + Emojis.getColorEmojiWithName(newColor));
-        ChangeColor.changePlayerColor(game, rift, oldColor, newColor);
+        ColorChangeHelper.changePlayerColor(game, rift, oldColor, newColor);
         return true;
     }
 

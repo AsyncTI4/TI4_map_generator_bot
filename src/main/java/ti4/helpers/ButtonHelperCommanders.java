@@ -14,15 +14,14 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.context.ButtonContext;
 import ti4.map.Game;
@@ -33,6 +32,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelperCommanders {
 
@@ -514,7 +514,7 @@ public class ButtonHelperCommanders {
     @ButtonHandler("pay1tgforKeleres")
     public static void pay1tgToUnlockKeleres(Player player, Game game, ButtonInteractionEvent event) {
         boolean unleash = ThreadLocalRandom.current().nextInt(20) == 0;
-        CommanderUnlockCheck.checkPlayer(player, "keleres");
+        CommanderUnlockCheckService.checkPlayer(player, "keleres");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " paid 1TG to " + (unleash ? "unleash" : "unlock") + " Suffi An, the Keleres commander " + player.gainTG(-1));
         event.getMessage().delete().queue();
     }
@@ -537,7 +537,7 @@ public class ButtonHelperCommanders {
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet1), "1 " + mechorInf + " " + planet1, game);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        CommanderUnlockCheck.checkPlayer(player, "naaz");
+        CommanderUnlockCheckService.checkPlayer(player, "naaz");
         ButtonHelper.deleteTheOneButton(event);
     }
 

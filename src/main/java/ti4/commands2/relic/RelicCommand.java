@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.ParentCommand;
 import ti4.commands2.Subcommand;
@@ -41,7 +40,7 @@ public class RelicCommand implements ParentCommand {
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return ParentCommand.super.accept(event) &&
-            CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.developerRoles);
+            CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
     }
 
     @Override

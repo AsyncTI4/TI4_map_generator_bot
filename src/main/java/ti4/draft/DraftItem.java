@@ -22,7 +22,7 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.draft.items.StartingFleetDraftItem;
 import ti4.draft.items.StartingTechDraftItem;
 import ti4.draft.items.TechDraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -114,7 +114,7 @@ public abstract class DraftItem implements ModelInterface {
         return items;
     }
 
-    public static List<DraftItem> GetAlwaysIncludeItems(Category type) {
+    public static List<DraftItem> getAlwaysIncludeItems(Category type) {
         List<DraftItem> alwaysInclude = new ArrayList<>();
         var frankenErrata = Mapper.getFrankenErrata().values();
         for (DraftErrataModel errataItem : frankenErrata) {

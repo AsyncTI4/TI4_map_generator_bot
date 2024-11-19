@@ -8,10 +8,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.SecretObjectiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.info.SecretObjectiveInfoService;
 
 class DrawSpecificSO extends GameStateSubcommand {
 
@@ -43,6 +43,6 @@ class DrawSpecificSO extends GameStateSubcommand {
             return;
         }
         MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand - please check `/ac info`");
-        SecretObjectiveHelper.sendSecretObjectiveInfo(game, player);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
     }
 }

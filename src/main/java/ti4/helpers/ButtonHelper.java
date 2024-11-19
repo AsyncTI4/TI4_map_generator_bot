@@ -44,6 +44,8 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -51,18 +53,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
-import ti4.commands.combat.CombatRoll;
-import ti4.commands.explore.ExploreFrontier;
-import ti4.commands.explore.ExploreInfo;
-import ti4.commands.explore.ExploreSubcommandData;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.player.SendDebt;
-import ti4.commands.player.Setup;
-import ti4.commands.player.TurnStart;
-import ti4.commands.special.CheckDistance;
-import ti4.commands.special.DiploSystem;
 import ti4.commands.tech.TechShowDeck;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddToken;
@@ -71,14 +62,17 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.CommandHelper;
-import ti4.generator.MapRenderPipeline;
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.TileGenerator;
-import ti4.generator.TileHelper;
+import ti4.commands2.player.SendDebt;
+import ti4.commands2.player.Setup;
+import ti4.commands2.player.TurnStart;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.MapRenderPipeline;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
+import ti4.image.TileGenerator;
+import ti4.image.TileHelper;
 import ti4.listeners.ButtonListener;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -104,6 +98,12 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
+import ti4.service.PlanetService;
+import ti4.service.combat.CombatRollService;
+import ti4.service.combat.CombatRollType;
+import ti4.service.decks.ShowActionCardsService;
+import ti4.service.explore.ExploreService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelper {
 
@@ -653,7 +653,7 @@ public class ButtonHelper {
     public static void resolveDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
         String deck = buttonID.replace("showDeck_", "");
         switch (deck) {
-            case "ac" -> ActionCardHelper.showDiscard(game, event, false);
+            case "ac" -> ShowActionCardsService.showDiscard(game, event, false);
             case "agenda" -> AgendaHelper.showDiscards(game, event);
             case "relic" -> RelicHelper.showRemaining(event, false, game, player);
             case "unscoredSO" -> SecretObjectiveHelper.showUnscored(game, event);
@@ -672,7 +672,7 @@ public class ButtonHelper {
                 } else {
                     types.add(deck);
                 }
-                ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false);
+                ExploreService.secondHalfOfExpInfo(types, event, player, game, false);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);
@@ -689,10 +689,10 @@ public class ButtonHelper {
             types.add(Constants.INDUSTRIAL);
             types.add(Constants.HAZARDOUS);
             types.add(Constants.FRONTIER);
-            ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(types, event, player, game, false, true);
         } else {
             types.add(type);
-            ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(types, event, player, game, false, true);
         }
         deleteMessage(event);
     }
@@ -768,7 +768,7 @@ public class ButtonHelper {
         }
 
         ActionCardHelper.sendActionCardInfo(game, player, event);
-        CommanderUnlockCheck.checkPlayer(player, "yssaril");
+        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         if (player.hasAbility("scheming")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
@@ -776,7 +776,7 @@ public class ButtonHelper {
         }
 
         addReaction(event, true, false, message, "");
-        checkACLimit(game, event, player);
+        checkACLimit(game, player);
         game.setCurrentACDrawStatusInfo(game.getCurrentACDrawStatusInfo() + "_" + player.getFaction());
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
         ButtonHelperActionCards.checkForPlayingManipulateInvestments(game, player);
@@ -858,11 +858,21 @@ public class ButtonHelper {
                             buttons2.add(hacanButton);
                             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                                 "Reminder you may use Minister of Peace.", buttons2);
-                            event.getHook().sendMessage(player.getRepresentation() + " Reminder you should really check in with the Minister of Peace if this activation has the possibility of being relevant. If you proceed over their window, a rollback may be required.").queue();
+                            event.getHook().sendMessage(player.getRepresentation() + " Reminder you should really check in with the Minister of Peace if this activation has the possibility of being relevant. If you proceed over their window, a rollback may be required.").setEphemeral(true).queue();
                         }
                     }
                 }
             }
+        }
+        if (doesPlayerHaveFSHere("arborec_flagship", player, activeSystem)) {
+            Button arboCommander = Buttons.green(
+                player.getFinsFactionCheckerPrefix() + "umbatTile_" + activeSystem.getPosition(),
+                "Build 5 Units With Arborec FS");
+            Button decline = Buttons.red("deleteButtons", "Decline Build");
+            List<Button> buttons = List.of(arboCommander, decline);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                player.getRepresentation() + " use buttons to resolve the Arborec Flagship Build.", buttons);
+
         }
 
         for (Player nonActivePlayer : game.getPlayers().values()) {
@@ -990,16 +1000,7 @@ public class ButtonHelper {
                         ident + " use buttons to resolve Dirzuga Rophal, the Arborec commander.", buttons);
                 }
             }
-            if (doesPlayerHaveFSHere("arborec_flagship", player, activeSystem)) {
-                Button arboCommander = Buttons.green(
-                    fincheckerForNonActive + "umbatTile_" + activeSystem.getPosition(),
-                    "Build 5 Units With Arborec FS");
-                Button decline = Buttons.red("deleteButtons", "Decline Build");
-                List<Button> buttons = List.of(arboCommander, decline);
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    ident + " use buttons to resolve the Arborec Flagship Build.", buttons);
 
-            }
             if (nonActivePlayer.hasLeaderUnlocked("celdaurihero")
                 && FoWHelper.playerHasPlanetsInSystem(nonActivePlayer, activeSystem)
                 && !activeSystem.isMecatol()) {
@@ -1251,7 +1252,7 @@ public class ButtonHelper {
             last = buttonID.replace("tech_", "");
             player.refreshTech(last);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied tech: " + Mapper.getTech(last).getRepresentation(false));
-            CommanderUnlockCheck.checkPlayer(player, "kolume");
+            CommanderUnlockCheckService.checkPlayer(player, "kolume");
         } else {
             player.refreshPlanet(last);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied planet: " + Helper.getPlanetRepresentation(last, game));
@@ -1292,7 +1293,7 @@ public class ButtonHelper {
         return limit;
     }
 
-    public static void checkACLimit(Game game, GenericInteractionCreateEvent event, Player player) {
+    public static void checkACLimit(Game game, Player player) {
         int limit = getACLimit(game, player);
         if (isPlayerOverLimit(game, player)) {
             MessageChannel channel = game.getMainGameChannel();
@@ -1310,20 +1311,6 @@ public class ButtonHelper {
 
     public static void updateMap(Game game, GenericInteractionCreateEvent event) {
         updateMap(game, event, "");
-    }
-
-    @ButtonHandler("trade_primary")
-    public static void tradePrimary(Game game, GenericInteractionCreateEvent event, Player player) {
-        boolean reacted = false;
-        if (event instanceof ButtonInteractionEvent e) {
-            reacted = true;
-            String msg = " gained 3" + Emojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(3) + " and replenished commodities (" + player.getCommodities() + " -> " + player.getCommoditiesTotal() + Emojis.comm + ")";
-            ButtonHelper.addReaction(e, false, false, msg, "");
-        }
-        CommanderUnlockCheck.checkPlayer(player, "hacan");
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
-        ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperStats.replenishComms(event, game, player, reacted);
     }
 
     public static void updateMap(Game game, GenericInteractionCreateEvent event, String message) {
@@ -2582,7 +2569,7 @@ public class ButtonHelper {
                 // new AddUnits().unitParsing(event, player.getColor(), tile, "sd
                 // "+capChecker.getName(), game);
             }
-            Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(capChecker, player);
+            Map<UnitModel, Integer> unitsByQuantity = getAllUnits(capChecker, player);
             for (UnitModel unit : unitsByQuantity.keySet()) {
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
                     capacity += unit.getCapacityValue() * unitsByQuantity.get(unit);
@@ -2604,7 +2591,7 @@ public class ButtonHelper {
             }
             for (Player p2 : game.getRealPlayers()) {
                 if (player.getAllianceMembers().contains(p2.getFaction())) {
-                    Map<UnitModel, Integer> unitsByQuantity2 = CombatHelper.GetAllUnits(capChecker, p2);
+                    Map<UnitModel, Integer> unitsByQuantity2 = getAllUnits(capChecker, p2);
                     for (UnitModel unit : unitsByQuantity2.keySet()) {
                         if ("space".equalsIgnoreCase(capChecker.getName())) {
                             capacity += unit.getCapacityValue() * unitsByQuantity2.get(unit);
@@ -2633,7 +2620,7 @@ public class ButtonHelper {
         // System.out.println(fightersIgnored);
         UnitHolder combatOnHolder = tile.getUnitHolders().get("space");
         List<String> unitTypesCounted = new ArrayList<>();
-        Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(combatOnHolder, player);
+        Map<UnitModel, Integer> unitsByQuantity = getAllUnits(combatOnHolder, player);
         for (UnitModel unit : unitsByQuantity.keySet()) {
             if (!unitTypesCounted.contains(unit.getBaseType())) {
                 if ("fighter".equalsIgnoreCase(unit.getBaseType()) || "infantry".equalsIgnoreCase(unit.getBaseType())
@@ -2693,7 +2680,7 @@ public class ButtonHelper {
             }
         }
         if (numOfCapitalShips > 8 && !fleetSupplyViolated) {
-            CommanderUnlockCheck.checkPlayer(player, "letnev");
+            CommanderUnlockCheckService.checkPlayer(player, "letnev");
         }
         if (player.hasAbility("flotilla")) {
             int numInf = tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor());
@@ -2739,7 +2726,7 @@ public class ButtonHelper {
         List<Tile> tiles = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             for (UnitHolder capChecker : tile.getUnitHolders().values()) {
-                Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(capChecker, player);
+                Map<UnitModel, Integer> unitsByQuantity = getAllUnits(capChecker, player);
                 for (UnitModel unit : unitsByQuantity.keySet()) {
                     if (unit.getProductionValue() > 0) {
                         if (!tiles.contains(tile)) {
@@ -3457,7 +3444,7 @@ public class ButtonHelper {
                 msg2 = msg2 + name1 + ": " + card.getText() + "\n";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             } else {
-                new ExploreFrontier().expFront(event, tile, game, player);
+                ExploreService.expFront(event, tile, game, player);
             }
 
             if (player.hasAbility("migrant_fleet")) {
@@ -3538,10 +3525,10 @@ public class ButtonHelper {
             Tile tile = game.getTileFromPlanet(planetName);
             String messageText = player.getRepresentation() + " explored " + Emojis.getEmojiFromDiscord(drawColor) + "Planet "
                 + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile " + tile.getPosition() + ")*:";
-            ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
+            ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
             if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                 && game.getPhaseOfGame().contains("agenda")) {
-                PlanetRefresh.doAction(player, planetName);
+                PlanetService.refreshPlanet(player, planetName);
                 MessageHelper.sendMessageToChannel(event.getChannel(),
                     "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
                 AgendaHelper.listVoteCount(game, game.getMainGameChannel());
@@ -3820,7 +3807,7 @@ public class ButtonHelper {
                 }
             }
         }
-        CombatRoll.secondHalfOfCombatRoll(player, game, event, game.getTileByPosition(pos), unitHolderName, rollType);
+        CombatRollService.secondHalfOfCombatRoll(player, game, event, game.getTileByPosition(pos), unitHolderName, rollType);
         if (buttonID.contains("bombardment") && ButtonHelper.isLawInPlay(game, "conventions")) {
             boolean relevant = false;
             for (UnitHolder unitHolder : game.getTileByPosition(pos).getPlanetUnitHolders()) {
@@ -4188,7 +4175,7 @@ public class ButtonHelper {
         }
         Button concludeMove = Buttons.red(finChecker + "doneLanding_" + tile.getPosition(), "Done landing troops");
         buttons.add(concludeMove);
-        CommanderUnlockCheck.checkPlayer(player, "naaz", "empyrean", "ghost");
+        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost");
 
         return buttons;
     }
@@ -4376,9 +4363,9 @@ public class ButtonHelper {
                     UnitModel uni = player.getUnitByBaseType(unit);
                     if (activeSystem != null && uni != null && uni.getIsShip()
                         && !uni.getBaseType().equalsIgnoreCase("fighter")) {
-                        int distance = CheckDistance.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
+                        int distance = CheckDistanceHelper.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
                             game.getActiveSystem(), true);
-                        int riftDistance = CheckDistance.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
+                        int riftDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
                             game.getActiveSystem(), false);
                         int moveValue = uni.getMoveValue();
                         if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasTech("absol_amd")) {
@@ -4504,7 +4491,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Added ionstorm beta to " + tile.getRepresentation());
         }
         deleteMessage(event);
-        CommanderUnlockCheck.checkPlayer(player, "ghost");
+        CommanderUnlockCheckService.checkPlayer(player, "ghost");
     }
 
     public static void checkForIonStorm(Game game, Tile tile, Player player) {
@@ -4741,14 +4728,15 @@ public class ButtonHelper {
             return;
         }
         CombatRollType rollType = CombatRollType.combatround;
-        Map<UnitModel, Integer> playerUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player,
+        Map<UnitModel, Integer> playerUnitsByQuantity = CombatRollService.getUnitsInCombat(tile, combatOnHolder, player,
             event, rollType, game);
         List<UnitModel> units = new ArrayList<>(playerUnitsByQuantity.keySet());
         for (UnitModel unitModel : units) {
             playerUnitsByQuantity.put(unitModel, 0);
             for (String thalnosUnit : game.getThalnosUnits().keySet()) {
                 int amount = game.getSpecificThalnosUnit(thalnosUnit);
-                String unitName = unitModel.getAsyncId();
+
+                String unitName = unitModel.getBaseType();
                 thalnosUnit = thalnosUnit.split("_")[2].replace("damaged", "");
                 if (thalnosUnit.equals(unitName)) {
                     playerUnitsByQuantity.put(unitModel, amount + playerUnitsByQuantity.get(unitModel));
@@ -4769,18 +4757,18 @@ public class ButtonHelper {
         }
         game.setStoredValue("thalnosPlusOne", "true");
         List<UnitHolder> combatHoldersForOpponent = new ArrayList<>(List.of(combatOnHolder));
-        Player opponent = CombatHelper.GetOpponent(player, combatHoldersForOpponent, game);
+        Player opponent = CombatRollService.getOpponent(player, combatHoldersForOpponent, game);
         if (opponent == null) {
             opponent = player;
         }
-        Map<UnitModel, Integer> opponentUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, opponent,
+        Map<UnitModel, Integer> opponentUnitsByQuantity = CombatRollService.getUnitsInCombat(tile, combatOnHolder, opponent,
             event, rollType, game);
 
         TileModel tileModel = TileHelper.getTileById(tile.getTileID());
-        List<NamedCombatModifierModel> modifiers = CombatModHelper.GetModifiers(player, opponent,
+        List<NamedCombatModifierModel> modifiers = CombatModHelper.getModifiers(player, opponent,
             playerUnitsByQuantity, tileModel, game, rollType, Constants.COMBAT_MODIFIERS);
 
-        List<NamedCombatModifierModel> extraRolls = CombatModHelper.GetModifiers(player, opponent,
+        List<NamedCombatModifierModel> extraRolls = CombatModHelper.getModifiers(player, opponent,
             playerUnitsByQuantity, tileModel, game, rollType, Constants.COMBAT_EXTRA_ROLLS);
 
         // Check for temp mods
@@ -4789,13 +4777,13 @@ public class ButtonHelper {
         List<NamedCombatModifierModel> tempMods = new ArrayList<>(
             CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(player, tileModel,
                 combatOnHolder, false, rollType));
-        List<NamedCombatModifierModel> tempOpponentMods = new ArrayList<>();
+        List<NamedCombatModifierModel> tempOpponentMods;
         tempOpponentMods = CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(opponent, tileModel,
             combatOnHolder, true, rollType);
         tempMods.addAll(tempOpponentMods);
 
         String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
-        message += CombatHelper.RollForUnits(playerUnitsByQuantity, opponentUnitsByQuantity, extraRolls, modifiers,
+        message += CombatRollService.rollForUnits(playerUnitsByQuantity, opponentUnitsByQuantity, extraRolls, modifiers,
             tempMods, player, opponent, game, rollType, event, tile);
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*", "");
@@ -6343,7 +6331,7 @@ public class ButtonHelper {
             String message = player.getFactionEmoji() + " chose to use the mahact PN in the tile " + tile.getRepresentation();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         } else {
-            if (!DiploSystem.diploSystem(event, game, player, planet.toLowerCase())) {
+            if (!DiploSystemHelper.diploSystem(event, game, player, planet.toLowerCase())) {
                 return;
             }
             String message = player.getFactionEmoji() + " chose to diplo the system containing "
@@ -6556,5 +6544,34 @@ public class ButtonHelper {
             }
         }
         return assignSpeakerButtons;
+    }
+
+    public static Map<UnitModel, Integer> getAllUnits(UnitHolder unitHolder, Player player) {
+        String colorID = Mapper.getColorID(player.getColor());
+        Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+        Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().flatMap(
+                entry -> player.getUnitsByAsyncID(entry.getKey()).stream()
+                    .map(x -> new ImmutablePair<>(x, entry.getValue())))
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+
+        HashMap<UnitModel, Integer> output;
+
+        output = new HashMap<>(unitsInCombat.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+
+        Set<String> duplicates = new HashSet<>();
+        List<String> dupes = output.keySet().stream()
+            .filter(unit -> !duplicates.add(unit.getAsyncId()))
+            .map(UnitModel::getBaseType)
+            .toList();
+        for (String dupe : dupes) {
+            for (UnitModel mod : output.keySet()) {
+                if (mod.getBaseType().equalsIgnoreCase(dupe) && !mod.getId().contains("2")) {
+                    output.put(mod, 0);
+                    break;
+                }
+            }
+        }
+        return output;
     }
 }
