@@ -1,11 +1,11 @@
 package ti4.commands2.uncategorized;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands2.GameStateCommand;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -28,6 +28,15 @@ public class ShowGame extends GameStateCommand {
     @Override
     public String getDescription() {
         return "Show selected map";
+    }
+
+    @Override
+    public List<OptionData> getOptions() {
+        return List.of(
+            new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown")
+                .setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -55,13 +64,5 @@ public class ShowGame extends GameStateCommand {
             displayType = DisplayType.all;
         }
         ShowGameService.simpleShowGame(game, event, displayType);
-    }
-
-    @Override
-    public void register(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getName(), "Shows selected map")
-                .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setAutoComplete(true)));
     }
 }

@@ -13,12 +13,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import ti4.ResourceHelper;
-import ti4.commands.tokens.AddFrontierTokens;
+import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -36,6 +37,7 @@ import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
+import ti4.service.explore.AddFrontierTokensService;
 
 public class AddTileList extends MapSubcommandData {
     public AddTileList() {
@@ -139,9 +141,13 @@ public class AddTileList extends MapSubcommandData {
 
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
         if (!game.isBaseGameMode()) {
-            AddFrontierTokens.parsingForTile(event, game);
+            AddFrontierTokensService.addFrontierTokens(event, game);
             MessageHelper.sendMessageToChannel(channel, Emojis.Frontier + "Frontier Tokens have been added to empty spaces.");
         }
+
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("deal2SOToAll", "Deal 2 SO To All"));
+        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Press this button after every player is setup", buttons);
 
         if (game.getRealPlayers().size() < game.getPlayers().size()) {
             ButtonHelper.offerPlayerSetupButtons(channel, game);

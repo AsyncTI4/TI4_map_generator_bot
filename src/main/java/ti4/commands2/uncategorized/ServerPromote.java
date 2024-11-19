@@ -1,6 +1,7 @@
 package ti4.commands2.uncategorized;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -10,9 +11,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands2.ParentCommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -160,11 +159,13 @@ public class ServerPromote implements ParentCommand {
     }
 
     @Override
-    public void register(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getName(), "Promotes Authorised User On Any Async Server")
-                .addOptions(new OptionData(OptionType.STRING, Constants.PROMOTE_TARGET, "Target Server").setRequired(true).setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.PROMOTE_RANK, "Rank").setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.PROMOTE_DEMOTE, "Demote").setAutoComplete(true)));
+    public List<OptionData> getOptions() {
+        return List.of(
+            new OptionData(OptionType.STRING, Constants.PROMOTE_TARGET, "Target Server")
+                .setRequired(true).setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.PROMOTE_RANK, "Rank")
+                .setAutoComplete(true),
+             new OptionData(OptionType.BOOLEAN, Constants.PROMOTE_DEMOTE, "Demote")
+                 .setAutoComplete(true));
     }
 }

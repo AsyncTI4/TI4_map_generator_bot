@@ -29,7 +29,6 @@ import ti4.commands.game.StartPhase;
 import ti4.commands.game.Swap;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.helpers.ActionCardHelper;
@@ -46,6 +45,7 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CombatTempModHelper;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -2031,7 +2031,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         String color = player.getColor();
         if (Mapper.isValidColor(color)) {
-            AddCC.addCC(event, color, tile);
+            CommandCounterHelper.addCC(event, color, tile);
         }
         String message = player.getFactionEmojiOrColor() + " Placed 1 CC from reinforcements in the " + Helper.getPlanetRepresentation(planet, game) + " system";
         ButtonHelper.sendMessageToRightStratThread(player, game, message, "construction");
@@ -2058,7 +2058,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
 
         if (Mapper.isValidColor(color)) {
-            AddCC.addCC(event, color, tile);
+            CommandCounterHelper.addCC(event, color, tile);
         }
         String message = player.getRepresentation() + " Placed 1 " + StringUtils.capitalize(color) + " CC In The "
             + Helper.getPlanetRepresentation(planet, game)
@@ -2238,7 +2238,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         if (!game.isNaaluAgent()) {
             player.setTacticalCC(player.getTacticalCC() - 1);
-            AddCC.addCC(event, player.getColor(),
+            CommandCounterHelper.addCC(event, player.getColor(),
                 game.getTileByPosition(game.getActiveSystem()));
             game.setStoredValue("vaylerianHeroActive", "true");
         }

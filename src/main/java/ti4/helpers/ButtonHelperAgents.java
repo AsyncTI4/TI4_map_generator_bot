@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.planet.PlanetExhaustAbility;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
@@ -1209,7 +1208,7 @@ public class ButtonHelperAgents {
         List<String> adjTiles = new ArrayList<>(FoWHelper.getAdjacentTiles(game, origTile.getPosition(), player, false));
         for (String posTile : adjTiles) {
             Tile adjTile = game.getTileByPosition(posTile);
-            if (adjTile != null && doesTileHaveAStructureInIt(player, adjTile) && !AddCC.hasCC(player, adjTile)) {
+            if (adjTile != null && doesTileHaveAStructureInIt(player, adjTile) && !CommandCounterHelper.hasCC(player, adjTile)) {
                 tiles.add(adjTile);
             }
         }
@@ -1427,7 +1426,7 @@ public class ButtonHelperAgents {
     public static void resolveCheiranAgentStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile origTile = game.getTileByPosition(pos);
-        AddCC.addCC(event, player.getColor(), origTile, true);
+        CommandCounterHelper.addCC(event, player.getColor(), origTile, true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " placed 1 CC in "
                 + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras, the Cheiran"
@@ -1438,7 +1437,7 @@ public class ButtonHelperAgents {
     public static List<Tile> getCheiranAgentTiles(Player player, Game game) {
         List<Tile> tiles = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (AddCC.hasCC(player, tile)) {
+            if (CommandCounterHelper.hasCC(player, tile)) {
                 if (!getAdjacentTilesWithStructuresInThemAndNoCC(player, game, tile).isEmpty()) {
                     tiles.add(tile);
                 }
@@ -1732,7 +1731,7 @@ public class ButtonHelperAgents {
             + " use buttons to select the system you want to move ships from";
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (FoWHelper.playerHasShipsInSystem(player, tile) && !AddCC.hasCC(player, tile)) {
+            if (FoWHelper.playerHasShipsInSystem(player, tile) && !CommandCounterHelper.hasCC(player, tile)) {
                 buttons.add(Buttons.green("fogAllianceAgentStep2_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
             }

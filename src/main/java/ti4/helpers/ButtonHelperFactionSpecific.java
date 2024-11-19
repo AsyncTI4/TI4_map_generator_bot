@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.commands.game.StartPhase;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.helpers.DiceHelper.Die;
@@ -188,7 +187,7 @@ public class ButtonHelperFactionSpecific {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String pos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
-        AddCC.addCC(event, p2.getColor(), tile);
+        CommandCounterHelper.addCC(event, p2.getColor(), tile);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " you placed " + p2.getFactionEmojiOrColor()
@@ -423,7 +422,7 @@ public class ButtonHelperFactionSpecific {
             && !game.playerHasLeaderUnlockedOrAlliance(player, "rohdhnacommander")) {
             String color = player.getColor();
             if (Mapper.isValidColor(color)) {
-                AddCC.addCC(event, color, tile);
+                CommandCounterHelper.addCC(event, color, tile);
             }
             ButtonHelper.sendMessageToRightStratThread(player, game,
                 player.getFactionEmoji() + " Placed 1 CC from reinforcements in the "
@@ -452,7 +451,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (!tile.getPosition().equalsIgnoreCase(game.getActiveSystem()) && !tile.isHomeSystem()
-                && !AddCC.hasCC(event, activePlayer.getColor(), tile)) {
+                && !CommandCounterHelper.hasCC(event, activePlayer.getColor(), tile)) {
                 buttons.add(Buttons.green("stymiePlayerStep2_" + activePlayer.getFaction() + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
             }
@@ -467,7 +466,7 @@ public class ButtonHelperFactionSpecific {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String pos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
-        AddCC.addCC(event, p2.getColor(), tile);
+        CommandCounterHelper.addCC(event, p2.getColor(), tile);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " you stymied the tile: "

@@ -9,9 +9,7 @@ import java.util.StringTokenizer;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -25,8 +23,20 @@ import ti4.service.PlanetService;
 public class RemoveToken extends AddRemoveToken {
 
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
+    public List<OptionData> getOptions() {
+        return List.of(
+                new OptionData(OptionType.STRING, Constants.TOKEN, "Token name")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.PLANET, "Planet name")
+                        .setAutoComplete(true));
+    }
 
+    @Override
+    void doAction(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
         OptionMapping option = event.getOption(Constants.TOKEN);
         if (option != null) {
             String tokenName = option.getAsString().toLowerCase();
@@ -99,23 +109,12 @@ public class RemoveToken extends AddRemoveToken {
     }
 
     @Override
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Remove token from tile/planet";
     }
 
     @Override
     public String getName() {
         return Constants.REMOVE_TOKEN;
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public void register(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getName(), getActionDescription())
-                .addOptions(new OptionData(OptionType.STRING, Constants.TOKEN, "Token name").setRequired(true).setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))
-        );
     }
 }

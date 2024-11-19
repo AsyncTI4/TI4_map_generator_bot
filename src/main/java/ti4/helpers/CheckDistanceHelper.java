@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.experimental.UtilityClass;
-import ti4.commands.tokens.AddCC;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -28,7 +27,7 @@ public class CheckDistanceHelper {
         Map<String, Integer> distances = new HashMap<>();
         List<Tile> originTiles = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (!AddCC.hasCC(player, tile) && FoWHelper.playerHasUnitsInSystem(player, tile)) {
+            if (!CommandCounterHelper.hasCC(player, tile) && FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 distances.put(tile.getPosition(), 0);
                 originTiles.add(tile);
             }
@@ -36,7 +35,7 @@ public class CheckDistanceHelper {
         for (Tile tile : originTiles) {
             Map<String, Integer> someDistances = getTileDistances(game, player, tile.getPosition(), 15, true);
             for (String tilePos : someDistances.keySet()) {
-                if (AddCC.hasCC(player, game.getTileByPosition(tilePos))) {
+                if (CommandCounterHelper.hasCC(player, game.getTileByPosition(tilePos))) {
                     continue;
                 }
                 if (distances.get(tilePos) == null && someDistances.get(tilePos) != null) {

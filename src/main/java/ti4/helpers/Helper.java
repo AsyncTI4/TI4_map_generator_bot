@@ -48,7 +48,6 @@ import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.game.SetOrder;
-import ti4.commands.tokens.AddCC;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -995,7 +994,7 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, game);
         for (Tile tile : tiles) {
-            if (AddCC.hasCC(event, player.getColor(), tile)) {
+            if (CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
                 Button button = Buttons.red(
                     "FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player));
@@ -1958,7 +1957,7 @@ public class Helper {
         Map<String, Tile> tileMap = game.getTileMap();
         for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
             Tile tile = tileEntry.getValue();
-            boolean hasCC = AddCC.hasCC(null, color, tile);
+            boolean hasCC = CommandCounterHelper.hasCC(null, color, tile);
             if (hasCC) {
                 ccCount++;
             }

@@ -54,7 +54,6 @@ import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
@@ -954,7 +953,7 @@ public class ButtonHelper {
                 }
             }
 
-            if (AddCC.hasCC(nonActivePlayer, activeSystem)) {
+            if (CommandCounterHelper.hasCC(nonActivePlayer, activeSystem)) {
                 if (nonActivePlayer.getActionCards().containsKey("counterstroke")
                     && !isPlayerElected(game, player, "censure")
                     && !isPlayerElected(game, player, "absol_censure")) {
@@ -1920,7 +1919,7 @@ public class ButtonHelper {
     public static List<Tile> getTilesWithYourCC(Player player, Game game, GenericInteractionCreateEvent event) {
         List<Tile> tilesWithCC = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-            if (AddCC.hasCC(event, player.getColor(), tileEntry.getValue())) {
+            if (CommandCounterHelper.hasCC(event, player.getColor(), tileEntry.getValue())) {
                 Tile tile = tileEntry.getValue();
                 tilesWithCC.add(tile);
             }
@@ -1985,7 +1984,7 @@ public class ButtonHelper {
                 target.setTacticalCC(target.getTacticalCC() + 1);
             }
             target.setTacticalCC(target.getTacticalCC() - 1);
-            AddCC.addCC(event, target.getColor(), tile);
+            CommandCounterHelper.addCC(event, target.getColor(), tile);
 
         }
 
@@ -2025,7 +2024,7 @@ public class ButtonHelper {
                 target.setTacticalCC(target.getTacticalCC() + 1);
             }
             target.setTacticalCC(target.getTacticalCC() - 1);
-            AddCC.addCC(event, target.getColor(), tile);
+            CommandCounterHelper.addCC(event, target.getColor(), tile);
         }
         MessageHelper.sendMessageToChannel(mahact.getCorrectChannel(),
             mahact.getRepresentationUnfogged() + " you have spent a strategy CC");
@@ -2069,12 +2068,12 @@ public class ButtonHelper {
         }
 
         if (!game.isNaaluAgent()) {
-            if (!AddCC.hasCC(target, tile)) {
+            if (!CommandCounterHelper.hasCC(target, tile)) {
                 if (!game.getStoredValue("absolLux").isEmpty()) {
                     target.setTacticalCC(target.getTacticalCC() + 1);
                 }
                 target.setTacticalCC(target.getTacticalCC() - 1);
-                AddCC.addCC(event, target.getColor(), tile);
+                CommandCounterHelper.addCC(event, target.getColor(), tile);
             }
         }
         MessageHelper.sendMessageToChannel(minister.getCorrectChannel(), minister.getRepresentationUnfogged() + " you have used the Minister of Peace agenda");
@@ -3139,13 +3138,13 @@ public class ButtonHelper {
         if (centerTile != null) {
             Button rex = Buttons.green(finChecker + "ringTile_000",
                 centerTile.getRepresentationForButtons(game, player));
-            if (!AddCC.hasCC(player, centerTile)) {
+            if (!CommandCounterHelper.hasCC(player, centerTile)) {
                 ringButtons.add(rex);
             }
         }
         int rings = game.getRingCount();
         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
-            if (AddCC.hasCC(player, tile)) {
+            if (CommandCounterHelper.hasCC(player, tile)) {
                 continue;
             }
             ringButtons.add(Buttons.green(finChecker + "ringTile_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)).withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
@@ -3169,7 +3168,7 @@ public class ButtonHelper {
             List<String> cornerPositions = List.of("tl", "tr", "bl", "br");
             for (String pos : cornerPositions) {
                 Tile t = game.getTileByPosition(pos);
-                if (t != null && !AddCC.hasCC(event, player.getColor(), t)
+                if (t != null && !CommandCounterHelper.hasCC(event, player.getColor(), t)
                     && (!game.isNaaluAgent() || !t.isHomeSystem())) {
                     Button corners = Buttons.green(finChecker + "ringTile_" + pos,
                         t.getRepresentationForButtons(game, player));
@@ -3191,7 +3190,7 @@ public class ButtonHelper {
                         String pos = ringN + "" + x;
                         Tile tile = game.getTileByPosition(pos);
                         if (tile != null && !tile.getRepresentationForButtons(game, player).contains("Hyperlane")
-                            && !AddCC.hasCC(event, player.getColor(), tile)
+                            && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
                             && (!game.isNaaluAgent() || !tile.isHomeSystem()
                                 || "17".equalsIgnoreCase(tile.getTileID()))) {
                             Button corners = Buttons.green(finChecker + "ringTile_" + pos,
@@ -3202,7 +3201,7 @@ public class ButtonHelper {
                     String pos = ringN + "01";
                     Tile tile = game.getTileByPosition(pos);
                     if (tile != null && !tile.getRepresentationForButtons(game, player).contains("Hyperlane")
-                        && !AddCC.hasCC(event, player.getColor(), tile)
+                        && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
                         && (!game.isNaaluAgent() || !tile.isHomeSystem()
                             || "17".equalsIgnoreCase(tile.getTileID()))) {
                         Button corners = Buttons.green(finChecker + "ringTile_" + pos,
@@ -3217,7 +3216,7 @@ public class ButtonHelper {
                         }
                         Tile tile = game.getTileByPosition(pos);
                         if (tile != null && !tile.getRepresentationForButtons(game, player).contains("Hyperlane")
-                            && !AddCC.hasCC(event, player.getColor(), tile)
+                            && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
                             && (!game.isNaaluAgent() || !tile.isHomeSystem())) {
                             Button corners = Buttons.green(finChecker + "ringTile_" + pos,
                                 tile.getRepresentationForButtons(game, player));
@@ -3234,7 +3233,7 @@ public class ButtonHelper {
                         }
                         Tile tile = game.getTileByPosition(pos);
                         if (tile != null && !tile.getRepresentationForButtons(game, player).contains("Hyperlane")
-                            && !AddCC.hasCC(event, player.getColor(), tile)
+                            && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
                             && (!game.isNaaluAgent() || !tile.isHomeSystem())) {
                             Button corners = Buttons.green(finChecker + "ringTile_" + pos,
                                 tile.getRepresentationForButtons(game, player));
@@ -3654,7 +3653,7 @@ public class ButtonHelper {
     public static void resolveEmpyCommanderCheck(Player player, Game game, Tile tile,
         GenericInteractionCreateEvent event) {
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 != player && AddCC.hasCC(event, p2.getColor(), tile)
+            if (p2 != player && CommandCounterHelper.hasCC(event, p2.getColor(), tile)
                 && game.playerHasLeaderUnlockedOrAlliance(p2, "empyreancommander")) {
                 MessageChannel channel = game.getMainGameChannel();
                 if (game.isFowMode()) {
@@ -3823,7 +3822,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tileEntry.getValue())
-                && (!AddCC.hasCC(event, player.getColor(), tileEntry.getValue())
+                && (!CommandCounterHelper.hasCC(event, player.getColor(), tileEntry.getValue())
                     || nomadHeroAndDomOrbCheck(player, game, tileEntry.getValue()))) {
                 Tile tile = tileEntry.getValue();
                 Button validTile = Buttons.green(finChecker + "tacticalMoveFrom_" + tileEntry.getKey(), tile.getRepresentationForButtons(game, player));
@@ -3917,7 +3916,7 @@ public class ButtonHelper {
             return buttons;
         }
 
-        if (!game.isNaaluAgent() && !game.isL1Hero() && !AddCC.hasCC(event, player.getColor(), tile)
+        if (!game.isNaaluAgent() && !game.isL1Hero() && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
             && game.getStoredValue("vaylerianHeroActive").isEmpty()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 player.setTacticalCC(player.getTacticalCC() + 1);
@@ -3925,7 +3924,7 @@ public class ButtonHelper {
             int cc = player.getTacticalCC();
             cc -= 1;
             player.setTacticalCC(cc);
-            AddCC.addCC(event, player.getColor(), tile, true);
+            CommandCounterHelper.addCC(event, player.getColor(), tile, true);
         }
         String thingToAdd = "box";
         for (String unit : displacedUnits.keySet()) {
@@ -6311,11 +6310,11 @@ public class ButtonHelper {
                 return;
             }
             Tile tile = game.getTileByPosition(planet);
-            AddCC.addCC(event, color2, tile);
+            CommandCounterHelper.addCC(event, color2, tile);
             Helper.isCCCountCorrect(event, game, color2);
             for (String color : mahactP.getMahactCC()) {
                 if (Mapper.isValidColor(color) && !color.equalsIgnoreCase(player.getColor())) {
-                    AddCC.addCC(event, color, tile);
+                    CommandCounterHelper.addCC(event, color, tile);
                     Helper.isCCCountCorrect(event, game, color);
                 }
             }

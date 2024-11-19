@@ -7,32 +7,37 @@ import java.util.StringTokenizer;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateCommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-import ti4.service.ShowGameService;
 
-abstract public class AddRemoveToken implements Command {
+abstract class AddRemoveToken extends GameStateCommand {
+
+    public AddRemoveToken() {
+        super(true, true);
+    }
+
+    @Override
+    public List<OptionData> getOptions() {
+        return List.of(
+                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.PLANET, "Planet name")
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
+                        .setAutoComplete(true));
+    }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        if (!GameManager.isUserWithActiveGame(userID)) {
-            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
-            return;
-        }
-
         String tileOptions = event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString);
         if (tileOptions == null) {
             MessageHelper.replyToMessage(event, "Tile needs to be specified.");
@@ -41,7 +46,7 @@ abstract public class AddRemoveToken implements Command {
 
         OptionMapping factionOrColour = event.getOption(Constants.FACTION_COLOR);
         List<String> colors = new ArrayList<>();
-        Game game = GameManager.getUserActiveGame(userID);
+        Game game = getGame();
         if (factionOrColour != null) {
             String colorString = factionOrColour.getAsString().toLowerCase();
             colorString = colorString.replace(" ", "");
@@ -57,10 +62,8 @@ abstract public class AddRemoveToken implements Command {
                 }
             }
         } else {
-            Player player = CommandHelper.getPlayerFromEvent(game, event);
-            if (player != null) {
-                colors.add(player.getColor());
-            }
+            Player player = getPlayer();
+            colors.add(player.getColor());
         }
 
         List<Tile> tiles = new ArrayList<>();
@@ -85,22 +88,9 @@ abstract public class AddRemoveToken implements Command {
         }
 
         for (Tile tile : tiles) {
-            parsingForTile(event, colors, tile, game);
+            doAction(event, colors, tile, game);
         }
-        GameSaveLoadManager.saveGame(game, event);
-        ShowGameService.simpleShowGame(game, event);
     }
 
-    abstract void parsingForTile(SlashCommandInteractionEvent event, List<String> color, Tile tile, Game game);
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public void register(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getName(), getActionDescription())
-                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true)));
-    }
-
-    abstract protected String getActionDescription();
+    abstract void doAction(SlashCommandInteractionEvent event, List<String> color, Tile tile, Game game);
 }

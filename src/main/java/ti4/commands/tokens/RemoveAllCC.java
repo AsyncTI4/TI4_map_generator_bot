@@ -1,53 +1,49 @@
 package ti4.commands.tokens;
 
 import java.util.Collection;
+import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands2.GameStateCommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
-import ti4.message.MessageHelper;
-import ti4.service.ShowGameService;
 
-public class RemoveAllCC implements Command {
+public class RemoveAllCC extends GameStateCommand {
 
-    void parsingForTile(Game game) {
-        Collection<Tile> tileList = game.getTileMap().values();
-        for (Tile tile : tileList) {
-            tile.removeAllCC();
-        }
+    public RemoveAllCC() {
+        super(true, false);
     }
 
+    @Override
+    public List<OptionData> getOptions() {
+        return List.of(
+                new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
+                        .setRequired(true));
+    }
+
+    @Override
     public String getName() {
         return Constants.REMOVE_ALL_CC;
     }
 
     @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        if (!GameManager.isUserWithActiveGame(userID)) {
-            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
-        } else {
-            Game game = GameManager.getUserActiveGame(userID);
-            parsingForTile(game);
-            GameSaveLoadManager.saveGame(game, event);
-            ShowGameService.simpleShowGame(game, event);
-        }
+    public String getDescription() {
+        return "Remove all CCs.";
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void register(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getName(), "Remove all CCs from entire map")
-                .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
-                    .setRequired(true)));
+    public void execute(SlashCommandInteractionEvent event) {
+        Game game = getGame();
+        parsingForTile(game);
+    }
+
+    private void parsingForTile(Game game) {
+        Collection<Tile> tileList = game.getTileMap().values();
+        for (Tile tile : tileList) {
+            tile.removeAllCC();
+        }
     }
 }

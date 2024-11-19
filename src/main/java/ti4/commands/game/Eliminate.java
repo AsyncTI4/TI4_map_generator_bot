@@ -13,14 +13,14 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
-import ti4.image.Mapper;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GameCreationHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -112,7 +112,7 @@ public class Eliminate extends AddRemovePlayer {
                 //Remove all of the players units and ccs from the board
                 for (Tile tile : game.getTileMap().values()) {
                     tile.removeAllUnits(player.getColor());
-                    if (!"null".equalsIgnoreCase(player.getColor()) && AddCC.hasCC(event, player.getColor(), tile)) {
+                    if (!"null".equalsIgnoreCase(player.getColor()) && CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
                         RemoveCC.removeCC(event, player.getColor(), tile, game);
                     }
                 }
