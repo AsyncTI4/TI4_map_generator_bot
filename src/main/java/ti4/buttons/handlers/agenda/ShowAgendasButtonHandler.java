@@ -7,7 +7,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.tech.TechShowDeck;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.RelicHelper;
@@ -18,6 +17,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.decks.ShowActionCardsService;
 import ti4.service.explore.ExploreService;
+import ti4.service.tech.ShowTechDeckService;
 
 import static ti4.helpers.ButtonHelper.deleteMessage;
 
@@ -32,7 +32,7 @@ class ShowAgendasButtonHandler {
             case "agenda" -> AgendaHelper.showDiscards(game, event);
             case "relic" -> RelicHelper.showRemaining(event, false, game, player);
             case "unscoredSO" -> SecretObjectiveHelper.showUnscored(game, event);
-            case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC, Constants.UNIT_UPGRADE -> TechShowDeck.displayTechDeck(game, event, deck);
+            case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC, Constants.UNIT_UPGRADE -> ShowTechDeckService.displayTechDeck(game, event, deck);
             case Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER, "all" -> {
                 List<String> types = new ArrayList<>();
                 String msg = "You may click this button to get the full text.";

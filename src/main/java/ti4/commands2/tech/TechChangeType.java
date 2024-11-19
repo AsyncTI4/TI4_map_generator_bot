@@ -1,4 +1,4 @@
-package ti4.commands.tech;
+package ti4.commands2.tech;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +15,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 
-public class TechChangeType extends GameStateSubcommand {
+class TechChangeType extends GameStateSubcommand {
 
     public TechChangeType() {
         super(Constants.CHANGE_TYPE, "Change what color a tech displays as", true, false);

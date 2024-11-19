@@ -1,4 +1,4 @@
-package ti4.commands.tech;
+package ti4.commands2.tech;
 
 import java.util.Map;
 import java.util.stream.Collectors;
