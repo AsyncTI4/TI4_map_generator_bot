@@ -9,7 +9,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.service.info.CardsInfoService;
 
-class CardsInfo extends GameStateCommand {
+public class CardsInfo extends GameStateCommand {
 
     public CardsInfo() {
         super(false, true);
