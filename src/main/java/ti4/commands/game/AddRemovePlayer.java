@@ -34,26 +34,26 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
         User callerUser = event.getUser();
         String mapName;
         if (gameOption != null) {
-            mapName = event.getOptions().get(0).getAsString();
-            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
+            mapName = event.getOptions().getFirst().getAsString();
+            if (!GameManager.getGameNameToGame().containsKey(mapName)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exist, use `/help list_games`");
                 return;
             }
         } else {
-            Game userActiveGame = GameManager.getInstance().getUserActiveGame(callerUser.getId());
+            Game userActiveGame = GameManager.getUserActiveGame(callerUser.getId());
             if (userActiveGame == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Specify game or set active Game");
                 return;
             }
             mapName = userActiveGame.getName();
         }
-        GameManager gameManager = GameManager.getInstance();
-        Game game = gameManager.getGame(mapName);
+
+        Game game = GameManager.getGame(mapName);
 
         User user = event.getUser();
         action(event, game, user);
         Helper.fixGameChannelPermissions(event.getGuild(), game);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         MessageHelper.replyToMessage(event, getResponseMessage(game, user));
     }
 

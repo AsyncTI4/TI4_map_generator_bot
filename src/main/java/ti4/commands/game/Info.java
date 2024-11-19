@@ -10,10 +10,12 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.users.UserSettingsManager;
 
 public class Info extends GameSubcommandData {
     public static final String NEW_LINE = "\n";
@@ -25,7 +27,6 @@ public class Info extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        GameManager gameManager = GameManager.getInstance();
         Game game = getActiveGame();
         if (game == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game not found.");
@@ -34,7 +35,7 @@ public class Info extends GameSubcommandData {
 
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
         if (gameNameOption != null && !game.getName().equalsIgnoreCase(gameNameOption.getAsString().toLowerCase())) {
-            game = gameManager.getGame(gameNameOption.getAsString().toLowerCase());
+            game = GameManager.getGame(gameNameOption.getAsString().toLowerCase());
         }
 
         StringBuilder sb = getGameInfo(game, event);
@@ -59,9 +60,33 @@ public class Info extends GameSubcommandData {
         sb.append("SO Count: ").append(game.getMaxSOCountPerPlayer()).append(NEW_LINE);
         sb.append("Private Game: ").append(privateGame).append(NEW_LINE);
         sb.append("Game Modes: ").append(game.getGameModesText()).append(NEW_LINE);
+        if (game.isCompetitiveTIGLGame()) {
+            // Game Rank
+            sb.append("TIGL Rank of Game: **");
+            TIGLRank rank = game.getMinimumTIGLRankAtGameStart();
+            if (rank == null) {
+                sb.append(" Unknown Rank");
+            } else {
+                sb.append(game.getMinimumTIGLRankAtGameStart().getName()).append("**");
+            }
+            sb.append("\n");
+
+            // Player Rank
+            sb.append("TIGL Ranks at Start of Game:\n");
+            for (Player player : game.getPlayers().values()) {
+                rank = player.getPlayerTIGLRankAtGameStart();
+                sb.append("> ").append(player.getRepresentationNoPing());
+                if (rank == null) {
+                    sb.append(" Unknown Rank");
+                } else {
+                    sb.append(" **").append(rank.getName()).append("**");
+                }
+                sb.append("\n");
+            }
+        }
         sb.append("Map Template: `").append(game.getMapTemplateID()).append("`").append(NEW_LINE);
         if (!privateGame || game.isHasEnded()) {
-            sb.append("Map String: `").append(Helper.getMapString(game)).append("`").append(NEW_LINE);
+            sb.append("Map String: `").append(game.getMapString()).append("`").append(NEW_LINE);
         } else {
             sb.append("Map String: Cannot show map string for private games").append(NEW_LINE);
         }
@@ -70,10 +95,12 @@ public class Info extends GameSubcommandData {
         sb.append("Decks: ").append(NEW_LINE);
         sb.append("- ").append(Emojis.ActionCard).append("Action Card Deck: `").append(game.getAcDeckID()).append("` ").append(game.getActionCardDeckSize()).append("/").append(game.getActionCardFullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.SecretObjective).append("Secret Objective Deck: `").append(game.getSoDeckID()).append("` ").append(game.getSecretObjectiveDeckSize()).append("/").append(game.getSecretObjectiveFullDeckSize()).append(NEW_LINE);
-        sb.append("- ").append(Emojis.Public1).append("Stage 1 Public Objective Deck: `").append(game.getStage1PublicDeckID()).append("` ").append(game.getPublicObjectives1DeckSize()).append("/").append(game.getPublicObjectives1FullDeckSize()).append(NEW_LINE);
-        sb.append("- ").append(Emojis.Public2).append("Stage 2 Public Objective Deck: `").append(game.getStage2PublicDeckID()).append("` ").append(game.getPublicObjectives2DeckSize()).append("/").append(game.getPublicObjectives2FullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.Public1).append("Stage 1 Public Objective Deck: `").append(game.getStage1PublicDeckID()).append("` ").append(game.getPublicObjectives1DeckSize()).append("/").append(game.getPublicObjectives1FullDeckSize());
+        sb.append(" (+").append(game.getPublicObjectives1Peakable().size()).append(" are staged/peekable)\n");
+        sb.append("- ").append(Emojis.Public2).append("Stage 2 Public Objective Deck: `").append(game.getStage2PublicDeckID()).append("` ").append(game.getPublicObjectives2DeckSize()).append("/").append(game.getPublicObjectives2FullDeckSize());
+        sb.append(" (+").append(game.getPublicObjectives2Peakable().size()).append(" are staged/peekable)\n");
         sb.append("- ").append(Emojis.Agenda).append("Agenda Deck: `").append(game.getAgendaDeckID()).append("` ").append(game.getAgendaDeckSize()).append("/").append(game.getAgendaFullDeckSize()).append(NEW_LINE);
-        if (game.getEventDeckID() != null && !"null".equals(game.getEventDeckID())) {
+        if (game.getEventDeckID() != null && !"null".equals(game.getEventDeckID()) && !game.getEventDeckID().isEmpty()) {
             sb.append("- ").append("Event Deck: `").append(game.getEventDeckID()).append("` ").append(game.getEventDeckSize()).append("/").append(game.getEventFullDeckSize()).append(NEW_LINE);
         }
         sb.append("- ").append(Emojis.NonUnitTechSkip).append("Technology Deck: `").append(game.getTechnologyDeckID()).append("`").append(NEW_LINE);
@@ -86,17 +113,26 @@ public class Info extends GameSubcommandData {
 
         sb.append("### Settings: ").append(NEW_LINE);
         sb.append("Beta Test Mode: ").append(game.isTestBetaFeaturesMode()).append(NEW_LINE);
-        sb.append("Auto-Ping Time Interval (hrs): ").append(game.getAutoPingSpacer()).append(NEW_LINE);
+        sb.append("Game Auto-Ping Time Interval (hrs): ").append(game.getAutoPingSpacer()).append(NEW_LINE);
+        sb.append("Player's Auto-Ping Time Interval (hrs):\n");
+        for (Player player : game.getRealPlayers()) {
+            String interval = String.valueOf(UserSettingsManager.get(player.getUserID()).getPersonalPingInterval());
+            if ("0".equals(interval)) {
+                interval = "Off";
+            }
+            sb.append("> ").append(player.getFactionEmojiOrColor()).append(": `").append(interval).append("`\n");
+        }
         sb.append("Text Size: ").append(game.getTextSize()).append(NEW_LINE);
         sb.append("Full Text Output: ").append(game.isShowFullComponentTextEmbeds()).append(NEW_LINE);
         sb.append("Output Verbosity: ").append(game.getOutputVerbosity()).append(NEW_LINE);
         if (game.getTableTalkChannel() != null) sb.append("Table Talk Channel: ").append(game.getTableTalkChannel().getAsMention()).append(NEW_LINE);
         if (game.getActionsChannel() != null) sb.append("Actions Channel: ").append(game.getActionsChannel().getAsMention()).append(NEW_LINE);
         if (game.getBotMapUpdatesThread() != null) sb.append("Bot Map Thread: ").append(game.getBotMapUpdatesThread().getAsMention()).append(NEW_LINE);
+        if (game.getLaunchPostThread() != null) sb.append("Launch Post Thread: ").append(game.getLaunchPostThread().getAsMention()).append(NEW_LINE);
         if (game.isFowMode()) {
             sb.append("FoW Options:");
             for (Map.Entry<String, String> entry : game.getFowOptions().entrySet()) {
-                sb.append(" " + entry.getKey() + ":" + entry.getValue());
+                sb.append(" ").append(entry.getKey()).append(":").append(entry.getValue());
             }
             sb.append(NEW_LINE);
         }
@@ -125,6 +161,7 @@ public class Info extends GameSubcommandData {
         sb.append("Current Phase: ").append(game.getPhaseOfGame()).append(NEW_LINE);
         sb.append("Game Player Count: ").append(game.getPlayerCountForMap()).append(NEW_LINE);
         sb.append("Game Real Player Count: ").append(game.getRealPlayers().size()).append(NEW_LINE);
+        sb.append("GMIDs: `").append(game.getFogOfWarGMIDs()).append("`\n");
         sb.append("SCs per player: ").append(game.getStrategyCardsPerPlayer()).append(NEW_LINE);
         sb.append("Map Images Generated: ").append(game.getMapImageGenerationCount()).append(NEW_LINE);
         sb.append("SC Trade Goods: `").append(game.getScTradeGoods()).append("`").append(NEW_LINE);

@@ -17,17 +17,18 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands.combat.StartCombat;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.uncategorized.ShowGame;
-import ti4.generator.Mapper;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -35,27 +36,26 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.ShowGameService;
+import ti4.service.combat.StartCombatService;
 
 abstract public class AddRemoveUnits implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
-        Game game = gameManager.getUserActiveGame(userID);
-        Player player = game.getPlayer(userID);
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
+        Game game = GameManager.getUserActiveGame(userID);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
+        // if (player == null) {
+        //     MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+        //     return;
+        // }
 
-        String color = Helper.getColor(game, event);
+        String color = CommandHelper.getColor(game, event);
         if (!Mapper.isValidColor(color)) {
             MessageHelper.replyToMessage(event, "Color/Faction not valid");
             return;
@@ -77,50 +77,33 @@ abstract public class AddRemoveUnits implements Command {
         }
         new AddUnits().actionAfterAll(event, tile, color, game);
 
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
 
         boolean generateMap = !event.getOption(Constants.NO_MAPGEN, false, OptionMapping::getAsBoolean);
         if (generateMap) {
-            ShowGame.simpleShowGame(game, event);
+            ShowGameService.simpleShowGame(game, event);
         } else {
             MessageHelper.replyToMessage(event, "Map update completed");
         }
     }
 
     public Tile getTileObject(SlashCommandInteractionEvent event, String tileID, Game game) {
-        return getTile(event, tileID, game);
-    }
-
-    public static Tile getTile(SlashCommandInteractionEvent event, String tileID, Game game) {
-        if (game.isTileDuplicated(tileID)) {
-            MessageHelper.replyToMessage(event, "Duplicate tile name `" + tileID + "` found, please use position coordinates");
-            return null;
-        }
-        Tile tile = game.getTile(tileID);
-        if (tile == null) {
-            tile = game.getTileByPosition(tileID);
-        }
-        if (tile == null) {
-            MessageHelper.replyToMessage(event, "Tile in map not found: " + tileID);
-            return null;
-        }
-        return tile;
+        return TileHelper.getTile(event, tileID, game);
     }
 
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game game) {
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
 
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
+        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains(Constants.dicecordId)) {
             game.setupNeutralPlayer(color);
         }
 
         unitParsing(event, color, tile, unitList, game);
     }
 
-    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList,
-        Game game) {
+    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Game game) {
 
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
+        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains(Constants.dicecordId)) {
             game.setupNeutralPlayer(color);
         }
 
@@ -130,8 +113,10 @@ abstract public class AddRemoveUnits implements Command {
 
     public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game game) {
         unitList = unitList.replace(", ", ",").replace("-", "").replace("'", "").toLowerCase();
-
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
+        if (!Mapper.isValidColor(color)) {
+            return;
+        }
+        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains(Constants.dicecordId)) {
             game.setupNeutralPlayer(color);
         }
 
@@ -175,7 +160,6 @@ abstract public class AddRemoveUnits implements Command {
             color = recheckColorForUnit(resolvedUnit, color, event);
 
             UnitKey unitID = Mapper.getUnitKey(resolvedUnit, color);
-            String unitPath = Tile.getUnitPath(unitID);
 
             // RESOLVE PLANET NAME
             String originalPlanetName = "";
@@ -193,7 +177,7 @@ abstract public class AddRemoveUnits implements Command {
             planetName = getPlanet(event, tile, planetName);
 
             boolean isValidCount = count > 0;
-            boolean isValidUnit = unitPath != null;
+            boolean isValidUnit = unitID != null;
             boolean isValidUnitHolder = Constants.SPACE.equals(planetName) || tile.isSpaceHolderValid(planetName);
             if (event instanceof SlashCommandInteractionEvent
                 && (!isValidCount || !isValidUnit || !isValidUnitHolder)) {
@@ -249,7 +233,7 @@ abstract public class AddRemoveUnits implements Command {
                 // players)]
                 Player player1 = game.getActivePlayer();
                 if (player1 == null)
-                    player1 = playersForCombat.get(0);
+                    player1 = playersForCombat.getFirst();
                 playersForCombat.remove(player1);
                 Player player2 = player1;
                 for (Player p2 : playersForCombat) {
@@ -258,11 +242,11 @@ abstract public class AddRemoveUnits implements Command {
                         break;
                     }
                 }
-                if (player1 != player2 && !tile.getPosition().equalsIgnoreCase("nombox")) {
+                if (player1 != player2 && !tile.getPosition().equalsIgnoreCase("nombox") && !player1.getAllianceMembers().contains(player2.getFaction())) {
                     if ("ground".equals(combatType)) {
-                        StartCombat.startGroundCombat(player1, player2, game, event, tile.getUnitHolderFromPlanet(planetName), tile);
+                        StartCombatService.startGroundCombat(player1, player2, game, event, tile.getUnitHolderFromPlanet(planetName), tile);
                     } else {
-                        StartCombat.startSpaceCombat(game, player1, player2, tile, event);
+                        StartCombatService.startSpaceCombat(game, player1, player2, tile, event);
                     }
                 }
             }
@@ -302,20 +286,14 @@ abstract public class AddRemoveUnits implements Command {
                 return;
             }
             ButtonHelper.checkFleetAndCapacity(player, game, tile, event);
-            if (player.getLeaderIDs().contains("naalucommander") && !player.hasLeaderUnlocked("naalucommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "naalu", event);
-            }
-            if (player.getLeaderIDs().contains("cabalcommander") && !player.hasLeaderUnlocked("cabalcommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "cabal", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, "naalu", "cabal");
         }
     }
 
     public static void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName, Game game) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
         if (game == null) {
-            game = gameManager.getUserActiveGame(userID);
+            game = GameManager.getUserActiveGame(userID);
         }
         // Map activeMap = mapManager.getUserActiveMap(userID);
         if (!Constants.SPACE.equals(planetName)) {
@@ -325,7 +303,9 @@ abstract public class AddRemoveUnits implements Command {
                 Set<String> unitColors = new HashSet<>();
                 for (UnitKey unit_ : allUnitsOnPlanet) {
                     String unitColor = unit_.getColorID();
-                    unitColors.add(unitColor);
+                    if (unit_.getUnitType() != UnitType.Fighter) {
+                        unitColors.add(unitColor);
+                    }
                 }
 
                 if (unitColors.size() == 1) {
@@ -350,7 +330,7 @@ abstract public class AddRemoveUnits implements Command {
         if (tile.isSpaceHolderValid(planetName))
             return planetName;
         return tile.getUnitHolders().keySet().stream()
-            .filter(id -> !Constants.SPACE.equals(planetName))
+            .filter(id -> !Constants.SPACE.equals(id))
             .filter(unitHolderID -> unitHolderID.startsWith(planetName))
             .findFirst().orElse(planetName);
     }
@@ -369,17 +349,12 @@ abstract public class AddRemoveUnits implements Command {
         // do nothing, overriden by child classes
     }
 
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
-    }
-
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                     .setRequired(true).setAutoComplete(true))
                 .addOptions(

@@ -1,17 +1,17 @@
 package ti4.model;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 
@@ -22,6 +22,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private List<String> aliases;
     private String imagePath;
     private List<String> planets;
+    @Nullable
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
@@ -29,13 +30,14 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private Boolean isSupernova;
     private Boolean isNebula;
     private Boolean isGravityRift;
+    private String imageURL;
     private ComponentSource source;
     private String tileBack;
 
     @Override
     @JsonIgnore
     public boolean isValid() {
-        return id != null 
+        return id != null
             && imagePath != null
             && source != null;
     }
@@ -85,6 +87,11 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public boolean hasPlanets() {
         return getPlanets() != null && !getPlanets().isEmpty();
+    }
+
+    @JsonIgnore
+    public int getNumPlanets() {
+        return getPlanets() == null ? 0 : getPlanets().size();
     }
 
     @JsonIgnore

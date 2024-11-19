@@ -5,10 +5,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ti4.commands.milty.MiltyDraftHelper;
-import ti4.commands.milty.MiltyDraftManager;
-import ti4.draft.items.*;
-import ti4.generator.Mapper;
+import ti4.commands2.milty.MiltyDraftHelper;
+import ti4.commands2.milty.MiltyDraftManager;
+import ti4.draft.items.AbilityDraftItem;
+import ti4.draft.items.AgentDraftItem;
+import ti4.draft.items.BlueTileDraftItem;
+import ti4.draft.items.CommanderDraftItem;
+import ti4.draft.items.CommoditiesDraftItem;
+import ti4.draft.items.FlagshipDraftItem;
+import ti4.draft.items.HeroDraftItem;
+import ti4.draft.items.HomeSystemDraftItem;
+import ti4.draft.items.MechDraftItem;
+import ti4.draft.items.PNDraftItem;
+import ti4.draft.items.RedTileDraftItem;
+import ti4.draft.items.SpeakerOrderDraftItem;
+import ti4.draft.items.StartingFleetDraftItem;
+import ti4.draft.items.StartingTechDraftItem;
+import ti4.draft.items.TechDraftItem;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
@@ -65,7 +79,7 @@ public class FrankenDraft extends BagDraft {
         Map<DraftItem.Category, List<DraftItem>> allDraftableItems = new HashMap<>();
         List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(game);
 
-        allDraftableItems.put(DraftItem.Category.ABILITY, AbilityDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(DraftItem.Category.ABILITY, AbilityDraftItem.buildAllDraftableItems(allDraftableFactions, game));
         allDraftableItems.put(DraftItem.Category.TECH, TechDraftItem.buildAllDraftableItems(allDraftableFactions));
         allDraftableItems.put(DraftItem.Category.AGENT, AgentDraftItem.buildAllDraftableItems(allDraftableFactions));
         allDraftableItems.put(DraftItem.Category.COMMANDER, CommanderDraftItem.buildAllDraftableItems(allDraftableFactions));
@@ -99,7 +113,7 @@ public class FrankenDraft extends BagDraft {
                 for (int j = 0; j < categoryLimit; j++) {
                     // ... and add it to the player's bag.
                     if (!draftableCollection.getValue().isEmpty()) {
-                        bag.Contents.add(draftableCollection.getValue().remove(0));
+                        bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
                         BotLogger.log("Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
                     }

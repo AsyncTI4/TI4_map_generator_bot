@@ -4,7 +4,7 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.commands.units.AddRemoveUnits;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -62,7 +62,7 @@ public class RemoveControl extends AddRemoveToken {
     }
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.REMOVE_CONTROL;
     }
 }

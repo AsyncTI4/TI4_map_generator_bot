@@ -1,16 +1,16 @@
 package ti4.draft.items;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.UnitModel;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class FlagshipDraftItem extends DraftItem {
     public FlagshipDraftItem(String itemId) {
@@ -71,7 +71,6 @@ public class FlagshipDraftItem extends DraftItem {
         return Emojis.flagship;
     }
 
-
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.FLAGSHIP);
@@ -84,7 +83,7 @@ public class FlagshipDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             var units = faction.getUnits();
             units.removeIf((String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(DraftItem.Generate(Category.FLAGSHIP, units.get(0)));
+            allItems.add(DraftItem.generate(Category.FLAGSHIP, units.getFirst()));
         }
         return allItems;
     }

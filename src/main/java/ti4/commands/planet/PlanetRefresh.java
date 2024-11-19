@@ -13,10 +13,10 @@ public class PlanetRefresh extends PlanetAddRemove {
 
     @Override
     public void doAction(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
-        doAction(player, planet, game);
+        doAction(player, planet);
     }
 
-    public static void doAction(Player player, String planet, Game game) {
+    public static void doAction(Player player, String planet) {
         if (!player.getPlanets().contains(planet)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " the bot doesn't think you have a planet by the name of " + planet);
         }

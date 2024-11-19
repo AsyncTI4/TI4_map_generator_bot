@@ -2,25 +2,24 @@ package ti4.commands.leaders;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.agenda.DrawAgenda;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.explore.DrawRelic;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.special.KeleresHeroMentak;
-import ti4.commands.special.RiseOfMessiah;
-import ti4.commands.status.ListTurnOrder;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
+import ti4.commands2.CommandHelper;
+import ti4.helpers.ActionCardHelper;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -30,7 +29,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -38,8 +39,10 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.model.LeaderModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.info.ListTurnOrderService;
 
 public class HeroPlay extends LeaderAction {
     public HeroPlay() {
@@ -49,14 +52,15 @@ public class HeroPlay extends LeaderAction {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
 
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        action(event, "hero", game, player);
+
+        String leader = event.getOption(Constants.LEADER, "hero", OptionMapping::getAsString);
+        action(event, leader, game, player);
     }
 
     @Override
@@ -150,13 +154,13 @@ public class HeroPlay extends LeaderAction {
         }
 
         switch (playerLeader.getId()) {
-            case "kollecchero" -> DrawRelic.drawWithAdvantage(player, event, game, game.getRealPlayers().size());
+            case "kollecchero" -> RelicHelper.drawWithAdvantage(player, game, game.getRealPlayers().size());
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();
                 if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
                     t.addToken("attachment_titanshero.png", "elysium");
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attachment added to Elysium and it has been readied");
-                    PlanetRefresh.doAction(player, "elysium", game);
+                    PlanetRefresh.doAction(player, "elysium");
                 } else {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         "`Use the following command to add the attachment: /add_token token:titanshero`");
@@ -165,14 +169,14 @@ public class HeroPlay extends LeaderAction {
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-                        if (player.getPlanets().contains(uH.getName())
+                        if (player.getPlanetsAllianceMode().contains(uH.getName())
                             && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                             new AddUnits().unitParsing(event, player.getColor(), tile, "2 ff", game);
                             break;
                         }
                     }
                 }
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true)
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged()
                     + "Added 2 fighters to every system with an owned planet and no opponent ships.");
                 ButtonHelperHeroes.resolveFlorzenHeroStep1(player, game);
             }
@@ -181,7 +185,7 @@ public class HeroPlay extends LeaderAction {
                 game.setStoredValue("kyroHeroSC", dieResult + "");
                 game.setStoredValue("kyroHeroPlayer", player.getFaction());
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getSCName(dieResult, game) + " has been marked with Speygh, the Kyro hero, and the faction that played the hero as " + player.getFaction());
-                ListTurnOrder.turnOrder(event, game);
+                ListTurnOrderService.turnOrder(event, game);
             }
             case "ghotihero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -211,8 +215,8 @@ public class HeroPlay extends LeaderAction {
             case "cymiaehero" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(
-                    Button.success("cymiaeHeroStep1_" + (game.getRealPlayers().size() + 1), "Resolve The Voice United (Cymiae Hero)"));
-                buttons.add(Button.primary("cymiaeHeroAutonetic", "Resolve Autonetic Memory First"));
+                    Buttons.green("cymiaeHeroStep1_" + (game.getRealPlayers().size() + 1), "Resolve Cymiae Hero"));
+                buttons.add(Buttons.blue("cymiaeHeroAutonetic", "Resolve Autonetic Memory First"));
 
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentation() + " choose whether to resolve Autonetic Memory or not.", buttons);
@@ -221,11 +225,11 @@ public class HeroPlay extends LeaderAction {
             case "lizhohero" -> {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
                     "You may use the buttons in your cards info to set traps, then when you're done with that, press the following button to start distributing 12 fighters.",
-                    Button.success("lizhoHeroFighterResolution", "Distribute 12 Fighters"));
+                    Buttons.green("lizhoHeroFighterResolution", "Distribute 12 Fighters"));
             }
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    player.getRepresentation(true, true) + " removed all of your CCs from the board");
+                    player.getRepresentationUnfogged() + " removed all of your CCs from the board");
                 for (Tile t : game.getTileMap().values()) {
                     if (AddCC.hasCC(event, player.getColor(), t)) {
                         RemoveCC.removeCC(event, player.getColor(), t, game);
@@ -237,8 +241,8 @@ public class HeroPlay extends LeaderAction {
             }
             case "olradinhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    player.getRepresentation(true, true) + " added 1 infantry to each planet");
-                RiseOfMessiah.doRise(player, event, game);
+                    player.getRepresentationUnfogged() + " added 1 infantry to each planet");
+                ActionCardHelper.doRise(player, event, game);
                 ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
             }
             case "argenthero" -> {
@@ -258,20 +262,20 @@ public class HeroPlay extends LeaderAction {
                 List<Button> buttons = ButtonHelperHeroes.getWinnuHeroSCButtons(game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
-                    + " use the button to pick which SC you'd like to do the primary of. Reminder you may allow others to do the secondary, but they should still pay 1 CC for resolving it.",
+                    + " use the button to pick which strategy card you'd like to do the primary of. Reminder you may allow others to do the secondary, but they should still pay 1 CC for resolving it.",
                     buttons);
             }
             case "gheminaherolady" -> {
                 List<Button> buttons = ButtonHelperHeroes.getButtonsForGheminaLadyHero(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                    player.getRepresentation(true, true)
+                    player.getRepresentationUnfogged()
                         + " use the button to pick on which planet you want to resolve The Lady, a Ghemina hero.",
                     buttons);
             }
             case "gheminaherolord" -> {
                 List<Button> buttons = ButtonHelperHeroes.getButtonsForGheminaLordHero(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                    player.getRepresentation(true, true)
+                    player.getRepresentationUnfogged()
                         + " use the button to pick on which planet you want to resolve The Lord, a Ghemina hero",
                     buttons);
             }
@@ -295,8 +299,8 @@ public class HeroPlay extends LeaderAction {
                     .getFactionEmoji() + " may resolve " + size
                     + " agenda" + (size == 1 ? "" : "s") + " because that's how many Sigils they got."
                     + " After putting the agendas on top in the order you want (don't bottom any), please press the button to reveal an agenda");
-                DrawAgenda.drawAgenda(event, size, game, player);
-                Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
+                AgendaHelper.drawAgenda(size, game, player);
+                Button flipAgenda = Buttons.blue("flip_agenda", "Press this to flip agenda");
                 List<Button> buttons = List.of(flipAgenda);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Flip Agenda", buttons);
             }
@@ -305,7 +309,7 @@ public class HeroPlay extends LeaderAction {
                 for (Tile tile : ButtonHelperAgents.getGloryTokenTiles(game)) {
                     List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event,
                         "kjalHero_" + tile.getPosition());
-                    if (buttons.size() > 0) {
+                    if (!buttons.isEmpty()) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             "Use buttons to remove token from "
                                 + tile.getRepresentationForButtons(game, player) + " or an adjacent tile",
@@ -315,7 +319,7 @@ public class HeroPlay extends LeaderAction {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getFactionEmoji() + " may gain " + size + " CC" + (size == 1 ? "" : "s") + ".");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                String trueIdentity = player.getRepresentation(true, true);
+                String trueIdentity = player.getRepresentationUnfogged();
                 String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
                     + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
@@ -328,7 +332,7 @@ public class HeroPlay extends LeaderAction {
                     game.setStoredValue("vaylerianHeroActive", "true");
                 }
                 List<Button> removeCCs = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
-                if (removeCCs.size() > 0) {
+                if (!removeCCs.isEmpty()) {
                     for (int x = 0; x < ButtonHelperAgents.getGloryTokenTiles(game).size(); x++) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Use buttons to remove a token from the board", removeCCs);
                     }
@@ -336,7 +340,7 @@ public class HeroPlay extends LeaderAction {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getFactionEmoji() + " may gain 1 CC.");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                String trueIdentity = player.getRepresentation(true, true);
+                String trueIdentity = player.getRepresentationUnfogged();
                 String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
                     + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
@@ -352,11 +356,10 @@ public class HeroPlay extends LeaderAction {
                 game.setComponentAction(true);
                 for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)) {
                     for (int x = 0; x < ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2); x++) {
-                        if (ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game)
-                            .size() > 0) {
-                            String msg = player.getRepresentation(true, true)
+                        if (!ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game).isEmpty()) {
+                            String msg = player.getRepresentationUnfogged()
                                 + " you may retrieve a unit upgrade tech from players with branch offices, one for each branch office. Here is the possible techs from "
-                                + ButtonHelper.getIdentOrColor(p2, game);
+                                + p2.getFactionEmojiOrColor();
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg,
                                 ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
                         }
@@ -389,16 +392,16 @@ public class HeroPlay extends LeaderAction {
             }
             case "yinhero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "yinHeroStart",
-                    "Invade a planet with Dannel of the Tenth (Yin Hero)"));
-                buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
+                buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "yinHeroStart",
+                    "Invade A Planet With Yin Hero"));
+                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
                     + " use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.",
                     buttons);
             }
             case "naazhero" -> {
-                DrawRelic.drawRelicAndNotify(player, event, game);
+                RelicHelper.drawRelicAndNotify(player, event, game);
                 List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
@@ -421,11 +424,11 @@ public class HeroPlay extends LeaderAction {
             }
             case "augershero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 1,
-                    "Resolve Atropha (Ilyxum Hero) on Stage 1 Deck"));
-                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 2,
-                    "Resolve Atropha (Ilyxum Hero) on Stage 2 Deck"));
-                buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
+                buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 1,
+                    "Resolve Ilyxum Hero on Stage 1 Deck"));
+                buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 2,
+                    "ResolveIlyxum Hero on Stage 2 Deck"));
+                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText)
                         + " use the button to choose on which objective type you wanna resolve Atropha, the Ilyxum hero.",
@@ -448,9 +451,9 @@ public class HeroPlay extends LeaderAction {
                         continue;
                     }
                     List<Button> buttons = new ArrayList<>(
-                        ACInfo.getYssarilHeroActionCardButtons(game, player, p2));
+                        ActionCardHelper.getYssarilHeroActionCardButtons(player, p2));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
-                        p2.getRepresentation(true, true)
+                        p2.getRepresentationUnfogged()
                             + " Kyver, Blade and Key, the Yssaril hero, has been played.  Use buttons to select which AC you will offer to them.",
                         buttons);
                 }
@@ -458,14 +461,64 @@ public class HeroPlay extends LeaderAction {
                     player.getRepresentation(true, showFlavourText)
                         + " sent everyone a ping in their private threads with buttons to send you 1 AC");
             }
-            case "keleresheroharka" -> KeleresHeroMentak.resolveKeleresHeroMentak(game, player, event);
+            case "keleresheroharka" -> resolveKeleresHeroMentak(game, player, event);
         }
-        TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.LEADER,
+        TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.LEADER,
             playerLeader.getId(), player.getNumberTurns());
         if (posssibleCombatMod != null) {
             player.addNewTempCombatMod(posssibleCombatMod);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Combat modifier will be applied next time you push the combat roll button.");
+        }
+    }
+
+    private static void resolveKeleresHeroMentak(Game game, Player player, GenericInteractionCreateEvent event) {
+        int originalACDeckCount = game.getActionCards().size();
+        StringBuilder acRevealMessage = new StringBuilder("The following non-component action cards were revealed before drawing three component action cards:\n");
+        StringBuilder acDrawMessage = new StringBuilder("The following component action cards were drawn into their hand:\n");
+        List<String> cardsToShuffleBackIntoDeck = new ArrayList<>();
+        int componentActionACCount = 0;
+        int index = 1;
+        boolean noMoreComponentActionCards = false;
+        while (componentActionACCount < 3) {
+            Integer acID = null;
+            String acKey = null;
+            for (Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(game.drawActionCard(player.getUserID())).entrySet()) {
+                acID = ac.getValue();
+                acKey = ac.getKey();
+            }
+            ActionCardModel actionCard = Mapper.getActionCard(acKey);
+            String acName = actionCard.getName();
+            String acWindow = actionCard.getWindow();
+            if ("Action".equalsIgnoreCase(acWindow)) {
+                acDrawMessage.append("> `").append(String.format("%02d", index)).append(".` ").append(actionCard.getRepresentation());
+                componentActionACCount++;
+            } else {
+                acRevealMessage.append("> `").append(String.format("%02d", index)).append(".` ").append(Emojis.ActionCard).append(" ").append(acName).append("\n");
+                game.discardActionCard(player.getUserID(), acID);
+                cardsToShuffleBackIntoDeck.add(acKey);
+            }
+            index++;
+            if (index >= originalACDeckCount) {
+                if (index > originalACDeckCount * 2) {
+                    noMoreComponentActionCards = true;
+                    break;
+                }
+            }
+        }
+        for (String card : cardsToShuffleBackIntoDeck) {
+            Integer cardID = game.getDiscardActionCards().get(card);
+            game.shuffleActionCardBackIntoDeck(cardID);
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.KeleresHeroHarka);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " uses Harka Leeds, the Keleres (Mentak) hero, to reveal " + Emojis.ActionCard + "action cards, until drawing 3 component action cards.\n");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), acRevealMessage.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), acDrawMessage.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "All non-component action cards have been reshuffled back into the deck.");
+        ActionCardHelper.sendActionCardInfo(game, player);
+        ButtonHelper.checkACLimit(game, player);
+        if (noMoreComponentActionCards) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**All action cards in the deck have been revealed. __No component action cards remain.__**");
         }
     }
 }

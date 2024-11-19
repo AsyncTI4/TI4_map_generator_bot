@@ -23,7 +23,7 @@ public class Preset extends MapSubcommandData {
         //addOption(OptionType.STRING, Constants.SLICE_8, "Player 8's slice", false);
     }
 
-    public static List<String> templates = List.of("Solo (1 slice)", "TspMap (6 slices)", "Magi's Madness (0 slices)");
+    public static final List<String> templates = List.of("Solo (1 slice)", "Minimal Solo (1 slice)", "TspMap (6 slices)", "Magi's Madness (0 slices)");
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -65,6 +65,17 @@ public class Preset extends MapSubcommandData {
                 List<String> tiles = List.of("85a3", "85a4", "85a5", s1[4], "85a1", "85a2", //ring 1
                     "85a3", "84a0", "85a4", "84a1", "85a5", "87a5", s1[1], s1[3], "85a1", "84a4", "85a2", "84a5", //ring 2
                     "85a3", "84a0", "84a0", "85a4", "84a1", "84a1", "85a5", "84a2", s1[2], home, s1[0], "84a3", "85a1", "84a4", "84a4", "85a2", "84a5", "84a5");//ring 3
+                String mapString = String.join(" ", tiles);
+                AddTileList.addTileListToMap(game, mapString, event);
+            }
+            case "Minimal Solo (1 slice)" -> {
+                if (s1 == null) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
+                    return;
+                }
+                List<String> tiles = List.of("{"+s1[4]+"}", //ring 0
+                    "18", "84a1", "84a1", s1[1], s1[3], "90b", // ring 1
+                    "85a3", "85a4", ph, ph, ph, s1[2], home, s1[0], "85a1", "85a2", ph, "85a2"); // ring 3
                 String mapString = String.join(" ", tiles);
                 AddTileList.addTileListToMap(game, mapString, event);
             }

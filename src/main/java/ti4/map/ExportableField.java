@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Target( {ElementType.FIELD})
+@Target({ ElementType.FIELD })
 @Retention(RUNTIME)
 @Documented
 public @interface ExportableField {

@@ -1,1487 +1,951 @@
 [
-  {
-    "alias": "augers",
-    "factionName": "Augers of Ilyxum",
-    "homeSystem": "d19",
-    "startingFleet": "cv,2 dd,2 ff, 2 inf c,2 inf d,sd c,pds d",
-    "commodities": 3,
-    "factionTech": [
-      "dsaugug",
-      "dsauguy"
-    ],
-    "startingTech": [
-      "aida",
-      "sdn"
-    ],
-    "homePlanets": [
-      "chrion",
-      "demis"
-    ],
-    "abilities": [
-      "oracle_ai",
-      "limited_vision",
-      "probability_algorithms"
-    ],
-    "leaders": [
-      "augersagent",
-      "augerscommander",
-      "augershero"
-    ],
-    "promissoryNotes": [
-      "dspnauge"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "augers_flagship",
-      "infantry",
-      "augers_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "axis",
-    "factionName": "Shipwrights of Axis",
-    "shortTag": "AXS",
-    "homeSystem": "d27",
-    "startingFleet": "dn,cv,dd,2 ff,3 inf a,sd a",
-    "commodities": 5,
-    "factionTech": [
-      "dsaxisb",
-      "dsaxisy"
-    ],
-    "startingTech": [
-      "st",
-      "aida"
-    ],
-    "homePlanets": [
-      "axis"
-    ],
-    "abilities": [
-      "military_industrial_complex",
-      "arms_dealers"
-    ],
-    "leaders": [
-      "axisagent",
-      "axiscommander",
-      "axishero"
-    ],
-    "promissoryNotes": [
-      "dspnaxis"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "axis_flagship",
-      "infantry",
-      "axis_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "bentor",
-    "factionName": "Bentor Conglomerate",
-    "shortTag": "BNT",
-    "homeSystem": "d07",
-    "startingFleet": "cv,2 cr,3 ff,2 inf b,2 inf h,sd b,pds h",
-    "commodities": 2,
-    "factionTech": [
-      "dsbentg",
-      "dsbenty"
-    ],
-    "startingTech": [],
-    "homePlanets": [
-      "benc",
-      "hau"
-    ],
-    "abilities": [
-      "secret_maps",
-      "ancient_blueprints",
-      "fortune_seekers"
-    ],
-    "leaders": [
-      "bentoragent",
-      "bentorcommander",
-      "bentorhero"
-    ],
-    "promissoryNotes": [
-      "dspnbent"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "bentor_flagship",
-      "infantry",
-      "bentor_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "celdauri",
-    "factionName": "Celdauri Trade Confederation",
-    "homeSystem": "d16",
-    "startingFleet": "2 cv,dd,4 ff,2 inf l,inf a,sd a,pds l",
-    "commodities": 4,
-    "factionTech": [
-      "dsceldr",
-      "dsceldsd"
-    ],
-    "startingTech": [],
-    "homePlanets": [
-      "louk",
-      "auldane"
-    ],
-    "abilities": [
-      "projection_of_power",
-      "industrialists"
-    ],
-    "leaders": [
-      "celdauriagent",
-      "celdauricommander",
-      "celdaurihero"
-    ],
-    "promissoryNotes": [
-      "dspnceld"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "celdauri_flagship",
-      "infantry",
-      "celdauri_mech",
-      "pds",
-      "celdauri_spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "cheiran",
-    "factionName": "Cheiran Hordes",
-    "shortTag": "CHR",
-    "homeSystem": "d08",
-    "startingFleet": "dn,cv,dd,2 ff,mech a,2 inf g,sd a",
-    "commodities": 2,
-    "factionTech": [
-      "dscheir",
-      "dscheidn"
-    ],
-    "startingTech": [],
-    "homePlanets": [
-      "arche",
-      "gghurntheta"
-    ],
-    "abilities": [
-      "teeming",
-      "moult",
-      "byssus"
-    ],
-    "leaders": [
-      "cheiranagent",
-      "cheirancommander",
-      "cheiranhero"
-    ],
-    "promissoryNotes": [
-      "dspnchei"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "cheiran_dreadnought",
-      "cheiran_flagship",
-      "infantry",
-      "cheiran_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "cymiae",
-    "factionName": "Savages of Cymiae",
-    "homeSystem": "d30",
-    "startingFleet": "dn,cv,dd,2 ff,3 inf c,sd c",
-    "commodities": 3,
-    "factionTech": [
-      "dscymiinf",
-      "dscymiy"
-    ],
-    "startingTech": [
-      "nm",
-      "aida"
-    ],
-    "homePlanets": [
-      "cymiae"
-    ],
-    "abilities": [
-      "autonetic_memory",
-      "cybernetic_madness"
-    ],
-    "leaders": [
-      "cymiaeagent",
-      "cymiaecommander",
-      "cymiaehero"
-    ],
-    "promissoryNotes": [
-      "dspncymi"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "cymiae_flagship",
-      "cymiae_infantry",
-      "cymiae_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "dihmohn",
-    "factionName": "Dih-Mohn Flotilla",
-    "shortTag": "DMN",
-    "homeSystem": "d29",
-    "startingFleet": "2 dn,2 dd,2 ff,mech a,2 inf a,sd a",
-    "commodities": 2,
-    "factionTech": [
-      "dsdihmdn",
-      "dsdihmy"
-    ],
-    "startingTech": [
-      "sdn",
-      "det"
-    ],
-    "homePlanets": [
-      "abyssus"
-    ],
-    "abilities": [
-      "capital_fleet",
-      "migrant_fleet",
-      "flotilla"
-    ],
-    "leaders": [
-      "dihmohnagent",
-      "dihmohncommander",
-      "dihmohnhero"
-    ],
-    "promissoryNotes": [
-      "dspndihm"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dihmohn_dreadnought",
-      "dihmohn_flagship",
-      "infantry",
-      "dihmohn_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "edyn",
-    "factionName": "Edyn Mandate",
-    "homeSystem": "d03",
-    "startingFleet": "cv,2 dd,4 ff,3 inf edyn,pds o,sd edyn",
-    "commodities": 3,
-    "factionTech": [
-      "dsedyny",
-      "dsedyng"
-    ],
-    "startingTech": [],
-    "homePlanets": [
-      "edyn",
-      "ekko",
-      "okke"
-    ],
-    "abilities": [
-      "grace",
-      "decree",
-      "radiance"
-    ],
-    "leaders": [
-      "edynagent",
-      "edyncommander",
-      "edynhero"
-    ],
-    "promissoryNotes": [
-      "dspnedyn"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "edyn_flagship",
-      "infantry",
-      "edyn_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "florzen",
-    "factionName": "Florzen Profiteers",
-    "shortTag": "FLZ",
-    "homeSystem": "d18",
-    "startingFleet": "2 cv,4 ff,2 inf d,2 inf k,sd d",
-    "commodities": 4,
-    "factionTech": [
-      "dsflorg",
-      "dsflorff"
-    ],
-    "startingTech": [
-      "nm",
-      "sdn"
-    ],
-    "homePlanets": [
-      "delmor",
-      "kyd"
-    ],
-    "abilities": [
-      "mercenaries",
-      "data_leak",
-      "black_markets"
-    ],
-    "leaders": [
-      "florzenagent",
-      "florzencommander",
-      "florzenhero"
-    ],
-    "promissoryNotes": [
-      "dspnflor"
-    ],
-    "units": [
-      "florzen_fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "florzen_flagship",
-      "infantry",
-      "florzen_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "freesystems",
-    "factionName": "Free Systems Compact",
-    "shortTag": "FSC",
-    "homeSystem": "d13",
-    "startingFleet": "cv,2 cr,2 ff,2 inf i,inf k,inf c,sd i,pds c",
-    "commodities": 4,
-    "factionTech": [
-      "dsfreeg",
-      "dsfreey"
-    ],
-    "startingTech": [
-      "pa"
-    ],
-    "homePlanets": [
-      "idyn",
-      "kroll",
-      "cyrra"
-    ],
-    "abilities": [
-      "rally_to_the_cause",
-      "diplomats",
-      "free_people"
-    ],
-    "leaders": [
-      "freesystemsagent",
-      "freesystemscommander",
-      "freesystemshero"
-    ],
-    "promissoryNotes": [
-      "dspnfree"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "freesystems_flagship",
-      "infantry",
-      "freesystems_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "ghemina",
-    "factionName": "Ghemina Raiders",
-    "shortTag": "GHE",
-    "homeSystem": "d20",
-    "startingFleet": "2 cv,dd,3 ff,2 inf d,inf t,sd d,sd t",
-    "commodities": 2,
-    "factionTech": [
-      "dsghemcv",
-      "dsghemg"
-    ],
-    "startingTech": [
-      "pa",
-      "det"
-    ],
-    "homePlanets": [
-      "drah",
-      "trykk"
-    ],
-    "abilities": [
-      "the_lady_and_the_lord",
-      "rule_of_two"
-    ],
-    "leaders": [
-      "gheminaagent",
-      "gheminacommander",
-      "gheminaherolord",
-      "gheminaherolady"
-    ],
-    "promissoryNotes": [
-      "dspnghem"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "ghemina_flagship_lord",
-      "ghemina_flagship_lady",
-      "infantry",
-      "ghemina_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "ghoti",
-    "factionName": "Ghoti Wayfarers",
-    "homeSystem": "d11",
-    "startingFleet": "fs,cr,2 ff,3 inf",
-    "commodities": 4,
-    "factionTech": [
-      "dsghotg",
-      "dsghoty"
-    ],
-    "startingTech": [],
-    "homePlanets": [
-      "ghoti"
-    ],
-    "abilities": [
-      "abyssal_embrace",
-      "mobile_command",
-      "spawning_grounds"
-    ],
-    "leaders": [
-      "ghotiagent",
-      "ghoticommander",
-      "ghotihero"
-    ],
-    "promissoryNotes": [
-      "dspnghot"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "ghoti_flagship",
-      "infantry",
-      "ghoti_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "gledge",
-    "factionName": "Gledge Union",
-    "shortTag": "GLD",
-    "homeSystem": "d09",
-    "startingFleet": "dn,cv,dd,3 ff,2 inf l,mech l,sd l",
-    "commodities": 2,
-    "factionTech": [
-      "dsgledb",
-      "dsgledpds"
-    ],
-    "startingTech": [],
-    "homePlanets": [
-      "laststop"
-    ],
-    "abilities": [
-      "mantle_cracking",
-      "celestial_reclamation",
-      "deep_mining"
-    ],
-    "leaders": [
-      "gledgeagent",
-      "gledgecommander",
-      "gledgehero"
-    ],
-    "promissoryNotes": [
-      "dspngled"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "gledge_flagship",
-      "infantry",
-      "gledge_mech",
-      "gledge_pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "khrask",
-    "factionName": "L'Tokk Khrask",
-    "shortTag": "KHR",
-    "homeSystem": "d33",
-    "startingFleet": "3 cr,ff,3 inf b,sd b,pds b",
-    "commodities": 2,
-    "factionTech": [
-      "dskhrag",
-      "dskhracr"
-    ],
-    "startingTech": [
-      "ps",
-      "sdn"
-    ],
-    "homePlanets": [
-      "bohldhur"
-    ],
-    "abilities": [
-      "lithoids",
-      "garden_worlds",
-      "meteor_slings"
-    ],
-    "leaders": [
-      "khraskagent",
-      "khraskcommander",
-      "khraskhero"
-    ],
-    "promissoryNotes": [
-      "dspnkhra"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "khrask_cruiser",
-      "carrier",
-      "dreadnought",
-      "khrask_flagship",
-      "infantry",
-      "khrask_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "kjalengard",
-    "factionName": "Berserkers of Kjalengard",
-    "homeSystem": "d02",
-    "startingFleet": "2 cv,dd,4 ff,2 inf k,2 inf h,sd k,pds h",
-    "commodities": 3,
-    "factionTech": [
-      "dskjalg",
-      "dskjalcv"
-    ],
-    "startingTech": [],
-    "homePlanets": [
-      "kjalengard",
-      "hulgade"
-    ],
-    "abilities": [
-      "heroism",
-      "glory",
-      "valor"
-    ],
-    "leaders": [
-      "kjalengardagent",
-      "kjalengardcommander",
-      "kjalengardhero"
-    ],
-    "promissoryNotes": [
-      "dspnkjal"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "kjalengard_carrier",
-      "dreadnought",
-      "kjalengard_flagship",
-      "infantry",
-      "kjalengard_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "kollecc",
-    "factionName": "Kollecc Society",
-    "shortTag": "KLC",
-    "homeSystem": "d34",
-    "startingFleet": "2 cv,cr,2 ff,4 inf s,sd s",
-    "commodities": 3,
-    "factionTech": [
-      "dskollb",
-      "dskolly"
-    ],
-    "startingTech": [
-      "sdn"
-    ],
-    "homePlanets": [
-      "susuros"
-    ],
-    "abilities": [
-      "cloaked_fleets",
-      "shroud_of_lith",
-      "treasure_hunters"
-    ],
-    "leaders": [
-      "kolleccagent",
-      "kollecccommander",
-      "kollecchero"
-    ],
-    "promissoryNotes": [
-      "dspnkoll"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "kollecc_flagship",
-      "infantry",
-      "kollecc_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "kolume",
-    "factionName": "Monks of Kolume",
-    "shortTag": "KLM",
-    "homeSystem": "d06",
-    "startingFleet": "2 cv,2 ff,cr,2 inf alesna,2 inf azle,sd azle",
-    "commodities": 3,
-    "factionTech": [
-      "dskolug",
-      "dskolur"
-    ],
-    "startingTech": [],
-    "homePlanets": [
-      "alesna",
-      "azle"
-    ],
-    "abilities": [
-      "starfall_gunnery",
-      "deliberate_action",
-      "meditation"
-    ],
-    "leaders": [
-      "kolumeagent",
-      "kolumecommander",
-      "kolumehero"
-    ],
-    "promissoryNotes": [
-      "dspnkolu"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "kolume_flagship",
-      "infantry",
-      "kolume_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "kortali",
-    "factionName": "Kortali Tribunal",
-    "shortTag": "KOR",
-    "homeSystem": "d24",
-    "startingFleet": "2 cv,cr,2 ff,2 inf o,2 inf b,sd o,pds b",
-    "commodities": 3,
-    "factionTech": [
-      "dskortg",
-      "dskortr"
-    ],
-    "startingTech": [
-      "ps",
-      "pa"
-    ],
-    "homePlanets": [
-      "ogdun",
-      "brthkul"
-    ],
-    "abilities": [
-      "zealous",
-      "ruthless"
-    ],
-    "leaders": [
-      "kortaliagent",
-      "kortalicommander",
-      "kortalihero"
-    ],
-    "promissoryNotes": [
-      "dspnkort"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "kortali_flagship",
-      "infantry",
-      "kortali_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "kyro",
-    "factionName": "Kyro Sodality",
-    "homeSystem": "d10",
-    "startingFleet": "dn,cv,dd,ff,3 inf a,sd a",
-    "commodities": 2,
-    "factionTech": [
-      "dskyrog",
-      "dskyroy"
-    ],
-    "startingTech": [],
-    "homePlanets": [
-      "avicenna"
-    ],
-    "abilities": [
-      "contagion",
-      "plague_reservoir",
-      "subversive"
-    ],
-    "leaders": [
-      "kyroagent",
-      "kyrocommander",
-      "kyrohero"
-    ],
-    "promissoryNotes": [
-      "dspnkyro"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "kyro_flagship",
-      "infantry",
-      "kyro_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "lanefir",
-    "factionName": "Lanefir Remnants",
-    "homeSystem": "d05",
-    "startingFleet": "2 cv,dd,2 ff,inf a,2 inf s,sd a,pds s",
-    "commodities": 2,
-    "factionTech": [
-      "dslaneb",
-      "dslaner"
-    ],
-    "startingTech": [],
-    "homePlanets": [
-      "aysisrest",
-      "solitude"
-    ],
-    "abilities": [
-      "a_new_edifice",
-      "iconoclasm",
-      "war_stories"
-    ],
-    "leaders": [
-      "lanefiragent",
-      "lanefircommander",
-      "lanefirhero"
-    ],
-    "promissoryNotes": [
-      "dspnlane"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "lanefir_flagship",
-      "infantry",
-      "lanefir_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "lizho",
-    "factionName": "Li-Zho Dynasty",
-    "shortTag": "LZH",
-    "homeSystem": "d14",
-    "startingFleet": "2 cv,dd,3 ff, inf k,2 inf p,inf v,sd k,pds k",
-    "commodities": 3,
-    "factionTech": [
-      "dslizhb",
-      "dslizhff"
-    ],
-    "startingTech": [
-      "pa",
-      "amd"
-    ],
-    "homePlanets": [
-      "pax",
-      "vess",
-      "kyr"
-    ],
-    "abilities": [
-      "cunning",
-      "subterfuge"
-    ],
-    "leaders": [
-      "lizhoagent",
-      "lizhocommander",
-      "lizhohero"
-    ],
-    "promissoryNotes": [
-      "dspnlizh"
-    ],
-    "units": [
-      "lizho_fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "lizho_flagship",
-      "infantry",
-      "lizho_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "mirveda",
-    "factionName": "Mirveda Protectorate",
-    "homeSystem": "d23",
-    "startingFleet": "2 cv,cr,5 ff,2 inf b,pds,sd a",
-    "commodities": 3,
-    "factionTech": [
-      "dsmirvpds",
-      "dsmirvr"
-    ],
-    "startingTech": [
-      "aida"
-    ],
-    "homePlanets": [
-      "aldra",
-      "beata"
-    ],
-    "abilities": [
-      "privileged_citizenry",
-      "combat_drones"
-    ],
-    "leaders": [
-      "mirvedaagent",
-      "mirvedacommander",
-      "mirvedahero"
-    ],
-    "promissoryNotes": [
-      "dspnmirv"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "mirveda_flagship",
-      "infantry",
-      "mirveda_mech",
-      "mirveda_pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "mortheus",
-    "factionName": "Glimmer of Mortheus",
-    "shortTag": "MTH",
-    "homeSystem": "d17",
-    "startingFleet": "dn,cv,dd,2 ff,inf b,2 inf e,sd b",
-    "commodities": 3,
-    "factionTech": [
-      "dsmortr",
-      "dsmorty"
-    ],
-    "startingTech": [
-      "det",
-      "st"
-    ],
-    "homePlanets": [
-      "blaheo",
-      "empero"
-    ],
-    "abilities": [
-      "facsimile",
-      "illusory_presence"
-    ],
-    "leaders": [
-      "mortheusagent",
-      "mortheuscommander",
-      "mortheushero"
-    ],
-    "promissoryNotes": [
-      "dspnmort"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "mortheus_flagship",
-      "infantry",
-      "mortheus_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "mykomentori",
-    "factionName": "Myko-Mentori",
-    "homeSystem": "d32",
-    "startingFleet": "2 cv,cr,ff,6 inf s,sd s",
-    "commodities": 1,
-    "factionTech": [
-      "dsmykog",
-      "dsmykosd"
-    ],
-    "startingTech": [
-      "pi"
-    ],
-    "homePlanets": [
-      "shihalaum"
-    ],
-    "abilities": [
-      "prescient_memories",
-      "divination",
-      "necrophage"
-    ],
-    "leaders": [
-      "mykomentoriagent",
-      "mykomentoricommander",
-      "mykomentorihero"
-    ],
-    "promissoryNotes": [
-      "dspnmyko"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "mykomentori_flagship",
-      "infantry",
-      "mykomentori_mech",
-      "pds",
-      "mykomentori_spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "nivyn",
-    "factionName": "Nivyn Star Kings",
-    "homeSystem": "d25",
-    "startingFleet": "cv,cr,dn,3 ff,3 inf e,mech e,sd e",
-    "commodities": 3,
-    "factionTech": [
-      "dsnivymf",
-      "dsnivyy"
-    ],
-    "startingTech": [
-      "ps",
-      "det"
-    ],
-    "homePlanets": [
-      "ellas"
-    ],
-    "abilities": [
-      "celestial_guides",
-      "singularity_point",
-      "voidsailors"
-    ],
-    "leaders": [
-      "nivynagent",
-      "nivyncommander",
-      "nivynhero"
-    ],
-    "promissoryNotes": [
-      "dspnnivy"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "nivyn_flagship",
-      "infantry",
-      "nivyn_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "nokar",
-    "factionName": "Nokar Sellships",
-    "homeSystem": "d04",
-    "startingFleet": "cr, cv,dd,2 ff,2 inf z,2 inf n,sd z,pds n",
-    "commodities": 4,
-    "factionTech": [
-      "dsnokadd",
-      "dsnokay"
-    ],
-    "startingTech": [],
-    "homePlanets": [
-      "zarr",
-      "nokk"
-    ],
-    "abilities": [
-      "hired_guns",
-      "private_fleet",
-      "desperados"
-    ],
-    "leaders": [
-      "nokaragent",
-      "nokarcommander",
-      "nokarhero"
-    ],
-    "promissoryNotes": [
-      "dspnnoka"
-    ],
-    "units": [
-      "fighter",
-      "nokar_destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "nokar_flagship",
-      "infantry",
-      "nokar_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "olradin",
-    "factionName": "Olradin League",
-    "homeSystem": "d22",
-    "startingFleet": "2 cv,cr,3 ff,4 inf s,sd s",
-    "commodities": 3,
-    "factionTech": [
-      "dsolrar",
-      "dsolrab"
-    ],
-    "startingTech": [
-      "pa",
-      "sdn"
-    ],
-    "homePlanets": [
-      "sanctuary"
-    ],
-    "abilities": [
-      "policies"
-    ],
-    "leaders": [
-      "olradinagent",
-      "olradincommander",
-      "olradinhero"
-    ],
-    "promissoryNotes": [
-      "dspnolra"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "olradin_flagship",
-      "infantry",
-      "olradin_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "rohdhna",
-    "factionName": "Roh'Dhna Mechatronics",
-    "shortTag": "RDM",
-    "homeSystem": "d31",
-    "startingFleet": "2 cv,dd,3 ff,3 inf p,sd p",
-    "commodities": 4,
-    "factionTech": [
-      "dsrohdws",
-      "dsrohdy"
-    ],
-    "startingTech": [
-      "pa",
-      "st"
-    ],
-    "homePlanets": [
-      "prind"
-    ],
-    "abilities": [
-      "industrious",
-      "recycled_materials",
-      "orbital_foundries"
-    ],
-    "leaders": [
-      "rohdhnaagent",
-      "rohdhnacommander",
-      "rohdhnahero"
-    ],
-    "promissoryNotes": [
-      "dspnrohd"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "rohdhna_flagship",
-      "rohdhna_warsun",
-      "infantry",
-      "rohdhna_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "tnelis",
-    "factionName": "Tnelis Syndicate",
-    "homeSystem": "d21",
-    "startingFleet": "cv,2 dd,2 ff,4 inf d,sd d,pds d",
-    "commodities": 2,
-    "factionTech": [
-      "dstneldd",
-      "dstnely"
-    ],
-    "startingTech": [],
-    "homePlanets": [
-      "discordia"
-    ],
-    "abilities": [
-      "plausible_deniability",
-      "information_brokers",
-      "stealth_insertion"
-    ],
-    "leaders": [
-      "tnelisagent",
-      "tneliscommander",
-      "tnelishero"
-    ],
-    "promissoryNotes": [
-      "dspntnel"
-    ],
-    "units": [
-      "fighter",
-      "tnelis_destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "tnelis_flagship",
-      "infantry",
-      "tnelis_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "vaden",
-    "factionName": "Vaden Banking Clans",
-    "homeSystem": "d26",
-    "startingFleet": "dn,cv,cr,2 ff,inf v,2 inf n,sd v",
-    "commodities": 3,
-    "factionTech": [
-      "dsvadeb",
-      "dsvadey"
-    ],
-    "startingTech": [],
-    "homePlanets": [
-      "vadarian",
-      "norvus"
-    ],
-    "abilities": [
-      "fine_print",
-      "collateralized_loans",
-      "binding_debts"
-    ],
-    "leaders": [
-      "vadenagent",
-      "vadencommander",
-      "vadenhero"
-    ],
-    "promissoryNotes": [
-      "dspnvade"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "vaden_flagship",
-      "infantry",
-      "vaden_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "vaylerian",
-    "factionName": "Vaylerian Scourge",
-    "homeSystem": "d28",
-    "startingFleet": "cv,cr,dd,3 ff,3 inf v,sd v,pds v",
-    "commodities": 2,
-    "factionTech": [
-      "dsvaylr",
-      "dsvaylcr"
-    ],
-    "startingTech": [
-      "nm",
-      "det"
-    ],
-    "homePlanets": [
-      "vaylar"
-    ],
-    "abilities": [
-      "cargo_raiders",
-      "scour",
-      "raze"
-    ],
-    "leaders": [
-      "vaylerianagent",
-      "vayleriancommander",
-      "vaylerianhero"
-    ],
-    "promissoryNotes": [
-      "dspnvayl"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "vaylerian_cruiser",
-      "carrier",
-      "dreadnought",
-      "vaylerian_flagship",
-      "infantry",
-      "vaylerian_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "veldyr",
-    "factionName": "Veldyr Sovereignty",
-    "homeSystem": "d01",
-    "startingFleet": "dn,cv,dd,2 ff,4 inf r,sd r,pds r",
-    "commodities": 4,
-    "factionTech": [
-      "dsvelddn",
-      "dsveldr"
-    ],
-    "startingTech": [
-      "aida",
-      "det"
-    ],
-    "homePlanets": [
-      "rhune"
-    ],
-    "abilities": [
-      "corporate_entity",
-      "holding_company",
-      "targeted_acquisition"
-    ],
-    "leaders": [
-      "veldyragent",
-      "veldyrcommander",
-      "veldyrhero"
-    ],
-    "promissoryNotes": [
-      "dspnveld1",
-      "dspnveld2",
-      "dspnveld3",
-      "dspnveld4"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "veldyr_dreadnought",
-      "veldyr_flagship",
-      "infantry",
-      "veldyr_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "zealots",
-    "factionName": "Zealots of Rhodun",
-    "shortTag": "RHO",
-    "homeSystem": "d15",
-    "startingFleet": "cv,cr,dd,3 ff,2 inf p,2 inf o,sd o",
-    "commodities": 3,
-    "factionTech": [
-      "dsrhodb",
-      "dsrhody"
-    ],
-    "startingTech": [
-      "bs"
-    ],
-    "homePlanets": [
-      "poh",
-      "orad"
-    ],
-    "abilities": [
-      "conspirators",
-      "ancient_knowledge"
-    ],
-    "leaders": [
-      "zealotsagent",
-      "zealotscommander",
-      "zealotshero"
-    ],
-    "promissoryNotes": [
-      "dspnrhod"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "zealots_flagship",
-      "infantry",
-      "zealots_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  },
-  {
-    "alias": "zelian",
-    "factionName": "Zelian Purifier",
-    "homeSystem": "d12",
-    "startingFleet": "dn,cv,dd,ff,2 inf z,3 inf g,sd z,pds g",
-    "commodities": 2,
-    "factionTech": [
-      "dszelir",
-      "dszeliinf"
-    ],
-    "startingTech": [
-      "aida",
-      "amd"
-    ],
-    "homePlanets": [
-      "zelian",
-      "gen"
-    ],
-    "abilities": [
-      "obsessive_designs",
-      "biophobic",
-      "paranoia"
-    ],
-    "leaders": [
-      "zelianagent",
-      "zeliancommander",
-      "zelianhero"
-    ],
-    "promissoryNotes": [
-      "dspnzeli"
-    ],
-    "units": [
-      "fighter",
-      "destroyer",
-      "cruiser",
-      "carrier",
-      "dreadnought",
-      "zelian_flagship",
-      "zelian_infantry",
-      "zelian_mech",
-      "pds",
-      "spacedock"
-    ],
-    "source": "ds"
-  }
+    {
+        "alias": "augers",
+        "factionName": "Augers of Ilyxum",
+        "homeSystem": "d19",
+        "startingFleet": "cv,2 dd,2 ff, 2 inf c,2 inf d,sd c,pds d",
+        "commodities": 3,
+        "factionTech": ["dsaugug", "dsauguy"],
+        "startingTech": ["aida", "sdn"],
+        "homePlanets": ["chrion", "demis"],
+        "abilities": ["oracle_ai", "limited_vision", "probability_algorithms"],
+        "leaders": ["augersagent", "augerscommander", "augershero"],
+        "promissoryNotes": ["dspnauge"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "augers_flagship",
+            "infantry",
+            "augers_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "axis",
+        "factionName": "Shipwrights of Axis",
+        "shortTag": "AXS",
+        "homeSystem": "d27",
+        "startingFleet": "dn,cv,dd,2 ff,3 inf a,sd a",
+        "commodities": 5,
+        "factionTech": ["dsaxisb", "dsaxisy"],
+        "startingTech": ["st", "aida"],
+        "homePlanets": ["axis"],
+        "abilities": ["military_industrial_complex", "arms_dealers"],
+        "leaders": ["axisagent", "axiscommander", "axishero"],
+        "promissoryNotes": ["dspnaxis"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "axis_flagship",
+            "infantry",
+            "axis_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "bentor",
+        "factionName": "Bentor Conglomerate",
+        "shortTag": "BNT",
+        "homeSystem": "d07",
+        "startingFleet": "cv,2 cr,3 ff,2 inf b,2 inf h,sd b,pds h",
+        "commodities": 2,
+        "factionTech": ["dsbentg", "dsbenty"],
+        "startingTechOptions": ["det", "pa", "sdn"],
+        "startingTechAmount": 2,
+        "homePlanets": ["benc", "hau"],
+        "abilities": ["secret_maps", "ancient_blueprints", "fortune_seekers"],
+        "leaders": ["bentoragent", "bentorcommander", "bentorhero"],
+        "promissoryNotes": ["dspnbent"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "bentor_flagship",
+            "infantry",
+            "bentor_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "celdauri",
+        "factionName": "Celdauri Trade Confederation",
+        "homeSystem": "d16",
+        "startingFleet": "2 cv,dd,4 ff,2 inf l,inf a,sd a,pds l",
+        "commodities": 4,
+        "factionTech": ["dsceldr", "dsceldsd"],
+        "startingTechOptions": ["amd", "st", "ps"],
+        "startingTechAmount": 2,
+        "homePlanets": ["louk", "auldane"],
+        "abilities": ["projection_of_power", "industrialists"],
+        "leaders": ["celdauriagent", "celdauricommander", "celdaurihero"],
+        "promissoryNotes": ["dspnceld"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "celdauri_flagship",
+            "infantry",
+            "celdauri_mech",
+            "pds",
+            "celdauri_spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "cheiran",
+        "factionName": "Cheiran Hordes",
+        "shortTag": "CHR",
+        "homeSystem": "d08",
+        "startingFleet": "dn,cv,dd,2 ff,mech a,2 inf g,sd a",
+        "commodities": 2,
+        "factionTech": ["dscheir", "dscheidn"],
+        "startingTechOptions": ["md", "sar"],
+        "startingTechAmount": 1,
+        "homePlanets": ["arche", "gghurntheta"],
+        "abilities": ["teeming", "moult", "byssus"],
+        "leaders": ["cheiranagent", "cheirancommander", "cheiranhero"],
+        "promissoryNotes": ["dspnchei"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "cheiran_dreadnought",
+            "cheiran_flagship",
+            "infantry",
+            "cheiran_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "cymiae",
+        "factionName": "Savages of Cymiae",
+        "homeSystem": "d30",
+        "startingFleet": "dn,cv,dd,2 ff,3 inf c,sd c",
+        "commodities": 3,
+        "factionTech": ["dscymiinf", "dscymiy"],
+        "startingTech": ["nm", "aida"],
+        "homePlanets": ["cymiae"],
+        "abilities": ["autonetic_memory", "cybernetic_madness"],
+        "leaders": ["cymiaeagent", "cymiaecommander", "cymiaehero"],
+        "promissoryNotes": ["dspncymi"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "cymiae_flagship",
+            "cymiae_infantry",
+            "cymiae_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "dihmohn",
+        "factionName": "Dih-Mohn Flotilla",
+        "shortTag": "DMN",
+        "homeSystem": "d29",
+        "startingFleet": "2 dn,2 dd,2 ff,mech a,2 inf a,sd a",
+        "commodities": 2,
+        "factionTech": ["dsdihmdn", "dsdihmy"],
+        "startingTech": ["sdn", "det"],
+        "homePlanets": ["abyssus"],
+        "abilities": ["capital_fleet", "migrant_fleet", "flotilla"],
+        "leaders": ["dihmohnagent", "dihmohncommander", "dihmohnhero"],
+        "promissoryNotes": ["dspndihm"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dihmohn_dreadnought",
+            "dihmohn_flagship",
+            "infantry",
+            "dihmohn_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "edyn",
+        "factionName": "Edyn Mandate",
+        "homeSystem": "d03",
+        "startingFleet": "cv,2 dd,4 ff,3 inf edyn,pds o,sd edyn",
+        "commodities": 3,
+        "factionTech": ["dsedyny", "dsedyng"],
+        "startingTechOptions": [
+            "amd",
+            "det",
+            "nm",
+            "pa",
+            "st",
+            "sdn",
+            "ps",
+            "aida"
+        ],
+        "startingTechAmount": 3,
+        "homePlanets": ["edyn", "ekko", "okke"],
+        "abilities": ["grace", "decree", "radiance"],
+        "leaders": ["edynagent", "edyncommander", "edynhero"],
+        "promissoryNotes": ["dspnedyn"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "edyn_flagship",
+            "infantry",
+            "edyn_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "florzen",
+        "factionName": "Florzen Profiteers",
+        "shortTag": "FLZ",
+        "homeSystem": "d18",
+        "startingFleet": "2 cv,4 ff,2 inf d,2 inf k,sd d",
+        "commodities": 4,
+        "factionTech": ["dsflorg", "dsflorff"],
+        "startingTech": ["nm", "sdn"],
+        "homePlanets": ["delmor", "kyd"],
+        "abilities": ["mercenaries", "data_leak", "black_markets"],
+        "leaders": ["florzenagent", "florzencommander", "florzenhero"],
+        "promissoryNotes": ["dspnflor"],
+        "units": [
+            "florzen_fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "florzen_flagship",
+            "infantry",
+            "florzen_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "freesystems",
+        "factionName": "Free Systems Compact",
+        "shortTag": "FSC",
+        "homeSystem": "d13",
+        "startingFleet": "cv,2 cr,2 ff,2 inf i,inf k,inf c,sd i,pds c",
+        "commodities": 4,
+        "factionTech": ["dsfreeg", "dsfreey"],
+        "startingTech": ["pa"],
+        "homePlanets": ["idyn", "kroll", "cyrra"],
+        "abilities": ["rally_to_the_cause", "diplomats", "free_people"],
+        "leaders": [
+            "freesystemsagent",
+            "freesystemscommander",
+            "freesystemshero"
+        ],
+        "promissoryNotes": ["dspnfree"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "freesystems_flagship",
+            "infantry",
+            "freesystems_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "ghemina",
+        "factionName": "Ghemina Raiders",
+        "shortTag": "GHE",
+        "homeSystem": "d20",
+        "startingFleet": "2 cv,dd,3 ff,2 inf d,inf t,sd d,sd t",
+        "commodities": 2,
+        "factionTech": ["dsghemcv", "dsghemg"],
+        "startingTech": ["pa", "det"],
+        "homePlanets": ["drah", "trykk"],
+        "abilities": ["the_lady_and_the_lord", "rule_of_two"],
+        "leaders": [
+            "gheminaagent",
+            "gheminacommander",
+            "gheminaherolord",
+            "gheminaherolady"
+        ],
+        "promissoryNotes": ["dspnghem"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "ghemina_carrier",
+            "dreadnought",
+            "ghemina_flagship_lord",
+            "ghemina_flagship_lady",
+            "infantry",
+            "ghemina_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "ghoti",
+        "factionName": "Ghoti Wayfarers",
+        "homeSystem": "d11",
+        "startingFleet": "fs,cr,2 ff,3 inf",
+        "commodities": 4,
+        "factionTech": ["dsghotg", "dsghoty"],
+        "startingTechOptions": ["gd", "sr"],
+        "startingTechAmount": 1,
+        "homePlanets": ["ghoti"],
+        "abilities": ["abyssal_embrace", "mobile_command", "spawning_grounds"],
+        "leaders": ["ghotiagent", "ghoticommander", "ghotihero"],
+        "promissoryNotes": ["dspnghot"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "ghoti_flagship",
+            "infantry",
+            "ghoti_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "gledge",
+        "factionName": "Gledge Union",
+        "shortTag": "GLD",
+        "homeSystem": "d09",
+        "startingFleet": "dn,cv,dd,3 ff,2 inf l,mech l,sd l",
+        "commodities": 2,
+        "factionTech": ["dsgledb", "dsgledpds"],
+        "startingTechOptions": ["pa", "sdn", "aida"],
+        "startingTechAmount": 2,
+        "homePlanets": ["laststop"],
+        "abilities": [
+            "mantle_cracking",
+            "celestial_reclamation",
+            "deep_mining"
+        ],
+        "leaders": ["gledgeagent", "gledgecommander", "gledgehero"],
+        "promissoryNotes": ["dspngled"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "gledge_flagship",
+            "infantry",
+            "gledge_mech",
+            "gledge_pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "khrask",
+        "factionName": "L'Tokk Khrask",
+        "shortTag": "KHR",
+        "homeSystem": "d33",
+        "startingFleet": "3 cr,ff,3 inf b,sd b,pds b",
+        "commodities": 2,
+        "factionTech": ["dskhrag", "dskhracr"],
+        "startingTech": ["ps", "sdn"],
+        "homePlanets": ["bohldhur"],
+        "abilities": ["lithoids", "garden_worlds", "meteor_slings"],
+        "leaders": ["khraskagent", "khraskcommander", "khraskhero"],
+        "promissoryNotes": ["dspnkhra"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "khrask_cruiser",
+            "carrier",
+            "dreadnought",
+            "khrask_flagship",
+            "infantry",
+            "khrask_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "kjalengard",
+        "factionName": "Berserkers of Kjalengard",
+        "homeSystem": "d02",
+        "startingFleet": "2 cv,dd,4 ff,2 inf k,2 inf h,sd k,pds h",
+        "commodities": 3,
+        "factionTech": ["dskjalg", "dskjalcv"],
+        "startingTechOptions": [],
+        "startingTechAmount": 1,
+        "homePlanets": ["kjalengard", "hulgade"],
+        "abilities": ["heroism", "glory", "valor"],
+        "leaders": ["kjalengardagent", "kjalengardcommander", "kjalengardhero"],
+        "promissoryNotes": ["dspnkjal"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "kjalengard_carrier",
+            "dreadnought",
+            "kjalengard_flagship",
+            "infantry",
+            "kjalengard_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "kollecc",
+        "factionName": "Kollecc Society",
+        "shortTag": "KLC",
+        "homeSystem": "d34",
+        "startingFleet": "2 cv,cr,2 ff,4 inf s,sd s",
+        "commodities": 3,
+        "factionTech": ["dskollb", "dskolly"],
+        "startingTech": ["sdn"],
+        "homePlanets": ["susuros"],
+        "abilities": ["cloaked_fleets", "shroud_of_lith", "treasure_hunters"],
+        "leaders": ["kolleccagent", "kollecccommander", "kollecchero"],
+        "promissoryNotes": ["dspnkoll"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "kollecc_flagship",
+            "infantry",
+            "kollecc_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "kolume",
+        "factionName": "Monks of Kolume",
+        "shortTag": "KLM",
+        "homeSystem": "d06",
+        "startingFleet": "2 cv,2 ff,cr,2 inf alesna,2 inf azle,sd azle",
+        "commodities": 3,
+        "factionTech": ["dskolug", "dskolur"],
+        "startingTechOptions": ["gls", "pi"],
+        "startingTechAmount": 1,
+        "homePlanets": ["alesna", "azle"],
+        "abilities": ["starfall_gunnery", "deliberate_action", "meditation"],
+        "leaders": ["kolumeagent", "kolumecommander", "kolumehero"],
+        "promissoryNotes": ["dspnkolu"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "kolume_flagship",
+            "infantry",
+            "kolume_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "kortali",
+        "factionName": "Kortali Tribunal",
+        "shortTag": "KOR",
+        "homeSystem": "d24",
+        "startingFleet": "2 cv,cr,2 ff,2 inf o,2 inf b,sd o,pds b",
+        "commodities": 3,
+        "factionTech": ["dskortg", "dskortr"],
+        "startingTech": ["ps", "pa"],
+        "homePlanets": ["ogdun", "brthkul"],
+        "abilities": ["zealous", "ruthless"],
+        "leaders": ["kortaliagent", "kortalicommander", "kortalihero"],
+        "promissoryNotes": ["dspnkort"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "kortali_flagship",
+            "infantry",
+            "kortali_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "kyro",
+        "factionName": "Kyro Sodality",
+        "homeSystem": "d10",
+        "startingFleet": "dn,cv,dd,ff,3 inf a,sd a",
+        "commodities": 2,
+        "factionTech": ["dskyrog", "dskyroy"],
+        "startingTechOptions": ["dxa", "bs"],
+        "startingTechAmount": 1,
+        "homePlanets": ["avicenna"],
+        "abilities": ["contagion", "plague_reservoir", "subversive"],
+        "leaders": ["kyroagent", "kyrocommander", "kyrohero"],
+        "promissoryNotes": ["dspnkyro"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "kyro_flagship",
+            "infantry",
+            "kyro_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "lanefir",
+        "factionName": "Lanefir Remnants",
+        "homeSystem": "d05",
+        "startingFleet": "2 cv,dd,2 ff,inf a,2 inf s,sd a,pds s",
+        "commodities": 2,
+        "factionTech": ["dslaneb", "dslaner"],
+        "startingTechOptions": ["det", "sdn", "aida"],
+        "startingTechAmount": 2,
+        "homePlanets": ["aysisrest", "solitude"],
+        "abilities": ["a_new_edifice", "iconoclasm", "war_stories"],
+        "leaders": ["lanefiragent", "lanefircommander", "lanefirhero"],
+        "promissoryNotes": ["dspnlane"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "lanefir_flagship",
+            "infantry",
+            "lanefir_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "lizho",
+        "factionName": "Li-Zho Dynasty",
+        "shortTag": "LZH",
+        "homeSystem": "d14",
+        "startingFleet": "2 cv,dd,3 ff, inf k,2 inf p,inf v,sd k,pds k",
+        "commodities": 3,
+        "factionTech": ["dslizhb", "dslizhff"],
+        "startingTech": ["pa", "amd"],
+        "homePlanets": ["pax", "vess", "kyr"],
+        "abilities": ["cunning", "subterfuge"],
+        "leaders": ["lizhoagent", "lizhocommander", "lizhohero"],
+        "promissoryNotes": ["dspnlizh"],
+        "units": [
+            "lizho_fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "lizho_flagship",
+            "infantry",
+            "lizho_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "mirveda",
+        "factionName": "Mirveda Protectorate",
+        "homeSystem": "d23",
+        "startingFleet": "2 cv,cr,5 ff,2 inf b,pds,sd a",
+        "commodities": 3,
+        "factionTech": ["dsmirvpds", "dsmirvr"],
+        "startingTech": ["aida"],
+        "homePlanets": ["aldra", "beata"],
+        "abilities": ["privileged_citizenry", "combat_drones"],
+        "leaders": ["mirvedaagent", "mirvedacommander", "mirvedahero"],
+        "promissoryNotes": ["dspnmirv"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "mirveda_flagship",
+            "infantry",
+            "mirveda_mech",
+            "mirveda_pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "mortheus",
+        "factionName": "Glimmer of Mortheus",
+        "shortTag": "MTH",
+        "homeSystem": "d17",
+        "startingFleet": "dn,cv,dd,2 ff,inf b,2 inf e,sd b",
+        "commodities": 3,
+        "factionTech": ["dsmortr", "dsmorty"],
+        "startingTech": ["det", "st"],
+        "homePlanets": ["blaheo", "empero"],
+        "abilities": ["facsimile", "illusory_presence"],
+        "leaders": ["mortheusagent", "mortheuscommander", "mortheushero"],
+        "promissoryNotes": ["dspnmort"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "mortheus_flagship",
+            "infantry",
+            "mortheus_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "mykomentori",
+        "factionName": "Myko-Mentori",
+        "homeSystem": "d32",
+        "startingFleet": "2 cv,cr,ff,6 inf s,sd s",
+        "commodities": 1,
+        "factionTech": ["dsmykog", "dsmykosd"],
+        "startingTech": ["pi"],
+        "homePlanets": ["shihalaum"],
+        "abilities": ["prescient_memories", "divination", "necrophage"],
+        "leaders": [
+            "mykomentoriagent",
+            "mykomentoricommander",
+            "mykomentorihero"
+        ],
+        "promissoryNotes": ["dspnmyko"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "mykomentori_flagship",
+            "infantry",
+            "mykomentori_mech",
+            "pds",
+            "mykomentori_spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "nivyn",
+        "factionName": "Nivyn Star Kings",
+        "homeSystem": "d25",
+        "startingFleet": "cv,cr,dn,3 ff,3 inf e,mech e,sd e",
+        "commodities": 3,
+        "factionTech": ["dsnivymf", "dsnivyy"],
+        "startingTech": ["ps", "det"],
+        "homePlanets": ["ellas"],
+        "abilities": ["celestial_guides", "singularity_point", "voidsailors"],
+        "leaders": ["nivynagent", "nivyncommander", "nivynhero"],
+        "promissoryNotes": ["dspnnivy"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "nivyn_flagship",
+            "infantry",
+            "nivyn_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "nokar",
+        "factionName": "Nokar Sellships",
+        "homeSystem": "d04",
+        "startingFleet": "cr, cv,dd,2 ff,2 inf z,2 inf n,sd z,pds n",
+        "commodities": 4,
+        "factionTech": ["dsnokadd", "dsnokay"],
+        "startingTechOptions": ["det", "pa", "aida"],
+        "startingTechAmount": 2,
+        "homePlanets": ["zarr", "nokk"],
+        "abilities": ["hired_guns", "private_fleet", "desperados"],
+        "leaders": ["nokaragent", "nokarcommander", "nokarhero"],
+        "promissoryNotes": ["dspnnoka"],
+        "units": [
+            "fighter",
+            "nokar_destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "nokar_flagship",
+            "infantry",
+            "nokar_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "olradin",
+        "factionName": "Olradin League",
+        "homeSystem": "d22",
+        "startingFleet": "2 cv,cr,3 ff,4 inf s,sd s",
+        "commodities": 3,
+        "factionTech": ["dsolrar", "dsolrab"],
+        "startingTech": ["pa", "sdn"],
+        "homePlanets": ["sanctuary"],
+        "abilities": ["policies"],
+        "leaders": ["olradinagent", "olradincommander", "olradinhero"],
+        "promissoryNotes": ["dspnolra"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "olradin_flagship",
+            "infantry",
+            "olradin_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "rohdhna",
+        "factionName": "Roh'Dhna Mechatronics",
+        "shortTag": "RDM",
+        "homeSystem": "d31",
+        "startingFleet": "2 cv,dd,3 ff,3 inf p,sd p",
+        "commodities": 4,
+        "factionTech": ["dsrohdws", "dsrohdy"],
+        "startingTech": ["pa", "st"],
+        "homePlanets": ["prind"],
+        "abilities": ["industrious", "recycled_materials", "orbital_foundries"],
+        "leaders": ["rohdhnaagent", "rohdhnacommander", "rohdhnahero"],
+        "promissoryNotes": ["dspnrohd"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "rohdhna_flagship",
+            "rohdhna_warsun",
+            "infantry",
+            "rohdhna_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "tnelis",
+        "factionName": "Tnelis Syndicate",
+        "homeSystem": "d21",
+        "startingFleet": "cv,2 dd,2 ff,4 inf d,sd d,pds d",
+        "commodities": 2,
+        "factionTech": ["dstneldd", "dstnely"],
+        "startingTechOptions": ["amd", "nm", "ps"],
+        "startingTechAmount": 2,
+        "homePlanets": ["discordia"],
+        "abilities": [
+            "plausible_deniability",
+            "information_brokers",
+            "stealth_insertion"
+        ],
+        "leaders": ["tnelisagent", "tneliscommander", "tnelishero"],
+        "promissoryNotes": ["dspntnel"],
+        "units": [
+            "fighter",
+            "tnelis_destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "tnelis_flagship",
+            "infantry",
+            "tnelis_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "vaden",
+        "factionName": "Vaden Banking Clans",
+        "homeSystem": "d26",
+        "startingFleet": "dn,cv,cr,2 ff,inf v,2 inf n,sd v",
+        "commodities": 3,
+        "factionTech": ["dsvadeb", "dsvadey"],
+        "startingTechOptions": ["amd", "nm", "st"],
+        "startingTechAmount": 2,
+        "homePlanets": ["vadarian", "norvus"],
+        "abilities": ["fine_print", "collateralized_loans", "binding_debts"],
+        "leaders": ["vadenagent", "vadencommander", "vadenhero"],
+        "promissoryNotes": ["dspnvade"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "vaden_flagship",
+            "infantry",
+            "vaden_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "vaylerian",
+        "factionName": "Vaylerian Scourge",
+        "homeSystem": "d28",
+        "startingFleet": "cv,cr,dd,3 ff,3 inf v,sd v,pds v",
+        "commodities": 2,
+        "factionTech": ["dsvaylr", "dsvaylcr"],
+        "startingTech": ["nm", "det"],
+        "homePlanets": ["vaylar"],
+        "abilities": ["cargo_raiders", "scour", "raze"],
+        "leaders": ["vaylerianagent", "vayleriancommander", "vaylerianhero"],
+        "promissoryNotes": ["dspnvayl"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "vaylerian_cruiser",
+            "carrier",
+            "dreadnought",
+            "vaylerian_flagship",
+            "infantry",
+            "vaylerian_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "veldyr",
+        "factionName": "Veldyr Sovereignty",
+        "homeSystem": "d01",
+        "startingFleet": "dn,cv,dd,2 ff,4 inf r,sd r,pds r",
+        "commodities": 4,
+        "factionTech": ["dsvelddn", "dsveldr"],
+        "startingTech": ["aida", "det"],
+        "homePlanets": ["rhune"],
+        "abilities": [
+            "corporate_entity",
+            "holding_company",
+            "targeted_acquisition"
+        ],
+        "leaders": ["veldyragent", "veldyrcommander", "veldyrhero"],
+        "promissoryNotes": ["dspnveld1", "dspnveld2", "dspnveld3", "dspnveld4"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "veldyr_dreadnought",
+            "veldyr_flagship",
+            "infantry",
+            "veldyr_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "zealots",
+        "factionName": "Zealots of Rhodun",
+        "shortTag": "RHO",
+        "homeSystem": "d15",
+        "startingFleet": "cv,cr,dd,3 ff,2 inf p,2 inf o,sd o",
+        "commodities": 3,
+        "factionTech": ["dsrhodb", "dsrhody"],
+        "startingTech": ["bs"],
+        "homePlanets": ["poh", "orad"],
+        "abilities": ["conspirators", "ancient_knowledge"],
+        "leaders": ["zealotsagent", "zealotscommander", "zealotshero"],
+        "promissoryNotes": ["dspnrhod"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "zealots_flagship",
+            "infantry",
+            "zealots_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    },
+    {
+        "alias": "zelian",
+        "factionName": "Zelian Purifier",
+        "homeSystem": "d12",
+        "startingFleet": "dn,cv,dd,ff,2 inf z,3 inf g,sd z,pds g",
+        "commodities": 2,
+        "factionTech": ["dszelir", "dszeliinf"],
+        "startingTech": ["aida", "amd"],
+        "homePlanets": ["zelian", "gen"],
+        "abilities": ["obsessive_designs", "biophobic", "paranoia"],
+        "leaders": ["zelianagent", "zeliancommander", "zelianhero"],
+        "promissoryNotes": ["dspnzeli"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "zelian_flagship",
+            "zelian_infantry",
+            "zelian_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ds"
+    }
 ]

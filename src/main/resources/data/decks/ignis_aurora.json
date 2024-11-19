@@ -23,9 +23,7 @@
         "name": "Baldricks Ignis Aurora Agendas",
         "type": "agenda",
         "description": "All Agendas for Ignis Aurora",
-        "cardIDs": [
-            
-        ],
+        "cardIDs": ["baldrick_agency_reorganization","secret","standardization","baldrick_articles_of_war","baldrick_checks_and_balances","cladenstine","classified","committee","disarmamament","covert","baldrick_dedevelopment","economic_equality","crisis","baldrick_homeland_defense_act","arbiter","incentive","baldrick_intergalactic_peacekeepers","baldrick_judicial_abolishment","minister_antiquities","minister_commrece","baldrick_minister_of_defense","baldrick_minister_of_development","baldrick_minister_of_industry","baldrick_minister_of_infrastructure","minister_peace","baldrick_minister_of_policy","minister_sciences","minister_war","baldrick_miscount_disclosed","mutiny","baldrick_nexus_sovereignty","censure","baldrick_public_execution","baldrick_regulated_conscription","grant_reallocation","warrant","seed_empire","baldrick_stately_quadrille","plowshares","unconventional"],
         "source": "ignis_aurora"
     },
     {

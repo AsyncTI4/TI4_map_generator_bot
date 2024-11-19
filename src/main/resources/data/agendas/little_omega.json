@@ -52,7 +52,7 @@
         "name": "Conventions of War ω",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Players cannot use Bombardment against units that are on planets that have a trait.",
+        "text1": "For: At the start of an invasion, players must discard 1 random action card from their hand to use BOMBARDMENT during that invasion.",
         "text2": "Against: Each player who voted \"Against\" or abstained discards 1 random action card from their hand.",
         "mapText": "Players cannot use Bombardment against units that are on planets that have a trait.",
         "source": "little_omega"
@@ -72,7 +72,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: Each player returns all of their trade goods to the supply. Then, each player gains 4 trade goods.",
-        "text2": "Against: Each player who cast 5 or more votes \"Against\" gains 1 trade good. Then, the player who cast the most votes \"Against\" gains 4 trade goods; the speaker breaks ties.",
+        "text2": "Against: Each player who cast votes \"Against\" gains 1 trade good. Then, the player who cast the most votes \"Against\" gains 4 trade goods; the speaker breaks ties.",
         "source": "little_omega"
     },
     {
@@ -216,8 +216,8 @@
         "name": "New Constitution ω",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: The player who cast the most votes \"For\" gains the speaker token; the speaker breaks ties. Then, discard all laws from play and reveal the top card of the agenda deck.",
-        "text2": "Against: Each player who cast 5 or more votes \"Against\" draws 2 action cards. During the next strategy phase, players cannot choose the \"Politics\" strategy card, if they have another choice.",
+        "text1": "For: The player who cast the most votes \"For\" gains the speaker token; the speaker breaks ties. Then, discard all laws from play.",
+        "text2": "Against: During the next strategy phase, players cannot choose the \"Politics\" strategy card, if they have another choice.",
         "source": "little_omega"
     },
     {

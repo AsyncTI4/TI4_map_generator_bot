@@ -113,5 +113,36 @@
         "text": "When you cast votes on an agenda, you may purge this token to cast 5 votes.",
         "isFakeRelic": true,
         "source": "ignis_aurora"       
-    }
-]
+    },
+     {
+        "alias": "votetoken2",
+        "name": "Vote Token 2",
+        "shortName": "Vote\nToken2",
+        "text": "When you cast votes on an agenda, you may purge this token to cast 5 votes.",
+        "isFakeRelic": true,
+        "source": "ignis_aurora"       
+    },
+     {
+        "alias": "votetoken3",
+        "name": "Vote Token 3",
+        "shortName": "Vote\nToken3",
+        "text": "When you cast votes on an agenda, you may purge this token to cast 5 votes.",
+        "isFakeRelic": true,
+        "source": "ignis_aurora"       
+    },
+     {
+        "alias": "votetoken4",
+        "name": "Vote Token 4",
+        "shortName": "Vote\nToken4",
+        "text": "When you cast votes on an agenda, you may purge this token to cast 5 votes.",
+        "isFakeRelic": true,
+        "source": "ignis_aurora"       
+    },
+{
+        "alias": "votetoken5",
+        "name": "Vote Token 5",
+        "shortName": "Vote\nToken5",
+        "text": "When you cast votes on an agenda, you may purge this token to cast 5 votes.",
+        "isFakeRelic": true,
+        "source": "ignis_aurora"       
+    }]

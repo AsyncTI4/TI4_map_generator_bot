@@ -8,10 +8,10 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.uncategorized.CardsInfoHelper;
-import ti4.generator.Mapper;
+import ti4.commands2.CommandHelper;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -25,9 +25,7 @@ public class TechInfo extends TechSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -35,8 +33,9 @@ public class TechInfo extends TechSubcommandData {
         sendTechInfo(game, player, event);
     }
 
+    @ButtonHandler(Constants.REFRESH_TECH_INFO)
     public static void sendTechInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
+        String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendTechInfo(game, player);
     }

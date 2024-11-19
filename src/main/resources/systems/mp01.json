@@ -1,0 +1,17 @@
+{
+    "id": "mp01",
+    "name": "Vigilum/Astrea (Netharii Keepers)",
+    "aliases": [
+        "nt01",
+        "netharii",
+        "keepers"
+    ],
+    "planets": [
+        "vigilum",
+        "astrea"
+    ],
+    "shipPositionsType": "TYPE02",
+    "tileBack": "green",
+    "imagePath": "mp01_netharii.png",
+    "source": "memephilosopher"
+}

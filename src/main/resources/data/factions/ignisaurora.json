@@ -1,0 +1,86 @@
+[
+    {
+        "alias": "qulane",
+        "factionName": "The Seers of Qulane",
+        "homeSystem": "qulane",
+        "startingFleet": "cv,2 dd,3 ff,4 inf m,sd k",
+        "commodities": 2,
+        "factionTech": [
+            "gjenspecterii",
+            "ciqineqreceptors"
+        ],
+        "startingTech": [],
+        "homePlanets": [
+            "kull",
+            "minaluk"
+        ],
+        "abilities": [
+            "revelation",
+            "redemption"
+        ],
+        "leaders": [
+            "qulaneagent",
+            "qulanecommander",
+            "qulanehero"
+        ],
+        "promissoryNotes": [
+            "qulaneafterssight"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "qulane_flagship",
+            "qulane_infantry",
+            "qulane_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "ignis_aurora"
+    },
+    {
+        "alias": "raven",
+        "factionName": "The Raven",
+        "homeSystem": "62",
+        "startingFleet": "dn,cv,dd,2 ff,3 inf s,sd s",
+        "commodities": 4,
+        "factionTech": [
+            "stco",
+            "negr"
+        ],
+        "startingTech": [
+            "ff2"
+        ],
+        "homePlanets": [
+            "semlore"
+        ],
+        "abilities": [
+            "voidmaker",
+            "impairment",
+            "tachyonpulse"
+        ],
+        "leaders": [
+            "ravenagent",
+            "ravencommander",
+            "ravenhero"
+        ],
+        "promissoryNotes": [
+            "strotemarket"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "pbd2000_raven_flagship",
+            "infantry",
+            "pbd2000_raven_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "pbd2000"
+    }
+]

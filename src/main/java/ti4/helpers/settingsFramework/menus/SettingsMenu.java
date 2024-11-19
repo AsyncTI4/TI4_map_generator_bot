@@ -7,13 +7,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.function.Consumers;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -25,6 +21,8 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.json.ObjectMapperFactory;
@@ -50,10 +48,10 @@ public abstract class SettingsMenu {
     protected static final String menuNav = "jmfN";
     protected static final String menuAction = "jmfA";
 
-    protected String menuId = null;
-    protected String menuName = null;
+    protected String menuId;
+    protected String menuName;
     protected List<String> description = new ArrayList<>();
-    protected SettingsMenu parent = null;
+    protected SettingsMenu parent;
     private String messageID = null;
 
     protected SettingsMenu(String menuId, String menuName, String description, SettingsMenu parent) {
@@ -86,7 +84,7 @@ public abstract class SettingsMenu {
 
     /** Action Handler. Returns null on a success */
     protected String resetSettings() {
-        if (enabledSettings().size() == 0) return "No settings to reset.";
+        if (enabledSettings().isEmpty()) return "No settings to reset.";
         for (SettingInterface setting : enabledSettings())
             setting.reset();
         return null;
@@ -116,9 +114,9 @@ public abstract class SettingsMenu {
             sb.append(setting.longSummary(pad, lastSettingTouched));
             sb.append("\n");
         }
-        if (enabledSettings().size() > 0) sb.append("\n"); // extra line for formatting
+        if (!enabledSettings().isEmpty()) sb.append("\n"); // extra line for formatting
 
-        if (categories().size() > 0) {
+        if (!categories().isEmpty()) {
             List<String> catStrings = new ArrayList<>();
             for (SettingsMenu cat : categories()) {
                 catStrings.add(cat.shortSummaryString(false));
@@ -184,7 +182,6 @@ public abstract class SettingsMenu {
         List<String> parts = Arrays.asList(originalId.split("_"));
         if (parts.size() < 3) {
             buttonFailed(event, "This button is not formatted properly.", true);
-            return;
         } else {
             String buttonType = parts.get(0);
             String pathString = parts.get(1);
@@ -232,13 +229,13 @@ public abstract class SettingsMenu {
 
     private boolean handleButtonPress(GenericInteractionCreateEvent event, String buttonType, String action, List<String> path) {
         List<String> remainingPath = new ArrayList<>(path); // copy to prevent pointer shenanigans
-        if (remainingPath.size() > 0) {
-            String menu = remainingPath.get(0);
+        if (!remainingPath.isEmpty()) {
+            String menu = remainingPath.getFirst();
             if (menu.equals(menuId)) {
-                remainingPath.remove(0);
-                if (remainingPath.size() > 0) {
+                remainingPath.removeFirst();
+                if (!remainingPath.isEmpty()) {
                     for (SettingsMenu child : categories()) {
-                        if (remainingPath.get(0).equals(child.getMenuId())) {
+                        if (remainingPath.getFirst().equals(child.getMenuId())) {
                             // found the path
                             return child.handleButtonPress(event, buttonType, action, remainingPath);
                         }
@@ -280,7 +277,7 @@ public abstract class SettingsMenu {
                 break;
             } else if (action.contains("_")) {
                 String actionID = action.split("_")[0];
-                if (actionID.length() > 0 && actionID.endsWith(setting.getId())) {
+                if (!actionID.isEmpty() && actionID.endsWith(setting.getId())) {
                     err = setting.modify(event, action);
                     settingTouched = setting.getId();
                     found = true;
@@ -409,7 +406,7 @@ public abstract class SettingsMenu {
             .flatMap(setting -> new ArrayList<>(setting.getButtons(prefixID)).stream())
             .toList();
         List<Button> output = new ArrayList<>();
-        if (settingButtons.size() > 0)
+        if (!settingButtons.isEmpty())
             output.add(Button.of(ButtonStyle.DANGER, prefixID + "reset", "Reset to default settings"));
         output.addAll(settingButtons);
         return output;
@@ -419,8 +416,7 @@ public abstract class SettingsMenu {
     public String json() {
         ObjectMapper mapper = ObjectMapperFactory.build();
         try {
-            String val = mapper.writeValueAsString(this);
-            return val;
+            return mapper.writeValueAsString(this);
         } catch (Exception e) {
             BotLogger.log("Error mapping to json:", e);
         }

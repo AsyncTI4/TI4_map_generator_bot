@@ -2,427 +2,151 @@
     {
         "id": "biotic",
         "imagePath": "attachment_biotic.png",
-        "techSpeciality": [
-            "biotic"
-        ]
+        "techSpeciality": ["biotic"],
+        "source": "pok"
     },
     {
         "id": "bioticstat",
         "imagePath": "attachment_bioticstat.png",
         "resourcesModifier": 1,
-        "influenceModifier": 1
+        "influenceModifier": 1,
+        "source": "pok"
     },
     {
         "id": "cybernetic",
         "imagePath": "attachment_cybernetic.png",
-        "techSpeciality": [
-            "cybernetic"
-        ]
+        "techSpeciality": ["cybernetic"],
+        "source": "pok"
     },
     {
         "id": "cyberneticstat",
         "imagePath": "attachment_cyberneticstat.png",
         "resourcesModifier": 1,
-        "influenceModifier": 1
+        "influenceModifier": 1,
+        "source": "pok"
     },
     {
         "id": "dmz",
         "imagePath": "attachment_dmz.png",
-        "token": "dmz_large"
+        "token": "dmz_large",
+        "source": "pok"
     },
     {
         "id": "dysonsphere",
+        "name": "Dyson Sphere",
         "imagePath": "attachment_dysonsphere.png",
         "resourcesModifier": 2,
-        "influenceModifier": 1
+        "influenceModifier": 1,
+        "source": "pok"
     },
     {
         "id": "lazaxsurvivors",
+        "name": "Lazax Survivors",
         "imagePath": "attachment_lazaxsurvivors.png",
         "resourcesModifier": 1,
-        "influenceModifier": 2
+        "influenceModifier": 2,
+        "source": "pok"
     },
     {
         "id": "miningworld",
+        "name": "Mining World",
         "imagePath": "attachment_miningworld.png",
-        "resourcesModifier": 2
+        "resourcesModifier": 2,
+        "source": "pok"
     },
     {
         "id": "nanoforge",
+        "name": "Nanoforge",
         "imagePath": "attachment_nanoforge.png",
         "resourcesModifier": 2,
         "influenceModifier": 2,
-        "isLegendary": true
+        "isLegendary": true,
+        "source": "pok"
     },
     {
         "id": "paradiseworld",
+        "name": "Paradise World",
         "imagePath": "attachment_paradiseworld.png",
         "resourcesModifier": 0,
-        "influenceModifier": 2
+        "influenceModifier": 2,
+        "source": "pok"
     },
     {
         "id": "propulsion",
         "imagePath": "attachment_propulsion.png",
-        "techSpeciality": [
-            "propulsion"
-        ]
+        "techSpeciality": ["propulsion"],
+        "source": "pok"
     },
     {
         "id": "propulsionstat",
         "imagePath": "attachment_propulsionstat.png",
         "resourcesModifier": 1,
-        "influenceModifier": 1
+        "influenceModifier": 1,
+        "source": "pok"
     },
     {
         "id": "richworld",
+        "name": "Rich World",
         "imagePath": "attachment_richworld.png",
-        "resourcesModifier": 1
+        "resourcesModifier": 1,
+        "source": "pok"
     },
     {
         "id": "titanshero",
+        "name": "Geoform",
         "imagePath": "attachment_titanshero.png",
         "resourcesModifier": 3,
         "influenceModifier": 3,
         "token": "ul",
         "spaceCannonHitsOn": 5,
-        "spaceCannonDieCount": 3
+        "spaceCannonDieCount": 3,
+        "source": "pok"
     },
     {
         "id": "titanspn",
+        "name": "Terraform",
         "imagePath": "attachment_titanspn.png",
         "resourcesModifier": 1,
         "influenceModifier": 1,
-        "planetTypes": [
-            "cultural",
-            "industrial",
-            "hazardous"
-        ]
-    },
-    {
-        "id": "threetraits",
-        "imagePath": "attachment_threetraits.png",
-        "planetTypes": [
-            "cultural",
-            "industrial",
-            "hazardous"
-        ],
-        "isFakeAttachment": true
-    },
-    {
-        "id": "negativeinf",
-        "imagePath": "attachment_negativeinf.png",
-        "influenceModifier": -1
-    },
-    {
-        "id": "negativeinf2",
-        "imagePath": "attachment_negativeinf2.png",
-        "influenceModifier": -2
-    },
-    {
-        "id": "negativeinf3",
-        "imagePath": "attachment_negativeinf3.png",
-        "influenceModifier": -3
-    },
-    {
-        "id": "positiveinf3",
-        "imagePath": "attachment_positiveinf3.png",
-        "influenceModifier": 3
-    },
-    {
-        "id": "negativeres",
-        "imagePath": "attachment_negativeres.png",
-        "resourcesModifier": -1
-    },
-    {
-        "id": "negativeres2",
-        "imagePath": "attachment_negativeres2.png",
-        "resourcesModifier": -2
-    },
-    {
-        "id": "negativeres3",
-        "imagePath": "attachment_negativeres3.png",
-        "resourcesModifier": -3
-    },
-    {
-        "id": "positiveres3",
-        "imagePath": "attachment_positiveres3.png",
-        "resourcesModifier": 3
+        "planetTypes": ["cultural", "industrial", "hazardous"],
+        "source": "pok"
     },
     {
         "id": "tombofemphidia",
         "imagePath": "attachment_tombofemphidia.png",
-        "influenceModifier": 1
+        "influenceModifier": 1,
+        "source": "pok"
     },
     {
         "id": "warfare",
         "imagePath": "attachment_warfare.png",
-        "techSpeciality": [
-            "warfare"
-        ]
+        "techSpeciality": ["warfare"],
+        "source": "pok"
     },
     {
         "id": "warfarestat",
         "imagePath": "attachment_warfarestat.png",
         "resourcesModifier": 1,
-        "influenceModifier": 1
-    },
-    {
-        "id": "encryptionkey",
-        "imagePath": "attachment_encryptionkey.png",
-        "techSpeciality": [
-            "biotic",
-            "cybernetic",
-            "propulsion",
-            "warfare"
-        ]
-    },
-    {
-        "id": "gledgebase",
-        "imagePath": "attachment_gledgebase.png",
-        "resourcesModifier": 2
-    },
-    {
-        "id": "lizhotrap",
-        "imagePath": "attachment_lizhotrap.png",
-        "isFakeAttachment": true
-    },
-    {
-        "id": "veldyrtaxhaven",
-        "imagePath": "attachment_veldyrtaxhaven.png",
         "influenceModifier": 1,
-        "isFakeAttachment": true
-    },
-    {
-        "id": "veldyrbroadcasthub",
-        "imagePath": "attachment_veldyrbroadcasthub.png",
-        "influenceModifier": 1,
-        "isFakeAttachment": true
-    },
-    {
-        "id": "veldyrreservebank",
-        "imagePath": "attachment_veldyrreservebank.png",
-        "resourcesModifier": 1,
-        "isFakeAttachment": true
-    },
-    {
-        "id": "veldyrorbitalshipyard",
-        "imagePath": "attachment_veldyrorbitalshipyard.png",
-        "resourcesModifier": 1,
-        "isFakeAttachment": true
-    },
-    {
-        "id": "automatons",
-        "imagePath": "attachment_automatons.png"
-    },
-    {
-        "id": "legendary",
-        "imagePath": "attachment_legendary.png",
-        "isLegendary": true
-    },
-    {
-        "id": "garden_worlds",
-        "imagePath": "attachment_garden_worlds.png",
-        "resourcesModifier": 1,
-        "isFakeAttachment": true
-    },
-    {
-        "id": "olradin_mech_res",
-        "imagePath": "attachment_olradin_mech_res.png",
-        "resourcesModifier": 1,
-        "isFakeAttachment": true
-    },
-    {
-        "id": "olradin_mech_inf",
-        "imagePath": "attachment_olradin_mech_inf.png",
-        "influenceModifier": 1,
-        "isFakeAttachment": true
-    },
-    {
-        "id": "obelisk",
-        "imagePath": "attachment_obelisk.png"
+        "source": "pok"
     },
     {
         "id": "ixthduel",
         "imagePath": "attachment_ixthduel.png",
         "resourcesModifier": 1,
-        "influenceModifier": 3
-    },
-    {
-        "id": "orbital_foundries",
-        "imagePath": "attachment_orbital_foundries.png"
-    },
-    {
-        "id": "arcane_shield",
-        "imagePath": "attachment_arc_shield.png"
-    },
-    {
-        "id": "arcane_citadel",
-        "imagePath": "attachment_arcane_citadel.png"
-    },
-    {
-        "id": "council_preserve",
-        "imagePath": "attachment_council_preserve.png"
-    },
-    {
-        "id": "lloyd_populationgrowth",
-        "imagePath": "attachment_populationgrowth.png",
-        "resourcesModifier": 1,
-        "influenceModifier": 1
-    },
-    {
-        "id": "lloyd_planetaryarcologies",
-        "imagePath": "attachment_planetaryarcologies.png",
-        "influenceModifier": 1
-    },
-    {
-        "id": "lloyd_industrialboom",
-        "imagePath": "attachment_industrialboom.png",
-        "resourcesModifier": 2,
-        "planetTypes": [
-            "industrial"
-        ]
-    },
-    {
-        "id": "lloyd_orbitalslingshot",
-        "imagePath": "attachment_orbitalslingshot.png"
-    },
-    {
-        "id": "lloyd_traderoute",
-        "imagePath": "attachment_traderoute.png"
-    },
-    {
-        "id": "lloyd_terraformingmilestone",
-        "imagePath": "attachment_terraformingmilestone.png",
-        "resourcesModifier": 2,
-        "influenceModifier": 2
-    },
-    {
-        "id": "lloyd_galacticfinancialcenter",
-        "imagePath": "attachment_galacticfinancialcenter.png"
-    },
-    {
-        "id": "lloyd_culturalboom",
-        "imagePath": "attachment_culturalboom.png",
-        "influenceModifier": 2,
-        "planetTypes": [
-            "cultural"
-        ]
-    },
-    {
-        "id": "lloyd_interplanetaryhub",
-        "imagePath": "attachment_interplanetaryhub.png"
-    },
-    {
-        "id": "lloyd_geothermal",
-        "imagePath": "attachment_geothermal.png",
-        "resourcesModifier": 1
-    },
-    {
-        "id": "lloyd_selfdefense",
-        "imagePath": "attachment_selfdefense.png"
-    },
-    {
-        "id": "galacticheritagesite",
-        "imagePath": " attachment_galacticheritagesite.png",
-        "source": "asteroid"
-    },
-    {
-        "id": "imperialinstitute",
-        "imagePath": "attachment_imperialinstitute.png",
-        "source": "asteroid"
-    },
-    {
-        "id": "manufactorum",
-        "imagePath": "attachment_manufactorum.png",
-        "source": "asteroid"
-    },
-    {
-        "id": "weapon",
-        "imagePath": "attachment_weapon.png",
-        "source": "asteroid"
-    },
-    {
-        "id": "weaponstat",
-        "imagePath": "attachment_weaponstat.png",
-        "source": "asteroid"
-    },
-    {
-        "id": "cultural",
-        "imagePath": "attachment_cultural.png",
-        "planetTypes": [
-            "cultural"
-        ],
-        "isFakeAttachment": true
-    },
-    {
-        "id": "industrial",
-        "imagePath": "attachment_industrial.png",
-        "planetTypes": [
-            "industrial"
-        ],
-        "isFakeAttachment": true
-    },
-    {
-        "id": "hazardous",
-        "imagePath": "attachment_hazardous.png",
-        "planetTypes": [
-            "hazardous"
-        ],
-        "isFakeAttachment": true
+        "influenceModifier": 3,
+        "source": "other"
     },
     {
         "id": "custodiavigilia1",
         "imagePath": "attachment_custodiavigilia_1.png",
-        "isFakeAttachment": true
+        "isFakeAttachment": true,
+        "source": "codex3"
     },
     {
         "id": "custodiavigilia2",
         "imagePath": "attachment_custodiavigilia_2.png",
-        "isFakeAttachment": true
-    },
-    {
-        "id": "sigma_ancient_hall",
-        "imagePath": "attachment_sigma_ancient_hall.png",
-        "token": "sigma_ancient_hall"
-    },
-    {
-        "id": "sigma_deserted_factories",
-        "imagePath": "attachment_sigma_deserted_factories.png",
-        "token": "sigma_deserted_factories"
-    },
-    {
-        "id": "sigma_unwelcoming",
-        "imagePath": "attachment_sigma_unwelcoming.png",
-        "token": "sigma_unwelcoming"
-    },
-    {
-        "id": "sigma_palace_diplomats",
-        "imagePath": "attachment_sigma_palace_diplomats.png",
-        "token": "sigma_palace_diplomats"
-    },
-    {
-        "id": "sigma_palace_politicians",
-        "imagePath": "attachment_sigma_palace_politicians.png",
-        "token": "sigma_palace_politicians"
-    },
-    {
-        "id": "sigma_palace_architects",
-        "imagePath": "attachment_sigma_palace_architects.png",
-        "token": "sigma_palace_architects"
-    },
-    {
-        "id": "sigma_palace_merchants",
-        "imagePath": "attachment_sigma_palace_merchants.png",
-        "token": "sigma_palace_merchants"
-    },
-    {
-        "id": "sigma_palace_admirals",
-        "imagePath": "attachment_sigma_palace_admirals.png",
-        "token": "sigma_palace_admirals"
-    },
-    {
-        "id": "sigma_palace_scientists",
-        "imagePath": "attachment_sigma_palace_scientists.png",
-        "token": "sigma_palace_scientists"
+        "isFakeAttachment": true,
+        "source": "codex3"
     }
 ]

@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class PlanetTypeModel {
     public enum PlanetType {
-        CULTURAL, HAZARDOUS, INDUSTRIAL, FACTION, NONE, MR;
+        CULTURAL, HAZARDOUS, INDUSTRIAL, FAKE, FACTION, NONE, MR;
 
         @Override
         public String toString() {

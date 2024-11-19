@@ -13,11 +13,12 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.model.TemporaryCombatModifierModel;
 
 public class ExhaustLeader extends LeaderAction {
 	public ExhaustLeader() {
 		super(Constants.EXHAUST_LEADER, "Exhaust leader");
-		addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "TG count to add to leader").setRequired(false));
+		addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "TG count to add to leader"));
 	}
 
 	@Override
@@ -42,14 +43,18 @@ public class ExhaustLeader extends LeaderAction {
 		exhaustLeader(event, game, player, playerLeader, tgCount);
 	}
 
+	public static void exhaustLeader(GenericInteractionCreateEvent event, Game game, Player player, Leader leader) {
+		exhaustLeader(event, game, player, leader, null);
+	}
+
 	public static void exhaustLeader(GenericInteractionCreateEvent event, Game game, Player player, Leader leader, Integer tgCount) {
 		leader.setExhausted(true);
 		LeaderModel leaderModel = leader.getLeaderModel().orElse(null);
 		String message = player.getRepresentation() + " exhausted: ";
 		if (leaderModel != null) {
-			MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, leaderModel.getRepresentationEmbed());
+			MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), message, leaderModel.getRepresentationEmbed());
 		} else {
-			MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + leader.getId());
+			MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message + leader.getId());
 		}
 
 		if (tgCount != null) {
@@ -60,13 +65,13 @@ public class ExhaustLeader extends LeaderAction {
 			if (leader.getTgCount() != tgCount) {
 				sb.append(" *(").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(game)).append(" total)*\n");
 			}
-			MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+			MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
 		}
 
-		var posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.LEADER, leader.getId(), player.getNumberTurns());
-		if (posssibleCombatMod != null) {
-			player.addNewTempCombatMod(posssibleCombatMod);
-			MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Combat modifier will be applied next time you push the combat roll button.");
+		TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.LEADER, leader.getId(), player.getNumberTurns());
+		if (possibleCombatMod != null) {
+			player.addNewTempCombatMod(possibleCombatMod);
+			MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Combat modifier will be applied next time you push the combat roll button.");
 		}
 	}
 }

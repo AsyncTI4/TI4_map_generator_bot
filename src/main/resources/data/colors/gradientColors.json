@@ -5,7 +5,8 @@
         "aliases": ["crm"],
         "textColor": "black",
         "primaryColor": { "red": 104, "green": 180, "blue": 238 },
-        "secondaryColor": { "red": 228, "green": 175, "blue": 30 }
+        "secondaryColor": { "red": 228, "green": 175, "blue": 30 },
+        "hue": "YELLOW"
     },
     {
         "alias": "sns",
@@ -13,7 +14,8 @@
         "aliases": ["sns"],
         "textColor": "black",
         "primaryColor": { "red": 120, "green": 129, "blue": 255 },
-        "secondaryColor": { "red": 255, "green": 90, "blue": 132 }
+        "secondaryColor": { "red": 255, "green": 90, "blue": 132 },
+        "hue": "PURPLE"
     },
     {
         "alias": "tqs",
@@ -21,7 +23,8 @@
         "aliases": ["tqs", "torq", "turquoise", "torquoise", "turq", "turquis"],
         "textColor": "black",
         "primaryColor": { "red": 63, "green": 255, "blue": 145 },
-        "secondaryColor": { "red": 40, "green": 255, "blue": 255 }
+        "secondaryColor": { "red": 40, "green": 255, "blue": 255 },
+        "hue": "GREEN"
     },
     {
         "alias": "gld",
@@ -29,7 +32,8 @@
         "aliases": ["gld"],
         "textColor": "black",
         "primaryColor": { "red": 255, "green": 100, "blue": 1 },
-        "secondaryColor": { "red": 190, "green": 190, "blue": 1 }
+        "secondaryColor": { "red": 190, "green": 190, "blue": 1 },
+        "hue": "YELLOW"
     },
     {
         "alias": "bld",
@@ -37,7 +41,8 @@
         "aliases": ["bld"],
         "textColor": "white",
         "primaryColor": { "red": 230, "green": 0, "blue": 40 },
-        "secondaryColor": { "red": 80, "green": 0, "blue": 20 }
+        "secondaryColor": { "red": 80, "green": 0, "blue": 20 },
+        "hue": "RED"
     },
     {
         "alias": "nvy",
@@ -45,7 +50,8 @@
         "aliases": ["nvy"],
         "textColor": "white",
         "primaryColor": { "red": 50, "green": 60, "blue": 255 },
-        "secondaryColor": { "red": 5, "green": 5, "blue": 120 }
+        "secondaryColor": { "red": 5, "green": 5, "blue": 120 },
+        "hue": "BLUE"
     },
     {
         "alias": "chk",
@@ -53,7 +59,8 @@
         "aliases": ["chk"],
         "textColor": "white",
         "primaryColor": { "red": 140, "green": 60, "blue": 55 },
-        "secondaryColor": { "red": 60, "green": 30, "blue": 25 }
+        "secondaryColor": { "red": 60, "green": 30, "blue": 25 },
+        "hue": "ORANGE"
     },
     {
         "alias": "eme",
@@ -61,7 +68,8 @@
         "aliases": ["eme"],
         "textColor": "white",
         "primaryColor": { "red": 37, "green": 255, "blue": 47 },
-        "secondaryColor": { "red": 0, "green": 90, "blue": 30 }
+        "secondaryColor": { "red": 0, "green": 90, "blue": 30 },
+        "hue": "GREEN"
     },
     {
         "alias": "rbw",
@@ -69,6 +77,16 @@
         "aliases": ["rbw"],
         "textColor": "white",
         "primaryColor": { "red": 255, "green": 0, "blue": 0 },
-        "secondaryColor": { "red": 0, "green": 255, "blue": 0 }
+        "secondaryColor": { "red": 0, "green": 255, "blue": 0 },
+        "hue": "GRAY"
+    },
+    {
+        "alias": "ero",
+        "name": "riftset",
+        "aliases": ["ero","riftset"],
+        "textColor": "white",
+        "primaryColor": { "red": 74, "green": 27, "blue": 36 },
+        "secondaryColor": { "red": 135, "green": 0, "blue": 4 },
+        "hue": "GRAY"
     }
 ]

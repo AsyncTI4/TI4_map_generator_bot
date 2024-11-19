@@ -4,17 +4,16 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Data;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 public class Units {
 
-    private static final String emdash = "—";
+    private static final String EMDASH = "—";
+    private static final Pattern UNIT_PATTERN = Pattern.compile(RegexHelper.colorRegex(null) + EMDASH + RegexHelper.unitTypeRegex());
 
     /**
      * <H3>
@@ -29,6 +28,7 @@ public class Units {
      */
     @Data
     public static class UnitKey {
+
         private UnitType unitType;
         private String colorID;
 
@@ -51,14 +51,24 @@ public class Units {
 
         @JsonIgnore
         public String getFileName() {
-            if (unitType == UnitType.Destroyer && ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {
+            return getFileName(ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0);
+        }
+
+        public String getFileName(boolean eyes) {
+            if (unitType == UnitType.Destroyer && eyes) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
-            if (UnitType.TyrantsLament == unitType || UnitType.Lady == unitType || UnitType.Cavalry == unitType) {
+            if (UnitType.Lady == unitType || UnitType.Cavalry == unitType) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
+            if (UnitType.TyrantsLament == unitType) {
+                return "TyrantsLament.png";
+            }
             if (UnitType.PlenaryOrbital == unitType) {
-                return String.format("%s_%s.png", colorID, "sd");
+                return "PlenaryOrbital.png";
+            }
+            if (UnitType.Monument == unitType) {
+                return getColor() + "_monument.png";
             }
 
             return String.format("%s_%s.png", colorID, asyncID());
@@ -74,7 +84,7 @@ public class Units {
         }
 
         public String outputForSave() {
-            return String.format("%s%s%s", colorID, emdash, asyncID());
+            return String.format("%s%s%s", colorID, EMDASH, asyncID());
         }
 
         public UnitKey(@JsonProperty("unitType") UnitType unitType, @JsonProperty("colorID") String colorID) {
@@ -83,8 +93,11 @@ public class Units {
         }
     }
 
+    /**
+     * UnitType - aka {@link UnitModel.getAsyncId()} - is a list of all the units in the game.
+     */
     public enum UnitType {
-        Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), CabalSpacedock("csd"), // ground based
+        Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), CabalSpacedock("csd"), Monument("monument"), // ground based
         Fighter("ff"), Destroyer("dd"), Cruiser("ca"), Carrier("cv"), Dreadnought("dn"), Flagship("fs"), Warsun("ws"), //ships
         PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"), Lady("lady"), Cavalry("cavalry"); //relics
 
@@ -100,8 +113,7 @@ public class Units {
                 case "gf" -> "Infantry";
                 case "mf" -> "Mech";
                 case "pd" -> "PDS";
-                case "sd" -> "Space Dock";
-                case "csd" -> "Dimensional Tear";
+                case "sd", "csd" -> "Space Dock";
                 case "ff" -> "Fighter";
                 case "dd" -> "Destroyer";
                 case "ca" -> "Cruiser";
@@ -113,6 +125,7 @@ public class Units {
                 case "tyrantslament" -> "Tyrant's Lament";
                 case "cavalry" -> "The Cavalry";
                 case "lady" -> "The Lady";
+                case "monument" -> "Monument";
                 default -> null;
             };
         }
@@ -122,8 +135,7 @@ public class Units {
                 case "gf" -> "infantry";
                 case "mf" -> "mech";
                 case "pd" -> "pds";
-                case "sd" -> "spacedock";
-                case "csd" -> "cabalspacedock";
+                case "sd", "csd" -> "spacedock";
                 case "ff" -> "fighter";
                 case "dd" -> "destroyer";
                 case "ca" -> "cruiser";
@@ -135,6 +147,7 @@ public class Units {
                 case "tyrantslament" -> "tyrantslament";
                 case "cavalry" -> "cavalry";
                 case "lady" -> "lady";
+                case "monument" -> "monument";
                 default -> null;
             };
         }
@@ -144,14 +157,17 @@ public class Units {
                 case "gf" -> Emojis.infantry;
                 case "mf" -> Emojis.mech;
                 case "pd" -> Emojis.pds;
-                case "sd", "csd", "plenaryorbital" -> Emojis.spacedock;
+                case "sd", "csd" -> Emojis.spacedock;
+                case "plenaryorbital" -> Emojis.PlenaryOrbital;
                 case "ff" -> Emojis.fighter;
                 case "dd" -> Emojis.destroyer;
                 case "ca" -> Emojis.cruiser;
                 case "cv" -> Emojis.carrier;
                 case "dn" -> Emojis.dreadnought;
-                case "fs", "tyrantslament", "lady", "cavalry" -> Emojis.flagship;
+                case "fs", "lady", "cavalry" -> Emojis.flagship;
+                case "tyrantslament" -> Emojis.TyrantsLament;
                 case "ws" -> Emojis.warsun;
+                case "monument" -> Emojis.Monument;
                 default -> null;
             };
         }
@@ -160,10 +176,6 @@ public class Units {
         public String toString() {
             return value;
         }
-    }
-
-    private static final String unitRegex() {
-        return RegexHelper.colorRegex(null) + emdash + RegexHelper.unitTypeRegex();
     }
 
     public static UnitType findUnitType(String unitType) {
@@ -179,13 +191,17 @@ public class Units {
         return new UnitKey(u, colorID);
     }
 
+    public static UnitKey getUnitKey(UnitType unitType, String colorID) {
+        return new UnitKey(unitType, colorID);
+    }
+
     @Nullable
     public static UnitKey parseID(String id) {
         if (id.contains(".png")) {
-            id = id.replace(".png", "").replace("_", emdash);
+            id = id.replace(".png", "").replace("_", EMDASH);
         }
 
-        Matcher unitParser = Pattern.compile(unitRegex()).matcher(id);
+        Matcher unitParser = UNIT_PATTERN.matcher(id);
         if (unitParser.matches()) {
             String colorID = unitParser.group("color");
             String unitType = unitParser.group("unittype");

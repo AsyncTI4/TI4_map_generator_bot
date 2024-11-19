@@ -76,7 +76,7 @@
         "name": "Projection of Power",
         "faction": "celdauri",
         "window": "At the start of a space combat in a system that is adjacent to or contains 1 or more of your space docks",
-        "windowEffect": "Choose up to 1 ship in that system to gain ANTI-FIGHTER BARRAGE 6(x2) until the end of that combat.",
+        "windowEffect": "Choose up to 1 ship in that system to gain ANTI-FIGHTER BARRAGE 6 until the end of that combat.",
         "source": "ds"
     },
     {
@@ -207,7 +207,7 @@
         "name": "Diplomats",
         "faction": "freesystems",
         "window": "Once per action",
-        "windowEffect": "You may exhaust 1 uncontrolled planet's planet card that is on the game board to spend its resources or influence.",
+        "windowEffect": "You may exhaust 1 uncontrolled planet's planet card that is on the game board to spend its resources or influence.[Note: this can be used during other players actions as well as your own]",
         "source": "ds"
     },
     {
@@ -237,7 +237,7 @@
         "id": "the_lady_and_the_lord",
         "name": "The Lady & The Lord",
         "faction": "ghemina",
-        "permanentEffect": "During setup, place the Lord flagship token in your reinforcements and place the additional Ghemina Hero next to your faction sheet. The Lord flagship token is a second flagship unit with the abilities and attributes listed on the Lord flagship card. You have 2 Heroes.",
+        "permanentEffect": "During setup, place the Lord flagship token in your reinforcements and place the additional Ghemina Hero next to your faction sheet. The Lord flagship token is a second flagship unit with the abilities and attributes listed on the Lord flagship card. You have 2 Heroes.[Note: In async, this ability has been changed to bestowing the Lady, with the Lord being the default flagship. This only affects franken]",
         "source": "ds"
     },
     {
@@ -444,7 +444,7 @@
         "id": "plague_reservoir",
         "name": "Plague Reservoir",
         "faction": "kyro",
-        "permanentEffect": "Once per action, during invasion on a planet that contains your units, you may resolve ground combat on that planet, even if it does not contain another player's ground forces.",
+        "permanentEffect": "Once per action, during invasion on a planet that contains your units, you may resolve ground combat on that planet, even if it does not contain another player's ground forces.[Note: designer intent seems to be that during invasion should refer to immediately after the space cannon defense window (this is the same as when ground combat normally starts)]",
         "source": "ds"
     },
     {

@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +20,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     private String text;
     private String attachmentId;
     private String flavorText;
+    private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 

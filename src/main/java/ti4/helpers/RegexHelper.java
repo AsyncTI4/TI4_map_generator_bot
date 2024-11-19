@@ -2,29 +2,44 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
+import ti4.image.TileHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
+import ti4.message.BotLogger;
 
 public class RegexHelper {
 
-    private static String regexBuilder(String groupname, Set<String> options) {
-        StringBuilder sb = new StringBuilder("(?<").append(groupname).append(">(");
-        sb.append(String.join("|", options));
-        sb.append("))");
-        return sb.toString();
+    public static boolean runMatcher(String regex, String buttonID, Consumer<Matcher> function) {
+        return runMatcher(regex, buttonID, function, fail -> BotLogger.log("Error matching regex: " + buttonID + "\n" + Constants.jazzPing()));
+    }
+
+    public static boolean runMatcher(String regex, String buttonID, Consumer<Matcher> function, Consumer<Void> failure) {
+        Matcher matcher = Pattern.compile(regex).matcher(buttonID);
+        if (matcher.matches()) {
+            function.accept(matcher);
+            return true;
+        } else {
+            failure.accept(null);
+            return false;
+        }
+    }
+
+    private static String regexBuilder(String groupname, Collection<String> options) {
+        return "(?<" + groupname + ">(" + String.join("|", options) + "))";
     }
 
     private static String regexBuilder(String groupname, String pattern) {
-        StringBuilder sb = new StringBuilder("(?<").append(groupname).append(">");
-        sb.append(pattern).append(")");
-        return sb.toString();
+        return "(?<" + groupname + ">" + pattern + ")";
     }
 
     private static Set<String> legalColors(Game game) {
@@ -49,15 +64,12 @@ public class RegexHelper {
     }
 
     public static String optional(String regex) {
-        StringBuilder sb = new StringBuilder("(").append(regex).append(")?");
-        return sb.toString();
+        return "(" + regex + ")?";
     }
 
     public static String oneOf(List<String> regex) {
-        StringBuilder sb = new StringBuilder("(");
-        sb.append("(").append(String.join(")|(", regex)).append(")");
-        sb.append(")");
-        return sb.toString();
+        return "(" + "(" + String.join(")|(", regex) + ")" +
+                ")";
     }
 
     /**
@@ -135,13 +147,13 @@ public class RegexHelper {
 
     /** @return group "tileID" matching any legal tile ID in the bot */
     public static String tileIDRegex() {
-        return regexBuilder("tileID", TileHelper.getAllTiles().keySet());
+        return regexBuilder("tileID", TileHelper.getAllTileIds());
     }
 
     /** @return group matching any planet on the map, and also "space" */
     public static String unitHolderRegex(Game game, String group) {
-        Set<String> unitholders = new HashSet<>();
-        unitholders.addAll(game.getPlanets());
+        Set<String> unitholders = new HashSet<>(game.getPlanets());
+        game.getPlanetsInfo().values().forEach(p -> unitholders.add(p.getName()));
         unitholders.add("space");
         return regexBuilder(group, unitholders);
     }
@@ -175,7 +187,7 @@ public class RegexHelper {
         return regexBuilder("token", tokens);
     }
 
-    // TODO: Use this
+    // TODO (Jazz): Use this
     /** format "__{Pfstkx}" @return groups ["type", "free", "swap", "tgsOnly", "share", "faction"] */
     public static String techMenuSuffixRegex() {
         String regex = "__\\{";

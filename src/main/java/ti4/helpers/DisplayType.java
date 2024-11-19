@@ -5,7 +5,19 @@ public enum DisplayType {
     map("map"),
     stats("stats"),
     split("split"),
-    system("system");
+    system("system"),
+    wormholes("wormholes"),
+    anomalies("anomalies"),
+    legendaries("legendaries"),
+    empties("empties"),
+    aetherstream("aetherstream"),
+    spacecannon("space_cannon_offense"),
+    traits("traits"),
+    techskips("technology_specialties"),
+    attachments("attachments"),
+    shipless("shipless"),
+    googly("googly"),
+    landscape("landscape");
 
     public final String value;
 

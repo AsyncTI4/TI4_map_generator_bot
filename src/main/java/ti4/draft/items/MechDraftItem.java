@@ -1,16 +1,16 @@
 package ti4.draft.items;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.UnitModel;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class MechDraftItem extends DraftItem {
     public MechDraftItem(String itemId) {
@@ -76,7 +76,7 @@ public class MechDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             var units = faction.getUnits();
             units.removeIf((String unit) -> !"mech".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(DraftItem.Generate(Category.MECH, units.get(0)));
+            allItems.add(DraftItem.generate(Category.MECH, units.getFirst()));
         }
         return allItems;
     }

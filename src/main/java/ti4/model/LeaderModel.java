@@ -1,18 +1,17 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import ti4.generator.Mapper;
+import org.apache.commons.lang3.StringUtils;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
@@ -31,6 +30,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String unlockCondition;
     private String flavourText;
     private String emoji;
+    private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
     private String homebrewReplacesID;

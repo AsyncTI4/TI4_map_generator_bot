@@ -58,10 +58,10 @@ public class SetOrder extends GameSubcommandData {
                 newPlayerOrder.putAll(players);
             }
             game.setPlayers(newPlayerOrder);
-        } catch (Exception e){
+        } catch (Exception e) {
             game.setPlayers(playersBackup);
         }
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         StringBuilder sb = new StringBuilder("Player order set:");
         for (Player player : game.getPlayers().values()) {
             sb.append("\n> ").append(player.getRepresentationNoPing());

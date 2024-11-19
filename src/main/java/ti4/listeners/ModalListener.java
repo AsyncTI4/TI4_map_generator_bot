@@ -1,11 +1,10 @@
 package ti4.listeners;
 
-import java.util.Date;
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import lombok.NonNull;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
@@ -31,13 +30,13 @@ public class ModalListener extends ListenerAdapter {
     }
 
     @Override
-    public void onModalInteraction(@NonNull ModalInteractionEvent event) {
+    public void onModalInteraction(@Nonnull ModalInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
             event.reply("Please try again in a moment. The bot is not ready to handle button presses.").setEphemeral(true).queue();
             return;
         }
         event.deferEdit().queue();
-        long startTime = new Date().getTime();
+        long startTime = System.currentTimeMillis();
         try {
             ModalContext context = new ModalContext(event);
             if (context.isValid()) {
@@ -46,7 +45,7 @@ public class ModalListener extends ListenerAdapter {
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
-        long endTime = new Date().getTime();
+        long endTime = System.currentTimeMillis();
         if (endTime - startTime > 3000) {
             BotLogger.log(event, "This button command took longer than 3000 ms (" + (endTime - startTime) + ")");
         }
@@ -70,7 +69,7 @@ public class ModalListener extends ListenerAdapter {
         return false;
     }
 
-    private void resolveModalInteractionEvent(@NonNull ModalContext context) {
+    private void resolveModalInteractionEvent(@Nonnull ModalContext context) {
         String modalID = context.getModalID();
         Game game = context.getGame();
 

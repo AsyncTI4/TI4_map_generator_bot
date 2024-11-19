@@ -1,18 +1,20 @@
 package ti4.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.CombatRollType;
 import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.Source.ComponentSource;
+import ti4.service.combat.CombatRollType;
 
 @Data
 public class UnitModel implements ModelInterface, EmbeddableModel {
@@ -20,14 +22,16 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private String baseType;
     private String asyncId;
     private String name;
+    private String subtitle;
     private String upgradesFromUnitId;
     private String upgradesToUnitId;
     private String requiredTechId;
-    private ComponentSource source;
     private String faction;
+    private List<String> eligiblePlanetTypes;
     private int moveValue;
     private int productionValue;
     private int capacityValue;
+    private int fleetSupplyBonus;
     private int capacityUsed;
     private float cost;
     private int combatHitsOn;
@@ -44,11 +48,14 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private Boolean disablesPlanetaryShield;
     private Boolean canBeDirectHit;
     private Boolean isStructure;
+    private Boolean isMonument;
     private Boolean isGroundForce;
     private Boolean isShip;
     private String ability;
     private String unlock; // for Flagshipping homebrew
     private String homebrewReplacesID;
+    private String imageURL;
+    private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
     //Source: units.json - source of json: https://docs.google.com/spreadsheets/d/1nbHylJyn4VURCRKX8ePmOrLa6dAsc504ww0BPZXIRxU/edit?usp=sharing
@@ -62,11 +69,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             && name != null
             && asyncId != null
             && source != null
-            && List.of("ca", "cv", "dd", "dn", "ff", "fs", "gf", "mf", "pd", "sd", "ws", "csd", "plenaryorbital", "tyrantslament", "lady", "cavalry").contains(getAsyncId())
-            // && (requiredTechId == null || Mapper.isValidTech(requiredTechId))
-            // && (upgradesFromUnitId == null || Mapper.isValidUnit(upgradesFromUnitId))
-            // && (upgradesToUnitId == null || Mapper.isValidUnit(upgradesToUnitId))
-            && (getFaction().isEmpty() || Mapper.isValidFaction(getFaction().orElse("").toLowerCase()));
+            && (getFaction().isEmpty() || Mapper.isValidFaction(getFaction().orElse("").toLowerCase()))
+            && List.of("CULTURAL", "HAZARDOUS", "INDUSTRIAL", "TECH_SPECIALTY", "LEGENDARY", "MECATOL_REX", "EMPTY_NONANOMALY").containsAll(getEligiblePlanetTypes());
     }
 
     public String getAlias() {
@@ -108,14 +112,16 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
         EmbedBuilder eb = new EmbedBuilder();
 
-        String name = getName() == null ? "" : getName();
+        String name = getName();
         eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji(), null);
+        if (getSubtitle().isPresent()) eb.setDescription("-# " + getSubtitle().get() + " " + getEligiblePlanetEmojis());
 
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
         if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
         if (!getOtherText().isEmpty()) eb.addField("Traits:", getOtherText(), true);
         if (getAbility().isPresent()) eb.addField("Ability:", getAbility().get(), false);
         if (getUnlock().isPresent()) eb.addField("Unlock:", getUnlock().get(), false);
+        // if (getImageURL() != null) eb.setThumbnail(getImageURL());
 
         if (includeAliases) eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
 
@@ -153,62 +159,62 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getAfbDieCount(Player player, Game game) {
-        if (!game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
-            if (game.getStoredValue("ShrapnelTurrentsFaction").equalsIgnoreCase(player.getFaction()) && getAfbHitsOn() == 0) {
-                return 2;
-            }
-            return getAfbDieCount();
-        } else {
-            if (getAfbDieCount() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))) {
-                return 1;
-            } else {
-                return getAfbDieCount();
-            }
+        if (getCapacityValue() > 0 &&
+            player.getFaction().equalsIgnoreCase(game.getStoredValue("ShrapnelTurretsFaction")) &&
+            getExpectedAfbHits() < .6) {
+            return 2;
         }
+        if (getAfbDieCount() == 0 &&
+            isWarsunOrDreadnought() &&
+            game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            return 1;
+        }
+        return getAfbDieCount();
+    }
+
+    private double getExpectedAfbHits() {
+        return getAfbDieCount() * ((10 - getAfbHitsOn()) / 10d);
+    }
+
+    private boolean isWarsunOrDreadnought() {
+        return getBaseType().equalsIgnoreCase("warsun") ||
+            getBaseType().equalsIgnoreCase("dreadnought");
     }
 
     public int getSpaceCannonDieCount(Player player, Game game) {
-        if (!game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
-            return getSpaceCannonDieCount();
-        } else {
+        if (game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
             if (getBaseType().equalsIgnoreCase("spacedock")) {
                 return 3;
-            } else {
-                return getSpaceCannonDieCount();
             }
         }
-    }
-
-    public int getAfbHitsOn(Player player, Game game) {
-        if (!game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
-            if (game.getStoredValue("ShrapnelTurrentsFaction").equalsIgnoreCase(player.getFaction()) && getAfbHitsOn() == 0) {
-                return 9;
-            }
-            return getAfbHitsOn();
-        } else {
-            if (getAfbHitsOn() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))) {
-                return 5;
-            } else {
-                return getAfbHitsOn();
-            }
-        }
+        return getSpaceCannonDieCount();
     }
 
     public int getSpaceCannonHitsOn(Player player, Game game) {
-        if (!game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
-            return getSpaceCannonHitsOn();
-        } else {
+        if (game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction()) || player.hasRelic("lightrailordnance")) {
             if (getBaseType().equalsIgnoreCase("spacedock")) {
                 return 5;
-            } else {
-                return getSpaceCannonHitsOn();
             }
         }
+        return getSpaceCannonHitsOn();
+    }
+
+    public int getAfbHitsOn(Player player, Game game) {
+        if (getCapacityValue() > 0 &&
+            game.getStoredValue("ShrapnelTurretsFaction").equalsIgnoreCase(player.getFaction()) &&
+            getExpectedAfbHits() < .6) {
+            return 8;
+        }
+        if (getAfbDieCount() == 0 &&
+            isWarsunOrDreadnought() &&
+            game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            return 5;
+        }
+        return getAfbHitsOn();
     }
 
     public int getBombardDieCount(Player player, Game game) {
         if (!game.getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
-
             if (game.getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction()) && getBombardDieCount() == 0 && getAfbDieCount() > 0) {
                 return getAfbDieCount();
             }
@@ -229,7 +235,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
             return getBombardHitsOn();
         } else {
-            if (isShip && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
+            if (isShip != null && isShip && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
                 return 6;
             } else {
                 return getBombardHitsOn();
@@ -316,6 +322,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             return "Combat: " + getCombatHitsOn() + "\n";
         } else if (getCombatDieCount() > 1) {
             return "Combat: " + getCombatHitsOn() + " (x" + getCombatDieCount() + ")\n";
+        } else if ("winnu_flagship".equals(getId())) {
+            return "Combat: " + getCombatHitsOn() + " (x # of opponent's non-fighter ships)\n";
         }
         return "";
     }
@@ -362,6 +370,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             || getFaction().orElse("").toLowerCase().contains(searchString)
             || getId().toLowerCase().contains(searchString)
             || getBaseType().toLowerCase().contains(searchString)
+            || getSubtitle().orElse("").toLowerCase().contains(searchString)
             || getSearchTags().contains(searchString);
     }
 
@@ -407,6 +416,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(isStructure).orElse(false);
     }
 
+    public boolean getIsMonument() {
+        return Optional.ofNullable(isMonument).orElse(false);
+    }
+
     public boolean getIsGroundForce() {
         return Optional.ofNullable(isGroundForce).orElse(false);
     }
@@ -427,6 +440,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(requiredTechId);
     }
 
+    public Optional<String> getSubtitle() {
+        return Optional.ofNullable(subtitle);
+    }
+
     public Optional<String> getFaction() {
         return Optional.ofNullable(faction);
     }
@@ -441,5 +458,17 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getHomebrewReplacesID() {
         return Optional.ofNullable(homebrewReplacesID);
+    }
+
+    public List<String> getEligiblePlanetTypes() {
+        return Optional.ofNullable(eligiblePlanetTypes).orElse(Collections.emptyList());
+    }
+
+    public String getEligiblePlanetEmojis() {
+        StringBuilder sb = new StringBuilder();
+        for (String type : getEligiblePlanetTypes()) {
+            sb.append(Emojis.getEmojiFromDiscord(type));
+        }
+        return sb.toString();
     }
 }

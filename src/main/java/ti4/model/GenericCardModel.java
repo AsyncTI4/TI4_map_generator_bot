@@ -9,7 +9,7 @@ import ti4.model.Source.ComponentSource;
 @Data
 public class GenericCardModel implements ModelInterface, EmbeddableModel {
     public enum CardType {
-        trap;
+        trap
     }
 
     String alias;
@@ -51,7 +51,6 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
     public String cardTypeEmoji() {
         return switch (cardType) {
             case trap -> Emojis.lizho;
-            default -> "";
         };
     }
 

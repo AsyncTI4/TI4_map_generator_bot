@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.Mapper;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import ti4.commands2.CommandHelper;
+import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -33,7 +33,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET4, "4th Planet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET5, "5th Planet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET6, "6th Planet").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
 
     }
@@ -41,9 +41,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -59,7 +57,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
 
         Set<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(OptionMapping::getAsString).map(s -> AliasHandler.resolvePlanet(StringUtils.substringBefore(s, " (").replace(" ", ""))).toList());
 
-        MessageHelper.sendMessageToEventChannel(event, getActionHeaderMessage(game, player) + ":");
+        MessageHelper.sendMessageToEventChannel(event, getActionHeaderMessage(player) + ":");
 
         for (String planetID : planetIDs) {
             parseParameter(event, player, planetID, game);
@@ -75,13 +73,17 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
                 Set<String> planets = game.getPlanets();
                 List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
                 if (possiblePlanets.isEmpty()) {
+                    if (player.getPlanets().remove(planetID)) { //To remove an invalid planet from player
+                        MessageHelper.sendMessageToEventChannel(event, "> Invalid planet '" + planetID + "'' removed.");
+                        return;
+                    }
                     MessageHelper.sendMessageToEventChannel(event, "> No matching Planet '" + planetID + "'' found - please try again.");
                     return;
                 } else if (possiblePlanets.size() > 1) {
                     MessageHelper.sendMessageToEventChannel(event, "> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
                     return;
                 }
-                String planet = possiblePlanets.get(0);
+                String planet = possiblePlanets.getFirst();
                 BotLogger.log(event, "`PlanetAddRemove.parseParameter - " + getActionID() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet);
                 doAction(event, player, planet, game);
                 MessageHelper.sendMessageToEventChannel(event, "> " + resolvePlanetMessage(planet));
@@ -97,7 +99,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
     /**
      * Customize the initial header response depending on ActionID (which /player planet_* action is used)
      */
-    private String getActionHeaderMessage(Game game, Player player) {
+    private String getActionHeaderMessage(Player player) {
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" ");
         return switch (getActionID()) {
             case Constants.PLANET_ADD -> message.append(" added planet(s):").toString();

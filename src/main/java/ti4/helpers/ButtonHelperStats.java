@@ -1,17 +1,55 @@
 package ti4.helpers;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.leaders.CommanderUnlockCheck;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class ButtonHelperStats {
 
+    @ButtonHandler("convertComms_")
+    public static void convertCommButton(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        boolean deleteMsg = true;
+        if (buttonID.endsWith("_stay")) {
+            deleteMsg = false;
+            buttonID = buttonID.replace("_stay", "");
+        }
+        String regex = "convertComms_" + RegexHelper.intRegex("amt");
+        Matcher matcher = Pattern.compile(regex).matcher(buttonID);
+        if (matcher.matches()) {
+            int amt = Integer.parseInt(matcher.group("amt"));
+            convertComms(event, game, player, amt, deleteMsg);
+        }
+    }
+
+    @ButtonHandler("gainComms_")
+    public static void gainCommsButton(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        boolean deleteMsg = true;
+        if (buttonID.endsWith("_stay")) {
+            deleteMsg = false;
+            buttonID = buttonID.replace("_stay", "");
+        }
+        String regex = "gainComms_" + RegexHelper.intRegex("amt");
+        Matcher matcher = Pattern.compile(regex).matcher(buttonID);
+        if (matcher.matches()) {
+            int amt = Integer.parseInt(matcher.group("amt"));
+            gainComms(event, game, player, amt, deleteMsg);
+        }
+    }
+
     public static void convertComms(ButtonInteractionEvent event, Game game, Player player, int amt) {
+        convertComms(event, game, player, amt, event.getMessage().getContentRaw().contains("explore"));
+    }
+
+    public static void convertComms(ButtonInteractionEvent event, Game game, Player player, int amt, boolean deleteMsg) {
         String message, ident = player.getRepresentation();
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
@@ -22,22 +60,16 @@ public class ButtonHelperStats {
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         } else {
-            message = "Converted their " +  player.getCommodities() + " remaining commodities (less than " + amt + ") into TGs";
+            message = "Converted their " + player.getCommodities() + " remaining commodities (less than " + amt + ") into TGs";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         }
         if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 
-        if (event.getMessage().getContentRaw().toLowerCase().contains("space station")) {
-            ButtonHelper.deleteMessage(event);
-            message += " using their space station";
-        }
-
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(player, "hacan");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " " + message);
-        if (event.getMessage().getContentRaw().contains("explore")) {
-            ButtonHelper.deleteMessage(event);
-        }
+
+        if (deleteMsg) ButtonHelper.deleteMessage(event);
     }
 
     public static void gainComms(GenericInteractionCreateEvent event, Game game, Player player, int amt, boolean deleteMsg) {
@@ -50,10 +82,10 @@ public class ButtonHelperStats {
         if (player.getCommodities() + amt >= player.getCommoditiesTotal()) {
             player.setCommodities(player.getCommoditiesTotal());
             int gained = player.getCommodities() - initComm;
-            message = "Gained " + gained + " Commodities (comms are now at max)";
+            message = "Gained " + gained + " Commodities (" + initComm + "->" + player.getCommoditiesRepresentation() + ")";
         } else {
             player.setCommodities(player.getCommodities() + amt);
-            message = "Gained " + amt + " Commodities (" + initComm + "->" + player.getCommodities() + ")";
+            message = "Gained " + amt + " Commodities (" + initComm + "->" + player.getCommoditiesRepresentation() + ")";
         }
         int finalComm = player.getCommodities();
 
@@ -85,27 +117,21 @@ public class ButtonHelperStats {
 
     public static void gainTGs(GenericInteractionCreateEvent event, Game game, Player player, int amt, boolean skipOutput) {
         if (amt == 0) return;
-
-        int init = player.getTg();
-        player.setTg(init + amt);
-
-        String message = "has gained " + amt + " trade goods (" + init + "->" + player.getTg() + ")";
+        String message = "has gained " + amt + " trade goods " + player.gainTG(amt);
         if (!skipOutput) MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " " + message);
         if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 
         // After gain tg checks
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, amt);
     }
 
     public static void afterGainCommsChecks(Game game, Player player, int realGain) {
         if (player.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
-            String axis = player.getRepresentation(true, true) + " you have the opportunity to buy axis orders";
+            String axis = player.getRepresentationUnfogged() + " you have the opportunity to buy axis orders";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), axis, ButtonHelperAbilities.getBuyableAxisOrders(player, game));
         }
-        if (player.getLeaderIDs().contains("mykomentoricommander") && !player.hasLeaderUnlocked("mykomentoricommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", null);
-        }
+        CommanderUnlockCheck.checkPlayer(player, "mykomentori");
     }
 
     public static void sendGainCCButtons(Game game, Player player, boolean redistribute) {

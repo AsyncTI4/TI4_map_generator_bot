@@ -2,16 +2,15 @@ package ti4.listeners.context;
 
 import java.util.Date;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.MessageListener;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
+import ti4.listeners.SlashCommandListener;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -45,22 +44,21 @@ public abstract class ListenerContext {
         this.componentID = this.origComponentID = compID;
 
         String userID = event.getUser().getId();
-        MessageListener.setActiveGame(event.getMessageChannel(), userID, getContextType(), getSubCommand());
+        SlashCommandListener.setActiveGame(event.getMessageChannel(), userID, getContextType(), getSubCommand());
 
         // Find game
         String gameName = event.getChannel().getName();
         gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
         gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
         gameName = StringUtils.substringBefore(gameName, "-");
-        game = GameManager.getInstance().getGame(gameName);
+        game = GameManager.getGame(gameName);
 
         player = null;
         privateChannel = event.getMessageChannel();
         mainGameChannel = event.getMessageChannel();
 
         if (game != null) {
-            player = game.getPlayer(userID);
-            player = Helper.getGamePlayer(game, player, event.getMember(), userID);
+            player = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
 
             if (player == null && !"showGameAgain".equalsIgnoreCase(componentID)) {
                 event.getMessageChannel().sendMessage("You're not a player of the game").queue();
@@ -74,7 +72,7 @@ public abstract class ListenerContext {
             }
 
             if (game.isFowMode()) {
-                if (player != null && player.getPrivateChannel() == null) {
+                if (player != null && player.isRealPlayer() && player.getPrivateChannel() == null) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Private channels are not set up for this game. Messages will be suppressed.");
                     privateChannel = null;
                 } else if (player != null) {
@@ -120,7 +118,7 @@ public abstract class ListenerContext {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Someone has changed their preference from \"" + old + "\" to  \"" + declaration + "\" ");
             }
             game.setStoredValue(player.getUserID() + "anonDeclare", declaration);
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveGame(game, event);
             contextIsValid = false;
             return;
         }

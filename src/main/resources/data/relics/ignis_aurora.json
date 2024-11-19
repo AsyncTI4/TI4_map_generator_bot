@@ -2,7 +2,7 @@
     {
         "alias": "baldrick_stellarconverter",
         "name": "Stellar Converter",
-        "text": "Action: Choose 1 non-home planet other than Mecatol Rex in a system that is adjacent to 1 or more of your units that have Bombardment; destroy all units on that planet and purge its attachments and its planet card.\nThen, place the destroyed planet token on that planet and purge this card.",
+        "text": "Action: Choose 1 non-home planet other than Mecatol Rex in a system that contains or is adjacent to 1 or more of your units that have Bombardment; destroy all units on that planet and purge its attachments and its planet card.\nThen, place the destroyed planet token on that planet and purge this card.",
         "source": "ignis_aurora"
     },
     {

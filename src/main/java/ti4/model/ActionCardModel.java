@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +20,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String window;
     private String text;
     private String flavorText;
+    private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
@@ -32,9 +33,20 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
             && source != null;
     }
 
+    public String getNameRepresentation() {
+        return Emojis.ActionCard + "__**" + name + "**__";
+    }
+
     public String getRepresentation() {
-        return Emojis.ActionCard + "__**" + name + "**__" + " *(" + phase + " Phase)*: " +
-            "_" + window + ":_ " + text + "\n";
+        return getRepresentationJustName() + ": _" + window + ":_ " + text + "\n";
+    }
+
+    public String getRepresentationJustName() {
+        return Emojis.ActionCard + "__**" + name + "**__ *(" + phase + " Phase)*";
+    }
+
+    public String getRepresentationJustText() {
+        return "*" + getWindow() + ":* " + getText();
     }
 
     public MessageEmbed getRepresentationEmbed() {

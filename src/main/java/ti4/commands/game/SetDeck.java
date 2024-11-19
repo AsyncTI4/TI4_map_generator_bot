@@ -1,19 +1,22 @@
 package ti4.commands.game;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.collections4.CollectionUtils;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
-import ti4.model.StrategyCardSetModel;
 
 public class SetDeck extends GameSubcommandData {
 
@@ -32,6 +35,7 @@ public class SetDeck extends GameSubcommandData {
         addDefaultOption(Constants.EXPLORATION_DECKS, "Exploration");
         addDefaultOption(Constants.STRATEGY_CARD_SET, "Strategy card");
         addDefaultOption(Constants.TECHNOLOGY_DECK, "Technology");
+        addOptions(new OptionData(OptionType.BOOLEAN, "reset_deck", "True to completely reset deck"));
     }
 
     @Override
@@ -69,14 +73,19 @@ public class SetDeck extends GameSubcommandData {
     }
 
     private void addDefaultOption(String constantName, String descName) {
-        addOptions(new OptionData(OptionType.STRING, constantName, descName + " deck").setRequired(false).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, constantName, descName + " deck").setAutoComplete(true));
         deckTypes.add(constantName);
     }
 
     public static boolean setDeck(SlashCommandInteractionEvent event, Game game, String deckType, DeckModel deckModel) {
         if (Optional.ofNullable(deckModel).isPresent()) {
+            boolean resetDeck = event.getOption("reset_deck", false, OptionMapping::getAsBoolean);
             switch (deckType) {
                 case Constants.AC_DECK -> {
+                    if (resetDeck) {
+                        game.resetActionCardDeck(deckModel);
+                        return true;
+                    }
                     return game.validateAndSetActionCardDeck(event, deckModel);
                 }
                 case Constants.SO_DECK -> {
@@ -110,8 +119,7 @@ public class SetDeck extends GameSubcommandData {
                     game.setTechnologyDeckID(deckModel.getAlias());
                     if (deckModel.getAlias().contains("absol")) {
                         for (Player player : game.getRealPlayers()) {
-                            List<String> techs = new ArrayList<>();
-                            techs.addAll(player.getTechs());
+                            List<String> techs = new ArrayList<>(player.getTechs());
                             for (String tech : techs) {
                                 if (!tech.contains("absol") && Mapper.getTech("absol_" + tech) != null) {
                                     if (!player.hasTech("absol_" + tech)) {

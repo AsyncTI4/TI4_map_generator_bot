@@ -7,9 +7,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
+import ti4.helpers.TIGLHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -26,7 +26,9 @@ public class WeirdGameSetup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_EXPLORATION_MODE, "True to enable the Age of Exploration, per Dane Tweet."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MINOR_FACTIONS_MODE, "True to enable the Minor Factions, per Dane Tweet."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.CC_LIMIT, "CC limit each player should have, default 16."));
         addOptions(new OptionData(OptionType.BOOLEAN, "extra_secret_mode", "True to allow each player to start with 2 secrets. Great for SftT-less games!"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
     }
 
     @Override
@@ -38,11 +40,6 @@ public class WeirdGameSetup extends GameSubcommandData {
 
         Boolean fowMode = event.getOption(Constants.FOW_MODE, null, OptionMapping::getAsBoolean);
         if (fowMode != null) game.setFowMode(fowMode);
-
-        String customGameName = event.getOption(Constants.GAME_CUSTOM_NAME, null, OptionMapping::getAsString);
-        if (customGameName != null) {
-            game.setCustomName(customGameName);
-        }
 
         if (!setGameMode(event, game)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong and the game modes could not be set, please see error above.");
@@ -59,11 +56,14 @@ public class WeirdGameSetup extends GameSubcommandData {
 
         Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
         if (extraSecretMode != null) game.setExtraSecretMode(extraSecretMode);
+
+        Integer cclimit = event.getOption(Constants.CC_LIMIT, null, OptionMapping::getAsInt);
+        if (cclimit != null) game.setStoredValue("ccLimit", cclimit + "");
     }
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
         if (event.getOption(Constants.TIGL_GAME) == null && event.getOption(Constants.ABSOL_MODE) == null && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
-            && event.getOption(Constants.BASE_GAME_MODE) == null && event.getOption(Constants.MILTYMOD_MODE) == null) {
+            && event.getOption(Constants.BASE_GAME_MODE) == null && event.getOption(Constants.MILTYMOD_MODE) == null && event.getOption(Constants.VOTC_MODE) == null) {
             return true; //no changes were made
         }
         boolean isTIGLGame = event.getOption(Constants.TIGL_GAME, game.isCompetitiveTIGLGame(), OptionMapping::getAsBoolean);
@@ -71,19 +71,18 @@ public class WeirdGameSetup extends GameSubcommandData {
         boolean miltyModMode = event.getOption(Constants.MILTYMOD_MODE, game.isMiltyModMode(), OptionMapping::getAsBoolean);
         boolean discordantStarsMode = event.getOption(Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
         boolean baseGameMode = event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
-        return setGameMode(event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame);
+        boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotcMode(), OptionMapping::getAsBoolean);
+        return setGameMode(event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode);
     }
 
     // TODO: find a better way to handle this - this is annoying
-    public static boolean setGameMode(GenericInteractionCreateEvent event, Game game, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode,
-        boolean isTIGLGame) {
-        if (isTIGLGame
-            && (baseGameMode || absolMode || discordantStarsMode || game.isHomebrewSCMode() || game.isFowMode() || game.isAllianceMode() || game.isCommunityMode())) {
+    // NOTE: (Jazz) This seems okay. Could use improvements to reduce manual handling, but it's fine for now.
+    public static boolean setGameMode(GenericInteractionCreateEvent event, Game game, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode, boolean isTIGLGame, boolean votcMode) {
+        if (isTIGLGame && (baseGameMode || absolMode || discordantStarsMode || game.isHomebrewSCMode() || game.isFowMode() || game.isAllianceMode() || game.isCommunityMode() || votcMode)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
-            game.setCompetitiveTIGLGame(true);
-            sendTIGLSetupText(game);
+            TIGLHelper.initializeTIGLGame(game);
             return true;
         }
 
@@ -212,15 +211,36 @@ public class WeirdGameSetup extends GameSubcommandData {
             game.swapInVariantUnits("pok");
         }
 
-        return true;
-    }
+        if (votcMode) {
+            if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_cryypter"))) return false;
+            if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
+            if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
+            if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
+            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
+            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_pok"))) return false;
+            if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
+            game.setTechnologyDeckID("techs_pok");
+            game.setBaseGameMode(false);
+            game.setAbsolMode(false);
+            game.setDiscordantStarsMode(false);
+            game.swapOutVariantTechs();
+            game.swapInVariantUnits("pok");
+            game.setScSetID("votc");
+            game.setVotcMode(true);
 
-    public static void sendTIGLSetupText(Game game) {
-        String sb = "# " + Emojis.TIGL + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n" +
-            "Please ensure you have all:\n" +
-            "- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6)\n" +
-            "- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n" +
-            "For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360";
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb);
+            // Add envoys to players
+            for (Player player : game.getPlayers().values()) {
+                String faction = player.getFaction();
+                if (faction.startsWith("keleres")) {
+                    faction = "keleres";
+                }
+                String leaderID = faction + "envoy";
+                if (Mapper.isValidLeader(leaderID)) {
+                    player.addLeader(leaderID);
+                }
+            }
+        }
+
+        return true;
     }
 }

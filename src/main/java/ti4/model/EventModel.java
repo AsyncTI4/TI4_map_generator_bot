@@ -1,17 +1,17 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import software.amazon.awssdk.utils.StringUtils;
-
 import org.jetbrains.annotations.Nullable;
-import ti4.generator.Mapper;
+import software.amazon.awssdk.utils.StringUtils;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 
@@ -25,6 +25,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
     private String target;
     private String text;
     private String mapText;
+    private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
@@ -103,7 +104,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
         sb.append("\n");
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
-        if (getText().length() > 0) {
+        if (!getText().isEmpty()) {
             String arg = getText().replace("For:", "**For:**");
             sb.append("> ").append(arg).append("\n");
         }

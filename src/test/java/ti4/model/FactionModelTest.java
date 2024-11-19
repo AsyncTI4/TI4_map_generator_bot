@@ -1,13 +1,14 @@
 package ti4.model;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.testUtils.BaseTi4Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FactionModelTest extends BaseTi4Test {
     @Test
@@ -67,17 +68,17 @@ class FactionModelTest extends BaseTi4Test {
     }
 
     private static boolean validateHomePlanets(FactionModel faction) {
-        if (TileHelper.getAllPlanets().keySet().containsAll(faction.getHomePlanets())) return true;
+        if (faction.getHomePlanets().stream().allMatch(TileHelper::isValidPlanet)) return true;
         List<String> invalidPlanetIDs = new ArrayList<>();
         for (String planetID : faction.getHomePlanets()) {
-            if (!TileHelper.getAllPlanets().containsKey(planetID)) invalidPlanetIDs.add(planetID);
+            if (!TileHelper.isValidPlanet(planetID)) invalidPlanetIDs.add(planetID);
         }
         System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid home planet IDs: `" + invalidPlanetIDs + "`");
         return false;
     }
 
     private static boolean validateHomeSystem(FactionModel faction) {
-        if (TileHelper.getAllTiles().containsKey(faction.getHomeSystem()) || faction.getHomeSystem().isEmpty()) {
+        if (TileHelper.isValidTile(faction.getHomeSystem()) || faction.getHomeSystem().isEmpty()) {
             return true;
         }
         System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid home system IDs: `" + faction.getHomeSystem() + "`");
@@ -85,9 +86,13 @@ class FactionModelTest extends BaseTi4Test {
     }
 
     private static boolean validateStartingTech(FactionModel faction) {
-        if (Mapper.getTechs().keySet().containsAll(faction.getStartingTech())) return true;
+        List<String> testTechIDs = new ArrayList<>();
+        if (faction.getStartingTech() != null) testTechIDs.addAll(faction.getStartingTech());
+        if (faction.getStartingTechOptions() != null) testTechIDs.addAll(faction.getStartingTechOptions());
+        if (Mapper.getTechs().keySet().containsAll(testTechIDs)) return true;
+
         List<String> invalidStartingTechIDs = new ArrayList<>();
-        for (String startingTechID : faction.getStartingTech()) {
+        for (String startingTechID : testTechIDs) {
             if (!Mapper.getTechs().containsKey(startingTechID)) invalidStartingTechIDs.add(startingTechID);
         }
         System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid starting tech IDs: `" + invalidStartingTechIDs + "`");

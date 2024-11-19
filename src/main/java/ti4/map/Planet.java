@@ -1,10 +1,6 @@
 package ti4.map;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,13 +8,18 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.apache.commons.lang3.StringUtils;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.helpers.Units.UnitKey;
 import ti4.model.AttachmentModel;
 import ti4.model.PlanetModel;
+import ti4.model.PlanetTypeModel;
+import ti4.model.TechSpecialtyModel;
 import ti4.model.UnitModel;
 
 @JsonTypeName("planet")
@@ -43,18 +44,19 @@ public class Planet extends UnitHolder {
         PlanetModel planetInfo = Mapper.getPlanet(name);
         if (Optional.ofNullable(planetInfo).isPresent()) {
             if (planetInfo.getPlanetTypes() != null) {
-                planetType.addAll(planetInfo.getPlanetTypes().stream().map(x -> x.toString()).toList());
+                planetType.addAll(planetInfo.getPlanetTypes().stream().map(PlanetTypeModel.PlanetType::toString).toList());
             }
-            if (planetInfo.getPlanetType() == null && planetInfo.getPlanetTypes() != null && planetInfo.getPlanetTypes().size() > 0) {
-                originalPlanetType = planetInfo.getPlanetTypes().get(0).toString();
+            if (planetInfo.getPlanetType() == null && planetInfo.getPlanetTypes() != null && !planetInfo.getPlanetTypes().isEmpty()) {
+                originalPlanetType = planetInfo.getPlanetTypes().getFirst().toString();
             } else if (planetInfo.getPlanetType() != null) {
                 originalPlanetType = planetInfo.getPlanetType().toString();
             }
-
-            contrastColor = planetInfo.getContrastColor().orElse("");
-            if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0) {
-                originalTechSpeciality = planetInfo.getTechSpecialties().get(0).toString();
-                techSpeciality.addAll(planetInfo.getTechSpecialties().stream().map(x -> x.toString()).toList());
+            if (planetInfo.getContrastColor() != null) {
+                contrastColor = planetInfo.getContrastColor();
+            }
+            if (!Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).isEmpty()) {
+                originalTechSpeciality = planetInfo.getTechSpecialties().getFirst().toString();
+                techSpeciality.addAll(planetInfo.getTechSpecialties().stream().map(TechSpecialtyModel.TechSpecialty::toString).toList());
             }
             if (!StringUtils.isBlank(planetInfo.getLegendaryAbilityName()))
                 hasAbility = true;
@@ -79,6 +81,7 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public boolean hasAttachment() {
         return tokenList.stream().anyMatch(token -> {
             AttachmentModel attach = Mapper.getAttachmentInfo(token);
@@ -86,16 +89,37 @@ public class Planet extends UnitHolder {
 
             if (token.contains("sleeper")) return false;
             if (token.contains("dmz_large")) return false;
+            if (token.contains("custodiavigilia")) return false;
             return !Helper.isFakeAttachment(token);
         });
     }
 
     @JsonIgnore
+    @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
+    public List<String> getAttachments() {
+        return tokenList.stream().filter(token -> {
+            AttachmentModel attach = Mapper.getAttachmentInfo(token);
+            if (attach != null && attach.isFakeAttachment()) return false;
+
+            if (token.contains("sleeper")) return false;
+            if (token.contains("dmz_large")) return false;
+            if (token.contains("custodiavigilia")) return false;
+            return !Helper.isFakeAttachment(token);
+        }).toList();
+    }
+
     public boolean hasGroundForces(Player player) {
         return getUnits().keySet().stream()
-            .map(UnitKey::asyncID)
-            .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
+            .filter(player::unitBelongsToPlayer)
+            .map(uk -> player.getPriorityUnitByAsyncID(uk.asyncID(), this))
             .filter(Objects::nonNull)
+            .anyMatch(UnitModel::getIsGroundForce);
+    }
+
+    public boolean hasGroundForces(Game game) {
+        return getUnits().keySet().stream()
+            .flatMap(uk -> game.getPriorityUnitByUnitKey(uk, this).stream())
+            .filter(obj -> true)
             .anyMatch(UnitModel::getIsGroundForce);
     }
 
@@ -175,6 +199,11 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    public int getMaxResInf() {
+        return Math.max(getResources(), getInfluence());
+    }
+
+    @JsonIgnore
     public int getOptimalResources() {
         if (getResources() > getInfluence()) {
             return getResources();
@@ -219,8 +248,13 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    public PlanetModel getPlanetModel() {
+        return Mapper.getPlanet(getName());
+    }
+
+    @JsonIgnore
     public Set<String> getPlanetTypes() {
-        Set<String> types = new HashSet<String>();
+        Set<String> types = new HashSet<>();
         List<String> three = List.of("hazardous", "cultural", "industrial");
         for (String type : planetType) {
             if (three.contains(type)) types.add(type);
@@ -249,6 +283,9 @@ public class Planet extends UnitHolder {
 
     @JsonIgnore
     public boolean isLegendary() {
+        PlanetModel model = getPlanetModel();
+        if (model.isLegendary()) return true;
+
         for (String token : tokenList) {
             AttachmentModel attachment = Mapper.getAttachmentInfo(token);
             if (attachment == null)

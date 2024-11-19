@@ -1,15 +1,14 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 
@@ -25,6 +24,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     private ComponentSource source;
     private String text;
     private String homebrewReplacesID;
+    private String imageURL;
     private List<String> searchTags = new ArrayList<>();
     private boolean dupe = false;
 
@@ -161,7 +161,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         StringBuilder sb = new StringBuilder();
         if (!StringUtils.isBlank(getFaction().orElse(""))) sb.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
         sb.append(Emojis.PN);
-        sb.append(" ").append(getName()).append("");
+        sb.append(" ").append(getName());
         if (!StringUtils.isBlank(getColor().orElse(""))) {
             sb.append(" (");
             if (color.equals("<color>")) {

@@ -7,7 +7,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "Action: Place this face up in your play area.While this card is in your play area, you may look at the public objective card on the Ilyxum player's faction sheet.If you activate a system that contains 1 or more of the Ilyxum player's units, return this card to the Ilyxum player."
+        "text": "Action: Place this face up in your play area.\nWhile this card is in your play area, you may look at the public objective card on the Ilyxum player's faction sheet.\nIf you activate a system that contains 1 or more of the Ilyxum player's units, return this card to the Ilyxum player."
     },
     {
         "alias": "dspnaxis",
@@ -17,7 +17,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "When 1 or more of your units use PRODUCTION:Place this card face up in your play area to apply +4 to the PRODUCTION value of those units and reduce the combined cost of the produced units by 1 for this use of PRODUCTION.At the beginning of the status phase, return this card to the Axis player."
+        "text": "When 1 or more of your units use PRODUCTION: Place this card face up in your play area to apply +4 to the PRODUCTION value of those units and reduce the combined cost of the produced units by 1 for this use of PRODUCTION.\nAt the beginning of the status phase, return this card to the Axis player."
     },
     {
         "alias": "dspnbent",
@@ -28,7 +28,7 @@
         "playImmediately": false,
         "attachment": "encryptionkey",
         "source": "ds",
-        "text": "Action: Attach this card to a non-home planet you control.This planet has 1 technology specialty of any color."
+        "text": "Action: Attach this card to a non-home planet you control.\nThis planet has 1 technology specialty of any color."
     },
     {
         "alias": "dspnblex",
@@ -37,7 +37,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "At the start of a ground combat against a player other than the Blex player: Apply -1 to the result of each of your opponent's unit's combat rolls during this combat.Then, return this card to the Blex player."
+        "text": "At the start of a ground combat against a player other than the Blex player: Apply -1 to the result of each of your opponent's unit's combat rolls during this combat.\nThen, return this card to the Blex player."
     },
     {
         "alias": "dspnceld",
@@ -47,7 +47,7 @@
         "playArea": true,
         "playImmediately": true,
         "source": "ds",
-        "text": "When you receive this card, if you are not the Celdauri player, you must place it face up in your play area. While this card is in your play area, you can use the Celdauri player's commander ability, if it is unlocked. If you activate a system that contains 1 or more of the Celdauri player's units, return this card to the Celdauri player."
+        "text": "When you receive this card, if you are not the Celdauri player, you must place it face up in your play area.\nWhile this card is in your play area, you can use the Celdauri player's commander ability, if it is unlocked.\nIf you activate a system that contains 1 or more of the Celdauri player's units, return this card to the Celdauri player."
     },
     {
         "alias": "dspnchei",
@@ -56,7 +56,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "When 1 of your non-fighter ships is destroyed during combat: You may place 2 fighters from your reinforcements in the space area of the active system.At the end of that combat, return this card to the Cheiran Hordes player."
+        "text": "When 1 of your non-fighter ships is destroyed during combat: You may place 2 fighters from your reinforcements in the space area of the active system.\nAt the end of that combat, return this card to the Cheiran Hordes player."
     },
     {
         "alias": "dspncymi",
@@ -65,7 +65,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "Action: Choose 1 action card from the action card discard pile and add it to your hand.Then, purge this card."
+        "text": "Action: Choose 1 action card from the action card discard pile and add it to your hand.\nThen, purge this card."
     },
     {
         "alias": "dspndihm",
@@ -75,7 +75,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "When 1 of your ships would be destroyed: Instead of destroying that ship, place this card face up in your play area.Return this card to the Dih-Mohn player at the start of the status phase."
+        "text": "When 1 of your ships would be destroyed: Instead of destroying that ship, place this card face up in your play area.\nReturn this card to the Dih-Mohn player at the start of the status phase."
     },
     {
         "alias": "dspnedyn",
@@ -84,7 +84,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 command token from another player's reinforcements in a system that contains your units. Then, return this card to the Edyn player."
+        "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 command token from another player's reinforcements in a system that contains your units.\nThen, return this card to the Edyn player."
     },
     {
         "alias": "dspnflor",
@@ -93,7 +93,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "When you would gain a relic:You may draw 1 additional card.  Choose 1 to gain and return the rest to the relic deck. Then, shuffle the relic deck.Then, return this card to the Florzen player."
+        "text": "When you would gain a relic: You may draw 1 additional card. Choose 1 to gain and return the rest to the relic deck. Then, shuffle the relic deck.\nThen, return this card to the Florzen player."
     },
     {
         "alias": "dspnfree",
@@ -102,7 +102,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "When you gain control of a planet during a tactical action:If the active system does not contain another player's ships, you may produce up to 2 ships in that system.Then, return this card to the Free Systems player."
+        "text": "When you gain control of a planet during a tactical action: If the active system does not contain another player's ships, you may produce up to 2 ships in that system.\nThen, return this card to the Free Systems player."
     },
     {
         "alias": "dspnghem",
@@ -111,7 +111,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "After you activate a system:Choose 1 non-fighter ship you control.  During this action, that unit gains BOMBARDMENT 5(x2) and a capacity value of 2.Return this card to the Ghemina player at the end of this action."
+        "text": "After you activate a system: Choose 1 non-fighter ship you control. During this action, that unit gains BOMBARDMENT 5(x2) and a capacity value of 2.\nReturn this card to the Ghemina player at the end of this action."
     },
     {
         "alias": "dspnghot",
@@ -121,7 +121,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "At the start of your turn: Place this card in your play area to produce up to 2 ships in a system that contains 1 or more of your ships.At the start of the status phase, return this card to the Ghoti Player."
+        "text": "At the start of your turn: Place this card in your play area to produce up to 2 ships in a system that contains 1 or more of your ships.\nAt the start of the status phase, return this card to the Ghoti Player."
     },
     {
         "alias": "dspngled",
@@ -132,7 +132,7 @@
         "playImmediately": false,
         "attachment": "gledgebase",
         "source": "ds",
-        "text": "Action: Attach this card to a non-home planet you control. This planet's resource value is increased by 2."
+        "text": "Action: Attach this card to a non-home planet you control.\nThis planet's resource value is increased by 2."
     },
     {
         "alias": "dspnkhra",
@@ -141,7 +141,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "During a tactical action, when you produce 1 or more hits during a BOMBARDMENT roll:For each hit you produced, you may instead place 1 infantry from your reinforcements on the planet being bombarded.Then, return this card to the L'tokk Khrask player."
+        "text": "During a tactical action, when you produce 1 or more hits during a BOMBARDMENT roll: For each hit you produced, you may instead place 1 infantry from your reinforcements on the planet being bombarded.\nThen, return this card to the L'tokk Khrask player."
     },
     {
         "alias": "dspnkjal",
@@ -150,7 +150,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "At the start of combat:Apply +1 to the results of each of your fighters' combat rolls during this combat. The Kjalengard player captures each of your fighters destroyed during this combat.Then, return this card to the Kjalengard player."
+        "text": "At the start of combat: Apply +1 to the results of each of your fighters' combat rolls during this combat.\nThe Kjalengard player captures each of your fighters destroyed during this combat.\nThen, return this card to the Kjalengard player."
     },
     {
         "alias": "dspnkoll",
@@ -159,7 +159,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "At the start of your turn:You may look at either the top card of the cultural, hazardous, and industrial exploration decks, or the top card of the relic deck.Then, return this card to the Kollecc player."
+        "text": "At the start of your turn: You may look at either the top card of the cultural, hazardous, and industrial exploration decks, or the top card of the relic deck.\nThen, return this card to the Kollecc player."
     },
     {
         "alias": "dspnkolu",
@@ -169,7 +169,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "At the start of invasion, place this card in your play area.During this invasion, all other player's units lose SPACE CANNON and PLANETARY SHIELD.At the start of your next turn, return this card to the Kolume player."
+        "text": "At the start of invasion, place this card in your play area.\nDuring this invasion, all other player's units lose SPACE CANNON and PLANETARY SHIELD.\nAt the start of your next turn, return this card to the Kolume player."
     },
     {
         "alias": "dspnkort",
@@ -179,7 +179,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "Action: Place this card face up in your play area and remove 1 of your command tokens from the game board.At the start of the status phase, return this card to the Kortali player."
+        "text": "Action: Place this card face up in your play area and remove 1 of your command tokens from the game board.\nAt the start of the status phase, return this card to the Kortali player."
     },
     {
         "alias": "dspnkyro",
@@ -188,7 +188,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 3 infantry from your reinforcements on a planet you control. Then, return this card to the Kyro player."
+        "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 3 infantry from your reinforcements on a planet you control.\nThen, return this card to the Kyro player."
     },
     {
         "alias": "dspnlane",
@@ -198,7 +198,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "After you win a combat: Place this card face-up in your play area to explore 1 planet you control.At the start of the Lanefir player's turn, return this card to the Lanefir player."
+        "text": "After you win a combat: Place this card face-up in your play area to explore 1 planet you control.\nAt the start of the Lanefir player's turn, return this card to the Lanefir player."
     },
     {
         "alias": "dspnlizh",
@@ -207,7 +207,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "At the start of a space combat you are participating in:You may place up to 2 fighters from your reinforcements into the space area of the active system.Then, return this card to the Li-Zho player."
+        "text": "At the start of a space combat you are participating in: You may place up to 2 fighters from your reinforcements into the space area of the active system.\nThen, return this card to the Li-Zho player."
     },
     {
         "alias": "dspnmirv",
@@ -216,7 +216,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "At the start of your turn:You may move up to 2 PDS units you control to a planet you control. Then, return this card to the Mirveda player."
+        "text": "At the start of your turn: You may move up to 2 PDS units you control to a planet you control.\nThen, return this card to the Mirveda player."
     },
     {
         "alias": "dspnmort",
@@ -225,7 +225,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "At the start of a space combat while you are the defender:You may spend influence equal to the cost value of 1 of your opponent's ships in the active system to place 1 unit of that type from your reinforcements in that system. Then, return this card to the Mortheus player."
+        "text": "At the start of a space combat while you are the defender: You may spend influence equal to the cost value of 1 of your opponent's ships in the active system to place 1 unit of that type from your reinforcements in that system.\nThen, return this card to the Mortheus player."
     },
     {
         "alias": "dspnmyko",
@@ -235,7 +235,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "Action: Place this card face up in your play area.While this card is in your play area, once per turn, after you roll a die, you may reroll that die.If you activate a system that contains 1 or more of the Myko-Mentori player's units, return this card to the Myko-Mentori player."
+        "text": "Action: Place this card face up in your play area.While this card is in your play area, once per turn, after you roll a die, you may reroll that die.\nIf you activate a system that contains 1 or more of the Myko-Mentori player's units, return this card to the Myko-Mentori player."
     },
     {
         "alias": "dspnnivy",
@@ -244,7 +244,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "After you activate a system:During this activation, you may ignore the effects of each anomaly.Return this card to the Nivyn player at the end of this activation."
+        "text": "After you activate a system: During this activation, you may ignore the effects of each anomaly.\nReturn this card to the Nivyn player at the end of this activation."
     },
     {
         "alias": "dspnnoka",
@@ -253,7 +253,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "At the start of a space combat:During this combat, the active system is adjacent to each system that contains a planet you control for the purposes of announcing and resolving retreats.At the end of this combat, return this card to the Nokar player."
+        "text": "At the start of a space combat: During this combat, the active system is adjacent to each system that contains a planet you control for the purposes of announcing and resolving retreats.\nAt the end of this combat, return this card to the Nokar player."
     },
     {
         "alias": "dspnolra",
@@ -263,7 +263,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "Action: Place this card face up in your play area to choose and exhaust 1 planet you control. Then, ready 1 non-home planet you control other than Mecatol Rex.At the start of the status phase, return this card to the Olradin player."
+        "text": "Action: Place this card face up in your play area to choose and exhaust 1 planet you control. Then, ready 1 non-home planet you control other than Mecatol Rex.\nAt the start of the status phase, return this card to the Olradin player."
     },
     {
         "alias": "dspnrohd",
@@ -274,7 +274,7 @@
         "playImmediately": false,
         "attachment": "automatons",
         "source": "ds",
-        "text": "At the end of your turn, you may attach this card to a non-home planet you control other than Mecatol Rex. This planet has PRODUCTION 3 as if it were a unit."
+        "text": "At the end of your turn, you may attach this card to a non-home planet you control other than Mecatol Rex.\nThis planet has PRODUCTION 3 as if it were a unit."
     },
     {
         "alias": "dspntnel",
@@ -283,7 +283,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "When you draw 1 or more secret objective cards: Draw 1 additional secret objective card. Then, return 1 secret objective card to the secret objective deck.  Shuffle that deck. Then, return this card to the Tnelis player."
+        "text": "When you draw 1 or more secret objective cards: Draw 1 additional secret objective card. Then, return 1 secret objective card to the secret objective deck. Shuffle that deck.\nThen, return this card to the Tnelis player."
     },
     {
         "alias": "dspnvade",
@@ -292,7 +292,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "After you activate a system:You may spend any number of trade goods. For each trade good spent, apply +1 to the move value of 1 non-fighter ship you control during this activation.Return this card to the Vaden player at the end of this activation."
+        "text": "After you activate a system: You may spend any number of trade goods. For each trade good spent, apply +1 to the move value of 1 non-fighter ship you control during this activation.\nReturn this card to the Vaden player at the end of this activation."
     },
     {
         "alias": "dspnvayl",
@@ -301,7 +301,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "At the start of a round of space combat:The Vaylerian player discards 1 action card. Then, move all of your ships from the active system to an adjacent system that does not contain another player's ships.  The space combat ends in a draw.Then, place a command token from your reinforcements in that system and return this card to the Vaylerian player."
+        "text": "At the start of a round of space combat: The Vaylerian player discards 1 action card. Then, move all of your ships from the active system to an adjacent system that does not contain another player's ships. The space combat ends in a draw.\nThen, place a command token from your reinforcements in that system and return this card to the Vaylerian player."
     },
     {
         "alias": "dspnveld1",
@@ -312,7 +312,7 @@
         "playImmediately": true,
         "attachment": "veldyr1",
         "source": "ds",
-        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment. Its influence value is increased by 1."
+        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts influence value is increased by 1."
     },
     {
         "alias": "dspnveld2",
@@ -323,7 +323,7 @@
         "playImmediately": true,
         "attachment": "veldyr2",
         "source": "ds",
-        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment. Its influence value is increased by 1."
+        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts influence value is increased by 1."
     },
     {
         "alias": "dspnveld3",
@@ -334,7 +334,7 @@
         "playImmediately": true,
         "attachment": "veldyr3",
         "source": "ds",
-        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment. Its resource value is increased by 1."
+        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts resource value is increased by 1."
     },
     {
         "alias": "dspnveld4",
@@ -345,7 +345,7 @@
         "playImmediately": true,
         "attachment": "veldyr4",
         "source": "ds",
-        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment. Its resource value is increased by 1."
+        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts resource value is increased by 1."
     },
     {
         "alias": "dspnrhod",
@@ -354,7 +354,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "When you ignore a prerequisite on a technology card you are researching: You may ignore 1 additional prerequisite of the same color.Then, return this card to the Rhodun player."
+        "text": "When you ignore a prerequisite on a technology card you are researching: You may ignore 1 additional prerequisite of the same color.\nThen, return this card to the Rhodun player."
     },
     {
         "alias": "dspnzeli",
@@ -363,6 +363,6 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "When 1 or more of your units would make a BOMBARDMENT roll:If you produce 1 or more hits during this BOMBARDMENT roll, produce 1 additional hit for that roll.Then, return this card to the Zelian player."
+        "text": "When 1 or more of your units would make a BOMBARDMENT roll: If you produce 1 or more hits during this BOMBARDMENT roll, produce 1 additional hit for that roll.\nThen, return this card to the Zelian player."
     }
 ]

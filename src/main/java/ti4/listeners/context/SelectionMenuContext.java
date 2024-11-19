@@ -32,7 +32,7 @@ public class SelectionMenuContext extends ListenerContext {
         this.values = new ArrayList<>(event.getValues());
 
         if (game != null) {
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveGame(game, event);
         }
     }
 }

@@ -1,7 +1,6 @@
 package ti4.listeners.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
@@ -37,17 +36,27 @@ public class ButtonContext extends ListenerContext {
         // Proceed with additional button things
         this.messageID = event.getMessageId();
 
-        boolean isUndo = componentID.contains("ultimateUndo");
-        boolean isShow = "showGameAgain".equalsIgnoreCase(componentID);
-        boolean isNoSabo = "no_sabotage".equalsIgnoreCase(componentID);
-        if (game != null && !isUndo && !isShow && !isNoSabo) {
-            ButtonHelper.saveButtons(event, game, player);
-            GameSaveLoadManager.saveMap(game, event);
-        }
-
         if (componentID.contains("deleteThisButton")) {
             componentID = componentID.replace("deleteThisButton", "");
             ButtonHelper.deleteTheOneButton(event);
+        }
+        if (componentID.contains("deleteThisMessage")) {
+            componentID = componentID.replace("deleteThisMessage", "");
+            ButtonHelper.deleteMessage(event);
+        }
+    }
+
+    public void save(ButtonInteractionEvent event) {
+        boolean skippableButton = componentID.contains("ultimateUndo") ||
+            "showGameAgain".equalsIgnoreCase(componentID) ||
+            "cardsInfo".equalsIgnoreCase(componentID) ||
+            componentID.contains("showDeck") ||
+            componentID.contains("FactionInfo") ||
+            componentID.contains("offerDeckButtons") ||
+            "no_sabotage".equalsIgnoreCase(componentID);
+        if (game != null && !skippableButton) {
+            ButtonHelper.saveButtons(event, game, player);
+            GameSaveLoadManager.saveGame(game, event);
         }
     }
 }

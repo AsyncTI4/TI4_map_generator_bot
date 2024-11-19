@@ -1,37 +1,36 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import ti4.model.ColorModel;
 
 public class ColourHelper {
 
     public static List<ColorModel> sortColours(String factionId, List<ColorModel> colours) {
-        List<ColorModel> newcolours = new ArrayList<ColorModel>(colours);
+        List<ColorModel> newcolours = new ArrayList<>(colours);
         // sort by name for deterministic sorting
-        newcolours.sort((c1, c2) -> c1.getAlias().compareTo(c2.getAlias()));
+        newcolours.sort(Comparator.comparing(ColorModel::getAlias));
         // sort by colour
         newcolours.sort((c1, c2) -> colourValue(factionId, c2) - colourValue(factionId, c1));
         // for each "page" of colours, randomise
         // this process means widows and orphans will never cross page boundaries
-        for (int x = 0; x < newcolours.size(); x+=22) {
-            Collections.shuffle(newcolours.subList(x, Math.min(x+22, newcolours.size())));
+        for (int x = 0; x < newcolours.size(); x += 22) {
+            Collections.shuffle(newcolours.subList(x, Math.min(x + 22, newcolours.size())));
         }
         // resort by colour
         newcolours.sort((c1, c2) -> colourValue(factionId, c2) - colourValue(factionId, c1));
         return newcolours;
     }
 
-    private static int colourValue(String factionId, ColorModel colour)
-    {
-        switch (factionId)
-        {
+    private static int colourValue(String factionId, ColorModel colour) {
+        switch (factionId) {
             case "arborec":
             case "pi_arborec":
             case "miltymodarborec":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -115,8 +114,7 @@ public class ColourHelper {
             case "ghost":
             case "pi_ghost":
             case "miltymodghost":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -200,8 +198,7 @@ public class ColourHelper {
             case "hacan":
             case "pi_hacan":
             case "miltymodhacan":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -285,8 +282,7 @@ public class ColourHelper {
             case "jolnar":
             case "pi_jolnar":
             case "miltymodjolnar":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -371,8 +367,7 @@ public class ColourHelper {
             case "lazax":
             case "pi_l1z1x":
             case "miltymodl1z1x":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -456,8 +451,7 @@ public class ColourHelper {
             case "letnev":
             case "pi_letnev":
             case "miltymodletnev":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -541,8 +535,7 @@ public class ColourHelper {
             case "mentak":
             case "pi_mentak":
             case "miltymodmentak":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -626,8 +619,7 @@ public class ColourHelper {
             case "muaat":
             case "pi_muaat":
             case "miltymodmuaat":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -711,8 +703,7 @@ public class ColourHelper {
             case "naalu":
             case "pi_naalu":
             case "miltymodnaalu":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -796,8 +787,7 @@ public class ColourHelper {
             case "nekro":
             case "pi_nekro":
             case "miltymodnekro":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -881,8 +871,7 @@ public class ColourHelper {
             case "saar":
             case "pi_saar":
             case "miltymodsaar":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -966,8 +955,7 @@ public class ColourHelper {
             case "sardakk":
             case "pi_sardakk":
             case "miltymodsardakk":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -1051,8 +1039,7 @@ public class ColourHelper {
             case "sol":
             case "pi_sol":
             case "miltymodsol":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -1136,8 +1123,7 @@ public class ColourHelper {
             case "winnu":
             case "pi_winnu":
             case "miltymodwinnu":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -1221,8 +1207,7 @@ public class ColourHelper {
             case "xxcha":
             case "pi_xxcha":
             case "miltymodxxcha":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -1306,8 +1291,7 @@ public class ColourHelper {
             case "yin":
             case "pi_yin":
             case "miltymodyin":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -1391,8 +1375,7 @@ public class ColourHelper {
             case "yssaril":
             case "pi_yssaril":
             case "miltymodyssaril":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -1475,8 +1458,7 @@ public class ColourHelper {
                 }
             case "argent":
             case "pi_argent":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -1559,8 +1541,7 @@ public class ColourHelper {
                 }
             case "cabal":
             case "pi_cabal":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -1643,8 +1624,7 @@ public class ColourHelper {
                 }
             case "empyrean":
             case "pi_empyrean":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -1727,8 +1707,7 @@ public class ColourHelper {
                 }
             case "mahact":
             case "pi_mahact":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -1811,8 +1790,7 @@ public class ColourHelper {
                 }
             case "nomad":
             case "pi_nomad":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -1895,8 +1873,7 @@ public class ColourHelper {
                 }
             case "naaz":
             case "pi_naaz":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -1979,8 +1956,7 @@ public class ColourHelper {
                 }
             case "titans":
             case "pi_titans":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -2068,8 +2044,7 @@ public class ColourHelper {
             case "pi_keleresm":
             case "pi_keleresx":
             case "pi_keleresa":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -2150,10 +2125,9 @@ public class ColourHelper {
                     case "splitrbw":
                         return 7;
                 }
-            // Discordant Stars
+                // Discordant Stars
             case "augers":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lvn":
                     case "ppl":
                     case "sns":
@@ -2164,8 +2138,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "axis":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -2183,8 +2156,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "bentor":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -2204,8 +2176,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "celdauri":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "spr":
                     case "ylw":
                     case "gld":
@@ -2230,8 +2201,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "cheiran":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "tan":
                     case "bwn":
                     case "chk":
@@ -2254,16 +2224,14 @@ public class ColourHelper {
                         return 10;
                 }
             case "cymiae":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "org":
                         return 35;
                     case "splitorg":
                         return 15;
                 }
             case "dihmohn":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -2283,8 +2251,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "edyn":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -2306,8 +2273,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "florzen":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lme":
                     case "grn":
                     case "tqs":
@@ -2334,8 +2300,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "freesystems":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lme":
                     case "grn":
                     case "tqs":
@@ -2358,8 +2323,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "ghemina":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "tea":
                     case "ptr":
                     case "eth":
@@ -2374,8 +2338,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "ghoti":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lme":
                     case "grn":
                     case "tqs":
@@ -2402,8 +2365,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "gledge":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "org":
                         return 35;
                     case "splitorg":
@@ -2418,8 +2380,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "khrask":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lme":
                     case "grn":
                     case "tqs":
@@ -2438,8 +2399,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "kjalengard":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lvn":
                     case "ppl":
                     case "sns":
@@ -2456,8 +2416,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "kollecc":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "tan":
                     case "bwn":
                     case "chk":
@@ -2477,8 +2436,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "kolume":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -2498,8 +2456,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "kortali":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -2511,8 +2468,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "kyro":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "spr":
                     case "ylw":
                     case "gld":
@@ -2537,8 +2493,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "lanefir":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "org":
                         return 35;
                     case "splitorg":
@@ -2557,8 +2512,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "lizho":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -2578,8 +2532,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "mirveda":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lvn":
                     case "ppl":
                     case "sns":
@@ -2596,8 +2549,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "mortheus":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "tea":
                     case "ptr":
                     case "eth":
@@ -2622,8 +2574,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "mykomentori":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lme":
                     case "grn":
                     case "tqs":
@@ -2648,8 +2599,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "nivyn":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
                     case "blk":
@@ -2671,8 +2621,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "nokar":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "org":
                         return 35;
                     case "splitorg":
@@ -2691,8 +2640,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "olradin":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "org":
                         return 35;
                     case "splitorg":
@@ -2711,8 +2659,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "rohdhna":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lvn":
                     case "ppl":
                     case "sns":
@@ -2723,8 +2670,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "tnelis":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "red":
                     case "bld":
                         return 30;
@@ -2745,8 +2691,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "vaden":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lme":
                     case "grn":
                     case "tqs":
@@ -2761,8 +2706,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "vaylerian":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lme":
                     case "grn":
                     case "tqs":
@@ -2789,8 +2733,7 @@ public class ColourHelper {
                         return 10;
                 }
             case "veldyr":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "lme":
                     case "grn":
                     case "tqs":
@@ -2817,8 +2760,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "zealots":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "tea":
                     case "ptr":
                     case "eth":
@@ -2833,8 +2775,7 @@ public class ColourHelper {
                         return 15;
                 }
             case "zelian":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "red":
                     case "bld":
                         return 35;
@@ -2842,10 +2783,9 @@ public class ColourHelper {
                     case "splitbld":
                         return 15;
                 }
-            // other homebrew
+                // other homebrew
             case "drahn":
-                switch (colour.getAlias())
-                {
+                switch (colour.getAlias()) {
                     case "red":
                     case "bld":
                         return 35;
@@ -2864,8 +2804,7 @@ public class ColourHelper {
                         return 10;
                 }
         }
-        if (colour.getAlias().startsWith("split") || colour.getAlias().equals("orca"))
-        {
+        if (colour.getAlias().startsWith("split") || colour.getAlias().equals("orca")) {
             return 5;
         }
         return 15;

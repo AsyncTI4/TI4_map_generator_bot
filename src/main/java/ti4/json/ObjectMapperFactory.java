@@ -2,11 +2,11 @@ package ti4.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-
 import ti4.helpers.Units.UnitKey;
 
 final public class ObjectMapperFactory {
-    private ObjectMapperFactory(){}
+    private ObjectMapperFactory() {
+    }
 
     /**
      * Builds the standard Jackson ObjectMapper to be used by the entire application.

@@ -1,16 +1,15 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @Data
@@ -26,6 +25,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     private String imageFileName;
     private String flavourText;
     private String colourHexCode;
+    private String imageURL;
     private ComponentSource source;
 
     @Override
@@ -104,9 +104,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAutoCompleteName() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(initiative).append(" ").append(name).append(" (").append(id).append(") [").append(source.toString()).append("]");
-        return sb.toString();
+        return initiative + " " + name + " (" + id + ") [" + source.toString() + "]";
     }
 
     @Override
@@ -132,7 +130,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         } else if (colourHexCode == null) {
             return Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode();
         }
-        return Optional.ofNullable(colourHexCode).orElse("#ffffff");
+        return Optional.of(colourHexCode).orElse("#ffffff");
     }
 
     /**
@@ -150,12 +148,10 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean hasImageFile() {
-        return imageFileName != null
-            && ResourceHelper.getInstance().getResourceFromFolder("strat_cards/",
-                imageFileName + ".png", null) != null;
+        return imageFileName != null && ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png") != null;
     }
 
     public String getImageFilePath() {
-        return ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", getImageFileName() + ".png", "Could not find SC image!");
+        return ResourceHelper.getResourceFromFolder("strat_cards/", getImageFileName() + ".png");
     }
 }

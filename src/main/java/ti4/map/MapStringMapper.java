@@ -1,16 +1,15 @@
 package ti4.map;
 
-import ti4.helpers.AliasHandler;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import ti4.helpers.AliasHandler;
 
 public class MapStringMapper {
     public static Map<String, String> getMappedTilesToPosition(String tileListAsString, Game userActiveGame) {
         Map<String, String> mappedTiles = new HashMap<>();
         StringTokenizer tokenizer = new StringTokenizer(tileListAsString, " ");
-
 
         int tileCount = 1;
         int ringCount = 1;
@@ -24,12 +23,11 @@ public class MapStringMapper {
             String position = "" + ringCount + (tileCount < 10 ? "0" + tileCount : tileCount);
             mappedTiles.put(position, AliasHandler.resolveTile(tileID));
             tileCount++;
-            if (tileCount > ringCount * 6){
+            if (tileCount > ringCount * 6) {
                 tileCount = 1;
                 ringCount++;
             }
         }
         return mappedTiles;
     }
-
 }

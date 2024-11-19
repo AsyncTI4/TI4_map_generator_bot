@@ -2,9 +2,9 @@ package ti4.commands.tech;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.generator.Mapper;
+import ti4.commands.leaders.CommanderUnlockCheck;
+import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -28,18 +28,7 @@ public class TechAdd extends TechAddRemove {
         if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             message = message + "\n Automatically added the Custodia Vigilia planet";
         }
-        if (player.getLeaderIDs().contains("mirvedacommander") && !player.hasLeaderUnlocked("mirvedacommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "mirveda", event);
-        }
-        if (player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "jolnar", event);
-        }
-        if (player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "nekro", event);
-        }
-        if (player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "dihmohn", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn");
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 }

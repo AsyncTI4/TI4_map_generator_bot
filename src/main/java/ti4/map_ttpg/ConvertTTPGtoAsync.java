@@ -1,12 +1,5 @@
 package ti4.map_ttpg;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -21,8 +14,15 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import ti4.commands.tokens.AddToken;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -102,8 +102,8 @@ public class ConvertTTPGtoAsync {
 
     public static final Map<String, String> fakePlayers = new HashMap<>() {
         {
-            put("481860200169472030", "PrisonerOne");
-            put("150809002974904321", "Holytispoon");
+            put(Constants.prisonerOneId, "PrisonerOne");
+            put(Constants.tspId, "Holytispoon");
             put("947763140517560331", "TI4 Game Management");
             put("235148962103951360", "Carl-bot");
             put("812171459564011580", "RoboDane");
@@ -146,8 +146,8 @@ public class ConvertTTPGtoAsync {
                 return false;
             }
             Game game = ConvertTTPGMaptoAsyncMap(ttpgMap, gamename);
-            GameSaveLoadManager.saveMap(game, "Imported from TTPG");
-            GameSaveLoadManager.loadMaps();
+            GameSaveLoadManager.saveGame(game, "Imported from TTPG");
+            GameSaveLoadManager.loadGame();
         } catch (Exception e) {
             BotLogger.log("TTPG Import Failed: " + gamename + "    filename: " + filename, e);
             return false;
@@ -159,7 +159,7 @@ public class ConvertTTPGtoAsync {
         Mapper.init();
         Game asyncGame = new Game() {
             {
-                setOwnerID("481860200169472030");
+                setOwnerID(Constants.prisonerOneId);
                 setOwnerName("PrisonerOne");
                 setPlayerCountForMap(ttpgMap.getPlayers().size());
                 setVp(ttpgMap.getScoreboard());
@@ -221,11 +221,11 @@ public class ConvertTTPGtoAsync {
 
             //PLAYER STRATEGY CARDS
             if (!ttpgPlayer.getStrategyCards().isEmpty()) {
-                String ttpgSC = (String) ttpgPlayer.getStrategyCards().get(0);
+                String ttpgSC = (String) ttpgPlayer.getStrategyCards().getFirst();
                 if (Objects.nonNull(ttpgSC)) asyncPlayer.addSC(Helper.getSCNumber(ttpgSC));
             }
             if (!ttpgPlayer.getStrategyCardsFaceDown().isEmpty()) {
-                String ttpgSCplayed = (String) ttpgPlayer.getStrategyCardsFaceDown().get(0);
+                String ttpgSCplayed = (String) ttpgPlayer.getStrategyCardsFaceDown().getFirst();
                 if (Objects.nonNull(ttpgSCplayed)) asyncGame.setSCPlayed(Helper.getSCNumber(ttpgSCplayed), true);
             }
 
@@ -369,7 +369,7 @@ public class ConvertTTPGtoAsync {
         String[] hexSummary = ttpgMap.getHexSummary().split(",");
         for (String hex : hexSummary) {
             System.out.println("Hex: " + hex);
-            if (hex.length() > 0) {
+            if (!hex.isEmpty()) {
                 Tile tile = ConvertTTPGHexToAsyncTile(asyncGame, hex);
                 if (tile != null) {
                     asyncGame.setTile(tile);
@@ -553,7 +553,7 @@ public class ConvertTTPGtoAsync {
 
         // TILE +-X +-Y SPACE ; PLANET1 ; PLANET2 ; ...
         Pattern firstRegionPattern = Pattern.compile("^([0-9AB]+)([-+][0-9]+)([-+][0-9]+)(.*)?$");
-        Pattern rotPattern = Pattern.compile("^(\\d+)([AB])(\\d)$"); //ignore hyperlanes for now
+        //Pattern rotPattern = Pattern.compile("^(\\d+)([AB])(\\d)$"); //ignore hyperlanes for now
         Pattern regionAttachmentsPattern = Pattern.compile("^(.*)\\*(.*)$");
 
         Matcher matcher = firstRegionPattern.matcher(ttpgHex);
@@ -653,7 +653,6 @@ public class ConvertTTPGtoAsync {
                         if (Constants.MIRAGE.equalsIgnoreCase(attachmentResolved)) {
                             Helper.addMirageToTile(tile);
                             tile.addToken(tokenFileName, Constants.SPACE);
-                            // asyncMap.clearPlanetsCache();
                         }
                     } else {
                         System.out.println("                character not recognized:  " + attachment);
@@ -682,7 +681,7 @@ public class ConvertTTPGtoAsync {
                     regionCount = Integer.valueOf(str);
 
                 } else if (Character.isLowerCase(chr) && validUnits.contains(str)) { // is a unit, control_token, or CC
-                    if (!"".equals(color)) { //color hasn't shown up yet, so probably just tokens in space, skip unit crap
+                    if (!color.isEmpty()) { //color hasn't shown up yet, so probably just tokens in space, skip unit crap
                         if ("t".equals(str)) { //CC
                             tile.addCC(Mapper.getCCID(color));
                         } else if ("o".equals(str)) { //control_token
@@ -764,16 +763,6 @@ public class ConvertTTPGtoAsync {
     }
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    private static ObjectMapper getDefaultObjectMapper() {
-
-        ObjectMapper defaultObjectMapper = new ObjectMapper();
-        //CONFIGS
-        defaultObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        // defaultObjectMapper.configure(DeserializationFeature.fail, false);
-        //END CONFIGS
-        return defaultObjectMapper;
-    }
 
     public static <A> A fromJson(JsonNode node, Class<A> clazz) throws JsonProcessingException, IllegalArgumentException {
         return objectMapper.treeToValue(node, clazz);

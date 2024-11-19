@@ -1,16 +1,17 @@
 package ti4.commands.explore;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.helpers.ButtonHelper;
+import ti4.commands2.CommandHelper;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.List;
+import ti4.model.ExploreModel;
 
 public class ExploreLookAtTop extends ExploreSubcommandData {
 
@@ -22,9 +23,7 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -46,8 +45,9 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
 
         StringBuilder sb = new StringBuilder();
         sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
-        String topCard = deck.get(0);
-        sb.append(displayExplore(topCard));
+        String topCard = deck.getFirst();
+        ExploreModel explore = Mapper.getExplore(topCard);
+        sb.append(explore.textRepresentation());
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji

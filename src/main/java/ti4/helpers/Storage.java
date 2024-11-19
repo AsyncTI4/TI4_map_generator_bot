@@ -1,26 +1,24 @@
 package ti4.helpers;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import ti4.message.BotLogger;
-
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import ti4.message.BotLogger;
+
 public class Storage {
 
     public static final String ENV_VAR_RESOURCE_PATH = "RESOURCE_PATH";
     public static final String ENV_VAR_DB_PATH = "DB_PATH";
-    public static final String MAPS_UNDO = "/maps/undo/";
-    public static final String MAPS = "/maps/";
-    public static final String MAPS_JSON = "/maps_json/";
-    public static final String DELETED_MAPS = "/deletedmaps/";
+    public static final String GAMES_UNDO = "/maps/undo/";
+    public static final String GAMES_PATH = "/maps/";
+    public static final String DELETED_GAMES_PATH = "/deletedmaps/";
     public static final String TTPG_EXPORTS = "/ttpg_exports/";
 
     private static String resourcePath = null;
-    private static String storagePath = null;
 
     private static Font EMOJI_FONT_40;
 
@@ -258,33 +256,37 @@ public class Storage {
     }
 
     @NotNull
-    public static File getMapUndoStorage(String mapName) {
-        return new File(getStoragePath() + MAPS_UNDO + mapName);
+    public static File getAppEmojiDirectory() {
+        return new File(getResourcePath() + "/emojis/");
     }
 
     @NotNull
-    public static File getMapUndoDirectory() {
-        return new File(getStoragePath() + MAPS_UNDO);
+    public static File getGameUndoStorage(String mapName) {
+        return new File(getStoragePath() + GAMES_UNDO + mapName);
     }
 
     @NotNull
-    public static File getMapImageStorage(String mapName) {
-        return new File(getStoragePath() + MAPS + mapName);
+    public static File getGameUndoDirectory() {
+        return new File(getStoragePath() + GAMES_UNDO);
     }
 
     @NotNull
-    public static File getMapImageDirectory() {
-        return new File(getStoragePath() + MAPS);
+    public static File getGameFile(String gameName) {
+        return new File(getStoragePath() + GAMES_PATH + gameName);
     }
 
     @NotNull
-    public static File getMapStorage(String mapName) {
-        return new File(getStoragePath() + MAPS + mapName);
+    public static File getGamesDirectory() {
+        var file = new File(getStoragePath() + GAMES_PATH);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        return file;
     }
 
     @NotNull
-    public static File getDeletedMapStorage(String mapName) {
-        return new File(getStoragePath() + DELETED_MAPS + mapName);
+    public static File getDeletedGame(String gameName) {
+        return new File(getStoragePath() + DELETED_GAMES_PATH + gameName);
     }
 
     @NotNull
@@ -297,27 +299,16 @@ public class Storage {
         return new File(getStoragePath() + TTPG_EXPORTS + fileName);
     }
 
-    @NotNull
-    public static File getMapsJSONDirectory() {
-        return new File(getStoragePath() + MAPS_JSON);
-    }
-
-    @NotNull
-    public static File getMapsJSONStorage(String fileName) {
-        return new File(getStoragePath() + MAPS_JSON + fileName);
-    }
-
     public static void init() {
         String resource = getStoragePath();
         if (resource != null) {
-            createDirectory(resource, DELETED_MAPS);
-            createDirectory(resource, MAPS);
-            createDirectory(resource, MAPS_JSON);
-            createDirectory(resource, TTPG_EXPORTS);
+            createDirectory(DELETED_GAMES_PATH);
+            createDirectory(GAMES_PATH);
+            createDirectory(TTPG_EXPORTS);
         }
     }
 
-    private static void createDirectory(String resource, String directoryName) {
+    private static void createDirectory(String directoryName) {
         File directory = new File(getStoragePath() + directoryName);
         if (!directory.exists()) {
             directory.mkdir();
@@ -332,19 +323,7 @@ public class Storage {
     }
 
     public static String getStoragePath() {
-        if (storagePath != null) {
-            return storagePath;
-        }
-
         return System.getenv(ENV_VAR_DB_PATH);
-    }
-
-    /**
-     * Allows for storage path overrides instead of using env var. Likely only useful
-     * for testing.
-     */
-    public static void setStoragePath(@Nullable String path) {
-        storagePath = path;
     }
 
     @Nullable

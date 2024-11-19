@@ -1,5 +1,8 @@
 package ti4.commands.units;
 
+import java.util.Objects;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -13,8 +16,6 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import java.util.Objects;
 
 public class RemoveUnits extends AddRemoveUnits {
 
@@ -82,7 +83,7 @@ public class RemoveUnits extends AddRemoveUnits {
             tile.removeUnit(unitHolder.getName(), unitID, count);
             tile.removeUnitDamage(unitHolder.getName(), unitID, countToRemove);
         } else {
-            if (event instanceof ButtonInteractionEvent eventB) {
+            if (event instanceof ButtonInteractionEvent) {
                 BotLogger.log(event.getId() + " found a null unitholder with the following info: " + tile.getRepresentation() + " " + planetName);
             }
         }
@@ -108,7 +109,7 @@ public class RemoveUnits extends AddRemoveUnits {
     }
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.REMOVE_UNITS;
     }
 
@@ -127,10 +128,10 @@ public class RemoveUnits extends AddRemoveUnits {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri").setRequired(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))

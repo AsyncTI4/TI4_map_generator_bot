@@ -3,47 +3,30 @@ package ti4.commands.capture;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import net.dv8tion.jda.api.entities.User;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.generator.MapGenerator;
+import ti4.image.MapRenderPipeline;
 import ti4.helpers.Constants;
+import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-import ti4.message.MessageHelper;
 
 public class CaptureCommand implements Command {
 
     private final Collection<CaptureSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.CAPTURE;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (event.getName().equals(getActionID())) {
-            String userID = event.getUser().getId();
-            GameManager gameManager = GameManager.getInstance();
-
-            if (!gameManager.isUserWithActiveGame(userID)) {
-                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
-                return false;
-            }
-            Game userActiveGame = gameManager.getUserActiveGame(userID);
-            if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
-                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
-                return false;
-            }
-            return true;
-        }
-        return false;
+        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getName(), event);
     }
 
     @Override
@@ -67,10 +50,10 @@ public class CaptureCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        Game game = GameManager.getUserActiveGame(userID);
+        GameSaveLoadManager.saveGame(game, event);
 
-        MapGenerator.saveImageToWebsiteOnly(game, event);
+        MapRenderPipeline.renderToWebsiteOnly(game, event);
     }
 
     protected String getActionDescription() {
@@ -86,9 +69,9 @@ public class CaptureCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

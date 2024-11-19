@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ti4.commands.milty.MiltyDraftHelper;
-import ti4.commands.milty.MiltyDraftManager;
-import ti4.draft.items.*;
-import ti4.generator.Mapper;
+import ti4.commands2.milty.MiltyDraftHelper;
+import ti4.commands2.milty.MiltyDraftManager;
+import ti4.draft.items.BlueTileDraftItem;
+import ti4.draft.items.HomeSystemDraftItem;
+import ti4.draft.items.RedTileDraftItem;
+import ti4.draft.items.SpeakerOrderDraftItem;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
@@ -20,13 +23,12 @@ public class StandardBagDraft extends BagDraft {
 
     @Override
     public int getItemLimitForCategory(DraftItem.Category category) {
-        int limit = 0;
-        switch (category) {
-            case BLUETILE -> limit = 3;
-            case REDTILE -> limit = 2;
-            case DRAFTORDER, HOMESYSTEM -> limit = 1;
-        }
-        return limit;
+        return switch (category) {
+            case BLUETILE -> 3;
+            case REDTILE -> 2;
+            case DRAFTORDER, HOMESYSTEM -> 1;
+            default -> 0;
+        };
     }
 
     @Override
@@ -85,7 +87,7 @@ public class StandardBagDraft extends BagDraft {
                 for (int j = 0; j < categoryLimit; j++) {
                     // ... and add it to the player's bag.
                     if (!draftableCollection.getValue().isEmpty()) {
-                        bag.Contents.add(draftableCollection.getValue().remove(0));
+                        bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
                         BotLogger.log("Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
                     }

@@ -2,9 +2,10 @@ package ti4.commands.map;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -12,8 +13,6 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-
-import org.jetbrains.annotations.NotNull;
 
 abstract public class AddRemoveTile extends MapSubcommandData {
     public AddRemoveTile(@NotNull String name, @NotNull String description) {
@@ -30,17 +29,16 @@ abstract public class AddRemoveTile extends MapSubcommandData {
             return;
         }
         String userID = member.getId();
-        GameManager gameManager = GameManager.getInstance();
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
-            Game userActiveGame = tileParsing(event, userID, gameManager);
+            Game userActiveGame = tileParsing(event, userID);
             if (userActiveGame == null) return;
-            GameSaveLoadManager.saveMap(userActiveGame, event);
+            GameSaveLoadManager.saveGame(userActiveGame, event);
         }
     }
 
-    protected Game tileParsing(SlashCommandInteractionEvent event, String userID, GameManager gameManager) {
+    protected Game tileParsing(SlashCommandInteractionEvent event, String userID) {
         String planetTileName = AliasHandler.resolveTile(event.getOptions().get(0).getAsString().toLowerCase());
         String position = event.getOptions().get(1).getAsString();
         if (!PositionMapper.isTilePositionValid(position)) {
@@ -64,12 +62,12 @@ abstract public class AddRemoveTile extends MapSubcommandData {
             AddTile.addCustodianToken(tile);
         }
 
-        Game userActiveGame = gameManager.getUserActiveGame(userID);
+        Game userActiveGame = GameManager.getUserActiveGame(userID);
         Boolean isFowPrivate = null;
         if (userActiveGame.isFowMode()) {
             isFowPrivate = event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL);
         }
-        if (isFowPrivate != null && isFowPrivate) {
+        if (isFowPrivate != null && isFowPrivate && !userActiveGame.isAgeOfExplorationMode()) {
             MessageHelper.replyToMessage(event, "Cannot run this command in a private channel.");
             return null;
         }

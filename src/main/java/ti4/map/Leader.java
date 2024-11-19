@@ -1,18 +1,16 @@
 package ti4.map;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.Comparator;
 import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.generator.Mapper;
+import org.apache.commons.lang3.StringUtils;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.model.LeaderModel;

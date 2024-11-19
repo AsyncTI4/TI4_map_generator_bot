@@ -1,0 +1,24 @@
+on: 
+  repository_dispatch:
+      types: [archive_game_channel]
+name: ArchiveGameChannel
+jobs:
+  build:
+    name: Archive Game Channel
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands
+      uses: appleboy/ssh-action@master
+      env:
+        DISCORD_BOT_KEY: ${{ secrets.CHAT_EXPORT_BOT_KEY }}
+        CHANNEL_ID: ${{ github.event.client_payload.channel }}
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        password: ${{ secrets.SSH_PASSWORD }}
+        port: ${{ secrets.SSH_PORT }}
+        script_stop: true
+        envs: DISCORD_BOT_KEY, CHANNEL_ID
+        script: |
+          docker version
+          docker run --rm -v /root/ti4bot/ti4bot_saves/exported_channels:/out --user $(id -u):$(id -g) tyrrrz/discordchatexporter:stable export -t $DISCORD_BOT_KEY -c $CHANNEL_ID

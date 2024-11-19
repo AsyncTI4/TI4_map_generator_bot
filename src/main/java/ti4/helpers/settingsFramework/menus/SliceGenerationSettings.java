@@ -1,10 +1,11 @@
 package ti4.helpers.settingsFramework.menus;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -15,9 +16,9 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
-
-import ti4.commands.milty.MiltyDraftHelper;
-import ti4.commands.milty.MiltyDraftSlice;
+import ti4.buttons.Buttons;
+import ti4.commands2.milty.MiltyDraftHelper;
+import ti4.commands2.milty.MiltyDraftSlice;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
@@ -32,10 +33,13 @@ public class SliceGenerationSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private IntegerSetting numSlices, numFactions;
-    private BooleanSetting extraWorms;
-    private IntegerSetting minimumRes, minimumInf;
-    private IntegerRangeSetting totalValue, numLegends;
+    private final IntegerSetting numSlices;
+    private final IntegerSetting numFactions;
+    private final BooleanSetting extraWorms;
+    private final IntegerSetting minimumRes;
+    private final IntegerSetting minimumInf;
+    private final IntegerRangeSetting totalValue;
+    private final IntegerRangeSetting numLegends;
 
     // This is handled fully manually as there's a lot of validation to do
     private String presetSlices = null;
@@ -90,12 +94,12 @@ public class SliceGenerationSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     @Override
     public List<SettingInterface> settings() {
-        List<SettingInterface> ls = new ArrayList<SettingInterface>();
+        List<SettingInterface> ls = new ArrayList<>();
+        ls.add(numFactions);
         if (presetSlices != null) {
             return ls;
         }
         ls.add(numSlices);
-        ls.add(numFactions);
         ls.add(minimumRes);
         ls.add(minimumInf);
         ls.add(totalValue);
@@ -107,8 +111,8 @@ public class SliceGenerationSettings extends SettingsMenu {
     @Override
     public List<Button> specialButtons() {
         String idPrefix = menuAction + "_" + navId() + "_";
-        List<Button> ls = new ArrayList<>();
-        ls.addAll(super.specialButtons());
+        List<Button> ls = new ArrayList<>(super.specialButtons());
+        ls.add(Buttons.gray(idPrefix + "scpt2025quals", "SCPT 2025 Qualifiers", "<:scpt:1289722139750039634>"));
         ls.add(Button.of(ButtonStyle.DANGER, idPrefix + "richPreset", "Rich galaxy", Emoji.fromFormatted(Emojis.tg)));
         ls.add(Button.of(ButtonStyle.DANGER, idPrefix + "poorPreset", "Poor galaxy", Emoji.fromFormatted(Emojis.comm)));
         ls.add(Button.of(ButtonStyle.SECONDARY, idPrefix + "presetSlices~MDL", "Use preset slices", Emoji.fromFormatted(Emojis.sliceA)));
@@ -118,6 +122,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         String error = switch (action) {
+            case "scpt2025quals" -> scpt2025quals();
             case "richPreset" -> richGalaxy();
             case "poorPreset" -> poorGalaxy();
             case "presetSlices~MDL" -> getPresetSlicesFromUser(event);
@@ -126,6 +131,41 @@ public class SliceGenerationSettings extends SettingsMenu {
         };
 
         return (error == null ? "success" : error);
+    }
+
+    @Override
+    public String menuSummaryString(String lastSettingTouched) {
+        StringBuilder sb = new StringBuilder("# **__").append(menuName).append(":__**");
+        for (String line : description)
+            sb.append("\n- *").append(line).append("*");
+        sb.append("\n");
+
+        int pad = enabledSettings().stream().map(x -> x.getName().length()).max(Comparator.comparingInt(x -> x)).orElse(15);
+        for (SettingInterface setting : enabledSettings()) {
+            sb.append("> ");
+            sb.append(setting.longSummary(pad, lastSettingTouched));
+            sb.append("\n");
+        }
+        if (presetSlices != null) sb.append("> Using preset slices: ").append(presetSlices).append("\n");
+        if (!enabledSettings().isEmpty()) sb.append("\n"); // extra line for formatting
+
+        if (!categories().isEmpty()) {
+            List<String> catStrings = new ArrayList<>();
+            for (SettingsMenu cat : categories()) {
+                catStrings.add(cat.shortSummaryString(false));
+            }
+            String catStr = String.join("\n\n", catStrings);
+            if (sb.length() + catStr.length() > 1999) {
+                List<String> shorterCatStrings = new ArrayList<>();
+                for (SettingsMenu cat : categories()) {
+                    shorterCatStrings.add(cat.shortSummaryString(true));
+                }
+                catStr = String.join("\n\n", shorterCatStrings);
+                if (sb.length() + catStr.length() > 1999) catStr = ""; //give up
+            }
+            sb.append(catStr);
+        }
+        return sb.toString();
     }
 
     @Override
@@ -148,6 +188,22 @@ public class SliceGenerationSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
+    private String scpt2025quals() {
+        int players = 6;
+        if (getParent() instanceof MiltySettings ms) {
+            players = ms.getPlayerSettings().getGamePlayers().getKeys().size();
+        }
+        //27,73,47,44,26;30,39,76,80,65;79,37,50,71,66;42,64,75,72,49;34,41,70,78,25;40,20,36,45,74
+        numSlices.setVal(players);
+        numFactions.setVal(players);
+        List<String> slices = new ArrayList<>(List.of("27,73,47,44,26", "30,39,76,80,65", "79,37,50,71,66", "42,64,75,72,49", "34,41,70,78,25", "40,20,36,45,74"));
+        Collections.shuffle(slices);
+        for (int i = players; i < 6; i++)
+            slices.removeFirst();
+        String ttsString = String.join("|", slices);
+        return setPresetSlices(ttsString);
+    }
+
     private String richGalaxy() {
         numSlices.setVal(6);
         numFactions.setVal(6);
@@ -195,26 +251,30 @@ public class SliceGenerationSettings extends SettingsMenu {
 
     private String setPresetSlices(GenericInteractionCreateEvent event) {
         if (event instanceof ModalInteractionEvent modalEvent) {
-            String ttsString = modalEvent.getValue("sliceStrings").getAsString();
-            presetSlices = ttsString;
-            List<ComponentSource> sources = new ArrayList<>();
-            int players = 6;
-            if (parent instanceof MiltySettings mparent) {
-                players = mparent.getPlayerSettings().getGamePlayers().getKeys().size();
-                sources.addAll(mparent.getSourceSettings().getTileSources());
-            }
-
-            this.parsedSlices = MiltyDraftHelper.parseSlicesFromString(ttsString, sources);
-            if (this.parsedSlices == null) {
-                presetSlices = null;
-                return "Invalid slice string";
-            } else if (parsedSlices.size() < players) {
-                presetSlices = null;
-                parsedSlices = null;
-                return "Not enough slices for the number of players.";
-            }
-            return null;
+            String slices = modalEvent.getValue("sliceStrings").getAsString();
+            return setPresetSlices(slices);
         }
         return "Unknown Event";
+    }
+
+    private String setPresetSlices(String sliceString) {
+        List<ComponentSource> sources = new ArrayList<>();
+        int players = 6;
+        presetSlices = sliceString;
+        if (parent instanceof MiltySettings mparent) {
+            players = mparent.getPlayerSettings().getGamePlayers().getKeys().size();
+            sources.addAll(mparent.getSourceSettings().getTileSources());
+        }
+
+        this.parsedSlices = MiltyDraftHelper.parseSlicesFromString(sliceString, sources);
+        if (this.parsedSlices == null) {
+            presetSlices = null;
+            return "Invalid slice string";
+        } else if (parsedSlices.size() < players) {
+            presetSlices = null;
+            parsedSlices = null;
+            return "Not enough slices for the number of players.";
+        }
+        return null;
     }
 }

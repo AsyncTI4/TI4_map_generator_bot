@@ -5,7 +5,7 @@ import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.PositionMapper;
+import ti4.image.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -25,11 +25,11 @@ public class RemoveTile extends AddRemoveTile {
     }
 
     @Override
-    protected Game tileParsing(SlashCommandInteractionEvent event, String userID, GameManager gameManager) {
-        String positionOption = event.getOptions().get(0).getAsString();
+    protected Game tileParsing(SlashCommandInteractionEvent event, String userID) {
+        String positionOption = event.getOptions().getFirst().getAsString();
         Set<String> positions = Helper.getSetFromCSV(positionOption);
 
-        Game userActiveGame = gameManager.getUserActiveGame(userID);
+        Game userActiveGame = GameManager.getUserActiveGame(userID);
         for (String position : positions) {
             if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Tile position `" + position + "` is not valid");

@@ -18,12 +18,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
-import ti4.helpers.async.CustomizationsHelper;
-import ti4.helpers.async.NotepadHelper;
-import ti4.helpers.async.RoundSummaryHelper;
-import ti4.helpers.async.WhisperHelper;
-import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
 import ti4.listeners.context.ButtonContext;
 import ti4.listeners.context.ListenerContext;
 import ti4.listeners.context.ModalContext;
@@ -34,20 +30,14 @@ import ti4.message.BotLogger;
 
 public class AnnotationHandler {
 
-    private static <H extends Annotation> List<Class<?>> classesToCheck(Class<H> handlerClass) {
-        List<Class<?>> classesWithHandlers = new ArrayList<>();
-        // Async
-        classesWithHandlers.addAll(List.of(RoundSummaryHelper.class, WhisperHelper.class, NotepadHelper.class, CustomizationsHelper.class));
-
-        // Homebrew
-        classesWithHandlers.addAll(List.of(IgnisAuroraHelperTechs.class));
-        return classesWithHandlers;
+    private static List<Class<?>> classesToCheck() {
+        return AsyncTI4DiscordBot.getAllClasses();
     }
 
     private static <C extends ListenerContext> boolean validateParams(Method method, Class<C> contextClass) {
         boolean hasComponentID = false;
         List<Parameter> badParams = new ArrayList<>();
-        for (Parameter param : Arrays.asList(method.getParameters())) {
+        for (Parameter param : method.getParameters()) {
             // easy parameters
             if (param.getType().equals(contextClass)) continue;
             if (param.getType().equals(Game.class)) continue;
@@ -113,7 +103,7 @@ public class AnnotationHandler {
         return ctx -> {
             boolean hasComponentID = false;
             List<Object> args = new ArrayList<>();
-            for (Parameter param : Arrays.asList(method.getParameters())) {
+            for (Parameter param : method.getParameters()) {
                 if (param.getType().equals(contextClass)) args.add(ctx);
                 if (param.getType().equals(Game.class)) args.add(ctx.getGame());
                 if (param.getType().equals(Player.class)) args.add(ctx.getPlayer());
@@ -135,13 +125,13 @@ public class AnnotationHandler {
                     } else {
                         switch (name.value().toLowerCase()) {
                             case "componentid", "component" -> args.add(ctx.getComponentID());
-                            case "buttonId", "button" -> {
+                            case "buttonid", "button" -> {
                                 if (ctx instanceof ButtonContext bctx) args.add(bctx.getButtonID());
                             }
-                            case "modalId", "modal" -> {
+                            case "modalid", "modal" -> {
                                 if (ctx instanceof ModalContext mctx) args.add(mctx.getModalID());
                             }
-                            case "menuId", "menu" -> {
+                            case "menuid", "menu" -> {
                                 if (ctx instanceof SelectionMenuContext sctx) args.add(sctx.getMenuID());
                             }
                             case "messageid", "message" -> {
@@ -163,9 +153,16 @@ public class AnnotationHandler {
                 method.setAccessible(true);
                 method.invoke(null, args.toArray());
             } catch (InvocationTargetException e) {
-                BotLogger.log("Error within button handler:", e.getCause());
+                BotLogger.log("Error within button handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName() + "\":", e.getCause());
+                for (Object arg : args) {
+                    if (arg instanceof ButtonInteractionEvent buttonInteractionEvent) {
+                        buttonInteractionEvent.getInteraction().getMessage()
+                            .reply("The button failed. An exception has been logged for the developers.")
+                            .queue();
+                    }
+                }
             } catch (Exception e) {
-                List<String> paramTypes = Arrays.asList(method.getParameters()).stream().map(param -> param.getType().getSimpleName()).toList();
+                List<String> paramTypes = Arrays.stream(method.getParameters()).map(param -> param.getType().getSimpleName()).toList();
                 List<String> argTypes = args.stream().map(obj -> obj.getClass().getSimpleName()).toList();
 
                 String methodName = method.getDeclaringClass().getSimpleName() + "." + method.getName();
@@ -192,8 +189,6 @@ public class AnnotationHandler {
      * <p>
      * Find all functions that are tagged with `@handlerClass`, and which take parameters based on `contextClass`.
      * <p>
-     * Add classes that need to be checked to {@link AnnotationHandler#classesToCheck}
-     * <p>
      * Untagged String parameters are assumed to be `componentID`. Use {@link NamedParam} to tag string parameters for now
      * 
      * @param <C> {@link AnnotationHandler#contexts}
@@ -214,11 +209,11 @@ public class AnnotationHandler {
                 return consumers;
             }
 
-            for (Class<?> klass : classesToCheck(handlerClass)) {
-                for (Method method : Arrays.asList(klass.getDeclaredMethods())) {
+            for (Class<?> klass : classesToCheck()) {
+                for (Method method : klass.getDeclaredMethods()) {
                     method.setAccessible(true);
                     List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));
-                    if (handlers == null || handlers.isEmpty()) continue;
+                    if (handlers.isEmpty()) continue;
 
                     String methodName = klass.getName() + "." + method.getName();
                     if (!Modifier.isStatic(method.getModifiers())) {

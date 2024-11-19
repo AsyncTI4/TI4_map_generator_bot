@@ -2,7 +2,7 @@
     {
         "alias": "orca",
         "name": "orca",
-        "aliases": ["orca"],
+        "aliases": ["orca", "splitlgy", "splitlightgrey", "splitwhite"],
         "textColor": "white",
         "primaryColorRef": "lightgray",
         "secondaryColorRef": "black"
@@ -74,7 +74,7 @@
     {
         "alias": "splittan",
         "name": "splittan",
-        "aliases": ["splittan", "splittan"],
+        "aliases": ["splittan"],
         "textColor": "white",
         "primaryColorRef": "tan",
         "secondaryColorRef": "black"

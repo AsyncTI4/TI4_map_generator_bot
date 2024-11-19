@@ -6,10 +6,7 @@
         "rial"
     ],
     "imagePath": "er01_rialarchon.png",
-    "shipPositionsType": null,
-    "wormholes": [
-        null
-    ],
+    "shipPositionsType": "TYPE04",
     "planets": [
         "rialarchon"
     ],

@@ -580,7 +580,7 @@
     "name": "Plague",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 planet that is controlled by another player. Roll 1 die for each infantry on that planet. For each result of 6 or greater, destroy 1 of those units.",
+    "text": "Choose 1 planet that is controlled by another player. Roll 1 die for each infantry on that planet. For each result of 6 or greater, destroy 1 of those units. [Note: You can target a planet with 0 infantry]",
     "flavorText": "The letani dipped a mossy limb beneath the surface of the reservoir, feeling the flow of the particles within, shifting them, changing them into something different. Something dangerous.",
     "source": "base"
   },
@@ -1354,7 +1354,7 @@
     "name": "Reveal Prototype",
     "phase": "Action",
     "window": "At the start of a combat",
-    "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the pre-reqs of the tech before you can research it.]",
+    "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the pre-reqs of the tech before you can research it. Nekro just gets CCs from this card, no tech.]",
     "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
     "source": "pok"
   },
@@ -1845,4 +1845,3 @@
     "source": "ds"
   }
 ]
-

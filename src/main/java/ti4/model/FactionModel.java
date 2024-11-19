@@ -10,9 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Emojis;
+import ti4.helpers.Helper;
 import ti4.model.Source.ComponentSource;
 
 @Data
@@ -23,8 +24,11 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private String homeSystem;
     private String startingFleet;
     private int commodities;
+    private String complexity;
     private List<String> factionTech;
     private List<String> startingTech;
+    private List<String> startingTechOptions;
+    private Integer startingTechAmount;
     private List<String> homePlanets;
     private List<String> abilities;
     private List<String> leaders;
@@ -32,7 +36,10 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private List<String> units;
     private ComponentSource source;
     private String homebrewReplacesID;
-    private String factionSheetURL;
+    private String factionSheetFrontImageURL;
+    private String factionSheetBackImageURL;
+    private String factionReferenceImageURL;
+    private String wikiURL;
 
     public boolean isValid() {
         return alias != null
@@ -40,7 +47,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             && homeSystem != null
             && startingFleet != null
             && factionTech != null
-            && startingTech != null
+            && (startingTech != null || (startingTechOptions != null && startingTechAmount != null))
             && homePlanets != null
             && abilities != null
             && leaders != null
@@ -63,6 +70,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     }
 
     public List<String> getStartingTech() {
+        if (startingTech == null) return null;
         return new ArrayList<>(startingTech);
     }
 
@@ -90,8 +98,43 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(homebrewReplacesID);
     }
 
-    public Optional<String> getFactionSheetURL() {
-        return Optional.ofNullable(factionSheetURL);
+    public String getComplexity() {
+        return Optional.ofNullable(complexity).orElse("Not added to bot yet");
+    }
+
+    public Optional<String> getFactionSheetFrontImageURL() {
+        return Optional.ofNullable(factionSheetFrontImageURL);
+    }
+
+    public Optional<String> getFactionSheetBackImageURL() {
+        return Optional.ofNullable(factionSheetBackImageURL);
+    }
+
+    public Optional<String> getFactionReferenceImageURL() {
+        return Optional.ofNullable(factionReferenceImageURL);
+    }
+
+    public Optional<String> getWikiURL() {
+        return Optional.ofNullable(wikiURL);
+    }
+
+    public String getLinksText() {
+        StringBuilder sb = new StringBuilder();
+        getFactionSheetFrontImageURL().ifPresent(url -> sb.append("[Faction Sheet Front](").append(url).append(")\n"));
+        getFactionSheetBackImageURL().ifPresent(url -> sb.append("[Faction Sheet Back](").append(url).append(")\n"));
+        getFactionReferenceImageURL().ifPresent(url -> sb.append("[Quick Reference Card](").append(url).append(")\n"));
+        getWikiURL().ifPresent(url -> sb.append("[Wiki Link](").append(url).append(")\n"));
+        return sb.toString();
+    }
+
+    public String getFactionSheetMessage() {
+        if (getFactionSheetFrontImageURL().isEmpty() && getFactionSheetBackImageURL().isEmpty()) return null;
+
+        StringBuilder sb = new StringBuilder("## Faction Sheet: ");
+        getFactionSheetFrontImageURL().ifPresent(url -> sb.append("[Front](").append(url).append(") "));
+        getFactionSheetBackImageURL().ifPresent(url -> sb.append("[Back](").append(url).append(") "));
+        getWikiURL().ifPresent(url -> sb.append("[Wiki Link](").append(url).append(")"));
+        return sb.toString();
     }
 
     @Override
@@ -102,16 +145,13 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeAliases) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
+        // TITLE
         eb.setTitle(getFactionTitle());
+        getWikiURL().ifPresent(eb::setUrl);
 
-        //DESCRIPTION
-        StringBuilder description = new StringBuilder();
-        eb.setDescription(description.toString());
+        getFactionSheetFrontImageURL().ifPresent(eb::setImage);
 
-        if (getFactionSheetURL().isPresent()) eb.setImage(getFactionSheetURL().get());
-
-        //FOOTER
+        // FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         if (includeAliases) footer.append("\nAliases: ").append(AliasHandler.getFactionAliasEntryList(getAlias()));
@@ -125,14 +165,10 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         // TITLE - [FactionEmoji] Sardakk N'orr [SourceEmoji]
-        StringBuilder title = new StringBuilder();
-        title.append(getFactionEmoji()).append(" ").append(getFactionNameWithSourceEmoji());
-        eb.setTitle(title.toString());
+        eb.setTitle(getFactionEmoji() + " " + getFactionNameWithSourceEmoji());
 
         // DESCRIPTION - <Commodity><Commodity><Commodity>
-        StringBuilder desc = new StringBuilder();
-        desc.append("\n").append(StringUtils.repeat(Emojis.comm, getCommodities()));
-        eb.setDescription(desc.toString());
+        eb.setDescription("\n" + Emojis.comm(getCommodities()));
 
         // FIELDS
         // Abilities
@@ -141,11 +177,11 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             AbilityModel model = Mapper.getAbility(id);
             sb.append(model.getName()).append(":");
             if (model.getPermanentEffect().isPresent()) {
-                String effect = model.getPermanentEffect().get().replaceAll("\n", "");
+                String effect = model.getPermanentEffect().get().replace("\n", "");
                 sb.append("\n> - ").append(effect);
             }
-            if (model.getWindow().isPresent()) {
-                String effect = model.getWindowEffect().get().replaceAll("\n", "");
+            if (model.getWindow().isPresent() && model.getWindowEffect().isPresent()) {
+                String effect = model.getWindowEffect().get().replace("\n", "");
                 sb.append("\n> ").append(model.getWindow().get()).append(":");
                 sb.append("\n> - ").append(effect);
             }
@@ -168,7 +204,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             UnitModel model = Mapper.getUnit(id);
             if (model.getFaction().isEmpty()) continue;
             sb.append(model.getUnitEmoji()).append(" ").append(model.getName());
-            if (model.getAbility().isPresent()) sb.append("\n> ").append(model.getAbility());
+            if (model.getAbility().isPresent()) sb.append("\n> ").append(model.getAbility().get());
             sb.append("\n");
         }
         eb.addField("__Units__", sb.toString(), false);
@@ -188,6 +224,10 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             sb.append(model.getLeaderEmoji()).append(" ").append(model.getName()).append("\n");
         }
         eb.addField("__Leaders__", sb.toString(), false);
+
+        sb = new StringBuilder();
+        sb.append(Helper.getUnitListEmojis(getStartingFleet())).append("\n");
+        eb.addField("__Starting Fleet__", sb.toString(), false);
 
         return eb.build();
     }

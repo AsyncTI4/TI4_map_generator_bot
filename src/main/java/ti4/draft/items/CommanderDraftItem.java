@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -26,10 +26,10 @@ public class CommanderDraftItem extends DraftItem {
     @Override
     public String getShortDescription() {
         LeaderModel leader = getLeader();
-        if (leader == null)
-        {
+        if (leader == null) {
             return getAlias();
-        }return "Commander - " + getLeader().getName();
+        }
+        return "Commander - " + getLeader().getName();
     }
 
     @JsonIgnore
@@ -65,7 +65,7 @@ public class CommanderDraftItem extends DraftItem {
             List<String> leaders = faction.getLeaders();
             leaders.removeIf((String leader) -> !"commander".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
-                allItems.add(DraftItem.Generate(Category.COMMANDER, leader));
+                allItems.add(DraftItem.generate(Category.COMMANDER, leader));
             }
         }
         return allItems;

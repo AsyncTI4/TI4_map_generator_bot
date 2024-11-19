@@ -32,8 +32,8 @@
         "category": "agenda",
         "type": "Law",
         "target": "For/Against",
-        "text1": "All mechs lose their printed abilities except for Sustain Damage.",
-        "text2": "Each player must place a command token in a system that contains one of their units with sustain damage, if possible.",
+        "text1": "For: All mechs lose their printed abilities except for Sustain Damage.",
+        "text2": "Against: Each player must place a command token in a system that contains one of their units with sustain damage, if possible.",
         "mapText": "All mechs lose their printed abilities except for Sustain Damage.",
         "source": "ignis_aurora"
     },
@@ -43,8 +43,8 @@
         "category": "agenda",
         "type": "Law",
         "target": "For/Against",
-        "text1": "During the strategy phase, begin with the player to the right of the speaker and proceed in counter-clockwise order",
-        "text2": "For each Support for the Throne promissory note in a player's play area, they lose 1 victory point. Then purge all Support for the Throne promissory notes.",
+        "text1": "For: During the strategy phase, begin with the player to the right of the speaker and proceed in counter-clockwise order",
+        "text2": "Against: For each Support for the Throne promissory note in a player's play area, they lose 1 victory point. Then purge all Support for the Throne promissory notes.",
         "mapText": "During the strategy phase, begin with the player to the right of the speaker and proceed in counter-clockwise order",
         "source": "ignis_aurora"
     },
@@ -54,8 +54,8 @@
         "category": "agenda",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "Each player removes 2 command tokens from their command sheet and return those tokens to their reinforcements.",
-        "text2": "Each player removes 1 command token from their fleet pool and returns that token to their reinforcements.",
+        "text1": "For: Each player removes 2 command tokens from their command sheet and return those tokens to their reinforcements.",
+        "text2": "Against: Each player removes 1 command token from their fleet pool and returns that token to their reinforcements.",
         "source": "ignis_aurora"
     },
     {
@@ -111,8 +111,8 @@
         "category": "agenda",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "Each player returns all of their trade goods to the supply. Then, each player gains 5 trade goods.",
-        "text2": "Each player returns all of their trade goods to the supply.",
+        "text1": "For: Each player returns all of their trade goods to the supply. Then, each player gains 5 trade goods.",
+        "text2": "Against: Each player returns all of their trade goods to the supply.",
         "source": "ignis_aurora"
     },
     {
@@ -130,8 +130,8 @@
         "category": "agenda",
         "type": "Law",
         "target": "For/Against",
-        "text1": "Players may not decline to fire space cannon or anti-fighter barrage.",
-        "text2": "Each player that voted For may place 1 PDS from their reinforcements on a planet they control.",
+        "text1": "For: Players may not decline to fire space cannon or anti-fighter barrage.",
+        "text2": "Against: Each player that voted For may place 1 PDS from their reinforcements on a planet they control.",
         "mapText": "Players may not decline to fire space cannon or anti-fighter barrage.",
         "source": "ignis_aurora"
     },
@@ -151,8 +151,8 @@
         "category": "agenda",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "Draw and reveal 1 stage I public objective from the deck and place it near the public objectives.",
-        "text2": "Draw and reveal 1 stage II public from the deck and place it near the public objectives.",
+        "text1": "For: Draw and reveal 1 stage I public objective from the deck and place it near the public objectives.",
+        "text2": "Against: Draw and reveal 1 stage II public from the deck and place it near the public objectives.",
         "source": "ignis_aurora"
     },
     {
@@ -161,9 +161,9 @@
         "category": "agenda",
         "type": "Law",
         "target": "For/Against",
-        "text1": "At the end of the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
-        "text2": "Each player that voted Against or abstained must remove 4 units from the gameboard, if possible.",
-        "mapText": "At the end of the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
+        "text1": "For: After assigning hits in the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
+        "text2": "Against: Each player that did not predict or cast at least 1 vote For must remove 4 units from the gameboard, if possible.",
+        "mapText": "After assigning hits in the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
         "source": "ignis_aurora"
     },
     {
@@ -289,8 +289,8 @@
         "category": "agenda",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "Each player that voted \"For\" gains 1 victory point.",
-        "text2": "Each player that voted \"For\" loses 1 victory point.",
+        "text1": "For: Each player that voted \"For\" gains 1 victory point.",
+        "text2": "Against: Each player that voted \"For\" loses 1 victory point.",
         "source": "ignis_aurora"
     },
     {
@@ -299,8 +299,8 @@
         "category": "agenda",
         "type": "Law",
         "target": "For/Against",
-        "text1": "A player must return a command token from their strategy pool to reinforcements in order to activate the wormhole nexus.",
-        "text2": "Place a gamma wormhole token in the Mecatol Rex system.",
+        "text1": "For: A player must return a command token from their strategy pool to reinforcements in order to activate the wormhole nexus.",
+        "text2": "Against: Place a gamma wormhole token in the Mecatol Rex system.",
         "mapText": "A player must return a command token from their strategy pool to reinforcements in order to activate the wormhole nexus.",
         "source": "ignis_aurora"
     },
@@ -329,8 +329,8 @@
         "category": "agenda",
         "type": "Law",
         "target": "For/Against",
-        "text1": "Each player may have no more than 6 ground forces on a planet. Any ground forces above 6 are removed",
-        "text2": "Each player that voted Against or abstained removes a command token from their player sheet. Each player that voted For gains a command token.",
+        "text1": "For: Each player may have no more than 6 ground forces on a planet. Any ground forces above 6 are removed",
+        "text2": "Against: Each player that did not predict or cast at least 1 vote For must remove a command token from their player sheet. Each player that voted For may gain a command token.",
         "mapText": "Each player may have no more than 6 ground forces on a planet. Any ground forces above 6 are removed",
         "source": "ignis_aurora"
     },
@@ -359,8 +359,8 @@
         "category": "agenda",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "The player with the most victory points gains 1 victory point.",
-        "text2": "The player with the fewest victory points gains 1 victory point.",
+        "text1": "For: The player with the most victory points gains 1 victory point.",
+        "text2": "Against: The player with the fewest victory points gains 1 victory point.",
         "source": "ignis_aurora"
     },
     {
@@ -369,8 +369,8 @@
         "category": "agenda",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "Return all alliance promissory notes to their owners. Then, each player gives their alliance to the player sitting to their right.",
-        "text2": "Return all alliance promissory notes to their owners. Then, each player gives their alliance to the player sitting to their left.",
+        "text1": "For: Return all alliance promissory notes to their owners. Then, each player gives their alliance to the player sitting to their right.",
+        "text2": "Against: Return all alliance promissory notes to their owners. Then, each player gives their alliance to the player sitting to their left.",
         "source": "ignis_aurora"
     },
     {
@@ -379,8 +379,8 @@
         "category": "agenda",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "Each player destroys half of their infantry on each planet they control, rounded up. Then, each player gains trade goods equal to the number of their infantry that were destroyed.",
-        "text2": "Each player places 1 infantry from their reinforcements on each planet they control.",
+        "text1": "For: Each player destroys half of their infantry on each planet they control, rounded up. Then, each player gains trade goods equal to the number of their infantry that were destroyed.",
+        "text2": "Against: Each player places 1 infantry from their reinforcements on each planet they control.",
         "source": "ignis_aurora"
     },
     {
@@ -389,8 +389,8 @@
         "category": "agenda",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "Each player that voted \"For\" draws 2 action cards.",
-        "text2": "Each player that voted \"For\" discards all of their action cards.",
+        "text1": "For: Each player that voted \"For\" draws 2 action cards.",
+        "text2": "Against: Each player that voted \"For\" discards all of their action cards.",
         "source": "ignis_aurora"
     },
     {
@@ -399,8 +399,9 @@
         "category": "faction",
         "categoryDescription": "sol",
         "type": "Law",
-        "text1": "When the Sol player uses their Orbital Drop ability, they gain 1 trade good.",
-        "text2": "The Sol player may place up to 4 fighters on the board in systems that contain their units.",
+        "target": "For/Against",
+        "text1": "For: When the Sol player uses their Orbital Drop ability, they gain 1 trade good.",
+        "text2": "Against: The Sol player may place up to 4 fighters on the board in systems that contain their units.",
         "mapText": "When the Sol player uses their Orbital Drop ability, they gain 1 trade good.",
         "source": "ignis_aurora"
     },
@@ -410,19 +411,21 @@
         "category": "faction",
         "categoryDescription": "muaat",
         "type": "Law",
-        "text1": "The Muaat flagship gains combat, capacity, and move values equivalent to the Muaat player's war suns.",
-        "text2": "Each player that voted For gains 1 command token in their strategy pool.",
+        "target": "For/Against",
+        "text1": "For: The Muaat flagship gains combat, capacity, and move values equivalent to the Muaat player's war suns.",
+        "text2": "Against: Each player that voted For gains 1 command token in their strategy pool.",
         "mapText": "The Muaat flagship gains combat, capacity, and move values equivalent to the Muaat player's war suns.",
         "source": "ignis_aurora"
     },
     {
         "alias": "baldrick_astral_echoes",
-        "name": "Astral Echoes (Seers of Quilane)",
+        "name": "Astral Echoes (Seers of Qulane)",
         "category": "faction",
         "categoryDescription": "qulane",
         "type": "Directive",
-        "text1": "The Quilane player may look at the top 4 cards of the relic deck, then return them to the top of the deck in any order",
-        "text2": "Each player that voted For gains 1 unknown relic fragment.",
+        "target": "For/Against",
+        "text1": "For: The Qulane player may look at the top 4 cards of the relic deck, then return them to the top of the deck in any order",
+        "text2": "Against: Each player that voted For gains 1 unknown relic fragment.",
         "source": "ignis_aurora"
     },
     {
@@ -431,8 +434,9 @@
         "category": "faction",
         "categoryDescription": "naalu",
         "type": "Directive",
-        "text1": "For each 5 fighters (round down) the Naalu player has on the board, they gain 1 trade good.",
-        "text2": "Each player that voted against or abstained must reveal 1 secret objective from their hand to the Naalu player, if possible.",
+        "target": "For/Against",
+        "text1": "For: For each 5 fighters (round down) the Naalu player has on the board, they gain 1 trade good.",
+        "text2": "Against: Each player that did not cast at least 1 vote For must reveal 1 secret objective from their hand to the Naalu player, if possible.",
         "source": "ignis_aurora"
     },
     {
@@ -441,8 +445,9 @@
         "category": "faction",
         "categoryDescription": "l1z1x",
         "type": "Directive",
-        "text1": "At the start of the strategy phase, the L1Z1X player may spend 4 resources to research 1 technology or 10 resources to research 2 technologies.",
-        "text2": "Each player that voted against must replace 1 technology on their player sheet with a technology of the same color that has fewer prerequisites. If they cannot do this, they cannot vote against.",
+        "target": "For/Against",
+        "text1": "For: At the start of the strategy phase, the L1Z1X player may spend 4 resources to research 1 technology or 10 resources to research 2 technologies.",
+        "text2": "Against: Each player that voted against must replace 1 technology on their player sheet with a technology of the same color that has fewer prerequisites. If they cannot do this, they cannot vote against.",
         "source": "ignis_aurora"
     },
     {
@@ -451,8 +456,9 @@
         "category": "faction",
         "categoryDescription": "nomad",
         "type": "Directive",
-        "text1": "The Nomad player gains 4 trade goods.",
-        "text2": "Each player that voted For gains 2 trade goods.",
+        "target": "For/Against",
+        "text1": "For: The Nomad player gains 4 trade goods.",
+        "text2": "Against: Each player that voted For gains 2 trade goods.",
         "source": "ignis_aurora"
     },
     {
@@ -461,8 +467,9 @@
         "category": "faction",
         "categoryDescription": "cabal",
         "type": "Law",
-        "text1": "At any time, the Cabal player may return captured units to the supply and gain trade goods equivalent to half the printed cost of the unit (round down).",
-        "text2": "The Cabal player may capture one unit costing 2 resources or less from the reinforcements of each player that abstained or voted Against.",
+        "target": "For/Against",
+        "text1": "For: At any time, the Cabal player may return captured units to the supply and gain trade goods equivalent to half the printed cost of the unit (round down).",
+        "text2": "Against: The Cabal player may capture one unit costing 2 resources or less from the reinforcements of each player that did not cast at least 1 vote For.",
         "mapText": "At any time, the Cabal player may return captured units to the supply and gain trade goods equivalent to half the printed cost of the unit (round down).",
         "source": "ignis_aurora"
     },
@@ -472,8 +479,9 @@
         "category": "faction",
         "categoryDescription": "naaz",
         "type": "Directive",
-        "text1": "The Naaz-Rokha player may explore 2 planets they control.",
-        "text2": "Each player that voted For may explore 1 planet they control.",
+        "target": "For/Against",
+        "text1": "For: The Naaz-Rokha player may explore 2 planets they control.",
+        "text2": "Against: Each player that voted For may explore 1 planet they control.",
         "source": "ignis_aurora"
     },
     {
@@ -482,8 +490,9 @@
         "category": "faction",
         "categoryDescription": "argent",
         "type": "Law",
-        "text1": "The Argent player gains this card\nAfter activating a system, the Argent player may purge this card to transport their PDS units as if they were ground forces.",
-        "text2": "The Argent player may place 1 PDS unit from their reinforcements on any planet they control.",
+        "target": "For/Against",
+        "text1": "For: The Argent player gains this card\nAfter activating a system, the Argent player may purge this card to transport their PDS units as if they were ground forces.",
+        "text2": "Against: The Argent player may place 1 PDS unit from their reinforcements on any planet they control.",
         "mapText": "After activating a system, the Argent player may purge this card to transport their PDS units as if they were ground forces.",
         "source": "ignis_aurora"
     },
@@ -493,8 +502,9 @@
         "category": "faction",
         "categoryDescription": "letnev",
         "type": "Law",
-        "text1": "A player must give the Letnev player 1 trade good or commodity before moving ships into a system that contains or is adjacent to a system that contains a Letnev unit with bombardment",
-        "text2": "At the start of the strategy phase, each ship with sustain damage that belongs to a player that voted against or abstained becomes damaged.",
+        "target": "For/Against",
+        "text1": "For: A player must give the Letnev player 1 trade good or commodity before moving ships into a system that contains or is adjacent to a system that contains a Letnev unit with bombardment",
+        "text2": "Against: Each ship with sustain damage that belongs to a player that did not cast at least 1 vote For becomes damaged.",
         "mapText": "You must give the Letnev player 1 trade good or commodity before moving ships into or adjacent to a system containing a Letnev unit with bombardment",
         "source": "ignis_aurora"
     },
@@ -504,8 +514,9 @@
         "category": "faction",
         "categoryDescription": "nekro",
         "type": "Directive",
-        "text1": "The Nekro player may gain 1 technology owned by a player who voted For this agenda, or from a player who abstained.",
-        "text2": "Each player that voted against must return 1 command token to their reinforcements.",
+        "target": "For/Against",
+        "text1": "For: The Nekro player may gain 1 technology owned by a player who voted For this agenda, or from a player who abstained.",
+        "text2": "Against: Each player that voted against must return 1 command token to their reinforcements.",
         "source": "ignis_aurora"
     },
     {
@@ -514,8 +525,9 @@
         "category": "faction",
         "categoryDescription": "saar",
         "type": "Law",
-        "text1": "After the Saar player loses control of a planet, they gain 1 trade good.",
-        "text2": "At the start of the strategy phase, each player that voted For may produce units worth up to 3 resources and place them in systems that contain 1 of their space docks.",
+        "target": "For/Against",
+        "text1": "For: After the Saar player loses control of a planet, they gain 1 trade good.",
+        "text2": "Against: At the start of the strategy phase, each player that voted For may produce units worth up to 3 resources and place them in systems that contain 1 of their space docks.",
         "mapText": "After the Saar player loses control of a planet, they gain 1 trade good.",
         "source": "ignis_aurora"
     },
@@ -525,8 +537,9 @@
         "category": "faction",
         "categoryDescription": "sardakk",
         "type": "Directive",
-        "text1": "The Sardakk player may research a technology.",
-        "text2": "At the start of the strategy phase, each player that voted against or abstained must exhaust 1 planet for each technology that they own.",
+        "target": "For/Against",
+        "text1": "For: The Sardakk player may research a technology.",
+        "text2": "Against: At the start of the strategy phase, each player that did not cast at least 1 vote For must exhaust 1 planet for each technology that they own.",
         "source": "ignis_aurora"
     },
     {
@@ -535,8 +548,9 @@
         "category": "faction",
         "categoryDescription": "keleresm",
         "type": "Law",
-        "text1": "Non-Keleres players must spend 1 influence to activate a system that contains another player's units.",
-        "text2": "The Keleres player gains 2 trade goods.",
+        "target": "For/Against",
+        "text1": "For: Non-Keleres players must spend 1 influence to activate a system that contains another player's units.",
+        "text2": "Against: The Keleres player gains 2 trade goods.",
         "mapText": "Non-Keleres players must spend 1 influence to activate a system that contains another player's units.",
         "source": "ignis_aurora"
     },
@@ -546,8 +560,9 @@
         "category": "faction",
         "categoryDescription": "mentak",
         "type": "Law",
-        "text1": "At the end of a combat in a system adjacent to 1 or more of Mentak's ships, the Mentak player gains a trade good.",
-        "text2": "The Mentak player may place up to 2 cruisers from their reinforcements in any system that contains their ships.",
+        "target": "For/Against",
+        "text1": "For: At the end of a combat in a system adjacent to 1 or more of Mentak's ships, the Mentak player gains a trade good.",
+        "text2": "Against: The Mentak player may place up to 2 cruisers from their reinforcements in any system that contains their ships.",
         "mapText": "At the end of a combat in a system adjacent to 1 or more of Mentak's ships, the Mentak player gains a trade good.",
         "source": "ignis_aurora"
     },
@@ -557,8 +572,9 @@
         "category": "faction",
         "categoryDescription": "arborec",
         "type": "Law",
-        "text1": "When the Arborec player uses Production, reduce the combined cost of the produced units by 1.",
-        "text2": "For each player that voted Against, the Arborec player may may place 1 command token from that player's reinforcements in any non-home system.",
+        "target": "For/Against",
+        "text1": "For: When the Arborec player uses Production, reduce the combined cost of the produced units by 1.",
+        "text2": "Against: For each player that voted Against, the Arborec player may may place 1 command token from that player's reinforcements in any non-home system.",
         "mapText": "When the Arborec player uses Production, reduce the combined cost of the produced units by 1.",
         "source": "ignis_aurora"
     },
@@ -568,8 +584,9 @@
         "category": "faction",
         "categoryDescription": "yssaril",
         "type": "Law",
-        "text1": "When using their stall tactics ability, if the Yssaril player does not deploy a mech they may instead place 2 infantry from their reinforcements on a planet they control.",
-        "text2": "Each player that voted For may draw 1 action card.",
+        "target": "For/Against",
+        "text1": "For: When using their stall tactics ability, if the Yssaril player does not deploy a mech they may instead place 2 infantry from their reinforcements on a planet they control.",
+        "text2": "Against: Each player that voted For may draw 1 action card.",
         "mapText": "When using their stall tactics ability, if Yssaril does not deploy a mech they can place 2 infantry from their reinforcements on a planet they control.",
         "source": "ignis_aurora"
     },
@@ -579,8 +596,9 @@
         "category": "faction",
         "categoryDescription": "mahact",
         "type": "Directive",
-        "text1": "The Mahact player may add 1 command token to their player sheet from a faction whose token is not already on the sheet.",
-        "text2": "Each player that voted Against or abstained must give the Mahact player a random action card.",
+        "target": "For/Against",
+        "text1": "For: The Mahact player may add 1 command token to their player sheet from a faction whose token is not already on the sheet.",
+        "text2": "Against: Each player that did not cast at least 1 vote For must give the Mahact player a random action card, if able.",
         "source": "ignis_aurora"
     },
     {
@@ -589,8 +607,9 @@
         "category": "faction",
         "categoryDescription": "xxcha",
         "type": "Law",
-        "text1": "The Xxcha player gains this card\nAt the end of the agenda phase, the Xxcha player may purge this card to begin another agenda phase.",
-        "text2": "The Xxcha player gains one trade good for each player that voted Against.",
+        "target": "For/Against",
+        "text1": "For: The Xxcha player gains this card\nAt the end of the agenda phase, the Xxcha player may purge this card to begin another agenda phase.",
+        "text2": "Against: The Xxcha player gains one trade good for each player that voted Against.",
         "mapText": "At the end of the agenda phase, the Xxcha player may purge this card to begin another agenda phase.",
         "source": "ignis_aurora"
     },
@@ -600,8 +619,9 @@
         "category": "faction",
         "categoryDescription": "hacan",
         "type": "Law",
-        "text1": "- At any time, the Hacan player may discard 1 action to gain 1 trade good. \n- At any time, the Hacan player may discard 2 trade goods to gain 1 action card.",
-        "text2": "At the start of the strategy phase, the Hacan player may produce 1 ship at one of their space docks.",
+        "target": "For/Against",
+        "text1": "For: - At any time, the Hacan player may discard 1 action to gain 1 trade good. \n- At any time, the Hacan player may discard 2 trade goods to gain 1 action card.",
+        "text2": "Against: At the start of the strategy phase, the Hacan player may produce 1 ship at one of their space docks.",
         "mapText": "At any time, the Hacan player may: discard 1 action to gain 1 trade good; discard 2 trade goods to gain 1 action card.",
         "source": "ignis_aurora"
     },
@@ -611,8 +631,9 @@
         "category": "faction",
         "categoryDescription": "titans",
         "type": "Directive",
-        "text1": "The Titans player may place up to 3 sleeper tokens on planets that are in or adjacent to systems that contain a planet they control.",
-        "text2": "Each player that voted For gains 2 trade goods.",
+        "target": "For/Against",
+        "text1": "For: The Titans player may place up to 3 sleeper tokens on planets that are in or adjacent to systems that contain a planet they control.",
+        "text2": "Against: Each player that voted For gains 2 trade goods.",
         "source": "ignis_aurora"
     },
     {
@@ -621,8 +642,9 @@
         "category": "faction",
         "categoryDescription": "yin",
         "type": "Law",
-        "text1": "When the Yin player uses a faction ability, they gain 1 trade good.",
-        "text2": "- Each player that voted For gains 1 trade good\n- The Yin player gains a trade good for each player that voted Against.",
+        "target": "For/Against",
+        "text1": "For: When the Yin player uses a faction ability, they gain 1 trade good.",
+        "text2": "Against: - Each player that voted For gains 1 trade good\n- The Yin player gains a trade good for each player that voted Against.",
         "mapText": "When the Yin player uses a faction ability, they gain 1 trade good.",
         "source": "ignis_aurora"
     },
@@ -632,8 +654,9 @@
         "category": "faction",
         "categoryDescription": "empyrean",
         "type": "Directive",
-        "text1": "The Empyrean player may place up to 2 destroyers or cruisers from their reinforcement in systems that do not contain another player's units.",
-        "text2": "The Empyrean player may place a frontier token in a system that does not contain a planet and does not already have a frontier token.",
+        "target": "For/Against",
+        "text1": "For: The Empyrean player may place up to 2 destroyers or cruisers from their reinforcement in systems that do not contain another player's units.",
+        "text2": "Against: The Empyrean player may place a frontier token in a system that does not contain a planet and does not already have a frontier token.",
         "source": "ignis_aurora"
     },
     {
@@ -642,8 +665,9 @@
         "category": "faction",
         "categoryDescription": "winnu",
         "type": "Law",
-        "text1": "When the Winnu player activates the Mecatol Rex system, they may apply +1 to the move value of their ships during this tactical action.",
-        "text2": "The Winnu player may draw 2 action cards.\nEach player that voted for may draw 1 action card.",
+        "target": "For/Against",
+        "text1": "For: When the Winnu player activates the Mecatol Rex system, they may apply +1 to the move value of their ships during this tactical action.",
+        "text2": "Against: The Winnu player may draw 2 action cards.\nEach player that voted for may draw 1 action card.",
         "mapText": "When the Winnu player activates the Mecatol Rex system, they may apply +1 to the move value of their ships during this tactical action.",
         "source": "ignis_aurora"
     },
@@ -653,8 +677,9 @@
         "category": "faction",
         "categoryDescription": "jolnar",
         "type": "Law",
-        "text1": "Ignore Jol-Nar's fragile faction ability in systems that contain a planet with a technology specialty.",
-        "text2": "Each player that voted against must exhaust 1 technology on their player sheet. If they cannot do this, they cannot vote against.",
+        "target": "For/Against",
+        "text1": "For: Ignore Jol-Nar's fragile faction ability in systems that contain a planet with a technology specialty.",
+        "text2": "Against: Each player that voted against must exhaust 1 technology on their player sheet. If they cannot do this, they cannot vote against.",
         "mapText": "Ignore Jol-Nar's fragile faction ability in systems that contain a planet with a technology specialty.",
         "source": "ignis_aurora"
     },
@@ -664,8 +689,9 @@
         "category": "faction",
         "categoryDescription": "ghost",
         "type": "Law",
-        "text1": "After a non-Creuss player moves ships through a wormhole, they must destroy 1 of the non-fighter ships that moved through a wormhole, if able.",
-        "text2": "The Creuss player may place up to 2 of their IFF tokens in non-home systems.",
+        "target": "For/Against",
+        "text1": "For: After a non-Creuss player moves ships through a wormhole, they must destroy 1 of the non-fighter ships that moved through a wormhole, if able.",
+        "text2": "Against: The Creuss player may place up to 2 of their IFF tokens in non-home systems.",
         "mapText": "After a non-Creuss player moves ships through a wormhole, they must destroy 1 of the non-fighter ships that moved through a wormhole, if able.",
         "source": "ignis_aurora"
     }

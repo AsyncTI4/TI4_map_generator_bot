@@ -2,15 +2,19 @@
     {
         "alias": "absol_amd",
         "name": "Antimass Deflectors",
-        "types": ["PROPULSION"],
+        "types": [
+            "PROPULSION"
+        ],
         "source": "absol",
-        "text": "Your ships can move into and through asteroid fields. When other players' units use SPACE CANNON against your units, apply -1 to the result of each die roll.",
+        "text": "Your ships can move into and through asteroid fields and retain their printed Move value when moving out of nebulas. When other players' units use SPACE CANNON against your units, apply -1 to the result of each die roll.",
         "homebrewReplacesID": "amd"
     },
     {
         "alias": "absol_det",
         "name": "Dark Energy Tap",
-        "types": ["PROPULSION"],
+        "types": [
+            "PROPULSION"
+        ],
         "source": "absol",
         "text": "After you perform a tactical action in a system that contains a frontier token, if you have 1 or more ships in that system, you may explore that token.\n \n Your ships can retreat into adjacent systems that do not contain other players' units, even if you do not have units or control planets in that system.",
         "homebrewReplacesID": "det"
@@ -18,25 +22,31 @@
     {
         "alias": "absol_gd",
         "name": "Gravity Drive",
-        "types": ["PROPULSION"],
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "B",
         "source": "absol",
-        "text": "During your tactical actions, apply +1 to the move value of each of your ships that moves through 1 or more wormholes.\n \n After rolling dice for your ships when moving out of or through a gravity rift, you may reroll any number of those dice.",
+        "text": "During your tactical actions, apply +1 to the move value of each of your ships that moves through 1 or more systems adjacent to a gravity rift or supernova, or that moves through 1 or more wormholes.\nAfter you roll dice for your ships moving through a gravity rift, you may reroll any number of those dice.",
         "homebrewReplacesID": "gd"
     },
     {
         "alias": "absol_sr",
         "name": "Sling Relay",
-        "types": ["PROPULSION"],
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "B",
         "source": "absol",
-        "text": "ACTION: Place 1 command token from your tactics pool and 1 command token from your reinforcements to activate 2 adjacent systems containing only your units. You may only move ships and ground forces between those systems, following the normal rules for movement. Then, perform the remaining tactical action steps in both systems. Produced ships may be placed in either system.",
+        "text": "During your tactical actions, your non-blockaded space docks in adjacent systems may use the PRODUCTION 1 ability in the active system if it does not contain other players' ships.  If you have a space dock unit upgrade technology, they instead may use PRODUCTION 2. All units produced are placed in the space area.",
         "homebrewReplacesID": "sr"
     },
     {
         "alias": "absol_fl",
         "name": "Fleet Logistics",
-        "types": ["PROPULSION"],
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "BB",
         "source": "absol",
         "text": "Once per turn, after you perform a tactical action, you may take an additional tactical action. You may activate the same system for this second tactical action; in that case, ensure that only 1 of your command tokens total is in the system by returning the second command token to your reinforcements instead of placing it in the active system.",
@@ -45,7 +55,9 @@
     {
         "alias": "absol_lwd",
         "name": "Light/Wave Deflector",
-        "types": ["PROPULSION"],
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "BBB",
         "source": "absol",
         "text": "Your ships can move through systems that contain other players' ships.",
@@ -54,23 +66,29 @@
     {
         "alias": "absol_nm",
         "name": "Neural Motivator",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "source": "absol",
-        "text": "The maximum number of action cards you can have in your hand is increased by 3\n \n ACTION: Exhaust this card to draw 2 action cards.",
+        "text": "The maximum number of action cards you can have in your hand is increased by 3\n \n At the end of your turn, you may exhaust this card to draw 2 action cards.",
         "homebrewReplacesID": "nm"
     },
     {
         "alias": "absol_pa",
         "name": "Psychoarchaeology",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "source": "absol",
-        "text": "You can use technology specialties on planets you control without exhausting them, even if those planets are exhausted.\nAt the end of your turn, you may discard an action card to explore a readied planet you control.",
+        "text": "You can use technology specialties on planets you control without exhausting them, even if those planets are exhausted.\nAt the end of your turn, you may discard 2 action cards to explore a readied planet you control.",
         "homebrewReplacesID": "pa"
     },
     {
         "alias": "absol_dxa",
         "name": "Dacxive Animators",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "G",
         "source": "absol",
         "text": "You may exhaust this card during the action phase to place 2 infantry from your reinforcements on a planet that contains your ground forces.\n \n After you win a ground combat, you may place 1 infantry from your reinforcements on that planet.",
@@ -79,7 +97,9 @@
     {
         "alias": "absol_bs",
         "name": "Bio-stims",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "G",
         "source": "absol",
         "text": "You may exhaust this card at the end of your turn to ready 1 of your planets or 1 of your other technologies.",
@@ -88,7 +108,9 @@
     {
         "alias": "absol_hm",
         "name": "Hyper Metabolism",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GG",
         "source": "absol",
         "text": "You may exhaust this card at the end of your turn to gain 1 command token or spend 1 command token from your strategy pool to ready an agent you control.",
@@ -97,7 +119,9 @@
     {
         "alias": "absol_x89",
         "name": "X-89 Bacterial Weapon",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GGG",
         "source": "absol",
         "text": "When your units use BOMBARDMENT, you may assign the first hit generated to all ground forces on the planet.\n \n At the start of a round of ground combat on a planet you control, you may exhaust this card to destroy all ground forces on the planet.",
@@ -106,30 +130,39 @@
     {
         "alias": "absol_st",
         "name": "Sarween Tools",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "source": "absol",
-        "text": "When you produce units, reduce the combined cost of the produced units by 1, plus an additional 1 for every 5 of the combined cost.",
+        "text": "'When you produce units, reduce the combined cost of the produced units by 1, plus an additional 1 for every 10 of the combined cost.\n\nDuring the production step of your tactical actions, you may spend 1 resource to repair 1 of your units if the active system contains 1 of your space docks, or 2 resources to repair 1 of your units if it does not.",
         "homebrewReplacesID": "st"
     },
     {
         "alias": "absol_techquantumcore",
         "name": "Quantumcore",
-        "types": ["CYBERNETIC", "WARFARE"],
+        "types": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
         "source": "absol",
-        "text": "After you roll dice for SPACE CANNON, you may exhaust this technology to reroll any number of those dice and treat all hits generated as a result of 10. [Note, this synergizes with absol plasma scoring]."
+        "text": "During the movement step of your tactical actions, you may move 1 of your structures from a system that does not contain 1 of your command tokens to a planet you control in the active system.\nWhen an opponent commits ground forces to a planet that contains 1 or more of your structures, you may destroy 1 strucutre on that planet to return the committed units to the space area.  If you do, purge this card"
     },
     {
         "alias": "absol_sdn",
         "name": "Scanlink Drone Network",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "source": "absol",
-        "text": "When you activate a system as part of a tactical action, you may explore 1 planet in that system that contains 1 or more of your units.\n \n When you explore a planet, you may choose to gain 1 trade good instead of resolving the exploration card.",
+        "text": "When you activate a system as part of a tactical action, you may explore 1 planet in that system that contains 1 or more of your units.\n \n Whenever you would resolve an exploration card, you may instead discard that card and gain 1 trade good.",
         "homebrewReplacesID": "sdn"
     },
     {
         "alias": "absol_gls",
         "name": "Graviton Laser System",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "Y",
         "source": "absol",
         "text": "When a player would resolve a retreat, your units may first use SPACE CANNON against the retreating player’s ships in the active system.\n \n You may exhaust this card before 1 or more of your units use SPACE CANNON; hits produced by those units must be assigned to non-fighter ships if able.",
@@ -138,68 +171,84 @@
     {
         "alias": "absol_pi",
         "name": "Predictive Intelligence",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "Y",
         "source": "absol",
-        "text": "At the end of your turn, you may exhaust this card to redistribute your command tokens.\n \n When you cast votes during the agenda phase, you may cast 3 additional votes",
+        "text": "At the start of your turn, you may exhaust this card to redistribute your command tokens.\n \n When you cast votes during the agenda phase, you may cast 3 additional votes",
         "homebrewReplacesID": "pi"
     },
     {
         "alias": "absol_td",
         "name": "Transit Diodes",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "source": "absol",
-        "text": "You may exhaust this card at the start of your turn during the action phase; remove up to 4 of your ground forces from the game board and place them on 1 or more planets you control.",
+        "text": "You may exhaust this card at the start of your turn during the action phase; remove up to 4 of your ground forces from the game board and place them on 1 or more planets you control.\n\nYou may exhaust this card at the start of a round of invasion combat on a planet you control. If you do, at the end of that combat round, you may remove all of your ground forces from that planet and place them on another planet you control.",
         "homebrewReplacesID": "td"
     },
     {
         "alias": "absol_ie",
         "name": "Integrated Economy",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YYY",
         "source": "absol",
-        "text": "Each planet you control with a planet trait may count as having any trait.\n \n Each planet you control gains the PRODUCTION 1 ability as if it were a unit.",
+        "text": "You may treat each planet with a planet trait that contains 1 or more of your structures as having any planet trait.\n \n Each planet you control gains the PRODUCTION 1 ability as if it were a unit.",
         "homebrewReplacesID": "ie"
     },
     {
         "alias": "absol_ps",
         "name": "Plasma Scoring",
-        "types": ["WARFARE"],
+        "types": [
+            "WARFARE"
+        ],
         "source": "absol",
-        "text": "When 1 or more of your units use BOMBARDMENT or SPACE CANNON, 1 of those units may roll 1 additional die. You may assign hits generated from results of 10 (before applying modifiers).",
+        "text": "When 1 or more of your units use BOMBARDMENT or SPACE CANNON, 1 of those units may roll 1 additional die. When the result of your non-fighter ships' combat roll exceeds that ship's combat value by 3 or more, your opponent may not assign that hit to a fighter unless they first destroy 1 of their fighters in the active system.",
         "homebrewReplacesID": "ps"
     },
     {
         "alias": "absol_aida",
         "name": "AI Development Algorithm",
-        "types": ["WARFARE"],
+        "types": [
+            "WARFARE"
+        ],
         "source": "absol",
-        "text": "When you research a unit upgrade technology, you may ignore any 1 prerequisite.\n \n When you pass, you may spend 6 influence to research a unit upgrade technology.",
+        "text": "When you research a unit upgrade technology, you may exhaust this card to ignore any 1 prerequisite.\n \n When you pass, you may spend 6 influence to research a unit upgrade technology.",
         "homebrewReplacesID": "aida"
     },
     {
         "alias": "absol_md",
         "name": "Magen Defense Grid",
-        "types": ["WARFARE"],
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "R",
         "source": "absol",
-        "text": "At the start of ground combat on a planet that contains 1 or more of your structures, you may produce 1 hit per structure and assign them to your opponent's ground forces.\n \n After you perform a tactical action, you may exhaust this card and spend 3 resources to place a structure on a planet you control in the active system.",
+        "text": "At the start of ground combat on a planet that contains 1 or more of your structures, you may produce 1 hit per structure and assign them to your opponent's ground forces.\n \n After you perform a tactical action, you may exhaust this card and spend 4 resources to place a structure on a planet you control in the active system.",
         "homebrewReplacesID": "md"
     },
     {
         "alias": "absol_sar",
         "name": "Self-Assembly Routines",
-        "types": ["WARFARE"],
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "R",
         "source": "absol",
-        "text": "After 1 or more of your units use PRODUCTION, you may spend 1 resource to place a mech on a planet you control in the active system.\n \n ACTION: Exhaust this card to produce 1 ship in any system that contains 1 of your space docks.",
+        "text": "When you produce a mech, you may produce 1 additional mech for free. This still counts against production limit.  \n \n ACTION: Exhaust this card to produce 1 ship in any system that contains 1 of your space docks.",
         "homebrewReplacesID": "sar"
     },
     {
         "alias": "absol_da",
         "name": "Duranium Armor",
-        "types": ["WARFARE"],
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "RR",
         "source": "absol",
         "text": "Your ships can move into and through asteroid fields.\n \n During each combat round, after you assign hits to your units, repair 1 of your damaged units that did not use SUSTAIN DAMAGE during this combat round.",
@@ -208,7 +257,9 @@
     {
         "alias": "absol_asc",
         "name": "Assault Cannon",
-        "types": ["WARFARE"],
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "RRR",
         "source": "absol",
         "text": "At the start of space combat, your opponent must destroy 1 of their non-fighter ships for every 3 of your non-fighter, non-Infantry ships in the active system.",
@@ -217,7 +268,9 @@
     {
         "alias": "absol_sd2",
         "name": "Space Dock II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "YY",
         "source": "absol",
         "text": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\n \n Up to 5 fighters in this system do not count against your ships' capacity. 1 non-fighter ship in this system does not count against your fleet pool.\n \n PRODUCTION X",
@@ -226,7 +279,9 @@
     {
         "alias": "absol_inf2",
         "name": "Infantry II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GG",
         "source": "absol",
         "text": "COST: 1(x2); COMBAT 7\n \n After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
@@ -235,7 +290,9 @@
     {
         "alias": "absol_pds2",
         "name": "PDS II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "YR",
         "source": "absol",
         "text": "You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.\n \n PLANETARY SHIELD; SPACE CANNON 5",
@@ -244,7 +301,9 @@
     {
         "alias": "absol_ff2",
         "name": "Fighter II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "BG",
         "source": "absol",
         "text": "COST: 1(x2); COMBAT 8; MOVE 2\n \n This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
@@ -253,7 +312,9 @@
     {
         "alias": "absol_dd2",
         "name": "Destroyer II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "RR",
         "source": "absol",
         "text": "COST 1; COMBAT 8; MOVE 2\n \n When this unit generates hits on rolls based on its combat value, it generates 1 additional hit that may only be assigned to fighters.\n \n ANTI-FIGHTER BARRAGE 6(x3)",
@@ -262,7 +323,9 @@
     {
         "alias": "absol_cr2",
         "name": "Cruiser II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GYR",
         "source": "absol",
         "text": "COST 2; COMBAT 6; MOVE 3; CAPACITY 1",
@@ -271,7 +334,9 @@
     {
         "alias": "absol_cv2",
         "name": "Carrier II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "BB",
         "source": "absol",
         "text": "COST 3; COMBAT 9; MOVE 2; CAPACITY 6",
@@ -280,7 +345,9 @@
     {
         "alias": "absol_dn2",
         "name": "Dreadnought II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "BBY",
         "source": "absol",
         "text": "COST 4; COMBAT 5; MOVE 2; CAPACITY 1\n \n This unit cannot be destroyed by \"Direct Hit\" action cards.\n \n SUSTAIN DAMAGE, BOMBARDMENT 5",
@@ -289,7 +356,9 @@
     {
         "alias": "absol_ws",
         "name": "War Sun",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "YRRR",
         "source": "absol",
         "text": "COST 10; COMBAT 3(x3); MOVE 2; CAPACITY 6\n \n Other player's units in this system lose PLANETARY SHIELD.\n \n SUSTAIN DAMAGE, BOMBARDMENT 3(x3)",
@@ -298,7 +367,9 @@
     {
         "alias": "absol_pm",
         "name": "Production Biomes",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GG",
         "faction": "hacan",
         "source": "absol",
@@ -308,7 +379,9 @@
     {
         "alias": "absol_qdn",
         "name": "Quantum Datahub Node",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YYY",
         "faction": "hacan",
         "source": "absol",
@@ -318,7 +391,9 @@
     {
         "alias": "absol_ac2",
         "name": "Advanced Carrier II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "BB",
         "faction": "sol",
         "baseUpgrade": "absol_cv2",
@@ -329,7 +404,9 @@
     {
         "alias": "absol_so2",
         "name": "Spec Ops II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GG",
         "faction": "sol",
         "baseUpgrade": "absol_inf2",
@@ -340,7 +417,9 @@
     {
         "alias": "absol_l4",
         "name": "L4 Disruptors",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "Y",
         "faction": "letnev",
         "source": "absol",
@@ -350,7 +429,9 @@
     {
         "alias": "absol_nes",
         "name": "Non-Euclidean Shielding",
-        "types": ["WARFARE"],
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "RR",
         "faction": "letnev",
         "source": "absol",
@@ -360,7 +441,9 @@
     {
         "alias": "absol_it",
         "name": "Instinct Training",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GG",
         "faction": "xxcha",
         "source": "absol",
@@ -370,7 +453,9 @@
     {
         "alias": "absol_nf",
         "name": "Nullification Field",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "xxcha",
         "source": "absol",
@@ -380,7 +465,9 @@
     {
         "alias": "absol_scc",
         "name": "Spatial Conduit Cylinder",
-        "types": ["PROPULSION"],
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "BB",
         "faction": "jolnar",
         "source": "absol",
@@ -390,7 +477,9 @@
     {
         "alias": "absol_ers",
         "name": "E-Res Siphons",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "jolnar",
         "source": "absol",
@@ -400,7 +489,9 @@
     {
         "alias": "absol_vpw",
         "name": "Valkyrie Particle Weave",
-        "types": ["WARFARE"],
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "RR",
         "faction": "sardakk",
         "source": "absol",
@@ -410,7 +501,9 @@
     {
         "alias": "absol_exo2",
         "name": "Exotrireme II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "BBY",
         "faction": "sardakk",
         "baseUpgrade": "absol_dn2",
@@ -421,7 +514,9 @@
     {
         "alias": "absol_is",
         "name": "Inheritance Systems",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "l1z1x",
         "source": "absol",
@@ -431,7 +526,9 @@
     {
         "alias": "absol_sdn2",
         "name": "Super-Dreadnought II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "BBY",
         "faction": "l1z1x",
         "baseUpgrade": "absol_dn2",
@@ -442,7 +539,9 @@
     {
         "alias": "absol_ng",
         "name": "Neuroglaive",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GGG",
         "faction": "naalu",
         "source": "absol",
@@ -452,7 +551,9 @@
     {
         "alias": "absol_hcf2",
         "name": "Hybrid Crystal Fighter II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "BG",
         "faction": "naalu",
         "baseUpgrade": "absol_ff2",
@@ -463,17 +564,21 @@
     {
         "alias": "absol_so",
         "name": "Salvage Operations",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "mentak",
         "source": "absol",
-        "text": "At the start of each space combat in systems that contain or are adjacent to your ships, gain 1 commodity.\n \n if you win a space combat, you may produce 1 ship of any type that was destroyed during that combat.",
+        "text": "At the start of each space combat in systems that contain or are adjacent to your ships, gain 1 commodity.\n \n if you win a space combat, you may produce 1 ship of any type that was destroyed during that combat, and may spend commodities as resources.",
         "homebrewReplacesID": "so"
     },
     {
         "alias": "absol_mc",
         "name": "Mirror Computing",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YYY",
         "faction": "mentak",
         "source": "absol",
@@ -483,7 +588,9 @@
     {
         "alias": "absol_tp",
         "name": "Transparasteel Plating",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "G",
         "faction": "yssaril",
         "source": "absol",
@@ -493,37 +600,45 @@
     {
         "alias": "absol_mi",
         "name": "Mageon Implants",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GGG",
         "faction": "yssaril",
         "source": "absol",
-        "text": "ACTION: Exhaust this card to look at another player's hand of action cards. If they have 4 or more action cards in their hand, choose 1 of those cards and add it to your hand.",
+        "text": "ACTION: Exhaust this card to look at another player's hand of action cards. If they have 5 or more action cards in their hand, choose 1 of those cards and add it to your hand.",
         "homebrewReplacesID": "mi"
     },
     {
         "alias": "absol_lgf",
         "name": "Lazax Gate Folding",
-        "types": ["PROPULSION"],
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "BB",
         "faction": "winnu",
         "source": "absol",
-        "text": "During your tactical actions, you treat your home system and the Mecatol Rex system as if they contained a gamma wormhole.",
+        "text": "During your tactical actions, you may treat your home system and the Mecatol Rex system as if they contained a gamma wormhole.",
         "homebrewReplacesID": "lgf"
     },
     {
         "alias": "absol_htp",
         "name": "Hegemonic Trade Policy",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "winnu",
         "source": "absol",
-        "text": "During the Production step of your tactical actions, you may treat the resource value of each planet you control as if it were equal to its influence value instead.",
+        "text": "During the Production step of your tactical actions, you may treat the resource value of any number of planets you control as if it were equal to its influence value instead.",
         "homebrewReplacesID": "htp"
     },
     {
         "alias": "absol_mr",
         "name": "Magmus Reactor",
-        "types": ["WARFARE"],
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "RR",
         "faction": "muaat",
         "source": "absol",
@@ -533,7 +648,9 @@
     {
         "alias": "absol_pws2",
         "name": "Prototype Warsun II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "YRRR",
         "faction": "muaat",
         "source": "absol",
@@ -543,7 +660,9 @@
     {
         "alias": "absol_yso",
         "name": "Yin Spinner",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GG",
         "faction": "yin",
         "source": "absol",
@@ -553,17 +672,21 @@
     {
         "alias": "absol_ic",
         "name": "Impulse Core",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "yin",
         "source": "absol",
-        "text": "ACTION: Exhaust this card, select a system and destroy 1 or more of your cruisers or destroyers in an adjacent system. Generate 1 hit for each ship you destroyed; you opponent must assign those hits to their ships in the chosen system, and must assign them to non-fighter ships, if able.",
+        "text": "ACTION: Exhaust this card, select a system and destroy any number of your cruisers or destroyers in adjacent systems. Generate 1 hit for each ship you destroyed; you opponent must assign those hits to their ships in the chosen system, and must assign them to non-fighter ships, if able.",
         "homebrewReplacesID": "ic"
     },
     {
         "alias": "absol_cm",
         "name": "Chaos Mapping",
-        "types": ["PROPULSION"],
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "B",
         "faction": "saar",
         "source": "absol",
@@ -573,7 +696,9 @@
     {
         "alias": "absol_ffac2",
         "name": "Floating Factory II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "YY",
         "faction": "saar",
         "baseUpgrade": "absol_sd2",
@@ -584,7 +709,9 @@
     {
         "alias": "absol_wg",
         "name": "Wormhole Generator",
-        "types": ["PROPULSION"],
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "BB",
         "faction": "ghost",
         "source": "absol",
@@ -594,7 +721,9 @@
     {
         "alias": "absol_ds",
         "name": "Dimensional Splicer",
-        "types": ["WARFARE"],
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "R",
         "faction": "ghost",
         "source": "absol",
@@ -604,7 +733,9 @@
     {
         "alias": "absol_bio",
         "name": "Bioplasmosis",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GG",
         "faction": "arborec",
         "source": "absol",
@@ -614,18 +745,22 @@
     {
         "alias": "absol_lw2",
         "name": "Letani Warrior II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GG",
         "faction": "arborec",
         "baseUpgrade": "absol_inf2",
         "source": "absol",
-        "text": "COST: 1(x2); COMBAT 7\n \n After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control.\n \n PRODUCTION 2",
+        "text": "COST: 1(x2); COMBAT 7\n\nAfter this unit is destroyed, place the unit on this card.\nAt the start of your next turn, for every 2 units that are on this card, place 1 on a planet you control and return the rest to your reinforcements.\n\nPRODUCTION 2",
         "homebrewReplacesID": "lw2"
     },
     {
         "alias": "absol_ht2",
         "name": "Hel-Titan II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "YR",
         "faction": "titans",
         "baseUpgrade": "absol_pds2",
@@ -636,7 +771,9 @@
     {
         "alias": "absol_se2",
         "name": "Saturn Engine II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GYR",
         "faction": "titans",
         "baseUpgrade": "absol_cr2",
@@ -647,7 +784,9 @@
     {
         "alias": "absol_as",
         "name": "Aetherstream",
-        "types": ["PROPULSION"],
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "BB",
         "faction": "empyrean",
         "source": "absol",
@@ -657,7 +796,9 @@
     {
         "alias": "absol_vw",
         "name": "Voidwatch",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "G",
         "faction": "empyrean",
         "source": "absol",
@@ -667,7 +808,9 @@
     {
         "alias": "absol_pfa",
         "name": "Pre-Fab Archologies",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GGG",
         "faction": "naaz",
         "source": "absol",
@@ -677,7 +820,9 @@
     {
         "alias": "absol_sc",
         "name": "Supercharge",
-        "types": ["WARFARE"],
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "R",
         "faction": "naaz",
         "source": "absol",
@@ -687,7 +832,9 @@
     {
         "alias": "absol_ah",
         "name": "Aerie Hololattice",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "Y",
         "faction": "argent",
         "source": "absol",
@@ -697,18 +844,22 @@
     {
         "alias": "absol_swa2",
         "name": "Strike Wing Alpha II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "RR",
         "faction": "argent",
         "baseUpgrade": "absol_dd2",
         "source": "absol",
-        "text": "Cost 1, Combat 7, Move 2, Capacity 1, ANTI-FIGHTER BARRAGE 6(x3). When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponents infantry in the space area of the active system.",
+        "text": "Cost 1, Combat 7, Move 2, Capacity 1, ANTI-FIGHTER BARRAGE 6(x3). When this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able. When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponents infantry in the space area of the active system.",
         "homebrewReplacesID": "swa2"
     },
     {
         "alias": "absol_vtx",
         "name": "Vortex",
-        "types": ["WARFARE"],
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "R",
         "faction": "cabal",
         "source": "absol",
@@ -718,7 +869,9 @@
     {
         "alias": "absol_dt2",
         "name": "Dimensional Tear II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "YY",
         "faction": "cabal",
         "baseUpgrade": "absol_sd2",
@@ -729,7 +882,9 @@
     {
         "alias": "absol_tcs",
         "name": "Temporal Command Suite",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "Y",
         "faction": "nomad",
         "source": "absol",
@@ -739,17 +894,21 @@
     {
         "alias": "absol_m2",
         "name": "Memoria II",
-        "types": ["UNITUPGRADE"],
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "BGY",
         "faction": "nomad",
         "source": "absol",
-        "text": "COST 8; COMBAT 5(x3); MOVE 2; Capacity 6\n \n You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs.\n \n SUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 5(x3)",
+        "text": "COST 8; COMBAT 5(x3); MOVE 3; Capacity 6\n \n You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs.\n \n SUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 5(x3)",
         "homebrewReplacesID": "m2"
     },
     {
         "alias": "absol_gr",
         "name": "Genetic Recombination",
-        "types": ["BIOTIC"],
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "G",
         "faction": "mahact",
         "source": "absol",
@@ -759,18 +918,22 @@
     {
         "alias": "absol_cl2",
         "name": "Crimson Legionnaire II",
-        "types": ["UNITUPGRADE"],
-        "requirements": "GGG",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
         "faction": "mahact",
         "baseUpgrade": "absol_inf2",
         "source": "absol",
-        "text": "COST: 1(x2); COMBAT 7\n \n After this unit is destroyed, gain 2 commodities or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system or that contains 1 of your space docks.",
+        "text": "COST: 1(x2); COMBAT 7\n \n After this unit is destroyed, gain 2 commodities or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet that contains 1 of your structures.",
         "homebrewReplacesID": "cl2"
     },
     {
         "alias": "absol_iihq",
         "name": "I.I.H.Q.",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "Y",
         "faction": "keleres",
         "source": "absol",
@@ -780,11 +943,13 @@
     {
         "alias": "absol_asn",
         "name": "Agency Supply Network",
-        "types": ["CYBERNETIC"],
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "keleres",
         "source": "absol",
-        "text": "Whenever you resolve one of your PRODUCTION abilities, you may resolve an additional one of your PRODUCTION abilities in any system; the additional use does not trigger this ability.",
+        "text": "After you resolve one of your PRODUCTION abilities, you may resolve an additional one of your PRODUCTION abilities in any system; the additional use does not trigger this ability.",
         "homebrewReplacesID": "asn"
     }
 ]

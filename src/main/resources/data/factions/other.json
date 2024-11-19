@@ -91,46 +91,5 @@
             "admins_spacedock"
         ],
         "source": "admins"
-    },
-    {
-        "alias": "qulane",
-        "factionName": "The Seers of Qulane",
-        "homeSystem": "qulane",
-        "startingFleet": "cv,2 dd,3 ff,4 inf m,sd k",
-        "commodities": 2,
-        "factionTech": [
-            "gjenspecterii",
-            "ciqineqreceptors"
-        ],
-        "startingTech": [],
-        "homePlanets": [
-            "kull",
-            "minaluk"
-        ],
-        "abilities": [
-            "revelation",
-            "redemption"
-        ],
-        "leaders": [
-            "qulaneagent",
-            "qulanecommander",
-            "qulanehero"
-        ],
-        "promissoryNotes": [
-            "qulaneafterssight"
-        ],
-        "units": [
-            "fighter",
-            "destroyer",
-            "cruiser",
-            "carrier",
-            "dreadnought",
-            "qulane_flagship",
-            "qulane_infantry",
-            "qulane_mech",
-            "pds",
-            "spacedock"
-        ],
-        "source": "ignis_aurora"
     }
 ]

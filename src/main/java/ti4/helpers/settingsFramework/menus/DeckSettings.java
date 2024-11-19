@@ -5,9 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
@@ -22,8 +21,15 @@ public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private ChoiceSetting<DeckModel> stage1, stage2, secrets, actionCards, agendas, techs, relics, explores;
-    private ChoiceSetting<StrategyCardSetModel> stratCards;
+    private final ChoiceSetting<DeckModel> stage1;
+    private final ChoiceSetting<DeckModel> stage2;
+    private final ChoiceSetting<DeckModel> secrets;
+    private final ChoiceSetting<DeckModel> actionCards;
+    private final ChoiceSetting<DeckModel> agendas;
+    private final ChoiceSetting<DeckModel> techs;
+    private final ChoiceSetting<DeckModel> relics;
+    private final ChoiceSetting<DeckModel> explores;
+    private final ChoiceSetting<StrategyCardSetModel> stratCards;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -84,7 +90,7 @@ public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     @Override
     public List<SettingInterface> settings() {
-        List<SettingInterface> ls = new ArrayList<SettingInterface>();
+        List<SettingInterface> ls = new ArrayList<>();
         ls.add(stage1);
         ls.add(stage2);
         ls.add(secrets);

@@ -7,11 +7,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -19,10 +17,11 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.combat.StartCombat;
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -34,6 +33,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
+import ti4.service.combat.StartCombatService;
 
 public class FoWHelper {
 
@@ -67,7 +67,7 @@ public class FoWHelper {
 			String gameName = channel.getName();
 			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
-			game = GameManager.getInstance().getGame(gameName);
+			game = GameManager.getGame(gameName);
 			if (game == null) {
 				return false;
 			}
@@ -103,10 +103,7 @@ public class FoWHelper {
 			return true;
 		}
 
-		return viewingPlayer != null && player != null && game != null &&
-			(hasHomeSystemInView(game, player, viewingPlayer)
-				|| hasPlayersPromInPlayArea(player, viewingPlayer)
-				|| hasMahactCCInFleet(player, viewingPlayer) || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
+		return game != null && (hasHomeSystemInView(game, player, viewingPlayer) || hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer) || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
 	}
 
 	/**
@@ -136,7 +133,7 @@ public class FoWHelper {
 		// Get all tiles with the player in it
 		Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
 		for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-			if (playerIsInSystem(game, tileEntry.getValue(), player)) {
+			if (playerIsInSystem(game, tileEntry.getValue(), player, false)) {
 				tilesWithPlayerUnitsPlanets.add(tileEntry.getKey());
 			}
 		}
@@ -164,7 +161,7 @@ public class FoWHelper {
 		// Get all tiles with the player in it
 		Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
 		for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-			if (playerIsInSystem(game, tileEntry.getValue(), player)) {
+			if (playerIsInSystem(game, tileEntry.getValue(), player, false)) {
 				tilesWithPlayerUnitsPlanets.add(tileEntry.getKey());
 			}
 		}
@@ -200,11 +197,8 @@ public class FoWHelper {
 	public static boolean hasHomeSystemInView(@NotNull Game game, @NotNull Player player,
 		@NotNull Player viewingPlayer) {
 		Tile tile = player.getHomeSystemTile();
-		if (tile != null && !tile.hasFog(viewingPlayer)) {
-			return true;
-		}
-		return false;
-	}
+        return tile != null && !tile.hasFog(viewingPlayer);
+    }
 
 	private static boolean hasPlayersPromInPlayArea(@NotNull Player player, @NotNull Player viewingPlayer) {
 		boolean hasPromInPA = false;
@@ -265,11 +259,11 @@ public class FoWHelper {
 
 		if (player != null && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander")
 			&& player == game.getActivePlayer() && !game.getActiveSystem().isEmpty()
-			&& game.getTileByPosition(game.getActiveSystem()).getPlanetUnitHolders().size() == 0) {
+			&& game.getTileByPosition(game.getActiveSystem()).getPlanetUnitHolders().isEmpty()) {
 			Collection<Tile> tileList = game.getTileMap().values();
 			List<String> frontierTileList = Mapper.getFrontierTileIds();
 			for (Tile tile : tileList) {
-				if (tile.getPlanetUnitHolders().size() == 0 && (tile.getUnitHolders().size() == 2
+				if (tile.getPlanetUnitHolders().isEmpty() && (tile.getUnitHolders().size() == 2
 					|| frontierTileList.contains(tile.getTileID()))) {
 					adjacentPositions.add(tile.getPosition());
 				}
@@ -410,9 +404,8 @@ public class FoWHelper {
 				}
 				for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
 					if (tokenName.contains(wh.getWhString())) {
-						wormholeIDs.add(wh.getWhString());
+						//wormholeIDs.add(wh.getWhString());
 						wormholeIDs.add(wh.toString());
-
 						break;
 					}
 				}
@@ -576,7 +569,7 @@ public class FoWHelper {
 				Set<String> tokenList = unitHolder.getTokenList();
 				for (String token : tokenList) {
 					for (String wormholeID : wormholeIDs) {
-						if (token.contains(wormholeID)) {
+						if (token.contains(wormholeID) && !(wormholeID.equals("eta") && token.contains("beta"))) {
 							adjacentPositions.add(position_);
 						}
 					}
@@ -601,7 +594,7 @@ public class FoWHelper {
 		Set<String> tilesToCheck = getAdjacentTiles(game, position, null, false);
 		Tile startingTile = game.getTileByPosition(position);
 
-		for (Player player_ : game.getPlayers().values()) {
+		for (Player player_ : game.getRealPlayers()) {
 			Set<String> tiles = new HashSet<>(tilesToCheck);
 			if (player_.hasAbility("quantum_entanglement")) {
 				tiles.addAll(getWormholeAdjacencies(game, position, player_));
@@ -615,7 +608,7 @@ public class FoWHelper {
 			for (String position_ : tiles) {
 				Tile tile = game.getTileByPosition(position_);
 				if (tile != null) {
-					if (playerIsInSystem(game, tile, player_)) {
+					if (playerIsInSystem(game, tile, player_, true)) {
 						players.add(player_);
 						break;
 					}
@@ -628,9 +621,12 @@ public class FoWHelper {
 	}
 
 	/** Check if the specified player should have vision on the system */
-	public static boolean playerIsInSystem(Game game, Tile tile, Player player) {
+	public static boolean playerIsInSystem(Game game, Tile tile, Player player, boolean forNeighbors) {
 		Set<String> unitHolderNames = tile.getUnitHolders().keySet();
-		List<String> playerPlanets = player.getPlanets();
+		List<String> playerPlanets = player.getPlanetsAllianceMode();
+		if (forNeighbors) {
+			playerPlanets = player.getPlanets();
+		}
 		if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
 			return true;
 		} else if (tile.isMecatol() && player.hasTech("iihq")) {
@@ -652,8 +648,11 @@ public class FoWHelper {
 	}
 
 	public static boolean playerHasPlanetsInSystem(Player player, Tile tile) {
+		if (tile == null || player == null) {
+			return false;
+		}
 		for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-			if (player.getPlanets().contains(uH.getName())) {
+			if (player.getPlanetsAllianceMode().contains(uH.getName())) {
 				return true;
 			}
 		}
@@ -695,7 +694,7 @@ public class FoWHelper {
 
 	public static boolean otherPlayersHaveShipsInSystem(Player player, Tile tile, Game game) {
 		for (Player p2 : game.getRealPlayersNDummies()) {
-			if (p2 == player) {
+			if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
 				continue;
 			}
 			if (playerHasShipsInSystem(p2, tile)) {
@@ -707,7 +706,7 @@ public class FoWHelper {
 
 	public static boolean otherPlayersHaveUnitsInSystem(Player player, Tile tile, Game game) {
 		for (Player p2 : game.getRealPlayersNDummies()) {
-			if (p2 == player) {
+			if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
 				continue;
 			}
 			if (playerHasUnitsInSystem(p2, tile)) {
@@ -795,7 +794,7 @@ public class FoWHelper {
 				success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
 				MessageChannel channel = player_.getPrivateChannel();
 				MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
-					StartCombat.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
+					StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
 			}
 			successfulCount += success ? 1 : 0;
 		}
@@ -883,10 +882,7 @@ public class FoWHelper {
 				sb.append("???");
 			}
 			sb.append(" sent ").append(transactedObject).append(" to ");
-			if (receivingPlayer == null) {
-				BotLogger.log(event, "`FoWHelper.pingPlayersTransaction` Warning, receivingPlayer is null");
-			}
-			if (receiverVisible && receivingPlayer != null) {
+            if (receiverVisible) {
 				sb.append(receivingPlayer.getRepresentation());
 			} else {
 				sb.append("???");
@@ -922,13 +918,13 @@ public class FoWHelper {
 
 	public static void sanityCheckFowReacts() {
 		List<String> badEmojis = new ArrayList<>(Emojis.symbols).stream()
-			.map(emoji -> Emoji.fromFormatted(emoji))
+			.map(Emoji::fromFormatted)
 			.map(emoji -> (emoji instanceof CustomEmoji c) ? c : null)
-			.filter(e -> e != null)
+			.filter(Objects::nonNull)
 			.filter(e -> AsyncTI4DiscordBot.jda.getEmojiById(e.getId()) == null)
 			.map(emoji -> emoji.getName() + " " + emoji.getId())
 			.toList();
-		if (badEmojis.size() > 0) {
+		if (!badEmojis.isEmpty()) {
 			StringBuilder sb = new StringBuilder(Constants.jazzPing());
 			sb.append(" Bad emojis are being used for FOW reacts:\n");
 			for (String err : badEmojis) {

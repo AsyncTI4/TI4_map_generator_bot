@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.menus.MiltySettings.DraftingMode;
@@ -20,7 +19,15 @@ public class SourceSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private BooleanSetting base, pok, codexes, discoStars, unchartedSpace, absol, miltymod, eronous;
+    private final BooleanSetting base;
+    private final BooleanSetting pok;
+    private final BooleanSetting codexes;
+    private final BooleanSetting discoStars;
+    private final BooleanSetting unchartedSpace;
+    private final BooleanSetting absol;
+    private final BooleanSetting miltymod;
+    private final BooleanSetting eronous;
+    private BooleanSetting cryypter;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -37,6 +44,7 @@ public class SourceSettings extends SettingsMenu {
         absol = new BooleanSetting("Absol", "Absol Mod", false);
         miltymod = new BooleanSetting("MiltyMod", "Milty Mod", false);
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
+        // cryypter = new BooleanSetting("Cryypter", "Voices of the Council", false);
 
         // Emojis
         base.setEmoji(Emojis.TI4BaseGame);
@@ -66,6 +74,7 @@ public class SourceSettings extends SettingsMenu {
             absol.initialize(json.get("absol"));
             miltymod.initialize(json.get("miltymod"));
             eronous.initialize(json.get("eronous"));
+            // cryypter.initialize(json.get("voice_of_the_council"));
         }
     }
 
@@ -74,7 +83,7 @@ public class SourceSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     @Override
     public List<SettingInterface> settings() {
-        List<SettingInterface> ls = new ArrayList<SettingInterface>();
+        List<SettingInterface> ls = new ArrayList<>();
 
         // Over-Validation for Twilight Falls
         if (parent instanceof MiltySettings milty && milty.getDraftMode().getValue() == DraftingMode.twilightfalls) {
@@ -107,6 +116,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(absol);
         ls.add(miltymod);
         ls.add(eronous);
+        // ls.add(cryypter);
         return ls;
 
     }
@@ -124,6 +134,7 @@ public class SourceSettings extends SettingsMenu {
         if (absol.isVal()) sources.add(ComponentSource.absol);
         if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
+        //if (cryypter.isVal()) sources.add(ComponentSource.cryypter);
         return sources;
     }
 
@@ -137,6 +148,7 @@ public class SourceSettings extends SettingsMenu {
         if (absol.isVal()) sources.add(ComponentSource.absol);
         if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
+        //if (cryypter.isVal()) sources.add(ComponentSource.cryypter);
         return sources;
     }
 }

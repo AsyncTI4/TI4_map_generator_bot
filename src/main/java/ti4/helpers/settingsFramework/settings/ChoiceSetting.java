@@ -6,13 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -23,6 +18,10 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.buttons.Buttons;
 import ti4.message.BotLogger;
 
 @Getter
@@ -71,7 +70,7 @@ public class ChoiceSetting<T> extends SettingInterface {
 
     protected List<Button> buttons(String idPrefix) {
         List<Button> ls = new ArrayList<>();
-        Button choose = Button.secondary(idPrefix + "change" + id, lang + " " + this.name);
+        Button choose = Buttons.gray(idPrefix + "change" + id, lang + " " + this.name);
         if (this.emoji != null) choose = choose.withEmoji(Emoji.fromFormatted(this.emoji));
         ls.add(choose);
         return ls;
@@ -86,21 +85,17 @@ public class ChoiceSetting<T> extends SettingInterface {
 
     public void setAllValues(Map<String, T> values) {
         allValues.clear();
-        for (Map.Entry<String, T> entry : values.entrySet()) {
-            allValues.put(entry.getKey(), entry.getValue());
-        }
+        allValues.putAll(values);
         // if the chosen/default keys no longer exist, replace with some random thing in the list I guess, idk
-        if (!allValues.containsKey(defaultKey) && allValues.size() > 0) {
-            chosenKey = new ArrayList<>(allValues.keySet()).get(0);
+        if (!allValues.containsKey(defaultKey) && !allValues.isEmpty()) {
+            chosenKey = new ArrayList<>(allValues.keySet()).getFirst();
             defaultKey = chosenKey;
         }
     }
 
     public void setAllValues(Map<String, T> values, String newDefault) {
         allValues.clear();
-        for (Map.Entry<String, T> entry : values.entrySet()) {
-            allValues.put(entry.getKey(), entry.getValue());
-        }
+        allValues.putAll(values);
         // if the chosen/default keys no longer exist, replace with some random thing in the list I guess, idk
         if (!allValues.containsKey(chosenKey)) {
             chosenKey = newDefault;
@@ -123,7 +118,7 @@ public class ChoiceSetting<T> extends SettingInterface {
             List<String> values = selectEvent.getValues();
             String itemToChoose = null;
             if (values.size() == 1) {
-                itemToChoose = values.get(0);
+                itemToChoose = values.getFirst();
             } else {
                 return "Too many values were selected";
             }

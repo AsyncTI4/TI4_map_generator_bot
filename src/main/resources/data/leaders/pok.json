@@ -196,7 +196,7 @@
         "name": "Field Marshal Mercer",
         "title": "Shikrai General",
         "abilityWindow": "At the end of a player's turn:",
-        "abilityText": "You may exhaust this card to allow that player to remove up to 2 of their ground forces from the game board and place them on planets they control in the active system.",
+        "abilityText": "You may exhaust this card to allow that player to remove up to 2 of their ground forces from the game board and place them on planets they control in the active system. [Note: The timing window of this agent should probably be end of tactical action, not end of turn. The bot treats it as such, and it is more consistent with the rules]",
         "unlockCondition": "Always Unlocked",
         "source": "pok"
     },
@@ -295,7 +295,7 @@
         "name": "Brother Milor",
         "title": "Purifed by Fire",
         "abilityWindow": "After a player's unit is destroyed:",
-        "abilityText": "You may exhaust this card to allow that player to place 2 fighters in the destroyed unit's system if it was a ship, or 2 infantry if it was a ground force.",
+        "abilityText": "You may exhaust this card to allow that player to place 2 fighters in the destroyed unit's system if it was a ship, or 2 infantry on its planet if it was a ground force.",
         "unlockCondition": "Always Unlocked",
         "source": "pok"
     },

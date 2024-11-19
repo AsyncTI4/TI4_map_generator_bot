@@ -216,33 +216,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "side_project2",
-        "name": "Side Project",
-        "phase": "Action",
-        "window": "Action",
-        "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
-        "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "side_project3",
-        "name": "Side Project",
-        "phase": "Action",
-        "window": "Action",
-        "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
-        "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "side_project4",
-        "name": "Side Project",
-        "phase": "Action",
-        "window": "Action",
-        "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
-        "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "steal_prototype2",
         "name": "Steal Prototype",
         "phase": "Action",
@@ -603,15 +576,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "sensor_jam",
-        "name": "Sensor Jam",
-        "phase": "Action",
-        "window": "At the start of a round of space combat",
-        "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain SUSTAIN DAMAGE until the end of this combat round.",
-        "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and, with that, it displayed the enemy's signature in a thirteenth different location.",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "grand_heist",
         "name": "Heist",
         "phase": "Action",
@@ -639,7 +603,7 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "unexpected_strategy",
+        "alias": "unexpected_strategy_old",
         "name": "Unexpected Strategy",
         "phase": "Strategy",
         "window": "When you choose a strategy card",
@@ -783,30 +747,12 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "virulent_gas",
-        "name": "Virulent Gas",
-        "phase": "Action",
-        "window": "After your SPACE CANNON or BOMBARDMENT roll produces hits against another player's units on a planet",
-        "text": "Produce 1 additional hit. Then, roll 1 die; if the result is 6 or greater, repeat this effect.",
-        "flavorText": "As they cut their way through the ancient structure's steel wall, Dart's laser-cutter illuminated a canister close to the beam. Tai let out a nervous squeal, \"E-e-exterrix gas!\"  Without hesitation, Dart ran.",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "tributes",
         "name": "Tributes",
         "phase": "Action",
         "window": "Action",
         "text": "Exhaust 1 non-home planet you control other than Mecatol Rex to gain trade goods equal to the combined value of its resources and influence.",
         "flavorText": "Berekar excelled at leveraging prestige to attain economic goals. The worlds governed by his people had become lavishly rich through tourism, fueled by their impressive collection of Lazax artifacts.",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "final_mission",
-        "name": "Final Mission",
-        "phase": "Action",
-        "window": "After 1 of your mechs is destroyed during a ground combat",
-        "text": "Roll 1 die for each of up to 3 of your opponent's ground forces; on a result of 6 or greater, produce 1 hit and assign it to that unit.",
-        "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
         "source": "action_deck_2_old"
     },
     {
@@ -819,12 +765,93 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "foreign_aid",
-        "name": "Foreign Aid",
+        "alias": "side_project",
+        "name": "Side Project",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Spend 1 token from your strategy pool to research a technology that has no prerequisites.",
+        "flavorText": "As the council meeting drew to a close, Suffi stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "defense_installation",
+        "name": "Defense Installation",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Exhaust 1 planet you control to place 1 PDS from your reinforcements on that planet.",
+        "flavorText": "Tellurian had heard rumors of their kind roaming to the far corners of the galaxy. However, many such tales had led them to nothing more than decrepit defense systems. Alas, no stone could be left unturned.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "meteor_pods",
+        "name": "Meteor Pods",
+        "phase": "Action",
+        "window": "After you commit a ground force to land on another player's planet",
+        "text": "Roll 2 dice. For each result equal to or greater than that unit's combat value, produce 1 hit against that player's ground forces on that planet.",
+        "flavorText": "A tendril-like formation of ships swarmed around the planet. It whipped furiously as they seeded the surface with brood.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "diverse_strategies",
+        "name": "Diverse Strategies",
+        "phase": "Action",
+        "window": "When you would perform the primary ability of your strategy card",
+        "text": "Perform the secondary ability of that strategy card and 1 other instead; do not spend or place command tokens to resolve these abilities.",
+        "flavorText": "\"We will win this war, Rickar, based on how we adapt to it,\" Claire said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "advantageous_position",
+        "name": "Advantageous Position",
+        "phase": "Action",
+        "window": "After another player makes a combat or unit ability roll against your units",
+        "text": "That player rerolls all of their dice.",
+        "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift's horizon. His crew clung to their stations, eyes wide, as the enemy's munitions vanished into the void like pebbles dropped into a well.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "defectors",
+        "name": "Defectors",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose 1 system that contains 1 of another player's ships and no other of that player's units. Spend influence equal to the cost of that ship to replace it with a matching ship from your reinforcements.",
+        "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative's words choked her. \"What's left of her,\" said Kuuasi, not unkindly.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "public_outcry",
+        "name": "Public Outcry",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Spend 8 resources and choose up to 2 other players. You and each of those players gain 1 command token.",
-        "flavorText": "\"Alone, we're vulnerable to looming threats,\" Odlynn projected dire scenes as he spoke, then pivoted to their reconstruction efforts. \"United, we're unstoppable.\"",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome places 1 command token from their reinforcements in a system that contains their units and destroys 3 of their units in that system.",
+        "flavorText": "Ciel laughed as Junn dodged an overripe fruit. \"Agile for your age!\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "liberation",
+        "name": "Liberation",
+        "phase": "Any",
+        "window": "After you gain control of a planet",
+        "text": "Place 3 infantry from your reinforcements on that planet.",
+        "flavorText": "Harsh penal colonies were all too common, always filled with hardy folk eager for a chance at revenge.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "last_minute_deliberation",
+        "name": "Last Minute Deliberation",
+        "phase": "Agenda",
+        "window": "Before the \"Ready Planets\" step of the agenda phase",
+        "text": "Ready up to 3 planets you control. Then, reveal the top card of the agenda deck; players vote on this agenda.",
+        "flavorText": "The rules for such an occasion were dubious. However, dubious had always been Elder Junn's specialty.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "promissory_rider",
+        "name": "Promissory Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each other player that did not vote for that outcome must give you 1 promissory note from their hand.",
+        "flavorText": "Gil's career at the Civita Planetar was prolific, with friends in hundreds of bureaucracies and favors owed in many more.",
         "source": "action_deck_2_old"
     }
 ]

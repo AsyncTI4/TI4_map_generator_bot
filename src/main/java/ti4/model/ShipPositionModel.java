@@ -2,8 +2,8 @@ package ti4.model;
 
 import java.awt.*;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ShipPositionModel {
@@ -20,7 +20,7 @@ public class ShipPositionModel {
                 case TYPE05 -> "dd 126,138; ca 51,158; cv 186,80; dn 60,227; fs 207,5; ws 24,86; sd 164,5; mf 192,254; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
                 case TYPE06 -> "dd 44,196; ca 55,233; cv 124,129; dn 62,31; fs 115,222; ws 113,71; sd 122,5; mf 259,203; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
                 case TYPE07 -> "dd 115,25; ca 115,85; cv 180,115; dn 210,190; fs 40,85; ws 60,35; sd 210,245; mf 220,55; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
-                case TYPE08 -> "dd 210,80; ca 210,195; cv 60,210; dn 115,150; fs 20,110; ws 175,235; sd 130,255; mf 180,15; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
+                case TYPE08 -> "dd 140,80; ca 210,195; cv 60,210; dn 115,150; fs 20,110; ws 175,235; sd 130,255; mf 180,15; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
                 case TYPE09 -> "dd 35,205; ca 65,250; cv 135,295; dn 290,180; fs 160,240; ws 230,235; sd 295,255; mf 65,65; tkn_gf 60,115; tkn_gf 30,115; tkn_ff 60,150; tkn_ff 30,150";
                 case TYPE10 -> "dd 60,35; ca 160,220; cv 140,20; dn 70,215; fs 225,30; ws 185,70; sd 35,90; mf 235,195; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
                 case TYPE11 -> "dd 60,65; ca 65,130; cv 130,190; dn 160,215; fs 180,155; ws 20,105; sd 170,250; mf 225,225; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
@@ -45,6 +45,18 @@ public class ShipPositionModel {
                 case TYPE09 -> List.of(new Point(195, 10), new Point(225, 50), new Point(305, 105), new Point(115, 40));
                 case TYPE10 -> List.of(new Point(195, 10), new Point(225, 75), new Point(225, 155), new Point(145, 205));
                 case TYPE11, TYPE12, TYPE13, TYPE14, TYPE15, TYPE16 -> null;
+            };
+        }
+
+        public Point getWormholeLocation() {
+            return switch (this) {
+                case TYPE05 -> new Point(162, 166); // planet and wormhole
+                case TYPE07 -> new Point(172, 32); // 1 planet bottom left
+                case TYPE08 -> new Point(132, 110); // empty and wormhole
+                case TYPE13 -> new Point(139, 186); // Eko
+                case TYPE14 -> new Point(152, 124); // Horace
+                
+                default -> null;
             };
         }
 

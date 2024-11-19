@@ -1,18 +1,16 @@
 package ti4.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.Optional;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-
-import ti4.generator.Mapper;
-import ti4.message.BotLogger;
+import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.testUtils.BaseTi4Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AbilityModelTest extends BaseTi4Test {
     @Test

@@ -8,15 +8,13 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import okhttp3.internal.ws.RealWebSocket.Message;
 import ti4.buttons.Buttons;
-import ti4.commands.uncategorized.CardsInfoHelper;
-import ti4.generator.Mapper;
+import ti4.commands2.CommandHelper;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -33,7 +31,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         Game game = getActiveGame();
         User user = getUser();
         Player player = game.getPlayer(user.getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -41,8 +39,9 @@ public class LeaderInfo extends LeaderSubcommandData {
         sendLeadersInfo(game, player, event);
     }
 
+    @ButtonHandler(Constants.REFRESH_LEADER_INFO)
     public static void sendLeadersInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
+        String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendLeadersInfo(game, player);
     }

@@ -1,0 +1,32 @@
+[
+    {
+        "id": "galacticheritagesite",
+        "imagePath": " attachment_galacticheritagesite.png",
+        "source": "asteroid"
+    },
+    {
+        "id": "imperialinstitute",
+        "imagePath": "attachment_imperialinstitute.png",
+        "source": "asteroid"
+    },
+    {
+        "id": "manufactorum",
+        "imagePath": "attachment_manufactorum.png",
+        "source": "asteroid"
+    },
+    {
+        "id": "weapon",
+        "imagePath": "attachment_weapon.png",
+        "source": "asteroid"
+    },
+    {
+        "id": "weaponstat",
+        "imagePath": "attachment_weaponstat.png",
+        "source": "asteroid"
+    },
+    {
+        "id": "obelisk",
+        "imagePath": "attachment_obelisk.png",
+        "source": "asteroid"
+    }
+]

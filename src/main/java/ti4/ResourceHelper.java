@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+
 import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -14,15 +15,11 @@ public class ResourceHelper {
     private final Map<String, String> unitCache = new HashMap<>();
     private final Map<String, String> decalCache = new HashMap<>();
     private final Map<String, String> spoopyCache = new HashMap<>();
-    private final Map<String, String> tileCache = new HashMap<>();
     private final Map<String, String> ccCache = new HashMap<>();
     private final Map<String, String> peekMarkerCache = new HashMap<>();
-    private final Map<String, String> attachmentCache = new HashMap<>();
-    private final Map<String, String> tokenCache = new HashMap<>();
     private final Map<String, String> factionCache = new HashMap<>();
     private final Map<String, String> generalCache = new HashMap<>();
     private final Map<String, String> planetCache = new HashMap<>();
-    private final Map<String, String> paCache = new HashMap<>();
 
     private ResourceHelper() {
     }
@@ -36,22 +33,12 @@ public class ResourceHelper {
 
     @Nullable
     public String getPositionFile(String name) {
-        return getResourceFromFolder("positions/", name, "Could not find position files");
-    }
-
-    public String getTileJsonFile(String name) {
-        return getResourceFromFolder("systems/", name, "Could not find tile JSON!");
+        return getResourceFromFolder("positions/", name);
     }
 
     @Nullable
     public String getTileFile(String name) {
-        String unitPath = tileCache.get(name);
-        if (unitPath != null) {
-            return unitPath;
-        }
-        String tile = getResourceFromFolder("tiles/", name, "Could not find tile file");
-        tileCache.put(name, tile);
-        return tile;
+        return getResourceFromFolder("tiles/", name);
     }
 
     @Nullable
@@ -60,7 +47,7 @@ public class ResourceHelper {
         if (unitPath != null) {
             return unitPath;
         }
-        String tile = getResourceFromFolder("factions/", name, "Could not find faction file");
+        String tile = getResourceFromFolder("factions/", name);
         factionCache.put(name, tile);
         return tile;
     }
@@ -71,7 +58,7 @@ public class ResourceHelper {
         if (unitPath != null) {
             return unitPath;
         }
-        String tile = getResourceFromFolder("general/", name, "Could not find general file");
+        String tile = getResourceFromFolder("general/", name);
         generalCache.put(name, tile);
         return tile;
     }
@@ -81,14 +68,14 @@ public class ResourceHelper {
     public String getUnitFile(String name) {
         if (name.endsWith(Constants.UNIT_DD)) {
             if (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {
-                return getResourceFromFolder("units/", name.replaceFirst(Constants.UNIT_DD, Constants.UNIT_DD_EYE), "Could not find eye file");
+                return getResourceFromFolder("units/", name.replaceFirst(Constants.UNIT_DD, Constants.UNIT_DD_EYE));
             }
         }
         String unitPath = unitCache.get(name);
         if (unitPath != null) {
             return unitPath;
         }
-        String unit = getResourceFromFolder("units/", name, "Could not find unit file");
+        String unit = getResourceFromFolder("units/", name);
         unitCache.put(name, unit);
         return unit;
     }
@@ -100,7 +87,19 @@ public class ResourceHelper {
         if (unitPath != null) {
             return unitPath;
         }
-        String filePath = getResourceFromFolder("units/", name, "Could not find unit file");
+        String filePath = getResourceFromFolder("units/", name);
+        unitCache.put(name, filePath);
+        return filePath;
+    }
+
+    @Nullable
+    public String getUnitFile(UnitKey unit, boolean eyes) {
+        String name = unit.getFileName(eyes);
+        String unitPath = unitCache.get(name);
+        if (unitPath != null) {
+            return unitPath;
+        }
+        String filePath = getResourceFromFolder("units/", name);
         unitCache.put(name, filePath);
         return filePath;
     }
@@ -111,7 +110,7 @@ public class ResourceHelper {
         if (decalPath != null) {
             return decalPath;
         }
-        String unit = getResourceFromFolder("decals/", name, "Could not find decal file");
+        String unit = getResourceFromFolder("decals/", name);
         decalCache.put(name, unit);
         return unit;
     }
@@ -125,20 +124,7 @@ public class ResourceHelper {
         if (spoopyPath != null) {
             return spoopyPath;
         }
-        String unit = getResourceFromFolder("decals/", name, "Could not find decal file");
-        spoopyCache.put(name, unit);
-        return unit;
-    }
-
-    @Nullable
-    public String getNonSpoopyFinFile(String name) {
-        // overlay_jackolantern_1
-
-        String spoopyPath = spoopyCache.get(name);
-        if (spoopyPath != null) {
-            return spoopyPath;
-        }
-        String unit = getResourceFromFolder("decals/", name, "Could not find decal file");
+        String unit = getResourceFromFolder("decals/", name);
         spoopyCache.put(name, unit);
         return unit;
     }
@@ -149,7 +135,7 @@ public class ResourceHelper {
         if (ccPath != null) {
             return ccPath;
         }
-        String cc = getResourceFromFolder("command_token/", name, "Could not find command token file");
+        String cc = getResourceFromFolder("command_token/", name);
         ccCache.put(name, cc);
         return cc;
     }
@@ -160,20 +146,18 @@ public class ResourceHelper {
         if (markerPath != null) {
             return markerPath;
         }
-        String marker = getResourceFromFolder("peek_marker/", name, "Could not find peek marker file");
+        String marker = getResourceFromFolder("peek_marker/", name);
         peekMarkerCache.put(name, marker);
         return marker;
     }
 
     @Nullable
     public String getAttachmentFile(String name) {
-        String tokenPath = attachmentCache.get(name);
-        if (tokenPath != null) {
-            return tokenPath;
+        File attachmentFile = getFile("attachment_token/", name);
+        if (attachmentFile.exists()) {
+            return attachmentFile.getAbsolutePath();
         }
-        String token = getResourceFromFolder("attachment_token/", name, "Could not find attachment token file: " + name);
-        attachmentCache.put(name, token);
-        return token;
+        return getTokenFile(name);
     }
 
     @Nullable
@@ -182,58 +166,43 @@ public class ResourceHelper {
         if (planetInfoPath != null) {
             return planetInfoPath;
         }
-        String token = getResourceFromFolder("planet_cards/", name, "Could not find planet token file");
+        String token = getResourceFromFolder("planet_cards/", name);
         planetCache.put(name, token);
         return token;
     }
 
     @Nullable
     public String getPAResource(String name) {
-        String paInfoPath = paCache.get(name);
-        if (paInfoPath != null) {
-            return paInfoPath;
-        }
-        String token = getResourceFromFolder("player_area/", name, "Could not find player area token file");
-        paCache.put(name, token);
-        return token;
+        return getResourceFromFolder("player_area/", name);
     }
 
     @Nullable
     public String getTokenFile(String name) {
-        String tokenPath = tokenCache.get(name);
-        if (tokenPath != null) {
-            return tokenPath;
-        }
-        String token = getResourceFromFolder("tokens/", name, "Could not find token file");
-        tokenCache.put(name, token);
-        return token;
-    }
-    @Nullable
-    public String getExtraFile(String name) {
-        String tokenPath = tokenCache.get(name);
-        if (tokenPath != null) {
-            return tokenPath;
-        }
-        String token = getResourceFromFolder("extra/", name, "Could not find token file");
-        tokenCache.put(name, token);
-        return token;
+        return getResourceFromFolder("tokens/", name);
     }
 
     @Nullable
-    public String getResourceFromFolder(String folder, String name, String errorDescription) {
-        File resourceFile = new File(Storage.getResourcePath() + File.separator + folder + name);
+    public String getExtraFile(String name) {
+        return getResourceFromFolder("extra/", name);
+    }
+
+    @Nullable
+    public static String getResourceFromFolder(String folder, String name) {
+        File resourceFile = getFile(folder, name);
         if (resourceFile.exists()) {
             return resourceFile.getAbsolutePath();
-        } else {
-            // System.out.println("Could not find resource file " + name + " in folder " + folder);
-            // System.out.println(errorDescription);
         }
+        //BotLogger.log("Could not find resource file: " + resourceFile.getAbsolutePath());
         return null;
+    }
+
+    private static File getFile(String folder, String name) {
+        return new File(Storage.getResourcePath() + File.separator + folder + name);
     }
 
     @Nullable
     public String getDataFile(String name) {
-        return getResourceFromFolder("data/", name, "Could not find data file");
+        return getResourceFromFolder("data/", name);
     }
 
     public String getDataFolder(String name) {
@@ -242,17 +211,17 @@ public class ResourceHelper {
 
     @Nullable
     public String getWebFile(String name) {
-        return getResourceFromFolder("web/", name, "Could not find web file");
+        return getResourceFromFolder("web/", name);
     }
 
     @Nullable
     public String getAliasFile(String name) {
-        return getResourceFromFolder("alias/", name, "Could not find alias file");
+        return getResourceFromFolder("alias/", name);
     }
 
     @Nullable
     public String getHelpFile(String name) {
-        return getResourceFromFolder("help/", name, "Could not find alias file");
+        return getResourceFromFolder("help/", name);
     }
 
 }

@@ -1,15 +1,16 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 
@@ -24,6 +25,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     private String text1;
     private String text2;
     private String mapText;
+    private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
@@ -107,11 +109,11 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         sb.append("\n");
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
-        if (getText1().length() > 0) {
+        if (!getText1().isEmpty()) {
             String arg = getText1().replace("For:", "**For:**");
             sb.append("> ").append(arg).append("\n");
         }
-        if (getText2().length() > 0) {
+        if (!getText2().isEmpty()) {
             String arg = getText2().replace("Against:", "**Against:**");
             sb.append("> ").append(arg).append("\n");
         }
@@ -136,11 +138,11 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
 
         // DESCRIPTION
         StringBuilder text = new StringBuilder("**" + getType() + ":** *" + getTarget() + "*\n");
-        if (getText1().length() > 0) {
+        if (!getText1().isEmpty()) {
             String arg = getText1().replace("For:", "__**For:**__");
             text.append(arg).append("\n");
         }
-        if (getText2().length() > 0) {
+        if (!getText2().isEmpty()) {
             String arg = getText2().replace("Against:", "__**Against:**__");
             text.append(arg).append("\n");
         }

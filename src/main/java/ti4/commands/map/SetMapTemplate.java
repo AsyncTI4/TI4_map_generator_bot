@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
@@ -36,7 +36,7 @@ public class SetMapTemplate extends MapSubcommandData {
             return;
         }
 
-        if (transform && true) {
+        if (transform) {
             // check if map templates are compatable
             MessageHelper.sendMessageToEventChannel(event, "New map template (" + mapTemplate + ") is not compatable with the old map template (" + game.getMapTemplateID() + ")");
             return;

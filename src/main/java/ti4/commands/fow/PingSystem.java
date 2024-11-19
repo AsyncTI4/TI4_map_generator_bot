@@ -8,11 +8,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.PositionMapper;
+import ti4.commands2.CommandHelper;
+import ti4.image.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class PingSystem extends FOWSubcommandData {
@@ -25,8 +26,7 @@ public class PingSystem extends FOWSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
 
         MessageChannel channel = event.getChannel();
         if (player == null) {
@@ -54,7 +54,7 @@ public class PingSystem extends FOWSubcommandData {
         List<Player> failList = new ArrayList<>();
         int successfulCount = 0;
         for (Player player_ : players) {
-            String playerMessage = player_.getRepresentation(true, true) + " - System " + position + " has been pinged:\n> " + message;
+            String playerMessage = player_.getRepresentationUnfogged() + " - System " + position + " has been pinged:\n> " + message;
             boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
             if (success) {
                 successfulCount++;

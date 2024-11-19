@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -25,9 +24,10 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String requirements;
     private String faction;
     private String baseUpgrade;
-    private ComponentSource source;
     private String text;
     private String homebrewReplacesID;
+    private String imageURL;
+    private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
     public enum TechnologyType {
@@ -35,6 +35,17 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
         public String toString() {
             return super.toString().toLowerCase();
+        }
+
+        public String emoji() {
+            return switch (this) {
+                case PROPULSION -> Emojis.PropulsionTech;
+                case CYBERNETIC -> Emojis.CyberneticTech;
+                case WARFARE -> Emojis.WarfareTech;
+                case BIOTIC -> Emojis.BioticTech;
+                case UNITUPGRADE -> Emojis.UnitUpgradeTech;
+                default -> "";
+            };
         }
     }
 
@@ -57,7 +68,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     @Deprecated
     @JsonIgnore
     public TechnologyType getType() {
-        return types.get(0);
+        return types.getFirst();
     }
 
     @JsonIgnore
@@ -270,69 +281,69 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public String getCondensedReqsEmojis(boolean single) {
         String reqs = getRequirements().orElse("");
-        String output = "";
+        StringBuilder output = new StringBuilder();
         Set<TechnologyType> types = new HashSet<>(getTypes());
         for (TechnologyType type : types) {
             switch (type) {
                 case PROPULSION -> {
                     String blues = reqs.replaceAll("[^B]", "");
                     switch (blues) {
-                        case "" -> output += Emojis.PropulsionDisabled;
-                        case "B" -> output += Emojis.PropulsionTech;
-                        case "BB" -> output += Emojis.Propulsion2;
-                        case "BBB" -> output += Emojis.Propulsion3;
+                        case "" -> output.append(Emojis.PropulsionDisabled);
+                        case "B" -> output.append(Emojis.PropulsionTech);
+                        case "BB" -> output.append(Emojis.Propulsion2);
+                        case "BBB" -> output.append(Emojis.Propulsion3);
                     }
                 }
                 case CYBERNETIC -> {
                     String yellows = reqs.replaceAll("[^Y]", "");
                     switch (yellows) {
-                        case "" -> output += Emojis.CyberneticDisabled;
-                        case "Y" -> output += Emojis.CyberneticTech;
-                        case "YY" -> output += Emojis.Cybernetic2;
-                        case "YYY" -> output += Emojis.Cybernetic3;
+                        case "" -> output.append(Emojis.CyberneticDisabled);
+                        case "Y" -> output.append(Emojis.CyberneticTech);
+                        case "YY" -> output.append(Emojis.Cybernetic2);
+                        case "YYY" -> output.append(Emojis.Cybernetic3);
                     }
                 }
                 case BIOTIC -> {
                     String greens = reqs.replaceAll("[^G]", "");
                     switch (greens) {
-                        case "" -> output += Emojis.BioticDisabled;
-                        case "G" -> output += Emojis.BioticTech;
-                        case "GG" -> output += Emojis.Biotic2;
-                        case "GGG" -> output += Emojis.Biotic3;
+                        case "" -> output.append(Emojis.BioticDisabled);
+                        case "G" -> output.append(Emojis.BioticTech);
+                        case "GG" -> output.append(Emojis.Biotic2);
+                        case "GGG" -> output.append(Emojis.Biotic3);
                     }
                 }
                 case WARFARE -> {
                     String reds = reqs.replaceAll("[^R]", "");
                     switch (reds) {
-                        case "" -> output += Emojis.WarfareDisabled;
-                        case "R" -> output += Emojis.WarfareTech;
-                        case "RR" -> output += Emojis.Warfare2;
-                        case "RRR" -> output += Emojis.Warfare3;
+                        case "" -> output.append(Emojis.WarfareDisabled);
+                        case "R" -> output.append(Emojis.WarfareTech);
+                        case "RR" -> output.append(Emojis.Warfare2);
+                        case "RRR" -> output.append(Emojis.Warfare3);
                     }
                 }
                 case UNITUPGRADE -> {
                     String unitType = getBaseUpgrade().isEmpty() ? getAlias() : getBaseUpgrade().get();
                     switch (unitType) {
-                        case "inf2" -> output += Emojis.infantry;
-                        case "ff2" -> output += Emojis.fighter;
-                        case "pds2" -> output += Emojis.pds;
-                        case "sd2" -> output += Emojis.spacedock;
-                        case "dd2" -> output += Emojis.destroyer;
-                        case "cr2" -> output += Emojis.cruiser;
-                        case "cv2" -> output += Emojis.carrier;
-                        case "dn2" -> output += Emojis.dreadnought;
-                        case "ws" -> output += Emojis.warsun;
-                        case "fs" -> output += Emojis.flagship;
-                        default -> output += Emojis.flagship;
+                        case "inf2" -> output.append(Emojis.infantry);
+                        case "ff2" -> output.append(Emojis.fighter);
+                        case "pds2" -> output.append(Emojis.pds);
+                        case "sd2" -> output.append(Emojis.spacedock);
+                        case "dd2" -> output.append(Emojis.destroyer);
+                        case "cr2" -> output.append(Emojis.cruiser);
+                        case "cv2" -> output.append(Emojis.carrier);
+                        case "dn2" -> output.append(Emojis.dreadnought);
+                        case "ws" -> output.append(Emojis.warsun);
+                        case "fs" -> output.append(Emojis.flagship);
+                        default -> output.append(Emojis.flagship);
                     }
                 }
                 default -> {
                 }
             }
-            if (single) return output;
+            if (single) return output.toString();
         }
 
-        return output;
+        return output.toString();
     }
 
     public String getRequirementsEmoji() {

@@ -19,7 +19,7 @@ public class AddUnitDamage extends AddRemoveUnits {
     }
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.ADD_UNIT_DAMAGE;
     }
 

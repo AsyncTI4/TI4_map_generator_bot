@@ -2,11 +2,14 @@
 - [Setup a Test Bot](#setup-a-test-bot)
   - [Run Locally](#run-locally)
     - [JAVA, IntelliJ, VSCode, or other Java IDE](#java-intellij-vscode-or-other-java-ide)
+    - [Default Formatter](#default-formatter)
   - [Run Docker Container](#run-docker-container)
     - [Windows 10, VS Code, Docker Desktop](#windows-10-vs-code-docker-desktop)
+- [Adding New Buttons](#adding-new-buttons)
 - [Adding Homebrew Content](#adding-homebrew-content)
 - [Testing your Changes](#testing-your-changes)
   - [VSCode Test](#vscode-test)
+- [Helpful Tips for Debugging](#helpful-tips-for-debugging)
   
 # Setup a Test Server
 
@@ -94,6 +97,10 @@ docker run -v ${PWD}/storage:/opt/STORAGE tibot $discordBotKey $discordUserID $d
 
 Bot should now be running and able to receive commands on your test server!
 
+# Adding New Buttons
+
+Don't add anything to ButtonListener.java! The if/elseif startsWith chain and select case method are deprecated. Use the @ButtonHandler annotation on your resolver method, ideally nearby where you sent/created the button!
+
 # Adding Homebrew Content
 
 For the most part, all raw data files are in `TI4_map_generator_bot/src/main/resources/data/`
@@ -117,3 +124,8 @@ To run Java tests in VSCode - make sure you add a test configuration your .vscod
 ]
 ```
 
+# Helpful Tips for Debugging
+
+- You can use `/game swap` to switch seats with another player (a bot) in the game
+- You can use `/bothelper list_buttons` to find the buttonIDs in that message, which you can use to search the repo for the code that created that button
+- You can spoof a button with a specific buttonID with `/button spoof_id:{spoofedID}`

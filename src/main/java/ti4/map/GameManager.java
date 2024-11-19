@@ -1,49 +1,40 @@
 package ti4.map;
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
+import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.Nullable;
+
+@UtilityClass
 public class GameManager {
 
-    private long loadTime;
-    private static GameManager gameManager;
-    private static final Map<String, String> userNameToGameName = new HashMap<>();
-    private Map<String, Game> gameNameToGame = new HashMap<>();
+    private static final ConcurrentMap<String, String> userNameToGameName = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Game> gameNameToGame = new ConcurrentHashMap<>();
 
-    private GameManager() {
-        loadTime = new Date().getTime();
-    }
-
-    public static GameManager getInstance() {
-        if (gameManager == null) {
-            gameManager = new GameManager();
-        }
-        return gameManager;
-    }
-
-    public Map<String, Game> getGameNameToGame() {
+    public static Map<String, Game> getGameNameToGame() {
         return gameNameToGame;
     }
 
-    public void setGameNameToGame(Map<String, Game> gameNameToGame) {
-        this.gameNameToGame = gameNameToGame;
-    }
-
-    public void addGame(Game game) {
+    public static void addGame(Game game) {
         gameNameToGame.put(game.getName(), game);
     }
 
-    public Game getGame(String gameName) {
+    public static Game getGame(String gameName) {
         return gameNameToGame.get(gameName);
     }
 
-    public Game deleteGame(String gameName) {
+    public static Game deleteGame(String gameName) {
         return gameNameToGame.remove(gameName);
     }
 
-    public boolean setGameForUser(String userID, String gameName) {
+    public static boolean isValidGame(String game) {
+        return gameNameToGame.containsKey(game);
+    }
+
+    public static boolean setGameForUser(String userID, String gameName) {
         if (gameNameToGame.get(gameName) != null) {
             userNameToGameName.put(userID, gameName);
             return true;
@@ -51,24 +42,24 @@ public class GameManager {
         return false;
     }
 
-    public void resetMapForUser(String userID) {
+    public static void resetGameForUser(String userID) {
         userNameToGameName.remove(userID);
     }
 
-    public boolean isUserWithActiveGame(String userID) {
+    public static boolean isUserWithActiveGame(String userID) {
         return userNameToGameName.containsKey(userID);
     }
 
-    public Game getUserActiveGame(String userID) {
+    @Nullable
+    public static Game getUserActiveGame(String userID) {
         String mapName = userNameToGameName.get(userID);
+        if (mapName == null) {
+            return null;
+        }
         return gameNameToGame.get(mapName);
     }
 
-    public List<String> getGameNames() {
+    public static List<String> getGameNames() {
         return getGameNameToGame().keySet().stream().sorted().toList();
-    }
-
-    public long getLoadTime() {
-        return loadTime;
     }
 }
