@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.commands2.tokens.AddToken;
+import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -634,7 +634,7 @@ public class ButtonHelperTacticalAction {
             String msg = player.getRepresentationUnfogged()
                 + " automatically added 1 frontier token to the system due to Mortheus Flagship";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-            AddToken.addToken(event, tile, Constants.FRONTIER, game);
+            AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         }
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, game, event);
         if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn")) && !button2.isEmpty() && !game.isL1Hero()) {

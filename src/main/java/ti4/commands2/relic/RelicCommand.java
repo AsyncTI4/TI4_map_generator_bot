@@ -34,7 +34,7 @@ public class RelicCommand implements ParentCommand {
     }
 
     public String getDescription() {
-        return "Relic`";
+        return "Relic";
     }
 
     @Override

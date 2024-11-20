@@ -19,9 +19,9 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-public class ShowDistances extends GameStateCommand {
+public class ShowDistancesCommand extends GameStateCommand {
 
-    public ShowDistances() {
+    public ShowDistancesCommand() {
         super(false, true);
     }
 

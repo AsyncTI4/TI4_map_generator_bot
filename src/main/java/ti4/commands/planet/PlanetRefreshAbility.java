@@ -6,6 +6,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 
 public class PlanetRefreshAbility extends PlanetAddRemove {
+
     public PlanetRefreshAbility() {
         super(Constants.PLANET_REFRESH_ABILITY, "Ready Planet Ability");
     }

@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.planet.PlanetAdd;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
@@ -31,6 +30,7 @@ import ti4.model.ExploreModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.AddPlanetService;
 import ti4.service.turn.StartTurnService;
 
 public class ButtonHelperAbilities {
@@ -1360,7 +1360,7 @@ public class ButtonHelperAbilities {
             Tile tile = game.getTileFromPlanet("hexlockedmallice");
             MoveUnits.flipMallice(event, tile, game);
         }
-        PlanetAdd.doAction(player, planetID, game, event, false);
+        AddPlanetService.addPlanet(player, planetID, game, event, false);
         String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game);
         String msg = player.getFactionEmojiOrColor() + " claimed the planet " + planetRep + " using the " + Emojis.Xxcha + "**Peace Accords** ability.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

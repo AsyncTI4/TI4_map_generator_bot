@@ -20,7 +20,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.PlanetService;
 
-public class RemoveToken extends AddRemoveToken {
+public class RemoveTokenCommand extends AddRemoveTokenCommand {
 
     @Override
     public List<OptionData> getOptions() {
