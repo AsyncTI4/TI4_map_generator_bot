@@ -13,7 +13,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands2.player.TurnStart;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -25,9 +24,10 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.turn.StartTurnService;
 
 @UtilityClass
-public class StrategyCardPickService {
+public class PickStrategyCardService {
 
     public static void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game game, int scPicked) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
@@ -150,7 +150,7 @@ public class StrategyCardPickService {
                     MapGenerator.drawBanner(privatePlayer);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.",
-                    TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
+                    StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
                 if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
@@ -181,7 +181,7 @@ public class StrategyCardPickService {
                     MapGenerator.drawBanner(privatePlayer);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.",
-                    TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
+                    StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
                 if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),

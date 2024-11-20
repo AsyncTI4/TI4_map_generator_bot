@@ -1,4 +1,4 @@
-package ti4.service;
+package ti4.service.player;
 
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;

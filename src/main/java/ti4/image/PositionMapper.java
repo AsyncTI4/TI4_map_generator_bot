@@ -268,8 +268,6 @@ public class PositionMapper {
         int side = (tile - 1) / ring; // math
         boolean isCorner = ((tile - 1) % ring) == 0;
 
-        if (ring == 0) return List.of("101", "102", "103", "104", "105", "106");
-
         // Define the different relevant spots
         String nextRing1 = makeTileStr(ring + 1, tile + side);
         String nextRing2 = makeTileStr(ring + 1, tile + side + 1);

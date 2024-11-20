@@ -23,7 +23,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.StrategyCardModel;
-import ti4.service.PlayerReactService;
+import ti4.service.player.PlayerReactService;
 import ti4.service.tech.PlayerTechService;
 import ti4.users.UserSettingsManager;
 

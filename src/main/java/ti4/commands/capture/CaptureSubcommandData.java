@@ -35,7 +35,4 @@ public abstract class CaptureSubcommandData extends SubcommandData {
         game = GameManager.getUserActiveGame(user.getId());
     }
 
-    public void reply(SlashCommandInteractionEvent event) {
-        // SCCommand.reply(event);
-    }
 }

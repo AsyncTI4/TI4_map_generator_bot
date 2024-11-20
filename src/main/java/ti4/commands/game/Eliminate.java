@@ -13,14 +13,14 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.commands.tokens.AddCC;
-import ti4.commands.tokens.RemoveCC;
-import ti4.image.Mapper;
+import ti4.commands2.tokens.RemoveCC;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GameCreationHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -40,7 +40,7 @@ public class Eliminate extends AddRemovePlayer {
     }
 
     @Override
-    protected void action(SlashCommandInteractionEvent event, Game game, User user) {
+    protected void action(SlashCommandInteractionEvent event, Game game) {
         sb = new StringBuilder();
         removeUser(event, game, Constants.PLAYER1);
         removeUser(event, game, Constants.PLAYER2);
@@ -56,22 +56,7 @@ public class Eliminate extends AddRemovePlayer {
         OptionMapping option;
         option = event.getOption(playerID);
 
-        // OptionMapping option2 = event.getOption(Constants.CONFIRM);
-        // if(!option2.getAsString().equalsIgnoreCase("yes"))
-        // {
-        //     MessageHelper.sendMessageToChannel(event.getChannel(), "Please confirm with yes");
-        //     return;
-        // }
         if (option != null) {
-
-            // OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
-
-            // if (removeOption == null) {
-            //     MessageHelper.replyToMessage(event, "Specify player to remove and replacement");
-            //     return;
-            // }
-
-            // Player player = CommandHelper.getPlayerFromEvent(game, event);
             User extraUser = option.getAsUser();
             Player player = game.getPlayer(extraUser.getId());
             Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
@@ -112,7 +97,7 @@ public class Eliminate extends AddRemovePlayer {
                 //Remove all of the players units and ccs from the board
                 for (Tile tile : game.getTileMap().values()) {
                     tile.removeAllUnits(player.getColor());
-                    if (!"null".equalsIgnoreCase(player.getColor()) && AddCC.hasCC(event, player.getColor(), tile)) {
+                    if (!"null".equalsIgnoreCase(player.getColor()) && CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
                         RemoveCC.removeCC(event, player.getColor(), tile, game);
                     }
                 }

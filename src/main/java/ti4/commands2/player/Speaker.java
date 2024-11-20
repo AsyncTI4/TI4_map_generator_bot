@@ -10,7 +10,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class Speaker extends GameStateSubcommand {
+class Speaker extends GameStateSubcommand {
 
     public Speaker() {
         super(Constants.SPEAKER, "Speaker selection", true, true);

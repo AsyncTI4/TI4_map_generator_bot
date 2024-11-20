@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class RemoveTeamMate extends GameStateSubcommand {
+class RemoveTeamMate extends GameStateSubcommand {
 
     public RemoveTeamMate() {
         super(Constants.REMOVE_TEAMMATE, "Remove a teammate", true, true);

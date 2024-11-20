@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands2.Subcommand;
-import ti4.service.PingIntervalService;
+import ti4.service.player.PingIntervalService;
 import ti4.users.UserSettingsManager;
 
 class SetPersonalPingInterval extends Subcommand {

@@ -16,7 +16,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SendCommodities extends GameStateSubcommand {
+class SendCommodities extends GameStateSubcommand {
 
     public SendCommodities() {
         super(Constants.SEND_COMMODITIES, "Sent Commodities to player/faction", true, true);

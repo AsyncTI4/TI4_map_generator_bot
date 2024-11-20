@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.tokens.AddCC;
 import ti4.commands2.CommandHelper;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
@@ -39,11 +39,11 @@ public class AddUnits extends AddRemoveUnits {
                 switch (value) {
                     case "t/tactics", "t", "tactics", "tac", "tact" -> {
                         MoveUnits.removeTacticsCC(event, color, tile, GameManager.getUserActiveGame(event.getUser().getId()));
-                        AddCC.addCC(event, color, tile);
+                        CommandCounterHelper.addCC(event, color, tile);
                         Helper.isCCCountCorrect(event, game, color);
                     }
                     case "r/retreat/reinforcements", "r", "retreat", "reinforcements" -> {
-                        AddCC.addCC(event, color, tile);
+                        CommandCounterHelper.addCC(event, color, tile);
                         Helper.isCCCountCorrect(event, game, color);
                     }
                 }

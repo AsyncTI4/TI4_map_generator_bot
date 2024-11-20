@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -35,6 +36,7 @@ import ti4.model.TileModel;
 import ti4.model.WormholeModel;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 
+@UtilityClass
 public class MiltyDraftHelper {
 
     public static void generateAndPostSlices(Game game) {

@@ -10,10 +10,9 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.commands2.player.TurnStart;
+import ti4.commands2.tokens.AddToken;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -27,6 +26,7 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.turn.StartTurnService;
 
 public class ButtonHelperTacticalAction {
 
@@ -319,7 +319,7 @@ public class ButtonHelperTacticalAction {
         game.setL1Hero(false);
         game.setStoredValue("vaylerianHeroActive", "");
         String message = player.getRepresentationUnfogged() + " Use buttons to end turn or do another action.";
-        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageChannel channel = event.getMessageChannel();
         if (game.isFowMode()) {
             channel = player.getPrivateChannel();
@@ -380,7 +380,7 @@ public class ButtonHelperTacticalAction {
             if (!game.getMovedUnitsFromCurrentActivation().isEmpty()) {
                 ButtonHelper.resolveEmpyCommanderCheck(player, game, tile, event);
                 ButtonHelper.sendEBSWarning(player, game, tile.getPosition());
-                ButtonHelper.checkForIonStorm(game, tile, player);
+                ButtonHelper.checkForIonStorm(tile, player);
                 for (Player nonActivePlayer : game.getRealPlayers()) {
                     if (player == nonActivePlayer) {
                         continue;
@@ -552,10 +552,9 @@ public class ButtonHelperTacticalAction {
     public static void getTilesThisFarAway(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int desiredDistance = Integer.parseInt(buttonID.split("_")[1]);
         Map<String, Integer> distances = CheckDistanceHelper.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
-        int maxDistance = desiredDistance;
         List<Button> buttons = new ArrayList<>();
         if (desiredDistance > 0) {
-            buttons.add(Buttons.gray("getTilesThisFarAway_" + (maxDistance - 1), "Get Tiles " + (maxDistance - 1) + " Spaces Away"));
+            buttons.add(Buttons.gray("getTilesThisFarAway_" + (desiredDistance - 1), "Get Tiles " + (desiredDistance - 1) + " Spaces Away"));
         }
         for (String pos : CheckDistanceHelper.getAllTilesACertainDistanceAway(game, player, distances, desiredDistance)) {
             Tile tile = game.getTileByPosition(pos);
@@ -564,7 +563,7 @@ public class ButtonHelperTacticalAction {
                 buttons.add(Buttons.green("ringTile_" + pos, tileRepresentation));
             }
         }
-        buttons.add(Buttons.gray("getTilesThisFarAway_" + (maxDistance + 1), "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
+        buttons.add(Buttons.gray("getTilesThisFarAway_" + (desiredDistance + 1), "Get Tiles " + (desiredDistance + 1) + " Spaces Away"));
 
         String message = "Doing a tactical action. Please select the tile you want to activate";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);

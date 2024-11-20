@@ -1,4 +1,4 @@
-package ti4.service;
+package ti4.service.player;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;

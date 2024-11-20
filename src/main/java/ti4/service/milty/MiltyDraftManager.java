@@ -27,7 +27,6 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.map.AddTileList;
-import ti4.commands2.player.Setup;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -442,7 +441,7 @@ public class MiltyDraftManager {
                     }
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                 } else {
-                    Setup.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, speaker);
+                    MiltyService.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, speaker);
                 }
             }
             game.setPhaseOfGame("playerSetup");

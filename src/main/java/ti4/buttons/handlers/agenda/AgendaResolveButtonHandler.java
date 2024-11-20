@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands2.player.SCPlay;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -42,6 +41,7 @@ import ti4.model.AgendaModel;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
+import ti4.service.strategycard.PlayStrategyCardService;
 
 @UtilityClass
 class AgendaResolveButtonHandler {
@@ -909,7 +909,7 @@ class AgendaResolveButtonHandler {
                             scButtons.add(Buttons.GET_A_TECH);
                         }
                         case "8" -> {
-                            SCPlay.handleSOQueueing(game, false);
+                            PlayStrategyCardService.handleSOQueueing(game, false);
                             scButtons.add(Buttons.gray("sc_draw_so", "Draw Secret Objective", Emojis.SecretObjective));
                         }
                     }

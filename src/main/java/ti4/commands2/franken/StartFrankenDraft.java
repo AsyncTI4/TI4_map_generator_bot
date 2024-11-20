@@ -10,7 +10,6 @@ import ti4.draft.OnePickFrankenDraft;
 import ti4.draft.PoweredFrankenDraft;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.franken.FrankenDraftBagService;
@@ -55,7 +54,6 @@ class StartFrankenDraft extends GameStateSubcommand {
         }
 
         FrankenDraftBagService.startDraft(game);
-        GameSaveLoadManager.saveGame(game, event);
     }
 }
 

@@ -14,11 +14,11 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
-import ti4.commands.tokens.AddCC;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -386,7 +386,7 @@ public class StartCombatService {
                         + " this is a reminder that if you win this combat, you may add the opponents CC to your fleet pool.",
                     buttons);
             }
-            if (player.hasTechReady("dskortg") && AddCC.hasCC(player, tile)) {
+            if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray("exhaustTech_dskortg_" + tile.getPosition(), "Tempest Drive", Emojis.kortali));
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
@@ -440,7 +440,7 @@ public class StartCombatService {
             boolean techOrLegendary = false;
             for (UnitHolder planet : tile.getPlanetUnitHolders()) {
                 if (ButtonHelper.checkForTechSkips(game, planet.getName())
-                    || ButtonHelper.isTileLegendary(tile, game)) {
+                    || ButtonHelper.isTileLegendary(tile)) {
                     techOrLegendary = true;
                 }
             }

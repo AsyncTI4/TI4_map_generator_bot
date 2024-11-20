@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.planet.PlanetExhaust;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
@@ -554,7 +553,7 @@ public class ButtonHelperCommanders {
 
             for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
                 Tile tile2 = game.getTileByPosition(pos2);
-                if (AddCC.hasCC(event, player.getColor(), tile2) && !game.isDominusOrb()
+                if (CommandCounterHelper.hasCC(event, player.getColor(), tile2) && !game.isDominusOrb()
                     && tile2 != tile) {
                     continue;
                 }

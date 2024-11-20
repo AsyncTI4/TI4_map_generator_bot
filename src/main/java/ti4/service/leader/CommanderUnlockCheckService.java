@@ -1,7 +1,6 @@
 package ti4.service.leader;
 
 import lombok.experimental.UtilityClass;
-import ti4.commands2.leaders.UnlockLeader;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -329,7 +328,7 @@ public class CommanderUnlockCheckService {
             // missing: yin, ghost, naalu, letnev
         }
         if (shouldBeUnlocked) {
-            UnlockLeader.unlockLeader(faction + "commander", game, player);
+            UnlockLeaderService.unlockLeader(faction + "commander", game, player);
         }
     }
 }

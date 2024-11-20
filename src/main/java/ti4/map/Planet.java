@@ -13,9 +13,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.apache.commons.lang3.StringUtils;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.model.AttachmentModel;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel;
@@ -119,7 +119,6 @@ public class Planet extends UnitHolder {
     public boolean hasGroundForces(Game game) {
         return getUnits().keySet().stream()
             .flatMap(uk -> game.getPriorityUnitByUnitKey(uk, this).stream())
-            .filter(obj -> true)
             .anyMatch(UnitModel::getIsGroundForce);
     }
 

@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
@@ -954,8 +953,7 @@ public class ButtonHelperModifyUnits {
                 if (!allowedUnits.contains(unitKey.getUnitType())) {
                     continue;
                 }
-                Player p2 = player;
-                UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
+                UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
                 String unitName = unitKey.unitName();
                 EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
@@ -984,9 +982,8 @@ public class ButtonHelperModifyUnits {
         List<Button> buttons = getOpposingUnitsToHit(player, game, event, tile, false);
         String msg = player.getRepresentation() + " choose which opposing unit to hit";
         String unit = buttonID.split("_")[2];
-        Player p2 = player;
-        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColor());
-        new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, p2.getColor(), false, game);
+        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
+        new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, player.getColor(), false, game);
         String msg2 = player.getRepresentation() + "used devotion to destroy one of their " + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile " + tile.getRepresentation();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
         event.getMessage().delete().queue();
@@ -1171,11 +1168,11 @@ public class ButtonHelperModifyUnits {
         Tile tile2 = game.getTileByPosition(pos2);
         tile2 = MoveUnits.flipMallice(event, tile2, game);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "kollecccommander") && !buttonID.contains("skilled")
-            && !AddCC.hasCC(event, player.getColor(), tile1)) {
+            && !CommandCounterHelper.hasCC(event, player.getColor(), tile1)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()
                 + " did not place a CC in the retreat system due to Kado S'mah-Qar, the Kollecc commander.");
         } else {
-            AddCC.addCC(event, player.getColor(), tile2, true);
+            CommandCounterHelper.addCC(event, player.getColor(), tile2, true);
         }
 
         for (Map.Entry<String, UnitHolder> entry : tile1.getUnitHolders().entrySet()) {
@@ -1438,7 +1435,7 @@ public class ButtonHelperModifyUnits {
                         + Helper.getPlanetRepresentation(planetName, game) + " system";
                     if (!game.playerHasLeaderUnlockedOrAlliance(player, "rohdhnacommander")) {
                         if (Mapper.isValidColor(color)) {
-                            AddCC.addCC(event, color, tile);
+                            CommandCounterHelper.addCC(event, color, tile);
                         }
                     } else {
                         msg = playerRep

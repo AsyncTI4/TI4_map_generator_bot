@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands2.leaders.UnlockLeader;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -25,6 +24,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.UnlockLeaderService;
 
 public class PlanetAdd extends PlanetAddRemove {
     public PlanetAdd() {
@@ -57,10 +57,9 @@ public class PlanetAdd extends PlanetAddRemove {
 
         List<String> mecatols = Constants.MECATOLS;
         if (mecatols.contains(planet) && player.hasTech("iihq")) {
-            Planet mecatolRex = unitHolder;
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
-            mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
-            mecatolRex.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
+            unitHolder.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
+            unitHolder.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
         }
         String color = player.getColor();
         boolean moveTitanPN = false;
@@ -172,7 +171,7 @@ public class PlanetAdd extends PlanetAddRemove {
                     String leaderID = p.getFactionHomeworld() + "commander";
                     player.addLeader(leaderID);
                     game.addFakeCommander(leaderID);
-                    UnlockLeader.unlockLeader(leaderID, game, player);
+                    UnlockLeaderService.unlockLeader(leaderID, game, player);
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2 == player) {
                             continue;
@@ -188,8 +187,7 @@ public class PlanetAdd extends PlanetAddRemove {
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setup) {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {
-                Planet planetReal = unitHolder;
-                List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
+                List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
                 if (event != null && buttons != null && !buttons.isEmpty()) {
                     String message = player.getFactionEmoji() + " Click button to explore "
                         + Helper.getPlanetRepresentation(planet, game);
@@ -293,8 +291,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
 
         if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !game.isBaseGameMode()) {
-            Planet planetReal = unitHolder;
-            List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
+            List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
             if (event != null && buttons != null && !buttons.isEmpty()) {
                 String message = player.getFactionEmoji() + " Click button to explore "
                     + Helper.getPlanetRepresentation(planet, game);

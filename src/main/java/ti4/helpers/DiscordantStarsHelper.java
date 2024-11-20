@@ -250,7 +250,7 @@ public class DiscordantStarsHelper {
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
         if (ids.size() == 1) {
-            ButtonHelper.detTileAdditionStep1(game, player, ids.getFirst());
+            ButtonHelper.detTileAdditionStep1(player, ids.getFirst());
         }
     }
 
@@ -283,10 +283,10 @@ public class DiscordantStarsHelper {
             if (game.isDiscordantStarsMode()) {
                 ButtonHelper.starChartStep1(game, player, ids.getFirst());
             } else {
-                ButtonHelper.detTileAdditionStep1(game, player, ids.getFirst());
+                ButtonHelper.detTileAdditionStep1(player, ids.getFirst());
             }
         } else {
-            ButtonHelper.starChartStep0(game, player, ids);
+            ButtonHelper.starChartStep0(player, ids);
         }
     }
 

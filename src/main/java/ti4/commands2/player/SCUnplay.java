@@ -14,7 +14,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SCUnplay extends GameStateSubcommand {
+class SCUnplay extends GameStateSubcommand {
 
     public SCUnplay() {
         super(Constants.SC_UNPLAY, "Unplay a Strategy Card", true, true);

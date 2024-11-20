@@ -8,7 +8,7 @@ import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.service.info.UnitInfoService;
 
-public class UnitInfo extends GameStateSubcommand {
+class UnitInfo extends GameStateSubcommand {
 
     public UnitInfo() {
         super(Constants.UNIT_INFO, "Send special unit information to your Cards Info channel", false, true);
