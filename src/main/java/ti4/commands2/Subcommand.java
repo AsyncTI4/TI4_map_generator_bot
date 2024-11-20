@@ -17,8 +17,6 @@ public abstract class Subcommand extends SubcommandData implements Command {
 
     public abstract void execute(SlashCommandInteractionEvent event);
 
-    public void postExecute(SlashCommandInteractionEvent event) {}
-
     // TODO: Remove once old Command interface is gone.
     @Override
     public void register(CommandListUpdateAction commands) {}

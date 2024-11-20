@@ -1023,7 +1023,7 @@ public class ActionCardHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
-    public static void pickACardFromDiscardStep2(Game game, Player player, ButtonInteractionEvent event,        String buttonID) {
+    public static void pickACardFromDiscardStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteMessage(event);
         String acID = buttonID.replace("pickFromDiscard_", "");
         boolean picked = game.pickActionCard(player.getUserID(), game.getDiscardActionCards().get(acID));
