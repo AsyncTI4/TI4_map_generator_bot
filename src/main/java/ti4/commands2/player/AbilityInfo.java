@@ -5,7 +5,7 @@ import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.service.info.AbilityInfoService;
 
-public class AbilityInfo extends GameStateSubcommand {
+class AbilityInfo extends GameStateSubcommand {
 
     public AbilityInfo() {
         super(Constants.ABILITY_INFO, "Send faction abilities information to your Cards Info channel", false, true);

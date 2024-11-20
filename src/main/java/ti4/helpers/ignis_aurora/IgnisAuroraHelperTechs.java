@@ -8,10 +8,10 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.tokens.AddCC;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Emojis;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -66,7 +66,7 @@ public class IgnisAuroraHelperTechs {
         // At the start of your turn you may exhaust this card to remove 1 of your command tokens
         // from a system that does not contain a planet owned by another player or another player's units
         Predicate<Tile> pred = tile -> {
-            if (!AddCC.hasCC(event, player.getColor(), tile)) return false;
+            if (!CommandCounterHelper.hasCC(event, player.getColor(), tile)) return false;
             for (Player p : game.getRealPlayers()) {
                 if (p == player) continue;
                 for (Planet planet : tile.getPlanetUnitHolders()) {

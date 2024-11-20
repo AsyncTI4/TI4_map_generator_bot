@@ -545,14 +545,14 @@ public class ButtonHelperSCs {
                 }
             }
         } else {
-            String empelar = "";
+            StringBuilder empelar = new StringBuilder();
             List<Character> letters = Arrays.asList('m','e','l','p','a');
             Collections.shuffle(letters);
             for (Character c: letters)
             {
-                empelar += c;
+                empelar.append(c);
             }
-            empelar = "E" + empelar + "r";
+            empelar = new StringBuilder("E" + empelar + "r");
             MessageHelper.sendMessageToChannel(channel,
                 player.getRepresentationUnfogged() + " exhausted Scepter of " + empelar + " to follow " + Helper.getSCName(scNum, game) + ".");
             player.addExhaustedRelic("emelpar");

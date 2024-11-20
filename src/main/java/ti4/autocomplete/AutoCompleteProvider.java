@@ -84,7 +84,7 @@ public class AutoCompleteProvider {
             case Constants.CARDS_AC -> resolveActionCardAutoComplete(event, subCommandName, optionName, game);
             case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName);
             case Constants.MAP -> resolveMapAutoComplete(event, subCommandName, optionName, game);
-            case Constants.EVENT -> resolveEventAutoComplete(event, subCommandName, optionName, game, player);
+            case Constants.EVENT -> resolveEventAutoComplete(event, subCommandName, optionName, player);
             case Constants.EXPLORE -> resolveExploreAutoComplete(event, subCommandName, optionName, game);
         }
 
@@ -998,7 +998,7 @@ public class AutoCompleteProvider {
         }
     }
 
-    private static void resolveEventAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Game game, Player player) {
+    private static void resolveEventAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Player player) {
         if (subCommandName.equals(Constants.EVENT_PLAY)) {
             if (optionName.equals(Constants.EVENT_ID)) {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();

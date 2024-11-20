@@ -20,12 +20,13 @@ import ti4.message.MessageHelper;
 @Getter
 public abstract class ListenerContext {
     protected boolean contextIsValid = true;
-    protected String origComponentID, componentID;
+    protected final String origComponentID;
+    protected String componentID;
     protected boolean factionChecked = false;
-    protected Game game;
+    protected final Game game;
     protected Player player;
     protected MessageChannel privateChannel, mainGameChannel, actionsChannel;
-    protected GenericInteractionCreateEvent event;
+    protected final GenericInteractionCreateEvent event;
 
     public abstract GenericInteractionCreateEvent getEvent();
 

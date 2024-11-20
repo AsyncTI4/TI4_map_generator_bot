@@ -888,7 +888,7 @@ public class AgendaHelper {
                 BotLogger.log("Could not find next in line", e);
             }
             if (nextInLine == null) {
-                BotLogger.log("`startTheVoting` " + nextInLine + " is **null**");
+                BotLogger.log("`startTheVoting` is **null**");
                 return;
             }
             String realIdentity = nextInLine.getRepresentationUnfogged();
@@ -1670,14 +1670,13 @@ public class AgendaHelper {
             if (thing.contains("planet_") && !prevoting) {
                 String planet = thing.replace("planet_", "");
                 player.exhaustPlanet(planet);
-                String planetName = planet;
-                UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+                UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                 if (uH != null) {
                     if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
-                        Tile tile = game.getTileFromPlanet(planetName);
-                        String msg = player.getRepresentation() + " added 1 infantry to " + planetName
+                        Tile tile = game.getTileFromPlanet(planet);
+                        String msg = player.getRepresentation() + " added 1 infantry to " + planet
                             + " due to the arcane citadel";
-                        new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + planetName, game);
+                        new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + planet, game);
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
                 }

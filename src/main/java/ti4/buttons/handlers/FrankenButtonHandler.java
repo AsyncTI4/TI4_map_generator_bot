@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.commands2.player.Stats;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -26,6 +25,7 @@ import ti4.service.franken.FrankenFactionTechService;
 import ti4.service.franken.FrankenLeaderService;
 import ti4.service.franken.FrankenPromissoryService;
 import ti4.service.franken.FrankenUnitService;
+import ti4.service.player.PlayerStatsService;
 import ti4.service.tech.PlayerTechService;
 
 @UtilityClass
@@ -94,7 +94,7 @@ class FrankenButtonHandler {
             case TECH -> FrankenFactionTechService.addFactionTechs(event, player, List.of(itemID));
             case AGENT, COMMANDER, HERO -> FrankenLeaderService.addLeaders(event, player, List.of(itemID));
             case MECH, FLAGSHIP -> FrankenUnitService.addUnits(event, player, List.of(itemID));
-            case COMMODITIES -> Stats.setTotalCommodities(event, player, (player.getCommoditiesTotal() + ((CommoditiesDraftItem) draftItem).getCommodities()));
+            case COMMODITIES -> PlayerStatsService.setTotalCommodities(event, player, (player.getCommoditiesTotal() + ((CommoditiesDraftItem) draftItem).getCommodities()));
             case PN -> FrankenPromissoryService.addPromissoryNotes(event, player.getGame(), player, List.of(itemID));
             case STARTINGTECH -> addStartingTech(event, player, itemID);
         }
@@ -107,7 +107,7 @@ class FrankenButtonHandler {
             case TECH -> FrankenFactionTechService.removeFactionTechs(event, player, List.of(itemID));
             case AGENT, COMMANDER, HERO -> FrankenLeaderService.removeLeaders(event, player, List.of(itemID));
             case MECH, FLAGSHIP -> FrankenUnitService.removeUnits(event, player, List.of(itemID));
-            case COMMODITIES -> Stats.setTotalCommodities(event, player, (player.getCommoditiesTotal() - ((CommoditiesDraftItem) draftItem).getCommodities()));
+            case COMMODITIES -> PlayerStatsService.setTotalCommodities(event, player, (player.getCommoditiesTotal() - ((CommoditiesDraftItem) draftItem).getCommodities()));
             case PN -> FrankenPromissoryService.removePromissoryNotes(event, player, List.of(itemID));
             case STARTINGTECH -> removeStartingTech(event, player, itemID);
         }

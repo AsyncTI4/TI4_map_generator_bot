@@ -10,8 +10,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.transaction.SendDebtService;
 
-public class SendDebt extends GameStateSubcommand {
+class SendDebt extends GameStateSubcommand {
 
     public SendDebt() {
         super(Constants.SEND_DEBT, "Send a debt token (control token) to player/faction", true, true);
@@ -31,13 +32,8 @@ public class SendDebt extends GameStateSubcommand {
         Game game = getGame();
         Player sendingPlayer = getPlayer();
         Player receivingPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
+        SendDebtService.sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
         CommanderUnlockCheckService.checkPlayer(receivingPlayer, "vaden");
         MessageHelper.sendMessageToEventChannel(event, sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation());
-    }
-
-    public static void sendDebt(Player sendingPlayer, Player receivingPlayer, int debtCountToSend) {
-        String sendingPlayerColor = sendingPlayer.getColor();
-        receivingPlayer.addDebtTokens(sendingPlayerColor, debtCountToSend);
     }
 }

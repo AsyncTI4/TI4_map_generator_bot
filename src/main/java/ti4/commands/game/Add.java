@@ -17,7 +17,7 @@ public class Add extends AddRemovePlayer {
     }
 
     @Override
-    protected void action(SlashCommandInteractionEvent event, Game game, User user) {
+    protected void action(SlashCommandInteractionEvent event, Game game) {
         addExtraUser(event, game, Constants.PLAYER1);
         addExtraUser(event, game, Constants.PLAYER2);
         addExtraUser(event, game, Constants.PLAYER3);

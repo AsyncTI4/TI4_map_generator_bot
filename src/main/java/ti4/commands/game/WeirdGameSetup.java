@@ -7,9 +7,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.TIGLHelper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -164,7 +164,7 @@ public class WeirdGameSetup extends GameSubcommandData {
 
         // JUST DS
         if (discordantStarsMode) {
-            game.setDiscordantStarsMode(discordantStarsMode);
+            game.setDiscordantStarsMode(true);
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
             if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;

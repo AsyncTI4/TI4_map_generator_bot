@@ -15,8 +15,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
-import ti4.commands.tokens.AddCC;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
@@ -119,7 +119,7 @@ public class MoveUnits extends AddRemoveUnits {
             removeTacticsCC(event, color, tile, game);
         }
 
-        AddCC.addCC(event, color, tile, false);
+        CommandCounterHelper.addCC(event, color, tile, false);
         Helper.isCCCountCorrect(event, game, color);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
             addPlanetToPlayArea(event, tile, unitHolder_.getName(), game);
@@ -213,7 +213,7 @@ public class MoveUnits extends AddRemoveUnits {
                 if (cc == 0) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have CC in Tactics");
                     break;
-                } else if (!AddCC.hasCC(event, color, tile)) {
+                } else if (!CommandCounterHelper.hasCC(event, color, tile)) {
                     cc -= 1;
                     player.setTacticalCC(cc);
                     break;

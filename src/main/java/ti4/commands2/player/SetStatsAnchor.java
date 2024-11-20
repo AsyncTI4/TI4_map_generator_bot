@@ -5,12 +5,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.PositionMapper;
 import ti4.helpers.Constants;
+import ti4.image.PositionMapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SetStatsAnchor extends GameStateSubcommand {
+class SetStatsAnchor extends GameStateSubcommand {
 
     public SetStatsAnchor() {
         super(Constants.SET_STATS_ANCHOR, "Set the location your stats anchor appears on the map", true, true);

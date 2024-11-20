@@ -16,7 +16,6 @@ import ti4.commands.planet.PlanetAdd;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.commands2.player.TurnStart;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -32,6 +31,7 @@ import ti4.model.ExploreModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.turn.StartTurnService;
 
 public class ButtonHelperAbilities {
 
@@ -118,7 +118,7 @@ public class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game) || tile.isHomeSystem()
-                || ButtonHelper.isTileLegendary(tile, game) || tile.isMecatol()) {
+                || ButtonHelper.isTileLegendary(tile) || tile.isMecatol()) {
                 continue;
             }
             buttons.add(Buttons.green("rallyToTheCauseStep2_" + tile.getPosition(),
@@ -1109,7 +1109,7 @@ public class ButtonHelperAbilities {
                 + player.getTg() + "). This is technically an optional gain");
         pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 4);
-        List<Button> buttons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> buttons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         String message = "Use buttons to end turn or do another action";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
@@ -1210,7 +1210,7 @@ public class ButtonHelperAbilities {
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
 
-        List<Button> buttons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> buttons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         if ("destroyer".equals(unit)) {
             new AddUnits().unitParsing(event, player.getColor(), tile, "1 destroyer", game);
             successMessage = "Produced 1 " + Emojis.destroyer + " in tile "
@@ -1257,11 +1257,10 @@ public class ButtonHelperAbilities {
             for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
                 Tile tile2 = game.getTileByPosition(pos2);
                 for (Planet planetUnit2 : tile2.getPlanetUnitHolders()) {
-                    Planet planetReal2 = planetUnit2;
-                    String planet2 = planetReal2.getName();
+                    String planet2 = planetUnit2.getName();
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
                     if (!player.getPlanetsAllianceMode().contains(planet2) && !planetRepresentation2.contains("Mecatol")
-                        && (planetReal2.getUnits() == null || planetReal2.getUnits().isEmpty())
+                        && (planetUnit2.getUnits() == null || planetUnit2.getUnits().isEmpty())
                         && !planetsChecked.contains(planet2)) {
                         buttons.add(Buttons.green(finChecker + "peaceAccords_" + planet2, planetRepresentation2, Emojis.Xxcha));
                         planetsChecked.add(planet2);
@@ -1281,8 +1280,7 @@ public class ButtonHelperAbilities {
                 false)) {
                 Tile tile2 = game.getTileByPosition(pos2);
                 for (Planet planetUnit2 : tile2.getPlanetUnitHolders()) {
-                    Planet planetReal2 = planetUnit2;
-                    String planet2 = planetReal2.getName();
+                    String planet2 = planetUnit2.getName();
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
                     if (!planetsChecked.contains(planet2)) {
                         buttons.add(Buttons.green(finChecker + "contagion_" + planet2, planetRepresentation2, Emojis.Xxcha));
@@ -1291,8 +1289,7 @@ public class ButtonHelperAbilities {
                 }
             }
             for (Planet planetUnit2 : tile.getPlanetUnitHolders()) {
-                Planet planetReal2 = planetUnit2;
-                String planet2 = planetReal2.getName();
+                String planet2 = planetUnit2.getName();
                 String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
                 if (!planetsChecked.contains(planet2)) {
                     buttons.add(Buttons.green(finChecker + "contagion_" + planet2, planetRepresentation2, Emojis.Xxcha));

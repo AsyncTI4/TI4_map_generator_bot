@@ -6,6 +6,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.service.ShowGameService;
 
 class CommandGameStateHelper {
 
@@ -41,6 +42,7 @@ class CommandGameStateHelper {
     public void postExecute(SlashCommandInteractionEvent event) {
         if (saveGame) { // if gameLastModifiedDate.get() != game.get().getLastModifiedDate()
             GameSaveLoadManager.saveGame(game.get(), event);
+            ShowGameService.simpleShowGame(game.get(), event);
         }
         game.remove();
         player.remove();

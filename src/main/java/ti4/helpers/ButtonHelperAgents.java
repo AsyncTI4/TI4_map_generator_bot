@@ -19,11 +19,9 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.planet.PlanetExhaustAbility;
-import ti4.commands.tokens.AddCC;
-import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.commands2.player.TurnStart;
+import ti4.commands2.tokens.RemoveCC;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -43,6 +41,7 @@ import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.turn.StartTurnService;
 
 public class ButtonHelperAgents {
 
@@ -1076,7 +1075,7 @@ public class ButtonHelperAgents {
                     exhaustAgent("exhaustAgent_edynagent", event, game, edyn2);
                     game.setStoredValue("edynAgentPreset", "");
                     game.setStoredValue("edynAgentInAction", newActivePlayer.getFaction() + "_" + edyn2.getFaction() + "_" + upNextPlayer.getFaction());
-                    List<Button> buttons = TurnStart.getStartOfTurnButtons(newActivePlayer, game, true, event);
+                    List<Button> buttons = StartTurnService.getStartOfTurnButtons(newActivePlayer, game, true, event);
                     MessageHelper.sendMessageToChannel(newActivePlayer.getCorrectChannel(),
                         newActivePlayer.getRepresentationUnfogged()
                             + " you may take 1 action now due to " + (edyn.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
@@ -1209,7 +1208,7 @@ public class ButtonHelperAgents {
         List<String> adjTiles = new ArrayList<>(FoWHelper.getAdjacentTiles(game, origTile.getPosition(), player, false));
         for (String posTile : adjTiles) {
             Tile adjTile = game.getTileByPosition(posTile);
-            if (adjTile != null && doesTileHaveAStructureInIt(player, adjTile) && !AddCC.hasCC(player, adjTile)) {
+            if (adjTile != null && doesTileHaveAStructureInIt(player, adjTile) && !CommandCounterHelper.hasCC(player, adjTile)) {
                 tiles.add(adjTile);
             }
         }
@@ -1319,8 +1318,7 @@ public class ButtonHelperAgents {
     @ButtonHandler("refreshWithOlradinAgent_")
     public static void resolveRefreshWithOlradinAgent(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planetName = buttonID.split("_")[1];
-        Player p2 = player;
-        PlanetService.refreshPlanet(p2, planetName);
+        PlanetService.refreshPlanet(player, planetName);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " readied " + Helper.getPlanetRepresentation(planetName, game)
                 + " with " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Baggil Wildpaw, the Olradin" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
@@ -1427,7 +1425,7 @@ public class ButtonHelperAgents {
     public static void resolveCheiranAgentStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile origTile = game.getTileByPosition(pos);
-        AddCC.addCC(event, player.getColor(), origTile, true);
+        CommandCounterHelper.addCC(event, player.getColor(), origTile, true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " placed 1 CC in "
                 + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras, the Cheiran"
@@ -1438,7 +1436,7 @@ public class ButtonHelperAgents {
     public static List<Tile> getCheiranAgentTiles(Player player, Game game) {
         List<Tile> tiles = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (AddCC.hasCC(player, tile)) {
+            if (CommandCounterHelper.hasCC(player, tile)) {
                 if (!getAdjacentTilesWithStructuresInThemAndNoCC(player, game, tile).isEmpty()) {
                     tiles.add(tile);
                 }
@@ -1525,7 +1523,6 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(zealots.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
             return;
         }
-        List<Tile> tiles = new ArrayList<>();
         List<Button> buttons = new ArrayList<>();
 
         for (String planet : player.getPlanetsAllianceMode()) {
@@ -1534,10 +1531,8 @@ public class ButtonHelperAgents {
             }
             Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             Tile tile = game.getTileFromPlanet(p.getName());
-            if (tile != null && !tiles.contains(tile)
-                && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
-                && ButtonHelper.checkForTechSkips(game, planet)
-                || tile.isHomeSystem()) {
+            if (tile != null && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game) && ButtonHelper.checkForTechSkips(game, planet)
+                    || tile.isHomeSystem()) {
                 buttons.add(Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_ZealotsAgent",
                     tile.getRepresentationForButtons(game, player)));
             }
@@ -1620,16 +1615,15 @@ public class ButtonHelperAgents {
         }
         String msg = player.getFactionEmojiOrColor() + " replenished commodities due to " + (kyro.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Tox, the Kyro" + (kyro.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
-        Player p2 = player;
-        p2.setCommodities(p2.getCommoditiesTotal());
-        ButtonHelper.resolveMinisterOfCommerceCheck(game, p2, event);
-        cabalAgentInitiation(game, p2);
+        player.setCommodities(player.getCommoditiesTotal());
+        ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
+        cabalAgentInitiation(game, player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFowMode() && kyro != player) {
             MessageHelper.sendMessageToChannel(kyro.getCorrectChannel(), msg);
         }
 
-        int infAmount = p2.getCommoditiesTotal() - 1;
+        int infAmount = player.getCommoditiesTotal() - 1;
         List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, infAmount + "gf", "placeOneNDone_skipbuild"));
         String message = kyro.getRepresentationUnfogged() + "Use buttons to drop " + infAmount + " infantry on a planet";
         MessageHelper.sendMessageToChannelWithButtons(kyro.getCorrectChannel(), message, buttons);
@@ -1732,7 +1726,7 @@ public class ButtonHelperAgents {
             + " use buttons to select the system you want to move ships from";
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (FoWHelper.playerHasShipsInSystem(player, tile) && !AddCC.hasCC(player, tile)) {
+            if (FoWHelper.playerHasShipsInSystem(player, tile) && !CommandCounterHelper.hasCC(player, tile)) {
                 buttons.add(Buttons.green("fogAllianceAgentStep2_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
             }

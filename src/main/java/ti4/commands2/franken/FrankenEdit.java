@@ -12,7 +12,6 @@ import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.franken.FrankenDraftBagService;
@@ -58,7 +57,6 @@ class FrankenEdit extends GameStateSubcommand {
 
         if ("forceSwap".equals(command)) {
             FrankenDraftBagService.passBags(game);
-            GameSaveLoadManager.saveGame(game, event);
             return;
         }
 
@@ -102,8 +100,6 @@ class FrankenEdit extends GameStateSubcommand {
 
             dmPlayerBag(game, editingPlayer, editingBag, bagName, event.getUser());
         }
-
-        GameSaveLoadManager.saveGame(game, event);
     }
 
     private void dmPlayerBag(Game game, Player player, DraftBag bag, String bagName, User user) {

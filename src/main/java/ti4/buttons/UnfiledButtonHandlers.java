@@ -29,13 +29,8 @@ import ti4.commands.game.StartPhase;
 import ti4.commands.game.Swap;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
-import ti4.commands2.player.Pass;
-import ti4.commands2.player.SCPlay;
-import ti4.commands2.player.TurnEnd;
-import ti4.commands2.player.TurnStart;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -50,6 +45,7 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CombatTempModHelper;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -88,6 +84,10 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
+import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.turn.EndTurnService;
+import ti4.service.turn.PassService;
+import ti4.service.turn.StartTurnService;
 
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
@@ -543,7 +543,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("finishComponentAction_")
     public static void finishComponentAction(ButtonInteractionEvent event, Player player, Game game) {
         String message = "Use buttons to end turn or do another action.";
-        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         ButtonHelper.deleteMessage(event);
@@ -697,13 +697,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
         }
         if (whatIsItFor.contains("tech") && player.hasAbility("ancient_knowledge")) {
-            String planet = planetName;
-            if ((Mapper.getPlanet(planet).getTechSpecialties() != null
-                && !Mapper.getPlanet(planet).getTechSpecialties().isEmpty())
-                || ButtonHelper.checkForTechSkips(game, planet)) {
+            if ((Mapper.getPlanet(planetName).getTechSpecialties() != null
+                && !Mapper.getPlanet(planetName).getTechSpecialties().isEmpty())
+                || ButtonHelper.checkForTechSkips(game, planetName)) {
                 String msg = player.getRepresentation()
                     + " due to your ancient knowledge ability, you may be eligible to receive a tech here if you exhausted this planet ("
-                    + planet
+                    + planetName
                     + ") for its tech skip";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.blue("gain_1_comms", "Gain 1 Commodity", Emojis.comm));
@@ -858,7 +857,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     // @ButtonHandler("strategicAction_")
     public static void strategicAction(ButtonInteractionEvent event, Player player, String buttonID, Game game, MessageChannel mainGameChannel) {
         int scNum = Integer.parseInt(buttonID.replace("strategicAction_", ""));
-        SCPlay.playSC(event, scNum, game, mainGameChannel, player);
+        PlayStrategyCardService.playSC(event, scNum, game, mainGameChannel, player);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -955,11 +954,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void cancelSpaceHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        Player opponent = player;
-        String msg = "\n" + opponent.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
+        String msg = "\n" + player.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
-        String finChecker = "FFCC_" + opponent.getFaction() + "_";
+        String finChecker = "FFCC_" + player.getFaction() + "_";
         buttons.add(Buttons.green(finChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
             "Auto-assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(
@@ -1424,7 +1422,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                         "mech", "placeOneNDone_skipbuild"));
                     buttons.add(Buttons.red("deleteButtons", "Decline to drop Mech"));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message3, buttons);
-                    List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+                    List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 }
                 if (drawReplacement) {
@@ -1764,7 +1762,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
                 String message = player.getRepresentationUnfogged()
                     + " Use buttons to end turn or do another action.";
-                List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+                List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message, systemButtons);
                 player.resetOlradinPolicyFlags();
@@ -2031,7 +2029,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         String color = player.getColor();
         if (Mapper.isValidColor(color)) {
-            AddCC.addCC(event, color, tile);
+            CommandCounterHelper.addCC(event, color, tile);
         }
         String message = player.getFactionEmojiOrColor() + " Placed 1 CC from reinforcements in the " + Helper.getPlanetRepresentation(planet, game) + " system";
         ButtonHelper.sendMessageToRightStratThread(player, game, message, "construction");
@@ -2058,7 +2056,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
 
         if (Mapper.isValidColor(color)) {
-            AddCC.addCC(event, color, tile);
+            CommandCounterHelper.addCC(event, color, tile);
         }
         String message = player.getRepresentation() + " Placed 1 " + StringUtils.capitalize(color) + " CC In The "
             + Helper.getPlanetRepresentation(planet, game)
@@ -2150,7 +2148,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("finishComponentAction")
     public static void doAnotherAction(ButtonInteractionEvent event, Player player, Game game) {
         String message = "Use buttons to end turn or do another action.";
-        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         ButtonHelper.deleteMessage(event);
     }
@@ -2238,7 +2236,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         if (!game.isNaaluAgent()) {
             player.setTacticalCC(player.getTacticalCC() - 1);
-            AddCC.addCC(event, player.getColor(),
+            CommandCounterHelper.addCC(event, player.getColor(),
                 game.getTileByPosition(game.getActiveSystem()));
             game.setStoredValue("vaylerianHeroActive", "true");
         }
@@ -2330,7 +2328,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("scoreAnObjective")
     public static void scoreAnObjective(ButtonInteractionEvent event, Player player, Game game) {
-        List<Button> poButtons = TurnEnd.getScoreObjectiveButtons(game, player.getFinsFactionCheckerPrefix());
+        List<Button> poButtons = EndTurnService.getScoreObjectiveButtons(game, player.getFinsFactionCheckerPrefix());
         poButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         MessageChannel channel = event.getMessageChannel();
         if (game.isFowMode()) {
@@ -3127,7 +3125,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("passForRound")
     public static void passForRound(ButtonInteractionEvent event, Player player, Game game) {
-        Pass.passPlayerForRound(event, game, player);
+        PassService.passPlayerForRound(event, game, player);
         ButtonHelper.deleteMessage(event);
     }
 

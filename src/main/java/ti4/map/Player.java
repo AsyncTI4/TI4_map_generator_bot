@@ -40,8 +40,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands2.player.TurnEnd;
-import ti4.commands2.player.TurnStart;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.helpers.AliasHandler;
@@ -72,6 +70,8 @@ import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.turn.EndTurnService;
+import ti4.service.turn.StartTurnService;
 import ti4.users.UserSettingsManager;
 
 public class Player {
@@ -476,11 +476,12 @@ public class Player {
         mahactCC.remove(cc);
     }
 
+    @Nullable
     public String getRoleIDForCommunity() {
         return roleIDForCommunity;
     }
 
-    public void setRoleIDForCommunity(String roleIDForCommunity) {
+    public void setRoleIDForCommunity(@Nullable String roleIDForCommunity) {
         this.roleIDForCommunity = roleIDForCommunity;
     }
 
@@ -495,11 +496,12 @@ public class Player {
         return null;
     }
 
+    @Nullable
     public String getPrivateChannelID() {
         return privateChannelID;
     }
 
-    public void setPrivateChannelID(String privateChannelID) {
+    public void setPrivateChannelID(@Nullable String privateChannelID) {
         this.privateChannelID = privateChannelID;
     }
 
@@ -515,10 +517,12 @@ public class Player {
 
     }
 
+    @Nullable
     public String getCardsInfoThreadID() {
         return cardsInfoThreadID;
     }
 
+    @Nullable
     public String getBagInfoThreadID() {
         return bagInfoThreadID;
     }
@@ -574,11 +578,11 @@ public class Player {
         return false;
     }
 
-    public void setCardsInfoThreadID(String cardsInfoThreadID) {
+    public void setCardsInfoThreadID(@Nullable String cardsInfoThreadID) {
         this.cardsInfoThreadID = cardsInfoThreadID;
     }
 
-    public void setBagInfoThreadID(String bagInfoThreadID) {
+    public void setBagInfoThreadID(@Nullable String bagInfoThreadID) {
         this.bagInfoThreadID = bagInfoThreadID;
     }
 
@@ -2013,7 +2017,7 @@ public class Player {
                 }
                 game.setStoredValue("endTurnWhenSCFinished", "");
                 Player p2 = game.getActivePlayer();
-                TurnEnd.pingNextPlayer(event, game, p2);
+                EndTurnService.pingNextPlayer(event, game, p2);
                 if (!game.isFowMode()) {
                     ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round "
                         + game.getRound() + " for " + p2.getFactionEmoji());
@@ -2029,7 +2033,7 @@ public class Player {
                 game.setStoredValue("fleetLogWhenSCFinished", "");
                 Player p2 = game.getActivePlayer();
                 String message = p2.getRepresentation() + " Use buttons to end turn or do another action.";
-                List<Button> systemButtons = TurnStart.getStartOfTurnButtons(p2, game, true, event);
+                List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(p2, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, systemButtons);
             }
         }
@@ -2911,7 +2915,7 @@ public class Player {
     public float getTotalResourceValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkValuesOfUnits(this, getGame(), tile, type);
+            count = count + ButtonHelper.checkValuesOfUnits(this, tile, type);
         }
         return count;
     }
@@ -2920,7 +2924,7 @@ public class Player {
     public int getTotalHPValueOfUnits(String type) {
         int count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkHPOfUnits(this, getGame(), tile, type);
+            count = count + ButtonHelper.checkHPOfUnits(this, tile, type);
         }
         return count;
     }
@@ -2929,7 +2933,7 @@ public class Player {
     public float getTotalCombatValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkCombatValuesOfUnits(this, getGame(), tile, type);
+            count = count + ButtonHelper.checkCombatValuesOfUnits(this, tile, type);
         }
         return Math.round(count * 10) / (float) 10.0;
     }

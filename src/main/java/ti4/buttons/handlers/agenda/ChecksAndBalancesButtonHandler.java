@@ -12,12 +12,12 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.game.StartPhase;
-import ti4.commands2.player.Stats;
 import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.player.PlayerStatsService;
 
 @UtilityClass
 class ChecksAndBalancesButtonHandler {
@@ -29,7 +29,7 @@ class ChecksAndBalancesButtonHandler {
         String factionPicked = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(factionPicked);
 
-        Stats.secondHalfOfPickSC(event, game, p2, scpick);
+        PlayerStatsService.secondHalfOfPickSC(event, game, p2, scpick);
 
         String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scpick, game)
             + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");

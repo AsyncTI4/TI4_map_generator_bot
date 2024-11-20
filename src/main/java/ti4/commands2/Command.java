@@ -13,9 +13,7 @@ public interface Command extends ti4.commands.Command {
 
     void execute(SlashCommandInteractionEvent event);
 
-    default void postExecute(SlashCommandInteractionEvent event) {
-        event.getHook().deleteOriginal().submit();
-    }
+    default void postExecute(SlashCommandInteractionEvent event) {}
 
     String getName();
 }

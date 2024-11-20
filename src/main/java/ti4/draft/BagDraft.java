@@ -106,23 +106,6 @@ public abstract class BagDraft {
         player.setReadyToPassBag(ready);
     }
 
-    public String getShortBagRepresentation(DraftBag bag) {
-        StringBuilder sb = new StringBuilder();
-        for (DraftItem.Category cat : DraftItem.Category.values()) {
-            sb.append("### ").append(cat.toString()).append(" (");
-            sb.append(bag.getCategoryCount(cat)).append("/").append(getItemLimitForCategory(cat));
-            sb.append("):\n");
-            for (DraftItem item : bag.Contents) {
-                if (item.ItemCategory != cat) {
-                    continue;
-                }
-                sb.append(" - ").append(item.getItemEmoji()).append(item.getShortDescription()).append("\n");
-            }
-        }
-        sb.append("**Total Cards: ").append(bag.Contents.size()).append("**\n");
-        return sb.toString();
-    }
-
     public String getLongBagRepresentation(DraftBag bag) {
         StringBuilder sb = new StringBuilder();
         for (DraftItem.Category cat : DraftItem.Category.values()) {

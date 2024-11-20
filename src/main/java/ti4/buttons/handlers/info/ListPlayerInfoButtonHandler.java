@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands2.player.Stats;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -19,6 +18,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.UnitInfoService;
+import ti4.service.player.PlayerStatsService;
 
 @UtilityClass
 class ListPlayerInfoButtonHandler {
@@ -77,7 +77,7 @@ class ListPlayerInfoButtonHandler {
             }
             switch (category) {
                 case "allFaction" -> {
-                    sb.append(new Stats().getPlayersCurrentStatsText(p2, game));
+                    sb.append(PlayerStatsService.getPlayersCurrentStatsText(p2, game));
                     for (String ability : p2.getAbilities()) {
                         messageEmbeds.add(Mapper.getAbility(ability).getRepresentationEmbed());
                     }
@@ -112,7 +112,7 @@ class ListPlayerInfoButtonHandler {
                         messageEmbeds.add(Mapper.getAbility(ability).getRepresentationEmbed());
                     }
                 }
-                case "stats" -> sb.append(new Stats().getPlayersCurrentStatsText(p2, game));
+                case "stats" -> sb.append(PlayerStatsService.getPlayersCurrentStatsText(p2, game));
                 case "relic" -> {
                     for (String relic : p2.getRelics()) {
                         messageEmbeds.add(Mapper.getRelic(relic).getRepresentationEmbed());

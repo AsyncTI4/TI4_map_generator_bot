@@ -1,11 +1,11 @@
 package ti4.commands2.uncategorized;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateCommand;
 import ti4.helpers.AliasHandler;
@@ -36,6 +36,13 @@ public class ShowDistances extends GameStateCommand {
     }
 
     @Override
+    public List<OptionData> getOptions() {
+        return List.of(
+            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true),
+            new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check"));
+    }
+
+    @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return super.accept(event) &&
             CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
@@ -62,13 +69,5 @@ public class ShowDistances extends GameStateCommand {
 
         MapRenderPipeline.render(game, event, DisplayType.map,
                 fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
-    }
-
-    @Override
-    public void register(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getName(), "Shows map with distances to each tile from specified tile")
-                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check")));
     }
 }
