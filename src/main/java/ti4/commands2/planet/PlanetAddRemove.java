@@ -1,4 +1,4 @@
-package ti4.commands.planet;
+package ti4.commands2.planet;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

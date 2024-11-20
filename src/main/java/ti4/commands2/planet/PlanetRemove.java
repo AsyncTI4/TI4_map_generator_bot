@@ -1,4 +1,4 @@
-package ti4.commands.planet;
+package ti4.commands2.planet;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Constants;

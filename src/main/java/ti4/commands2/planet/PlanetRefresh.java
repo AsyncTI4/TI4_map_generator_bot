@@ -1,18 +1,19 @@
-package ti4.commands.planet;
+package ti4.commands2.planet;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.service.PlanetService;
 
-public class PlanetRefreshAbility extends PlanetAddRemove {
+public class PlanetRefresh extends PlanetAddRemove {
 
-    public PlanetRefreshAbility() {
-        super(Constants.PLANET_REFRESH_ABILITY, "Ready Planet Ability");
+    public PlanetRefresh() {
+        super(Constants.PLANET_REFRESH, "Ready Planet");
     }
 
     @Override
     public void doAction(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
-        player.refreshPlanetAbility(planet);
+        PlanetService.refreshPlanet(player, planet);
     }
 }
