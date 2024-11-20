@@ -1,7 +1,6 @@
 package ti4.commands2;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.message.MessageHelper;
 
 //TODO REMOVE EXTENSION WHEN READY
 public interface Command extends ti4.commands.Command {
@@ -14,10 +13,7 @@ public interface Command extends ti4.commands.Command {
 
     void execute(SlashCommandInteractionEvent event);
 
-    default void postExecute(SlashCommandInteractionEvent event) {
-        MessageHelper.replyToMessage(event, getName() + " executed.");
-        event.getHook().deleteOriginal().queue();
-    }
+    default void postExecute(SlashCommandInteractionEvent event) {}
 
     String getName();
 }
