@@ -17,7 +17,7 @@ import ti4.model.ExploreModel;
 class ExploreLookAtTop extends GameStateSubcommand {
 
     public ExploreLookAtTop() {
-        super(Constants.LOOK_AT_TOP, "Look at the top card of an explore deck. Sends to Cards Info thread.", true, true);
+        super(Constants.LOOK_AT_TOP, "Look at the top card of an explore deck. Sends to Cards Info thread.", false, true);
         new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true).setRequired(true);
     }
 
