@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.map.AddTile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.RegexHelper;
 import ti4.image.PositionMapper;
@@ -22,6 +21,7 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.TileModel;
+import ti4.service.map.AddTileService;
 
 // Jazz's Interactive Map Builder
 public class JimboHandlers {
@@ -143,7 +143,7 @@ public class JimboHandlers {
         } else if ((matcher = Pattern.compile(regexPt4).matcher(buttonID)).matches()) {
             TileModel model = TileHelper.getTileById(matcher.group("tileID"));
             String pos = matcher.group("pos");
-            AddTile.addTile(game, new Tile(model.getAlias(), pos));
+            AddTileService.addTile(game, new Tile(model.getAlias(), pos));
 
             String msg = model.getName() + " (" + model.getAlias() + ") has been placed in location " + pos + ".";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);

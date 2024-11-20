@@ -9,7 +9,6 @@ import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.TileHelper;
@@ -18,7 +17,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.service.ShowGameService;
 
 class MoveAllUnits extends GameStateSubcommand {
 
@@ -71,7 +69,5 @@ class MoveAllUnits extends GameStateSubcommand {
             }
             Helper.isCCCountCorrect(event, game, player.getColor());
         }
-
-        ShowGameService.simpleShowGame(game, event, DisplayType.map);
     }
 }

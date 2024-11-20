@@ -1,37 +1,24 @@
-package ti4.commands.map;
+package ti4.service.map;
 
 import java.util.List;
 
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class Preset extends MapSubcommandData {
-    public Preset() {
-        super(Constants.PRESET, "Create a map from a template");
-        addOption(OptionType.STRING, Constants.MAP_TEMPLATE, "Which map template do you want to use", true, true);
-        addOption(OptionType.STRING, Constants.SLICE_1, "Player 1's milty draft slice", false);
-        addOption(OptionType.STRING, Constants.SLICE_2, "Player 2's slice", false);
-        addOption(OptionType.STRING, Constants.SLICE_3, "Player 3's slice", false);
-        addOption(OptionType.STRING, Constants.SLICE_4, "Player 4's slice", false);
-        addOption(OptionType.STRING, Constants.SLICE_5, "Player 5's slice", false);
-        addOption(OptionType.STRING, Constants.SLICE_6, "Player 6's slice", false);
-        //addOption(OptionType.STRING, Constants.SLICE_7, "Player 7's slice", false);
-        //addOption(OptionType.STRING, Constants.SLICE_8, "Player 8's slice", false);
-    }
+@UtilityClass
+public class MapPresetService {
 
-    public static final List<String> templates = List.of("Solo (1 slice)", "Minimal Solo (1 slice)", "TspMap (6 slices)", "Magi's Madness (0 slices)");
+    public static List<String> templates = List.of(
+        "Solo (1 slice)",
+        "Minimal Solo (1 slice)",
+        "TspMap (6 slices)",
+        "Magi's Madness (0 slices)");
 
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-
-        OptionMapping template = event.getOption(Constants.MAP_TEMPLATE);
-        if (template == null) return;
-
-        Game game = getActiveGame();
+    public void build(SlashCommandInteractionEvent event, Game game, String template) {
         String slice1 = event.getOption(Constants.SLICE_1, null, OptionMapping::getAsString);
         String slice2 = event.getOption(Constants.SLICE_2, null, OptionMapping::getAsString);
         String slice3 = event.getOption(Constants.SLICE_3, null, OptionMapping::getAsString);
@@ -56,7 +43,7 @@ public class Preset extends MapSubcommandData {
         String ph = "-1"; //placeholder string. Either will never exist or will be a hyperlane added later
         String home = "0g"; //Home system placeholder
         String error = "Not enough slices for selected preset, or slices are improperly formatted";
-        switch (template.getAsString()) {
+        switch (template) {
             case "Solo (1 slice)" -> {
                 if (s1 == null) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
@@ -66,7 +53,7 @@ public class Preset extends MapSubcommandData {
                     "85a3", "84a0", "85a4", "84a1", "85a5", "87a5", s1[1], s1[3], "85a1", "84a4", "85a2", "84a5", //ring 2
                     "85a3", "84a0", "84a0", "85a4", "84a1", "84a1", "85a5", "84a2", s1[2], home, s1[0], "84a3", "85a1", "84a4", "84a4", "85a2", "84a5", "84a5");//ring 3
                 String mapString = String.join(" ", tiles);
-                AddTileList.addTileListToMap(game, mapString, event);
+                AddTileListService.addTileListToMap(game, mapString, event);
             }
             case "Minimal Solo (1 slice)" -> {
                 if (s1 == null) {
@@ -77,7 +64,7 @@ public class Preset extends MapSubcommandData {
                     "18", "84a1", "84a1", s1[1], s1[3], "90b", // ring 1
                     "85a3", "85a4", ph, ph, ph, s1[2], home, s1[0], "85a1", "85a2", ph, "85a2"); // ring 3
                 String mapString = String.join(" ", tiles);
-                AddTileList.addTileListToMap(game, mapString, event);
+                AddTileListService.addTileListToMap(game, mapString, event);
             }
             case "TspMap (6 slices)" -> {
                 if (s1 == null || s2 == null || s3 == null || s4 == null || s5 == null || s6 == null) {
@@ -92,16 +79,16 @@ public class Preset extends MapSubcommandData {
                 // 29,27,41,62,43
                 // left, fwd, right, equi, mecatol
                 String mapString = String.join(" ", tiles);
-                AddTileList.addTileListToMap(game, mapString, event);
+                AddTileListService.addTileListToMap(game, mapString, event);
 
                 // finish adding hyperlanes and adjacencies
-                InitTspmap.addTspmapHyperlanes(game);
-                InitTspmap.addTspmapEdgeAdjacencies(game);
+                TeaspoonMapService.addTspmapHyperlanes(game);
+                TeaspoonMapService.addTspmapEdgeAdjacencies(game);
             }
             case "Magi's Madness (0 slices)" -> {
                 String mapString = "{85A2} 70 84A5 0g 83A2 69 0g 62 42 90B1 36 27 34 65 68 46 76 74 75 0g 88B2 26 44 37 66 25 43 48 19 18 78"
                     + " 35 61 79 49 64 45 29 80 50 67 33 0g 22 87B3 86A5 73 0g 38 77 39 40 41 59 0g 47 72 24 0g 28 91B1";
-                AddTileList.addTileListToMap(game, mapString, event);
+                AddTileListService.addTileListToMap(game, mapString, event);
             }
         }
     }
