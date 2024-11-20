@@ -12,7 +12,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.units.AddUnits;
-import ti4.commands2.tokens.RemoveCC;
+import ti4.commands2.tokens.RemoveCCCommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
@@ -148,7 +148,7 @@ public class PlayerTechService {
                     String ident = player.getFactionEmoji();
                     String msg = ident + " removed CC from " + tileRep;
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                    RemoveCC.removeCC(event, player.getColor(), tile, game);
+                    RemoveCCCommand.removeCC(event, player.getColor(), tile, game);
                 }
             }
             case "td", "absol_td" -> { // Transit Diodes

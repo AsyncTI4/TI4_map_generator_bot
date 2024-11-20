@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 
 import ti4.commands.capture.CaptureCommand;
 import ti4.commands.game.GameCommand;
-import ti4.commands.planet.PlanetCommand;
 import ti4.commands.units.AddUnitDamage;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.ModifyUnits;
@@ -36,6 +35,7 @@ import ti4.commands2.installation.InstallationCommand;
 import ti4.commands2.leaders.LeaderCommand;
 import ti4.commands2.map.MapCommand;
 import ti4.commands2.milty.MiltyCommand;
+import ti4.commands2.planet.PlanetCommand;
 import ti4.commands2.player.PlayerCommand;
 import ti4.commands2.relic.RelicCommand;
 import ti4.commands2.search.SearchCommand;
@@ -44,17 +44,17 @@ import ti4.commands2.statistics.StatisticsCommand;
 import ti4.commands2.status.StatusCommand;
 import ti4.commands2.tech.TechCommand;
 import ti4.commands2.tigl.TIGLCommand;
-import ti4.commands2.tokens.AddCC;
-import ti4.commands2.tokens.AddFrontierTokens;
-import ti4.commands2.tokens.AddToken;
+import ti4.commands2.tokens.AddCCCommand;
+import ti4.commands2.tokens.AddFrontierTokensCommand;
+import ti4.commands2.tokens.AddTokenCommand;
 import ti4.commands2.tokens.RemoveAllCC;
-import ti4.commands2.tokens.RemoveCC;
-import ti4.commands2.tokens.RemoveToken;
-import ti4.commands2.uncategorized.AllInfo;
-import ti4.commands2.uncategorized.CardsInfo;
-import ti4.commands2.uncategorized.SelectionBoxDemo;
-import ti4.commands2.uncategorized.ShowDistances;
-import ti4.commands2.uncategorized.ShowGame;
+import ti4.commands2.tokens.RemoveCCCommand;
+import ti4.commands2.tokens.RemoveTokenCommand;
+import ti4.commands2.uncategorized.AllInfoCommand;
+import ti4.commands2.uncategorized.CardsInfoCommand;
+import ti4.commands2.uncategorized.SelectionBoxDemoCommand;
+import ti4.commands2.uncategorized.ShowDistancesCommand;
+import ti4.commands2.uncategorized.ShowGameCommand;
 import ti4.commands2.user.UserCommand;
 
 public class CommandManager {
@@ -63,18 +63,18 @@ public class CommandManager {
         new AddUnits(),
         new RemoveUnits(),
         new RemoveAllUnits(),
-        new AllInfo(),
-        new CardsInfo(),
-        new ShowGame(),
-        new ShowDistances(),
-        new AddCC(),
-        new RemoveCC(),
+        new AllInfoCommand(),
+        new CardsInfoCommand(),
+        new ShowGameCommand(),
+        new ShowDistancesCommand(),
+        new AddCCCommand(),
+        new RemoveCCCommand(),
         new RemoveAllCC(),
-        new AddFrontierTokens(),
+        new AddFrontierTokensCommand(),
         new MoveUnits(),
         new ModifyUnits(),
-        new RemoveToken(),
-        new AddToken(),
+        new RemoveTokenCommand(),
+        new AddTokenCommand(),
         new AddUnitDamage(),
         new RemoveUnitDamage(),
         new RemoveAllUnitDamage(),
@@ -112,7 +112,7 @@ public class CommandManager {
         new StatisticsCommand(),
         new TechCommand(),
         new PlanetCommand(),
-        new SelectionBoxDemo(),
+        new SelectionBoxDemoCommand(),
         new UserCommand(),
         new TIGLCommand()
     ).collect(Collectors.toMap(Command::getName, command -> command));

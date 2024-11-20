@@ -16,7 +16,7 @@ import ti4.commands2.ParentCommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ServerPromote implements ParentCommand {
+public class ServerPromoteCommand implements ParentCommand {
 
     public static final String DEV_CHANNEL = "947520255826198549";
     public static final Map<String, String> Servers = new HashMap<>() {

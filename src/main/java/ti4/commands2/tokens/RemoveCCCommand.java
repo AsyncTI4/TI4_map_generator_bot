@@ -15,7 +15,7 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-public class RemoveCC extends AddRemoveToken {
+public class RemoveCCCommand extends AddRemoveTokenCommand {
 
     @Override
     public List<OptionData> getOptions() {

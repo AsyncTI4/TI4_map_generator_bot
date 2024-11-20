@@ -53,13 +53,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
-import ti4.commands.planet.PlanetAdd;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.CommandHelper;
-import ti4.commands2.tokens.AddToken;
-import ti4.commands2.tokens.RemoveCC;
+import ti4.commands2.tokens.AddTokenCommand;
+import ti4.commands2.tokens.RemoveCCCommand;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -100,6 +99,7 @@ import ti4.service.decks.ShowActionCardsService;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyService;
+import ti4.service.planet.AddPlanetService;
 import ti4.service.tech.ShowTechDeckService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
@@ -477,7 +477,7 @@ public class ButtonHelper {
                 "Could not resolve second player, please resolve manually.");
             return;
         }
-        PlanetAdd.doAction(p2, dmzPlanet, game, event, true);
+        AddPlanetService.addPlanet(p2, dmzPlanet, game, event, true);
         if (!"exhausted".equalsIgnoreCase(exhausted)) {
             p2.refreshPlanet(dmzPlanet);
         }
@@ -515,7 +515,7 @@ public class ButtonHelper {
                 "Could not resolve second player, please resolve manually.");
             return;
         }
-        PlanetAdd.doAction(p2, dmzPlanet, game, event, false);
+        AddPlanetService.addPlanet(p2, dmzPlanet, game, event, false);
         List<Button> goAgainButtons = new ArrayList<>();
         Button button = Buttons.gray("transactWith_" + p2.getColor(), "Send something else to player?");
         Button done = Buttons.gray("finishTransaction_" + p2.getColor(), "Done With This Transaction");
@@ -1942,7 +1942,7 @@ public class ButtonHelper {
                 + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         }
 
-        RemoveCC.removeCC(event, player.getColor(), tile, game);
+        RemoveCCCommand.removeCC(event, player.getColor(), tile, game);
 
         String finChecker = "FFCC_" + player.getFaction() + "_";
         if ("mahactCommander".equalsIgnoreCase(whatIsItFor)) {
@@ -2825,7 +2825,7 @@ public class ButtonHelper {
     public static void resolveEchoPlaceFrontier(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
-        AddToken.addToken(event, tile, Constants.FRONTIER, game);
+        AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " placed a frontier token in "
             + tile.getRepresentationForButtons(game, player));
         deleteMessage(event);
@@ -3009,7 +3009,7 @@ public class ButtonHelper {
         Tile tile = new Tile(newTileID, pos);
         game.setTile(tile);
         if (tile.getPlanetUnitHolders().isEmpty()) {
-            AddToken.addToken(event, tile, Constants.FRONTIER, game);
+            AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " added the tile " + tile.getRepresentationForButtons(game, player));
@@ -3069,7 +3069,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " added the tile " + tile.getRepresentationForButtons(game, player));
             if (tile.getPlanetUnitHolders().isEmpty()) {
-                AddToken.addToken(event, tile, Constants.FRONTIER, game);
+                AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
             }
         }
     }
@@ -3093,7 +3093,7 @@ public class ButtonHelper {
 
             Tile tile = game.getTileByPosition(pos);
             if (planet == null) {
-                AddToken.addToken(event, tile, token, game);
+                AddTokenCommand.addToken(event, tile, token, game);
             } else {
                 tile.addToken(token, planet);
             }
@@ -3653,7 +3653,7 @@ public class ButtonHelper {
                 if (game.isFowMode()) {
                     channel = p2.getPrivateChannel();
                 }
-                RemoveCC.removeCC(event, p2.getColor(), tile, game);
+                RemoveCCCommand.removeCC(event, p2.getColor(), tile, game);
                 String message = p2.getRepresentationUnfogged()
                     + " due to having Xuange, the Empyrean commander, the CC you had in the active system has been removed. Reminder that this is optional but was done automatically.";
                 MessageHelper.sendMessageToChannel(channel, message);

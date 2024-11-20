@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands.Command;
-import ti4.commands.planet.PlanetAdd;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -37,6 +36,7 @@ import ti4.service.PlanetService;
 import ti4.service.ShowGameService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.AddPlanetService;
 
 abstract public class AddRemoveUnits implements Command {
 
@@ -308,7 +308,7 @@ abstract public class AddRemoveUnits implements Command {
                             String colorID = Mapper.getColorID(player.getColor());
                             if (unitColor.equals(colorID)) {
                                 if (!player.getPlanetsAllianceMode().contains(planetName)) {
-                                    PlanetAdd.doAction(player, planetName, game, event, false);
+                                    AddPlanetService.addPlanet(player, planetName, game, event, false);
                                 }
                                 break;
                             }

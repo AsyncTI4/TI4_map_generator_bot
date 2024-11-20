@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.commands2.ParentCommand;
 import ti4.selections.selectmenus.BigSelectDemo;
 
-public class SelectionBoxDemo implements ParentCommand {
+public class SelectionBoxDemoCommand implements ParentCommand {
 
     @Override
     public String getName() {

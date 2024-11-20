@@ -30,7 +30,7 @@ public class DeveloperCommand implements ParentCommand {
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return ParentCommand.super.accept(event) &&
-                CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.developerRoles);
+            CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.developerRoles);
     }
 
     @Override

@@ -1,8 +1,9 @@
-package ti4.commands.planet;
+package ti4.service.planet;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -26,21 +27,14 @@ import ti4.model.PlanetModel;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 
-public class PlanetAdd extends PlanetAddRemove {
-    public PlanetAdd() {
-        super(Constants.PLANET_ADD, "Add or transfer a planet card to your player area");
+@UtilityClass
+public class AddPlanetService {
+
+    public static void addPlanet(Player player, String planet, Game game) {
+        addPlanet(player, planet, game, null, false);
     }
 
-    @Override
-    public void doAction(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
-        doAction(player, planet, game, event, false);
-    }
-
-    public static void doAction(Player player, String planet, Game game) {
-        doAction(player, planet, game, null, false);
-    }
-
-    public static void doAction(Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
+    public static void addPlanet(Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
 

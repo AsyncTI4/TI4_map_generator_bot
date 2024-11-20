@@ -1,4 +1,4 @@
-package ti4.commands.planet;
+package ti4.commands2.planet;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -13,20 +13,21 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import ti4.commands2.CommandHelper;
-import ti4.image.Mapper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public abstract class PlanetAddRemove extends PlanetSubcommandData {
+abstract class PlanetAddRemove extends GameStateSubcommand {
+
     public PlanetAddRemove(String id, String description) {
-        super(id, description);
+        super(id, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET2, "2nd Planet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET3, "3rd Planet").setAutoComplete(true));
@@ -40,13 +41,6 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-
         List<OptionMapping> planetOptions = new ArrayList<>();
         planetOptions.add(event.getOption(Constants.PLANET));
         planetOptions.add(event.getOption(Constants.PLANET2));
@@ -57,10 +51,11 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
 
         Set<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(OptionMapping::getAsString).map(s -> AliasHandler.resolvePlanet(StringUtils.substringBefore(s, " (").replace(" ", ""))).toList());
 
+        Player player = getPlayer();
         MessageHelper.sendMessageToEventChannel(event, getActionHeaderMessage(player) + ":");
 
         for (String planetID : planetIDs) {
-            parseParameter(event, player, planetID, game);
+            parseParameter(event, player, planetID, getGame());
         }
     }
 
@@ -84,7 +79,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
                     return;
                 }
                 String planet = possiblePlanets.getFirst();
-                BotLogger.log(event, "`PlanetAddRemove.parseParameter - " + getActionID() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet);
+                BotLogger.log(event, "`PlanetAddRemove.parseParameter - " + getName() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet);
                 doAction(event, player, planet, game);
                 MessageHelper.sendMessageToEventChannel(event, "> " + resolvePlanetMessage(planet));
             }
@@ -96,12 +91,9 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
 
     public abstract void doAction(GenericInteractionCreateEvent event, Player player, String techID, Game game);
 
-    /**
-     * Customize the initial header response depending on ActionID (which /player planet_* action is used)
-     */
     private String getActionHeaderMessage(Player player) {
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" ");
-        return switch (getActionID()) {
+        return switch (getName()) {
             case Constants.PLANET_ADD -> message.append(" added planet(s):").toString();
             case Constants.PLANET_REMOVE -> message.append(" removed planet(s):").toString();
             case Constants.PLANET_EXHAUST -> message.append(" exhausted planet(s):").toString();
@@ -112,14 +104,8 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
         };
     }
 
-    /**
-     * Customize the message depending on ActionID and planet name
-     * 
-     * @return special message depending on which action was used and which planet was targeted
-     */
     private String resolvePlanetMessage(String planet) {
-        // System.out.println("resolving " + getActionID() + " message for " + planet);
-        if (getActionID().equals(Constants.PLANET_EXHAUST_ABILITY)) {
+        if (getName().equals(Constants.PLANET_EXHAUST_ABILITY)) {
             return switch (planet) {
                 case "hopesend" -> Emojis.HopesEnd + Emojis.LegendaryPlanet + " **Imperial Arms Vault**: You may exhaust this card at the end of your turn to place 1 mech from your reinforcements on any planet you control, or draw 1 action card";
                 case "primor" -> Emojis.Primor + Emojis.LegendaryPlanet + " **The Atrament**: You may exhaust this card at the end of your turn to place up to 2 infantry from your reinforcements on any planet you control";
@@ -127,7 +113,8 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
                 case "mirage" -> Emojis.LegendaryPlanet + " **Mirage Flight Academy**: You may exhaust this card at the end of your turn to place up to 2 fighters from your reinforcements in any system that contains 1 or more of your ships";
                 default -> planet;
             };
-        } else if (getActionID().equals(Constants.PLANET_REFRESH_ABILITY)) {
+        }
+        if (getName().equals(Constants.PLANET_REFRESH_ABILITY)) {
             return switch (planet) {
                 case "hopesend" -> Emojis.HopesEnd + Emojis.LegendaryPlanet + " **Imperial Arms Vault**";
                 case "primor" -> Emojis.Primor + Emojis.LegendaryPlanet + " **The Atrament**";
@@ -135,8 +122,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
                 case "mirage" -> Emojis.LegendaryPlanet + " **Mirage Flight Academy**";
                 default -> planet;
             };
-        } else {
-            return Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, getActiveGame());
         }
+        return Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, getGame());
     }
 }

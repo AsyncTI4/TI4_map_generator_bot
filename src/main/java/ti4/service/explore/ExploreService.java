@@ -19,9 +19,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.planet.PlanetAdd;
 import ti4.commands.units.AddUnits;
-import ti4.commands2.tokens.AddToken;
+import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -51,6 +50,7 @@ import ti4.model.PlanetModel;
 import ti4.service.PlanetService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.AddPlanetService;
 
 @UtilityClass
 public class ExploreService {
@@ -470,7 +470,7 @@ public class ExploreService {
                     MessageHelper.sendMessageToEventChannel(event, "Invalid planet: " + mirageID);
                     return;
                 }
-                PlanetAdd.doAction(player, mirageID, game, null, false);
+                AddPlanetService.addPlanet(player, mirageID, game, null, false);
                 PlanetService.refreshPlanet(player, mirageID);
                 String exploreID = game.drawExplore(Constants.CULTURAL);
                 if (exploreID == null) {
@@ -664,7 +664,7 @@ public class ExploreService {
             }
             case "hiddenlaboratory" -> {
                 MessageHelper.sendMessageToEventChannel(event, "# Exploring frontier in this system due to finding the hidden laboratory industrial explore.");
-                AddToken.addToken(event, tile, Constants.FRONTIER, game);
+                AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
                 expFront(event, tile, game, player);
             }
             case "ancientshipyard" -> {

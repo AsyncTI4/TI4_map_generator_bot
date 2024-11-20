@@ -16,8 +16,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.planet.PlanetAdd;
-import ti4.commands2.tokens.AddToken;
+import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -55,6 +54,7 @@ import ti4.service.info.LeaderInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.info.TechInfoService;
 import ti4.service.info.UnitInfoService;
+import ti4.service.planet.AddPlanetService;
 
 @UtilityClass
 public class MiltyService {
@@ -485,7 +485,7 @@ public class MiltyService {
                 continue;
             }
             String planetResolved = AliasHandler.resolvePlanet(planet.toLowerCase());
-            PlanetAdd.doAction(player, planetResolved, game, event, true);
+            AddPlanetService.addPlanet(player, planetResolved, game, event, true);
             player.refreshPlanet(planetResolved);
         }
 
@@ -679,7 +679,7 @@ public class MiltyService {
             }
         }
         if (hsTile.equalsIgnoreCase("d11")) {
-            AddToken.addToken(event, tile, Constants.FRONTIER, game);
+            AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         }
         if (game.getStoredValue("removeSupports").equalsIgnoreCase("true")) {
             player.removeOwnedPromissoryNoteByID(player.getColor() + "_sftt");

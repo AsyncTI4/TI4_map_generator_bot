@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import ti4.commands2.tokens.AddToken;
+import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -706,7 +706,7 @@ public class ConvertTTPGtoAsync {
                     if ("e".equals(str)) { //frontier token
                         System.out.println("attempt to add frontier token to " + tile.getPosition());
                         // tile.addToken(Mapper.getTokenPath(Constants.FRONTIER), Constants.SPACE);
-                        AddToken.addToken(null, tile, Constants.FRONTIER, null);
+                        AddTokenCommand.addToken(null, tile, Constants.FRONTIER, null);
                     }
                 } else {
                     System.out.println("                character not recognized:  " + str);

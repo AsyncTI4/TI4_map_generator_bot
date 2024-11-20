@@ -13,7 +13,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Tile;
 
-public class AddCC extends AddRemoveToken {
+public class AddCCCommand extends AddRemoveTokenCommand {
 
     @Override
     void doAction(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
@@ -34,7 +34,7 @@ public class AddCC extends AddRemoveToken {
 
     @Override
     public String getDescription() {
-        return "Add CC to tile/system";
+        return "Add CCs to tile/system";
     }
 
     @Override
