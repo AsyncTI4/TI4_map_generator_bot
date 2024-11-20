@@ -992,6 +992,7 @@ public class ButtonHelperHeroes {
         if (playerLeader == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 player.getFactionEmoji() + "You don't have Titus Flavius, the Celdauri hero.");
+            return;
         }
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
             .append(Helper.getLeaderFullRepresentation(playerLeader));
@@ -1040,7 +1041,8 @@ public class ButtonHelperHeroes {
         Leader playerLeader = player.unsafeGetLeader("mentakhero");
         if (playerLeader == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
-                player.getFactionEmoji() + "You don't have this Ipswitch, Loose Cannon, the Mentak hero.");
+                player.getFactionEmoji() + "You don't have Ipswitch, Loose Cannon, the Mentak hero.");
+            return;
         }
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
             .append(Helper.getLeaderFullRepresentation(playerLeader));
