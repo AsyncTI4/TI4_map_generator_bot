@@ -7,9 +7,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -23,7 +23,7 @@ class ShowPNToAll extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
-        int pnIndex = event.getOption(Constants.ACTION_CARD_ID).getAsInt();
+        int pnIndex = event.getOption(Constants.PROMISSORY_NOTE_ID).getAsInt();
         String pnID = null;
         for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
             if (pn.getValue().equals(pnIndex)) {
