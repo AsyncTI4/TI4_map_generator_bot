@@ -134,8 +134,11 @@ public class GameSettings extends SettingsMenu {
             int players = m.getPlayerSettings().getGamePlayers().getKeys().size();
             Map<String, MapTemplateModel> allowed = Mapper.getMapTemplatesForPlayerCount(players).stream()
                 .collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x));
-            String defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players).getAlias();
-            mapTemplate.setAllValues(allowed, defaultTemplate);
+            var defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
+            if (defaultTemplate == null) {
+                return;
+            }
+            mapTemplate.setAllValues(allowed, defaultTemplate.getAlias());
         }
     }
 

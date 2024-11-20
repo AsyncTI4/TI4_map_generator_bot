@@ -12,10 +12,10 @@ import ti4.model.EventModel;
 public class EventHelper {
 
     public static void revealEvent(GenericInteractionCreateEvent event, Game game, MessageChannel channel) {
-        revealEvent(event, game, channel, game.revealEvent(false));
+        revealEvent(event, channel, game.revealEvent(false));
     }
 
-    public static void revealEvent(GenericInteractionCreateEvent event, Game game, MessageChannel channel, String eventID) {
+    public static void revealEvent(GenericInteractionCreateEvent event, MessageChannel channel, String eventID) {
         EventModel eventModel = Mapper.getEvent(eventID);
         if (eventModel != null) {
             channel.sendMessageEmbeds(eventModel.getRepresentationEmbed()).queue();
