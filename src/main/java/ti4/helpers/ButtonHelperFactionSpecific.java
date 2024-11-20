@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.commands.game.StartPhase;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.helpers.DiceHelper.Die;
@@ -40,6 +39,7 @@ import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
+import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.planet.AddPlanetService;
@@ -969,7 +969,7 @@ public class ButtonHelperFactionSpecific {
             "> " + player1.getRepresentationNoPing() + Emojis.getSCEmojiFromInteger(player1SC) + " :arrow_right: " + Emojis.getSCEmojiFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), sb);
         event.getMessage().delete().queue();
-        StartPhase.startActionPhase(event, game);
+        StartPhaseService.startActionPhase(event, game);
     }
 
     @ButtonHandler("raghsCallStepTwo_")

@@ -158,73 +158,74 @@ public class GameSaveLoadManager {
 
     public static void undo(Game game, GenericInteractionCreateEvent event) {
         File originalMapFile = Storage.getGameFile(game.getName() + Constants.TXT);
-        if (originalMapFile.exists()) {
-            File mapUndoDirectory = Storage.getGameUndoDirectory();
-            if (!mapUndoDirectory.exists()) {
-                return;
+        if (!originalMapFile.exists()) {
+            return;
+        }
+        File mapUndoDirectory = Storage.getGameUndoDirectory();
+        if (!mapUndoDirectory.exists()) {
+            return;
+        }
+
+        String mapName = game.getName();
+        String mapNameForUndoStart = mapName + "_";
+        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+        if (mapUndoFiles == null || mapUndoFiles.length <= 0) {
+            return;
+        }
+        try {
+            List<Integer> numbers = Arrays.stream(mapUndoFiles)
+                .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+                .map(fileName -> fileName.replace(Constants.TXT, ""))
+                .map(Integer::parseInt).toList();
+            int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
+            File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + (maxNumber - 1) + Constants.TXT);
+            File mapUndoStorage2 = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
+            CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
+            Files.copy(mapUndoStorage2.toPath(), originalMapFile.toPath(), options);
+            Game loadedGame = loadGame(originalMapFile);
+            try {
+                if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null
+                    && !game.getPhaseOfGame().contains("status")) {
+                    // MessageHelper.sendMessageToChannel(loadedGame.getSavedChannel(), "Attempting
+                    // to regenerate buttons:");
+                    MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(),
+                        loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
+                } else {
+                    System.out.println("Boop" + loadedGame.getSavedButtons().size());
+                }
+            } catch (Exception e) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Had trouble getting the saved buttons, sorry");
             }
+            StringBuilder sb = new StringBuilder("Rolled the game back, including this command:\n> `")
+                .append(maxNumber).append("` ");
+            if (loadedGame.getSavedChannel() instanceof ThreadChannel
+                && loadedGame.getSavedChannel().getName().contains("Cards Info")) {
+                sb.append("[CLASSIFIED]");
+            } else {
+                sb.append(loadedGame.getLatestCommand());
+            }
+            Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
+            mapUndoStorage2.delete();
+            loadedGame = loadGame(originalMapFile);
+            if (loadedGame == null) throw new Exception("Failed to load undo copy");
 
-            String mapName = game.getName();
-            String mapNameForUndoStart = mapName + "_";
-            String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
-            if (mapUndoFiles != null && mapUndoFiles.length > 0) {
-                try {
-                    List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                        .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
-                        .map(fileName -> fileName.replace(Constants.TXT, ""))
-                        .map(Integer::parseInt).toList();
-                    int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
-                    File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + (maxNumber - 1) + Constants.TXT);
-                    File mapUndoStorage2 = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
-                    CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
-                    Files.copy(mapUndoStorage2.toPath(), originalMapFile.toPath(), options);
-                    Game loadedGame = loadGame(originalMapFile);
-                    try {
-                        if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null
-                            && !game.getPhaseOfGame().contains("status")) {
-                            // MessageHelper.sendMessageToChannel(loadedGame.getSavedChannel(), "Attempting
-                            // to regenerate buttons:");
-                            MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(),
-                                loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
-                        } else {
-                            System.out.println("Boop" + loadedGame.getSavedButtons().size());
-                        }
-                    } catch (Exception e) {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                            "Had trouble getting the saved buttons, sorry");
-                    }
-                    StringBuilder sb = new StringBuilder("Rolled the game back, including this command:\n> `")
-                        .append(maxNumber).append("` ");
-                    if (loadedGame.getSavedChannel() instanceof ThreadChannel
-                        && loadedGame.getSavedChannel().getName().contains("Cards Info")) {
-                        sb.append("[CLASSIFIED]");
-                    } else {
-                        sb.append(loadedGame.getLatestCommand());
-                    }
-                    Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
-                    mapUndoStorage2.delete();
-                    loadedGame = loadGame(originalMapFile);
-                    if (loadedGame == null) throw new Exception("Failed to load undo copy");
-
-                    for (Player p1 : loadedGame.getRealPlayers()) {
-                        Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
-                        if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
-                            CardsInfoService.sendCardsInfo(loadedGame, p1);
-                        }
-                    }
-                    GameManager.deleteGame(game.getName());
-                    GameManager.addGame(loadedGame);
-
-                    if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
-                    } else {
-                        ButtonHelper.findOrCreateThreadWithMessage(game, mapName + "-undo-log", sb.toString());
-                    }
-
-                } catch (Exception e) {
-                    BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
+            for (Player p1 : loadedGame.getRealPlayers()) {
+                Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
+                if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
+                    CardsInfoService.sendCardsInfo(loadedGame, p1);
                 }
             }
+            GameManager.deleteGame(game.getName());
+            GameManager.addGame(loadedGame);
+
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+            } else {
+                ButtonHelper.findOrCreateThreadWithMessage(game, mapName + "-undo-log", sb.toString());
+            }
+        } catch (Exception e) {
+            BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
         }
     }
 

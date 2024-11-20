@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ti4.commands.capture.CaptureCommand;
-import ti4.commands.game.GameCommand;
 import ti4.commands.units.AddUnitDamage;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.ModifyUnits;
@@ -30,6 +29,7 @@ import ti4.commands2.event.EventCommand;
 import ti4.commands2.explore.ExploreCommand;
 import ti4.commands2.fow.FOWCommand;
 import ti4.commands2.franken.FrankenCommand;
+import ti4.commands2.game.GameCommand;
 import ti4.commands2.help.HelpCommand;
 import ti4.commands2.installation.InstallationCommand;
 import ti4.commands2.leaders.LeaderCommand;

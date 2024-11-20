@@ -7,7 +7,7 @@ import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
-import ti4.service.RematchService;
+import ti4.service.game.RematchService;
 
 class Rematch extends GameStateSubcommand {
 

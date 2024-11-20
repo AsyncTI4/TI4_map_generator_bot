@@ -4,13 +4,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.game.SetDeck;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.service.game.SetDeckService;
 
 class ChangeToBaseGame extends GameStateSubcommand {
 
@@ -33,7 +33,7 @@ class ChangeToBaseGame extends GameStateSubcommand {
         }
         game.setBaseGameMode(true);
         Helper.removePoKComponents(game, codex);
-        SetDeck.setDeck(event, game, "agenda_deck", Mapper.getDecks().get("agendas_base_game"));
+        SetDeckService.setDeck(event, game, "agenda_deck", Mapper.getDecks().get("agendas_base_game"));
         MessageHelper.sendMessageToChannel(event.getChannel(), "Removed PoK components.");
     }
 }

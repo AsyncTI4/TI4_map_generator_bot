@@ -25,8 +25,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.game.StartPhase;
-import ti4.commands.game.Swap;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.planet.PlanetExhaust;
@@ -80,6 +78,8 @@ import ti4.service.PlanetService;
 import ti4.service.StatusCleanupService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.explore.ExploreService;
+import ti4.service.game.StartPhaseService;
+import ti4.service.game.SwapFactionService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
@@ -1108,7 +1108,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
         }
 
-        StartPhase.startStatusHomework(event, game);
+        StartPhaseService.startStatusHomework(event, game);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1969,7 +1969,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 } else {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), game.getPing()
                         + " All players have indicated completion of status phase. Proceed to Strategy Phase.");
-                    StartPhase.startPhase(event, game, "strategy");
+                    StartPhaseService.startPhase(event, game, "strategy");
                 }
             }
             case "redistributeCCButtons" -> {
@@ -2882,7 +2882,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Did not refresh planets due to the Checks and Balances resolving against. Players have been sent buttons to refresh up to 3 planets.");
         }
-        StartPhase.startStrategyPhase(event, game);
+        StartPhaseService.startStrategyPhase(event, game);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -3057,7 +3057,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("startStrategyPhase")
     public static void startStrategyPhase(ButtonInteractionEvent event, Game game) {
-        StartPhase.startPhase(event, game, "strategy");
+        StartPhaseService.startPhase(event, game, "strategy");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -3431,7 +3431,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             return;
         }
         RevealPublicObjectiveService.revealTwoStage1(game);
-        StartPhase.startStrategyPhase(event, game);
+        StartPhaseService.startStrategyPhase(event, game);
         PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
         ButtonHelper.deleteMessage(event);
     }
@@ -3445,6 +3445,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("swapToFaction_")
     public static void swapToFaction(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = buttonID.replace("swapToFaction_", "");
-        Swap.secondHalfOfSwap(game, player, game.getPlayerFromColorOrFaction(faction), event.getUser(), event);
+        SwapFactionService.secondHalfOfSwap(game, player, game.getPlayerFromColorOrFaction(faction), event.getUser(), event);
     }
 }

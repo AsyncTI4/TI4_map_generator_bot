@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.units.AddUnits;
-import ti4.commands2.tokens.RemoveCCCommand;
+import ti4.commands2.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -180,7 +180,7 @@ public class PlayHeroService {
                     player.getRepresentationUnfogged() + " removed all of your CCs from the board");
                 for (Tile t : game.getTileMap().values()) {
                     if (CommandCounterHelper.hasCC(event, player.getColor(), t)) {
-                        RemoveCCCommand.removeCC(event, player.getColor(), t, game);
+                        RemoveCommandCounterService.removeCC(event, player.getColor(), t, game);
                     }
                 }
             }

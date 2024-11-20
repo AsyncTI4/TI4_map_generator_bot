@@ -57,8 +57,8 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.commandcounter.RemoveCommandCounterService;
 import ti4.commands2.tokens.AddTokenCommand;
-import ti4.commands2.tokens.RemoveCCCommand;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -1942,7 +1942,7 @@ public class ButtonHelper {
                 + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         }
 
-        RemoveCCCommand.removeCC(event, player.getColor(), tile, game);
+        RemoveCommandCounterService.removeCC(event, player.getColor(), tile, game);
 
         String finChecker = "FFCC_" + player.getFaction() + "_";
         if ("mahactCommander".equalsIgnoreCase(whatIsItFor)) {
@@ -3653,7 +3653,7 @@ public class ButtonHelper {
                 if (game.isFowMode()) {
                     channel = p2.getPrivateChannel();
                 }
-                RemoveCCCommand.removeCC(event, p2.getColor(), tile, game);
+                RemoveCommandCounterService.removeCC(event, p2.getColor(), tile, game);
                 String message = p2.getRepresentationUnfogged()
                     + " due to having Xuange, the Empyrean commander, the CC you had in the active system has been removed. Reminder that this is optional but was done automatically.";
                 MessageHelper.sendMessageToChannel(channel, message);

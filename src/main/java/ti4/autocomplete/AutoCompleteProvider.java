@@ -21,7 +21,6 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.game.Undo;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.statistics.GameStatTypes;
 import ti4.commands2.statistics.PlayerStatTypes;
@@ -60,6 +59,7 @@ import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.UnitDecalService;
 import ti4.service.franken.FrankenDraftMode;
+import ti4.service.game.UndoService;
 import ti4.service.map.MapPresetService;
 
 public class AutoCompleteProvider {
@@ -571,7 +571,7 @@ public class AutoCompleteProvider {
                     event.replyChoiceStrings("Game is Fog of War mode - you can't see what you are undoing.").queue();
                 }
                 long datetime = System.currentTimeMillis();
-                List<Command.Choice> options = Undo.getAllUndoSavedGames(game).entrySet().stream()
+                List<Command.Choice> options = UndoService.getAllUndoSavedGames(game).entrySet().stream()
                     .sorted(Map.Entry.<String, Game>comparingByValue(Comparator.comparing(Game::getLastModifiedDate)).reversed())
                     .limit(25)
                     .map(entry -> new Command.Choice(
