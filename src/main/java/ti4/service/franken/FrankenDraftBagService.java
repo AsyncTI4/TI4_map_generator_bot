@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import ti4.buttons.Buttons;
-import ti4.commands.game.SetOrder;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -25,6 +24,7 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.game.SetOrderService;
 import ti4.service.milty.MiltyService;
 
 @UtilityClass
@@ -86,7 +86,7 @@ public class FrankenDraftBagService {
             }))
             .map(Player::getUser)
             .toList();
-        SetOrder.setPlayerOrder(event, game, users);
+        SetOrderService.setPlayerOrder(event, game, users);
     }
 
     public static String getBagReceipt(DraftBag bag) {

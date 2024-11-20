@@ -17,8 +17,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.game.GameCreate;
-import ti4.commands.game.GameEnd;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.RegexHelper;
@@ -32,7 +30,7 @@ import ti4.message.MessageHelper;
 public class RematchService {
 
     public static void rematch(Game game, GenericInteractionCreateEvent event) {
-        GameEnd.gameEndStuff(game, event, true);
+        EndGameService.gameEndStuff(game, event, true);
         secondHalfOfRematch(event, game);
     }
 
@@ -100,7 +98,7 @@ public class RematchService {
                 break;
             }
         }
-        Game newGame = GameCreate.createNewGame(event, newName, gameOwner);
+        Game newGame = CreateGameService.createNewGame(event, newName, gameOwner);
         // ADD PLAYERS
         for (Player player : game.getPlayers().values()) {
             if (!player.getFaction().equals("neutral"))

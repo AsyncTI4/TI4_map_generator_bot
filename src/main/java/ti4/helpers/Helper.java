@@ -47,7 +47,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
-import ti4.commands.game.SetOrder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -70,6 +69,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.milty.MiltyDraftManager;
@@ -2483,7 +2483,7 @@ public class Helper {
             Map<String, Player> playersBackup = new LinkedHashMap<>(game.getPlayers());
             try {
                 for (Player player : sortedPlayers) {
-                    new SetOrder().setPlayerOrder(newPlayerOrder, players, player);
+                    SetOrderService.setPlayerOrder(newPlayerOrder, players, player);
                     if (player.isSpeaker()) {
                         msg.append(player.getRepresentationUnfogged()).append(" ").append(Emojis.SpeakerToken).append(" \n");
                     } else {
