@@ -15,7 +15,5 @@ public interface Command {
 
     void register(CommandListUpdateAction commands);
 
-    default void postExecute(SlashCommandInteractionEvent event) {
-        event.getHook().deleteOriginal().submit();
-    }
+    default void postExecute(SlashCommandInteractionEvent event) {}
 }

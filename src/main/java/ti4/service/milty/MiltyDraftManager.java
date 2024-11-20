@@ -26,7 +26,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
-import ti4.commands.map.AddTileList;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -41,6 +40,7 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
+import ti4.service.map.AddTileListService;
 
 @Data
 public class MiltyDraftManager {
@@ -445,7 +445,7 @@ public class MiltyDraftManager {
                 }
             }
             game.setPhaseOfGame("playerSetup");
-            AddTileList.finishSetup(game, event);
+            AddTileListService.finishSetup(game, event);
             if (keleresExists) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " be sure to wait for keleres to get set up before dealing out secrets.");
             }

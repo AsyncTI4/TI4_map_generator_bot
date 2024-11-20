@@ -7,8 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateCommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.service.ShowGameService;
 import ti4.service.explore.AddFrontierTokensService;
 
 public class AddFrontierTokens extends GameStateCommand {
@@ -36,8 +34,6 @@ public class AddFrontierTokens extends GameStateCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getGame();
-        AddFrontierTokensService.addFrontierTokens(event, game);
-        ShowGameService.simpleShowGame(game, event);
+        AddFrontierTokensService.addFrontierTokens(event, getGame());
     }
 }
