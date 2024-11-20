@@ -315,15 +315,15 @@ public class SCPick extends GameStateSubcommand {
             .append("\n> Picked: " + Helper.getSCRepresentation(game, scNumber));
 
         Integer tgCountOnSC = scTradeGoods.get(scNumber);
-        if (tgCountOnSC == null || tgCountOnSC != 0) {
+        if (tgCountOnSC == null || tgCountOnSC == 0) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         } else {
-            String gainTG = player.gainTG(tgCountOnSC);
-            sb.append(" gaining ").append(Emojis.tg(tgCountOnSC)).append(gainTG);
+            String gainTGRepresentation = player.gainTG(tgCountOnSC);
+            sb.append(" gaining ").append(Emojis.tg(tgCountOnSC)).append(" ").append(gainTGRepresentation);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
 
             if (game.isFowMode()) {
-                String fowMessage = player.getFactionEmojiOrColor() + " gained " + Emojis.tg(tgCountOnSC) + " " + gainTG + " from picking " + Helper.getSCRepresentation(game, scNumber);
+                String fowMessage = player.getFactionEmojiOrColor() + " gained " + Emojis.tg(tgCountOnSC) + " " + gainTGRepresentation + " from picking " + Helper.getSCRepresentation(game, scNumber);
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, fowMessage);
             }
 
