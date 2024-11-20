@@ -11,7 +11,7 @@ import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 class ShowGameAsPlayer extends GameStateSubcommand {
 
     public ShowGameAsPlayer() {
-        super(Constants.SHOW_GAME_AS_PLAYER, "Shows map as the specified player sees it.", true, true);
+        super(Constants.SHOW_GAME_AS_PLAYER, "Shows map as the specified player sees it.", false, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which to show the map as").setAutoComplete(true).setRequired(true));
     }
 

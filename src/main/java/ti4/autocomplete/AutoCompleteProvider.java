@@ -22,7 +22,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.game.Undo;
-import ti4.commands.map.Preset;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.statistics.GameStatTypes;
 import ti4.commands2.statistics.PlayerStatTypes;
@@ -61,6 +60,7 @@ import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.UnitDecalService;
 import ti4.service.franken.FrankenDraftMode;
+import ti4.service.map.MapPresetService;
 
 public class AutoCompleteProvider {
 
@@ -987,7 +987,7 @@ public class AutoCompleteProvider {
                     System.out.println("Found autocomplete");
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
 
-                    List<Command.Choice> options = Preset.templates.stream()
+                    List<Command.Choice> options = MapPresetService.templates.stream()
                         .filter(value -> value.contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))

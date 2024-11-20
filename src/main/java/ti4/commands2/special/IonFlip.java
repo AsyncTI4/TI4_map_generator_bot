@@ -7,13 +7,11 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
 import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.service.ShowGameService;
 
 class IonFlip extends GameStateSubcommand {
 
@@ -49,6 +47,5 @@ class IonFlip extends GameStateSubcommand {
             tile.removeToken(Constants.TOKEN_ION_BETA_PNG, spaceUnitHolder.getName());
             tile.addToken(Constants.TOKEN_ION_ALPHA_PNG, spaceUnitHolder.getName());
         }
-        ShowGameService.simpleShowGame(game, event, DisplayType.all);
     }
 }

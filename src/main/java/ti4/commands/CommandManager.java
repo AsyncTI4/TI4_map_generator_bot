@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 
 import ti4.commands.capture.CaptureCommand;
 import ti4.commands.game.GameCommand;
-import ti4.commands.map.MapCommand;
 import ti4.commands.planet.PlanetCommand;
 import ti4.commands.units.AddUnitDamage;
 import ti4.commands.units.AddUnits;
@@ -35,6 +34,7 @@ import ti4.commands2.franken.FrankenCommand;
 import ti4.commands2.help.HelpCommand;
 import ti4.commands2.installation.InstallationCommand;
 import ti4.commands2.leaders.LeaderCommand;
+import ti4.commands2.map.MapCommand;
 import ti4.commands2.milty.MiltyCommand;
 import ti4.commands2.player.PlayerCommand;
 import ti4.commands2.relic.RelicCommand;

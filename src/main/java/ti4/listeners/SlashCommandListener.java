@@ -107,8 +107,8 @@ public class SlashCommandListener extends ListenerAdapter {
                 }
                 command.execute(event);
                 command.postExecute(event);
-                event.getHook().deleteOriginal().queue();
                 MessageHelper.replyToMessage(event, command.getName() + " executed.");
+                event.getHook().deleteOriginal().queue();
             } catch (Exception e) {
                 String messageText = "Error trying to execute command: " + command.getName();
                 String errorMessage = ExceptionUtils.getMessage(e);
