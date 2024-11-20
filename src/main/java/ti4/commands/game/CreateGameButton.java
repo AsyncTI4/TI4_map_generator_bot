@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.GameCreationHelper;
 import ti4.helpers.SearchGameHelper;
@@ -26,7 +27,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
-public class CreateGameButton extends GameSubcommandData {
+class CreateGameButton extends Subcommand {
 
     public CreateGameButton() {
         super(Constants.CREATE_GAME_BUTTON, "Create Game Creation Button");
@@ -63,7 +64,6 @@ public class CreateGameButton extends GameSubcommandData {
                 + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
             return;
         }
-
         // SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
 
@@ -75,6 +75,7 @@ public class CreateGameButton extends GameSubcommandData {
                 Member member = event.getOption("player" + i).getAsMember();
                 if (member != null)
                     members.add(member);
+                // TODO: MAGICAL USER NUMBER...?
                 if (member.getId().equalsIgnoreCase("400038967744921612")) {
                     int amount = SearchGameHelper.searchGames(member.getUser(), event, false, false, false, true, false, true, false, true);
                     if (amount > 4) {
@@ -92,12 +93,11 @@ public class CreateGameButton extends GameSubcommandData {
         // CHECK IF GUILD HAS ALL PLAYERS LISTED
         GameCreationHelper.inviteUsersToServer(guild, members, event.getMessageChannel());
 
-        StringBuilder buttonMsg = new StringBuilder();
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("createGameChannels", "Create Game"));
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
         if (!members.isEmpty()) {
-            buttonMsg = new StringBuilder("Game Fun Name: " + gameFunName.replace(":", "") + "\nPlayers:\n");
+            StringBuilder buttonMsg = new StringBuilder("Game Fun Name: " + gameFunName.replace(":", "") + "\nPlayers:\n");
             int counter = 1;
             for (Member member : members) {
                 buttonMsg.append(counter).append(":").append(member.getId()).append(".(").append(member.getEffectiveName().replace(":", "")).append(")\n");

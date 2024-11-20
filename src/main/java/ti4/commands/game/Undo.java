@@ -13,30 +13,27 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class Undo extends GameSubcommandData {
+class Undo extends GameStateSubcommand {
+
     public Undo() {
-        super(Constants.UNDO, "Undo the last action");
+        super(Constants.UNDO, "Undo the last action", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.UNDO_TO_BEFORE_COMMAND, "Command to undo back to").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = GameManager.getUserActiveGame(event.getUser().getId());
-        if (game == null) {
-            MessageHelper.replyToMessage(event, "Must set active Game");
-            return;
-        }
+        Game game = getGame();
         if (!event.getChannel().getName().startsWith(game.getName() + "-")) {
             MessageHelper.replyToMessage(event, "Undo must be executed in game channel only!");
             return;
@@ -101,8 +98,6 @@ public class Undo extends GameSubcommandData {
         }
         // MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
 
-        GameManager.deleteGame(game.getName());
-        GameManager.addGame(gameToRestore);
         GameSaveLoadManager.undo(gameToRestore, event);
     }
 
@@ -126,12 +121,12 @@ public class Undo extends GameSubcommandData {
         if (!mapUndoDirectory.exists()) {
             return;
         }
-        String mapName = game.getName();
-        String mapNameForUndoStart = mapName + "_";
-        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+        String gameName = game.getName();
+        String gameNameForUndoStart = gameName + "_";
+        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
         if (mapUndoFiles != null && mapUndoFiles.length > 0) {
             List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+                .map(fileName -> fileName.replace(gameNameForUndoStart, ""))
                 .map(fileName -> fileName.replace(Constants.TXT, ""))
                 .map(Integer::parseInt).toList();
             int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
@@ -154,9 +149,9 @@ public class Undo extends GameSubcommandData {
 
     public static Map<String, Game> getAllUndoSavedGames(Game game) {
         File mapUndoDirectory = Storage.getGameUndoDirectory();
-        String mapName = game.getName();
-        String mapNameForUndoStart = mapName + "_";
-        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+        String gameName = game.getName();
+        String gameNameForUndoStart = gameName + "_";
+        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
         return Arrays.stream(mapUndoFiles).map(Storage::getGameUndoStorage)
             .collect(Collectors.toMap(File::getName, GameSaveLoadManager::loadGame));
     }

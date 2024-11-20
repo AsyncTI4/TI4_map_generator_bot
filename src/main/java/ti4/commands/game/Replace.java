@@ -15,20 +15,20 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class Replace extends GameSubcommandData {
+class Replace extends GameStateSubcommand {
 
     public Replace() {
-        super(Constants.REPLACE, "Replace player in game");
+        super(Constants.REPLACE, "Replace player in game", true, false);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player being replaced @playerName"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction being replaced").setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Replacement player @playerName"));
@@ -37,18 +37,6 @@ public class Replace extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game;
-        var gameOption = event.getOption(Constants.GAME_NAME);
-        if (gameOption != null) {
-            game = GameManager.getGame(gameOption.getAsString());
-        } else {
-            game = getActiveGame();
-        }
-        if (game == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine the game to run the command against...");
-            return;
-        }
-
         Member member = event.getMember();
         boolean isAdmin = false;
         if (member != null) {
@@ -61,6 +49,7 @@ public class Replace extends GameSubcommandData {
             }
         }
 
+        Game game = getGame();
         if (game.getPlayer(event.getUser().getId()) == null && !isAdmin) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Only game players or Bothelpers can replace a player.");
             return;

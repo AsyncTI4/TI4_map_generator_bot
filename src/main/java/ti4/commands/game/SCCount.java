@@ -4,19 +4,21 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class SCCount extends GameSubcommandData {
+class SCCount extends GameStateSubcommand {
+
     public SCCount() {
-        super(Constants.SC_COUNT, "Strategy Cards count in game");
+        super(Constants.SC_COUNT, "Strategy Cards count in game", false, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Cards count").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         OptionMapping scOption = event.getOption(Constants.STRATEGY_CARD);
         if (scOption == null) {

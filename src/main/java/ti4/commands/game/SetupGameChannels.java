@@ -6,14 +6,16 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SetupGameChannels extends GameSubcommandData {
+class SetupGameChannels extends GameStateSubcommand {
+
     public SetupGameChannels() {
-        super(Constants.GAME_CHANNEL_SETUP, "Setup channels and roles for non-standard games");
+        super(Constants.GAME_CHANNEL_SETUP, "Setup channels and roles for non-standard games", true, false);
         addOptions(new OptionData(OptionType.CHANNEL, Constants.MAIN_GAME_CHANNEL, "Main game channel").setRequired(true));
         addOptions(new OptionData(OptionType.CHANNEL, Constants.TABLE_TALK_CHANNEL, "Table talk channel"));
 
@@ -42,17 +44,15 @@ public class SetupGameChannels extends GameSubcommandData {
         addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL6, "Private channel for player/role"));
 
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Main player for Community/Fog mode"));
-        //addOptions(new OptionData(OptionType.ROLE, Constants.ROLE7, "Community Mode role"));
         addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL7, "Private channel for player/role"));
 
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Main player for Community/Fog mode"));
-        //addOptions(new OptionData(OptionType.ROLE, Constants.ROLE8, "Community Mode role"));
         addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL8, "Private channel for player/role"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         // Set main channel where SC's get played
         OptionMapping channel = event.getOption(Constants.MAIN_GAME_CHANNEL);

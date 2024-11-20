@@ -14,16 +14,17 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class Swap extends GameSubcommandData {
+class Swap extends GameStateSubcommand {
 
     public Swap() {
-        super(Constants.SWAP, "Swap factions with a player ");
+        super(Constants.SWAP, "Swap factions with a player", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Swap with player in Faction/Color ").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.TARGET_PLAYER, "Replacement player @playerName").setRequired(true));
     }
@@ -31,7 +32,7 @@ public class Swap extends GameSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         User callerUser = event.getUser();
-        Game game = getActiveGame();
+        Game game = getGame();
         Collection<Player> players = game.getPlayers().values();
         Member member = event.getMember();
         boolean isAdmin = false;

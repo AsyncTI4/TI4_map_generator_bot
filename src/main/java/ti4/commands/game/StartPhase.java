@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -46,15 +47,16 @@ import ti4.service.info.ListTurnOrderService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 
-public class StartPhase extends GameSubcommandData {
+class StartPhase extends GameStateSubcommand {
+
     public StartPhase() {
-        super(Constants.START_PHASE, "Start a specific phase of the game");
+        super(Constants.START_PHASE, "Start a specific phase of the game", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.SPECIFIC_PHASE, "What phase do you want to get buttons for?").setRequired(true).setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         String phase = event.getOption(Constants.SPECIFIC_PHASE, null, OptionMapping::getAsString);
         startPhase(event, game, phase);
     }

@@ -1,4 +1,4 @@
-package ti4.service;
+package ti4.service.game;
 
 import java.util.ArrayList;
 import java.util.List;

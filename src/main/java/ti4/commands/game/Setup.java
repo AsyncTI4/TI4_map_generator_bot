@@ -4,13 +4,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class Setup extends GameSubcommandData {
+class Setup extends GameStateSubcommand {
+
     public Setup() {
-        super(Constants.SETUP, "Game Setup");
+        super(Constants.SETUP, "Game Setup", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Number of players between 1 or 30. Default 6"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Game VP count. Default is 10"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC_COUNT_FOR_MAP, "Number of strategy cards each player gets. Default 1"));
@@ -22,7 +24,7 @@ public class Setup extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         OptionMapping playerCount = event.getOption(Constants.PLAYER_COUNT_FOR_MAP);
         if (playerCount != null) {

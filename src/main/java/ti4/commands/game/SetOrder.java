@@ -11,17 +11,17 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SetOrder extends GameSubcommandData {
+class SetOrder extends GameStateSubcommand {
 
     public SetOrder() {
-        super(Constants.SET_ORDER, "Set player order in game");
+        super(Constants.SET_ORDER, "Set player order in game", true, false);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
@@ -37,13 +37,12 @@ public class SetOrder extends GameSubcommandData {
         List<User> users = new ArrayList<>();
         for (int i = 1; i <= 8; i++) {
             User member = event.getOption("player" + i, null, OptionMapping::getAsUser);
-            if (member != null) {
-                users.add(member);
-            } else {
+            if (member == null) {
                 break;
             }
+            users.add(member);
         }
-        setPlayerOrder(event, getActiveGame(), users);
+        setPlayerOrder(event, getGame(), users);
     }
 
     public static void setPlayerOrder(GenericInteractionCreateEvent event, Game game, List<User> users) {
@@ -61,7 +60,6 @@ public class SetOrder extends GameSubcommandData {
         } catch (Exception e) {
             game.setPlayers(playersBackup);
         }
-        GameSaveLoadManager.saveGame(game, event);
         StringBuilder sb = new StringBuilder("Player order set:");
         for (Player player : game.getPlayers().values()) {
             sb.append("\n> ").append(player.getRepresentationNoPing());

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.TIGLHelper;
 import ti4.image.Mapper;
@@ -14,9 +15,10 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class WeirdGameSetup extends GameSubcommandData {
+class WeirdGameSetup extends GameStateSubcommand {
+
     public WeirdGameSetup() {
-        super(Constants.WEIRD_GAME_SETUP, "Game Setup for Weird Games");
+        super(Constants.WEIRD_GAME_SETUP, "Game Setup for Weird Games", true, false);
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True to enable Community mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_MODE, "True to enable FoW mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to switch to No Expansion (base game) mode."));
@@ -33,7 +35,7 @@ public class WeirdGameSetup extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         Boolean communityMode = event.getOption(Constants.COMMUNITY_MODE, null, OptionMapping::getAsBoolean);
         if (communityMode != null) game.setCommunityMode(communityMode);

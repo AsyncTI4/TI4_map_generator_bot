@@ -11,19 +11,20 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.collections4.CollectionUtils;
-import ti4.image.Mapper;
+import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
 
-public class SetDeck extends GameSubcommandData {
+class SetDeck extends GameStateSubcommand {
 
     private final List<String> deckTypes;
 
     public SetDeck() {
-        super(Constants.SET_DECK, "Change game card decks");
+        super(Constants.SET_DECK, "Change game card decks", true, false);
         deckTypes = new ArrayList<>();
         addDefaultOption(Constants.AC_DECK, "AC");
         addDefaultOption(Constants.SO_DECK, "SO");
@@ -40,7 +41,7 @@ public class SetDeck extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         Map<DeckModel.DeckType, DeckModel> changedDecks = new HashMap<>();
 

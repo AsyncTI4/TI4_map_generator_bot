@@ -12,13 +12,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.GameCreationHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
-public class Observer extends GameSubcommandData {
+class Observer extends Subcommand {
+
     public Observer() {
         super(Constants.OBSERVER, "Add or remove observers to game channels");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "The game name I.E. pbd###-xxxxxx").setRequired(true).setAutoComplete(true));
