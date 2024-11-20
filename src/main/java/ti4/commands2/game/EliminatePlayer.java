@@ -1,4 +1,4 @@
-package ti4.commands.game;
+package ti4.commands2.game;
 
 import java.util.ArrayList;
 import java.util.HashSet;
