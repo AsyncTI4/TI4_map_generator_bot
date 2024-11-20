@@ -33,7 +33,6 @@ import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
-import ti4.commands.game.GameCreate;
 import ti4.image.ImageHelper;
 import ti4.image.MapGenerator;
 import ti4.listeners.annotations.ButtonHandler;
@@ -43,6 +42,7 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameService;
 
 public class GameCreationHelper {
 
@@ -84,7 +84,7 @@ public class GameCreationHelper {
 		}
 
 		// CREATE GAME
-		Game newGame = GameCreate.createNewGame(event, gameName, gameOwner);
+		Game newGame = CreateGameService.createNewGame(event, gameName, gameOwner);
 
 		// ADD PLAYERS
 		for (Member member : members) {
@@ -144,7 +144,7 @@ public class GameCreationHelper {
 		MessageHelper.sendMessageToEventChannel(event, message);
 
 		GameSaveLoadManager.saveGame(newGame, event);
-		GameCreate.reportNewGameCreated(newGame);
+		CreateGameService.reportNewGameCreated(newGame);
 
 		presentSetupToPlayers(newGame);
 

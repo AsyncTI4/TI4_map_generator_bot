@@ -2,7 +2,6 @@ package ti4.commands2.tokens;
 
 import java.util.List;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -43,19 +42,6 @@ public class RemoveCCCommand extends AddRemoveTokenCommand {
             tile.removeCC(ccID);
             Helper.isCCCountCorrect(event, game, color);
         }
-    }
-
-    public static void removeCC(GenericInteractionCreateEvent event, String color, Tile tile, Game game) {
-        String ccID = Mapper.getCCID(color);
-        String ccPath = tile.getCCPath(ccID);
-        if (ccPath == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
-        }
-        if (game.isFowMode()) {
-            String colorMention = Emojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a token in the system");
-        }
-        tile.removeCC(ccID);
     }
 
     @Override

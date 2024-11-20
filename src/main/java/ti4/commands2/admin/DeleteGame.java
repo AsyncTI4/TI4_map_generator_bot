@@ -3,12 +3,12 @@ package ti4.commands2.admin;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import ti4.commands.game.GameEnd;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
+import ti4.service.game.EndGameService;
 
 class DeleteGame extends Subcommand {
 
@@ -29,7 +29,7 @@ class DeleteGame extends Subcommand {
         }
 
         if (GameSaveLoadManager.deleteGame(gameName)) {
-            GameEnd.secondHalfOfGameEnd(event, gameToDelete, false, true, false);
+            EndGameService.secondHalfOfGameEnd(event, gameToDelete, false, true, false);
             MessageHelper.replyToMessage(event, "Map: " + gameName + " deleted.");
         } else {
             MessageHelper.replyToMessage(event, "Map could not be deleted");

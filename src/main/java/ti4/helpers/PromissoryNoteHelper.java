@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.game.StartPhase;
 import ti4.commands.units.AddUnits;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -21,6 +20,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.Source;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
@@ -404,7 +404,7 @@ public class PromissoryNoteHelper {
             ButtonHelperFactionSpecific.offerSpyNetOptions(player);
         }
         if ("gift".equalsIgnoreCase(id)) {
-            StartPhase.startActionPhase(event, game);
+            StartPhaseService.startActionPhase(event, game);
             //in case Naalu gets eliminated and the PN goes away
             game.setStoredValue("naaluPNUser", player.getFaction());
         }
