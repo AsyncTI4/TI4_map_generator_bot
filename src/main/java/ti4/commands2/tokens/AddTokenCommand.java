@@ -28,7 +28,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.PlanetService;
 
-public class AddToken extends AddRemoveToken {
+public class AddTokenCommand extends AddRemoveTokenCommand {
 
     @Override
     void doAction(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {

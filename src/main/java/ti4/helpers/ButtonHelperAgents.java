@@ -18,10 +18,10 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.commands2.tokens.RemoveCC;
+import ti4.commands2.planet.PlanetExhaustAbility;
+import ti4.commands2.tokens.RemoveCCCommand;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -1402,7 +1402,7 @@ public class ButtonHelperAgents {
     public static void resolveCheiranAgentStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile origTile = game.getTileByPosition(pos);
-        RemoveCC.removeCC(event, player.getColor(), origTile, game);
+        RemoveCCCommand.removeCC(event, player.getColor(), origTile, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " removed 1 CC from "
                 + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras, the Cheiran"

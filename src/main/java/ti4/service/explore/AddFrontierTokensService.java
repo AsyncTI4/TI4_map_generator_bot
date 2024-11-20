@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.commands2.tokens.AddToken;
+import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -25,7 +25,7 @@ public class AddFrontierTokensService {
                         break;
                     }
                 }
-                if (!hasMirage) AddToken.addToken(event, tile, Constants.FRONTIER, game);
+                if (!hasMirage) AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
             }
         }
     }

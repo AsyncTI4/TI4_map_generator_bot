@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.planet.PlanetAdd;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
@@ -42,6 +41,7 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.franken.FrankenLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.planet.AddPlanetService;
 import ti4.service.strategycard.PlayStrategyCardService;
 
 public class ButtonHelperHeroes {
@@ -849,7 +849,7 @@ public class ButtonHelperHeroes {
             Tile tile = game.getTileFromPlanet("lockedmallice");
             MoveUnits.flipMallice(event, tile, game);
         }
-        PlanetAdd.doAction(player, planetID, game, event, false);
+        AddPlanetService.addPlanet(player, planetID, game, event, false);
         PlanetService.refreshPlanet(player, planetID);
         String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game);
         String msg = player.getFactionEmojiOrColor() + " claimed the planet " + planetRep + " using The Lord, a Ghemina hero.";

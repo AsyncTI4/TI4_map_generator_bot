@@ -16,7 +16,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.commands2.tokens.RemoveCC;
+import ti4.commands2.tokens.RemoveCCCommand;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -317,7 +317,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveCounterStroke")
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event) {
-        RemoveCC.removeCC(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
+        RemoveCCCommand.removeCC(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
         String message = player.getFactionEmoji() + " removed their CC from tile " + game.getActiveSystem() + " using Counterstroke and gained it to their tactic pool";
         player.setTacticalCC(player.getTacticalCC() + 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -326,7 +326,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveCounterStroke_")
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        RemoveCC.removeCC(event, player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
+        RemoveCCCommand.removeCC(event, player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
         String message = player.getFactionEmoji() + " removed their CC from tile " + buttonID.split("_")[1]
             + " using Counterstroke and gained it to their tactic pool";
         player.setTacticalCC(player.getTacticalCC() + 1);

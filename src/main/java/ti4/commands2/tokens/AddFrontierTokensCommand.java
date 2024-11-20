@@ -9,9 +9,9 @@ import ti4.commands2.GameStateCommand;
 import ti4.helpers.Constants;
 import ti4.service.explore.AddFrontierTokensService;
 
-public class AddFrontierTokens extends GameStateCommand {
+public class AddFrontierTokensCommand extends GameStateCommand {
 
-    public AddFrontierTokens() {
+    public AddFrontierTokensCommand() {
         super(true, false);
     }
 

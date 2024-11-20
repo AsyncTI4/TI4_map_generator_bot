@@ -1,4 +1,4 @@
-package ti4.commands2.relic;
+package ti4.commands2.planet;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,31 +10,28 @@ import ti4.commands2.ParentCommand;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 
-public class RelicCommand implements ParentCommand {
+public class PlanetCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-        new RelicInfo(),
-        new RelicDraw(),
-        new RelicPurge(),
-        new RelicExhaust(),
-        new RelicReady(),
-        new RelicDrawSpecific(),
-        new RelicLookAtTop(),
-        new RelicSend(),
-        new RelicShuffleBack(),
-        new RelicShowRemaining(),
-        new RelicAddBackIntoDeck(),
-        new RelicSendFragments(),
-        new RelicPurgeFragments()
+            new PlanetAdd(),
+            new PlanetRemove(),
+            new PlanetExhaust(),
+            new PlanetRefresh(),
+            new PlanetExhaustAbility(),
+            new PlanetRefreshAbility(),
+            new PlanetRefreshAll(),
+            new PlanetExhaustAll(),
+            new PlanetInfo()
     ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {
-        return Constants.RELIC;
+        return Constants.PLANET;
     }
 
+    @Override
     public String getDescription() {
-        return "Relic";
+        return "Add/remove/exhaust/ready/spend planets";
     }
 
     @Override

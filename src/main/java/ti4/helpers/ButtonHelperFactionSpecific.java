@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.commands.game.StartPhase;
-import ti4.commands.planet.PlanetAdd;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.helpers.DiceHelper.Die;
@@ -43,6 +42,7 @@ import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.planet.AddPlanetService;
 import ti4.service.tech.PlayerTechService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
@@ -1037,7 +1037,7 @@ public class ButtonHelperFactionSpecific {
                 unitGroupRef = "mech";
             }
         }
-        PlanetAdd.doAction(p2, origPlanet, game, event, false);
+        AddPlanetService.addPlanet(p2, origPlanet, game, event, false);
 
         List<Button> goAgainButtons = new ArrayList<>();
         Button button = Buttons.gray("transactWith_" + p2.getColor(), "Send something else to player?");

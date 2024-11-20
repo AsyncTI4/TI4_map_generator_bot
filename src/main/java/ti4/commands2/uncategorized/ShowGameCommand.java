@@ -14,9 +14,9 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 
-public class ShowGame extends GameStateCommand {
+public class ShowGameCommand extends GameStateCommand {
 
-    public ShowGame() {
+    public ShowGameCommand() {
         super(false, false);
     }
 

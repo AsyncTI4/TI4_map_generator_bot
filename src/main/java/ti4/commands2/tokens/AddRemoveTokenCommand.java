@@ -18,9 +18,9 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-abstract class AddRemoveToken extends GameStateCommand {
+abstract class AddRemoveTokenCommand extends GameStateCommand {
 
-    public AddRemoveToken() {
+    public AddRemoveTokenCommand() {
         super(true, true);
     }
 
