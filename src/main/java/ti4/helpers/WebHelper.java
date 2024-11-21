@@ -126,7 +126,7 @@ public class WebHelper {
             String json = objectMapper.writeValueAsString(payloads);
             PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(webProperties.getProperty("bucket"))
-                .key(String.format("statistics/%s.json", "test")) // TODO: when this export is final/good, change from "test", tell ParsleySage (stats dashboard dev)
+                .key("statistics/statistics.json")
                 .contentType("application/json")
                 .cacheControl("no-cache, no-store, must-revalidate")
                 .build();

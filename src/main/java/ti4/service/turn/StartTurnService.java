@@ -37,7 +37,7 @@ public class StartTurnService {
 
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setWhetherPlayerShouldBeTenMinReminded(false);
-        player.setTurnCount(player.getTurnCount() + 1);
+        player.setInRoundTurnCount(player.getInRoundTurnCount() + 1);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         Map<String, String> maps = new HashMap<>(game.getMessagesThatICheckedForAllReacts());
         for (String id : maps.keySet()) {
@@ -66,7 +66,7 @@ public class StartTurnService {
                 goingToPass = true;
             }
         }
-        String text = player.getRepresentationUnfogged() + " UP NEXT (Turn #" + player.getTurnCount() + ")";
+        String text = player.getRepresentationUnfogged() + " UP NEXT (Turn #" + player.getInRoundTurnCount() + ")";
         String buttonText = "Use buttons to do your turn. ";
         if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
             buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];

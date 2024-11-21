@@ -22,7 +22,7 @@ class TurnStart extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player player = getPlayer();
-        player.setTurnCount(player.getTurnCount() - 1);
+        player.setInRoundTurnCount(player.getInRoundTurnCount() - 1);
         StartTurnService.turnStart(event, game, player);
     }
 }

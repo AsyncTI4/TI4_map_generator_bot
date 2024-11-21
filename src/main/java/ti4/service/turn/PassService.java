@@ -63,6 +63,6 @@ public class PassService {
             }
         }
         EndTurnService.pingNextPlayer(event, game, player, true);
-        ButtonHelper.updateMap(game, event, "End of Turn (PASS) " + player.getTurnCount() + ", Round " + game.getRound() + " for " + player.getFactionEmoji());
+        ButtonHelper.updateMap(game, event, "End of Turn (PASS) " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + player.getFactionEmoji());
     }
 }

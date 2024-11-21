@@ -480,7 +480,7 @@ public class MapGenerator implements AutoCloseable {
         }
         DrawingUtil.superDrawString(bannerG, "#" + player.getInitiative(), 300 - mod, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
 
-        String turnOrdinal = StringHelper.ordinal(player.getTurnCount());
+        String turnOrdinal = StringHelper.ordinal(player.getInRoundTurnCount());
         String descr = player.getFlexibleDisplayName() + "'s " + turnOrdinal + " turn";
         FileUpload fileUpload = createFileUpload(bannerImage, 1.0f, player.getFaction() + player.getColor() + "banner").setDescription(descr);
         MessageHelper.sendFileUploadToChannel(player.getCorrectChannel(), fileUpload);
