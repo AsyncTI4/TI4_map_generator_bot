@@ -1137,7 +1137,8 @@ public class GameSaveLoadManager {
                             BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
                             return;
                         }
-                        if (file.getName().contains("pbd4765") || file.getName().contains("reference") || Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 60 || game.isCustodiansScored()) {
+                        // Temporarily not loading some dead games
+                        if (!game.isHasEnded() || file.getName().contains("pbd4765") || file.getName().contains("reference") || Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 60 || game.isCustodiansScored()) {
                             GameManager.addGame(game);
                         }
                     } catch (Exception e) {
