@@ -1892,6 +1892,10 @@ public class Player {
         return actualHits;
     }
 
+    public double getExpectedHits() {
+        return expectedHitsTimes10 / 10.0;
+    }
+
     public int getExpectedHitsTimes10() {
         return expectedHitsTimes10;
     }
