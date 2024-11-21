@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.commandcounter.RemoveCommandCounterService;
@@ -35,6 +34,7 @@ import ti4.model.UnitModel;
 import ti4.service.explore.ExploreService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.unit.AddUnitService;
 
 public class ButtonHelperActionCards {
 
@@ -775,7 +775,7 @@ public class ButtonHelperActionCards {
     public static void resolveGhostShipStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         tile = MoveUnits.flipMallice(event, tile, game);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "destroyer", game);
+        AddUnitService.addUnits(event, player.getColor(), tile, "destroyer", game);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " put 1 destroyer in " + tile.getRepresentation());
@@ -1357,7 +1357,7 @@ public class ButtonHelperActionCards {
     public static void resolveUpgrade(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         new RemoveUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "dread", game);
+        AddUnitService.addUnits(event, player.getColor(), tile, "dread", game);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " replaced 1 cruiser with 1 dreadnought in " + tile.getRepresentation());

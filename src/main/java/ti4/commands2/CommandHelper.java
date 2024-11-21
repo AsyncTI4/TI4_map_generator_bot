@@ -21,12 +21,14 @@ import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -203,5 +205,11 @@ public class CommandHelper {
             }
         }
         return factionColor;
+    }
+
+    public Tile getTile(SlashCommandInteractionEvent event, Game game) {
+        String tileName = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
+        String tileId = AliasHandler.resolveTile(tileName);
+        return TileHelper.getTile(event, tileId, game);
     }
 }

@@ -1676,7 +1676,7 @@ public class AgendaHelper {
                         Tile tile = game.getTileFromPlanet(planet);
                         String msg = player.getRepresentation() + " added 1 infantry to " + planet
                             + " due to the arcane citadel";
-                        new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + planet, game);
+                        AddUnitService.addUnits(event, player.getColor(), tile, "1 infantry " + planet, game);
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
                 }
@@ -1729,7 +1729,7 @@ public class AgendaHelper {
                                 Tile tile = game.getTileFromPlanet(planet);
                                 String msg = player.getRepresentation() + " added 1 infantry to " + planet
                                     + " due to the Arcane Citadel";
-                                new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + planet, game);
+                                AddUnitService.addUnits(event, player.getColor(), tile, "1 infantry " + planet, game);
                                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                             }
                         }

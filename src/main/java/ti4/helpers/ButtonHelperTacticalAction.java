@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.Units.UnitKey;
@@ -27,6 +26,7 @@ import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.AddUnitService;
 
 public class ButtonHelperTacticalAction {
 
@@ -48,7 +48,6 @@ public class ButtonHelperTacticalAction {
         rest = rest.replace(pos + "_", "");
 
         if (rest.contains("reverseall") || rest.contains("moveall")) {
-
             if (rest.contains("reverse")) {
                 for (String unit : currentSystem.keySet()) {
 
@@ -70,8 +69,8 @@ public class ButtonHelperTacticalAction {
                         unitkey = unitkey.replace("damaged", "");
                         damagedMsg = " damaged ";
                     }
-                    new AddUnits().unitParsing(event, player.getColor(),
-                        game.getTileByPosition(pos), (amount) + " " + unitkey + " " + planet, game);
+                    AddUnitService.addUnits(event, game.getTileByPosition(pos), game, player.getColor(),
+                        (amount) + " " + unitkey + " " + planet);
                     if (damagedMsg.contains("damaged")) {
                         if ("".equalsIgnoreCase(planet)) {
                             planet = "space";
@@ -225,8 +224,8 @@ public class ButtonHelperTacticalAction {
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColor());
         rest = rest.replace("damaged", "");
         if (amount < 0) {
-            new AddUnits().unitParsing(event, player.getColor(), game.getTileByPosition(pos),
-                (amount * -1) + " " + unitName + " " + planet, game);
+            AddUnitService.addUnits(event, game.getTileByPosition(pos), game, player.getColor(),
+                (amount * -1) + " " + unitName + " " + planet);
             if (buttonLabel.toLowerCase().contains("damaged")) {
                 if ("".equalsIgnoreCase(planet)) {
                     planet = "space";
@@ -357,8 +356,7 @@ public class ButtonHelperTacticalAction {
     public static void finishMovingForTacticalAction(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String message = "Moved all units to the space area.";
 
-        Tile tile = null;
-
+        Tile tile;
         if (buttonID.contains("_")) {
             tile = game.getTileByPosition(buttonID.split("_")[1]);
         } else {

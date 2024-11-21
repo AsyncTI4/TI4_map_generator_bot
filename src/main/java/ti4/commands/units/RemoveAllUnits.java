@@ -6,13 +6,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.commands2.GameStateCommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 
-public class RemoveAllUnits extends AddRemoveUnits {
+public class RemoveAllUnits extends GameStateCommand {
 
     @Override
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game game) {

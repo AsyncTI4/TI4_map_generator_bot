@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import ti4.commands.capture.CaptureCommand;
 import ti4.commands.units.AddUnitDamage;
 import ti4.commands.units.AddUnits;
-import ti4.commands.units.ModifyUnits;
+import ti4.commands.units.CaptureCommand;
+import ti4.commands.units.ModifyUnitsButtons;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveAllUnitDamage;
 import ti4.commands.units.RemoveAllUnits;
@@ -72,7 +72,7 @@ public class CommandManager {
         new RemoveAllCC(),
         new AddFrontierTokensCommand(),
         new MoveUnits(),
-        new ModifyUnits(),
+        new ModifyUnitsButtons(),
         new RemoveTokenCommand(),
         new AddTokenCommand(),
         new AddUnitDamage(),

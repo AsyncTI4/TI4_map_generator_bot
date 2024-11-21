@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
@@ -29,6 +28,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 class ActionCardDeck2ButtonHandler {
@@ -63,7 +63,7 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveDefenseInstallationStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         player.exhaustPlanet(planet);
-        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "pds " + planet, game);
+        AddUnitService.addUnits(event, player.getColor(), game.getTileFromPlanet(planet), "pds " + planet, game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and put 1 PDS on it");
@@ -296,7 +296,7 @@ class ActionCardDeck2ButtonHandler {
         String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         tile = MoveUnits.flipMallice(event, tile, game);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
+        AddUnitService.addUnits(event, player.getColor(), tile, "cruiser", game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " put 1 cruiser in " + tile.getRepresentation());
