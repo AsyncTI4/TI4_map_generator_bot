@@ -13,7 +13,6 @@ public class StatsComputationPipeline {
     // SearchGames
     // GameStatisticsFilter*****
     // GameStats
-    // ListTitlesGiven
     // StellarConverter
     // ListTitlesGiven
 
