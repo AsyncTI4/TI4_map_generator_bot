@@ -215,7 +215,6 @@ public class MapGenerator implements AutoCloseable {
                 displayTypeBasic = DisplayType.all;
                 width = mapWidth;
         }
-        System.out.println(displayType);
         allEyesOnMe = this.displayType.equals(DisplayType.googly);
         mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         graphics = mainImage.getGraphics();
@@ -1564,7 +1563,14 @@ public class MapGenerator implements AutoCloseable {
             } else {
                 drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
                 g2.setFont(Storage.getFont16());
-                drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 6, y + 144, 130);
+                if (abilityModel.getShortName().charAt(0) == '\n')
+                {
+                    drawTextVertically(g2, abilityModel.getShortName().substring(1).toUpperCase(), x + deltaX + 17, y + 144, Storage.getFont16());
+                }
+                else
+                {
+                    drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 9, y + 144, 130);
+                }
                 drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
             }
 
