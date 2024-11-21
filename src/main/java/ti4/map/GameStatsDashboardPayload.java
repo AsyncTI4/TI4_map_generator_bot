@@ -155,7 +155,7 @@ public class GameStatsDashboardPayload {
                         .flatMap(Collection::stream)
                         .map(Mapper::getPromissoryNote)
                         .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
-                        .map(pn -> "Support for the Throne (" + pn.getColor() + ")")
+                        .map(pn -> "Support for the Throne (" + pn.getColor().get() + ")")
                         .forEach(otherObjectives::add);
         game.getCustomPublicVP().keySet()
                 .forEach(customPublicVp -> {
