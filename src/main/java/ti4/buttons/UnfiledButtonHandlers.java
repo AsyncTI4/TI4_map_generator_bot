@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -22,9 +26,6 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.planet.PlanetExhaust;
@@ -384,13 +385,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 && !player.ownsPromissoryNote("riderx")
                 && !player.ownsPromissoryNote("riderm") && !player.ownsPromissoryNote("ridera")
                 && !player.hasTechReady("gr")) {
-                    List<Button> buttons = new ArrayList<>();
-                    String msg = player.getRepresentation()
-                        + " The bot may also auto react for you when you have no whens/afters, using the same interval. Default for this is off. This will only apply to this game. If you have any whens or afters or related when/after abilities, it will not do anything. ";
-                    buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
-                    buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
-                }
+                List<Button> buttons = new ArrayList<>();
+                String msg = player.getRepresentation()
+                    + " The bot may also auto react for you when you have no whens/afters, using the same interval. Default for this is off. This will only apply to this game. If you have any whens or afters or related when/after abilities, it will not do anything. ";
+                buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
+                buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+            }
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -1864,6 +1865,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (game.getLatestAfterMsg().equalsIgnoreCase(messageId)) {
                     msg.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
                     AgendaHelper.startTheVoting(game);
+                    GameSaveLoadManager.saveGame(game, "Started Voting");
                 } else if (game.getLatestWhenMsg().equalsIgnoreCase(messageId)) {
                     msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
 
