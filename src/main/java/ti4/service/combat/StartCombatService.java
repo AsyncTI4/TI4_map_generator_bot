@@ -38,7 +38,7 @@ public class StartCombatService {
     public static String combatThreadName(Game game, Player player1, @Nullable Player player2, Tile tile) {
         StringBuilder sb = new StringBuilder();
         sb.append(game.getName()).append("-round-").append(game.getRound()).append("-system-")
-            .append(tile.getPosition()).append("-turn-").append(player1.getTurnCount()).append("-");
+            .append(tile.getPosition()).append("-turn-").append(player1.getInRoundTurnCount()).append("-");
         if (game.isFowMode()) {
             sb.append(player1.getColor());
             if (player2 != null)
@@ -63,7 +63,7 @@ public class StartCombatService {
     private static String combatThreadName(Game game, Player player1, @Nullable Player player2, Tile tile, String specialCombatTitle) {
         StringBuilder sb = new StringBuilder();
         sb.append(game.getName()).append("-round-").append(game.getRound()).append("-system-")
-            .append(tile.getPosition()).append("-turn-").append(player1.getTurnCount()).append("-");
+            .append(tile.getPosition()).append("-turn-").append(player1.getInRoundTurnCount()).append("-");
         if (game.isFowMode()) {
             sb.append(player1.getColor());
             if (player2 != null) {

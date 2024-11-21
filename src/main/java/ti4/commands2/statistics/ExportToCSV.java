@@ -76,7 +76,7 @@ class ExportToCSV extends Subcommand {
         for (Player p : game.getRealAndEliminatedAndDummyPlayers()) {
             fields.add(p.getFaction());
             fields.add(p.getColor());
-            fields.add(Integer.toString(p.getTurnCount()));
+            fields.add(Integer.toString(p.getInRoundTurnCount()));
             fields.add(Integer.toString(p.getTotalVictoryPoints()));
             fields.add(Integer.toString(p.getSecretVictoryPoints()));
             fields.add(Integer.toString(p.getPublicVictoryPoints(false)));
