@@ -287,4 +287,8 @@ public class GameStatsDashboardPayload {
     public boolean isFrankenGame() {
         return game.isFrankenGame();
     }
+
+    public boolean isAllianceMode() {
+        return game.isAllianceMode();
+    }
 }
