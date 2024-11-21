@@ -92,7 +92,7 @@ public class EndTurnService {
         game.setStoredValue("possiblyUsedRift", "");
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _\n"
-                + "**End of Turn " + mainPlayer.getTurnCount() + " for** " + mainPlayer.getRepresentation());
+                + "**End of Turn " + mainPlayer.getInRoundTurnCount() + " for** " + mainPlayer.getRepresentation());
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn");
         }

@@ -145,7 +145,7 @@ public class PickStrategyCardService {
                 game.setPhaseOfGame("strategy");
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick your strategy card.", Helper.getRemainingSCButtons(event, game, privatePlayer));
             } else {
-                privatePlayer.setTurnCount(privatePlayer.getTurnCount() + 1);
+                privatePlayer.setInRoundTurnCount(privatePlayer.getInRoundTurnCount() + 1);
                 if (game.isShowBanners()) {
                     MapGenerator.drawBanner(privatePlayer);
                 }
@@ -176,7 +176,7 @@ public class PickStrategyCardService {
                 game.setPhaseOfGame("strategy");
             } else {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
-                privatePlayer.setTurnCount(privatePlayer.getTurnCount() + 1);
+                privatePlayer.setInRoundTurnCount(privatePlayer.getInRoundTurnCount() + 1);
                 if (game.isShowBanners()) {
                     MapGenerator.drawBanner(privatePlayer);
                 }
