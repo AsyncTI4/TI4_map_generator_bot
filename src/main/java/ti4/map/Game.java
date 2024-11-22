@@ -156,7 +156,7 @@ public class Game extends GameProperties {
     private List<String> relics;
     @JsonIgnore
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
-    private final List<String> runDataMigrations = new ArrayList<>();
+    private final Set<String> runDataMigrations = new HashSet<>();
     private BagDraft activeDraft;
     @JsonIgnore
     @Getter
@@ -504,9 +504,10 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public String getGameModesText() {
+        boolean isNormalGame = isNormalGame();
         Map<String, Boolean> gameModes = new HashMap<>() {
             {
-                put(Emojis.TI4PoK + "Normal", isNormalGame());
+                put(Emojis.TI4PoK + "Normal", isNormalGame);
                 put(Emojis.TI4BaseGame + "Base Game", isBaseGameMode());
                 put(Emojis.MiltyMod + "MiltyMod", isMiltyModMode());
                 put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
@@ -522,7 +523,7 @@ public class Game extends GameProperties {
                 put("HomebrewSC", isHomebrewSCMode());
                 put("Little Omega", isLittleOmega());
                 put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
-                put("Homebrew", hasHomebrew());
+                put("Homebrew", !isNormalGame);
             }
         };
         for (String tag : getTags()) {
@@ -679,9 +680,8 @@ public class Game extends GameProperties {
     public String getFactionsThatReactedToThis(String messageID) {
         if (checkingForAllReacts.get(messageID) != null) {
             return checkingForAllReacts.get(messageID);
-        } else {
-            return "";
         }
+        return "";
     }
 
     public void clearAllEmptyStoredValues() {
@@ -3638,7 +3638,7 @@ public class Game extends GameProperties {
         runDataMigrations.add(string);
     }
 
-    public List<String> getRunMigrations() {
+    public Set<String> getRunMigrations() {
         return runDataMigrations;
     }
 
@@ -4105,9 +4105,10 @@ public class Game extends GameProperties {
                 .map(Mapper::getFaction)
                 .filter(Objects::nonNull)
                 .anyMatch(faction -> !faction.getSource().isOfficial())
-            || Mapper.getLeaders().values().stream()
-                .filter(leader -> !leader.getSource().isOfficial())
-                .anyMatch(leader -> isLeaderInGame(leader.getID()))
+            || getRealAndEliminatedAndDummyPlayers().stream().map(Player::getLeaderIDs)
+                .flatMap(Collection::stream)
+                .map(Mapper::getLeader)
+                .anyMatch(leader -> !leader.getSource().isOfficial())
             || (publicObjectives1 != null && publicObjectives1.size() < 5 && getRound() >= 4)
             || (publicObjectives2 != null && publicObjectives2.size() < (getRound() - 4))
             || getRealPlayers().stream()

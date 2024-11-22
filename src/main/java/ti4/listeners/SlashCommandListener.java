@@ -51,7 +51,7 @@ public class SlashCommandListener extends ListenerAdapter {
                     .setEphemeral(true).queue();
                 return;
             } else {
-                Game userActiveGame = GameManager.getUserActiveGame(userID);
+                Game userActiveGame = UserGameContextManager.getContextGame(userID);
                 if (userActiveGame != null) {
                     userActiveGame.incrementSpecificSlashCommandCount(event.getFullCommandName());
                 }
@@ -65,7 +65,7 @@ public class SlashCommandListener extends ListenerAdapter {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
             event.getChannel().sendMessage(commandText).queue(m -> {
                 BotLogger.logSlashCommand(event, m);
-                Game userActiveGame = GameManager.getUserActiveGame(userID);
+                Game userActiveGame = UserGameContextManager.getContextGame(userID);
                 boolean harmless = false;
                 if (!event.getInteraction().getName().equals(Constants.HELP)
                     && !event.getInteraction().getName().equals(Constants.STATISTICS)
@@ -142,7 +142,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
     public static boolean setActiveGame(MessageChannel channel, String userID, String eventName, String subCommandName) {
         String channelName = channel.getName();
-        Game userActiveGame = GameManager.getUserActiveGame(userID);
+        Game userActiveGame = UserGameContextManager.getContextGame(userID);
         List<String> mapList = GameManager.getGameNames();
 
         String gameID = StringUtils.substringBefore(channelName, "-");
@@ -165,8 +165,8 @@ public class SlashCommandListener extends ListenerAdapter {
         if (!gameExists && !(isUnprotectedCommand) && !(isUnprotectedCommandSubcommand)) {
             return false;
         }
-        if (gameExists && (GameManager.getUserActiveGame(userID) == null
-            || !GameManager.getUserActiveGame(userID).getName().equals(gameID)
+        if (gameExists && (UserGameContextManager.getContextGame(userID) == null
+            || !UserGameContextManager.getContextGame(userID).getName().equals(gameID)
                 && (GameManager.getGame(gameID) != null && (GameManager.getGame(gameID).isCommunityMode()
                     || GameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
             GameManager.setGameForUser(userID, gameID);

@@ -6065,7 +6065,7 @@ public class ButtonHelper {
             return;
 
         String userID = event.getUser().getId();
-        Game game = GameManager.getUserActiveGame(userID);
+        Game game = UserGameContextManager.getContextGame(userID);
         if (game == null) {
             event.getChannel().sendMessage("Unable to determine active game.").queue();
             return;

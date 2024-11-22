@@ -71,7 +71,7 @@ public class AutoCompleteProvider {
 
         String userId = event.getUser().getId();
         SlashCommandListener.setActiveGame(event.getMessageChannel(), userId, event.getName(), event.getSubcommandName());
-        Game game = GameManager.getUserActiveGame(userId);
+        Game game = UserGameContextManager.getContextGame(userId);
         Player player = null;
         if (game != null) {
             player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
