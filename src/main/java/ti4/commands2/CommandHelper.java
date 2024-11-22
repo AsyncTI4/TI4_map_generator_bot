@@ -212,4 +212,10 @@ public class CommandHelper {
         String tileId = AliasHandler.resolveTile(tileName);
         return TileHelper.getTile(event, tileId, game);
     }
+
+    public Tile getTile(SlashCommandInteractionEvent event, Game game, String tileName) {
+        tileName = StringUtils.substringBefore(tileName.toLowerCase(), " ");
+        String tileId = AliasHandler.resolveTile(tileName);
+        return TileHelper.getTile(event, tileId, game);
+    }
 }

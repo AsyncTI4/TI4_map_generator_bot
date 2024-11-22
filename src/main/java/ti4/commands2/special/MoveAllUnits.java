@@ -4,18 +4,18 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.commands2.commandcounter.RemoveCommandCounterService;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
-import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 class MoveAllUnits extends GameStateSubcommand {
@@ -32,19 +32,21 @@ class MoveAllUnits extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        String tile1ID = AliasHandler.resolveTile(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());
-        Tile tile1 = TileHelper.getTile(event, tile1ID, game);
-        if (tile1 == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tile1ID + "`. Tile not found");
+        Tile tileFrom = CommandHelper.getTile(event, game);
+        if (tileFrom == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the tile you're moving from.");
+            return;
+        }
+
+        Tile tileTo = CommandHelper.getTile(event, game, event.getOption(Constants.TILE_NAME_TO).getAsString());
+        if (tileTo == null) {
+            BotLogger.log("Could not find the tile you're moving to.");
             return;
         }
 
         Player player = getPlayer();
-        String tile2ID = AliasHandler.resolveTile(event.getOption(Constants.TILE_NAME_TO).getAsString().toLowerCase());
-        Tile tile2 = TileHelper.getTile(event, tile2ID, game);
-
-        UnitHolder space = tile2.getUnitHolders().get("space");
-        for (UnitHolder uH : tile1.getUnitHolders().values()) {
+        UnitHolder space = tileTo.getUnitHolders().get("space");
+        for (UnitHolder uH : tileFrom.getUnitHolders().values()) {
             for (UnitKey key : uH.getUnits().keySet()) {
                 if (!player.unitBelongsToPlayer(key)) continue;
                 space.addUnit(key, uH.getUnits().get(key));
@@ -62,10 +64,10 @@ class MoveAllUnits extends GameStateSubcommand {
         if (optionCC != null) {
           String value = optionCC.getAsString().toLowerCase();
             if ("t".equals(value) || "tactics".equals(value) || "t/tactics".equals(value)) {
-                RemoveCommandCounterService.fromTacticsPool(event, player.getColor(), tile2, game);
+                RemoveCommandCounterService.fromTacticsPool(event, player.getColor(), tileTo, game);
             }
             if (!"no".equals(value)) {
-                CommandCounterHelper.addCC(event, player.getColor(), tile2, false);
+                CommandCounterHelper.addCC(event, player.getColor(), tileTo, false);
             }
             Helper.isCCCountCorrect(event, game, player.getColor());
         }

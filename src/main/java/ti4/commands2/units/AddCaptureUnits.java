@@ -1,4 +1,4 @@
-package ti4.commands.units;
+package ti4.commands2.units;
 
 import java.util.List;
 
@@ -17,10 +17,10 @@ import ti4.message.MessageHelper;
 import ti4.service.unit.ParseUnitService;
 import ti4.service.unit.ParsedUnit;
 
-class RemoveCaptureUnits extends GameStateSubcommand {
+class AddCaptureUnits extends GameStateSubcommand {
 
-    public RemoveCaptureUnits() {
-        super(Constants.REMOVE_UNITS, "Release captured units", true, true);
+    public AddCaptureUnits() {
+        super(Constants.ADD_UNITS, "Capture units", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit' Eg. 2 infantry, carrier, 2 fighter, mech").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color for unit").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color capturing (default you)").setAutoComplete(true));
@@ -47,7 +47,7 @@ class RemoveCaptureUnits extends GameStateSubcommand {
                 Units.UnitKey unitKey = new Units.UnitKey(parsedUnit.getUnitKey().getUnitType(), getPlayer().getColor());
                 parsedUnit = new ParsedUnit(unitKey, parsedUnit.getCount(), parsedUnit.getLocation());
             }
-            tile.removeUnit(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
+            tile.addUnit(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
         }
 
         UnitCommandHelper.handleGenerateMapOption(event, game);

@@ -49,8 +49,8 @@ public class ParseUnitService {
     private ParsedUnit parseUnit(String unitListToken, String color, Tile tile, GenericInteractionCreateEvent event) {
         StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
 
-        int count = parseCount(unitInfoTokenizer);
-        count = Math.max(count, 1);
+        int count = unitInfoTokenizer.countTokens() == 1 ? 1 :
+            Math.max(parseCount(unitInfoTokenizer), 1);
 
         String originalUnit = parseUnitName(unitInfoTokenizer);
         String resolvedUnit = AliasHandler.resolveUnit(originalUnit);
@@ -60,7 +60,7 @@ public class ParseUnitService {
         String planetName = parsePlanetName(unitInfoTokenizer, tile);
 
         var parsedUnit =  new ParsedUnit(unitKey, count, planetName);
-        if (!validateParsedUnit(parsedUnit, tile, unitListToken, event)) {
+        if (event instanceof SlashCommandInteractionEvent && !validateParsedUnit(parsedUnit, tile, unitListToken, event)) {
             return null;
         }
         return parsedUnit;
@@ -94,7 +94,7 @@ public class ParseUnitService {
         boolean isValidUnit = parsedUnit.getUnitKey() != null;
         boolean isValidUnitHolder = parsedUnit.getLocation().equals(Constants.SPACE) || tile.isSpaceHolderValid(parsedUnit.getLocation());
 
-        if (!(event instanceof SlashCommandInteractionEvent) || (isValidUnit && isValidUnitHolder)) {
+        if (isValidUnit && isValidUnitHolder) {
             return true;
         }
 

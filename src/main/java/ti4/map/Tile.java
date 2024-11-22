@@ -19,13 +19,13 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
+import ti4.image.TileHelper;
 import ti4.message.BotLogger;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
@@ -102,16 +102,18 @@ public class Tile {
 
     public void addUnitDamage(String spaceHolder, UnitKey unitID, @Nullable Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
-        if (unitHolder != null && count != null) {
-            Map<UnitKey, Integer> units = unitHolder.getUnits();
-            Integer unitCount = units.get(unitID);
-            if (unitCount != null) {
-                if (unitCount < count) {
-                    count = unitCount;
-                }
-                unitHolder.addUnitDamage(unitID, count);
-            }
+        if (unitHolder == null || count == null) {
+            return;
         }
+        Map<UnitKey, Integer> units = unitHolder.getUnits();
+        Integer unitCount = units.get(unitID);
+        if (unitCount == null) {
+            return;
+        }
+        if (unitCount < count) {
+            count = unitCount;
+        }
+        unitHolder.addUnitDamage(unitID, count);
     }
 
     public void addCC(String ccID) {

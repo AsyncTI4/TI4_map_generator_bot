@@ -1,4 +1,4 @@
-package ti4.commands.units;
+package ti4.commands2.units;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -20,7 +20,7 @@ class UnitCommandHelper {
         if (generateMap) {
             ShowGameService.simpleShowGame(game, event);
         } else {
-            MessageHelper.replyToMessage(event, "Map update completed");
+            MessageHelper.replyToMessage(event, "Update completed");
         }
     }
 
