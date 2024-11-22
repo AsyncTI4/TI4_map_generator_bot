@@ -50,6 +50,10 @@ public class PlayerStatsDashboardPayload {
         return player.getUserID().equals(game.getActivePlayerID()); // UNUSED, IGNORE
     }
 
+    public String getDiscordUserID() {
+        return player.getUserID();
+    }
+
     public List<String> getAlliances() {
         return player.getPromissoryNotesInPlayArea().stream()
             .map(Mapper::getPromissoryNote)
@@ -284,6 +288,22 @@ public class PlayerStatsDashboardPayload {
             .filter(u -> u.getRequiredTechId().isPresent()) // is a unit that requires a tech upgrade
             .map(UnitModel::getBaseType)
             .toList();
+    }
+
+    public int getTotalNumberOfTurns() {
+        return player.getNumberTurns();
+    }
+
+    public long getTotalTurnTime() {
+        return player.getTotalTurnTime();
+    }
+
+    public double getExpectedHits() {
+        return player.getExpectedHits();
+    }
+
+    public int getActualHits() {
+        return player.getActualHits();
     }
 
     @Data

@@ -385,13 +385,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 && !player.ownsPromissoryNote("riderx")
                 && !player.ownsPromissoryNote("riderm") && !player.ownsPromissoryNote("ridera")
                 && !player.hasTechReady("gr")) {
-                    List<Button> buttons = new ArrayList<>();
-                    String msg = player.getRepresentation()
-                        + " The bot may also auto react for you when you have no whens/afters, using the same interval. Default for this is off. This will only apply to this game. If you have any whens or afters or related when/after abilities, it will not do anything. ";
-                    buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
-                    buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
-                }
+                List<Button> buttons = new ArrayList<>();
+                String msg = player.getRepresentation()
+                    + " The bot may also auto react for you when you have no whens/afters, using the same interval. Default for this is off. This will only apply to this game. If you have any whens or afters or related when/after abilities, it will not do anything. ";
+                buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
+                buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+            }
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -1668,7 +1668,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     player.addSpentThing("warmachine");
                 }
                 ButtonHelper.updateMap(game, event,
-                    "Result of build on turn " + player.getTurnCount() + " for " + player.getFactionEmoji());
+                    "Result of build on turn " + player.getInRoundTurnCount() + " for " + player.getFactionEmoji());
                 buttons.add(doneExhausting);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 if (tile != null && player.hasAbility("rally_to_the_cause")
@@ -1865,6 +1865,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (game.getLatestAfterMsg().equalsIgnoreCase(messageId)) {
                     msg.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
                     AgendaHelper.startTheVoting(game);
+                    GameSaveLoadManager.saveGame(game, "Started Voting");
                 } else if (game.getLatestWhenMsg().equalsIgnoreCase(messageId)) {
                     msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
 

@@ -25,6 +25,6 @@ class TurnEndButtonHandler {
         EndTurnService.pingNextPlayer(event, game, player);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
 
-        ButtonHelper.updateMap(game, event, "End of Turn " + player.getTurnCount() + ", Round " + game.getRound() + " for " + player.getFactionEmoji());
+        ButtonHelper.updateMap(game, event, "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + player.getFactionEmoji());
     }
 }

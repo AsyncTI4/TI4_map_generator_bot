@@ -440,7 +440,7 @@ public class CombatRollService {
                     String pos = thalnosUnit.split("_")[0];
                     String unitHolderName = thalnosUnit.split("_")[1];
                     Tile tile = game.getTileByPosition(pos);
-                    String unitName = unitModel.getAsyncId();
+                    String unitName = unitModel.getBaseType();
                     thalnosUnit = thalnosUnit.split("_")[2].replace("damaged", "");
                     if (thalnosUnit.equals(unitName)) {
                         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), misses + " " + unitName + " " + unitHolderName);
@@ -584,9 +584,9 @@ public class CombatRollService {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
-                entry -> new ImmutablePair<>(
-                    player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
-                    entry.getValue()))
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
+                entry.getValue()))
             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         HashMap<UnitModel, Integer> output;
         if (unitHolder.getName().equals(Constants.SPACE)) {
@@ -601,9 +601,9 @@ public class CombatRollService {
                     }
                     Map<String, Integer> unitsByAsyncId2 = u2.getUnitAsyncIdsOnHolder(colorID);
                     Map<UnitModel, Integer> unitsInCombat2 = unitsByAsyncId2.entrySet().stream().map(
-                            entry -> new ImmutablePair<>(
-                                player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
-                                entry.getValue()))
+                        entry -> new ImmutablePair<>(
+                            player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
+                            entry.getValue()))
                         .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
                     HashMap<UnitModel, Integer> output2;
                     output2 = new HashMap<>(unitsInCombat2.entrySet().stream()
@@ -655,9 +655,9 @@ public class CombatRollService {
 
     private static Map<UnitModel, Integer> getUnitsInCombat(Player player, Map<String, Integer> unitsByAsyncId) {
         return unitsByAsyncId.entrySet().stream().map(
-                entry -> new ImmutablePair<>(
-                    player.getPriorityUnitByAsyncID(entry.getKey(), null),
-                    entry.getValue()))
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                entry.getValue()))
             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
     }
 
@@ -708,9 +708,9 @@ public class CombatRollService {
         }
 
         Map<UnitModel, Integer> unitsOnPlanet = unitsByAsyncId.entrySet().stream().map(
-                entry -> new ImmutablePair<>(
-                    player.getPriorityUnitByAsyncID(entry.getKey(), null),
-                    entry.getValue()))
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                entry.getValue()))
             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         // Check for space cannon die on planet
@@ -766,14 +766,14 @@ public class CombatRollService {
         }
 
         Map<UnitModel, Integer> unitsOnTile = unitsByAsyncId.entrySet().stream().map(
-                entry -> new ImmutablePair<>(
-                    player.getPriorityUnitByAsyncID(entry.getKey(), null),
-                    entry.getValue()))
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                entry.getValue()))
             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         Map<UnitModel, Integer> unitsOnAdjacentTiles = adjacentUnitsByAsyncId.entrySet().stream().map(
-                entry -> new ImmutablePair<>(
-                    player.getPriorityUnitByAsyncID(entry.getKey(), null),
-                    entry.getValue()))
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                entry.getValue()))
             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         // Check for space cannon die on planets

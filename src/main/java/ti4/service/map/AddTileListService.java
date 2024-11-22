@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.ResourceHelper;
+import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -103,6 +104,10 @@ public class AddTileListService {
             AddFrontierTokensService.addFrontierTokens(event, game);
             MessageHelper.sendMessageToChannel(channel, Emojis.Frontier + "Frontier Tokens have been added to empty spaces.");
         }
+        
+        MessageHelper.sendMessageToChannelWithButtons(
+            game.getMainGameChannel(), "Press this button after every player is setup",
+            List.of(Buttons.green("deal2SOToAll", "Deal 2 SO To All")));
 
         if (game.getRealPlayers().size() < game.getPlayers().size()) {
             ButtonHelper.offerPlayerSetupButtons(channel, game);
