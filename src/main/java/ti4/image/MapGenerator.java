@@ -1532,7 +1532,15 @@ public class MapGenerator implements AutoCloseable {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
         boolean addedAbilities = false;
-        for (String abilityID : player.getAbilities()) {
+        Comparator<String> abilityComparator = (ability1, ability2) -> {
+            AbilityModel abilityModel1 = Mapper.getAbility(ability1);
+            AbilityModel abilityModel2 = Mapper.getAbility(ability2);
+            return abilityModel1.getName().compareToIgnoreCase(abilityModel2.getName());
+        };
+        List<String> allAbilities = new ArrayList<>(player.getAbilities());
+        allAbilities.sort(abilityComparator);
+        
+        for (String abilityID : allAbilities) {
             String abilityFileName = null;
             switch (abilityID) {
                 case "grace" -> abilityFileName = "pa_ds_edyn_grace";

@@ -38,7 +38,8 @@
         "permanentEffect": "You may not give your commodities to other players as part of a transaction.",
         "window": "After you gain 1 or more commodities",
         "windowEffect": "You may spend a number of commodities equal to the combined cost listed on any number of Axis Order cards in your reinforcements to place those cards in your play area.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Military Industr'l Cmplx"
     },
     {
         "id": "ancient_blueprints",
@@ -69,7 +70,8 @@
         "name": "Industrialists",
         "faction": "celdauri",
         "permanentEffect": "During setup, place the Celdauri space dock token in your reinforcements, the Celdauri space dock token is a fourth space dock unit.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Indust-\nrialists"
     },
     {
         "id": "projection_of_power",
@@ -152,7 +154,8 @@
         "name": "Enlightenment (Outdated Ability - please remove this ability and add 'radiance')",
         "faction": "edyn",
         "permanentEffect": "During setup, purge your \"Support for the Throne\" promissory note. You may score up to 1 public objective a second time.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Enlight\n-enment"
     },
     {
         "id": "grace",
@@ -176,7 +179,8 @@
         "faction": "edyn",
         "window": "After the \"Second Agenda\" step of the agenda phase",
         "windowEffect": "Look at the top card of the agenda deck. Then, you may ready all planets to repeat the Second Agenda step for a third agenda.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Royal\nDecree"
     },
     {
         "id": "black_markets",
@@ -410,7 +414,7 @@
     },
     {
         "id": "fervor",
-        "name": "Zealous",
+        "name": "Fervor",
         "faction": "kortali",
         "window": "When you spend a command token to resolve the secondary ability of the \"Warfare\" strategy card",
         "windowEffect": "You may resolve the primary ability instead.",
@@ -785,7 +789,8 @@
         "faction": "zealots",
         "window": "Once per agenda phase, after an agenda is revealed, if you are not the speaker",
         "windowEffect": "You may choose to vote after the speaker on that agenda.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Conspir\n-ators"
     },
     {
         "id": "biophobic",
