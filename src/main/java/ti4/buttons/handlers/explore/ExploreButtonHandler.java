@@ -41,7 +41,7 @@ class ExploreButtonHandler {
             ButtonHelper.addReaction(event, false, false, "Didn't have any Comms/TGs to spend, no mech placed", "");
             return;
         }
-        AddUnitService.addUnits(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName, game);
+        AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), "mech " + planetName);
         planetName = Mapper.getPlanet(planetName) == null ? "`error?`" : Mapper.getPlanet(planetName).getName();
         ButtonHelper.addReaction(event, false, false, "Spent a " + commOrTg + " for a Mech on " + planetName, "");
         ButtonHelper.deleteMessage(event);
@@ -115,12 +115,10 @@ class ExploreButtonHandler {
         boolean failed = message.contains("Please try again.");
         if (!failed) {
             if ("mech".equalsIgnoreCase(mech)) {
-                AddUnitService.addUnits(event, player.getColor(), game.getTileFromPlanet(planet),
-                    "mech " + planet, game);
+                AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(),"mech " + planet);
                 message += "Placed mech on" + Mapper.getPlanet(planet).getName();
             } else {
-                AddUnitService.addUnits(event, player.getColor(), game.getTileFromPlanet(planet),
-                    "2 infantry " + planet, game);
+                AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "2 infantry " + planet);
                 message += "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
             }
             ButtonHelper.addReaction(event, false, false, message, "");

@@ -180,7 +180,7 @@ public class PlayHeroService {
                     player.getRepresentationUnfogged() + " removed all of your CCs from the board");
                 for (Tile t : game.getTileMap().values()) {
                     if (CommandCounterHelper.hasCC(event, player.getColor(), t)) {
-                        RemoveCommandCounterService.removeCC(event, player.getColor(), t, game);
+                        RemoveCommandCounterService.fromTile(event, player.getColor(), t, game);
                     }
                 }
             }

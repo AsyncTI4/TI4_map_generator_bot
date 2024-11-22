@@ -3,11 +3,11 @@ package ti4.commands.units;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.commands2.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
@@ -32,29 +32,13 @@ class UnitCommandHelper {
         String value = ccUseOption.getAsString().toLowerCase();
         switch (value) {
             case "t/tactics", "t", "tactics", "tac", "tact" -> {
-                removeTacticsCC(event, color, tile, game);
+                RemoveCommandCounterService.fromTacticsPool(event, color, tile, game);
                 CommandCounterHelper.addCC(event, color, tile);
                 Helper.isCCCountCorrect(event, game, color);
             }
             case "r/retreat/reinforcements", "r", "retreat", "reinforcements" -> {
                 CommandCounterHelper.addCC(event, color, tile);
                 Helper.isCCCountCorrect(event, game, color);
-            }
-        }
-    }
-
-    public static void removeTacticsCC(SlashCommandInteractionEvent event, String color, Tile tile, Game game) {
-        for (Player player : game.getPlayers().values()) {
-            if (color.equals(player.getColor())) {
-                int cc = player.getTacticalCC();
-                if (cc == 0) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have CC in Tactics");
-                    break;
-                } else if (!CommandCounterHelper.hasCC(event, color, tile)) {
-                    cc -= 1;
-                    player.setTacticalCC(cc);
-                    break;
-                }
             }
         }
     }

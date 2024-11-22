@@ -14,6 +14,7 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.RemoveUnitService;
 
 public class MoveUnits extends GameStateCommand {
 
@@ -78,7 +79,7 @@ public class MoveUnits extends GameStateCommand {
 
         boolean prioritizeNoDamage = event.getOption(Constants.PRIORITY_NO_DAMAGE, false, OptionMapping::getAsBoolean);
         String fromUnitList = event.getOption(Constants.UNIT_NAMES).getAsString();
-        RemoveUnits.removeUnits(event, tile, game, color, fromUnitList, prioritizeNoDamage);
+        RemoveUnitService.removeUnits(event, tile, game, color, fromUnitList, prioritizeNoDamage);
 
         String toUnitList = event.getOption(Constants.UNIT_NAMES_TO).getAsString();
         AddUnitService.addUnits(event, tile, game, color, toUnitList);

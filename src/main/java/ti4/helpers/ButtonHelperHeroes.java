@@ -15,8 +15,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.units.MoveUnits;
-import ti4.commands.units.RemoveUnits;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -41,8 +39,11 @@ import ti4.service.franken.FrankenLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.planet.AddPlanetService;
+import ti4.service.planet.FlipTileService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.ParsedUnit;
+import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelperHeroes {
 
@@ -142,9 +143,9 @@ public class ButtonHelperHeroes {
             damaged = true;
             unitName = unitName.replace("damaged", "");
         }
-        destination = MoveUnits.flipMallice(event, destination, game);
-        new RemoveUnits().unitParsing(event, player.getColor(), origin, unitName + " " + unitHolderName, game);
-        AddUnitService.addUnits(event, player.getColor(), destination, unitName, game);
+        destination = FlipTileService.flipTileIfNeeded(event, destination, game);
+        RemoveUnitService.removeUnits(event, origin, game, player.getColor(), unitName + " " + unitHolderName);
+        AddUnitService.addUnits(event, destination, game, player.getColor(), unitName);
         String msg2 = player.getFactionEmoji() + " moved 1 " + unitName + " from "
             + origin.getRepresentationForButtons(game, player) + " to "
             + destination.getRepresentationForButtons(game, player);
@@ -847,7 +848,7 @@ public class ButtonHelperHeroes {
         if ("lockedmallice".equalsIgnoreCase(planetID)) {
             planetID = "mallice";
             Tile tile = game.getTileFromPlanet("lockedmallice");
-            MoveUnits.flipMallice(event, tile, game);
+            FlipTileService.flipTileIfNeeded(event, tile, game);
         }
         AddPlanetService.addPlanet(player, planetID, game, event, false);
         PlanetService.refreshPlanet(player, planetID);
@@ -937,11 +938,11 @@ public class ButtonHelperHeroes {
                         ButtonHelper.resolveInfantryDeath(game, p2, amountInf);
                     }
                     if (amountInf > 0) {
-                        new RemoveUnits().unitParsing(event, p2.getColor(), tile, amountInf + " inf " + name, game);
+                        RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountInf + " inf " + name);
                     }
                     int amountFF = unitHolder.getUnitCount(UnitType.Fighter, p2.getColor());
                     if (amountFF > 0) {
-                        new RemoveUnits().unitParsing(event, p2.getColor(), tile, amountFF + " ff", game);
+                        RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountFF + " ff");
                     }
                     if (amountFF + amountInf > 0) {
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
@@ -1557,7 +1558,7 @@ public class ButtonHelperHeroes {
         String planet = planetNInf.split("_")[0];
         String amount = planetNInf.split("_")[1];
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
-        AddUnitService.addUnits(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), amount + " inf " + planet, game);
+        AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planet)), game, player.getColor(),  amount + " inf " + planet);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " Chose to land " + amount + " infantry on " + Helper.getPlanetRepresentation(planet, game));
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
@@ -1712,9 +1713,9 @@ public class ButtonHelperHeroes {
                 damagedUnits = unitHolder.getUnitDamage().get(unitKey);
             }
 
-            new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitKey, player.getColor(), false,
-                game);
-            AddUnitService.addUnits(event, player.getColor(), tile2, totalUnits + " " + unitName, game);
+            var parsedUnit = new ParsedUnit(unitKey, totalUnits, Constants.SPACE);
+            RemoveUnitService.removeUnit(event, tile1, game, parsedUnit);
+            AddUnitService.addUnits(event, tile2, game, player.getColor(), totalUnits + " " + unitName);
             if (damagedUnits > 0) {
                 game.getTileByPosition(pos2).addUnitDamage("space", unitKey, damagedUnits);
             }
@@ -1738,11 +1739,11 @@ public class ButtonHelperHeroes {
                 damagedUnits = unitHolder.getUnitDamage().get(unitKey);
             }
 
-            new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitKey, player.getColor(), false,
-                game);
-            AddUnitService.addUnits(event, player.getColor(), tile2, totalUnits + " " + unitName, game);
+            var parsedUnit = new ParsedUnit(unitKey, totalUnits, Constants.SPACE);
+            RemoveUnitService.removeUnit(event, tile1, game, parsedUnit);
+            AddUnitService.addUnits(event, tile2, game, player.getColor(), totalUnits + " " + unitName);
             if (damagedUnits > 0) {
-                game.getTileByPosition(pos2).addUnitDamage("space", unitKey, damagedUnits);
+                game.getTileByPosition(pos2).addUnitDamage(Constants.SPACE, unitKey, damagedUnits);
             }
         }
 
@@ -1884,7 +1885,8 @@ public class ButtonHelperHeroes {
                 UnitKey unitKey = unitEntry.getKey();
                 int totalUnits = unitEntry.getValue();
                 if (unitKey.getUnitType() != UnitType.Infantry && unitKey.getUnitType() != UnitType.Mech) {
-                    new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitKey, player.getColor(), false, game);
+                    var parsedUnit = new ParsedUnit(unitKey, totalUnits, Constants.SPACE);
+                    RemoveUnitService.removeUnit(event, tile1, game, parsedUnit);
                 }
             }
         }
@@ -2102,11 +2104,11 @@ public class ButtonHelperHeroes {
         if (planet.equalsIgnoreCase("lockedmallice")) {
             Tile tile = game.getTileFromPlanet("lockedmallice");
             planet = "mallice";
-            tile = MoveUnits.flipMallice(event, tile, game);
+            tile = FlipTileService.flipTileIfNeeded(event, tile, game);
         } else if (planet.equalsIgnoreCase("hexlockedmallice")) {
             Tile tile = game.getTileFromPlanet("hexlockedmallice");
             planet = "hexmallice";
-            tile = MoveUnits.flipMallice(event, tile, game);
+            tile = FlipTileService.flipTileIfNeeded(event, tile, game);
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged() + " Chose to invade " + Helper.getPlanetRepresentation(planet, game));
         List<Button> buttons = new ArrayList<>();

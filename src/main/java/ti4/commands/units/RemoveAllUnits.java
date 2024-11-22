@@ -1,36 +1,24 @@
 package ti4.commands.units;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateCommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Units.UnitKey;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.MessageHelper;
+import ti4.service.planet.AddPlanetToPlayAreaService;
 
 public class RemoveAllUnits extends GameStateCommand {
 
-    @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game game) {
-        tile.removeAllUnits(color);
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder.getName(), game);
-        }
-    }
-
-    @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game game) {
-        //No need for this action
-    }
-
-    @Override
-    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game game) {
-        //No need for this action
+    public RemoveAllUnits() {
+        super(true, false);
     }
 
     @Override
@@ -38,18 +26,48 @@ public class RemoveAllUnits extends GameStateCommand {
         return Constants.REMOVE_ALL_UNITS;
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void register(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getName(), "Remove units from map")
-                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")));
+    public String getDescription() {
+        return "Removal all units from the map";
     }
 
     @Override
-    protected String getActionDescription() {
-        return "";
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return super.accept(event) &&
+            CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
+    }
+
+    @Override
+    public List<OptionData> getOptions() {
+        return List.of(
+            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                .setRequired(true)
+                .setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
+                .setAutoComplete(true),
+            new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")
+        );
+    }
+
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        Game game = getGame();
+
+        String color = CommandHelper.getColor(game, event);
+        if (!Mapper.isValidColor(color)) {
+            MessageHelper.replyToMessage(event, "Color/Faction not valid");
+            return;
+        }
+
+        Tile tile = CommandHelper.getTile(event, game);
+        if (tile == null) return;
+
+        tile.removeAllUnits(color);
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, unitHolder.getName(), game);
+        }
+
+        UnitCommandHelper.handleGenerateMapOption(event, game);
     }
 }

@@ -148,7 +148,7 @@ public class PlayerTechService {
                     String ident = player.getFactionEmoji();
                     String msg = ident + " removed CC from " + tileRep;
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                    RemoveCommandCounterService.removeCC(event, player.getColor(), tile, game);
+                    RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
                 }
             }
             case "td", "absol_td" -> { // Transit Diodes

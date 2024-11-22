@@ -21,7 +21,7 @@ class ColonialButtonHelper {
         String planet = buttonID.split("_")[2];
         Tile tile = game.getTileFromPlanet(planet);
         if (tile != null) {
-            AddUnitService.addUnits(event, p2.getColor(), tile, "1 inf " + planet, game);
+            AddUnitService.addUnits(event, tile, game, p2.getColor(), "1 inf " + planet);
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
             "1 " + p2.getColor() + " infantry was added to " + planet);

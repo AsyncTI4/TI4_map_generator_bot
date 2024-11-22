@@ -53,8 +53,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
-import ti4.commands.units.MoveUnits;
-import ti4.commands.units.RemoveUnits;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.commandcounter.RemoveCommandCounterService;
 import ti4.commands2.tokens.AddTokenCommand;
@@ -99,10 +97,12 @@ import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
+import ti4.service.planet.FlipTileService;
 import ti4.service.tech.ShowTechDeckService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelper {
 
@@ -233,7 +233,7 @@ public class ButtonHelper {
         }
 
         Tile tile = game.getTileFromPlanet(planet);
-        AddUnitService.addUnits(event, player.getColor(), tile, amount + " inf " + planet, game);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " inf " + planet);
         player.setStasisInfantry(player.getGenSynthesisInfantry() - Integer.parseInt(amount));
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " Placed " + amount + " infantry on "
             + Helper.getPlanetRepresentation(planet, game) + ". You have " + player.getGenSynthesisInfantry() + " infantry left to revive.");
@@ -1942,7 +1942,7 @@ public class ButtonHelper {
                 + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         }
 
-        RemoveCommandCounterService.removeCC(event, player.getColor(), tile, game);
+        RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
 
         String finChecker = "FFCC_" + player.getFaction() + "_";
         if ("mahactCommander".equalsIgnoreCase(whatIsItFor)) {
@@ -2550,9 +2550,9 @@ public class ButtonHelper {
                 capChecker.removeUnit(csdKey, 1);
                 capChecker.addUnit(sdKey, 1);
                 BotLogger.log("Removing csd in game " + game.getName());
-                // new RemoveUnits().unitParsing(event, player.getColor(), tile, "csd
+                // RemoveUnitService.removeUnits(event, player.getColor(), tile, "csd
                 // "+capChecker.getName(), game);
-                // AddUnitService.addUnits(event, player.getColor(), tile, "sd
+                // AddUnitService.addUnits(event, tile, player.getColor(),  "sd
                 // "+capChecker.getName(), game);
             }
             Map<UnitModel, Integer> unitsByQuantity = getAllUnits(capChecker, player);
@@ -2805,7 +2805,7 @@ public class ButtonHelper {
 
         String mechOrInf = buttonID.split("_")[3];
         String msg = player.getFactionEmojiOrColor() + " used the special Mecatol Rex power to remove 1 " + mechOrInf + " on " + Helper.getPlanetRepresentation(planet, game);
-        new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet), "1 " + mechOrInf + " " + planet, game);
+        RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, p2.getColor(), "1 " + mechOrInf + " " + planet);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         deleteMessage(event);
     }
@@ -3282,7 +3282,7 @@ public class ButtonHelper {
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 if (Constants.MECATOLS.contains(uH.getName())
                     && game.getStoredValue("planetsTakenThisRound").contains(uH.getName())) {
-                    AddUnitService.addUnits(event, player.getColor(), tile, "sd mr, pds mr", game);
+                    AddUnitService.addUnits(event, tile, game, player.getColor(),  "sd mr, pds mr");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
                             + " Due to the reclamation ability, 1 PDS and 1 space dock have been added to Mecatol Rex. This is optional though.");
@@ -3574,7 +3574,7 @@ public class ButtonHelper {
     public static void addAbsolOrbital(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         UnitHolder uH = tile.getUnitHolders().get(buttonID.split("_")[2]);
-        AddUnitService.addUnits(event, player.getColor(), tile, "plenaryorbital " + uH.getName(), game);
+        AddUnitService.addUnits(event, tile, game, player.getColor(),  "plenaryorbital " + uH.getName());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()
             + " added an Plenary Orbital to " + Mapper.getPlanet(uH.getName()).getName());
         player.addOwnedUnitByID("plenaryorbital");
@@ -3653,7 +3653,7 @@ public class ButtonHelper {
                 if (game.isFowMode()) {
                     channel = p2.getPrivateChannel();
                 }
-                RemoveCommandCounterService.removeCC(event, p2.getColor(), tile, game);
+                RemoveCommandCounterService.fromTile(event, p2.getColor(), tile, game);
                 String message = p2.getRepresentationUnfogged()
                     + " due to having Xuange, the Empyrean commander, the CC you had in the active system has been removed. Reminder that this is optional but was done automatically.";
                 MessageHelper.sendMessageToChannel(channel, message);
@@ -3901,7 +3901,7 @@ public class ButtonHelper {
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         if (!game.getMovedUnitsFromCurrentActivation().isEmpty()) {
-            tile = MoveUnits.flipMallice(event, tile, game);
+            tile = FlipTileService.flipTileIfNeeded(event, tile, game);
         }
 
         if (tile == null) {
@@ -3932,7 +3932,7 @@ public class ButtonHelper {
             }
         }
         if (!"box".equalsIgnoreCase(thingToAdd)) {
-            AddUnitService.addUnits(event, player.getColor(), tile, thingToAdd, game);
+            AddUnitService.addUnits(event, tile, game, player.getColor(), thingToAdd);
         }
         for (String unit : displacedUnits.keySet()) {
             int amount = displacedUnits.get(unit);
@@ -4181,8 +4181,7 @@ public class ButtonHelper {
                         if (!"space".equalsIgnoreCase(unitHolder.getName())) {
                             planetName = " " + unitHolder.getName();
                         }
-                        AddUnitService.addUnits(event, player.getColor(), tile, numMechs + " infantry" + planetName,
-                            game);
+                        AddUnitService.addUnits(event, tile, game, player.getColor(),  numMechs + " infantry" + planetName);
 
                         successMessageBuilder.append("\n").append(player.getFactionEmoji()).append(" placed ").append(numMechs)
                             .append(" ").append(Emojis.infantry)
@@ -6461,7 +6460,7 @@ public class ButtonHelper {
             + Helper.getPlanetRepresentation(planet, game);
         player.exhaustTech("sar");
         Tile tile = game.getTileFromPlanet(planet);
-        AddUnitService.addUnits(event, player.getColor(), tile, "mech " + planet, game);
+        AddUnitService.addUnits(event, tile, game, player.getColor(),  "mech " + planet);
         deleteMessage(event);
         sendMessageToRightStratThread(player, game, msg1, warfareOrNot);
     }

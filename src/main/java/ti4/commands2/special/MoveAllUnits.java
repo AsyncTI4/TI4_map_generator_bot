@@ -4,8 +4,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.units.MoveUnits;
 import ti4.commands2.GameStateSubcommand;
+import ti4.commands2.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
@@ -62,7 +62,7 @@ class MoveAllUnits extends GameStateSubcommand {
         if (optionCC != null) {
           String value = optionCC.getAsString().toLowerCase();
             if ("t".equals(value) || "tactics".equals(value) || "t/tactics".equals(value)) {
-                MoveUnits.removeTacticsCC(event, player.getColor(), tile2, game);
+                RemoveCommandCounterService.fromTacticsPool(event, player.getColor(), tile2, game);
             }
             if (!"no".equals(value)) {
                 CommandCounterHelper.addCC(event, player.getColor(), tile2, false);

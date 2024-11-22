@@ -82,6 +82,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
+import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.PassService;
@@ -322,7 +323,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         UnitHolder plan = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         plan.removeAllUnits(player.getColor());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Removed all units on " + planet + " for " + player.getRepresentation());
-        AddRemoveUnits.addPlanetToPlayArea(event, game.getTileFromPlanet(planet), planet, game);
+        AddPlanetToPlayAreaService.addPlanetToPlayArea(event, game.getTileFromPlanet(planet), planet, game);
     }
 
     @ButtonHandler("jrStructure_")
@@ -347,7 +348,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("dacxive_")
     public static void daxcive(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String planet = buttonID.replace("dacxive_", "");
-        AddUnitService.addUnits(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), "infantry " + planet, game);
+        AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planet)), game, player.getColor(), "infantry " + planet);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game) + " via the tech Dacxive Animators");
         ButtonHelper.deleteMessage(event);
     }
@@ -356,7 +357,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void glimmerHeroOn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
-        AddUnitService.addUnits(event, player.getColor(), game.getTileByPosition(pos), unit, game);
+        AddUnitService.addUnits(event, game.getTileByPosition(pos), game, player.getColor(), unit);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " chose to duplicate a " + unit + " in " + game.getTileByPosition(pos).getRepresentationForButtons(game, player));
         ButtonHelper.deleteMessage(event);
     }
@@ -692,7 +693,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 Tile tile = game.getTileFromPlanet(planetName);
                 String msg = player.getRepresentation() + " added 1 infantry to " + planetName
                     + " due to the arcane citadel";
-                AddUnitService.addUnits(event, player.getColor(), tile, "1 infantry " + planetName, game);
+                AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planetName);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
@@ -2271,9 +2272,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Kuuasi Aun Jalatai, the Keleres (Argent) hero, was not purged - something went wrong.");
         }
-        AddUnitService.addUnits(event, player.getColor(),
-            game.getTileByPosition(game.getActiveSystem()), "2 cruiser, 1 flagship",
-            game);
+        AddUnitService.addUnits(event, game.getTileByPosition(game.getActiveSystem()), game, player.getColor(), "2 cruiser, 1 flagship");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getRepresentationUnfogged() + " 2 cruisers and 1 flagship added.");
         ButtonHelper.deleteTheOneButton(event);

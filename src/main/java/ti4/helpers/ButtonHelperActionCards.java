@@ -13,8 +13,6 @@ import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.units.MoveUnits;
-import ti4.commands.units.RemoveUnits;
 import ti4.commands2.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -34,7 +32,10 @@ import ti4.model.UnitModel;
 import ti4.service.explore.ExploreService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.ParsedUnit;
+import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelperActionCards {
 
@@ -223,7 +224,8 @@ public class ButtonHelperActionCards {
             damaged = true;
         }
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColor());
-        new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, p2.getColor(), damaged, game);
+        var parsedUnit = new ParsedUnit(unitKey);
+        RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
         String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " owned by "
             + p2.getFactionEmojiOrColor() + " in tile " + tile.getRepresentationForButtons(game, player)
             + " was removed via the Lucky Shot AC";
@@ -281,7 +283,8 @@ public class ButtonHelperActionCards {
             damaged = true;
         }
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
-        new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, player.getColor(), damaged, game);
+        var parsedUnit = new ParsedUnit(unitKey);
+        RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
         String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile "
             + tile.getRepresentation() + " was removed via the Scuttle AC by "
             + player.getFactionEmoji();
@@ -317,7 +320,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveCounterStroke")
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event) {
-        RemoveCommandCounterService.removeCC(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
+        RemoveCommandCounterService.fromTile(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
         String message = player.getFactionEmoji() + " removed their CC from tile " + game.getActiveSystem() + " using Counterstroke and gained it to their tactic pool";
         player.setTacticalCC(player.getTacticalCC() + 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -326,7 +329,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveCounterStroke_")
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        RemoveCommandCounterService.removeCC(event, player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
+        RemoveCommandCounterService.fromTile(event, player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
         String message = player.getFactionEmoji() + " removed their CC from tile " + buttonID.split("_")[1]
             + " using Counterstroke and gained it to their tactic pool";
         player.setTacticalCC(player.getTacticalCC() + 1);
@@ -774,8 +777,8 @@ public class ButtonHelperActionCards {
     @ButtonHandler("ghostShipStep2_")
     public static void resolveGhostShipStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        tile = MoveUnits.flipMallice(event, tile, game);
-        AddUnitService.addUnits(event, player.getColor(), tile, "destroyer", game);
+        tile = FlipTileService.flipTileIfNeeded(event, tile, game);
+        AddUnitService.addUnits(event, tile, game, player.getColor(),  "destroyer");
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " put 1 destroyer in " + tile.getRepresentation());
@@ -1280,7 +1283,7 @@ public class ButtonHelperActionCards {
         if ("space".equalsIgnoreCase(unitHolderName)) {
             unitHolderName = "";
         }
-        new RemoveUnits().unitParsing(event, p2.getColor(), tile, "sd " + unitHolderName, game);
+        RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), "sd " + unitHolderName);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " you killed the space dock in " + tile.getRepresentation());
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
@@ -1356,8 +1359,8 @@ public class ButtonHelperActionCards {
     @ButtonHandler("resolveUpgrade_")
     public static void resolveUpgrade(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        new RemoveUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
-        AddUnitService.addUnits(event, player.getColor(), tile, "dread", game);
+        RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "cruiser");
+        AddUnitService.addUnits(event, tile, game, player.getColor(),  "dread");
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " replaced 1 cruiser with 1 dreadnought in " + tile.getRepresentation());
@@ -1599,8 +1602,7 @@ public class ButtonHelperActionCards {
         if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
             ButtonHelperFactionSpecific.offerMahactInfButtons(p2, game);
         }
-        new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet),
-            amountToKill + " inf " + planet, game);
+        RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, p2.getColor(), amountToKill + " inf " + planet);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " you exhausted " + planetRep
                 + " and killed " + amountToKill + " infantry there");
@@ -1662,8 +1664,8 @@ public class ButtonHelperActionCards {
             }
             msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
             UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), p2.getColor());
-            new RemoveUnits().removeStuff(event, game.getTileFromPlanet(planet), hits, planet, key, p2.getColor(),
-                false, game);
+            var parsedUnit = new ParsedUnit(key, hits, planet);
+            RemoveUnitService.removeUnit(event, game.getTileFromPlanet(planet), game, parsedUnit);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
             ButtonHelper.resolveInfantryDeath(game, p2, hits);
             if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
@@ -1723,8 +1725,8 @@ public class ButtonHelperActionCards {
             }
             msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
             UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("fighter"), p2.getColor());
-            new RemoveUnits().removeStuff(event, tile, hits, "space", key, p2.getColor(),
-                false, game);
+            var unitParsed = new ParsedUnit(key, hits, Constants.SPACE);
+            RemoveUnitService.removeUnit(event, tile, game, unitParsed);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
 
             if (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile)) {
@@ -1750,8 +1752,8 @@ public class ButtonHelperActionCards {
         int amount = uH.getUnitCount(UnitType.Pds, p2.getColor());
         if (amount > 0) {
             UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), p2.getColor());
-            new RemoveUnits().removeStuff(event, game.getTileFromPlanet(planet), amount, planet, key,
-                p2.getColor(), false, game);
+            var unit = new ParsedUnit(key, amount, planet);
+            RemoveUnitService.removeUnit(event, game.getTileFromPlanet(planet), game, unit);
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " you crippled " + planetRep + " and killed " + amount + " PDS");

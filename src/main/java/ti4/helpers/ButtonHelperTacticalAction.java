@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.units.RemoveUnits;
 import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -27,6 +26,8 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.ParsedUnit;
+import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelperTacticalAction {
 
@@ -120,7 +121,6 @@ public class ButtonHelperTacticalAction {
                                         game.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName, amount);
                                     }
                                 }
-                                rest = unitName;
                                 amount = totalUnits - damagedUnits;
                                 if (amount > 0) {
                                     rest = unitName.toLowerCase() + "_" + unitHolder.getName().toLowerCase();
@@ -138,9 +138,8 @@ public class ButtonHelperTacticalAction {
                                     }
                                 }
 
-                                new RemoveUnits().removeStuff(event, game.getTileByPosition(pos),
-                                    unitEntry.getValue(), unitHolder.getName(), unitKey, player.getColor(), false,
-                                    game);
+                                var unitParsed = new ParsedUnit(unitKey, unitEntry.getValue(), unitHolder.getName());
+                                RemoveUnitService.removeUnit(event, game.getTileByPosition(pos), game, unitParsed);
                             }
                         }
                     } else {
@@ -161,8 +160,8 @@ public class ButtonHelperTacticalAction {
                                 damagedUnits = unitHolder.getUnitDamage().get(unitKey);
                             }
 
-                            new RemoveUnits().removeStuff(event, game.getTileByPosition(pos), totalUnits, "space",
-                                unitKey, player.getColor(), false, game);
+                            var unit = new ParsedUnit(unitKey, totalUnits, Constants.SPACE);
+                            RemoveUnitService.removeUnit(event, game.getTileByPosition(pos), game, unit);
                             if (damagedUnits > 0) {
                                 rest = unitName + "damaged";
                                 amount = damagedUnits;
@@ -241,8 +240,8 @@ public class ButtonHelperTacticalAction {
                 planetName = AliasHandler.resolvePlanet(planetName);
             }
 
-            new RemoveUnits().removeStuff(event, game.getTileByPosition(pos), amount, planetName, unitKey,
-                player.getColor(), buttonLabel.toLowerCase().contains("damaged"), game);
+            var unitParsed = new ParsedUnit(unitKey, amount, planetName);
+            RemoveUnitService.removeUnit(event, game.getTileByPosition(pos), game, unitParsed, buttonLabel.toLowerCase().contains("damaged"));
         }
         if (buttonLabel.toLowerCase().contains("damaged")) {
             unitName = unitName + "damaged";
