@@ -433,7 +433,6 @@ public class ButtonHelperTacticalAction {
             ButtonHelperFactionSpecific.checkForStymie(game, player, tile);
 
             if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
-
                 List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, game, tile);
                 Player player2 = player;
                 for (Player p2 : players) {
@@ -443,7 +442,6 @@ public class ButtonHelperTacticalAction {
                     }
                 }
                 if (player != player2) {
-
                     StartCombatService.startSpaceCombat(game, player, player2, tile, event);
                 } else {
                     needPDSCheck = true;
