@@ -5,8 +5,7 @@
         "faction": "argent",
         "window": "When 1 or more of your units uses ANTI-FIGHTER BARRAGE",
         "windowEffect": "for each hit produced in excess of your opponent's fighters, choose 1 of your opponent's ships that has SUSTAIN DAMAGE to become damaged.",
-        "source": "pok",
-        "shortName": "Raid\nFormation"
+        "source": "pok"
     },
     {
         "id": "zeal",
@@ -15,8 +14,7 @@
         "permanentEffect": "You always vote first during the agenda phase",
         "window": "When you cast at least 1 vote",
         "windowEffect": "cast 1 additional vote for each player in the game including you.",
-        "source": "pok",
-        "shortName": "\nZeal"
+        "source": "pok"
     },
     {
         "id": "amalgamation",
@@ -32,8 +30,7 @@
         "name": "Devour",
         "faction": "cabal",
         "permanentEffect": "Capture your opponent's non-structure units that are destroyed during combat.",
-        "source": "pok",
-        "shortName": "\nDevour"
+        "source": "pok"
     },
     {
         "id": "riftmeld",
@@ -41,8 +38,7 @@
         "faction": "cabal",
         "window": "When you research a unit upgrade technology",
         "windowEffect": "You may return 1 captured unit of that type to ignore all of the technology's prerequisites.",
-        "source": "pok",
-        "shortName": "\nRiftmeld"
+        "source": "pok"
     },
     {
         "id": "aetherpassage",
@@ -58,16 +54,14 @@
         "name": "Dark Whispers",
         "faction": "empyrean",
         "permanentEffect": "During setup, take the additional Empyrean faction promissory note; you have 2 faction promissory notes",
-        "source": "pok",
-        "shortName": "Dark\nWhispers"
+        "source": "pok"
     },
     {
         "id": "voidborn",
         "name": "Voidborn",
         "faction": "empyrean",
         "permanentEffect": "Nebulae do not affect your ships' movement",
-        "source": "pok",
-        "shortName": "\nVoidborn"
+        "source": "pok"
     },
     {
         "id": "edict",
@@ -76,24 +70,21 @@
         "permanentEffect": "Other player's tokens in your fleet pool increase your fleet limit but cannot be redistributed.",
         "window": "When you win a combat",
         "windowEffect": "Place 1 command token from your opponent's reinforcements in your fleet pool if it does not already contain 1 of that player's tokens.",
-        "source": "pok",
-        "shortName": "\nEdict"
+        "source": "pok"
     },
     {
         "id": "hubris",
         "name": "Hubris",
         "faction": "mahact",
         "permanentEffect": "During setup, purge your \"Alliance\" promissory note. Other players cannot give you their 'Alliance\" promissory note.",
-        "source": "pok",
-        "shortName": "\nHubris"
+        "source": "pok"
     },
     {
         "id": "imperia",
         "name": "Imperia",
         "faction": "mahact",
         "permanentEffect": "While another player's command token is in your fleet pool, you can use the ability of that player's commander, if it is unlocked.",
-        "source": "pok",
-        "shortName": "\nImperia"
+        "source": "pok"
     },
     {
         "id": "distant_suns",
@@ -101,8 +92,7 @@
         "faction": "naaz",
         "window": "When you explore a planet that contains 1 of your mechs",
         "windowEffect": "You may draw 1 additional card; choose 1 to resolve and discard the rest.",
-        "source": "pok",
-        "shortName": "Distant\nSuns"
+        "source": "pok"
     },
     {
         "id": "fabrication",
@@ -110,8 +100,7 @@
         "faction": "naaz",
         "window": "ACTION",
         "windowEffect": "Either purge 2 of your relic fragments of the same type to gain 1 relic; or purge 1 of your relic fragments to gain 1 command token.",
-        "source": "pok",
-        "shortName": "\nFabrication"
+        "source": "pok"
     },
     {
         "id": "future_sight",
@@ -119,16 +108,14 @@
         "faction": "nomad",
         "window": "During the Agenda phase, after an outcome that you voted for or predicted is resolved",
         "windowEffect": "Gain 1 trade good",
-        "source": "pok",
-        "shortName": "Future\nSight"
+        "source": "pok"
     },
     {
         "id": "the_company",
         "name": "The Company",
         "faction": "nomad",
         "permanentEffect": "During setup, take the 2 additional Nomad faction agents and place them next to your faction sheet; you have 3 agents",
-        "source": "pok",
-        "shortName": "\nThe Company"
+        "source": "pok"
     },
     {
         "id": "awaken",
@@ -136,16 +123,14 @@
         "faction": "titans",
         "window": "After you activate a system that contains 1 or more of your sleeper tokens",
         "windowEffect": "You may replace each of those tokens with 1 PDS from your reinforcements.",
-        "source": "pok",
-        "shortName": "\nAwaken"
+        "source": "pok"
     },
     {
         "id": "coalescence",
         "name": "Coalescence",
         "faction": "titans",
         "permanentEffect": "If your flagship or your AWAKEN faction ability places your units into the same space area or onto the same planet as another player's units, your units must participate in combat during \"Space Combat\" or \"Ground Combat\" steps.",
-        "source": "pok",
-        "shortName": "\nCoalescence"
+        "source": "pok"
     },
     {
         "id": "terragenesis",

@@ -1563,14 +1563,7 @@ public class MapGenerator implements AutoCloseable {
             } else {
                 drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
                 g2.setFont(Storage.getFont16());
-                if (abilityModel.getShortName().charAt(0) == '\n')
-                {
-                    drawTextVertically(g2, abilityModel.getShortName().substring(1).toUpperCase(), x + deltaX + 17, y + 144, Storage.getFont16());
-                }
-                else
-                {
-                    drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 9, y + 144, 130);
-                }
+                drawOneOrTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 9, y + 144, 130);
                 drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
             }
 
@@ -4298,6 +4291,61 @@ public class MapGenerator implements AutoCloseable {
         if (StringUtils.isNotBlank(secondRow)) {
             drawTextVertically(graphics, secondRow, x + spacing, y, graphics.getFont());
         }
+    }
+
+    private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth)
+    {
+        // vertically prints text on one line, centred horizontally, if it fits,
+        // otherwise prints it over two lines
+        
+        // if the text contains a linebreak, print it over two lines
+        if (text.contains("\n"))
+        {
+            drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth);
+            return;
+        }
+        
+        int spacing = graphics.getFontMetrics().getAscent() + graphics.getFontMetrics().getLeading();
+        text = text.toUpperCase();
+        
+        // if the text is short enough to fit on one line, print it on one
+        if (text.equals(trimTextToPixelWidth(graphics, text, maxWidth)))
+        {
+            drawTextVertically(graphics, text, x + spacing/2, y, graphics.getFont());
+            return;
+        }
+        
+        // if there's a space in the text, try to split it
+        // as close to the centre as possible
+        if (text.contains(" "))
+        {
+            float center = text.length() / 2.0f + 0.5f;
+            String front = text.substring(0, (int) center);
+            String back = text.substring((int) (center - 0.5f));
+            int before = front.lastIndexOf(" ");
+            int after = text.indexOf(" ", (int) (center - 0.5f));
+            
+            // if there's only a space in the back half, replace the first space with a newline
+            if (before == -1)
+            {
+                text = text.substring(0, after) + "\n" + text.substring(after);
+            }
+            // if there's only a space in the front half, or if the last space in the
+            // front half is closer to the centre than the first space in the back half,
+            // replace the last space in the front half with a newline
+            else if (after == -1 || (center - before - 1 <= after - center + 1))
+            {
+                text = text.substring(0, before) + "\n" + text.substring(before + 1);
+            }
+            // otherwise, the first space in the back half is closer to the centre
+            // than the last space in the front half, so replace
+            // the first space in the back half with a newline
+            else
+            {
+                text = text.substring(0, after) + "\n" + text.substring(after + 1);
+            }
+        }
+        drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth);
     }
 
     private static String trimTextToPixelWidth(Graphics graphics, String text, int pixelLength) {
