@@ -7,6 +7,7 @@ import java.util.StringTokenizer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.apache.commons.lang3.math.NumberUtils;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
@@ -49,10 +50,16 @@ public class ParseUnitService {
     private ParsedUnit parseUnit(String unitListToken, String color, Tile tile, GenericInteractionCreateEvent event) {
         StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
 
-        int count = unitInfoTokenizer.countTokens() == 1 ? 1 :
-            Math.max(parseCount(unitInfoTokenizer), 1);
+        String firstToken = unitInfoTokenizer.nextToken();
+        int count = 1;
+        String originalUnit;
+        if (NumberUtils.isDigits(firstToken)) {
+            count = Math.max(parseCount(unitInfoTokenizer), 1);
+            originalUnit = unitInfoTokenizer.nextToken();
+        }  else {
+            originalUnit = firstToken;
+        }
 
-        String originalUnit = parseUnitName(unitInfoTokenizer);
         String resolvedUnit = AliasHandler.resolveUnit(originalUnit);
 
         Units.UnitKey unitKey = Mapper.getUnitKey(resolvedUnit, color);
@@ -73,10 +80,6 @@ public class ParseUnitService {
         } catch (NumberFormatException e) {
             return 1;
         }
-    }
-
-    private String parseUnitName(StringTokenizer tokenizer) {
-        return tokenizer.hasMoreTokens() ? tokenizer.nextToken() : "";
     }
 
     private String parsePlanetName(StringTokenizer tokenizer, Tile tile) {
