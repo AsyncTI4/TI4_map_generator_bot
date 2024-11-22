@@ -49,7 +49,6 @@ import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
 import ti4.listeners.UserJoinServerListener;
-import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
@@ -189,10 +188,9 @@ public class AsyncTI4DiscordBot {
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
 
-        // LOAD GAMES
-        BotLogger.logWithTimestamp(" LOADING GAMES");
+        // LOAD GAMES NAMES
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
-        GameSaveLoadManager.loadGame();
+        GameManager.initialize();
 
         // RUN DATA MIGRATIONS
         BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
@@ -200,8 +198,8 @@ public class AsyncTI4DiscordBot {
         BotLogger.logWithTimestamp(" FINISHED CHECKING FOR DATA MIGRATIONS");
 
         // START MAP GENERATION
-        MapRenderPipeline.start();
         ImageIO.setUseCache(false);
+        MapRenderPipeline.start();
 
         // START CRONS
         AutoPingCron.start();
@@ -351,5 +349,9 @@ public class AsyncTI4DiscordBot {
                 .forEach(classes::add);
         }
         return classes;
+    }
+
+    public static Guild getGuild(String guildId) {
+        return guilds.stream().filter(guild -> guild.getId().equals(guildId)).findFirst().orElse(null);
     }
 }
