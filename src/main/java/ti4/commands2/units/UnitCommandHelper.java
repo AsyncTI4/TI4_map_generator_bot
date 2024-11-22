@@ -58,7 +58,7 @@ class UnitCommandHelper {
             if (Mapper.isValidColor(factionColor)) {
                 return game.setupNeutralPlayer(factionColor).getColor();
             }
-            MessageHelper.replyToMessage(event, Constants.TARGET_FACTION_OR_COLOR + " option is not valid.");
+            MessageHelper.replyToMessage(event, Constants.FACTION_COLOR + " option is not valid.");
             return null;
         }
         return player.getColor();
@@ -70,11 +70,7 @@ class UnitCommandHelper {
         if (otherPlayer != null) {
             return otherPlayer.getColor();
         }
-        String neutralColor = event.getOption(Constants.TARGET_FACTION_OR_COLOR).getAsString();
-        if (!Mapper.isValidColor(neutralColor)) {
-            MessageHelper.replyToMessage(event, Constants.TARGET_FACTION_OR_COLOR + " option is not valid.");
-            return null;
-        }
-        return game.setupNeutralPlayer(neutralColor).getColor();
+        MessageHelper.replyToMessage(event, Constants.TARGET_FACTION_OR_COLOR + " option is not valid. Use `/special2 setup_neutral_player` for neutrals.");
+        return null;
     }
 }

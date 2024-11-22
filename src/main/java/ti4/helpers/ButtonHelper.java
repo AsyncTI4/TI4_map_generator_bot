@@ -5084,7 +5084,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
-        List<ColorModel> unusedColors = game.getUnusedColors();
+        List<ColorModel> unusedColors = game.getUnusedColorsPreferringBase();
         unusedColors = ColourHelper.sortColours(factionId, unusedColors);
         for (ColorModel color : unusedColors) {
             String colorName = color.getName();
