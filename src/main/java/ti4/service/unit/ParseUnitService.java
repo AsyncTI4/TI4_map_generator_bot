@@ -54,7 +54,7 @@ public class ParseUnitService {
         int count = 1;
         String originalUnit;
         if (NumberUtils.isDigits(firstToken)) {
-            count = Math.max(parseCount(unitInfoTokenizer), 1);
+            count = Math.max(Integer.parseInt(firstToken), 1);
             originalUnit = unitInfoTokenizer.nextToken();
         }  else {
             originalUnit = firstToken;
@@ -71,15 +71,6 @@ public class ParseUnitService {
             return null;
         }
         return parsedUnit;
-    }
-
-    private int parseCount(StringTokenizer tokenizer) {
-        if (!tokenizer.hasMoreTokens()) return 1;
-        try {
-            return Integer.parseInt(tokenizer.nextToken());
-        } catch (NumberFormatException e) {
-            return 1;
-        }
     }
 
     private String parsePlanetName(StringTokenizer tokenizer, Tile tile) {
