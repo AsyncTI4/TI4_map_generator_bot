@@ -3,11 +3,15 @@ package ti4.commands2.units;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.jetbrains.annotations.Nullable;
+import ti4.commands2.CommandHelper;
 import ti4.commands2.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
@@ -41,5 +45,36 @@ class UnitCommandHelper {
                 Helper.isCCCountCorrect(event, game, color);
             }
         }
+    }
+
+    @Nullable
+    static String getColor(SlashCommandInteractionEvent event, Game game) {
+        String factionColor = event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString);
+        if (factionColor == null) {
+            return CommandHelper.getPlayerFromEvent(game, event).getColor();
+        }
+        Player player = CommandHelper.getPlayerByFactionColor(factionColor, game);
+        if (player == null) {
+            if (Mapper.isValidColor(factionColor)) {
+                return game.setupNeutralPlayer(factionColor).getColor();
+            }
+            MessageHelper.replyToMessage(event, Constants.TARGET_FACTION_OR_COLOR + " option is not valid.");
+            return null;
+        }
+        return player.getColor();
+    }
+
+    @Nullable
+    static String getTargetColor(SlashCommandInteractionEvent event, Game game) {
+        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (otherPlayer != null) {
+            return otherPlayer.getColor();
+        }
+        String neutralColor = event.getOption(Constants.TARGET_FACTION_OR_COLOR).getAsString();
+        if (!Mapper.isValidColor(neutralColor)) {
+            MessageHelper.replyToMessage(event, Constants.TARGET_FACTION_OR_COLOR + " option is not valid.");
+            return null;
+        }
+        return game.setupNeutralPlayer(neutralColor).getColor();
     }
 }
