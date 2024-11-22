@@ -2,8 +2,6 @@ package ti4.map;
 
 import java.awt.*;
 import java.lang.reflect.Field;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -24,7 +22,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -87,6 +84,7 @@ import ti4.model.UnitModel;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 
+import static java.util.function.Predicate.not;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public class Game extends GameProperties {
@@ -551,7 +549,7 @@ public class Game extends GameProperties {
             TextChannel tableTalkChannel;
             List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda.getTextChannels().stream()
                 .filter(c -> c.getName().startsWith(getName()))
-                .filter(Predicate.not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
+                .filter(not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
                 .toList();
             if (gameChannels.size() == 1) {
                 tableTalkChannel = gameChannels.getFirst();
@@ -3215,13 +3213,8 @@ public class Game extends GameProperties {
         return null;
     }
 
-    public void addPlayer(String id, String name) {
-        Player player = new Player(id, name, getName());
-        players.put(id, player);
-    }
-
-    public Player addPlayerLoad(String id, String name) {
-        Player player = new Player(id, name, getName());
+    public Player addPlayer(String id, String name) {
+        Player player = new Player(id, name, this);
         players.put(id, player);
         return player;
     }
@@ -3268,7 +3261,7 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public List<Player> getNotRealPlayers() {
-        return getPlayers().values().stream().filter(Player::isNotRealPlayer).collect(Collectors.toList());
+        return getPlayers().values().stream().filter(not(Player::isRealPlayer)).collect(Collectors.toList());
     }
 
     @JsonIgnore
@@ -4270,15 +4263,5 @@ public class Game extends GameProperties {
             }
         }
         return false;
-    }
-
-    @JsonIgnore
-    public String getGameStatsDashboardJSON() {
-        return new GameStatsDashboardPayload(this).getJson();
-    }
-
-    public void addHistoricalGameStatsDashboardPayload() {
-        GameStatsDashboardPayload payload = new GameStatsDashboardPayload(this);
-        getHistoricalGameStatsDashboardPayloads().put(Timestamp.from(Instant.now()), payload);
     }
 }
