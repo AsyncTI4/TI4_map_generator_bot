@@ -750,8 +750,7 @@ public class ButtonHelperModifyUnits {
         UnitHolder uH = tile.getUnitHolders().get(unitH);
 
         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 " + unit + " " + unitH.replace("space", ""));
-        if (uH.getUnitCount(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()).getUnitType(),
-            player.getColor()) < 1) {
+        if (uH.getUnitCount(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()).getUnitType(), player.getColor()) < 1) {
             ButtonHelper.deleteTheOneButton(event);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),

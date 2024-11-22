@@ -37,7 +37,7 @@ public class RemoveUnitService {
             return;
         }
 
-        int countToRemove = prioritizeNoDamage ? parsedUnit.getCount() : calculateDamageToRemoveWithDamage(unitHolder, parsedUnit);
+        int countToRemove = prioritizeNoDamage ? parsedUnit.getCount() : calculateNumberToRemove(unitHolder, parsedUnit);
 
         removeUnitsFromHolder(tile, unitHolder, parsedUnit, countToRemove);
         handleOtherUnitHoldersIfNeeded(tile, parsedUnit);
@@ -75,10 +75,10 @@ public class RemoveUnitService {
         }
     }
 
-    private static int calculateDamageToRemoveWithDamage(UnitHolder unitHolder, ParsedUnit parsedUnit) {
+    private static int calculateNumberToRemove(UnitHolder unitHolder, ParsedUnit parsedUnit) {
         int unitCount = unitHolder.getUnits().getOrDefault(parsedUnit.getUnitKey(), 0);
-        int damageCount = unitHolder.getUnitDamage().getOrDefault(parsedUnit.getUnitKey(), 0);
-        return Math.max(0, damageCount - (unitCount - parsedUnit.getCount()));
+        int damagedCount = unitHolder.getUnitDamage().getOrDefault(parsedUnit.getUnitKey(), 0);
+        return Math.max(0, damagedCount - (unitCount - parsedUnit.getCount()));
     }
 
     private static void removeUnitsFromHolder(Tile tile, UnitHolder unitHolder, ParsedUnit parsedUnit, int countToRemove) {
