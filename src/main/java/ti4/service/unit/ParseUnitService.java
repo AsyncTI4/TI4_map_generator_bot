@@ -49,7 +49,6 @@ public class ParseUnitService {
 
     private ParsedUnit parseUnit(String unitListToken, String color, Tile tile, GenericInteractionCreateEvent event) {
         StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
-        int tokenCount = unitInfoTokenizer.countTokens();
 
         String firstToken = unitInfoTokenizer.nextToken();
         int count;
