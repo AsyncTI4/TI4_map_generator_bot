@@ -51,13 +51,12 @@ public class ParseUnitService {
         StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
 
         String firstToken = unitInfoTokenizer.nextToken();
-        int count;
+        int count = 1;
         String originalUnit;
         if (NumberUtils.isDigits(firstToken)) {
             count = Math.max(parseCount(unitInfoTokenizer), 1);
             originalUnit = unitInfoTokenizer.nextToken();
         }  else {
-            count = 1;
             originalUnit = firstToken;
         }
 
