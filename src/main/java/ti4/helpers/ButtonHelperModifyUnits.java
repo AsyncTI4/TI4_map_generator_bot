@@ -233,9 +233,12 @@ public class ButtonHelperModifyUnits {
         return player.hasTech("nes") ? Math.min(totalUnits, (hits + 1) / 2) : Math.min(totalUnits, hits);
     }
 
-    public static int autoAssignGroundCombatHits(Player player, Game game, String planet, int hits,
-        ButtonInteractionEvent event) {
+    public static int autoAssignGroundCombatHits(Player player, Game game, String planet, int hits, ButtonInteractionEvent event) {
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        if (unitHolder == null) {
+            MessageHelper.replyToMessage(event, "Unable to determine the planet the ground combat is occurring on. This may be a bug to report?");
+            return 0;
+        }
         StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " assigned " + (hits == 1 ? "the hit" : "hits") + " in the following way:\n");
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int numSustains = getNumberOfSustainableUnits(player, game, unitHolder, false, false);
