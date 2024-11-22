@@ -37,7 +37,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands.units.AddUnits;
 import ti4.commands2.planet.PlanetExhaust;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -59,6 +58,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.service.fow.FowConstants;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.unit.AddUnitService;
 
 public class AgendaHelper {
 
@@ -1676,7 +1676,7 @@ public class AgendaHelper {
                         Tile tile = game.getTileFromPlanet(planet);
                         String msg = player.getRepresentation() + " added 1 infantry to " + planet
                             + " due to the arcane citadel";
-                        new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + planet, game);
+                        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planet);
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
                 }
@@ -1729,7 +1729,7 @@ public class AgendaHelper {
                                 Tile tile = game.getTileFromPlanet(planet);
                                 String msg = player.getRepresentation() + " added 1 infantry to " + planet
                                     + " due to the Arcane Citadel";
-                                new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + planet, game);
+                                AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planet);
                                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                             }
                         }

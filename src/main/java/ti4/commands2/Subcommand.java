@@ -2,7 +2,6 @@ package ti4.commands2;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class Subcommand extends SubcommandData implements Command {
@@ -16,8 +15,4 @@ public abstract class Subcommand extends SubcommandData implements Command {
     }
 
     public abstract void execute(SlashCommandInteractionEvent event);
-
-    // TODO: Remove once old Command interface is gone.
-    @Override
-    public void register(CommandListUpdateAction commands) {}
 }

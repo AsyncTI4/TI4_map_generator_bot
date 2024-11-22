@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.units.AddUnits;
 import ti4.commands2.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
@@ -39,6 +38,7 @@ import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.PlanetService;
 import ti4.service.explore.AddFrontierTokensService;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class PlayHeroService {
@@ -119,7 +119,7 @@ public class PlayHeroService {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                         if (player.getPlanetsAllianceMode().contains(uH.getName())
                             && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
-                            new AddUnits().unitParsing(event, player.getColor(), tile, "2 ff", game);
+                            AddUnitService.addUnits(event, tile, game, player.getColor(), "2 ff");
                             break;
                         }
                     }
@@ -180,7 +180,7 @@ public class PlayHeroService {
                     player.getRepresentationUnfogged() + " removed all of your CCs from the board");
                 for (Tile t : game.getTileMap().values()) {
                     if (CommandCounterHelper.hasCC(event, player.getColor(), t)) {
-                        RemoveCommandCounterService.removeCC(event, player.getColor(), t, game);
+                        RemoveCommandCounterService.fromTile(event, player.getColor(), t, game);
                     }
                 }
             }

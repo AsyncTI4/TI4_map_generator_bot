@@ -14,9 +14,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.Command;
-import ti4.commands.CommandManager;
-import ti4.commands2.ParentCommand;
+import ti4.commands2.Command;
+import ti4.commands2.CommandManager;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -101,13 +100,9 @@ public class SlashCommandListener extends ListenerAdapter {
         Command command = CommandManager.getCommand(event.getName());
         if (command.accept(event)) {
             try {
-                // TODO: remove this when commands are fully merged, commandmanager should have only ParentCommands
-                if (command instanceof ParentCommand parent) {
-                    parent.preExecute(event);
-                }
+                command.preExecute(event);
                 command.execute(event);
                 command.postExecute(event);
-                event.getHook().deleteOriginal().queue();
             } catch (Exception e) {
                 String messageText = "Error trying to execute command: " + command.getName();
                 String errorMessage = ExceptionUtils.getMessage(e);
@@ -115,6 +110,9 @@ public class SlashCommandListener extends ListenerAdapter {
                 BotLogger.log(event, messageText, e);
             }
         }
+
+        event.getHook().deleteOriginal().queue();
+
         long endTime = System.currentTimeMillis();
         if (endTime - startTime > 3000) {
             BotLogger.log(event, "This slash command took longer than 3000 ms (" + (endTime - startTime) + ")");

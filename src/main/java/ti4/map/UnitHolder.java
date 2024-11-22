@@ -17,11 +17,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.jetbrains.annotations.NotNull;
-import ti4.image.Mapper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "javaClassType")
 @JsonSubTypes({
@@ -29,6 +29,7 @@ import ti4.helpers.Units.UnitType;
     @JsonSubTypes.Type(value = Planet.class, name = "Planet")
 })
 abstract public class UnitHolder {
+
     private final String name;
 
     private final Point holderCenterPosition;
@@ -62,14 +63,15 @@ abstract public class UnitHolder {
     }
 
     public void addUnit(UnitKey unit, Integer count) {
-        if (count != null && count > 0) {
-            Integer unitCount = units.get(unit);
-            if (unitCount != null) {
-                unitCount += count;
-                units.put(unit, unitCount);
-            } else {
-                units.put(unit, count);
-            }
+        if (count == null || count <= 0) {
+            return;
+        }
+        Integer unitCount = units.get(unit);
+        if (unitCount != null) {
+            unitCount += count;
+            units.put(unit, unitCount);
+        } else {
+            units.put(unit, count);
         }
     }
 
@@ -115,41 +117,45 @@ abstract public class UnitHolder {
     }
 
     public void removeUnit(UnitKey unit, Integer count) {
-        if (count != null && count > 0) {
-            Integer unitCount = units.get(unit);
-            if (unitCount != null) {
-                unitCount -= count;
-                if (unitCount > 0) {
-                    units.put(unit, unitCount);
-                } else {
-                    units.remove(unit);
-                }
-            }
+        if (count == null || count <= 0) {
+            return;
+        }
+        Integer unitCount = units.get(unit);
+        if (unitCount == null) {
+            return;
+        }
+        unitCount -= count;
+        if (unitCount > 0) {
+            units.put(unit, unitCount);
+        } else {
+            units.remove(unit);
         }
     }
 
     public void addUnitDamage(UnitKey unit, Integer count) {
-        if (count != null && count > 0) {
-            Integer unitCount = unitsDamage.get(unit);
-            if (unitCount != null) {
-                unitCount += count;
-                unitsDamage.put(unit, unitCount);
-            } else {
-                unitsDamage.put(unit, count);
-            }
+        if (count == null || count <= 0) {
+            return;
+        }
+        Integer unitCount = unitsDamage.get(unit);
+        if (unitCount != null) {
+            unitCount += count;
+            unitsDamage.put(unit, unitCount);
+        } else {
+            unitsDamage.put(unit, count);
         }
     }
 
     public void removeUnitDamage(UnitKey unit, Integer count) {
-        if (count != null && count > 0) {
-            Integer unitCount = unitsDamage.get(unit);
-            if (unitCount != null) {
-                unitCount -= count;
-                if (unitCount > 0) {
-                    unitsDamage.put(unit, unitCount);
-                } else {
-                    unitsDamage.remove(unit);
-                }
+        if (count == null || count <= 0) {
+            return;
+        }
+        Integer unitCount = unitsDamage.get(unit);
+        if (unitCount != null) {
+            unitCount -= count;
+            if (unitCount > 0) {
+                unitsDamage.put(unit, unitCount);
+            } else {
+                unitsDamage.remove(unit);
             }
         }
     }
