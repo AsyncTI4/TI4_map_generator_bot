@@ -35,12 +35,12 @@ public class AddUnitService {
         tile.addUnit(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
         AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.getLocation(), game);
 
-        if (originalNumberOfPlayersInLocation != 0) {
-            int newNumberOfPlayersInLocation = getNumberOfPlayersInTile(tile, game, parsedUnit);
-            if (newNumberOfPlayersInLocation <= originalNumberOfPlayersInLocation) return;
-        }
+        if (originalNumberOfPlayersInLocation == 0) return;
 
-        startCombat(event, tile, game, parsedUnit);
+        int newNumberOfPlayersInLocation = getNumberOfPlayersInTile(tile, game, parsedUnit);
+        if (newNumberOfPlayersInLocation > originalNumberOfPlayersInLocation) {
+            startCombat(event, tile, game, parsedUnit);
+        }
     }
 
     private static void handleFogOfWar(GenericInteractionCreateEvent event, Tile tile, String color, Game game, String unitList) {
