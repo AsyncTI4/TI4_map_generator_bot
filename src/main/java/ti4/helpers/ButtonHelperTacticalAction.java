@@ -441,9 +441,7 @@ public class ButtonHelperTacticalAction {
                         break;
                     }
                 }
-                if (player != player2) {
-                    StartCombatService.startSpaceCombat(game, player, player2, tile, event);
-                } else {
+                if (player == player2) {
                     needPDSCheck = true;
                 }
             }

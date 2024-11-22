@@ -416,7 +416,7 @@ public class MiltyDraftManager {
                 Player player = game.getPlayer(playerId);
                 PlayerDraft picks = getPlayerDraft(playerId);
                 String color = player.getNextAvailableColour();
-                if (playerId.equals(Constants.chassitId) && game.getUnusedColors().contains(Mapper.getColor("lightgray"))) {
+                if (playerId.equals(Constants.chassitId) && game.getUnusedColorsPreferringBase().contains(Mapper.getColor("lightgray"))) {
                     color = "lightgray";
                 }
                 String faction = picks.getFaction();

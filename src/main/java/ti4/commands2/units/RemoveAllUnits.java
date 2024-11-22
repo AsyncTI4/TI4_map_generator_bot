@@ -8,11 +8,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateCommand;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.MessageHelper;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 
 public class RemoveAllUnits extends GameStateCommand {
@@ -54,15 +52,10 @@ public class RemoveAllUnits extends GameStateCommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        String color = CommandHelper.getColor(game, event);
-        if (!Mapper.isValidColor(color)) {
-            MessageHelper.replyToMessage(event, "Color/Faction not valid");
-            return;
-        }
-
         Tile tile = CommandHelper.getTile(event, game);
         if (tile == null) return;
 
+        String color = getPlayer().getColor();
         tile.removeAllUnits(color);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, unitHolder.getName(), game);
