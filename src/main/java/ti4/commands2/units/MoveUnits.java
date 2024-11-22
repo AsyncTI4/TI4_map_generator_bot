@@ -9,18 +9,16 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateCommand;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
-import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
 public class MoveUnits extends GameStateCommand {
 
     public MoveUnits() {
-        super(true, false);
+        super(true, true);
     }
 
     @Override
@@ -65,16 +63,6 @@ public class MoveUnits extends GameStateCommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        String color = CommandHelper.getColor(game, event);
-        if (!Mapper.isValidColor(color)) {
-            MessageHelper.replyToMessage(event, "Color/Faction not valid");
-            return;
-        }
-
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains(Constants.dicecordId)) {
-            game.setupNeutralPlayer(color);
-        }
-
         Tile tileFrom = CommandHelper.getTile(event, game);
         if (tileFrom == null) {
             BotLogger.log("Could not find the tile you're moving from.");
@@ -87,6 +75,7 @@ public class MoveUnits extends GameStateCommand {
             return;
         }
 
+        String color = getPlayer().getColor();
         boolean prioritizeNoDamage = event.getOption(Constants.PRIORITY_NO_DAMAGE, false, OptionMapping::getAsBoolean);
         String fromUnitList = event.getOption(Constants.UNIT_NAMES).getAsString();
         RemoveUnitService.removeUnits(event, tileFrom, game, color, fromUnitList, prioritizeNoDamage);

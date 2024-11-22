@@ -5,15 +5,11 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
-import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.MessageHelper;
 import ti4.service.unit.ParseUnitService;
 import ti4.service.unit.ParsedUnit;
 
@@ -31,10 +27,8 @@ class AddCaptureUnits extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        String color = determineColor(event, game);
-        if (color == null) {
-            return;
-        }
+        String color = UnitCommandHelper.getTargetColor(event, game);
+        if (color == null) return;
 
         Tile tile = getPlayer().getNomboxTile();
 
@@ -51,19 +45,5 @@ class AddCaptureUnits extends GameStateSubcommand {
         }
 
         UnitCommandHelper.handleGenerateMapOption(event, game);
-    }
-
-    private String determineColor(SlashCommandInteractionEvent event, Game game) {
-        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (otherPlayer != null) {
-            return otherPlayer.getColor();
-        }
-        // using a neutral unit?
-        String neutralColor = event.getOption(Constants.TARGET_FACTION_OR_COLOR).getAsString();
-        if (!Mapper.isValidColor(neutralColor)) {
-            MessageHelper.replyToMessage(event, "Color/Faction not valid");
-            return null;
-        }
-        return game.getNeutralPlayer(neutralColor).getColor();
     }
 }

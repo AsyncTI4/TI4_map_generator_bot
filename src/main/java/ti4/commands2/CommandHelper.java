@@ -73,7 +73,7 @@ public class CommandHelper {
         var game = GameManager.getGame(getGameName(event));
         var player = getPlayerFromEvent(game, event);
         if (player == null) {
-            MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+            MessageHelper.replyToMessage(event, "Command must be ran by a player in the game, please use `/join gameName` or `/special2 setup_neutral_player`.");
             return false;
         }
         if (!event.getChannel().getName().startsWith(game.getName() + "-")) {

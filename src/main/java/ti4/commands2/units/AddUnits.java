@@ -9,10 +9,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateCommand;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Tile;
-import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
 
 public class AddUnits extends GameStateCommand {
@@ -58,19 +56,10 @@ public class AddUnits extends GameStateCommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        String color = CommandHelper.getColor(game, event);
-        if (!Mapper.isValidColor(color)) {
-            MessageHelper.replyToMessage(event, "Color/Faction not valid");
-            return;
-        }
-
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains(Constants.dicecordId)) {
-            game.setupNeutralPlayer(color);
-        }
-
         Tile tile = CommandHelper.getTile(event, game);
         if (tile == null) return;
 
+        String color = getPlayer().getColor();
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
         AddUnitService.addUnits(event, tile, game, color, unitList);
 

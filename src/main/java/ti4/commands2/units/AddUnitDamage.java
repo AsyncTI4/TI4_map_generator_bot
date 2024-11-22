@@ -8,17 +8,15 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateCommand;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Tile;
-import ti4.message.MessageHelper;
 import ti4.service.unit.ParseUnitService;
 import ti4.service.unit.ParsedUnit;
 
 public class AddUnitDamage extends GameStateCommand {
 
     public AddUnitDamage() {
-        super(true, false);
+        super(true, true);
     }
 
     @Override
@@ -55,15 +53,10 @@ public class AddUnitDamage extends GameStateCommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        String color = CommandHelper.getColor(game, event);
-        if (!Mapper.isValidColor(color)) {
-            MessageHelper.replyToMessage(event, "Color/Faction not valid");
-            return;
-        }
-
         Tile tile = CommandHelper.getTile(event, game);
         if (tile == null) return;
 
+        String color = getPlayer().getColor();
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
