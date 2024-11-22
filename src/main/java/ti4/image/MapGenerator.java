@@ -4328,7 +4328,7 @@ public class MapGenerator implements AutoCloseable {
             // if there's only a space in the back half, replace the first space with a newline
             if (before == -1)
             {
-                text = text.substring(0, after) + "\n" + text.substring(after);
+                text = text.substring(0, after) + "\n" + text.substring(after + 1);
             }
             // if there's only a space in the front half, or if the last space in the
             // front half is closer to the centre than the first space in the back half,
