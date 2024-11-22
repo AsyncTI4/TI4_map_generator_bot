@@ -55,6 +55,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
@@ -230,10 +231,13 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Player setupNeutralPlayer(String color) {
-        if (players.get(Constants.dicecordId) != null)
+        Player neutral = players.get(Constants.dicecordId);
+        if (neutral != null) {
+            ColorChangeHelper.changePlayerColor(this, neutral, neutral.getColor(), color);
             return players.get(Constants.dicecordId);
+        }
         addPlayer(Constants.dicecordId, "Dicecord"); //Dicecord
-        Player neutral = getPlayer(Constants.dicecordId);
+        neutral = getPlayer(Constants.dicecordId);
         neutral.setColor(color);
         neutral.setFaction("neutral");
         neutral.setDummy(true);
@@ -241,47 +245,6 @@ public class Game extends GameProperties {
         Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         neutral.setUnitsOwned(playerOwnedUnits);
         return neutral;
-    }
-
-    public String getColorNotInUseByPlayer() {
-        return Mapper.getColorNames().stream()
-            .filter(c -> getPlayers().values().stream()
-                .noneMatch(player -> c.equals(player.getColor())))
-            .findFirst()
-            .orElse(null);
-    }
-
-    @JsonIgnore
-    public Player getNeutralPlayer(String fallbackColor) {
-        if (players.get(Constants.dicecordId) != null)
-            return players.get(Constants.dicecordId);
-        return setupNeutralPlayer(fallbackColor);
-    }
-
-    @JsonIgnore
-    public Player getNeutralPlayer() {
-        if (players.get(Constants.dicecordId) != null)
-            return players.get(Constants.dicecordId);
-        return getNeutralPlayer(getColorNotInUseByPlayer());
-    }
-
-    public String pickNeutralColorID(List<String> exclusions) {
-        // Start with the preferred colors, but then add all the colors to the list anyway
-        List<String> colorPriority = new ArrayList<>(List.of("gray", "red", "blue", "green", "orange", "yellow", "black", "pink", "purple", "rose", "lime", "brown", "teal", "spring", "petrol", "lightgray"));
-        colorPriority.addAll(Mapper.getColorNames());
-        List<String> preferredNeutralColors = new ArrayList<>(colorPriority.stream().map(Mapper::getColorID).toList());
-
-        // Build the full set of exclusions based on the argument plus the list of players
-        Set<String> excludedColorIDs = new HashSet<>();
-        if (exclusions != null) excludedColorIDs.addAll(exclusions);
-        excludedColorIDs.addAll(getPlayers().values().stream().map(Player::getColorID).toList());
-
-        // Finally, pick a color
-        String neutralColorID = preferredNeutralColors.stream().filter(colorID -> !excludedColorIDs.contains(colorID)).findFirst().orElse(null);
-        if (neutralColorID == null) {
-            MessageHelper.sendMessageToChannel(getActionsChannel(), "Could not determine a good neutral unit color " + Constants.jazzPing());
-        }
-        return neutralColorID;
     }
 
     public int getNumberOfSOsInTheDeck() {
@@ -4177,7 +4140,7 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
-    public List<ColorModel> getUnusedColors() {
+    public List<ColorModel> getUnusedColorsPreferringBase() {
         List<String> priorityColourIDs = List.of("red", "blue", "yellow", "purple", "green", "orange", "pink", "black");
         List<ColorModel> priorityColours = priorityColourIDs.stream()
             .map(Mapper::getColor)
@@ -4186,6 +4149,10 @@ public class Game extends GameProperties {
         if (!priorityColours.isEmpty()) {
             return priorityColours;
         }
+        return getUnusedColors();
+    }
+
+    public List<ColorModel> getUnusedColors() {
         return Mapper.getColors().stream()
             .filter(color -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(color.getName())))
             .toList();

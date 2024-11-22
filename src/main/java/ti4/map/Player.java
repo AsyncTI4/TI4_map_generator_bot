@@ -2971,10 +2971,10 @@ public class Player {
     public String getNextAvailableColorIgnoreCurrent() {
         Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
         String color = UserSettingsManager.get(getUserID()).getPreferredColourList().stream()
-            .filter(c -> getGame().getUnusedColors().stream().anyMatch(col -> col.getName().equals(c)))
+            .filter(c -> getGame().getUnusedColorsPreferringBase().stream().anyMatch(col -> col.getName().equals(c)))
             .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
             .findFirst()
-            .orElse(getGame().getUnusedColors().stream().filter(nonExclusive).findFirst().map(ColorModel::getName).orElse(null));
+            .orElse(getGame().getUnusedColorsPreferringBase().stream().filter(nonExclusive).findFirst().map(ColorModel::getName).orElse(null));
         return Mapper.getColorName(color);
     }
 

@@ -30,6 +30,7 @@ import ti4.commands2.planet.PlanetCommand;
 import ti4.commands2.player.PlayerCommand;
 import ti4.commands2.relic.RelicCommand;
 import ti4.commands2.search.SearchCommand;
+import ti4.commands2.special.Special2Command;
 import ti4.commands2.special.SpecialCommand;
 import ti4.commands2.statistics.StatisticsCommand;
 import ti4.commands2.status.StatusCommand;
@@ -99,6 +100,7 @@ public class CommandManager {
         new EventCommand(),
 
         new SpecialCommand(),
+        new Special2Command(),
         new LeaderCommand(),
         new CombatCommand(),
         new CustomCommand(),
