@@ -1,6 +1,5 @@
 package ti4.map;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -80,10 +79,6 @@ public class GameStatsDashboardPayload {
         // CSV of {tileID}{+x+yCoords}??{list;of;tokens} ?? 
         // See ConvertTTPGtoAsync.ConvertTTPGHexToAsyncTile() and reverse it!
         return null;
-    }
-
-    public Map<Timestamp, GameStatsDashboardPayload> getHistory() {
-        return game.getHistoricalGameStatsDashboardPayloads();
     }
 
     @JsonProperty("isPoK")

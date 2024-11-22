@@ -79,7 +79,7 @@ public class Player {
     private String userID;
     private String userName;
 
-    private String gameID;
+    private final Game game;
     private boolean tenMinReminderPing;
 
     private boolean passed;
@@ -225,19 +225,15 @@ public class Player {
 
     private final Tile nomboxTile = new Tile("nombox", "nombox");
 
-    public Player() {
-    }
-
-    public Player(@JsonProperty("userID") String userID, @JsonProperty("userName") String userName,
-        @JsonProperty("gameID") String gameID) {
+    public Player(String userID, String userName, Game game) {
         this.userID = userID;
         this.userName = userName;
-        this.gameID = gameID;
+        this.game = game;
     }
 
     @JsonIgnore
     public Game getGame() {
-        return GameManager.getGame(gameID);
+        return game;
     }
 
     @JsonIgnore
@@ -2611,22 +2607,9 @@ public class Player {
         this.isDummy = isDummy;
     }
 
-    /**
-     * @return true if the player is: not a "dummy", faction != null, color != null,
-     *         & color != "null"
-     */
     @JsonIgnore
     public boolean isRealPlayer() {
         return !(isDummy || faction == null || color == null || "null".equals(color));
-    }
-
-    /**
-     * @return true if the player is: a "dummy", faction == null, color == null, &
-     *         color == "null"
-     */
-    @JsonIgnore
-    public boolean isNotRealPlayer() {
-        return !isRealPlayer();
     }
 
     public void setFogFilter(String preference) {

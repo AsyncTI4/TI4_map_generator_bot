@@ -29,14 +29,14 @@ public class Planet extends UnitHolder {
     private int influenceOriginal;
     private int resourcesModifier;
     private int influenceModifier;
-    private String originalPlanetType = "";
-    private String originalTechSpeciality = "";
+    private String originalPlanetType;
+    private String originalTechSpeciality;
     private final List<String> planetType = new ArrayList<>();
     private final List<String> techSpeciality = new ArrayList<>();
     private boolean hasAbility;
     private int spaceCannonHitsOn;
     private int spaceCannonDieCount;
-    private String contrastColor = "";
+    private String contrastColor;
 
     @JsonCreator
     public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
