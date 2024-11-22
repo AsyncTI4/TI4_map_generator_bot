@@ -9,7 +9,6 @@ import ti4.commands2.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -45,23 +44,6 @@ class UnitCommandHelper {
                 Helper.isCCCountCorrect(event, game, color);
             }
         }
-    }
-
-    @Nullable
-    static String getColor(SlashCommandInteractionEvent event, Game game) {
-        String factionColor = event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString);
-        if (factionColor == null) {
-            return CommandHelper.getPlayerFromEvent(game, event).getColor();
-        }
-        Player player = CommandHelper.getPlayerByFactionColor(factionColor, game);
-        if (player == null) {
-            if (Mapper.isValidColor(factionColor)) {
-                return game.setupNeutralPlayer(factionColor).getColor();
-            }
-            MessageHelper.replyToMessage(event, Constants.FACTION_COLOR + " option is not valid.");
-            return null;
-        }
-        return player.getColor();
     }
 
     @Nullable
