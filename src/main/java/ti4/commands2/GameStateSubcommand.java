@@ -7,32 +7,32 @@ import ti4.map.Player;
 
 public abstract class GameStateSubcommand extends Subcommand {
 
-    private final CommandGameStateHelper commandGameStateHelper;
+    private final CommandGameState commandGameState;
 
     public GameStateSubcommand(@NotNull String name, @NotNull String description, boolean saveGame, boolean isPlayerCommand) {
         super(name, description);
-        commandGameStateHelper = new CommandGameStateHelper(saveGame, isPlayerCommand);
+        commandGameState = new CommandGameState(saveGame, isPlayerCommand);
     }
 
     @Override
     public void preExecute(SlashCommandInteractionEvent event) {
         super.preExecute(event);
-        commandGameStateHelper.preExecute(event);
+        commandGameState.preExecute(event);
     }
 
     @Override
     public void postExecute(SlashCommandInteractionEvent event) {
         super.postExecute(event);
-        commandGameStateHelper.postExecute(event);
+        commandGameState.postExecute(event);
     }
 
     @NotNull
     protected Game getGame() {
-        return commandGameStateHelper.getGame();
+        return commandGameState.getGame();
     }
 
     @NotNull
     protected Player getPlayer() {
-        return commandGameStateHelper.getPlayer();
+        return commandGameState.getPlayer();
     }
 }

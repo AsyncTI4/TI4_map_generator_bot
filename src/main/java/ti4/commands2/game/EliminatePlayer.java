@@ -105,7 +105,7 @@ class EliminatePlayer extends GameStateSubcommand {
             for (Tile tile : game.getTileMap().values()) {
                 tile.removeAllUnits(player.getColor());
                 if (!"null".equalsIgnoreCase(player.getColor()) && CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
-                    RemoveCommandCounterService.removeCC(event, player.getColor(), tile, game);
+                    RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
                 }
             }
             //discard all of a players ACs

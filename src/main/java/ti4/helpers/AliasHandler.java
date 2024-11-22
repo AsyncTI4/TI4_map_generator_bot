@@ -183,7 +183,6 @@ public class AliasHandler {
         if (tileId != null) {
             return tileId;
         }
-        System.out.println("Could not find an alias for Tile: " + name);
         return name;
     }
 
@@ -229,10 +228,9 @@ public class AliasHandler {
         String aliasID = allPlanetAliases.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
-        } else {
-            System.out.println("Could not find an alias for Planet: " + name);
-            return name;
         }
+        System.out.println("Could not find an alias for Planet: " + name);
+        return name;
     }
 
     public static String resolveAttachment(String name) {

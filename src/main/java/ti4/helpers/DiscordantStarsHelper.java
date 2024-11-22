@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.units.RemoveUnits;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -24,6 +23,7 @@ import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftTile;
+import ti4.service.unit.RemoveUnitService;
 
 public class DiscordantStarsHelper {
 
@@ -334,7 +334,7 @@ public class DiscordantStarsHelper {
                             if (p2 == player) {
                                 continue;
                             }
-                            new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet), "2 inf " + planet, game);
+                            RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, p2.getColor(), "2 inf " + planet);
                         }
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Destroyed up to 2 enemy infantry from " + representation);
                     }

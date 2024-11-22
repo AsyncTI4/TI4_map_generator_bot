@@ -6,7 +6,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.units.AddUnits;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -23,6 +22,7 @@ import ti4.service.PlanetService;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 class ExploreButtonHandler {
@@ -41,7 +41,7 @@ class ExploreButtonHandler {
             ButtonHelper.addReaction(event, false, false, "Didn't have any Comms/TGs to spend, no mech placed", "");
             return;
         }
-        new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName, game);
+        AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), "mech " + planetName);
         planetName = Mapper.getPlanet(planetName) == null ? "`error?`" : Mapper.getPlanet(planetName).getName();
         ButtonHelper.addReaction(event, false, false, "Spent a " + commOrTg + " for a Mech on " + planetName, "");
         ButtonHelper.deleteMessage(event);
@@ -115,12 +115,10 @@ class ExploreButtonHandler {
         boolean failed = message.contains("Please try again.");
         if (!failed) {
             if ("mech".equalsIgnoreCase(mech)) {
-                new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
-                    "mech " + planet, game);
+                AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(),"mech " + planet);
                 message += "Placed mech on" + Mapper.getPlanet(planet).getName();
             } else {
-                new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
-                    "2 infantry " + planet, game);
+                AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "2 infantry " + planet);
                 message += "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
             }
             ButtonHelper.addReaction(event, false, false, message, "");

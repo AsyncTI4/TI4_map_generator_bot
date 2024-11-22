@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.units.AddUnits;
 import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
@@ -51,6 +50,7 @@ import ti4.service.PlanetService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetService;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class ExploreService {
@@ -205,7 +205,7 @@ public class ExploreService {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab Arcologies.");
         }
         if (ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord", player, tile)) {
-            new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf " + planetName, game);
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planetName);
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Infantry added due to presence of The Lord (a Ghemina flagship) . Technically happens after exploring.");
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && game.getPhaseOfGame().contains("agenda")) {
@@ -529,7 +529,7 @@ public class ExploreService {
                     Set<String> tokenList = ButtonHelper.getUnitHolderFromPlanetName(planetID, game).getTokenList();
                     boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
                     if (!containsDMZ) {
-                        new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetID, game);
+                        AddUnitService.addUnits(event, tile, game, player.getColor(), "inf " + planetID);
                         message = player.getFactionEmoji() + Emojis.getColorEmojiWithName(player.getColor()) + Emojis.infantry
                             + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
                             + ", however this placement *is* optional.";
@@ -670,7 +670,7 @@ public class ExploreService {
             case "ancientshipyard" -> {
                 List<String> colors = tile == null ? List.of() : tile.getUnitHolders().get("space").getUnitColorsOnHolder();
                 if (colors.isEmpty() || colors.contains(player.getColorID())) {
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
+                    AddUnitService.addUnits(event, tile, game, player.getColor(), "cruiser");
                     MessageHelper.sendMessageToEventChannel(event, "Cruiser added to the system automatically.");
                 } else {
                     MessageHelper.sendMessageToEventChannel(event, "Someone else's ships were in the system, no cruiser added");

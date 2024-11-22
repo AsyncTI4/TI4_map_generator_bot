@@ -243,6 +243,14 @@ public class Game extends GameProperties {
         return neutral;
     }
 
+    public String getColorNotInUseByPlayer() {
+        return Mapper.getColorNames().stream()
+            .filter(c -> getPlayers().values().stream()
+                .noneMatch(player -> c.equals(player.getColor())))
+            .findFirst()
+            .orElse(null);
+    }
+
     @JsonIgnore
     public Player getNeutralPlayer(String fallbackColor) {
         if (players.get(Constants.dicecordId) != null)
@@ -254,7 +262,7 @@ public class Game extends GameProperties {
     public Player getNeutralPlayer() {
         if (players.get(Constants.dicecordId) != null)
             return players.get(Constants.dicecordId);
-        return null;
+        return getNeutralPlayer(getColorNotInUseByPlayer());
     }
 
     public String pickNeutralColorID(List<String> exclusions) {

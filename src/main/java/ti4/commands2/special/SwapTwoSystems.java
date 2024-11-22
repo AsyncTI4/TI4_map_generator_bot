@@ -3,13 +3,12 @@ package ti4.commands2.special;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Tile;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 class SwapTwoSystems extends GameStateSubcommand {
@@ -23,30 +22,28 @@ class SwapTwoSystems extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        String tile1ID = AliasHandler.resolveTile(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());
-        Tile tile1 = TileHelper.getTile(event, tile1ID, game);
-        if (tile1 == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tile1ID + "`. Tile not found");
+
+        Tile tileFrom = CommandHelper.getTile(event, game);
+        if (tileFrom == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the tile you're moving from.");
             return;
         }
 
-        String tile2ID = AliasHandler.resolveTile(event.getOption(Constants.TILE_NAME_TO).getAsString().toLowerCase());
-        Tile tile2 = TileHelper.getTile(event, tile2ID, game);
-
-        String positionFrom = tile1.getPosition();
-        String positionTo = tile2ID; //need to validate position
-
-        if (tile2 != null) { // tile exists, so swap
-            positionTo = tile2.getPosition();
-            tile2.setPosition(positionFrom);
-            game.setTile(tile2);
-        } else if (!PositionMapper.isTilePositionValid(positionTo)) { // tile does not exist, so validate the TO position
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid Tile To position: " + positionTo);
+        Tile tileTo = CommandHelper.getTile(event, game, event.getOption(Constants.TILE_NAME_TO).getAsString());
+        if (tileTo == null) {
+            BotLogger.log("Could not find the tile you're moving to.");
             return;
         }
 
-        tile1.setPosition(positionTo);
-        game.setTile(tile1);
+        String positionFrom = tileFrom.getPosition();
+
+        // tile exists, so swap
+        String positionTo = tileTo.getPosition();
+        tileTo.setPosition(positionFrom);
+        game.setTile(tileTo);
+
+        tileFrom.setPosition(positionTo);
+        game.setTile(tileFrom);
 
         game.rebuildTilePositionAutoCompleteList();
     }

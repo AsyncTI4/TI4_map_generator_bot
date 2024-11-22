@@ -76,6 +76,7 @@ import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.player.PlayerReactService;
+import ti4.service.unit.RemoveUnitService;
 
 public class Helper {
 
@@ -1331,10 +1332,7 @@ public class Helper {
             }
             Tile tile = game.getTileByPosition(tilePos);
             String un = unit.split("_")[0];
-            // UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(un),
-            // player.getColor());
-            new ti4.commands.units.RemoveUnits().unitParsing(event, player.getColor(), tile,
-                producedUnits.get(unit) + " " + AliasHandler.resolveUnit(un) + planetOrSpace, game);
+            RemoveUnitService.removeUnits(event, tile, game, player.getColor(), producedUnits.get(unit) + " " + AliasHandler.resolveUnit(un) + planetOrSpace);
         }
 
         player.resetProducedUnits();

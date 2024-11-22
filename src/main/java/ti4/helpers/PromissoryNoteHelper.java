@@ -11,10 +11,10 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.units.AddUnits;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
@@ -22,6 +22,7 @@ import ti4.model.Source;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class PromissoryNoteHelper {
@@ -261,8 +262,8 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if ("dspnlizh".equalsIgnoreCase(id) || "dspnchei".equalsIgnoreCase(id)) {
-            new AddUnits().unitParsing(event, player.getColor(),
-                game.getTileByPosition(game.getActiveSystem()), "2 ff", game);
+            Tile tile = game.getTileByPosition(game.getActiveSystem());
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "2 ff");
             String message = player.getRepresentationUnfogged() + " added 2 fighters to the active system";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }

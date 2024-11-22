@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -32,6 +31,7 @@ import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class ActionCardHelper {
@@ -1086,7 +1086,7 @@ public class ActionCardHelper {
                     if (ignorePlanet) {
                         continue;
                     }
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + unitHolder.getName(), game);
+                    AddUnitService.addUnits(event, tile, game, player.getColor(), "inf " + unitHolder.getName());
                     PlanetModel planetModel = Mapper.getPlanet(unitHolder.getName());
                     if (planetModel != null) {
                         sb.append("\n> ").append(Helper.getPlanetRepresentationPlusEmoji(unitHolder.getName()));
@@ -1147,7 +1147,7 @@ public class ActionCardHelper {
             }
 
             if (!blockaded && (hasCap || hasSD)) {
-                new AddUnits().unitParsing(event, player.getColor(), tile, "ff", game);
+                AddUnitService.addUnits(event, tile, game, player.getColor(), "ff");
                 tilesAffected.add(tile);
             }
         }
