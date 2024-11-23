@@ -666,6 +666,7 @@ public class MiltyService {
                     if (managedPlayer.isDistanceBasedTacticalActions()) {
                         player.setPreferenceForDistanceBasedTacticalActions(true);
                     }
+                    break;
                 }
             }
         }

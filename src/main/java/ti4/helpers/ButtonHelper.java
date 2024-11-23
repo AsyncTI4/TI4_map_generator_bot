@@ -6067,7 +6067,6 @@ public class ButtonHelper {
 
         if (!skipReaction) {
             if (event.getMessageChannel() instanceof ThreadChannel) {
-
                 game.getActionsChannel().addReactionById(event.getChannel().getId(), emojiToUse).queue();
             }
 
