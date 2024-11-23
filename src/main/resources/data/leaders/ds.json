@@ -152,7 +152,9 @@
         "abilityWindow": "At the start of a combat:",
         "abilityText": "Exhaust this card to move a Glory token to the active system, if able. Then, the active player may gain a number of commodities equal to the number of neighbors they have.",
         "unlockCondition": "Always Unlocked",
-        "source": "ds"
+        "source": "ds",
+        "shrinkName": true,
+        "shortName": "Merkism'thr Asvand"
     },
     {
         "id": "kolleccagent",
