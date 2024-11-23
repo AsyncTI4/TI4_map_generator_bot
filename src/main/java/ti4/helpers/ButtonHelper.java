@@ -5962,7 +5962,7 @@ public class ButtonHelper {
     }
 
     public static boolean isPlayerNew(String playerId) {
-        return GameManager.getManagedPlayer(playerId).getGames().size() == 1;
+        return GameManager.getManagedPlayer(playerId).getGames().size() <= 1;
     }
 
     public static boolean anyoneHaveInPlayArea(Game game, String pnID) {
