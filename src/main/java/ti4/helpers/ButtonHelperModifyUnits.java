@@ -104,7 +104,7 @@ public class ButtonHelperModifyUnits {
                     msg.append("> Destroyed ").append(min).append(" ").append(Emojis.fighter).append("\n");
                     hits = hits - min;
                     var unit = new ParsedUnit(unitKey, min, unitHolder.getName());
-                    RemoveUnitService.removeUnit(event, tile, game, unit, false);
+                    RemoveUnitService.removeUnit(event, tile, game, unit, true);
 
                     if (cabal != null
                         && (!cabal.getFaction().equalsIgnoreCase(player.getFaction())
@@ -750,8 +750,7 @@ public class ButtonHelperModifyUnits {
         UnitHolder uH = tile.getUnitHolders().get(unitH);
 
         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 " + unit + " " + unitH.replace("space", ""));
-        if (uH.getUnitCount(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()).getUnitType(),
-            player.getColor()) < 1) {
+        if (uH.getUnitCount(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()).getUnitType(), player.getColor()) < 1) {
             ButtonHelper.deleteTheOneButton(event);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),

@@ -113,7 +113,7 @@ public class Tile {
         if (unitCount < count) {
             count = unitCount;
         }
-        unitHolder.addUnitDamage(unitID, count);
+        unitHolder.addDamagedUnit(unitID, count);
     }
 
     public void addCC(String ccID) {
@@ -191,7 +191,7 @@ public class Tile {
     public void removeUnitDamage(String spaceHolder, UnitKey unitID, @Nullable Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null && count != null) {
-            unitHolder.removeUnitDamage(unitID, count);
+            unitHolder.removeDamagedUnit(unitID, count);
         }
     }
 
