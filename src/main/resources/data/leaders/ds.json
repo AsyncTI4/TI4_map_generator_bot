@@ -927,7 +927,8 @@
         "abilityWindow": "ACTION:",
         "abilityText": "For each system that contains a Glory token, remove up to 1 command token in or adjacent to that system from the game board and gain 1 command token, if able. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "ds"
+        "source": "ds",
+        "shrinkName": true
     },
     {
         "id": "kollecchero",
