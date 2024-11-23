@@ -8,7 +8,8 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Exhaust this card to choose 1 player: that player may place 1 cruiser or 1 destroyer from their reinforcements in a system that contains their ships. Then, if you chose another player, gain 2 commodities.",
         "unlockCondition": "Always Unlocked",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Shipmngr Zxknck"
     },
     {
         "id": "bentoragent",
