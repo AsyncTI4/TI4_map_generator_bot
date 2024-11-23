@@ -86,7 +86,8 @@
         "abilityWindow": "At any time:",
         "abilityText": "You may exhaust this card to allow any player to spend commodities as if they were trade goods.",
         "unlockCondition": "Always Unlocked",
-        "source": "pok"
+        "source": "pok",
+        "shrinkName": true
     },
     {
         "id": "l1z1xagent",
@@ -199,7 +200,8 @@
         "abilityWindow": "At the end of a player's turn:",
         "abilityText": "You may exhaust this card to allow that player to remove up to 2 of their ground forces from the game board and place them on planets they control in the active system. [Note: The timing window of this agent should probably be end of tactical action, not end of turn. The bot treats it as such, and it is more consistent with the rules]",
         "unlockCondition": "Always Unlocked",
-        "source": "pok"
+        "source": "pok",
+        "shrinkName": true
     },
     {
         "id": "nomadagentthundarian",
@@ -342,7 +344,8 @@
         "abilityWindow": "When you produce fighter or infantry units:",
         "abilityText": "Up to 2 of those units do not count against your Production limit.",
         "unlockCondition": "Have units in 3 gravity rifts.",
-        "source": "pok"
+        "source": "pok",
+        "shrinkName": true
     },
     {
         "id": "ghostcommander",
