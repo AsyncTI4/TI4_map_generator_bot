@@ -482,7 +482,8 @@
         "abilityWindow": "After you win a space combat in a system that contains no planets or a planet with a structure",
         "abilityText": "You may gain 1 trade good.",
         "unlockCondition": "Have 2 flagships on the game board.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Jarls Vel & Jotrun"
     },
     {
         "id": "ghoticommander",
