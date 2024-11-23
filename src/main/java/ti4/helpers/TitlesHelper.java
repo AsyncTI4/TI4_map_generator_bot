@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import lombok.experimental.UtilityClass;
-import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.ManagedGame;
 
 @UtilityClass
 public class TitlesHelper {
@@ -18,10 +18,10 @@ public class TitlesHelper {
         HashMap<String, String> gameHistory = new HashMap<>();
         Map<String, Integer> titles = new HashMap<>();
 
-        Predicate<Game> thisPlayerIsInGame = game -> game.getPlayer(userId) != null;
-        List<Game> games = GameManager.getGameNameToGame().values().stream()
-            .filter(thisPlayerIsInGame.and(Game::isHasEnded))
-            .sorted(Comparator.comparing(Game::getGameNameForSorting))
+        Predicate<ManagedGame> thisPlayerIsInGame = game -> game.getPlayer(userId) != null;
+        List<ManagedGame> games = GameManager.getManagedGames().stream()
+            .filter(thisPlayerIsInGame.and(ManagedGame::isHasEnded))
+            .sorted(Comparator.comparing(ManagedGame::getGameNameForSorting))
             .toList();
 
         for (var managedGame : games) {

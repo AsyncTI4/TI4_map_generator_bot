@@ -19,8 +19,9 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.ManagedGame;
+import ti4.map.ManagedPlayer;
 import ti4.message.MessageHelper;
 
 class AverageTurnTime extends Subcommand {
@@ -45,9 +46,9 @@ class AverageTurnTime extends Subcommand {
 
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         boolean showMedian = event.getOption(Constants.SHOW_MEDIAN, false, OptionMapping::getAsBoolean);
-        Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
+        Predicate<ManagedGame> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (Game game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
+        for (ManagedGame game : GameManager.getManagedGames().stream().filter(endedGamesFilter).toList()) {
             mapPlayerTurnTimes(playerTurnTimes, playerAverageTurnTimes, game);
         }
 
@@ -92,16 +93,16 @@ class AverageTurnTime extends Subcommand {
         return sb.toString();
     }
 
-    private void mapPlayerTurnTimes(Map<String, Entry<Integer, Long>> playerTurnTimes, Map<String, Set<Long>> playerAverageTurnTimes, Game game) {
-        for (var player : game.getRealPlayers()) {
-            Integer totalTurns = game.getPlayer(player.getUserID()).getNumberTurns();
-            Long totalTurnTime = game.getPlayer(player.getUserID()).getTotalTurnTime();
+    private void mapPlayerTurnTimes(Map<String, Entry<Integer, Long>> playerTurnTimes, Map<String, Set<Long>> playerAverageTurnTimes, ManagedGame game) {
+        for (ManagedPlayer player : game.getPlayers()) {
+            Integer totalTurns = game.getPlayerToTotalTurns().get(player.getId());
+            Long totalTurnTime = game.getPlayerToTurnTime().get(player.getId());
             Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
-            playerTurnTimes.merge(player.getUserID(), playerTurnTime, (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerTurnTime.getKey(), oldEntry.getValue() + playerTurnTime.getValue()));
+            playerTurnTimes.merge(player.getId(), playerTurnTime, (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerTurnTime.getKey(), oldEntry.getValue() + playerTurnTime.getValue()));
 
             if (playerTurnTime.getKey() == 0) continue;
             Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
-            playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
+            playerAverageTurnTimes.compute(player.getId(), (key, value) -> {
                 if (value == null) value = new HashSet<>();
                 value.add(averageTurnTime);
                 return value;
@@ -115,9 +116,6 @@ class AverageTurnTime extends Subcommand {
         sb.append("## __**Average Turn Time:**__\n");
         int index = 1;
         for (User user : users) {
-            if (!playerTurnTimes.containsKey(user.getId())) {
-                continue;
-            }
             int turnCount = playerTurnTimes.get(user.getId()).getKey();
             long totalMillis = playerTurnTimes.get(user.getId()).getValue();
 
@@ -136,10 +134,10 @@ class AverageTurnTime extends Subcommand {
     }
 
     public Map<String, Entry<Integer, Long>> getAllPlayersTurnTimes(boolean ignoreEndedGames) {
-        Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
+        Predicate<ManagedGame> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
         Map<String, Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
         Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
-        for (var game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
+        for (ManagedGame game : GameManager.getManagedGames().stream().filter(endedGamesFilter).toList()) {
             mapPlayerTurnTimes(playerTurnTimes, playerAverageTurnTimes, game);
         }
         return playerTurnTimes;

@@ -29,6 +29,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class ButtonListener extends ListenerAdapter {
+
     public static ButtonListener instance = null;
 
     public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();

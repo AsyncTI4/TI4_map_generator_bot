@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
@@ -25,12 +24,7 @@ public class CreateGameService {
         newGame.setName(gameName);
         newGame.setAutoPing(true);
         newGame.setAutoPingSpacer(24);
-        GameManager.addGame(newGame);
-        boolean setMapSuccessful = GameManager.setGameForUser(ownerID, gameName);
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
-        if (!setMapSuccessful) {
-            MessageHelper.replyToMessage(event, "Could not assign active Game " + gameName);
-        }
         GameSaveLoadManager.saveGame(newGame, event);
         return newGame;
     }

@@ -629,7 +629,7 @@ public class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         }
-        List<Button> button2 = ButtonHelper.scanlinkResolution(player, game, event);
+        List<Button> button2 = ButtonHelper.scanlinkResolution(player, game);
         if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn")) && !button2.isEmpty() && !game.isL1Hero()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", Please resolve Scanlink Drone Network.", button2);
             if (player.hasAbility("awaken") || player.hasUnit("titans_flagship")) {

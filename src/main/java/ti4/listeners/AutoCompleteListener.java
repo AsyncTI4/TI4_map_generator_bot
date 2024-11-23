@@ -20,7 +20,8 @@ public class AutoCompleteListener extends ListenerAdapter {
         try {
             AutoCompleteProvider.autoCompleteListener(event);
         } catch (Exception e) {
-            String message = "Auto complete issue in event: " + event.getName() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getCommandString();
+            String message = "Auto complete issue in event: " + event.getName() + "\n> Channel: " + event.getChannel().getAsMention() +
+                "\n> Command: " + event.getCommandString();
             BotLogger.log(message, e);
         }
     }

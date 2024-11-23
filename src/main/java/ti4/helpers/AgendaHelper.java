@@ -2937,7 +2937,7 @@ public class AgendaHelper {
                             .append(" and gained that many TGs (").append(cTG).append("->").append(fTG).append("). \n");
                         tile.removeUnit(unitHolder.getName(), infKey, numTG);
                         if (player.hasInf2Tech()) {
-                            ButtonHelper.resolveInfantryDeath(game, player, numTG);
+                            ButtonHelper.resolveInfantryDeath(player, numTG);
                         }
                         boolean cabalMech = player.hasAbility("amalgamation") && unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0 && player.hasUnit("cabal_mech") && !game.getLaws().containsKey("articles_war");
                         if (player.hasAbility("amalgamation") && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", player, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(player, tile, unitHolder.getName())) {

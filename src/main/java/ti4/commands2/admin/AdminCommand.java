@@ -20,8 +20,8 @@ public class AdminCommand implements ParentCommand {
                     new ReloadMapperObjects(),
                     new RestoreGame(),
                     new CardsInfoForPlayer(),
-                    new UpdateThreadArchiveTime(),
-                    new UploadStatistics())
+                    // new UploadStatistics(),
+                    new UpdateThreadArchiveTime())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

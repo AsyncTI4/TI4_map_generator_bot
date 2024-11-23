@@ -26,8 +26,8 @@ public class BothelperCommand implements ParentCommand {
                     new ListButtons(),
                     new ServerGameStats(),
                     new ListDeadGames(),
-                    new RemoveTitle(),
-                    new ListSlashCommandsUsed())
+                    //new ListSlashCommandsUsed(),
+                    new RemoveTitle())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

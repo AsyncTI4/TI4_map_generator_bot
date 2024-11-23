@@ -657,14 +657,13 @@ public class MiltyService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }
 
-        Map<String, Game> mapList = GameManager.getGameNameToGame();
-        for (Game game2 : mapList.values()) {
-            for (Player player2 : game2.getRealPlayers()) {
-                if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                    if (!player2.getHoursThatPlayerIsAFK().isEmpty()) {
-                        player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
+        for (var managedGame : GameManager.getManagedGames()) {
+            for (var managedPlayer : managedGame.getRealPlayers()) {
+                if (managedPlayer.getId().equalsIgnoreCase(player.getUserID())) {
+                    if (!managedPlayer.getAfkHours().isEmpty()) {
+                        player.setHoursThatPlayerIsAFK(managedPlayer.getAfkHours());
                     }
-                    if (player2.doesPlayerPreferDistanceBasedTacticalActions()) {
+                    if (managedPlayer.isDistanceBasedTacticalActions()) {
                         player.setPreferenceForDistanceBasedTacticalActions(true);
                     }
                 }

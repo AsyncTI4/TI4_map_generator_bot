@@ -174,7 +174,6 @@ public class MessageListener extends ListenerAdapter {
                     if (roles.contains(player2.getRoleForCommunity())) {
                         player3 = player2;
                     }
-
                 }
             }
 

@@ -102,6 +102,10 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         return playerToIsReal.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).toList();
     }
 
+    public boolean hasRealPlayer(String playerId) {
+        return getRealPlayers().stream().anyMatch(p -> p.getId().equals(playerId));
+    }
+
     public String getGameNameForSorting() {
         if (getName().startsWith("pbd")) {
             return StringUtils.leftPad(getName(), 10, "0");

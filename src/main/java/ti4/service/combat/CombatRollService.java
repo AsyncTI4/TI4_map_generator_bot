@@ -445,7 +445,7 @@ public class CombatRollService {
                     if (thalnosUnit.equals(unitName)) {
                         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), misses + " " + unitName + " " + unitHolderName);
                         if (unitName.equalsIgnoreCase("infantry")) {
-                            ButtonHelper.resolveInfantryDeath(game, player, misses);
+                            ButtonHelper.resolveInfantryDeath(player, misses);
                         }
                         if (unitName.equalsIgnoreCase("mech")) {
                             if (player.hasUnit("mykomentori_mech")) {
@@ -517,7 +517,7 @@ public class CombatRollService {
                 String kills = "\nDue to SWA II destroyer ability, " + argentInfKills + " of " + opponent.getRepresentation(false, true) + " infantry were destroyed\n";
                 resultBuilder.append(kills);
                 space.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), opponent.getColorID()), argentInfKills);
-                ButtonHelper.resolveInfantryDeath(game, opponent, argentInfKills);
+                ButtonHelper.resolveInfantryDeath(opponent, argentInfKills);
             }
         }
         result = resultBuilder.toString();
@@ -803,7 +803,7 @@ public class CombatRollService {
         }
         if (player.hasAbility("starfall_gunnery")) {
             if (player == game.getActivePlayer()) {
-                int count = Math.min(3, ButtonHelper.checkNumberNonFighterShipsWithoutSpaceCannon(player, game, tile));
+                int count = Math.min(3, ButtonHelper.checkNumberNonFighterShipsWithoutSpaceCannon(player, tile));
                 if (count > 0) {
                     UnitModel starfallFakeUnit = new UnitModel();
                     starfallFakeUnit.setSpaceCannonHitsOn(8);

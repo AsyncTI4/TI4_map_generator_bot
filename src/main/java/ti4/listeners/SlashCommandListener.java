@@ -7,14 +7,12 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.channel.unions.IThreadContainerUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Command;
+import ti4.commands2.CommandHelper;
 import ti4.commands2.CommandManager;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -23,6 +21,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class SlashCommandListener extends ListenerAdapter {
+
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
@@ -32,7 +31,6 @@ public class SlashCommandListener extends ListenerAdapter {
 
         long startTime = System.currentTimeMillis();
 
-        String userID = event.getUser().getId();
         // CHECK IF CHANNEL IS MATCHED TO A GAME
         if (!event.getInteraction().getName().equals(Constants.HELP)
             && !event.getInteraction().getName().equals(Constants.STATISTICS)
@@ -43,19 +41,15 @@ public class SlashCommandListener extends ListenerAdapter {
                 || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
             && event.getOption(Constants.GAME_NAME) == null) {
 
-            boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
-            if (!isChannelOK) {
-                event
-                    .reply(
-                        "Command canceled. Execute command in correctly named channel that starts with the game name.\n> For example, for game `pbd123`, the channel name should start with `pbd123`")
-                    .setEphemeral(true).queue();
+            String gameName = CommandHelper.getGameNameFromChannel(event);
+            if (!GameManager.isValidGame(gameName)) {
+                event.reply(
+                    "Command canceled. Execute command in correctly named channel that starts with the game name.\n> For example, for game `pbd123`, the channel name should start with `pbd123`")
+                        .setEphemeral(true).queue();
                 return;
-            } else {
-                Game userActiveGame = UserGameContextManager.getContextGame(userID);
-                if (userActiveGame != null) {
-                    userActiveGame.incrementSpecificSlashCommandCount(event.getFullCommandName());
-                }
             }
+            Game game = GameManager.getGame(gameName);
+            game.incrementSpecificSlashCommandCount(event.getFullCommandName());
         }
 
         event.getInteraction().deferReply().queue();
@@ -65,7 +59,6 @@ public class SlashCommandListener extends ListenerAdapter {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
             event.getChannel().sendMessage(commandText).queue(m -> {
                 BotLogger.logSlashCommand(event, m);
-                Game userActiveGame = UserGameContextManager.getContextGame(userID);
                 boolean harmless = false;
                 if (!event.getInteraction().getName().equals(Constants.HELP)
                     && !event.getInteraction().getName().equals(Constants.STATISTICS)
@@ -80,15 +73,17 @@ public class SlashCommandListener extends ListenerAdapter {
                 } else {
                     harmless = true;
                 }
-                if (userActiveGame != null && !userActiveGame.isFowMode() && !harmless
-                    && userActiveGame.getName().contains("pbd") && !userActiveGame.getName().contains("pbd1000") && !userActiveGame.getName().contains("pbd100two")) {
+                String gameName = CommandHelper.getGameNameFromChannel(event);
+                Game game = GameManager.getGame(gameName);
+                if (game != null && !game.isFowMode() && !harmless
+                    && game.getName().contains("pbd") && !game.getName().contains("pbd1000") && !game.getName().contains("pbd100two")) {
                     if (event.getMessageChannel() instanceof ThreadChannel thread) {
                         if (!thread.isPublic()) {
                             reportSusSlashCommand(event, m);
                         }
                     } else {
-                        if (event.getMessageChannel() != userActiveGame.getActionsChannel()
-                            && event.getMessageChannel() != userActiveGame.getTableTalkChannel()
+                        if (event.getMessageChannel() != game.getActionsChannel()
+                            && event.getMessageChannel() != game.getTableTalkChannel()
                             && !event.getMessageChannel().getName().contains("bot-map-updates")) {
                             reportSusSlashCommand(event, m);
                         }
@@ -138,46 +133,5 @@ public class SlashCommandListener extends ListenerAdapter {
                 break;
             }
         }
-    }
-
-    public static boolean setActiveGame(MessageChannel channel, String userID, String eventName, String subCommandName) {
-        String channelName = channel.getName();
-        Game userActiveGame = UserGameContextManager.getContextGame(userID);
-        List<String> mapList = GameManager.getGameNames();
-
-        String gameID = StringUtils.substringBefore(channelName, "-");
-        boolean gameExists = mapList.contains(gameID);
-        
-        boolean isThreadEnabledSubcommand = 
-            (Constants.COMBAT.equals(eventName) && Constants.COMBAT_ROLL.equals(subCommandName));
-        if (!gameExists && channel instanceof ThreadChannel && isThreadEnabledSubcommand) {
-            IThreadContainerUnion parentChannel = ((ThreadChannel) channel).getParentChannel();
-            channelName = parentChannel.getName();
-            gameID = StringUtils.substringBefore(channelName, "-");
-            gameExists = mapList.contains(gameID);
-        }
-
-        boolean isUnprotectedCommand = eventName.contains(Constants.SHOW_GAME)
-            || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN)
-            || eventName.contains(Constants.DEVELOPER);
-        boolean isUnprotectedCommandSubcommand = (Constants.GAME.equals(eventName)
-            && Constants.CREATE_GAME.equals(subCommandName));
-        if (!gameExists && !(isUnprotectedCommand) && !(isUnprotectedCommandSubcommand)) {
-            return false;
-        }
-        if (gameExists && (UserGameContextManager.getContextGame(userID) == null
-            || !UserGameContextManager.getContextGame(userID).getName().equals(gameID)
-                && (GameManager.getGame(gameID) != null && (GameManager.getGame(gameID).isCommunityMode()
-                    || GameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
-            GameManager.setGameForUser(userID, gameID);
-        } else if (GameManager.isUserWithActiveGame(userID)) {
-            if (gameExists && !channelName.startsWith(userActiveGame.getName())) {
-                // MessageHelper.sendMessageToChannel(channel,"Active game reset. Channel name
-                // indicates to have map associated with it. Please select correct active game
-                // or do action in neutral channel");
-                GameManager.resetGameForUser(userID);
-            }
-        }
-        return true;
     }
 }

@@ -54,6 +54,7 @@ import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Leader;
+import ti4.map.ManagedGame;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -1771,7 +1772,7 @@ public class Helper {
                     unitButtons.add(mfButton);
                 }
 
-            } else if (ButtonHelper.canIBuildGFInSpace(game, player, tile, warfareNOtherstuff)
+            } else if (ButtonHelper.canIBuildGFInSpace(player, tile, warfareNOtherstuff)
                 && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
                 Button inf1Button = Buttons.green(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_space" + tile.getPosition(),
@@ -2151,7 +2152,7 @@ public class Helper {
         return true;
     }
 
-    public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Game game) {
+    public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull ManagedGame game) {
         if (game.isFowMode() || game.isCommunityMode()) {
             return;
         }
@@ -2174,8 +2175,8 @@ public class Helper {
         }
     }
 
-    public static void addMapPlayerPermissionsToGameChannels(Guild guild, Game game) {
-        var players = game.getPlayerIDs();
+    public static void addMapPlayerPermissionsToGameChannels(Guild guild, ManagedGame game) {
+        var players = game.getPlayerIds();
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null) {
             addPlayerPermissionsToGameChannel(guild, tableTalkChannel, players);
@@ -2201,7 +2202,7 @@ public class Helper {
         // long role = 1093925613288562768L;
         long role = 1166011604488425482L;
 
-        for (var game : GameManager.getGameNameToGame().values()) {
+        for (ManagedGame game : GameManager.getManagedGames()) {
             if (!game.isHasEnded()) {
                 if (game.getGuild() != null && game.getGuild().equals(guild)) {
                     var tableTalkChannel = game.getTableTalkChannel();
@@ -2214,8 +2215,7 @@ public class Helper {
                     }
                 }
                 String gameName = game.getName();
-                List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
-                    .toList();
+                List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
                 for (GuildChannel channel : channels) {
                     addRolePermissionsToGameChannel(guild, channel, role);
                 }
@@ -2248,9 +2248,9 @@ public class Helper {
         }
     }
 
-    private static void addGameRoleToMapPlayers(Guild guild, Role role, Game game) {
-        for (var playerId : game.getPlayerIDs()) {
-            if (game.getRound() > 1 && !game.getPlayer(playerId).isRealPlayer()) {
+    private static void addGameRoleToMapPlayers(Guild guild, Role role, ManagedGame game) {
+        for (var playerId : game.getPlayerIds()) {
+            if (game.getRound() > 1 && !game.hasRealPlayer(playerId)) {
                 continue;
             }
             Member member = guild.getMemberById(playerId);

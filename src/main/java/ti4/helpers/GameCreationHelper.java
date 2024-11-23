@@ -250,7 +250,7 @@ public class GameCreationHelper {
 
 		// Find new players
 		for (Player player : game.getPlayers().values()) {
-			if (ButtonHelper.isPlayerNew(game, player)) {
+			if (ButtonHelper.isPlayerNew(player.getUserID())) {
 				newPlayers.add(player);
 			}
 		}
