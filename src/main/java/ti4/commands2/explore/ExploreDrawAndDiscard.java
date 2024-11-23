@@ -16,7 +16,9 @@ class ExploreDrawAndDiscard extends GameStateSubcommand {
     public ExploreDrawAndDiscard() {
         super(Constants.DRAW_AND_DISCARD, "Draw from a specified Exploration Deck.", true, true);
         addOptions(
-                new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.")
+                    .setRequired(true)
+                    .setAutoComplete(true),
                 new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of cards to draw (default 1)"));
     }
 
