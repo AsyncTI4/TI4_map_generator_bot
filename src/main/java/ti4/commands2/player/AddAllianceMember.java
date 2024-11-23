@@ -22,12 +22,12 @@ class AddAllianceMember extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player player = getPlayer();
-        if (player.isNotRealPlayer()) {
+        if (!player.isRealPlayer()) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (otherPlayer == null || otherPlayer.isNotRealPlayer()) {
+        if (otherPlayer == null || !otherPlayer.isRealPlayer()) {
             MessageHelper.sendMessageToEventChannel(event, "Player to add to the alliance could not be found");
             return;
         }

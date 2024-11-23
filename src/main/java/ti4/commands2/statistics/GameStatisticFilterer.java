@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GameManager;
 
 @UtilityClass
 public class GameStatisticFilterer {
@@ -47,26 +46,28 @@ public class GameStatisticFilterer {
     }
 
     public static List<Game> getFilteredGames(Integer playerCountFilter, Integer minPlayerCountFilter, Integer victoryPointGoalFilter, String gameTypeFilter, Boolean fogFilter, Boolean homebrewFilter, Boolean hasWinnerFilter) {
-        return GameManager.getGameNameToGame().values().stream()
-            .filter(GameStatisticFilterer::filterAbortedGames)
-            .filter(game -> filterOnPlayerCount(playerCountFilter, game))
-            .filter(game -> filterOnMinPlayerCount(minPlayerCountFilter, game))
-            .filter(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
-            .filter(game -> filterOnGameType(gameTypeFilter, game))
-            .filter(game -> filterOnFogType(fogFilter, game))
-            .filter(game -> filterOnHomebrew(homebrewFilter, game))
-            .filter(game -> filterOnHasWinner(hasWinnerFilter, game))
-            .toList();
+//        return GameManager.getGameNameToGame().values().stream()
+//            .filter(GameStatisticFilterer::filterAbortedGames)
+//            .filter(game -> filterOnPlayerCount(playerCountFilter, game))
+//            .filter(game -> filterOnMinPlayerCount(minPlayerCountFilter, game))
+//            .filter(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
+//            .filter(game -> filterOnGameType(gameTypeFilter, game))
+//            .filter(game -> filterOnFogType(fogFilter, game))
+//            .filter(game -> filterOnHomebrew(homebrewFilter, game))
+//            .filter(game -> filterOnHasWinner(hasWinnerFilter, game))
+//            .toList();
+        return List.of();
     }
 
     public static List<Game> getNormalFinishedGames(Integer playerCountFilter, Integer victoryPointGoalFilter) {
-        return GameManager.getGameNameToGame().values().stream()
-            .filter(GameStatisticFilterer::filterAbortedGames)
-            .filter(game -> filterOnPlayerCount(playerCountFilter, game))
-            .filter(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
-            .filter(game -> filterOnHomebrew(Boolean.FALSE, game))
-            .filter(game -> filterOnHasWinner(Boolean.TRUE, game))
-            .toList();
+//        return GameManager.getGameNameToGame().values().stream()
+//            .filter(GameStatisticFilterer::filterAbortedGames)
+//            .filter(game -> filterOnPlayerCount(playerCountFilter, game))
+//            .filter(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
+//            .filter(game -> filterOnHomebrew(Boolean.FALSE, game))
+//            .filter(game -> filterOnHasWinner(Boolean.TRUE, game))
+//            .toList();
+        return List.of();
     }
 
     private static boolean filterOnFogType(Boolean fogFilter, Game game) {

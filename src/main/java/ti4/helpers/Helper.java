@@ -2152,7 +2152,7 @@ public class Helper {
         return true;
     }
 
-    public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull ManagedGame game) {
+    public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Game game) {
         if (game.isFowMode() || game.isCommunityMode()) {
             return;
         }
@@ -2175,8 +2175,8 @@ public class Helper {
         }
     }
 
-    public static void addMapPlayerPermissionsToGameChannels(Guild guild, ManagedGame game) {
-        var players = game.getPlayerIds();
+    public static void addMapPlayerPermissionsToGameChannels(Guild guild, Game game) {
+        var players = game.getPlayerIDs();
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null) {
             addPlayerPermissionsToGameChannel(guild, tableTalkChannel, players);
@@ -2248,9 +2248,9 @@ public class Helper {
         }
     }
 
-    private static void addGameRoleToMapPlayers(Guild guild, Role role, ManagedGame game) {
-        for (var playerId : game.getPlayerIds()) {
-            if (game.getRound() > 1 && !game.hasRealPlayer(playerId)) {
+    private static void addGameRoleToMapPlayers(Guild guild, Role role, Game game) {
+        for (var playerId : game.getPlayerIDs()) {
+            if (game.getRound() > 1 && !game.getPlayer(playerId).isRealPlayer()) {
                 continue;
             }
             Member member = guild.getMemberById(playerId);

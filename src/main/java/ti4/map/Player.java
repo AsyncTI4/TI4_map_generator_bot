@@ -1499,8 +1499,6 @@ public class Player {
                     }
                     if (ping) {
                         sb.append(" ").append(userById.getAsMention());
-                    } else {
-                        //sb.append(" ").append(userById.getEffectiveName());
                     }
                 }
                 if (getColor() != null && !"null".equals(getColor()) && !noColor) {

@@ -17,8 +17,9 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.ManagedGame;
+import ti4.map.ManagedPlayer;
 import ti4.message.MessageHelper;
 
 class MedianTurnTime extends Subcommand {
@@ -42,21 +43,21 @@ class MedianTurnTime extends Subcommand {
         Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
 
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
-        Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
+        Predicate<ManagedGame> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (Game game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
-            for (var player : game.getRealPlayers()) {
-                Integer totalTurns = player.getNumberTurns();
-                Long totalTurnTime = player.getTotalTurnTime();
+        for (ManagedGame game : GameManager.getManagedGames().stream().filter(endedGamesFilter).toList()) {
+            for (ManagedPlayer player : game.getPlayers()) {
+                Integer totalTurns = game.getPlayerToTotalTurns().get(player.getId());
+                Long totalTurnTime = game.getPlayerToTurnTime().get(player.getId());
                 Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
                 if (playerTurnTime.getKey() == 0) continue;
                 Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
-                playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
+                playerAverageTurnTimes.compute(player.getId(), (key, value) -> {
                     if (value == null) value = new HashSet<>();
                     value.add(averageTurnTime);
                     return value;
                 });
-                playerTurnCount.merge(player.getUserID(), playerTurnTime.getKey(), Integer::sum);
+                playerTurnCount.merge(player.getId(), playerTurnTime.getKey(), Integer::sum);
             }
         }
 
@@ -64,7 +65,7 @@ class MedianTurnTime extends Subcommand {
         StringBuilder sb = new StringBuilder();
 
         sb.append("## __**Median Turn Time:**__\n");
-        
+
         int index = 1;
         int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
 
@@ -77,13 +78,13 @@ class MedianTurnTime extends Subcommand {
             int turnCount = playerTurnCount.get(userMedianTurnTime.getKey());
 
             if (user == null || turnCount == 0 || totalMillis == 0) continue;
-            
+
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
             sb.append(Helper.getTimeRepresentationToSeconds(userMedianTurnTime.getValue()));
             sb.append("` ").append(user.getEffectiveName());
             sb.append("   [").append(turnCount).append(" total turns]");
             sb.append("\n");
-            index++;     
+            index++;
         }
 
         return sb.toString();
