@@ -32,7 +32,7 @@ public class SpaceTest extends BaseTi4Test {
         Space space = new Space(expectedName, expectedHolderCenterPosition);
 
         space.addUnit(expectedUnitKey, expectedUnitCount);
-        space.addUnitDamage(expectedUnitKey, expectedUnitDamage);
+        space.addDamagedUnit(expectedUnitKey, expectedUnitDamage);
         space.addCC(expectedCommandCounter);
         space.addControl(expectedControl);
         space.addToken(expectedToken);

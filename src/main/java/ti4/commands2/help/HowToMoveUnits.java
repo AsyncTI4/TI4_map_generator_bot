@@ -65,7 +65,7 @@ class HowToMoveUnits extends Subcommand {
             "> - If you do not want that to happen for any reason, you can use other options:\n" +
             ">  - “r” uses from your reinforcements (e.g., if you are retreating)\n" +
             ">  - “No” doesn't place a token (e.g., for Transit Diodes)\n" +
-            "### 7. __priority_no_damage__\n> I have never used this, but if you want to prioritize moving units that have not sustained damage, you can select that here (e.g., you have 4 dreads, 2 sustained, and you want to move the two undamaged ones only)\n" +
+            "### 7. __prioritize_damaged__\n> I have never used this, but if you want to prioritize moving units that have not sustained damage, you can select that here (e.g., you have 4 dreads, 2 sustained, and you want to move the two undamaged ones only)\n" +
             "### 8. __no_mapgen__\n> 'True' to not produce a map image in the chat afterwards.\n" +
 
             "## Final notes:\n" +
