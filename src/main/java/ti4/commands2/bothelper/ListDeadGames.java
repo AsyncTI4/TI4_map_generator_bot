@@ -1,7 +1,5 @@
 package ti4.commands2.bothelper;
 
-import java.util.List;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -24,17 +22,13 @@ class ListDeadGames extends Subcommand {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        execute(event, GameManager.getManagedGames());
-    }
-
-    private void execute(SlashCommandInteractionEvent event, List<ManagedGame> games) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         boolean delete = "DELETE".equals(option.getAsString());
         StringBuilder sb = new StringBuilder("Dead Channels\n");
         StringBuilder sb2 = new StringBuilder("Dead Roles\n");
         int channelCount = 0;
         int roleCount = 0;
-        for (ManagedGame game : games) {
+        for (ManagedGame game : GameManager.getManagedGames()) {
             if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
                 continue;
             }

@@ -10,11 +10,9 @@ import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.time.StopWatch;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
@@ -23,7 +21,6 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.ManagedGame;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.StrategyCardModel;
@@ -45,9 +42,6 @@ public class AutoPingCron {
     }
 
     private static void autoPingGames() {
-        boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
-        var stopWatch = debug ? StopWatch.createStarted() : null;
-
         GameManager.getManagedGames().stream().filter(not(ManagedGame::isHasEnded))
             .forEach(managedGame -> {
                 var game = GameManager.getGame(managedGame.getName());
@@ -61,8 +55,6 @@ public class AutoPingCron {
                     handleAutoPing(game, player);
                 }
             });
-
-        if (stopWatch != null) BotLogger.log("AutoPingGames runtime: " + stopWatch.getDuration());
     }
 
     private static void checkAllSaboWindows(Game game) {
