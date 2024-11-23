@@ -1379,7 +1379,32 @@ public class MapGenerator implements AutoCloseable {
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
-        for (Leader leader : player.getLeaders()) {
+        
+        Comparator<Leader> leaderComparator = (leader1, leader2) -> {
+            int leaderRank1 = switch(leader1.getType()) {
+                case Constants.AGENT -> 0;
+                case Constants.ENVOY -> 1;
+                case Constants.COMMANDER -> 2;
+                case Constants.HERO -> 3;
+                default -> -1;
+            };
+            int leaderRank2 = switch(leader2.getType()) {
+                case Constants.AGENT -> 0;
+                case Constants.ENVOY -> 1;
+                case Constants.COMMANDER -> 2;
+                case Constants.HERO -> 3;
+                default -> -1;
+            };
+            if (leaderRank1 == leaderRank2)
+            {
+                return Mapper.getLeader(leader1.getId()).getName().compareToIgnoreCase(Mapper.getLeader(leader2.getId()).getName());
+            }
+            return leaderRank1 - leaderRank2;
+        };
+        List<Leader> allLeaders = new ArrayList<>(player.getLeaders());
+        allLeaders.sort(leaderComparator);
+        
+        for (Leader leader : allLeaders) {
             boolean isExhaustedLocked = leader.isExhausted() || leader.isLocked();
             if (isExhaustedLocked) {
                 graphics.setColor(Color.GRAY);
@@ -1419,20 +1444,17 @@ public class MapGenerator implements AutoCloseable {
                     drawPAImage(x + deltaX, y, leaderPipInfo);
                 }
             }
-
-            String leaderInfoFileName = "pa_leaders_" + leader.getId() + status + ".png";
-            String resourcePath = ResourceHelper.getInstance().getPAResource(leaderInfoFileName);
-            try {
-                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
-                if (resourceBufferedImage == null) {
-                    LeaderModel leaderModel = Mapper.getLeader(leader.getId());
-                    g2.setFont(Storage.getFont16());
-                    drawTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 10, y + 148, 130);
-                } else {
-                    graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
-                }
-            } catch (Exception e) {
-                BotLogger.log("Bad file: " + leaderInfoFileName, e);
+            
+            LeaderModel leaderModel = Mapper.getLeader(leader.getId());
+            if (leaderModel.getShrinkName())
+            {
+                g2.setFont(Storage.getFont16());
+                drawOneOrTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 9, y + 30, 120, true);
+            }
+            else
+            {
+                g2.setFont(Storage.getFont18());
+                drawOneOrTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 7, y + 30, 120, true);
             }
 
             deltaX += 48;
@@ -4265,10 +4287,19 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static void drawTextVertically(Graphics graphics, String text, int x, int y, Font font) {
+        drawTextVertically(graphics, text, x, y, font, false);
+    }
+
+    private static void drawTextVertically(Graphics graphics, String text, int x, int y, Font font, boolean rightAlign) {
         Graphics2D graphics2D = (Graphics2D) graphics;
         AffineTransform originalTransform = graphics2D.getTransform();
         graphics2D.rotate(Math.toRadians(-90));
         graphics2D.setFont(font);
+        
+        if (rightAlign)
+        {
+            y += graphics.getFontMetrics().stringWidth(text);
+        }
 
         // DRAW A 1px BLACK BORDER AROUND TEXT
         Color originalColor = graphics2D.getColor();
@@ -4289,19 +4320,29 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth) {
+        drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, false);
+
+    }
+
+    private static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth, boolean rightAlign) {
         int spacing = graphics.getFontMetrics().getAscent() + graphics.getFontMetrics().getLeading();
         text = text.toUpperCase();
         String firstRow = StringUtils.substringBefore(text, "\n");
         firstRow = trimTextToPixelWidth(graphics, firstRow, maxWidth);
         String secondRow = text.replace(firstRow, "").replace("\n", "");
         secondRow = trimTextToPixelWidth(graphics, secondRow, maxWidth);
-        drawTextVertically(graphics, firstRow, x, y, graphics.getFont());
+        drawTextVertically(graphics, firstRow, x, y, graphics.getFont(), rightAlign);
         if (StringUtils.isNotBlank(secondRow)) {
-            drawTextVertically(graphics, secondRow, x + spacing, y, graphics.getFont());
+            drawTextVertically(graphics, secondRow, x + spacing, y, graphics.getFont(), rightAlign);
         }
     }
-
+    
     private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth)
+    {
+        drawOneOrTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, false);
+    }
+
+    private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth, boolean rightAlign)
     {
         // vertically prints text on one line, centred horizontally, if it fits,
         // otherwise prints it over two lines
@@ -4309,7 +4350,7 @@ public class MapGenerator implements AutoCloseable {
         // if the text contains a linebreak, print it over two lines
         if (text.contains("\n"))
         {
-            drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth);
+            drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, rightAlign);
             return;
         }
         
@@ -4319,7 +4360,7 @@ public class MapGenerator implements AutoCloseable {
         // if the text is short enough to fit on one line, print it on one
         if (text.equals(trimTextToPixelWidth(graphics, text, maxWidth)))
         {
-            drawTextVertically(graphics, text, x + spacing/2, y, graphics.getFont());
+            drawTextVertically(graphics, text, x + spacing/2, y, graphics.getFont(), rightAlign);
             return;
         }
         
@@ -4353,14 +4394,12 @@ public class MapGenerator implements AutoCloseable {
                 text = text.substring(0, after) + "\n" + text.substring(after + 1);
             }
         }
-        drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth);
+        drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, rightAlign);
     }
 
     private static String trimTextToPixelWidth(Graphics graphics, String text, int pixelLength) {
-        int currentPixels = 0;
         for (int i = 0; i < text.length(); i++) {
-            currentPixels += graphics.getFontMetrics().charWidth(text.charAt(i));
-            if (currentPixels > pixelLength) {
+            if (graphics.getFontMetrics().stringWidth(text.substring(0, i+1)) > pixelLength) {
                 return text.substring(0, i);
             }
         }
