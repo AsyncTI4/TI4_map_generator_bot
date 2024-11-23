@@ -202,7 +202,7 @@
         "abilityText": "You may exhaust this card to allow that player to remove up to 2 of their ground forces from the game board and place them on planets they control in the active system. [Note: The timing window of this agent should probably be end of tactical action, not end of turn. The bot treats it as such, and it is more consistent with the rules]",
         "unlockCondition": "Always Unlocked",
         "source": "pok",
-        "shrinkName": true
+        "shortName": "Fld Mrshl\nMercer"
     },
     {
         "id": "nomadagentthundarian",
@@ -768,7 +768,9 @@
         "abilityWindow": "At the start of a space combat that you are participating in:",
         "abilityText": "You may purge this card. if you do, for each other player's ship that is destroyed during this combat, place 1 ship of that type from your reinforcements in the active system.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "pok"
+        "source": "pok",
+        "shrinkName": true,
+        "shortName": "Ipswitch, Loose C'nn'n"
     },
     {
         "id": "muaathero",
