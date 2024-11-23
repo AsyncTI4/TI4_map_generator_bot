@@ -20,7 +20,8 @@
         "name": "Quantum Entanglement",
         "faction": "ghost",
         "permanentEffect": "You treat all systems that contain either an alpha or beta wormhole as adjacent to each other. Game effects cannot prevent you from using this ability.",
-        "source": "base"
+        "source": "base",
+        "shortName": "Quantum\nEnt'glem'nt"
     },
     {
         "id": "slipstream",
@@ -168,7 +169,8 @@
         "permanentEffect": "You cannot research technology",
         "window": "When you would research a technology",
         "windowEffect": "Gain 3 command tokens instead.",
-        "source": "base"
+        "source": "base",
+        "shortName": "Propa-\ngation"
     },
     {
         "id": "technological_singularity",
@@ -176,7 +178,8 @@
         "faction": "nekro",
         "window": "Once per combat, after 1 of your opponent's units is destroyed",
         "windowEffect": "You may gain 1 technology that is owned by that player.",
-        "source": "base"
+        "source": "base",
+        "shortName": "Techno...\nSingularity"
     },
     {
         "id": "nomadic",
@@ -198,7 +201,8 @@
         "name": "Unrelenting",
         "faction": "sardakk",
         "permanentEffect": "Apply +1 to the result of each of your unit's combat rolls.",
-        "source": "base"
+        "source": "base",
+        "shortName": "Unre-\nlenting"
     },
     {
         "id": "orbital_drop",
@@ -229,7 +233,8 @@
         "faction": "winnu",
         "window": "After you resolve a tactical action during which you gained control of Mecatol Rex",
         "windowEffect": "You may place 1 PDS and 1 space dock from your reinforcements on Mecatol Rex.",
-        "source": "base"
+        "source": "base",
+        "shortName": "Recla-\nmation"
     },
     {
         "id": "peace_accords",
@@ -261,7 +266,8 @@
         "faction": "yin",
         "window": "At the start of a ground combat",
         "windowEffect": "You may spend 2 influence to replace 1 of your opponent's participating infantry with 1 infantry from your reinforcements.",
-        "source": "base"
+        "source": "base",
+        "shortName": "Indoctri\n-nation"
     },
     {
         "id": "crafty",

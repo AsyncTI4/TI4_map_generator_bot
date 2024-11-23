@@ -215,7 +215,6 @@ public class MapGenerator implements AutoCloseable {
                 displayTypeBasic = DisplayType.all;
                 width = mapWidth;
         }
-        System.out.println(displayType);
         allEyesOnMe = this.displayType.equals(DisplayType.googly);
         mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         graphics = mainImage.getGraphics();
@@ -1533,7 +1532,15 @@ public class MapGenerator implements AutoCloseable {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
         boolean addedAbilities = false;
-        for (String abilityID : player.getAbilities()) {
+        Comparator<String> abilityComparator = (ability1, ability2) -> {
+            AbilityModel abilityModel1 = Mapper.getAbility(ability1);
+            AbilityModel abilityModel2 = Mapper.getAbility(ability2);
+            return abilityModel1.getName().compareToIgnoreCase(abilityModel2.getName());
+        };
+        List<String> allAbilities = new ArrayList<>(player.getAbilities());
+        allAbilities.sort(abilityComparator);
+        
+        for (String abilityID : allAbilities) {
             String abilityFileName = null;
             switch (abilityID) {
                 case "grace" -> abilityFileName = "pa_ds_edyn_grace";
@@ -1563,8 +1570,8 @@ public class MapGenerator implements AutoCloseable {
                 drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
             } else {
                 drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
-                g2.setFont(Storage.getFont16());
-                drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 6, y + 144, 130);
+                g2.setFont(Storage.getFont18());
+                drawOneOrTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 7, y + 144, 130);
                 drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
             }
 
@@ -4292,6 +4299,61 @@ public class MapGenerator implements AutoCloseable {
         if (StringUtils.isNotBlank(secondRow)) {
             drawTextVertically(graphics, secondRow, x + spacing, y, graphics.getFont());
         }
+    }
+
+    private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth)
+    {
+        // vertically prints text on one line, centred horizontally, if it fits,
+        // otherwise prints it over two lines
+        
+        // if the text contains a linebreak, print it over two lines
+        if (text.contains("\n"))
+        {
+            drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth);
+            return;
+        }
+        
+        int spacing = graphics.getFontMetrics().getAscent() + graphics.getFontMetrics().getLeading();
+        text = text.toUpperCase();
+        
+        // if the text is short enough to fit on one line, print it on one
+        if (text.equals(trimTextToPixelWidth(graphics, text, maxWidth)))
+        {
+            drawTextVertically(graphics, text, x + spacing/2, y, graphics.getFont());
+            return;
+        }
+        
+        // if there's a space in the text, try to split it
+        // as close to the centre as possible
+        if (text.contains(" "))
+        {
+            float center = text.length() / 2.0f + 0.5f;
+            String front = text.substring(0, (int) center);
+            String back = text.substring((int) (center - 0.5f));
+            int before = front.lastIndexOf(" ");
+            int after = text.indexOf(" ", (int) (center - 0.5f));
+            
+            // if there's only a space in the back half, replace the first space with a newline
+            if (before == -1)
+            {
+                text = text.substring(0, after) + "\n" + text.substring(after + 1);
+            }
+            // if there's only a space in the front half, or if the last space in the
+            // front half is closer to the centre than the first space in the back half,
+            // replace the last space in the front half with a newline
+            else if (after == -1 || (center - before - 1 <= after - center + 1))
+            {
+                text = text.substring(0, before) + "\n" + text.substring(before + 1);
+            }
+            // otherwise, the first space in the back half is closer to the centre
+            // than the last space in the front half, so replace
+            // the first space in the back half with a newline
+            else
+            {
+                text = text.substring(0, after) + "\n" + text.substring(after + 1);
+            }
+        }
+        drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth);
     }
 
     private static String trimTextToPixelWidth(Graphics graphics, String text, int pixelLength) {
