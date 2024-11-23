@@ -39,7 +39,7 @@
         "window": "After you gain 1 or more commodities",
         "windowEffect": "You may spend a number of commodities equal to the combined cost listed on any number of Axis Order cards in your reinforcements to place those cards in your play area.",
         "source": "ds",
-        "shortName": "Military Industr'l Cmplx"
+        "shortName": "Military Industr'l Cx"
     },
     {
         "id": "ancient_blueprints",
@@ -204,7 +204,8 @@
         "faction": "florzen",
         "window": "At the start of a space combat",
         "windowEffect": "You may remove up to 2 fighters you control in a system adjacent to the active system. Then, choose 1 player participating in that combat; that player places the same number of fighters from their reinforcements in the active system.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Mercen\n-aries"
     },
     {
         "id": "diplomats",
@@ -272,7 +273,8 @@
         "name": "Celestial Reclamation",
         "faction": "gledge",
         "window": "Planets that contain Core tokens have a base resource value of 2 and influence value of 0. Core tokens cannot be removed from the planet that contains them.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Celestial Reclamatn"
     },
     {
         "id": "deep_mining",
@@ -718,7 +720,8 @@
         "faction": "vaden",
         "window": "After 1 of your opponent's ships is destroyed during a round of space combat",
         "windowEffect": "You may remove 1 of that player's control tokens from your faction sheet to place 1 ship of that type from your reinforcements in the active system.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Collateral\n-ized Loans"
     },
     {
         "id": "fine_print",
