@@ -64,7 +64,9 @@
         "abilityWindow": "During the action phase:",
         "abilityText": "You may exhaust this card to gain 2 commodities or replenish another player's commodities.",
         "unlockCondition": "Always Unlocked",
-        "source": "pok"
+        "source": "pok",
+        "shrinkName": true,
+        "shortName": "Carth of G'ld'n Sands"
     },
     {
         "id": "jolnaragent",
@@ -87,7 +89,7 @@
         "abilityText": "You may exhaust this card to allow any player to spend commodities as if they were trade goods.",
         "unlockCondition": "Always Unlocked",
         "source": "pok",
-        "shrinkName": true
+        "shortName": "Xander A. Victori III"
     },
     {
         "id": "l1z1xagent",
@@ -213,7 +215,8 @@
         "abilityWindow": "After the \"Roll Dice\" step of combat:",
         "abilityText": "You may exhaust this card. If you do, hits are not assigned to either player's units. Return to the start of this combat round's \"Roll Dice\" step.",
         "unlockCondition": "Always Unlocked",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "The Thun\n-darian"
     },
     {
         "id": "sardakkagent",
@@ -379,7 +382,8 @@
         "abilityWindow": "When you cast votes:",
         "abilityText": "You may spend any number of trade goods: cast 2 additional votes for each trade good spent.",
         "unlockCondition": "Have 10 trade goods.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Gila the Sil\n-vertongue"
     },
     {
         "id": "jolnarcommander",
@@ -428,7 +432,7 @@
         "abilityText": "You may gain 1 trade good.",
         "unlockCondition": "Have 5 non-fighter ships in 1 system.",
         "source": "pok",
-        "shortName": "Rear Admiral Farran"
+        "shortName": "Rear Adml Farran"
     },
     {
         "id": "mahactcommander",
@@ -819,7 +823,8 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Choose a planet that has a technology specialty in a system that contains your units. Destroy any other player's units on that planet. Gain trade goods equal to the planet's combined resource and influence values and gain 1 technology that matches the specialty of that planet. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "UNIT.DSGN.\nFLAYESH"
     },
     {
         "id": "nomadhero",
