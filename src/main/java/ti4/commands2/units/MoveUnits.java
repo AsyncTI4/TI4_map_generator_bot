@@ -54,7 +54,7 @@ public class MoveUnits extends GameStateCommand {
                 .setAutoComplete(true),
             new OptionData(OptionType.STRING, Constants.CC_USE, "Type t or tactics to add a CC from tactics, r or retreat to add a CC without taking it from tactics")
                 .setAutoComplete(true),
-            new OptionData(OptionType.BOOLEAN, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units. Type in yes or y"),
+            new OptionData(OptionType.BOOLEAN, Constants.PRIORITIZE_DAMAGED, "Prioritize moving damaged units. Default false."),
             new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")
         );
     }
@@ -76,9 +76,9 @@ public class MoveUnits extends GameStateCommand {
         }
 
         String color = getPlayer().getColor();
-        boolean prioritizeNoDamage = event.getOption(Constants.PRIORITY_NO_DAMAGE, false, OptionMapping::getAsBoolean);
+        boolean prioritizeDamaged = event.getOption(Constants.PRIORITIZE_DAMAGED, false, OptionMapping::getAsBoolean);
         String fromUnitList = event.getOption(Constants.UNIT_NAMES).getAsString();
-        RemoveUnitService.removeUnits(event, tileFrom, game, color, fromUnitList, prioritizeNoDamage);
+        RemoveUnitService.removeUnits(event, tileFrom, game, color, fromUnitList, prioritizeDamaged);
 
         String toUnitList = event.getOption(Constants.UNIT_NAMES_TO).getAsString();
         AddUnitService.addUnits(event, tileTo, game, color, toUnitList);

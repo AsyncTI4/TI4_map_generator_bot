@@ -265,8 +265,8 @@ public class ButtonHelperFactionSpecific {
         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), unit);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "cavalry");
         if (damaged) {
-            unitHolder.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
-            unitHolder.addUnitDamage(Mapper.getUnitKey("cavalry", player.getColorID()), 1);
+            unitHolder.removeDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
+            unitHolder.addDamagedUnit(Mapper.getUnitKey("cavalry", player.getColorID()), 1);
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
@@ -287,9 +287,9 @@ public class ButtonHelperFactionSpecific {
                                 .get(Mapper.getUnitKey("cavalry", player.getColorID())) != null
                             && unitHolder.getUnitDamage()
                                 .get(Mapper.getUnitKey("cavalry", player.getColorID())) > 0) {
-                            unitHolder.addUnitDamage(
+                            unitHolder.addDamagedUnit(
                                 Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
-                            unitHolder.removeUnitDamage(Mapper.getUnitKey("cavalry", player.getColorID()), 1);
+                            unitHolder.removeDamagedUnit(Mapper.getUnitKey("cavalry", player.getColorID()), 1);
                         }
                         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "cavalry");
                         AddUnitService.addUnits(event, tile, game, player.getColor(), unit);
@@ -2110,7 +2110,7 @@ public class ButtonHelperFactionSpecific {
         boolean removed = false;
         for (UnitHolder uH : tile.getUnitHolders().values()) {
             int count = uH.getUnitCount(UnitType.Mech, player.getColor())
-                - uH.getUnitDamageCount(UnitType.Mech, player.getColorID());
+                - uH.getDamagedUnitCount(UnitType.Mech, player.getColorID());
 
             if (count > 0 && !removed) {
                 removed = true;
@@ -2118,7 +2118,7 @@ public class ButtonHelperFactionSpecific {
                 if ("space".equals(name)) {
                     name = "";
                 }
-                uH.addUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), 1);
+                uH.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), 1);
                 sb.append("\n ").append(player.getFactionEmoji()).append(" damaged 1 mech on ")
                     .append(tile.getRepresentation()).append("(").append(uH.getName()).append(")");
             }

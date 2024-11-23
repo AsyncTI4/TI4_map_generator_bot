@@ -251,7 +251,7 @@ public class Constants {
     public static final String START_PHASE = "start_phase";
     public static final String SPECIFIC_PHASE = "specific_phase";
     public static final String REMOVE_CODEX_AC = "remove_codex_ac";
-    public static final String PRIORITY_NO_DAMAGE = "priority_no_damage";
+    public static final String PRIORITIZE_DAMAGED = "prioritize_damaged";
     public static final String UNIT_NAMES_TO = "unit_names_to";
     public static final String UNIT_NAMES_FROM = "unit_names_from";
     public static final String UNIT_NAMES_FROM_2 = "unit_names_from_2";
