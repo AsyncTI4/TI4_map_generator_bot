@@ -433,8 +433,7 @@ class AgendaResolveButtonHandler {
                                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
                             }
                             if (player.hasInf2Tech()) {
-                                ButtonHelper.resolveInfantryDeath(player,
-                                    uH.getUnitCount(Units.UnitType.Infantry, player.getColor()));
+                                ButtonHelper.resolveInfantryDeath(player, uH.getUnitCount(Units.UnitType.Infantry, player.getColor()));
                             }
                             if (cabalFS || cabalMech) {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabalFSOwner,
@@ -505,8 +504,7 @@ class AgendaResolveButtonHandler {
                                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
                             }
                             if (player.hasInf2Tech()) {
-                                ButtonHelper.resolveInfantryDeath(player,
-                                    uH.getUnitCount(Units.UnitType.Infantry, player.getColor()));
+                                ButtonHelper.resolveInfantryDeath(player, uH.getUnitCount(Units.UnitType.Infantry, player.getColor()));
                             }
                             if (cabalFS || cabalMech) {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabalFSOwner,
