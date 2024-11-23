@@ -123,7 +123,8 @@
         "abilityWindow": "When you would spend a command token during the secondary ability of a strategic action:",
         "abilityText": "You may exhaust this card to remove 1 of the active player's command tokens from the board and use it instead.",
         "unlockCondition": "Always Unlocked",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Jae\nMir Kan"
     },
     {
         "id": "mentakagent",
@@ -548,7 +549,8 @@
         "abilityWindow": "When 1 or more of your units use Production:",
         "abilityText": "You may gain 1 trade good.",
         "unlockCondition": "Have 5 structures on the game board.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Tung-\nstantus"
     },
     {
         "id": "winnucommander",
@@ -653,7 +655,8 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Place 1 frontier token in each system that does not contain any planets and does not already have a frontier token. Then, explore each frontier token that is in a system that contains 1 or more of your ships. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Conservtr Procyon"
     },
     {
         "id": "hacanhero",
