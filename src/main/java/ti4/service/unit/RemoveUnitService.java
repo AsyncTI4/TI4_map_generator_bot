@@ -1,126 +1,100 @@
 package ti4.service.unit;
 
+import java.util.Collections;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 
 @UtilityClass
 public class RemoveUnitService {
 
     public static void removeUnits(GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
-        removeUnits(event, tile, game, color, unitList, false);
+        removeUnits(event, tile, game, color, unitList, true);
     }
 
-    public static void removeUnits(GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList, boolean prioritizeNoDamage) {
+    public static void removeUnits(GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList, boolean prioritizeDamagedUnits) {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
-            removeUnit(event, tile, game, parsedUnit, prioritizeNoDamage);
+            removeUnit(event, tile, game, parsedUnit, prioritizeDamagedUnits);
         }
     }
 
     public static void removeUnit(GenericInteractionCreateEvent event, Tile tile, Game game, ParsedUnit parsedUnit) {
-        removeUnit(event, tile, game, parsedUnit, false);
+        removeUnit(event, tile, game, parsedUnit, true);
     }
 
-    public static void removeUnit(GenericInteractionCreateEvent event, Tile tile, Game game, ParsedUnit parsedUnit, boolean prioritizeNoDamage) {
-        UnitHolder unitHolder = determineUnitHolder(tile, parsedUnit);
-        if (unitHolder == null) {
-            handleNullUnitHolder(event, tile, parsedUnit);
+    public static void removeUnit(GenericInteractionCreateEvent event, Tile tile, Game game, ParsedUnit parsedUnit, boolean prioritizeDamagedUnits) {
+        List<UnitHolder> unitHoldersToRemoveFrom = getUnitHoldersToRemoveFrom(tile, parsedUnit);
+
+        if (unitHoldersToRemoveFrom.isEmpty()) {
+            handleEmptyUnitHolders(event, tile, parsedUnit);
             return;
         }
 
-        int countToRemove = prioritizeNoDamage ? parsedUnit.getCount() : calculateNumberToRemove(unitHolder, parsedUnit);
+        int toRemoveCount = parsedUnit.getCount();
+        for (UnitHolder unitHolder : unitHoldersToRemoveFrom) {
+            int oldUnitCount = unitHolder.getUnitCount(parsedUnit.getUnitKey());
+            int unitsRemovedCount = unitHolder.removeUnit(parsedUnit.getUnitKey(), toRemoveCount);
 
-        removeUnitsFromHolder(tile, unitHolder, parsedUnit, countToRemove);
-        handleOtherUnitHoldersIfNeeded(tile, parsedUnit);
+            int damagedToRemove = getNumberOfDamagedUnitsToRemove(unitHolder, parsedUnit.getUnitKey(), prioritizeDamagedUnits, oldUnitCount, unitsRemovedCount);
+            unitHolder.removeDamagedUnit(parsedUnit.getUnitKey(), damagedToRemove);
 
-        tile.getUnitHolders().values().forEach(unitHolder_ ->
-            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, unitHolder_.getName(), game)
+            toRemoveCount -= unitsRemovedCount;
+            if (toRemoveCount == 0) {
+                break;
+            }
+        }
+
+        if (toRemoveCount > 0) {
+            MessageHelper.replyToMessage(event, "Did not find enough units to remove, " + toRemoveCount + " were missing.");
+        }
+
+        tile.getUnitHolders().values().forEach(unitHolder ->
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, unitHolder.getName(), game)
         );
     }
 
-    private static UnitHolder determineUnitHolder(Tile tile, ParsedUnit parsedUnit) {
-        // Check if there is only one non-empty unit holder
-        long nonEmptyUnitHolders = tile.getUnitHolders().values().stream()
-            .filter(holder -> hasUnitsOrDamage(holder, parsedUnit.getUnitKey()))
-            .count();
-
-        if (nonEmptyUnitHolders == 1) {
-            return tile.getUnitHolders().values().stream()
-                .filter(holder -> hasUnitsOrDamage(holder, parsedUnit.getUnitKey()))
-                .findFirst()
-                .orElse(null);
+    private static int getNumberOfDamagedUnitsToRemove(UnitHolder unitHolder, Units.UnitKey unitKey, boolean prioritizeDamagedUnits, int oldUnitCount, int unitsRemoved) {
+        if (prioritizeDamagedUnits) {
+            return unitsRemoved;
         }
-
-        return tile.getUnitHolders().get(parsedUnit.getLocation());
+        int damagedUnitCount = unitHolder.getDamagedUnitCount(unitKey);
+        int undamagedUnitCount = oldUnitCount - damagedUnitCount;
+        return Math.max(0, unitsRemoved - undamagedUnitCount);
     }
 
-    private static boolean hasUnitsOrDamage(UnitHolder holder, Units.UnitKey unitKey) {
+    private static List<UnitHolder> getUnitHoldersToRemoveFrom(Tile tile, ParsedUnit parsedUnit) {
+        if (!parsedUnit.getLocation().equals(Constants.SPACE)) { // We are removing from a specific planet.
+            var specificUnitHolder = tile.getUnitHolders().get(parsedUnit.getLocation());
+            return specificUnitHolder == null ? Collections.emptyList() : List.of(specificUnitHolder);
+        }
+        // Otherwise, the location was not specified, so we check everywhere
+        return tile.getUnitHolders().values().stream()
+            .filter(unitHolderTemp -> countUnitsInHolder(unitHolderTemp, parsedUnit.getUnitKey()) > 0)
+            .toList();
+    }
+
+    private static int countUnitsInHolder(UnitHolder holder, Units.UnitKey unitKey) {
         int unitCount = holder.getUnits().getOrDefault(unitKey, 0);
         int damageCount = holder.getUnitDamage().getOrDefault(unitKey, 0);
-        return (unitCount + damageCount) > 0;
+        return unitCount + damageCount;
     }
 
-    private static void handleNullUnitHolder(GenericInteractionCreateEvent event, Tile tile, ParsedUnit parsedUnit) {
+    private static void handleEmptyUnitHolders(GenericInteractionCreateEvent event, Tile tile, ParsedUnit parsedUnit) {
         if (event instanceof ButtonInteractionEvent) {
             BotLogger.log(event.getId() + " found a null UnitHolder with the following info: " + tile.getRepresentation() + " " + parsedUnit.getLocation());
-        }
-    }
-
-    private static int calculateNumberToRemove(UnitHolder unitHolder, ParsedUnit parsedUnit) {
-        int unitCount = unitHolder.getUnits().getOrDefault(parsedUnit.getUnitKey(), 0);
-        int damagedCount = unitHolder.getUnitDamage().getOrDefault(parsedUnit.getUnitKey(), 0);
-        return Math.max(0, damagedCount - (unitCount - parsedUnit.getCount()));
-    }
-
-    private static void removeUnitsFromHolder(Tile tile, UnitHolder unitHolder, ParsedUnit parsedUnit, int countToRemove) {
-        tile.removeUnit(unitHolder.getName(), parsedUnit.getUnitKey(), parsedUnit.getCount());
-        tile.removeUnitDamage(unitHolder.getName(), parsedUnit.getUnitKey(), countToRemove);
-    }
-
-    private static void handleOtherUnitHoldersIfNeeded(Tile tile, ParsedUnit parsedUnit) {
-        long totalUnitsOnHex = calculateTotalUnitsOnHex(tile, parsedUnit.getUnitKey());
-        boolean otherHoldersContainUnit = checkOtherHoldersContainUnit(tile, parsedUnit);
-
-        if (totalUnitsOnHex == parsedUnit.getCount() && otherHoldersContainUnit) {
-            tile.getUnitHolders().forEach((name, holder) -> {
-                if (!name.equals(parsedUnit.getLocation())) {
-                    removeAllUnitsAndDamage(tile, name, parsedUnit.getUnitKey());
-                }
-            });
-        }
-    }
-
-    private static long calculateTotalUnitsOnHex(Tile tile, Units.UnitKey unitKey) {
-        return tile.getUnitHolders().values().stream()
-            .mapToInt(holder ->
-                holder.getUnits().getOrDefault(unitKey, 0) +
-                    holder.getUnitDamage().getOrDefault(unitKey, 0))
-            .sum();
-    }
-
-    private static boolean checkOtherHoldersContainUnit(Tile tile, ParsedUnit parsedUnit) {
-        return tile.getUnitHolders().values().stream()
-            .filter(holder -> !holder.getName().equals(parsedUnit.getLocation()))
-            .anyMatch(holder -> hasUnitsOrDamage(holder, parsedUnit.getUnitKey()));
-    }
-
-    private static void removeAllUnitsAndDamage(Tile tile, String unitHolderName, Units.UnitKey unitKey) {
-        int unitCount = tile.getUnitHolders().get(unitHolderName).getUnits().getOrDefault(unitKey, 0);
-        if (unitCount > 0) {
-            tile.removeUnit(unitHolderName, unitKey, unitCount);
-        }
-        int damageCount = tile.getUnitHolders().get(unitHolderName).getUnitDamage().getOrDefault(unitKey, 0);
-        if (damageCount > 0) {
-            tile.removeUnitDamage(unitHolderName, unitKey, damageCount);
+        } else {
+            MessageHelper.replyToMessage(event, "Unable to determine where the units are being removed from.");
         }
     }
 }

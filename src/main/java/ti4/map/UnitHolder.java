@@ -116,23 +116,25 @@ abstract public class UnitHolder {
         ccList.clear();
     }
 
-    public void removeUnit(UnitKey unit, Integer count) {
-        if (count == null || count <= 0) {
-            return;
+    public int removeUnit(UnitKey unit, Integer count) {
+        if (count <= 0) {
+            return 0;
         }
-        Integer unitCount = units.get(unit);
-        if (unitCount == null) {
-            return;
+        Integer unitCount = units.getOrDefault(unit, 0);
+        if (unitCount <= 0) {
+            return 0;
         }
-        unitCount -= count;
-        if (unitCount > 0) {
-            units.put(unit, unitCount);
+        int unitsToRemove = Math.min(unitCount, count);
+        int newUnitCount = unitCount - unitsToRemove;
+        if (newUnitCount > 0) {
+            units.put(unit, newUnitCount);
         } else {
             units.remove(unit);
         }
+        return unitsToRemove;
     }
 
-    public void addUnitDamage(UnitKey unit, Integer count) {
+    public void addDamagedUnit(UnitKey unit, Integer count) {
         if (count == null || count <= 0) {
             return;
         }
@@ -145,19 +147,22 @@ abstract public class UnitHolder {
         }
     }
 
-    public void removeUnitDamage(UnitKey unit, Integer count) {
-        if (count == null || count <= 0) {
-            return;
+    public int removeDamagedUnit(UnitKey unit, Integer count) {
+        if (count <= 0) {
+            return 0;
         }
-        Integer unitCount = unitsDamage.get(unit);
-        if (unitCount != null) {
-            unitCount -= count;
-            if (unitCount > 0) {
-                unitsDamage.put(unit, unitCount);
-            } else {
-                unitsDamage.remove(unit);
-            }
+        Integer unitCount = unitsDamage.getOrDefault(unit, 0);
+        if (unitCount <= 0) {
+            return 0;
         }
+        int unitsToRemove = Math.min(unitCount, count);
+        int newUnitCount = unitCount - unitsToRemove;
+        if (newUnitCount > 0) {
+            unitsDamage.put(unit, newUnitCount);
+        } else {
+            unitsDamage.remove(unit);
+        }
+        return unitsToRemove;
     }
 
     public void removeAllUnitDamage(String color) {
@@ -223,7 +228,7 @@ abstract public class UnitHolder {
     }
 
     @NotNull
-    public Integer getUnitDamageCount(UnitType unitType, String colorID) {
+    public Integer getDamagedUnitCount(UnitType unitType, String colorID) {
         return unitsDamage.entrySet().stream()
             .filter(e -> e.getKey().getUnitType() == unitType && e.getKey().getColorID().equals(colorID))
             .findFirst().map(Entry::getValue).orElse(0);
@@ -231,8 +236,8 @@ abstract public class UnitHolder {
 
     @NotNull
     @JsonIgnore
-    public Integer getUnitDamageCount(UnitKey unitKey) {
-        return getUnitDamageCount(unitKey.getUnitType(), unitKey.getColorID());
+    public Integer getDamagedUnitCount(UnitKey unitKey) {
+        return getDamagedUnitCount(unitKey.getUnitType(), unitKey.getColorID());
     }
 
     /**

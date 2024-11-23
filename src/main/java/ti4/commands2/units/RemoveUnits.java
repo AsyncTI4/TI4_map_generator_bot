@@ -45,7 +45,7 @@ public class RemoveUnits extends GameStateCommand {
                 .setRequired(true),
             new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                 .setAutoComplete(true),
-            new OptionData(OptionType.BOOLEAN, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units."),
+            new OptionData(OptionType.BOOLEAN, Constants.PRIORITIZE_DAMAGED, "Priority for not damaged units."),
             new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")
         );
     }
@@ -58,9 +58,9 @@ public class RemoveUnits extends GameStateCommand {
         if (tile == null) return;
 
         String color = getPlayer().getColor();
-        boolean prioritizeNoDamage = event.getOption(Constants.PRIORITY_NO_DAMAGE, false, OptionMapping::getAsBoolean);
+        boolean prioritizeDamaged = event.getOption(Constants.PRIORITIZE_DAMAGED, false, OptionMapping::getAsBoolean);
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
-        RemoveUnitService.removeUnits(event, tile, game, color, unitList, prioritizeNoDamage);
+        RemoveUnitService.removeUnits(event, tile, game, color, unitList, prioritizeDamaged);
 
         UnitCommandHelper.handleGenerateMapOption(event, game);
     }

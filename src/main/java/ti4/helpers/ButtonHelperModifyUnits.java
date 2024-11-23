@@ -104,7 +104,7 @@ public class ButtonHelperModifyUnits {
                     msg.append("> Destroyed ").append(min).append(" ").append(Emojis.fighter).append("\n");
                     hits = hits - min;
                     var unit = new ParsedUnit(unitKey, min, unitHolder.getName());
-                    RemoveUnitService.removeUnit(event, tile, game, unit, false);
+                    RemoveUnitService.removeUnit(event, tile, game, unit, true);
 
                     if (cabal != null
                         && (!cabal.getFaction().equalsIgnoreCase(player.getFaction())

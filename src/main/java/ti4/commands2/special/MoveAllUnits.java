@@ -53,7 +53,7 @@ class MoveAllUnits extends GameStateSubcommand {
             }
             for (UnitKey key : uH.getUnitDamage().keySet()) {
                 if (!player.unitBelongsToPlayer(key)) continue;
-                space.addUnitDamage(key, uH.getUnitDamage().get(key));
+                space.addDamagedUnit(key, uH.getUnitDamage().get(key));
             }
 
             uH.removeAllUnits(player.getColor());
