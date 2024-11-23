@@ -581,7 +581,6 @@ public class Game extends GameProperties {
 
         // CHECK IF ARCHIVED
         if (getActionsChannel() == null) {
-            BotLogger.log(getName() + " does not have an actions channel and therefore can't find the bot-map-updates channel");
             return null;
         }
         for (ThreadChannel archivedChannel : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
