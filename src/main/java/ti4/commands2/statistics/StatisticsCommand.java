@@ -11,8 +11,8 @@ import ti4.helpers.Constants;
 public class StatisticsCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-        //new GameStats(),
-        new PlayerStats(),
+        new GameStatistics(),
+        new PlayerStatistics(),
         new AverageTurnTime(),
         new MedianTurnTime(),
         new CompareAFKTimes(),
@@ -21,8 +21,8 @@ public class StatisticsCommand implements ParentCommand {
         new FactionRecordOfTech(),
         new FactionRecordOfSCPick(),
         new GameWinsWithOtherFactions(),
-        //new StellarConverter(),
-        //new ListTitlesGiven(),
+        new StellarConverterStatistics(),
+        new ListTitlesGiven(),
         new ExportToCSV()
     ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

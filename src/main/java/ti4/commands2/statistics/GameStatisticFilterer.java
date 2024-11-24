@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.GamesPage;
 
 @UtilityClass
 public class GameStatisticFilterer {
@@ -45,35 +46,62 @@ public class GameStatisticFilterer {
         return getFilteredGames(playerCountFilter, minPlayerCountFilter, victoryPointGoalFilter, gameTypeFilter, fogFilter, homebrewFilter, hasWinnerFilter);
     }
 
-    public static List<Game> getFilteredGames(Integer playerCountFilter, Integer minPlayerCountFilter, Integer victoryPointGoalFilter, String gameTypeFilter, Boolean fogFilter, Boolean homebrewFilter, Boolean hasWinnerFilter) {
-//        return GameManager.getGameNameToGame().values().stream()
-//            .filter(GameStatisticFilterer::filterAbortedGames)
-//            .filter(game -> filterOnPlayerCount(playerCountFilter, game))
-//            .filter(game -> filterOnMinPlayerCount(minPlayerCountFilter, game))
-//            .filter(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
-//            .filter(game -> filterOnGameType(gameTypeFilter, game))
-//            .filter(game -> filterOnFogType(fogFilter, game))
-//            .filter(game -> filterOnHomebrew(homebrewFilter, game))
-//            .filter(game -> filterOnHasWinner(hasWinnerFilter, game))
-//            .toList();
-        return List.of();
+    public static List<Game> getFilteredGames(Integer playerCountFilter, Integer minPlayerCountFilter, Integer victoryPointGoalFilter, String gameTypeFilter,
+                                                Boolean fogFilter, Boolean homebrewFilter, Boolean hasWinnerFilter) {
+        List<Game> filteredGames = new ArrayList<>();
+        int currentPage = 0;
+        GamesPage pagedGames;
+        do {
+            pagedGames = GamesPage.getPage(currentPage++);
+            filteredGames.addAll(
+                getFilteredGames(pagedGames.getGames(), playerCountFilter, minPlayerCountFilter, victoryPointGoalFilter,
+                    gameTypeFilter, fogFilter, homebrewFilter, hasWinnerFilter));
+        } while (pagedGames.hasNextPage());
+        return filteredGames;
     }
 
-    public static List<Game> getNormalFinishedGames(Integer playerCountFilter, Integer victoryPointGoalFilter) {
-//        return GameManager.getGameNameToGame().values().stream()
-//            .filter(GameStatisticFilterer::filterAbortedGames)
-//            .filter(game -> filterOnPlayerCount(playerCountFilter, game))
-//            .filter(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
-//            .filter(game -> filterOnHomebrew(Boolean.FALSE, game))
-//            .filter(game -> filterOnHasWinner(Boolean.TRUE, game))
-//            .toList();
-        return List.of();
+    public static List<Game> getFilteredGames(List<Game> games, Integer playerCountFilter, Integer minPlayerCountFilter, Integer victoryPointGoalFilter,
+                                                String gameTypeFilter, Boolean fogFilter, Boolean homebrewFilter, Boolean hasWinnerFilter) {
+        return games.stream()
+            .filter(GameStatisticFilterer::filterAbortedGames)
+            .filter(game -> filterOnPlayerCount(playerCountFilter, game))
+            .filter(game -> filterOnMinPlayerCount(minPlayerCountFilter, game))
+            .filter(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
+            .filter(game -> filterOnGameType(gameTypeFilter, game))
+            .filter(game -> filterOnFogType(fogFilter, game))
+            .filter(game -> filterOnHomebrew(homebrewFilter, game))
+            .filter(game -> filterOnHasWinner(hasWinnerFilter, game))
+            .toList();
+    }
+
+    public static List<Game> getNormalFinishedGames( Integer playerCountFilter, Integer victoryPointGoalFilter) {
+        List<Game> filteredGames = new ArrayList<>();
+        int currentPage = 0;
+        GamesPage pagedGames;
+        do {
+            pagedGames = GamesPage.getPage(currentPage++);
+            filteredGames.addAll(
+                getNormalFinishedGames(pagedGames.getGames(), playerCountFilter, victoryPointGoalFilter));
+        } while (pagedGames.hasNextPage());
+        return filteredGames;
+    }
+
+    public static List<Game> getNormalFinishedGames(List<Game> games, Integer playerCountFilter, Integer victoryPointGoalFilter) {
+        return games.stream()
+            .filter(GameStatisticFilterer::filterAbortedGames)
+            .filter(game -> filterOnPlayerCount(playerCountFilter, game))
+            .filter(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
+            .filter(game -> filterOnHomebrew(Boolean.FALSE, game))
+            .filter(game -> filterOnHasWinner(Boolean.TRUE, game))
+            .toList();
     }
 
     private static boolean filterOnFogType(Boolean fogFilter, Game game) {
-        return fogFilter == null
-            || (fogFilter && (game.isFowMode() || game.isLightFogMode()))
-            || (!fogFilter && (!game.isFowMode() && !game.isLightFogMode()));
+        if (fogFilter == null) {
+            return true;
+        }
+        boolean isFogMode = game.isFowMode() || game.isLightFogMode();
+        return fogFilter == isFogMode;
     }
 
     private static boolean filterOnGameType(String gameTypeFilter, Game game) {

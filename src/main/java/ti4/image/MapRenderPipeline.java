@@ -29,7 +29,7 @@ public class MapRenderPipeline {
                 try {
                     RenderEvent renderEvent = gameRenderQueue.poll(2, TimeUnit.SECONDS);
                     if (renderEvent != null) {
-                        render(renderEvent);
+                        queue(renderEvent);
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -57,7 +57,7 @@ public class MapRenderPipeline {
         }
     }
 
-    private static void render(RenderEvent renderEvent) {
+    private static void queue(RenderEvent renderEvent) {
         try (var mapGenerator = new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
             mapGenerator.draw();
             if (renderEvent.uploadToDiscord) {
@@ -83,20 +83,20 @@ public class MapRenderPipeline {
 
     public static void renderToWebsiteOnly(Game game, @Nullable GenericInteractionCreateEvent event) {
         if (GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) {
-            render(game, event, null, null, false, true);
+            queue(game, event, null, null, false, true);
         }
     }
 
-    public static void render(Game game, @Nullable SlashCommandInteractionEvent event, @Nullable Consumer<FileUpload> callback) {
-        render(game, event, null, callback, true, true);
+    public static void queue(Game game, @Nullable SlashCommandInteractionEvent event, @Nullable Consumer<FileUpload> callback) {
+        queue(game, event, null, callback, true, true);
     }
 
-    public static void render(Game game, @Nullable GenericInteractionCreateEvent event, @Nullable DisplayType displayType,
+    public static void queue(Game game, @Nullable GenericInteractionCreateEvent event, @Nullable DisplayType displayType,
                        @Nullable Consumer<FileUpload> callback) {
-        render(game, event, displayType, callback, true, true);
+        queue(game, event, displayType, callback, true, true);
     }
 
-    public static void render(Game game, @Nullable GenericInteractionCreateEvent event,  @Nullable DisplayType displayType,
+    public static void queue(Game game, @Nullable GenericInteractionCreateEvent event,  @Nullable DisplayType displayType,
                        @Nullable Consumer<FileUpload> callback, boolean uploadToDiscord, boolean uploadToWebsite) {
         if (game == null) {
             throw new IllegalArgumentException("game cannot be null in render pipeline");

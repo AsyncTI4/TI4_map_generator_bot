@@ -1314,7 +1314,7 @@ public class ButtonHelper {
     public static void updateMap(Game game, GenericInteractionCreateEvent event, String message) {
         String threadName = game.getName() + "-bot-map-updates";
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
-        MapRenderPipeline.render(game, event, DisplayType.all, fileUpload -> {
+        MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
             boolean foundSomething = false;
             if (!game.isFowMode()) {
                 for (ThreadChannel threadChannel_ : threadChannels) {
@@ -5657,7 +5657,7 @@ public class ButtonHelper {
     }
 
     public static void showFeatureType(GenericInteractionCreateEvent event, Game game, DisplayType feature) {
-        MapRenderPipeline.render(game, event, feature,
+        MapRenderPipeline.queue(game, event, feature,
             fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 

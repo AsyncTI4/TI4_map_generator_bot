@@ -22,6 +22,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final String name;
     private final boolean hasEnded;
     private final boolean hasWinner;
+    private final boolean vpGoalReached;
     private final boolean fowMode;
     private final boolean communityMode;
     private final long lastModifiedDate;
@@ -48,6 +49,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         name = game.getName();
         hasEnded = game.isHasEnded();
         hasWinner = game.hasWinner();
+        vpGoalReached = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
         fowMode = game.isFowMode();
         communityMode = game.isCommunityMode();
         lastModifiedDate = game.getLastModifiedDate();

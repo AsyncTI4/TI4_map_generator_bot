@@ -53,7 +53,7 @@ import ti4.map.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
-import ti4.service.stats.StatisticsPipeline;
+import ti4.service.statistics.StatisticsPipeline;
 
 import static org.reflections.scanners.Scanners.SubTypes;
 

@@ -173,7 +173,7 @@ public class EndGameService {
         TextChannel summaryChannel = getGameSummaryChannel(game);
         if (!game.isFowMode()) {
             // SEND THE MAP IMAGE
-            MapRenderPipeline.render(game, event, DisplayType.all, fileUpload -> {
+            MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
                 MessageHelper.replyToMessage(event, fileUpload);
                 // CREATE POST
                 if (publish) {

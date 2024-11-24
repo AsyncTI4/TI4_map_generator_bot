@@ -416,7 +416,6 @@ public class Game extends GameProperties {
         listOfTilePinged[count] = tileName;
     }
 
-    // Overrides
     @Override
     public void setRound(int round) {
         super.setRound(Math.max(1, round));

@@ -183,8 +183,6 @@ public class GameSaveLoadManager {
                     try {
                         if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null
                             && !game.getPhaseOfGame().contains("status")) {
-                            // MessageHelper.sendMessageToChannel(loadedGame.getSavedChannel(), "Attempting
-                            // to regenerate buttons:");
                             MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(),
                                 loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                         } else {

@@ -1,37 +1,29 @@
-package ti4.commands2.statistics;
+package ti4.service.statistics;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands2.Subcommand;
+import ti4.commands2.statistics.GameStatisticFilterer;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-class PlayerStats extends Subcommand {
+@UtilityClass
+public class PlayerStatisticsService {
 
-    private static final String MINIMUM_GAME_COUNT_FILTER = "has_minimum_game_count";
-    private static final String MAX_LIST_SIZE = "max_list_size";
-
-    public PlayerStats() {
-        super("players", "Player Statistics");
-        addOptions(new OptionData(OptionType.STRING, Constants.PLAYER_STATISTIC, "Choose a stat to show").setRequired(true).setAutoComplete(true));
-        addOptions(GameStatisticFilterer.gameStatsFilters());
-        addOptions(new OptionData(OptionType.INTEGER, MINIMUM_GAME_COUNT_FILTER, "Filter by the minimum number of games player has played, default 10"));
-        addOptions(new OptionData(OptionType.INTEGER, MAX_LIST_SIZE, "The maximum number of players listed, default 50"));
+    public void queueReply(SlashCommandInteractionEvent event) {
+        StatisticsPipeline.queue(new StatisticsPipeline.StatisticsEvent(event, () -> getPlayerStatistics(event)));
     }
 
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
+    private void getPlayerStatistics(SlashCommandInteractionEvent event) {
         String statisticToShow = event.getOption(Constants.PLAYER_STATISTIC, null, OptionMapping::getAsString);
         PlayerStatTypes stat = PlayerStatTypes.fromString(statisticToShow);
         if (stat == null) {
@@ -58,8 +50,8 @@ class PlayerStats extends Subcommand {
             });
         }
 
-        int maximumListedPlayers = event.getOption(MAX_LIST_SIZE, 50, OptionMapping::getAsInt);
-        int minimumGameCountFilter = event.getOption(MINIMUM_GAME_COUNT_FILTER, 10, OptionMapping::getAsInt);
+        int maximumListedPlayers = event.getOption("max_list_size", 50, OptionMapping::getAsInt);
+        int minimumGameCountFilter = event.getOption("has_minimum_game_count", 10, OptionMapping::getAsInt);
         List<Map.Entry<String, Integer>> entries = playerUserIdToUsername.keySet().stream()
             .filter(userId -> playerGameCount.get(userId) >= minimumGameCountFilter)
             .map(userId -> Map.entry(userId, playerGameCount.get(userId)))
@@ -107,8 +99,8 @@ class PlayerStats extends Subcommand {
             });
         }
 
-        int maximumListedPlayers = event.getOption(MAX_LIST_SIZE, 50, OptionMapping::getAsInt);
-        int minimumGameCountFilter = event.getOption(MINIMUM_GAME_COUNT_FILTER, 10, OptionMapping::getAsInt);
+        int maximumListedPlayers = event.getOption("max_list_size", 50, OptionMapping::getAsInt);
+        int minimumGameCountFilter = event.getOption("has_minimum_game_count", 10, OptionMapping::getAsInt);
         List<Map.Entry<String, Long>> entries = playerUserIdToUsername.keySet().stream()
             .filter(userId -> playerGameCount.get(userId) >= minimumGameCountFilter)
             .map(userId -> {

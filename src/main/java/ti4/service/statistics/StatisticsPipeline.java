@@ -1,21 +1,13 @@
-package ti4.service.stats;
+package ti4.service.statistics;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import ti4.message.BotLogger;
 
-// TODO
 public class StatisticsPipeline {
-    // ListSlashCommandsUsed
-    // SearchGames
-    // GameStatisticsFilter*****
-    // GameStats
-    // StellarConverter
-    // ListTitlesGiven
 
     private static final StatisticsPipeline instance = new StatisticsPipeline();
 
@@ -29,7 +21,8 @@ public class StatisticsPipeline {
                 try {
                     StatisticsPipeline.StatisticsEvent statisticsEvent = statisticsQueue.poll(2, TimeUnit.SECONDS);
                     if (statisticsEvent != null) {
-                        statisticsEvent.consumer.accept(statisticsEvent.event);
+                        statisticsEvent.event.reply("Your statistics are being processed, please hold...").setEphemeral(true).queue();
+                        statisticsEvent.runner.run();
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -57,5 +50,9 @@ public class StatisticsPipeline {
         }
     }
 
-    public record StatisticsEvent(GenericInteractionCreateEvent event, Consumer<GenericInteractionCreateEvent> consumer) {}
+    public static void queue(StatisticsPipeline.StatisticsEvent event) {
+        instance.statisticsQueue.add(event);
+    }
+
+    public record StatisticsEvent(IReplyCallback event, Runnable runner) {}
 }

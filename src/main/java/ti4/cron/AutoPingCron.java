@@ -261,7 +261,6 @@ public class AutoPingCron {
                                 String sb = player.getRepresentationUnfogged() +
                                         Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
 
-                                //MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), sb.toString());
                                 ButtonHelper.sendMessageToRightStratThread(player, game, sb, ButtonHelper.getStratName(sc));
                                 player.addFollowedSC(sc);
                                 game.setStoredValue("scPlayPingCount" + sc + player.getFaction(),
