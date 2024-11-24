@@ -7,12 +7,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.time.StopWatch;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.WebHelper;
 import ti4.map.PersistenceManager;
 import ti4.message.BotLogger;
 
+@UtilityClass
 public class UploadStatsCron {
 
     private static final String JSON_DATA_FILE_NAME = "UploadStatsCronData.json";
@@ -21,6 +23,18 @@ public class UploadStatsCron {
 
     public static void start() {
         SCHEDULER.scheduleAtFixedRate(UploadStatsCron::uploadStats, 2, 8, TimeUnit.HOURS);
+    }
+
+    public static void shutdown() {
+        SCHEDULER.shutdown();
+        try {
+            if (!SCHEDULER.awaitTermination(10, TimeUnit.SECONDS)) {
+                SCHEDULER.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            SCHEDULER.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
     private static void uploadStats() {

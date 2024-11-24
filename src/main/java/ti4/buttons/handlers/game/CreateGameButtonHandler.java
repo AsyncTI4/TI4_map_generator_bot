@@ -1,5 +1,6 @@
 package ti4.buttons.handlers.game;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
@@ -14,7 +16,10 @@ import ti4.helpers.GameCreationHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.PersistenceManager;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.metadata.GameCreationLocks;
 
 @UtilityClass
 class CreateGameButtonHandler {
@@ -22,30 +27,18 @@ class CreateGameButtonHandler {
     @ButtonHandler("createGameChannels")
     public static void decodeButtonMsg(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " pressed the [Create Game] button");
-
-        Member member = event.getMember();
-        boolean isAdmin = false;
         Game mapreference = GameManager.getGame("finreference");
 
         if (mapreference != null && mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
             return;
         }
-        if (member != null) {
-            List<Role> roles = member.getRoles();
-            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
-                if (roles.contains(role)) {
-                    isAdmin = true;
-                    break;
-                }
-            }
-        }
-        if (!isAdmin && mapreference != null && !mapreference.getStoredValue("gameCreator" + member.getIdLong()).isEmpty()) {
+
+
+        if (isLockedFromCreatingGames(event)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "You created a game within the last 10 minutes and thus are being stopped from creating more until some time has passed. You can have someone else in the game press the button instead. ");
             return;
-        } else if (mapreference != null) {
-            mapreference.setStoredValue("gameCreator" + member.getIdLong(), "created");
         }
 
         String buttonMsg = event.getMessage().getContentRaw();
@@ -95,5 +88,34 @@ class CreateGameButtonHandler {
         }
         event.getMessage().delete().queue();
         GameCreationHelper.createGameChannels(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
+    }
+
+    private static boolean isLockedFromCreatingGames(GenericInteractionCreateEvent event) {
+        Member member = event.getMember();
+        if (member != null) {
+            List<Role> roles = member.getRoles();
+            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
+                if (roles.contains(role)) {
+                    return false;
+                }
+            }
+        }
+
+        try {
+            GameCreationLocks gameCreationLocks = PersistenceManager.readObjectFromJsonFile(GameCreationLocks.JSON_DATA_FILE_NAME, GameCreationLocks.class);
+            if (gameCreationLocks == null) {
+                gameCreationLocks = new GameCreationLocks();
+            }
+            String userId = event.getUser().getId();
+            boolean isGameCreationLocked = gameCreationLocks.getUsernameToLastGameCreation().containsKey(userId);
+            if (isGameCreationLocked) {
+                return true;
+            }
+            gameCreationLocks.getUsernameToLastGameCreation().put(userId, Instant.now());
+            PersistenceManager.writeObjectToJsonFile(GameCreationLocks.JSON_DATA_FILE_NAME, gameCreationLocks);
+        } catch (Exception e) {
+            BotLogger.log("Unable to handle game creation locks.", e);
+        }
+        return false;
     }
 }
