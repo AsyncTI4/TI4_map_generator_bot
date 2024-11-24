@@ -1,5 +1,6 @@
 package ti4.buttons.handlers.game;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,13 +100,22 @@ class CreateGameButtonHandler {
                 }
             }
         }
-        GameCreationLocks gameCreationLocks;
+
         try {
-            gameCreationLocks = PersistenceManager.readObjectFromJsonFile(GameCreationLocks.JSON_DATA_FILE_NAME, GameCreationLocks.class);
+            GameCreationLocks gameCreationLocks = PersistenceManager.readObjectFromJsonFile(GameCreationLocks.JSON_DATA_FILE_NAME, GameCreationLocks.class);
+            if (gameCreationLocks == null) {
+                gameCreationLocks = new GameCreationLocks();
+            }
+            String userId = event.getUser().getId();
+            boolean isGameCreationLocked = gameCreationLocks.getUsernameToLastGameCreation().containsKey(userId);
+            if (isGameCreationLocked) {
+                return true;
+            }
+            gameCreationLocks.getUsernameToLastGameCreation().put(userId, Instant.now());
+            PersistenceManager.writeObjectToJsonFile(GameCreationLocks.JSON_DATA_FILE_NAME, gameCreationLocks);
         } catch (Exception e) {
-            BotLogger.log("Unable to read game creation locks.");
-            return false;
+            BotLogger.log("Unable to handle game creation locks.", e);
         }
-        return gameCreationLocks != null && gameCreationLocks.getUsernameToLastGameCreation().containsKey(event.getUser().getId());
+        return false;
     }
 }

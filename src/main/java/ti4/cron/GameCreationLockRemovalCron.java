@@ -14,7 +14,6 @@ import ti4.model.metadata.GameCreationLocks;
 @UtilityClass
 public class GameCreationLockRemovalCron {
 
-    private static final String JSON_DATA_FILE_NAME = "GameCreationLockRemovalCronData.json";
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
     public static void start() {
@@ -23,12 +22,15 @@ public class GameCreationLockRemovalCron {
 
     private static void removeGameCreationLocks() {
         try {
-            GameCreationLocks gameCreationLocks = PersistenceManager.readObjectFromJsonFile(JSON_DATA_FILE_NAME, GameCreationLocks.class);
+            GameCreationLocks gameCreationLocks = PersistenceManager.readObjectFromJsonFile(GameCreationLocks.JSON_DATA_FILE_NAME, GameCreationLocks.class);
+            if (gameCreationLocks == null) {
+                gameCreationLocks = new GameCreationLocks();
+            }
             var tenMinutesAgo = Instant.now().minus(10, ChronoUnit.MINUTES);
             boolean locksRemoved = gameCreationLocks.getUsernameToLastGameCreation().entrySet()
                 .removeIf(entry -> entry.getValue().isBefore(tenMinutesAgo));
             if (locksRemoved) {
-                PersistenceManager.writeObjectToJsonFile(JSON_DATA_FILE_NAME, gameCreationLocks);
+                PersistenceManager.writeObjectToJsonFile(GameCreationLocks.JSON_DATA_FILE_NAME, gameCreationLocks);
             }
         } catch (Exception e) {
             BotLogger.log("Failed to remove game creation locks.", e);
