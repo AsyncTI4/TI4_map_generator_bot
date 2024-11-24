@@ -54,6 +54,10 @@ public class PlayerStatsDashboardPayload {
         return player.getUserID();
     }
 
+    public String getDiscordUsername() {
+        return player.getUserName();
+    }
+
     public List<String> getAlliances() {
         return player.getPromissoryNotesInPlayArea().stream()
             .map(Mapper::getPromissoryNote)
@@ -304,6 +308,14 @@ public class PlayerStatsDashboardPayload {
 
     public int getActualHits() {
         return player.getActualHits();
+    }
+
+    public boolean isEliminated() {
+        return player.isEliminated();
+    }
+
+    public List<String> getTeammateIDs() {
+        return player.getTeamMateIDs();
     }
 
     @Data
