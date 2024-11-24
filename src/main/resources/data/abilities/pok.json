@@ -22,7 +22,8 @@
         "faction": "cabal",
         "window": "When you produce a unit",
         "windowEffect": "You may return 1 captured unit of that type to produce that unit without spending resources.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Amalga\n-mation"
     },
     {
         "id": "devour",
@@ -45,7 +46,8 @@
         "faction": "empyrean",
         "window": "After a player activates a system",
         "windowEffect": "You may allow that player to move their ships through systems that contain your ships.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Aether-\npassage"
     },
     {
         "id": "dark_whispers",
@@ -128,7 +130,8 @@
         "name": "Coalescence",
         "faction": "titans",
         "permanentEffect": "If your flagship or your AWAKEN faction ability places your units into the same space area or onto the same planet as another player's units, your units must participate in combat during \"Space Combat\" or \"Ground Combat\" steps.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Coale-\nscence"
     },
     {
         "id": "terragenesis",
@@ -136,6 +139,7 @@
         "faction": "titans",
         "window": "After you explore a planet that does not have a sleeper token",
         "windowEffect": "You may place or move 1 sleeper token onto that planet.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Terra-\ngenesis"
     }
 ]
