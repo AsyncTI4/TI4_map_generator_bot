@@ -252,29 +252,32 @@ public class GameSaveLoadManager {
 
         String mapName = game.getName();
         String mapNameForUndoStart = mapName + "_";
+        int maxUndoFiles = game.isHasEnded() ? 10 : 100;
         String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
-        if (mapUndoFiles != null) {
-            try {
-                List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                    .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
-                    .map(fileName -> fileName.replace(Constants.TXT, ""))
-                    .map(Integer::parseInt).toList();
-                if (numbers.size() == 50) {
-                    int minNumber = numbers.stream().mapToInt(value -> value)
-                        .min().orElseThrow(NoSuchElementException::new);
-                    File mapToDelete = Storage.getGameUndoStorage(mapName + "_" + minNumber + Constants.TXT);
-                    mapToDelete.delete();
-                }
-                int maxNumber = numbers.isEmpty() ? 0
-                    : numbers.stream().mapToInt(value -> value)
-                        .max().orElseThrow(NoSuchElementException::new);
-                maxNumber++;
-                File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
-                CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
-                Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), options);
-            } catch (Exception e) {
-                BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
+        if (mapUndoFiles == null) {
+            return;
+        }
+
+        try {
+            List<Integer> numbers = Arrays.stream(mapUndoFiles)
+                .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+                .map(fileName -> fileName.replace(Constants.TXT, ""))
+                .map(Integer::parseInt).toList();
+            if (numbers.size() == maxUndoFiles) {
+                int minNumber = numbers.stream().mapToInt(value -> value)
+                    .min().orElseThrow(NoSuchElementException::new);
+                File mapToDelete = Storage.getGameUndoStorage(mapName + "_" + minNumber + Constants.TXT);
+                mapToDelete.delete();
             }
+            int maxNumber = numbers.isEmpty() ? 0
+                : numbers.stream().mapToInt(value -> value)
+                    .max().orElseThrow(NoSuchElementException::new);
+            maxNumber++;
+            File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
+            CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
+            Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), options);
+        } catch (Exception e) {
+            BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
         }
     }
 
