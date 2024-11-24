@@ -10,6 +10,7 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -247,10 +248,7 @@ public class GameSaveLoadManager {
     }
 
     private static void saveUndo(Game game, File originalMapFile) {
-        File mapUndoDirectory = Storage.getGameUndoDirectory();
-        if (!mapUndoDirectory.exists()) {
-            mapUndoDirectory.mkdir();
-        }
+        File mapUndoDirectory = getMapUndoDirectory();
 
         String mapName = game.getName();
         String mapNameForUndoStart = mapName + "_";
@@ -289,6 +287,36 @@ public class GameSaveLoadManager {
         } catch (Exception e) {
             BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
         }
+    }
+
+    private static File getMapUndoDirectory() {
+        File mapUndoDirectory = Storage.getGameUndoDirectory();
+        if (!mapUndoDirectory.exists()) {
+            mapUndoDirectory.mkdir();
+        }
+        return mapUndoDirectory;
+    }
+
+    public static void cleanupOldUndoFiles() {
+        File mapUndoDirectory = getMapUndoDirectory();
+        String[] mapUndoFiles = mapUndoDirectory.list();
+        if (mapUndoFiles == null) {
+            return;
+        }
+        int count = 0;
+        int daysOld = 365;
+        long howOldIsTooOld = System.currentTimeMillis() - (1000 * 60 * 60 * 24 * daysOld); // (1 day) * multiplier
+        Date tooOld = Date.from(Instant.ofEpochMilli(howOldIsTooOld));
+        for (String mapFilePath : mapUndoFiles) {
+            File mapToDelete = Storage.getGameUndoStorage(mapFilePath);
+            Date lastModified = Date.from(Instant.ofEpochMilli(mapToDelete.lastModified()));
+            if (lastModified.before(tooOld)) {
+                BotLogger.log(tooOld + " is before " + lastModified);
+                // mapToDelete.delete();
+                count++;
+            }
+        }
+        BotLogger.log("Deleted `" + count + "` undo files that were over `" + daysOld + "` days old (" + Date.from(Instant.ofEpochMilli(howOldIsTooOld)) + ")");
     }
 
     private static void saveGameInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {
