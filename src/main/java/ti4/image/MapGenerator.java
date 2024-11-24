@@ -1423,7 +1423,7 @@ public class MapGenerator implements AutoCloseable {
             if (leader.getTgCount() != 0) {
                 graphics.setColor(TradeGoodColor);
                 graphics.setFont(Storage.getFont32());
-                graphics.drawString(Integer.toString(leader.getTgCount()), x + deltaX + 3, y + 32);
+                graphics.drawString(Integer.toString(leader.getTgCount()), x + deltaX + 9, y + 32);
             } else {
                 String pipID;
                 switch (leader.getType()) {
@@ -1446,7 +1446,12 @@ public class MapGenerator implements AutoCloseable {
             }
             
             LeaderModel leaderModel = Mapper.getLeader(leader.getId());
-            if (leaderModel.getShrinkName())
+            if (leader.getId().equalsIgnoreCase("yssarilagent"))
+            {
+                drawTextVertically(g2, "Clever, Clever".toUpperCase(), x + deltaX + 8, y + 30, Storage.getFont14(), true);
+                drawTextVertically(g2, "Ssruu".toUpperCase(), x + deltaX + 23, y + 30, Storage.getFont18(), true);
+            }
+            else if (leaderModel.getShrinkName())
             {
                 g2.setFont(Storage.getFont16());
                 drawOneOrTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 9, y + 30, 120, true);
@@ -1459,6 +1464,7 @@ public class MapGenerator implements AutoCloseable {
 
             deltaX += 48;
         }
+
         if (player.hasAbility("imperia")) {
             deltaX += 5;
             List<String> mahactCCs = player.getMahactCC();
@@ -1485,6 +1491,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
         }
+
         return x + deltaX + 20;
     }
 
@@ -2239,14 +2246,7 @@ public class MapGenerator implements AutoCloseable {
         }
         for (String tech : techs) {
             boolean isExhausted = exhaustedTechs.contains(tech);
-            String techStatus;
-            if (isExhausted) {
-                graphics.setColor(Color.GRAY);
-                techStatus = "_exh.png";
-            } else {
-                graphics.setColor(Color.WHITE);
-                techStatus = "_rdy.png";
-            }
+            String techStatus = isExhausted ? "_exh.png" : "_rdy.png";
 
             TechnologyModel techModel = Mapper.getTech(tech);
 
@@ -2267,19 +2267,141 @@ public class MapGenerator implements AutoCloseable {
             if (techModel.getFaction().isPresent()) {
                 drawFactionIconImage(graphics, techModel.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
             }
-
-            // Draw Tech Name
-            String techName = "pa_tech_techname_" + tech + techStatus;
-            String resourcePath = ResourceHelper.getInstance().getPAResource(techName);
-            if (resourcePath != null) {
-                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
-                graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
-                if ("dslaner".equalsIgnoreCase(tech)) {
-                    drawTextVertically(graphics, "" + player.getAtsCount(), x + deltaX + 15, y + 140, Storage.getFont16());
+            else
+            {
+                Color foreground = Color.WHITE;
+                int types = 0;
+                if (techModel.isPropulsionTech())
+                {
+                    foreground = Color.decode("#509dce");
+                    types++;
                 }
-            } else { //no special image, so draw the text
-                graphics.setFont(Storage.getFont20());
-                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 5, y + 148, 130);
+                if (techModel.isCyberneticTech())
+                {
+                    foreground = Color.decode("#e2da6a");
+                    types++;
+                }
+                if (techModel.isBioticTech())
+                {
+                    foreground = Color.decode("#7cba6b");
+                    types++;
+                }
+                if (techModel.isWarfareTech())
+                {
+                    foreground = Color.decode("#dc6569");
+                    types++;
+                }
+                if (types != 1)
+                {
+                    foreground = Color.WHITE;
+                }
+                if (isExhausted)
+                {
+                    foreground = Color.GRAY;
+                }
+                
+                String initials = techModel.getInitials();
+                if (initials.length() == 2)
+                {
+                    String left = initials.substring(0,1);
+                    String right = initials.substring(1,2);
+                    graphics.setFont(Storage.getFont32());
+                    int offsetLeft = Math.max(0, 10 - graphics.getFontMetrics().stringWidth(left)/2);
+                    int offsetRight = Math.min(40 - graphics.getFontMetrics().stringWidth(right),
+                                               30 - graphics.getFontMetrics().stringWidth(right)/2);
+                    graphics.setColor(Color.BLACK);
+                    for (int i=-1; i<=1; i++)
+                    {
+                        for (int j=-1; j<=1; j++)
+                        {
+                            graphics.drawString(right, x + i + deltaX + offsetRight, y + j + 148);
+                        }
+                    }
+                    graphics.setColor(foreground);
+                    graphics.drawString(right, x + deltaX + offsetRight, y + 148);
+                    graphics.setColor(Color.BLACK);
+                    for (int i=-1; i<=1; i++)
+                    {
+                        for (int j=-1; j<=1; j++)
+                        {
+                            graphics.drawString(left, x + i + deltaX + offsetLeft, y + j + 139);
+                        }
+                    }
+                    graphics.setColor(foreground);
+                    graphics.drawString(left, x + deltaX + offsetLeft, y + 139);
+                }
+                else if (initials.length() == 3)
+                {
+                    String left = initials.substring(0,1);
+                    String middle = initials.substring(1,2);
+                    String right = initials.substring(2,3);
+                    graphics.setFont(Storage.getFont24());
+                    int offsetLeft = Math.max(0, 7 - graphics.getFontMetrics().stringWidth(left)/2);
+                    int offsetMiddle = 20 - graphics.getFontMetrics().stringWidth(middle)/2;
+                    int offsetRight = Math.min(40 - graphics.getFontMetrics().stringWidth(right),
+                                               33 - graphics.getFontMetrics().stringWidth(right)/2);
+                    graphics.setColor(Color.BLACK);
+                    for (int i=-1; i<=1; i++)
+                    {
+                        for (int j=-1; j<=1; j++)
+                        {
+                            graphics.drawString(right, x + i + deltaX + offsetRight, y + j + 148);
+                        }
+                    }
+                    graphics.setColor(foreground);
+                    graphics.drawString(right, x + deltaX + offsetRight, y + 148);
+                    graphics.setColor(Color.BLACK);
+                    for (int i=-1; i<=1; i++)
+                    {
+                        for (int j=-1; j<=1; j++)
+                        {
+                            graphics.drawString(middle, x + i + deltaX + offsetMiddle, y + j + 141);
+                        }
+                    }
+                    graphics.setColor(foreground);
+                    graphics.drawString(middle, x + deltaX + offsetMiddle, y + 141);
+                    graphics.setColor(Color.BLACK);
+                    for (int i=-1; i<=1; i++)
+                    {
+                        for (int j=-1; j<=1; j++)
+                        {
+                            graphics.drawString(left, x + i + deltaX + offsetLeft, y + j + 134);
+                        }
+                    }
+                    graphics.setColor(foreground);
+                    graphics.drawString(left, x + deltaX + offsetLeft, y + 134);
+                }
+                else
+                {
+                    initials = initials.substring(0,1);
+                    graphics.setFont(Storage.getFont48());
+                    int offset = 20 - graphics.getFontMetrics().stringWidth(initials)/2;
+                    graphics.setColor(Color.BLACK);
+                    for (int i=-2; i<=2; i++)
+                    {
+                        for (int j=-2; j<=2; j++)
+                        {
+                            graphics.drawString(initials, x + i + deltaX + offset, y + j + 148);
+                        }
+                    }
+                    graphics.setColor(foreground);
+                    graphics.drawString(initials, x + deltaX + offset, y + 148);
+                }
+            }
+            
+            graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
+            if (techModel.getShrinkName())
+            {
+                graphics.setFont(Storage.getFont16());
+                drawOneOrTwoLinesOfTextVertically(graphics, techModel.getShortName(), x + deltaX + 9, y + 116, 116);
+            }
+            else
+            {
+                graphics.setFont(Storage.getFont18());
+                drawOneOrTwoLinesOfTextVertically(graphics, techModel.getShortName(), x + deltaX + 7, y + 116, 116);
+            }
+            if ("dslaner".equalsIgnoreCase(tech)) {
+                drawTextVertically(graphics, "" + player.getAtsCount(), x + deltaX + 15, y + 140, Storage.getFont16());
             }
 
             drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, techModel);
@@ -3873,6 +3995,10 @@ public class MapGenerator implements AutoCloseable {
                 width = g2.getFontMetrics().stringWidth(substringText);
             }
             if (index > 0) {
+                while (index < agendaTextLength && agendaText.charAt(agendaTextLength - index) != ' ')
+                {
+                    index++;
+                }
                 graphics.drawString(agendaText.substring(0, agendaTextLength - index), x + 95, y + 70);
                 graphics.drawString(agendaText.substring(agendaTextLength - index), x + 95, y + 96);
             } else {
