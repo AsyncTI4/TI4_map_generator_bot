@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -29,35 +30,14 @@ public class StellarConverterStatisticsService {
 
     private String getStellarConverts() {
         Map<String, Integer> numberConverts = new HashMap<>();
+        AtomicInteger count = new AtomicInteger();
 
-        int count = 0;
-        int currentPage = 0;
-        GamesPage pagedGames;
-        do {
-            pagedGames = GamesPage.getPage(currentPage++);
-            for (Game g : pagedGames.getGames()) {
-                List<String> worldsThisGame = g.getTileMap().values().stream()
-                    .flatMap(tile -> tile.getPlanetUnitHolders().stream()) //planets
-                    .filter(uh -> uh.getTokenList().contains(Constants.WORLD_DESTROYED_PNG))
-                    .map(UnitHolder::getName)
-                    .toList();
-
-                if (worldsThisGame.size() == 1) {
-                    count++;
-                    String planet = worldsThisGame.getFirst();
-                    if (numberConverts.containsKey(planet)) {
-                        numberConverts.put(planet, numberConverts.get(planet) + 1);
-                    } else {
-                        numberConverts.put(planet, 1);
-                    }
-                }
-            }
-        } while (pagedGames.hasNextPage());
+        GamesPage.consumeAllGames(game -> getStellarConverterInfo(game, count, numberConverts));
 
         Comparator<Map.Entry<String, Integer>> comparator = (p1, p2) -> (-1) * p1.getValue().compareTo(p2.getValue());
 
         int index = 1;
-        int width = (int) Math.round(Math.ceil(Math.log10(count + 1)));
+        int width = (int) Math.round(Math.ceil(Math.log10(count.get() + 1)));
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         StringBuilder output = new StringBuilder("## **__Stellar Converter Stats__**\n");
         for (Map.Entry<String, Integer> planetStats : numberConverts.entrySet().stream().sorted(comparator).toList()) {
@@ -69,5 +49,24 @@ public class StellarConverterStatisticsService {
         }
 
         return output.toString();
+    }
+
+    private void getStellarConverterInfo(Game game, AtomicInteger count, Map<String, Integer> numberConverts) {
+        List<String> worldsThisGame = game.getTileMap().values().stream()
+            .flatMap(tile -> tile.getPlanetUnitHolders().stream()) //planets
+            .filter(uh -> uh.getTokenList().contains(Constants.WORLD_DESTROYED_PNG))
+            .map(UnitHolder::getName)
+            .toList();
+
+        if (worldsThisGame.size() != 1) {
+            return;
+        }
+        count.incrementAndGet();
+        String planet = worldsThisGame.getFirst();
+        if (numberConverts.containsKey(planet)) {
+            numberConverts.put(planet, numberConverts.get(planet) + 1);
+        } else {
+            numberConverts.put(planet, 1);
+        }
     }
 }

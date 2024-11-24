@@ -1,4 +1,4 @@
-package ti4.service.statistics;
+package ti4.service.statistics.game;
 
 public enum GameStatTypes {
     // Add your new statistic here

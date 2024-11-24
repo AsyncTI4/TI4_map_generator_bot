@@ -8,7 +8,7 @@ class ExportToCSV extends Subcommand {
 
     public ExportToCSV() {
         super("export_games_to_csv", "Export game data to a CSV file");
-        addOptions(GameStatisticFilterer.gameStatsFilters());
+        addOptions(GameStatisticsFilterer.gameStatsFilters());
     }
 
     @Override

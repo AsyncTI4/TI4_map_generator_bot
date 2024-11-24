@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands2.statistics.GameStatisticFilterer;
+import ti4.commands2.statistics.GameStatisticsFilterer;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -38,7 +38,7 @@ public class PlayerStatisticsService {
     }
 
     private void showPlayerGameCount(SlashCommandInteractionEvent event) {
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticsFilterer.getGamesFilter(event);
         Map<String, Integer> playerGameCount = new HashMap<>();
         Map<String, String> playerUserIdToUsername = new HashMap<>();
         for (Game game : filteredGames) {
@@ -78,7 +78,7 @@ public class PlayerStatisticsService {
     }
 
     private static void showPlayerWinPercent(SlashCommandInteractionEvent event) {
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticsFilterer.getGamesFilter(event);
         Map<String, Integer> playerWinCount = new HashMap<>();
         Map<String, Integer> playerGameCount = new HashMap<>();
         Map<String, String> playerUserIdToUsername = new HashMap<>();

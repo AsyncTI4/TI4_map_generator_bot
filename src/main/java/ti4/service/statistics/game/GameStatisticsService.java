@@ -1,10 +1,9 @@
-package ti4.service.statistics;
+package ti4.service.statistics.game;
 
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,29 +11,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
-import ti4.commands2.statistics.GameStatisticFilterer;
+import ti4.commands2.statistics.GameStatisticsFilterer;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.GameStatsHelper;
-import ti4.helpers.Helper;
-import ti4.helpers.SortHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GamesPage;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import ti4.service.statistics.StatisticsPipeline;
 
 @UtilityClass
 public class GameStatisticsService {
@@ -51,266 +42,32 @@ public class GameStatisticsService {
             return;
         }
         switch (stat) {
-            case UNLEASH_THE_NAMES -> sendAllNames(event);
-            case PING_LIST -> listPingCounterList(event);
-            case HIGHEST_SPENDERS -> calculateSpendToWinCorrellation(event);
-            case GAME_LENGTH -> showGameLengths(event, null);
-            case GAME_LENGTH_4MO -> showGameLengths(event, 120);
-            case FACTIONS_PLAYED -> showMostPlayedFactions(event);
+            case UNLEASH_THE_NAMES -> AllNamesStatisticsService.sendAllNames(event);
+            case PING_LIST -> PingCounterStatisticsService.listPingCounterList(event);
+            case HIGHEST_SPENDERS -> SpendToWinCorrelationStatisticsService.calculateSpendToWinCorrelation(event);
+            case GAME_LENGTH -> GameLengthStatisticsService.showGameLengths(event, 3650);
+            case GAME_LENGTH_4MO -> GameLengthStatisticsService.showGameLengths(event, 120);
+            case FACTIONS_PLAYED -> MostPlayedFactionsStatisticsService.showMostPlayedFactions(event);
             case AVERAGE_TURNS -> showAverageTurnsInAGameByFaction(event);
             case COLOURS_PLAYED -> showMostPlayedColour(event);
             case FACTION_WINS -> showMostWinningFactions(event);
             case PHASE_TIMES -> showTimeOfRounds(event);
-            case SOS_SCORED -> listScoredSOsPulledRelicsRevealedPOs(event);
+            case SOS_SCORED -> VictoryPointsScoredStatisticsService.listScoredVictoryPoints(event);
             case FACTION_WIN_PERCENT -> showFactionWinPercent(event);
-            case COLOUR_WINS -> showMostWinningColour(event);
+            case COLOUR_WINS -> MostWinningColorStatisticsService.showMostWinningColor(event);
             case GAME_COUNT -> showGameCount(event);
             case WINNING_PATH -> showWinningPath(event);
             case SUPPORT_WIN_COUNT -> GameStatsHelper.showWinsWithSupport(event);
-
-            // case WINNING_PATH_NAMES
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
         }
-    }
-
-    private static void listPingCounterList(SlashCommandInteractionEvent event) {
-        Game reference = GameManager.getGame("finreference");
-        Map<String, Integer> pings = new HashMap<>();
-        for (String pingsFor : reference.getMessagesThatICheckedForAllReacts().keySet()) {
-
-            if (pingsFor.contains("pingsFor")) {
-                String userID = pingsFor.replace("pingsFor", "");
-                User user = AsyncTI4DiscordBot.jda.getUserById(Long.parseLong(userID));
-                if (user == null) {
-                    continue;
-                }
-                pings.put(userID, Integer.parseInt(reference.getMessagesThatICheckedForAllReacts().get(pingsFor)));
-
-            }
-        }
-
-        Map<String, Integer> topThousand = pings.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(3000)
-            .collect(Collectors.toMap(
-                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-        int index = 1;
-        StringBuilder sb = new StringBuilder("List of times the player has hit the autoping threshold(aka the bots most wanted list)\n");
-        for (String ket : topThousand.keySet()) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(Long.parseLong(ket));
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
-            sb.append("` ").append(user.getEffectiveName()).append(": ");
-            sb.append(topThousand.get(ket)).append(" pings");
-            sb.append("\n");
-            index++;
-        }
-        MessageHelper.sendMessageToThread(event.getChannel(), "Ping Counts", sb.toString());
-    }
-
-    private static void listScoredSOsPulledRelicsRevealedPOs(SlashCommandInteractionEvent event) {
-        Map<String, Integer> sos = new HashMap<>();
-        Map<String, Integer> publics = new HashMap<>();
-        Map<String, Integer> relics = new HashMap<>();
-
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
-        for (Game game : filteredGames) {
-            for (Player player : game.getRealPlayers()) {
-                for (String so : player.getSecretsScored().keySet()) {
-                    if (Mapper.getSecretObjective(so) != null) {
-                        String secret = Mapper.getSecretObjective(so).getName();
-                        if (sos.containsKey(secret)) {
-                            sos.put(secret, sos.get(secret) + 1);
-                        } else {
-                            sos.put(secret, 1);
-                        }
-                    }
-                }
-            }
-            for (String po : game.getRevealedPublicObjectives().keySet()) {
-                if (Mapper.getPublicObjective(po) != null) {
-                    String publicO = Mapper.getPublicObjective(po).getName();
-                    if (publics.containsKey(publicO)) {
-                        publics.put(publicO, publics.get(publicO) + 1);
-                    } else {
-                        publics.put(publicO, 1);
-                    }
-                }
-            }
-
-            List<String> relicsNames = Mapper.getDecks().get(game.getRelicDeckID()).getNewShuffledDeck();
-            for (String relic : relicsNames) {
-                if (!game.getAllRelics().contains(relic)) {
-                    String relicName = Mapper.getRelic(relic).getName();
-                    if (relics.containsKey(relicName)) {
-                        relics.put(relicName, relics.get(relicName) + 1);
-                    } else {
-                        relics.put(relicName, 1);
-                    }
-                }
-            }
-        }
-
-        Map<String, Integer> topThousand = sos.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(3000)
-            .collect(Collectors.toMap(
-                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-        int index = 1;
-        StringBuilder sb = new StringBuilder("List of times a particular secret has been scored\n");
-        for (String ket : topThousand.keySet()) {
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
-            sb.append("` ").append(ket).append(": ");
-            sb.append(topThousand.get(ket));
-            sb.append("\n");
-            index++;
-        }
-        MessageHelper.sendMessageToThread(event.getChannel(), "Secret Score Counts", sb.toString());
-
-        topThousand = publics.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(3000)
-            .collect(Collectors.toMap(
-                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-        index = 1;
-        sb = new StringBuilder("List of times a particular public has been revealed \n");
-        for (String ket : topThousand.keySet()) {
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
-            sb.append("` ").append(ket).append(": ");
-            sb.append(topThousand.get(ket));
-            sb.append("\n");
-            index++;
-        }
-        MessageHelper.sendMessageToThread(event.getChannel(), "Public Objectives Revealed", sb.toString());
-
-        topThousand = relics.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(3000)
-            .collect(Collectors.toMap(
-                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-        index = 1;
-        sb = new StringBuilder("List of times a particular relic has been drawn \n");
-        for (String ket : topThousand.keySet()) {
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
-            sb.append("` ").append(ket).append(": ");
-            sb.append(topThousand.get(ket));
-            sb.append("\n");
-            index++;
-        }
-        MessageHelper.sendMessageToThread(event.getChannel(), "Relics Drawn Count", sb.toString());
-    }
-
-    private static void sendAllNames(SlashCommandInteractionEvent event) {
-        StringBuilder names = new StringBuilder();
-        int num = 0;
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
-        for (Game game : filteredGames) {
-            num++;
-            names.append(num).append(". ").append(game.getName());
-            if (isNotBlank(game.getCustomName())) {
-                names.append(" (").append(game.getCustomName()).append(")");
-            }
-            names.append("\n");
-        }
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
-    }
-
-    private static void calculateSpendToWinCorrellation(SlashCommandInteractionEvent event) {
-        StringBuilder names = new StringBuilder();
-        int num = 0;
-        int gamesWhereHighestWon = 0;
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
-        for (Game game : filteredGames) {
-            if (game.getWinner().isEmpty()) {
-                continue;
-            }
-
-            int highest = 0;
-            Player winner = game.getWinner().get();
-            Player highestP = null;
-            for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
-                if (player.getTotalExpenses() > highest) {
-                    highestP = player;
-                    highest = player.getTotalExpenses();
-                }
-                if (player.getTotalExpenses() < 20) {
-                    highestP = null;
-                    break;
-                }
-            }
-            if (highestP != null) {
-                num++;
-                names.append(num).append(". ").append(game.getName());
-                names.append(" - Winner was ").append(winner.getFactionEmoji()).append(" (").append("Highest was ").append(highestP.getFactionEmoji()).append(" at ").append(highestP.getTotalExpenses()).append(")");
-                names.append("\n");
-                if (highestP == winner) {
-                    gamesWhereHighestWon++;
-                }
-            }
-        }
-        names.append("Total games where highest spender won was ").append(gamesWhereHighestWon).append(" out of ").append(num);
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Expenses", names.toString());
-    }
-
-    private static void showGameLengths(SlashCommandInteractionEvent event, Integer pastDays) {
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
-        if (pastDays == null) pastDays = 3650;
-        int num = 0;
-        int total = 0;
-        Map<String, Integer> endedGames = new HashMap<>();
-        for (Game game : filteredGames) {
-            if (game.isHasEnded() && game.getWinner().isPresent() && game.getPlayerCountForMap() > 2
-                && Helper.getDateDifference(game.getEndedDateString(), Helper.getDateRepresentation(System.currentTimeMillis())) < pastDays) {
-                num++;
-                int dif = Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
-                endedGames.put(game.getName() + " (" + game.getPlayerCountForMap() + "p, " + game.getVp() + "pt)", dif);
-                total = total + dif;
-            }
-        }
-        StringBuilder longMsg = new StringBuilder("The number of games that finished in the last " + pastDays + " days is " + num + ". They are listed below based on the number of days it took to complete\n");
-        if (num != 0) {
-            Map<String, Integer> sortedMapAsc = SortHelper.sortByValue(endedGames, false);
-            int num2 = 0;
-            for (String command : sortedMapAsc.keySet()) {
-                num2++;
-                longMsg.append(num2).append(". ").append(command).append(": ")
-                    .append(sortedMapAsc.get(command)).append(" \n");
-            }
-            longMsg.append("\n The average completion time of these games is: ").append(total / num).append("\n");
-        }
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Lengths", longMsg.toString());
-    }
-
-    private static void showMostPlayedFactions(SlashCommandInteractionEvent event) {
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
-        Map<String, Integer> factionCount = new HashMap<>();
-        Map<String, Integer> custodians = new HashMap<>();
-        for (Game game : filteredGames) {
-            for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
-                String faction = player.getFaction();
-                factionCount.put(faction,
-                    1 + factionCount.getOrDefault(faction, 0));
-                if (game.getCustodiansTaker() != null && game.getCustodiansTaker().equalsIgnoreCase(faction)) {
-                    if (custodians.containsKey(faction)) {
-                        custodians.put(faction, custodians.get(faction) + 1);
-                    } else {
-                        custodians.put(faction, 1);
-                    }
-                }
-            }
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append("Plays per Faction:").append("\n");
-        factionCount.entrySet().stream()
-            .filter(entry -> Mapper.isValidFaction(entry.getKey()))
-            .sorted(Map.Entry.comparingByValue())
-            .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
-            .forEach(entry -> sb.append("`")
-                .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                .append("x` ")
-                .append(entry.getKey().getFactionEmoji()).append(" ")
-                .append(entry.getKey().getFactionNameWithSourceEmoji()).append(" (Took Custodians a total of  ").append(custodians.getOrDefault(entry.getKey().getAlias(), 0)).append(" times, or ").append((float) custodians.getOrDefault(entry.getKey().getAlias(), 0) / entry.getValue()).append(")")
-                .append("\n"));
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
     }
 
     private static void showAverageTurnsInAGameByFaction(SlashCommandInteractionEvent event) {
         Map<String, Double> factionCount = new HashMap<>();
         Map<String, Double> factionTurnCount = new HashMap<>();
 
-        List<Game> mapList = GameStatisticFilterer.getFilteredGames(event);
-        for (Game game : mapList) {
+        List<Game> filteredGames = GameStatisticsFilterer.getGamesFilter(event);
+        for (Game game : filteredGames) {
             for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
                 String faction = player.getFaction();
                 double turnCount = player.getNumberTurns() - game.getDiscardAgendas().size() - game.getRound();
@@ -346,12 +103,12 @@ public class GameStatisticsService {
 
     private static void showGameCount(SlashCommandInteractionEvent event) {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "Game count: " + GameStatisticFilterer.getFilteredGames(event).size());
+            "Game count: " + GameStatisticsFilterer.getGamesFilter(event).size());
     }
 
     private static void showMostWinningFactions(SlashCommandInteractionEvent event) {
         Map<String, Integer> winnerFactionCount = new HashMap<>();
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticsFilterer.getGamesFilter(event);
         for (Game game : filteredGames) {
             Optional<Player> winner = game.getWinner();
             if (winner.isEmpty()) {
@@ -377,7 +134,7 @@ public class GameStatisticsService {
     }
 
     private static void showFactionWinPercent(SlashCommandInteractionEvent event) {
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticsFilterer.getGamesFilter(event);
         Map<String, Integer> factionWinCount = new HashMap<>();
         Map<String, Integer> factionGameCount = new HashMap<>();
         Map<String, Integer> factionWinsWithRelics = new HashMap<>();
@@ -459,7 +216,7 @@ public class GameStatisticsService {
 
     private static void showMostPlayedColour(SlashCommandInteractionEvent event) {
         Map<String, Integer> colorCount = new HashMap<>();
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticsFilterer.getGamesFilter(event);
         for (Game game : filteredGames) {
             for (Player player : game.getRealPlayers()) {
                 String color = player.getColor();
@@ -495,7 +252,7 @@ public class GameStatisticsService {
     private static void showTimeOfRounds(SlashCommandInteractionEvent event) {
         Map<String, Long> timeCount = new HashMap<>();
         Map<String, Integer> amountCount = new HashMap<>();
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticsFilterer.getGamesFilter(event);
         for (Game game : filteredGames) {
             for (int x = 1; x < game.getRound() + 1; x++) {
                 long time1;
@@ -552,42 +309,11 @@ public class GameStatisticsService {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Time per Phase", sb.toString());
     }
 
-    private static void showMostWinningColour(GenericInteractionCreateEvent event) {
-        Map<String, Integer> winnerColorCount = new HashMap<>();
-
-        int currentPage = 0;
-        GamesPage pagedGames;
-        do {
-            pagedGames = GamesPage.getPage(currentPage++);
-            for (Game game : pagedGames.getGames()) {
-                Optional<Player> winner = game.getWinner();
-                if (winner.isEmpty()) {
-                    continue;
-                }
-                String winningColor = winner.get().getColor();
-                winnerColorCount.put(winningColor, 1 + winnerColorCount.getOrDefault(winningColor, 0));
-            }
-        } while (pagedGames.hasNextPage());
-
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("Wins per Colour:").append("\n");
-        winnerColorCount.entrySet().stream()
-            .filter(e -> Mapper.isValidColor(e.getKey()))
-            .sorted(Map.Entry.comparingByValue())
-            .forEach(entry -> sb.append("`")
-                .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                .append("x` ")
-                .append(Emojis.getColorEmojiWithName(entry.getKey()))
-                .append("\n"));
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Wins per Colour", sb.toString());
-    }
-
     private static void showWinningPath(SlashCommandInteractionEvent event) {
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticsFilterer.getGamesFilter(event);
         Map<String, Integer> winningPathCount = getAllWinningPathCounts(filteredGames);
         int gamesWithWinnerCount = winningPathCount.values().stream().reduce(0, Integer::sum);
-        AtomicInteger atomicInteger = new AtomicInteger(0);
+        AtomicInteger atomicInteger = new AtomicInteger();
         StringBuilder sb = new StringBuilder();
         sb.append("__**Winning Paths Count:**__").append("\n");
         winningPathCount.entrySet().stream()

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands2.statistics.GameStatisticFilterer;
+import ti4.commands2.statistics.GameStatisticsFilterer;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -93,7 +93,7 @@ public class GameStatsHelper {
     public static void showWinsWithSupport(SlashCommandInteractionEvent event) {
         Map<Integer, Integer> supportWinCount = new HashMap<>();
         AtomicInteger gameWithWinnerCount = new AtomicInteger();
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticsFilterer.getGamesFilter(event);
         for (Game game : filteredGames) {
             game.getWinner().ifPresent(winner -> {
                 gameWithWinnerCount.getAndIncrement();
@@ -102,7 +102,7 @@ public class GameStatsHelper {
                     1 + supportWinCount.getOrDefault(supportCount, 0));
             });
         }
-        AtomicInteger atomicInteger = new AtomicInteger(0);
+        AtomicInteger atomicInteger = new AtomicInteger();
         StringBuilder sb = new StringBuilder();
         sb.append("__**Winning Paths With SftT Count:**__").append("\n");
         supportWinCount.entrySet().stream()

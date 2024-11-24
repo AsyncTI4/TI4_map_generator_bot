@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands2.statistics.GameStatisticFilterer;
+import ti4.commands2.statistics.GameStatisticsFilterer;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -26,7 +26,7 @@ public class GameWinsWithOtherFactionsService {
     }
 
     private void getRecord(SlashCommandInteractionEvent event) {
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticsFilterer.getGamesFilter(event);
         Map<String, Integer> factionWinCount = new HashMap<>();
         Map<String, Integer> factionGameCount = new HashMap<>();
         List<String> reqFactions = new ArrayList<>();

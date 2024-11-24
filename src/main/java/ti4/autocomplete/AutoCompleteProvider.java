@@ -22,6 +22,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.statistics.GameStatisticsFilterer;
 import ti4.commands2.uncategorized.ServerPromoteCommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -58,8 +59,8 @@ import ti4.service.UnitDecalService;
 import ti4.service.franken.FrankenDraftMode;
 import ti4.service.game.UndoService;
 import ti4.service.map.MapPresetService;
-import ti4.service.statistics.GameStatTypes;
 import ti4.service.statistics.PlayerStatTypes;
+import ti4.service.statistics.game.GameStatTypes;
 
 public class AutoCompleteProvider {
 
@@ -94,7 +95,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.FACTION, Constants.FACTION2, Constants.FACTION3, Constants.FACTION4, Constants.FACTION5, Constants.FACTION6 -> {
+            case Constants.FACTION, Constants.FACTION2, Constants.FACTION3, Constants.FACTION4, Constants.FACTION5, Constants.FACTION6, GameStatisticsFilterer.WINNING_FACTION_FILTER -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<FactionModel> factions = Mapper.getFactions();
                 List<Command.Choice> options;

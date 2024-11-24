@@ -30,23 +30,7 @@ public class ListTitlesGivenService {
         Map<String, Integer> titlesAPersonHas = new HashMap<>();
         Map<String, Integer> timesPersonHasGottenSpecificTitle = new HashMap<>();
 
-        int currentPage = 0;
-        GamesPage pagedGames;
-        do {
-            pagedGames = GamesPage.getPage(currentPage++);
-            for (Game game : pagedGames.getGames()) {
-                for (String storedValue : game.getMessagesThatICheckedForAllReacts().keySet()) {
-                    if (storedValue.contains("TitlesFor")) {
-                        String userID = storedValue.replace("TitlesFor", "");
-                        for (String title : game.getStoredValue(storedValue).split("_")) {
-                            timesTitleHasBeenBestowed.put(title, 1 + timesTitleHasBeenBestowed.getOrDefault(title, 0));
-                            titlesAPersonHas.put(userID, 1 + titlesAPersonHas.getOrDefault(userID, 0));
-                            timesPersonHasGottenSpecificTitle.put(userID + "_" + title, 1 + timesPersonHasGottenSpecificTitle.getOrDefault(userID + "_" + title, 0));
-                        }
-                    }
-                }
-            }
-        } while (pagedGames.hasNextPage());
+        GamesPage.consumeAllGames(game -> aggregateTitles(game, timesTitleHasBeenBestowed, titlesAPersonHas, timesPersonHasGottenSpecificTitle));
 
         StringBuilder longMsg = new StringBuilder("The number of each title that has been bestowed:\n");
         Map<String, Integer> sortedTitlesMapAsc = SortHelper.sortByValue(timesTitleHasBeenBestowed, false);
@@ -76,5 +60,19 @@ public class ListTitlesGivenService {
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
+    }
+
+    private void aggregateTitles(Game game, Map<String, Integer> timesTitleHasBeenBestowed, Map<String, Integer> titlesAPersonHas, Map<String, Integer> timesPersonHasGottenSpecificTitle) {
+        for (String storedValue : game.getMessagesThatICheckedForAllReacts().keySet()) {
+            if (!storedValue.contains("TitlesFor")) {
+                continue;
+            }
+            String userID = storedValue.replace("TitlesFor", "");
+            for (String title : game.getStoredValue(storedValue).split("_")) {
+                timesTitleHasBeenBestowed.put(title, 1 + timesTitleHasBeenBestowed.getOrDefault(title, 0));
+                titlesAPersonHas.put(userID, 1 + titlesAPersonHas.getOrDefault(userID, 0));
+                timesPersonHasGottenSpecificTitle.put(userID + "_" + title, 1 + timesPersonHasGottenSpecificTitle.getOrDefault(userID + "_" + title, 0));
+            }
+        }
     }
 }

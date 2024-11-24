@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands2.statistics.GameStatisticFilterer;
+import ti4.commands2.statistics.GameStatisticsFilterer;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
@@ -322,7 +322,7 @@ public class EndGameService {
             String winningPath = GameStatsHelper.getWinningPath(game, winner.get());
             sb.append("**Winning Path:** ").append(winningPath).append("\n");
             int playerCount = game.getRealAndEliminatedAndDummyPlayers().size();
-            List<Game> games = GameStatisticFilterer.getNormalFinishedGames(playerCount, game.getVp());
+            List<Game> games = GameStatisticsFilterer.getNormalFinishedGames(playerCount, game.getVp());
             Map<String, Integer> winningPathCounts = GameStatsHelper.getAllWinningPathCounts(games);
             int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
             if (gamesWithWinnerCount >= 100) {

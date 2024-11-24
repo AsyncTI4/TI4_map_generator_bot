@@ -2,6 +2,8 @@ package ti4.service.statistics;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -23,82 +25,18 @@ public class ListSlashCommandsUsedService {
     }
 
     private static void listSlashCommandsUsed(SlashCommandInteractionEvent event) {
-        int buttonsPressed = 0;
-        int slashCommandsUsed = 0;
-        int acsSabod = 0;
-        boolean useOnlyLastMonth = false;
-        Boolean onlyLastMonth = event.getOption(Constants.ONLY_LAST_MONTH, null, OptionMapping::getAsBoolean);
-        if (onlyLastMonth != null) {
-            useOnlyLastMonth = true;
-        }
-        int largestAmountOfButtonsIn1Game = 0;
-        String largestGame = "";
-
+        AtomicInteger buttonsPressed = new AtomicInteger();
+        AtomicInteger slashCommandsUsed = new AtomicInteger();
+        AtomicInteger acsSabod = new AtomicInteger();
+        AtomicInteger largestAmountOfButtonsIn1Game = new AtomicInteger();
+        AtomicReference<String> largestGame = new AtomicReference<>("");
+        boolean useOnlyLastMonth = event.getOption(Constants.ONLY_LAST_MONTH, false, OptionMapping::getAsBoolean);
         Map<String, Integer> slashCommands = new HashMap<>();
         Map<String, Integer> actionCards = new HashMap<>();
         Map<String, Integer> actionCardsPlayed = new HashMap<>();
 
-        int currentPage = 0;
-        GamesPage pagedGames;
-        do {
-            pagedGames = GamesPage.getPage(currentPage++);
-            for (Game game : pagedGames.getGames()) {
-                if (useOnlyLastMonth && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) > 30) {
-                    continue;
-                }
-                if (game.getButtonPressCount() > largestAmountOfButtonsIn1Game) {
-                    largestGame = game.getName();
-                    largestAmountOfButtonsIn1Game = game.getButtonPressCount();
-                }
-                buttonsPressed = game.getButtonPressCount() + buttonsPressed;
-                slashCommandsUsed = game.getSlashCommandsRunCount() + slashCommandsUsed;
-                for (String command : game.getAllSlashCommandsUsed().keySet()) {
-                    int numUsed = game.getAllSlashCommandsUsed().get(command);
-                    int numUsed2 = 0;
-                    if (slashCommands.containsKey(command)) {
-                        numUsed2 = slashCommands.get(command);
-                    }
-                    slashCommands.put(command, numUsed + numUsed2);
-                }
-                if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1698724000011L)) < 0) {
-                    for (String acName : game.getAllActionCardsSabod().keySet()) {
-                        int numUsed = game.getAllActionCardsSabod().get(acName);
-                        int numUsed2 = 0;
-                        if (actionCards.containsKey(acName)) {
-                            numUsed2 = actionCards.get(acName);
-                        }
-                        acsSabod = acsSabod + numUsed;
-                        actionCards.put(acName, numUsed + numUsed2);
-                    }
-                    for (String acID : game.getDiscardActionCards().keySet()) {
-                        ActionCardModel ac = Mapper.getActionCard(acID);
-                        if (ac == null) {
-                            continue;
-                        }
-                        String acName = ac.getName();
-                        int numUsed = 1;
-                        int numUsed2 = 0;
-                        if (actionCardsPlayed.containsKey(acName)) {
-                            numUsed2 = actionCardsPlayed.get(acName);
-                        }
-                        actionCardsPlayed.put(acName, numUsed + numUsed2);
-                    }
-                    for (String acID : game.getPurgedActionCards().keySet()) {
-                        ActionCardModel ac = Mapper.getActionCard(acID);
-                        if (ac == null) {
-                            continue;
-                        }
-                        String acName = ac.getName();
-                        int numUsed = 1;
-                        int numUsed2 = 0;
-                        if (actionCardsPlayed.containsKey(acName)) {
-                            numUsed2 = actionCardsPlayed.get(acName);
-                        }
-                        actionCardsPlayed.put(acName, numUsed + numUsed2);
-                    }
-                }
-            }
-        } while (pagedGames.hasNextPage());
+        GamesPage.consumeAllGames(game -> listSlashCommandsUsed(game, useOnlyLastMonth, slashCommands, actionCards, actionCardsPlayed, largestGame,
+            largestAmountOfButtonsIn1Game, buttonsPressed, slashCommandsUsed, acsSabod));
 
         StringBuilder longMsg = new StringBuilder("The number of button pressed so far recorded is " + buttonsPressed + ". The largest number of buttons pressed in a single game is " + largestAmountOfButtonsIn1Game + " in game " + largestGame + ". The number of slash commands used is " + slashCommandsUsed
             + ". The number of ACs Sabo'd is " + acsSabod + ". The following is the recorded frequency of slash commands \n");
@@ -112,5 +50,65 @@ public class ListSlashCommandsUsedService {
             longMsg.append(command).append(": ").append(sortedMapAscACs.get(command)).append(" out of ").append(actionCardsPlayed.get(command)).append(" times played").append(" \n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
+    }
+
+    private static void listSlashCommandsUsed(Game game, boolean useOnlyLastMonth, Map<String, Integer> slashCommands, Map<String, Integer> actionCards,
+                                                Map<String, Integer> actionCardsPlayed, AtomicReference<String> largestGame, AtomicInteger largestAmountOfButtonsIn1Game,
+                                                AtomicInteger buttonsPressed, AtomicInteger slashCommandsUsed, AtomicInteger acsSabod) {
+        if (useOnlyLastMonth && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) > 30) {
+            return;
+        }
+        if (game.getButtonPressCount() > largestAmountOfButtonsIn1Game.get()) {
+            largestGame.set(game.getName());
+            largestAmountOfButtonsIn1Game.set(game.getButtonPressCount());
+        }
+        buttonsPressed.addAndGet(game.getButtonPressCount());
+        slashCommandsUsed.addAndGet(game.getSlashCommandsRunCount());
+        for (String command : game.getAllSlashCommandsUsed().keySet()) {
+            int numUsed = game.getAllSlashCommandsUsed().get(command);
+            int numUsed2 = 0;
+            if (slashCommands.containsKey(command)) {
+                numUsed2 = slashCommands.get(command);
+            }
+            slashCommands.put(command, numUsed + numUsed2);
+        }
+        if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1698724000011L)) >= 0) {
+            return;
+        }
+        for (String acName : game.getAllActionCardsSabod().keySet()) {
+            int numUsed = game.getAllActionCardsSabod().get(acName);
+            int numUsed2 = 0;
+            if (actionCards.containsKey(acName)) {
+                numUsed2 = actionCards.get(acName);
+            }
+            acsSabod.addAndGet(numUsed);
+            actionCards.put(acName, numUsed + numUsed2);
+        }
+        for (String acID : game.getDiscardActionCards().keySet()) {
+            ActionCardModel ac = Mapper.getActionCard(acID);
+            if (ac == null) {
+                continue;
+            }
+            String acName = ac.getName();
+            int numUsed = 1;
+            int numUsed2 = 0;
+            if (actionCardsPlayed.containsKey(acName)) {
+                numUsed2 = actionCardsPlayed.get(acName);
+            }
+            actionCardsPlayed.put(acName, numUsed + numUsed2);
+        }
+        for (String acID : game.getPurgedActionCards().keySet()) {
+            ActionCardModel ac = Mapper.getActionCard(acID);
+            if (ac == null) {
+                continue;
+            }
+            String acName = ac.getName();
+            int numUsed = 1;
+            int numUsed2 = 0;
+            if (actionCardsPlayed.containsKey(acName)) {
+                numUsed2 = actionCardsPlayed.get(acName);
+            }
+            actionCardsPlayed.put(acName, numUsed + numUsed2);
+        }
     }
 }

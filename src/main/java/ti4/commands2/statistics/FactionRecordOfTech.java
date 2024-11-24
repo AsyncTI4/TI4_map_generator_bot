@@ -14,7 +14,7 @@ class FactionRecordOfTech extends Subcommand {
     public FactionRecordOfTech() {
         super(Constants.FACTION_RECORD_OF_TECH, "# of times a tech has been acquired by a faction");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction That You Want Tech History Of").setRequired(true).setAutoComplete(true));
-        addOptions(GameStatisticFilterer.gameStatsFilters());
+        addOptions(GameStatisticsFilterer.gameStatsFilters());
         addOptions(new OptionData(OptionType.BOOLEAN, FACTION_WON_FILTER, "Only include games where the faction won"));
 
     }

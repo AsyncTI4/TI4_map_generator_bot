@@ -8,8 +8,9 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.commands2.statistics.GameStatisticFilterer;
+import ti4.commands2.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
+import ti4.map.GamesPage;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -21,16 +22,17 @@ public class ExportToCsvService {
     }
 
     private void exportToCsv(SlashCommandInteractionEvent event) {
-        List<Game> games = GameStatisticFilterer.getFilteredGames(event);
-        if (games.isEmpty()) {
+        int playerCount = event.getOption(GameStatisticsFilterer.PLAYER_COUNT_FILTER, 6, OptionMapping::getAsInt);
+        StringBuilder output = new StringBuilder(header(playerCount));
+
+        GamesPage.consumeAllGames(
+            GameStatisticsFilterer.getGamesFilter(event),
+            game -> output.append(System.lineSeparator()).append(gameToCsv(game))
+        );
+
+        if (output.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No games found matching filter.");
             return;
-        }
-
-        int playerCount = event.getOption(GameStatisticFilterer.PLAYER_COUNT_FILTER, 6, OptionMapping::getAsInt);
-        StringBuilder output = new StringBuilder(header(playerCount));
-        for (Game game : games) {
-            output.append(System.lineSeparator()).append(gameToCsv(game));
         }
 
         File outputCSV = new File("output.csv");

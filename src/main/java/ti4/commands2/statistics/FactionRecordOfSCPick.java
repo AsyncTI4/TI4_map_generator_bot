@@ -12,8 +12,7 @@ class FactionRecordOfSCPick extends Subcommand {
     public FactionRecordOfSCPick() {
         super(Constants.FACTION_RECORD_OF_SCPICK, "# of times an SC has been picked by a faction, by round");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction That You Want History Of").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, "faction_won", "Only include games where the faction won"));
-        addOptions(GameStatisticFilterer.gameStatsFilters());
+        addOptions(GameStatisticsFilterer.gameStatsFilters());
     }
 
     @Override

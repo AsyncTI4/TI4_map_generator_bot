@@ -2,18 +2,18 @@ package ti4.service.statistics;
 
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.commands2.statistics.GameStatisticFilterer;
+import ti4.commands2.statistics.GameStatisticsFilterer;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.GamesPage;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -34,48 +34,20 @@ public class FactionRecordOfStrategyCardPickService {
     }
 
     private String getSCPick(SlashCommandInteractionEvent event, int round) {
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
-        String faction = event.getOption(Constants.FACTION, "eh", OptionMapping::getAsString);
+        String faction = event.getOption(Constants.FACTION, "", OptionMapping::getAsString);
         FactionModel factionM = Mapper.getFaction(faction);
         if (factionM == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No faction known as " + faction);
-            return "bleh";
-        }
-        boolean onlyIncludeWins = event.getOption("faction_won", false, OptionMapping::getAsBoolean);
-        if (onlyIncludeWins) {
-            filteredGames = filteredGames.stream()
-                .filter(game -> game.getWinner().get().getFaction().equalsIgnoreCase(faction))
-                .toList();
+            return "UNKNOWN FACTION";
         }
         Map<String, Integer> scsPicked = new HashMap<>();
         Map<String, Integer> custodians = new HashMap<>();
-        int gamesThatHadThem = 0;
+        AtomicInteger gamesThatHadThem = new AtomicInteger();
 
-        for (Game game : filteredGames) {
-            for (Player player : game.getRealPlayers()) {
-                String scs = game.getStoredValue("Round" + round + "SCPickFor" + faction);
-                if (player.getFaction().equalsIgnoreCase(faction) && !scs.isEmpty()) {
-                    gamesThatHadThem++;
-                    String[] scList = scs.split("_");
-                    for (String sc : scList) {
-                        sc = game.getStrategyCardModelByInitiative(Integer.parseInt(sc)).get().getName();
-                        if (scsPicked.containsKey(sc)) {
-                            scsPicked.put(sc, scsPicked.get(sc) + 1);
-                        } else {
-                            scsPicked.put(sc, 1);
-                        }
-                        if (game.getCustodiansTaker() != null && game.getCustodiansTaker().equalsIgnoreCase(faction)) {
-                            if (custodians.containsKey(sc)) {
-                                custodians.put(sc, custodians.get(sc) + 1);
-                            } else {
-                                custodians.put(sc, 1);
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
+        GamesPage.consumeAllGames(
+            GameStatisticsFilterer.getGamesFilter(event),
+            game -> getScPick(game, round, faction, gamesThatHadThem, scsPicked, custodians)
+        );
 
         StringBuilder sb = new StringBuilder();
 
@@ -104,5 +76,32 @@ public class FactionRecordOfStrategyCardPickService {
             });
 
         return sb.toString();
+    }
+
+    private void getScPick(Game game, int round, String faction, AtomicInteger gamesThatHadThem, Map<String, Integer> scsPicked, Map<String, Integer> custodians) {
+        for (Player player : game.getRealPlayers()) {
+            String scs = game.getStoredValue("Round" + round + "SCPickFor" + faction);
+            if (!player.getFaction().equalsIgnoreCase(faction) || scs.isEmpty()) {
+                continue;
+            }
+            gamesThatHadThem.incrementAndGet();
+            String[] scList = scs.split("_");
+            for (String sc : scList) {
+                sc = game.getStrategyCardModelByInitiative(Integer.parseInt(sc)).get().getName();
+                if (scsPicked.containsKey(sc)) {
+                    scsPicked.put(sc, scsPicked.get(sc) + 1);
+                } else {
+                    scsPicked.put(sc, 1);
+                }
+                if (game.getCustodiansTaker() != null && game.getCustodiansTaker().equalsIgnoreCase(faction)) {
+                    if (custodians.containsKey(sc)) {
+                        custodians.put(sc, custodians.get(sc) + 1);
+                    } else {
+                        custodians.put(sc, 1);
+                    }
+                }
+
+            }
+        }
     }
 }

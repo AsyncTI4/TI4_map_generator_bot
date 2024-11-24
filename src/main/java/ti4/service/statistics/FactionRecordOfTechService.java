@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.commands2.statistics.GameStatisticFilterer;
+import ti4.commands2.statistics.GameStatisticsFilterer;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -32,7 +32,7 @@ public class FactionRecordOfTechService {
     }
 
     private String getTechResearched(SlashCommandInteractionEvent event) {
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticsFilterer.getGamesFilter(event);
         String faction = event.getOption(Constants.FACTION, "eh", OptionMapping::getAsString);
         FactionModel factionM = Mapper.getFaction(faction);
         if (factionM == null) {

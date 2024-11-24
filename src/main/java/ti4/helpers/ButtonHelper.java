@@ -4981,7 +4981,6 @@ public class ButtonHelper {
         GameSaveLoadManager.saveGame(game, event);
         String newName = name + "clone";
         Guild guild = game.getGuild();
-        Role gameRole = null;
         String gameFunName = game.getCustomName();
         String newChatChannelName = newName + "-" + gameFunName;
         String newActionsChannelName = newName + Constants.ACTIONS_CHANNEL_SUFFIX;
@@ -4989,7 +4988,7 @@ public class ButtonHelper {
 
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
-        gameRole = guild.createRole()
+        Role gameRole = guild.createRole()
             .setName(newName)
             .setMentionable(true)
             .complete();
