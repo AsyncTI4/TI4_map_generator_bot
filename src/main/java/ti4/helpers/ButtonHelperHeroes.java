@@ -1561,10 +1561,9 @@ public class ButtonHelperHeroes {
         AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planet)), game, player.getColor(),  amount + " inf " + planet);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " Chose to land " + amount + " infantry on " + Helper.getPlanetRepresentation(planet, game));
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
-        List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
-        if (players.size() > 1) {
+        boolean groundCombatStarted = StartCombatService.groundCombatCheck(game, unitHolder, tile, event);
+        if (groundCombatStarted) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Reminder that Dannel of the Tenth, the Yin hero, skips space cannon fire.");
-            StartCombatService.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -1585,25 +1584,16 @@ public class ButtonHelperHeroes {
         return buttons;
     }
 
-    public static List<Button> getBenediction2ndTileOptions(Player player, Game game, String pos1) {
+    public static List<Button> getJolNarHeroSwapOutOptions(Player player) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
-        Player origPlayer = player;
-        Tile tile1 = game.getTileByPosition(pos1);
-        List<Player> players2 = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, game, tile1);
-        if (!players2.isEmpty()) {
-            player = players2.getFirst();
-        }
-        for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, player, false)) {
-            if (pos1.equalsIgnoreCase(pos2)) {
-                continue;
-            }
-            Tile tile2 = game.getTileByPosition(pos2);
-            if (FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, game)) {
-                buttons.add(Buttons.gray(finChecker + "mahactBenedictionFrom_" + pos1 + "_" + pos2,
-                    tile2.getRepresentationForButtons(game, origPlayer)));
+        for (String tech : player.getTechs()) {
+            TechnologyModel techM = Mapper.getTech(tech);
+            if (!techM.isUnitUpgrade()) {
+                buttons.add(Buttons.gray(finChecker + "jnHeroSwapOut_" + tech, techM.getName()));
             }
         }
+        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
         return buttons;
     }
 
@@ -1634,20 +1624,6 @@ public class ButtonHelperHeroes {
             }
 
         }
-
-        return buttons;
-    }
-
-    public static List<Button> getJolNarHeroSwapOutOptions(Player player) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
-        List<Button> buttons = new ArrayList<>();
-        for (String tech : player.getTechs()) {
-            TechnologyModel techM = Mapper.getTech(tech);
-            if (!techM.isUnitUpgrade()) {
-                buttons.add(Buttons.gray(finChecker + "jnHeroSwapOut_" + tech, techM.getName()));
-            }
-        }
-        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
         return buttons;
     }
 
