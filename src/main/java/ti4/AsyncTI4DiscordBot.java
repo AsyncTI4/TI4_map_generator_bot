@@ -53,6 +53,7 @@ import ti4.map.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
+import ti4.service.stats.StatisticsPipeline;
 
 import static org.reflections.scanners.Scanners.SubTypes;
 
@@ -201,6 +202,7 @@ public class AsyncTI4DiscordBot {
         // START MAP GENERATION
         ImageIO.setUseCache(false);
         MapRenderPipeline.start();
+        StatisticsPipeline.start();
 
         // START CRONS
         AutoPingCron.start();
@@ -223,6 +225,9 @@ public class AsyncTI4DiscordBot {
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
                 if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.logWithTimestamp("DONE RENDERING MAPS");
+                }
+                if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
+                    BotLogger.logWithTimestamp("DONE PROCESSING STATISTICS");
                 }
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS COMPLETE");
                 TimeUnit.SECONDS.sleep(1); // wait for BotLogger
