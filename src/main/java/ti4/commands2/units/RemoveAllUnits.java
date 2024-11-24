@@ -16,7 +16,7 @@ import ti4.service.planet.AddPlanetToPlayAreaService;
 public class RemoveAllUnits extends GameStateCommand {
 
     public RemoveAllUnits() {
-        super(true, false);
+        super(true, true);
     }
 
     @Override
