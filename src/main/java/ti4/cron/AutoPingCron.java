@@ -8,6 +8,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
@@ -30,6 +31,7 @@ import ti4.users.UserSettingsManager;
 
 import static java.util.function.Predicate.not;
 
+@UtilityClass
 public class AutoPingCron {
 
     private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
@@ -39,6 +41,18 @@ public class AutoPingCron {
 
     public static void start() {
         SCHEDULER.scheduleAtFixedRate(AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
+    }
+
+    public static void shutdown() {
+        SCHEDULER.shutdown();
+        try {
+            if (!SCHEDULER.awaitTermination(10, TimeUnit.SECONDS)) {
+                SCHEDULER.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            SCHEDULER.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
     private static void autoPingGames() {
@@ -231,51 +245,46 @@ public class AutoPingCron {
     private static void handleFastScFollowMode(Game game) {
         for (Player player : game.getRealPlayers()) {
             for (int sc : game.getPlayedSCsInOrder(player)) {
-                if (!player.hasFollowedSC(sc)) {
-                    int twenty4 = 24;
-                    int half = 12;
-                    if (!game.getStoredValue("fastSCFollow").isEmpty()) {
-                        twenty4 = Integer.parseInt(game.getStoredValue("fastSCFollow"));
-                        half = twenty4 / 2;
-                    }
-                    long twelveHoursInMilliseconds = (long) half * ONE_HOUR_IN_MILLISECONDS;
-                    long twentyFourHoursInMilliseconds = (long) twenty4 * ONE_HOUR_IN_MILLISECONDS;
-                    String scTime = game.getStoredValue("scPlayMsgTime" + game.getRound() + sc);
-                    if (!scTime.isEmpty()) {
-                        long scPlayTime = Long.parseLong(scTime);
-                        long timeDifference = System.currentTimeMillis() - scPlayTime;
-                        String timesPinged = game
-                                .getStoredValue("scPlayPingCount" + sc + player.getFaction());
-                        if (timeDifference > twelveHoursInMilliseconds && timeDifference < twentyFourHoursInMilliseconds) {
+                if (player.hasFollowedSC(sc)) continue;
 
-                            if (!timesPinged.equalsIgnoreCase("1")) {
-                                StringBuilder sb = new StringBuilder();
-                                sb.append(player.getRepresentationUnfogged());
-                                sb.append(" You are getting this ping because ").append(Helper.getSCName(sc, game)).append(" has been played and now it has been half the alloted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
-                                appendScMessages(game, player, sc, sb);
-                                game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
-                            }
-                        }
-                        if (timeDifference > twentyFourHoursInMilliseconds) {
-                            if (!timesPinged.equalsIgnoreCase("2")) {
-                                String sb = player.getRepresentationUnfogged() +
-                                        Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
+                String scTime = game.getStoredValue("scPlayMsgTime" + game.getRound() + sc);
+                if (scTime.isEmpty()) continue;
 
-                                ButtonHelper.sendMessageToRightStratThread(player, game, sb, ButtonHelper.getStratName(sc));
-                                player.addFollowedSC(sc);
-                                game.setStoredValue("scPlayPingCount" + sc + player.getFaction(),
-                                        "2");
-                                String messageID = game
-                                        .getStoredValue("scPlayMsgID" + sc);
-                                ButtonHelper.addReaction(player, false, true, "Not following", "",
-                                        messageID, game);
+                int twenty4 = 24;
+                int half = 12;
+                if (!game.getStoredValue("fastSCFollow").isEmpty()) {
+                    twenty4 = Integer.parseInt(game.getStoredValue("fastSCFollow"));
+                    half = twenty4 / 2;
+                }
+                long twelveHoursInMilliseconds = (long) half * ONE_HOUR_IN_MILLISECONDS;
+                long twentyFourHoursInMilliseconds = (long) twenty4 * ONE_HOUR_IN_MILLISECONDS;
+                long scPlayTime = Long.parseLong(scTime);
+                long timeDifference = System.currentTimeMillis() - scPlayTime;
+                String timesPinged = game
+                        .getStoredValue("scPlayPingCount" + sc + player.getFaction());
+                if (timeDifference > twelveHoursInMilliseconds && timeDifference < twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("1")) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(player.getRepresentationUnfogged());
+                    sb.append(" You are getting this ping because ").append(Helper.getSCName(sc, game)).append(" has been played and now it has been half the alloted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
+                    appendScMessages(game, player, sc, sb);
+                    game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
+                }
+                if (timeDifference > twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("2")) {
+                    String sb = player.getRepresentationUnfogged() +
+                        Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
 
-                                StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
-                                if (scModel != null && scModel.usesAutomationForSCID("pok8imperial")) {
-                                    handleSecretObjectiveDrawOrder(game, player);
-                                }
-                            }
-                        }
+                    ButtonHelper.sendMessageToRightStratThread(player, game, sb, ButtonHelper.getStratName(sc));
+                    player.addFollowedSC(sc);
+                    game.setStoredValue("scPlayPingCount" + sc + player.getFaction(),
+                        "2");
+                    String messageID = game
+                        .getStoredValue("scPlayMsgID" + sc);
+                    ButtonHelper.addReaction(player, false, true, "Not following", "",
+                        messageID, game);
+
+                    StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
+                    if (scModel != null && scModel.usesAutomationForSCID("pok8imperial")) {
+                        handleSecretObjectiveDrawOrder(game, player);
                     }
                 }
             }

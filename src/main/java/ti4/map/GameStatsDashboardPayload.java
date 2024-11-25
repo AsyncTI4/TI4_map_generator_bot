@@ -286,4 +286,8 @@ public class GameStatsDashboardPayload {
     public boolean isAllianceMode() {
         return game.isAllianceMode();
     }
+
+    public boolean isTIGLGame() {
+        return game.isCompetitiveTIGLGame();
+    }
 }

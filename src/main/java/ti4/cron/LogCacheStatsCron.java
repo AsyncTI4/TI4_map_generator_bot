@@ -10,11 +10,13 @@ import java.util.stream.Collectors;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
+import lombok.experimental.UtilityClass;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.ToStringHelper;
 import ti4.message.MessageHelper;
 
+@UtilityClass
 public class LogCacheStatsCron {
 
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
@@ -28,6 +30,19 @@ public class LogCacheStatsCron {
 
     public static void start() {
         SCHEDULER.scheduleAtFixedRate(LogCacheStatsCron::logCacheStats, 5, LOG_CACHE_STATS_INTERVAL_MINUTES, TimeUnit.MINUTES);
+    }
+
+
+    public static void shutdown() {
+        SCHEDULER.shutdown();
+        try {
+            if (!SCHEDULER.awaitTermination(10, TimeUnit.SECONDS)) {
+                SCHEDULER.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            SCHEDULER.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
     private static void logCacheStats() {
