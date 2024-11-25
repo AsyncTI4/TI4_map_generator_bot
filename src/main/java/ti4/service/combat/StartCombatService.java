@@ -57,7 +57,7 @@ public class StartCombatService {
         }
         Player player = playersWithShipsInSystem.getFirst();
         playersWithShipsInSystem.stream()
-            .filter(p -> !p.isPlayerMemberOfAlliance(player))
+            .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
             .findFirst()
             .ifPresent(enemyPlayer -> startSpaceCombat(game, player, enemyPlayer, tile, event));
     }
@@ -69,7 +69,7 @@ public class StartCombatService {
         }
         Player player = playersWithUnitsOnPlanet.getFirst();
         Optional<Player> enemyPlayer = playersWithUnitsOnPlanet.stream()
-            .filter(p -> !p.isPlayerMemberOfAlliance(player))
+            .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
             .findFirst();
         if (enemyPlayer.isPresent()) {
             startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
@@ -88,31 +88,31 @@ public class StartCombatService {
         startSpaceCombat(game, player, player2, tile, event, null);
     }
 
-    private static void startSpaceCombat(Game game, Player player, Player player2, Tile tile, GenericInteractionCreateEvent event, String specialCombatTitle) {
+    public static void startSpaceCombat(Game game, Player player, Player player2, Tile tile, GenericInteractionCreateEvent event, String specialCombatTitle) {
         String threadName = combatThreadName(game, player, player2, tile, specialCombatTitle);
         if (!game.isFowMode()) {
             findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,
                 threadName, tile, event, "space", "space");
-        } else {
-            findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
+            return;
+        }
+        findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
+            threadName, tile, event, "space", "space");
+        if (player2.getPrivateChannel() != null) {
+            findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
                 threadName, tile, event, "space", "space");
-            if (player2.getPrivateChannel() != null) {
-                findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
-                    threadName, tile, event, "space", "space");
+        }
+        for (Player player3 : game.getRealPlayers()) {
+            if (player3 == player2 || player3 == player) {
+                continue;
             }
-            for (Player player3 : game.getRealPlayers()) {
-                if (player3 == player2 || player3 == player) {
-                    continue;
-                }
-                if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
-                    continue;
-                }
-                createSpectatorThread(game, player3, threadName, tile, event, "space");
+            if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
+                continue;
             }
+            createSpectatorThread(game, player3, threadName, tile, event, "space");
         }
     }
 
-    private static void startGroundCombat(Player player, Player player2, Game game, GenericInteractionCreateEvent event, UnitHolder unitHolder, Tile tile) {
+    public static void startGroundCombat(Player player, Player player2, Game game, GenericInteractionCreateEvent event, UnitHolder unitHolder, Tile tile) {
         String threadName = combatThreadName(game, player, player2, tile);
         if (!game.isFowMode()) {
             findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,

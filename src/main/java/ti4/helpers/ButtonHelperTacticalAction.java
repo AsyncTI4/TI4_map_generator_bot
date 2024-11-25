@@ -464,6 +464,7 @@ public class ButtonHelperTacticalAction {
         if (needPDSCheck && !game.isL1Hero() && !playersWithPds2.isEmpty()) {
             StartCombatService.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game, player, tile);
         }
+        StartCombatService.combatCheck(game, event, tile);
         ButtonHelper.deleteMessage(event);
     }
 
