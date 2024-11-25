@@ -304,19 +304,14 @@ public class GameSaveLoadManager {
             return;
         }
         int count = 0;
-        int daysOld = 365;
-        long howOldIsTooOld = System.currentTimeMillis() - (1000 * 60 * 60 * 24 * daysOld); // (1 day) * multiplier
-        Date tooOld = Date.from(Instant.ofEpochMilli(howOldIsTooOld));
+        long daysOld = 60;
+        Date tooOld = Date.from(Instant.ofEpochMilli(Instant.now().toEpochMilli() - (daysOld * 24 * 60 * 60 * 1000)));
         for (String mapFilePath : mapUndoFiles) {
             File mapToDelete = Storage.getGameUndoStorage(mapFilePath);
             Date lastModified = Date.from(Instant.ofEpochMilli(mapToDelete.lastModified()));
-            if (lastModified.before(tooOld)) {
-                BotLogger.log(tooOld + " is before " + lastModified);
-                // mapToDelete.delete();
-                count++;
-            }
+            if (lastModified.before(tooOld) && mapToDelete.delete()) count++;
         }
-        BotLogger.log("Deleted `" + count + "` undo files that were over `" + daysOld + "` days old (" + Date.from(Instant.ofEpochMilli(howOldIsTooOld)) + ")");
+        BotLogger.log("Cleaned up `" + count + "` undo files that were over `" + daysOld + "` days old (" + tooOld + ")");
     }
 
     private static void saveGameInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {
