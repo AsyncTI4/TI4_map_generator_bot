@@ -2,6 +2,8 @@
     "id": "custodiavigiliaplus",
     "tileId": null,
     "name": "Custodia Vigilia (Plus)",
+    "shortName": "Cust. Vigilia",
+    "shrinkNamePNAttach": true,
     "aliases": [
         "custodiavigiliaplus",
         "custodiavigilia(plus)",

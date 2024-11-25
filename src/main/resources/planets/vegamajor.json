@@ -2,6 +2,7 @@
     "id": "vegamajor",
     "tileId": "74",
     "name": "Vega Major",
+    "shrinkNamePNAttach": true,
     "aliases": [
         "vegamajor",
         "vgamj",

@@ -2,6 +2,7 @@
     "id": "hopesend",
     "tileId": "66",
     "name": "Hope's End",
+    "shrinkNamePNAttach": true,
     "aliases": [
         "hopesend",
         "hope'send",

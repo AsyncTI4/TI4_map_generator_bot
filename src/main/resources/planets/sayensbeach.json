@@ -2,6 +2,8 @@
     "id": "sayensbeach",
     "tileId": "s05",
     "name": "Sayen's Beach",
+    "shrinkName": true,
+    "shortNamePNAttach": "Sayen's B.",
     "aliases": [
         "sayensbeach",
         "sayen'sbeach",

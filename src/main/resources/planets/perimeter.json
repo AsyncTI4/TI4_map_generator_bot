@@ -2,6 +2,7 @@
     "id": "perimeter",
     "tileId": "60",
     "name": "Perimeter",
+    "shrinkNamePNAttach": true,
     "aliases": [
         "perimeter",
         "peremeter",

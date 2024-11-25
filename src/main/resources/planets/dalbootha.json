@@ -2,6 +2,7 @@
     "id": "dalbootha",
     "tileId": "32",
     "name": "Dal Bootha",
+    "shrinkNamePNAttach": true,
     "aliases": [
         "dalbootha",
         "db",

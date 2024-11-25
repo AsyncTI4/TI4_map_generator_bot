@@ -2,6 +2,9 @@
     "id": "mollprimusk",
     "tileId": "94new",
     "name": "Moll Primus Keleres",
+    "shortName": "Moll Primus",
+    "shrinkNamePNAttach": true,
+    "shortNamePNAttach": "Moll Prim's",
     "aliases": [
         "mollprimusk",
         "mollprimuskeleres",

@@ -2,6 +2,8 @@
     "id": "wrenterra",
     "tileId": "10",
     "name": "Wren Terra",
+    "shrinkNamePNAttach": true,
+    "shortNamePNAttach": "Wren T'rra",
     "aliases": [
         "wrenterra",
         "renterra",

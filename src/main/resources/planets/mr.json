@@ -2,6 +2,8 @@
     "id": "mr",
     "tileId": "18",
     "name": "Mecatol Rex",
+    "shortNamePNAttach": "Mecatol R.",
+    "shrinkNamePNAttach": true,
     "aliases": [
         "mr",
         "mecatol",
