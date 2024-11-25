@@ -43,6 +43,10 @@ class SendCommodities extends GameStateSubcommand {
         player.setCommodities(commodities);
 
         Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (targetPlayer == null) {
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
+            return;
+        }
         if (!player.isPlayerMemberOfAlliance(targetPlayer)) {
             int targetTG = targetPlayer.getTg();
             targetTG += sendCommodities;

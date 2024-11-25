@@ -24,7 +24,7 @@ class ShowAllAC extends GameStateSubcommand {
         Game game = getGame();
         Player factionToShowTo = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (factionToShowTo == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
         Player player = getPlayer();
