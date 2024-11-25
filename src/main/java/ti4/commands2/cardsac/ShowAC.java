@@ -53,7 +53,7 @@ class ShowAC extends GameStateSubcommand {
 
         Player playerToShowTo = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (playerToShowTo == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
         User user = AsyncTI4DiscordBot.jda.getUserById(playerToShowTo.getUserID());
