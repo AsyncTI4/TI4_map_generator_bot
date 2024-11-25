@@ -31,7 +31,7 @@ public class CronManager {
             stopWatch.stop();
             Duration timeElapsed = stopWatch.getDuration();
             if (timeElapsed.toSeconds() > EXECUTION_TIME_SECONDS_WARNING_THRESHOLD) {
-                BotLogger.log("A cron took longer than " + EXECUTION_TIME_SECONDS_WARNING_THRESHOLD + " seconds: " + clazz.getSimpleName());
+                BotLogger.log(clazz.getSimpleName() + " took longer than " + EXECUTION_TIME_SECONDS_WARNING_THRESHOLD + " seconds (" + timeElapsed.toSeconds() + ").");
             }
         };
     }
