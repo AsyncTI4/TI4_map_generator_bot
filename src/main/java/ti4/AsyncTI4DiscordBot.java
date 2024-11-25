@@ -194,6 +194,7 @@ public class AsyncTI4DiscordBot {
         BotLogger.logWithTimestamp(" LOADING GAMES");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
         GameSaveLoadManager.loadGame();
+        GameSaveLoadManager.cleanupOldUndoFiles();
 
         // RUN DATA MIGRATIONS
         BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
