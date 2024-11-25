@@ -74,6 +74,7 @@ class Info extends GameStateSubcommand {
         sb.append("Map Template: `").append(game.getMapTemplateID()).append("`").append("\n");
         if (!privateGame || game.isHasEnded()) {
             sb.append("Map String: `").append(game.getMapString()).append("`").append("\n");
+            sb.append("Hex Summary: `").append(game.getHexSummary()).append("`").append("\n");
         } else {
             sb.append("Map String: Cannot show map string for private games").append("\n");
         }
