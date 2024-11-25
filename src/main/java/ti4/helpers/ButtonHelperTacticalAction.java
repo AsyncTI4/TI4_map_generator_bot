@@ -462,9 +462,9 @@ public class ButtonHelperTacticalAction {
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         if (needPDSCheck && !game.isL1Hero() && !playersWithPds2.isEmpty()) {
-            StartCombatService.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game,
-                player, tile);
+            StartCombatService.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game, player, tile);
         }
+        StartCombatService.combatCheck(game, event, tile);
         ButtonHelper.deleteMessage(event);
     }
 

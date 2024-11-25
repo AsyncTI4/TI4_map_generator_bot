@@ -24,7 +24,7 @@ class SendACRandom extends GameStateSubcommand {
         Game game = getGame();
         Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (otherPlayer == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
         ActionCardHelper.sendRandomACPart2(event, game, getPlayer(), otherPlayer);

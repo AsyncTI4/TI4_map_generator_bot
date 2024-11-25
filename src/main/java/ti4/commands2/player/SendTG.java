@@ -38,6 +38,10 @@ class SendTG extends GameStateSubcommand {
         ButtonHelperAbilities.pillageCheck(player, game);
 
         Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (targetPlayer == null) {
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
+            return;
+        }
         int targetTG = targetPlayer.getTg();
         targetTG += sendTG;
         targetPlayer.setTg(targetTG);

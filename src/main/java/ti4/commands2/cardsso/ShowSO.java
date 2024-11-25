@@ -57,7 +57,7 @@ class ShowSO extends GameStateSubcommand {
 
         Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (targetPlayer == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player not found");
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
 

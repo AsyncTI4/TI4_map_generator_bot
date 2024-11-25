@@ -45,7 +45,7 @@ class ShowRandomSO extends GameStateSubcommand {
 
         Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (otherPlayer == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player not found");
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
 
