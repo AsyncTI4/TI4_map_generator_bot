@@ -3,8 +3,6 @@ package ti4.cron;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -36,22 +34,9 @@ public class AutoPingCron {
     private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
     private static final long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
-    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
-    public static void start() {
-        SCHEDULER.scheduleAtFixedRate(AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
-    }
-
-    public static void shutdown() {
-        SCHEDULER.shutdown();
-        try {
-            if (!SCHEDULER.awaitTermination(10, TimeUnit.SECONDS)) {
-                SCHEDULER.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            SCHEDULER.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
+    public static void register() {
+        CronManager.register(AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
     }
 
     private static void autoPingGames() {

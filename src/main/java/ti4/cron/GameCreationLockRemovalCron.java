@@ -2,8 +2,6 @@ package ti4.cron;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import lombok.experimental.UtilityClass;
@@ -14,10 +12,8 @@ import ti4.model.metadata.GameCreationLocks;
 @UtilityClass
 public class GameCreationLockRemovalCron {
 
-    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
-
-    public static void start() {
-        SCHEDULER.scheduleAtFixedRate(GameCreationLockRemovalCron::removeGameCreationLocks, 1, 10, TimeUnit.MINUTES);
+    public static void register() {
+        CronManager.register(GameCreationLockRemovalCron::removeGameCreationLocks, 1, 10, TimeUnit.MINUTES);
     }
 
     private static void removeGameCreationLocks() {
@@ -34,18 +30,6 @@ public class GameCreationLockRemovalCron {
             }
         } catch (Exception e) {
             BotLogger.log("Failed to remove game creation locks.", e);
-        }
-    }
-
-    public static void shutdown() {
-        SCHEDULER.shutdown();
-        try {
-            if (!SCHEDULER.awaitTermination(10, TimeUnit.SECONDS)) {
-                SCHEDULER.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            SCHEDULER.shutdownNow();
-            Thread.currentThread().interrupt();
         }
     }
 }

@@ -2,9 +2,9 @@ package ti4.cron;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.experimental.UtilityClass;
@@ -21,20 +21,8 @@ public class UploadStatsCron {
     private static final int UPLOAD_STATS_INTERVAL_DAYS = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_STATS_INTERVAL_DAYS.toString(), Integer.class, 7);
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
-    public static void start() {
-        SCHEDULER.scheduleAtFixedRate(UploadStatsCron::uploadStats, 2, 8, TimeUnit.HOURS);
-    }
-
-    public static void shutdown() {
-        SCHEDULER.shutdown();
-        try {
-            if (!SCHEDULER.awaitTermination(10, TimeUnit.SECONDS)) {
-                SCHEDULER.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            SCHEDULER.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
+    public static void register() {
+        CronManager.register(UploadStatsCron::uploadStats, 0, 0, ZoneId.of("America/New_York"));
     }
 
     private static void uploadStats() {
