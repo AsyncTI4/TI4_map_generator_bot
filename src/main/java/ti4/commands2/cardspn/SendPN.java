@@ -73,7 +73,7 @@ class SendPN extends GameStateSubcommand {
 		Game game = getGame();
 		Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
 		if (targetPlayer == null) {
-			MessageHelper.sendMessageToEventChannel(event, "No such Player in game");
+			MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
 			return;
 		}
 

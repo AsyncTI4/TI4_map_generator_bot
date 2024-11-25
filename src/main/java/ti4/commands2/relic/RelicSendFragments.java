@@ -11,6 +11,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.RelicHelper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 class RelicSendFragments extends GameStateSubcommand {
 
@@ -31,6 +32,10 @@ class RelicSendFragments extends GameStateSubcommand {
 		Game game = getGame();
 		Player sender = getPlayer();
 		Player receiver = CommandHelper.getOtherPlayerFromEvent(game, event);
+		if (receiver == null) {
+			MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
+			return;
+		}
 		String trait = event.getOption(Constants.TRAIT, null, OptionMapping::getAsString);
 		int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
 		ButtonHelperAbilities.pillageCheck(sender, game);

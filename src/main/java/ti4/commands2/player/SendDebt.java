@@ -32,6 +32,10 @@ class SendDebt extends GameStateSubcommand {
         Game game = getGame();
         Player sendingPlayer = getPlayer();
         Player receivingPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (receivingPlayer == null) {
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
+            return;
+        }
         SendDebtService.sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
         CommanderUnlockCheckService.checkPlayer(receivingPlayer, "vaden");
         MessageHelper.sendMessageToEventChannel(event, sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation());

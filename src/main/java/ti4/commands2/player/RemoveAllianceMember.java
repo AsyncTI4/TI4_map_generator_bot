@@ -26,6 +26,10 @@ class RemoveAllianceMember extends GameStateSubcommand {
         Game game = getGame();
         Player player = getPlayer();
         Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (targetPlayer == null) {
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
+            return;
+        }
         if (targetPlayer.getAllianceMembers().contains(player.getFaction())) {
             targetPlayer.removeAllianceMember(player.getFaction());
         }

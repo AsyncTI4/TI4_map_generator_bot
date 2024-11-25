@@ -44,7 +44,7 @@ class SendAC extends GameStateSubcommand {
         Game game = getGame();
         Player playerToSendTo = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (playerToSendTo == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
 

@@ -14,7 +14,7 @@ import ti4.map.Tile;
 public class RemoveAllUnitDamage extends GameStateCommand {
 
     public RemoveAllUnitDamage() {
-        super(true, false);
+        super(true, true);
     }
 
     @Override

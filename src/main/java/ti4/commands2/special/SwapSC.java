@@ -25,7 +25,10 @@ class SwapSC extends GameStateSubcommand {
         Game game = getGame();
         Player player1 = getPlayer();
         Player player2 = CommandHelper.getOtherPlayerFromEvent(game, event);
-
+        if (player2 == null) {
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
+            return;
+        }
         if (player1.equals(player2)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Players provided are the same player");
             return;

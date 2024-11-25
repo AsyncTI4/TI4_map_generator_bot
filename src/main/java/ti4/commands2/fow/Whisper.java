@@ -31,7 +31,7 @@ class Whisper extends GameStateSubcommand {
 
         Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (otherPlayer == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to send message to could not be found");
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
 
