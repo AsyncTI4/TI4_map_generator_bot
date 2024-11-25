@@ -28,7 +28,9 @@
         "playImmediately": false,
         "attachment": "encryptionkey",
         "source": "ds",
-        "text": "Action: Attach this card to a non-home planet you control.\nThis planet has 1 technology specialty of any color."
+        "text": "Action: Attach this card to a non-home planet you control.\nThis planet has 1 technology specialty of any color.",
+        "shortName": "Encrypt. Key",
+        "shrinkName": true
     },
     {
         "alias": "dspnblex",
@@ -132,7 +134,8 @@
         "playImmediately": false,
         "attachment": "gledgebase",
         "source": "ds",
-        "text": "Action: Attach this card to a non-home planet you control.\nThis planet's resource value is increased by 2."
+        "text": "Action: Attach this card to a non-home planet you control.\nThis planet's resource value is increased by 2.",
+        "shrinkName": true
     },
     {
         "alias": "dspnkhra",
@@ -169,7 +172,8 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "At the start of invasion, place this card in your play area.\nDuring this invasion, all other player's units lose SPACE CANNON and PLANETARY SHIELD.\nAt the start of your next turn, return this card to the Kolume player."
+        "text": "At the start of invasion, place this card in your play area.\nDuring this invasion, all other player's units lose SPACE CANNON and PLANETARY SHIELD.\nAt the start of your next turn, return this card to the Kolume player.",
+        "shortName": "Combin't'r'l\nBypass"
     },
     {
         "alias": "dspnkort",
@@ -179,7 +183,8 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "Action: Place this card face up in your play area and remove 1 of your command tokens from the game board.\nAt the start of the status phase, return this card to the Kortali player."
+        "text": "Action: Place this card face up in your play area and remove 1 of your command tokens from the game board.\nAt the start of the status phase, return this card to the Kortali player.",
+        "shrinkName": true
     },
     {
         "alias": "dspnkyro",
@@ -274,7 +279,8 @@
         "playImmediately": false,
         "attachment": "automatons",
         "source": "ds",
-        "text": "At the end of your turn, you may attach this card to a non-home planet you control other than Mecatol Rex.\nThis planet has PRODUCTION 3 as if it were a unit."
+        "text": "At the end of your turn, you may attach this card to a non-home planet you control other than Mecatol Rex.\nThis planet has PRODUCTION 3 as if it were a unit.",
+        "shrinkName": true
     },
     {
         "alias": "dspntnel",
@@ -310,9 +316,11 @@
         "color": "",
         "playArea": true,
         "playImmediately": true,
-        "attachment": "veldyr1",
+        "attachment": "veldyrtaxhaven",
         "source": "ds",
-        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts influence value is increased by 1."
+        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts influence value is increased by 1.",
+        "shortName": "Br. Office I",
+        "shrinkName": true
     },
     {
         "alias": "dspnveld2",
@@ -321,9 +329,11 @@
         "color": "",
         "playArea": true,
         "playImmediately": true,
-        "attachment": "veldyr2",
+        "attachment": "veldyrbroadcasthub",
         "source": "ds",
-        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts influence value is increased by 1."
+        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts influence value is increased by 1.",
+        "shortName": "Br. Office I",
+        "shrinkName": true
     },
     {
         "alias": "dspnveld3",
@@ -332,9 +342,11 @@
         "color": "",
         "playArea": true,
         "playImmediately": true,
-        "attachment": "veldyr3",
+        "attachment": "veldyrreservebank",
         "source": "ds",
-        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts resource value is increased by 1."
+        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts resource value is increased by 1.",
+        "shortName": "Br. Office R",
+        "shrinkName": true
     },
     {
         "alias": "dspnveld4",
@@ -343,9 +355,11 @@
         "color": "",
         "playArea": true,
         "playImmediately": true,
-        "attachment": "veldyr4",
+        "attachment": "veldyrorbitalshipyard",
         "source": "ds",
-        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts resource value is increased by 1."
+        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts resource value is increased by 1.",
+        "shortName": "Br. Office R",
+        "shrinkName": true
     },
     {
         "alias": "dspnrhod",
