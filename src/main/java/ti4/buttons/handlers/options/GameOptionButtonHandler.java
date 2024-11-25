@@ -17,6 +17,13 @@ class GameOptionButtonHandler {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("disableAidReacts")
+    public static void disableAidReact(ButtonInteractionEvent event, Game game) {
+        game.setBotFactionReacts(false);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Faction reaction icons have been disabled. Use `/game options` to change this.");
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("showHexBorders_")
     public static void editShowHexBorders(ButtonInteractionEvent event, Game game, String buttonID) {
         String value = buttonID.replace("showHexBorders_", "");
