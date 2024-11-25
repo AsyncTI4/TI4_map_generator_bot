@@ -68,10 +68,10 @@ class CreateGameButton extends Subcommand {
                 Member member = event.getOption("player" + i).getAsMember();
                 if (member != null)
                     members.add(member);
-                // TODO: MAGICAL USER NUMBER...?
+                // Rodrigo, a player we're limiting to 7 games rn
                 if (member.getId().equalsIgnoreCase("400038967744921612")) {
                     int amount = SearchGameHelper.searchGames(member.getUser(), event, false, false, false, true, false, true, false, true);
-                    if (amount > 4) {
+                    if (amount > 6) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "One of the games proposed members is currently under a limit and cannot join more games at this time");
                         return;
                     }
