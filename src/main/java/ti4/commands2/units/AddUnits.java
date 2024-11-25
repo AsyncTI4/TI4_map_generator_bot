@@ -11,6 +11,7 @@ import ti4.commands2.GameStateCommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Tile;
+import ti4.service.combat.StartCombatService;
 import ti4.service.unit.AddUnitService;
 
 public class AddUnits extends GameStateCommand {
@@ -61,8 +62,10 @@ public class AddUnits extends GameStateCommand {
 
         String color = getPlayer().getColor();
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
+
         AddUnitService.addUnits(event, tile, game, color, unitList);
 
+        StartCombatService.combatCheck(game, event, tile);
         handleSlingRelayOption(event);
         UnitCommandHelper.handleCcUseOption(event, tile, color, game);
         UnitCommandHelper.handleGenerateMapOption(event, game);

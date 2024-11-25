@@ -20,10 +20,10 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -747,11 +747,14 @@ public class FoWHelper {
 	}
 
 	public static boolean playerHasUnitsOnPlanet(Player player, Tile tile, String planet) {
+		return playerHasUnitsOnPlanet(player, tile.getUnitHolders().get(planet));
+	}
+
+	public static boolean playerHasUnitsOnPlanet(Player player, UnitHolder unitHolder) {
 		String colorID = Mapper.getColorID(player.getColor());
 		if (colorID == null)
 			return false; // player doesn't have a color
 
-		UnitHolder unitHolder = tile.getUnitHolders().get(planet);
 		Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
 		for (UnitKey unitKey : units.keySet()) {

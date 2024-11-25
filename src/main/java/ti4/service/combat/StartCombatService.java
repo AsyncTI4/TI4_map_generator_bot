@@ -2,6 +2,7 @@ package ti4.service.combat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -19,6 +20,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CommandCounterHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -35,50 +37,55 @@ import ti4.service.leader.CommanderUnlockCheckService;
 @UtilityClass
 public class StartCombatService {
 
-    public static String combatThreadName(Game game, Player player1, @Nullable Player player2, Tile tile) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(game.getName()).append("-round-").append(game.getRound()).append("-system-")
-            .append(tile.getPosition()).append("-turn-").append(player1.getInRoundTurnCount()).append("-");
-        if (game.isFowMode()) {
-            sb.append(player1.getColor());
-            if (player2 != null)
-                sb.append("-vs-").append(player2.getColor()).append("-private");
-        } else {
-            sb.append(player1.getFaction());
-            if (player2 != null)
-                sb.append("-vs-").append(player2.getFaction());
+    public static void combatCheckEachTile(Game game, GenericInteractionCreateEvent event) {
+        for (Tile tile : game.getTileMap().values()) {
+            combatCheck(game, event, tile);
         }
-        return sb.toString();
     }
 
+    public static void combatCheck(Game game, GenericInteractionCreateEvent event, Tile tile) {
+        spaceCombatCheck(game, tile, event);
+        tile.getUnitHolders().values().stream()
+            .filter(unitHolder -> !Constants.SPACE.equals(unitHolder.getName()))
+            .forEach(unitHolder -> groundCombatCheck(game, unitHolder, tile, event));
+    }
+
+    public static void spaceCombatCheck(Game game, Tile tile, GenericInteractionCreateEvent event) {
+        List<Player> playersWithShipsInSystem = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile);
+        if (playersWithShipsInSystem.size() <= 1) {
+            return;
+        }
+        Player player = playersWithShipsInSystem.getFirst();
+        playersWithShipsInSystem.stream()
+            .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
+            .findFirst()
+            .ifPresent(enemyPlayer -> startSpaceCombat(game, player, enemyPlayer, tile, event));
+    }
+
+    public static boolean groundCombatCheck(Game game, UnitHolder unitHolder, Tile tile, GenericInteractionCreateEvent event) {
+        List<Player> playersWithUnitsOnPlanet = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, unitHolder);
+        if (playersWithUnitsOnPlanet.size() <= 1) {
+            return false;
+        }
+        Player player = playersWithUnitsOnPlanet.getFirst();
+        Optional<Player> enemyPlayer = playersWithUnitsOnPlanet.stream()
+            .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
+            .findFirst();
+        if (enemyPlayer.isPresent()) {
+            startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
+            return true;
+        }
+        return false;
+    }
+
+    // TODO: can we get rid of this and just have the command do a combat check?
     public static void findOrCreateCombatThread(Game game, MessageChannel channel, Player player1, Player player2,
-        Tile tile, GenericInteractionCreateEvent event, String spaceOrGround, String unitHolderName) {
+                                                    Tile tile, GenericInteractionCreateEvent event, String spaceOrGround, String unitHolderName) {
         findOrCreateCombatThread(game, channel, player1, player2, null, tile, event, spaceOrGround, unitHolderName);
     }
 
-    public static void startSpaceCombat(Game game, Player player, Player player2, Tile tile, GenericInteractionCreateEvent event) {
+    private static void startSpaceCombat(Game game, Player player, Player player2, Tile tile, GenericInteractionCreateEvent event) {
         startSpaceCombat(game, player, player2, tile, event, null);
-    }
-
-    private static String combatThreadName(Game game, Player player1, @Nullable Player player2, Tile tile, String specialCombatTitle) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(game.getName()).append("-round-").append(game.getRound()).append("-system-")
-            .append(tile.getPosition()).append("-turn-").append(player1.getInRoundTurnCount()).append("-");
-        if (game.isFowMode()) {
-            sb.append(player1.getColor());
-            if (player2 != null) {
-                sb.append("-vs-").append(player2.getColor());
-            }
-            sb.append(specialCombatTitle != null ? specialCombatTitle : "");
-            sb.append("-private");
-        } else {
-            sb.append(player1.getFaction());
-            if (player2 != null) {
-                sb.append("-vs-").append(player2.getFaction());
-            }
-            sb.append(specialCombatTitle != null ? specialCombatTitle : "");
-        }
-        return sb.toString();
     }
 
     public static void startSpaceCombat(Game game, Player player, Player player2, Tile tile, GenericInteractionCreateEvent event, String specialCombatTitle) {
@@ -86,22 +93,22 @@ public class StartCombatService {
         if (!game.isFowMode()) {
             findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,
                 threadName, tile, event, "space", "space");
-        } else {
-            findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
+            return;
+        }
+        findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
+            threadName, tile, event, "space", "space");
+        if (player2.getPrivateChannel() != null) {
+            findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
                 threadName, tile, event, "space", "space");
-            if (player2.getPrivateChannel() != null) {
-                findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
-                    threadName, tile, event, "space", "space");
+        }
+        for (Player player3 : game.getRealPlayers()) {
+            if (player3 == player2 || player3 == player) {
+                continue;
             }
-            for (Player player3 : game.getRealPlayers()) {
-                if (player3 == player2 || player3 == player) {
-                    continue;
-                }
-                if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
-                    continue;
-                }
-                createSpectatorThread(game, player3, threadName, tile, event, "space");
+            if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
+                continue;
             }
+            createSpectatorThread(game, player3, threadName, tile, event, "space");
         }
     }
 
@@ -144,7 +151,8 @@ public class StartCombatService {
         }
     }
 
-    public static void findOrCreateCombatThread(Game game, MessageChannel channel, Player player1, Player player2, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround, String unitHolderName) {
+    private static void findOrCreateCombatThread(Game game, MessageChannel channel, Player player1, Player player2, String threadName, Tile tile,
+                                                    GenericInteractionCreateEvent event, String spaceOrGround, String unitHolderName) {
         Helper.checkThreadLimitAndArchive(event.getGuild());
         if (threadName == null)
             threadName = combatThreadName(game, player1, player2, tile);
@@ -301,8 +309,7 @@ public class StartCombatService {
         sendGeneralCombatButtonsToThread(threadChannel, game, player, player, tile, "justPicture", event);
     }
 
-    public static void sendSpaceCannonButtonsToThread(MessageChannel threadChannel, Game game,
-        Player activePlayer, Tile tile) {
+    public static void sendSpaceCannonButtonsToThread(MessageChannel threadChannel, Game game, Player activePlayer, Tile tile) {
         StringBuilder pdsMessage = new StringBuilder();
         if (game.isFowMode()) {
             pdsMessage.append("In fog, it is the Players' responsibility to check for PDS2\n");
@@ -592,10 +599,7 @@ public class StartCombatService {
             return buttons;
         }
         buttons.add(Buttons.red("getDamageButtons_" + pos + "_" + groundOrSpace + "combat", "Assign Hits"));
-        // if (getButtonsForRepairingUnitsInASystem(p1, game, tile).size() > 1 ||
-        // getButtonsForRepairingUnitsInASystem(p2, game, tile).size() > 1) {
         buttons.add(Buttons.green("getRepairButtons_" + pos, "Repair Damage"));
-        // }
         buttons.add(Buttons.blue(
             "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,
             "Refresh Picture"));
@@ -607,9 +611,6 @@ public class StartCombatService {
                 "Use Ul Agent", Emojis.Titans));
         }
         if (p1.hasTechReady("sc") || (!game.isFowMode() && p2.hasTechReady("sc"))) {
-            // TemporaryCombatModifierModel combatModAC =
-            // CombatTempModHelper.GetPossibleTempModifier("tech", "sc",
-            // p1.getNumberTurns());
             buttons.add(Buttons.green("applytempcombatmod__" + "tech" + "__" + "sc", "Use Supercharge", Emojis.Naaz));
         }
 
@@ -726,26 +727,6 @@ public class StartCombatService {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "startDevotion_" + tile.getPosition(), "Devotion", Emojis.Yin));
         }
-
-        // if (isSpaceCombat && game.playerHasLeaderUnlockedOrAlliance(p2,
-        // "mentakcommander") && !game.isFoWMode()) {
-        // String finChecker = "FFCC_" + p2.getFaction() + "_";
-        // buttons.add(Buttons.gray(finChecker + "mentakCommander_" + p1.getColor(),
-        // "Mentak Commander on " +
-        // p1.getColor(), Emojis.Mentak);
-        // }
-        // if (isSpaceCombat && ((p1.hasTech("so")) || (!game.isFoWMode() &&
-        // p2.hasTech("so")))) {
-        // buttons.add(Buttons.gray("salvageOps_" + tile.getPosition(), "Salvage
-        // Ops", Emojis.Mentak);
-        // }
-        // if (isSpaceCombat && game.playerHasLeaderUnlockedOrAlliance(p1,
-        // "mentakcommander")) {
-        // String finChecker = "FFCC_" + p1.getFaction() + "_";
-        // buttons.add(Buttons.gray(finChecker + "mentakCommander_" + p2.getColor(),
-        // "Mentak Commander on " +
-        // p2.getColor(), Emojis.Mentak);
-        // }
 
         if (isSpaceCombat && game.playerHasLeaderUnlockedOrAlliance(p2, "mykomentoricommander")
             && !game.isFowMode()) {
@@ -978,5 +959,42 @@ public class StartCombatService {
                 > 5. Start of Combat (Morale Boost, etc.)
                 > 6. Roll Dice!
                 """;
+    }
+
+    private static String combatThreadName(Game game, Player player1, @Nullable Player player2, Tile tile, String specialCombatTitle) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(game.getName()).append("-round-").append(game.getRound()).append("-system-")
+            .append(tile.getPosition()).append("-turn-").append(player1.getInRoundTurnCount()).append("-");
+        if (game.isFowMode()) {
+            sb.append(player1.getColor());
+            if (player2 != null) {
+                sb.append("-vs-").append(player2.getColor());
+            }
+            sb.append(specialCombatTitle != null ? specialCombatTitle : "");
+            sb.append("-private");
+        } else {
+            sb.append(player1.getFaction());
+            if (player2 != null) {
+                sb.append("-vs-").append(player2.getFaction());
+            }
+            sb.append(specialCombatTitle != null ? specialCombatTitle : "");
+        }
+        return sb.toString();
+    }
+
+    private static String combatThreadName(Game game, Player player1, @Nullable Player player2, Tile tile) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(game.getName()).append("-round-").append(game.getRound()).append("-system-")
+            .append(tile.getPosition()).append("-turn-").append(player1.getInRoundTurnCount()).append("-");
+        if (game.isFowMode()) {
+            sb.append(player1.getColor());
+            if (player2 != null)
+                sb.append("-vs-").append(player2.getColor()).append("-private");
+        } else {
+            sb.append(player1.getFaction());
+            if (player2 != null)
+                sb.append("-vs-").append(player2.getFaction());
+        }
+        return sb.toString();
     }
 }

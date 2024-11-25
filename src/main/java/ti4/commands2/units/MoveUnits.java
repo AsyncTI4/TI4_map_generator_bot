@@ -12,6 +12,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
+import ti4.service.combat.StartCombatService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
@@ -83,6 +84,7 @@ public class MoveUnits extends GameStateCommand {
         String toUnitList = event.getOption(Constants.UNIT_NAMES_TO).getAsString();
         AddUnitService.addUnits(event, tileTo, game, color, toUnitList);
 
+        StartCombatService.combatCheck(game, event, tileTo);
         UnitCommandHelper.handleCcUseOption(event, tileTo, color, game);
         UnitCommandHelper.handleGenerateMapOption(event, game);
     }

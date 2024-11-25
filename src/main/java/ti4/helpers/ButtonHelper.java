@@ -1874,9 +1874,9 @@ public class ButtonHelper {
 
     public static List<Player> getPlayersWithShipsInTheSystem(Game game, Tile tile) {
         List<Player> playersWithShips = new ArrayList<>();
-        for (Player p2 : game.getRealPlayersNNeutral()) {
-            if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
-                playersWithShips.add(p2);
+        for (Player player : game.getRealPlayersNNeutral()) {
+            if (FoWHelper.playerHasShipsInSystem(player, tile)) {
+                playersWithShips.add(player);
             }
         }
         return playersWithShips;
@@ -1904,14 +1904,18 @@ public class ButtonHelper {
         return playersWithShips;
     }
 
-    public static List<Player> getPlayersWithUnitsOnAPlanet(Game game, Tile tile, String planet) {
-        List<Player> playersWithShips = new ArrayList<>();
+    public static List<Player> getPlayersWithUnitsOnAPlanet(Game game, UnitHolder unitHolder) {
+        List<Player> playersWithUnits = new ArrayList<>();
         for (Player p2 : game.getPlayers().values()) {
-            if (FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet)) {
-                playersWithShips.add(p2);
+            if (FoWHelper.playerHasUnitsOnPlanet(p2, unitHolder)) {
+                playersWithUnits.add(p2);
             }
         }
-        return playersWithShips;
+        return playersWithUnits;
+    }
+
+    public static List<Player> getPlayersWithUnitsOnAPlanet(Game game, Tile tile, String planet) {
+        return getPlayersWithUnitsOnAPlanet(game, tile.getUnitHolderFromPlanet(planet));
     }
 
     public static List<Tile> getTilesWithYourCC(Player player, Game game, GenericInteractionCreateEvent event) {
