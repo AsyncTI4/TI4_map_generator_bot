@@ -19,7 +19,7 @@ import ti4.message.BotLogger;
 
 public class MapRenderPipeline {
 
-    private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 10;
+    private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 20;
     private static final MapRenderPipeline instance = new MapRenderPipeline();
 
     private final BlockingQueue<RenderEvent> gameRenderQueue = new LinkedBlockingQueue<>();
