@@ -22,7 +22,7 @@ public class UploadStatsCron {
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
     public static void register() {
-        CronManager.register(UploadStatsCron::uploadStats, 0, 0, ZoneId.of("America/New_York"));
+        CronManager.register(UploadStatsCron.class, UploadStatsCron::uploadStats, 0, 0, ZoneId.of("America/New_York"));
     }
 
     private static void uploadStats() {

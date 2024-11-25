@@ -36,7 +36,7 @@ public class AutoPingCron {
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
 
     public static void register() {
-        CronManager.register(AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
+        CronManager.register(AutoPingCron.class, AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
     }
 
     private static void autoPingGames() {

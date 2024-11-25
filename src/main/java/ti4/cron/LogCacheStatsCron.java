@@ -26,7 +26,7 @@ public class LogCacheStatsCron {
     }
 
     public static void register() {
-        CronManager.register(LogCacheStatsCron::logCacheStats, LOG_CACHE_STATS_INTERVAL_MINUTES, LOG_CACHE_STATS_INTERVAL_MINUTES, TimeUnit.MINUTES);
+        CronManager.register(LogCacheStatsCron.class, LogCacheStatsCron::logCacheStats, LOG_CACHE_STATS_INTERVAL_MINUTES, LOG_CACHE_STATS_INTERVAL_MINUTES, TimeUnit.MINUTES);
     }
 
     private static void logCacheStats() {

@@ -13,7 +13,7 @@ import ti4.model.metadata.GameCreationLocks;
 public class GameCreationLockRemovalCron {
 
     public static void register() {
-        CronManager.register(GameCreationLockRemovalCron::removeGameCreationLocks, 1, 10, TimeUnit.MINUTES);
+        CronManager.register(GameCreationLockRemovalCron.class, GameCreationLockRemovalCron::removeGameCreationLocks, 1, 10, TimeUnit.MINUTES);
     }
 
     private static void removeGameCreationLocks() {
