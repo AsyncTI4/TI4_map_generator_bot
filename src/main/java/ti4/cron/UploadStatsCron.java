@@ -2,13 +2,10 @@ package ti4.cron;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.time.ZoneId;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.time.StopWatch;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.WebHelper;
 import ti4.map.PersistenceManager;
@@ -19,37 +16,21 @@ public class UploadStatsCron {
 
     private static final String JSON_DATA_FILE_NAME = "UploadStatsCronData.json";
     private static final int UPLOAD_STATS_INTERVAL_DAYS = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_STATS_INTERVAL_DAYS.toString(), Integer.class, 7);
-    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
-    public static void start() {
-        SCHEDULER.scheduleAtFixedRate(UploadStatsCron::uploadStats, 2, 8, TimeUnit.HOURS);
-    }
-
-    public static void shutdown() {
-        SCHEDULER.shutdown();
-        try {
-            if (!SCHEDULER.awaitTermination(10, TimeUnit.SECONDS)) {
-                SCHEDULER.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            SCHEDULER.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
+    public static void register() {
+        CronManager.register(UploadStatsCron.class, UploadStatsCron::uploadStats, 0, 0, ZoneId.of("America/New_York"));
     }
 
     private static void uploadStats() {
-        var stopWatch = StopWatch.createStarted();
-
         var uploadStatsCronData = readUploadStatsCronData();
         if (uploadStatsCronData != null && uploadStatsCronData.lastUpload != null &&
                 uploadStatsCronData.lastUpload.plusDays(UPLOAD_STATS_INTERVAL_DAYS).isBefore(LocalDate.now())) {
             return;
         }
 
-        BotLogger.log("Starting stats upload.");
         WebHelper.putStats();
         persistUploadStatsCronData();
-        BotLogger.log("Finished stats upload in: " + stopWatch.getDuration());
+        BotLogger.log("Stats uploaded successfully.");
     }
 
     private static UploadStatsCronData readUploadStatsCronData() {
