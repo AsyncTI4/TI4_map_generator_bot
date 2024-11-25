@@ -590,10 +590,6 @@ public class ConvertTTPGtoAsync {
             case "17" -> { //DeltaWH
                 //TODO: move Creuss if exists in tileList - i.e. if 17 is near BL, put 51 in BL
             }
-            case "54" -> { //Cabal, add S11 cabal prison nearby - i.e. if 54 is near BR, put S11 in BR
-                Tile prison = new Tile("s11", "br"); //hardcode bottom right for now
-                asyncGame.setTile(prison);
-            }
         }
 
         if (asyncPosition == null) {
