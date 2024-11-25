@@ -2,7 +2,6 @@
     "id": "hellsmaw",
     "tileId": "er03",
     "name": "Hell's Maw",
-    "shortName": null,
     "aliases": ["hellsmaw", "hell'smaw", "hell", "maw"],
     "positionInTile": {
         "x": 135.0,
