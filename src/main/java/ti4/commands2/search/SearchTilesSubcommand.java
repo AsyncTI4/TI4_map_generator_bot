@@ -66,10 +66,10 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
         boolean include_draft = event.getOption(INCLUDE_DRAFT_TILES, false, OptionMapping::getAsBoolean);
         boolean include_hyperlanes = event.getOption(INCLUDE_HYPERLANES, false, OptionMapping::getAsBoolean);
         Boolean with_anomalies = event.getOption(WITH_ANOMALY, null, OptionMapping::getAsBoolean);
-        Boolean with_asteroids = event.getOption(WITH_ANOMALY, null, OptionMapping::getAsBoolean);
-        Boolean with_grifts = event.getOption(WITH_ANOMALY, null, OptionMapping::getAsBoolean);
-        Boolean with_nebula = event.getOption(WITH_ANOMALY, null, OptionMapping::getAsBoolean);
-        Boolean with_supernova = event.getOption(WITH_ANOMALY, null, OptionMapping::getAsBoolean);
+        Boolean with_asteroids = event.getOption(WITH_ASTEROID, null, OptionMapping::getAsBoolean);
+        Boolean with_grifts = event.getOption(WITH_GRAVITY_RIFT, null, OptionMapping::getAsBoolean);
+        Boolean with_nebula = event.getOption(WITH_NEBULA, null, OptionMapping::getAsBoolean);
+        Boolean with_supernova = event.getOption(WITH_SUPERNOVA, null, OptionMapping::getAsBoolean);
 
         List<Entry<TileModel, MessageEmbed>> tileEmbeds = new ArrayList<>();
         if (TileHelper.isValidTile(searchString)) {

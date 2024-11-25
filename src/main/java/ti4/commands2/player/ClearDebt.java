@@ -30,6 +30,11 @@ class ClearDebt extends GameStateSubcommand {
         Game game = getGame();
         Player clearingPlayer = getPlayer();
         Player clearedPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (clearedPlayer == null) {
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
+            return;
+        }
+
         if (debtCountToClear > clearingPlayer.getDebtTokenCount(clearedPlayer.getColor())) {
             MessageHelper.sendMessageToEventChannel(event, "You cannot clear more debt tokens than you have");
             return;

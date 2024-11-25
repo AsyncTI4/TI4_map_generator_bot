@@ -28,7 +28,7 @@ class AddAllianceMember extends GameStateSubcommand {
         }
         Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (otherPlayer == null || !otherPlayer.isRealPlayer()) {
-            MessageHelper.sendMessageToEventChannel(event, "Player to add to the alliance could not be found");
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
         String currentMembers = otherPlayer.getAllianceMembers();

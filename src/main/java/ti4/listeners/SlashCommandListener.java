@@ -59,34 +59,27 @@ public class SlashCommandListener extends ListenerAdapter {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
             event.getChannel().sendMessage(commandText).queue(m -> {
                 BotLogger.logSlashCommand(event, m);
-                boolean harmless = false;
-                if (!event.getInteraction().getName().equals(Constants.HELP)
-                    && !event.getInteraction().getName().equals(Constants.STATISTICS)
-                    && !event.getInteraction().getName().equals(Constants.BOTHELPER)
-                    && !event.getInteraction().getName().equals(Constants.DEVELOPER)
-                    && (event.getInteraction().getSubcommandName() == null || !event.getInteraction()
-                        .getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
-                    && !event.getInteraction().getName().equals(Constants.SEARCH)
-                    && !event.getInteraction().getName().equals(Constants.USER)
-                        & !event.getInteraction().getName().equals(Constants.SHOW_GAME)
-                    && event.getOption(Constants.GAME_NAME) == null) {
-                } else {
-                    harmless = true;
-                }
                 String gameName = CommandHelper.getGameNameFromChannel(event);
                 Game game = GameManager.getGame(gameName);
-                if (game != null && !game.isFowMode() && !harmless
-                    && game.getName().contains("pbd") && !game.getName().contains("pbd1000") && !game.getName().contains("pbd100two")) {
+                boolean harmless = event.getInteraction().getName().equals(Constants.HELP)
+                    || event.getInteraction().getName().equals(Constants.STATISTICS)
+                    || event.getInteraction().getName().equals(Constants.BOTHELPER)
+                    || event.getInteraction().getName().equals(Constants.DEVELOPER)
+                    || (event.getInteraction().getSubcommandName() != null && event.getInteraction()
+                    .getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
+                    || event.getInteraction().getName().equals(Constants.SEARCH)
+                    || !(!event.getInteraction().getName().equals(Constants.USER) && !event.getInteraction().getName().equals(Constants.SHOW_GAME))
+                    || event.getOption(Constants.GAME_NAME) != null;
+                if (game != null && !game.isFowMode() && !harmless && game.getName().contains("pbd") && !game.getName().contains("pbd1000")
+                        && !game.getName().contains("pbd100two")) {
                     if (event.getMessageChannel() instanceof ThreadChannel thread) {
                         if (!thread.isPublic()) {
                             reportSusSlashCommand(event, m);
                         }
-                    } else {
-                        if (event.getMessageChannel() != game.getActionsChannel()
+                    } else if (event.getMessageChannel() != game.getActionsChannel()
                             && event.getMessageChannel() != game.getTableTalkChannel()
                             && !event.getMessageChannel().getName().contains("bot-map-updates")) {
-                            reportSusSlashCommand(event, m);
-                        }
+                        reportSusSlashCommand(event, m);
                     }
                 }
             }, BotLogger::catchRestError);

@@ -10,6 +10,7 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -232,6 +233,31 @@ public class GameSaveLoadManager {
             return loadGame(gameFile);
         }
         return null;
+    }
+
+    private static File getMapUndoDirectory() {
+        File mapUndoDirectory = Storage.getGameUndoDirectory();
+        if (!mapUndoDirectory.exists()) {
+            mapUndoDirectory.mkdir();
+        }
+        return mapUndoDirectory;
+    }
+
+    public static void cleanupOldUndoFiles() {
+        File mapUndoDirectory = getMapUndoDirectory();
+        String[] mapUndoFiles = mapUndoDirectory.list();
+        if (mapUndoFiles == null) {
+            return;
+        }
+        int count = 0;
+        long daysOld = 60;
+        Date tooOld = Date.from(Instant.ofEpochMilli(Instant.now().toEpochMilli() - (daysOld * 24 * 60 * 60 * 1000)));
+        for (String mapFilePath : mapUndoFiles) {
+            File mapToDelete = Storage.getGameUndoStorage(mapFilePath);
+            Date lastModified = Date.from(Instant.ofEpochMilli(mapToDelete.lastModified()));
+            if (lastModified.before(tooOld) && mapToDelete.delete()) count++;
+        }
+        BotLogger.log("Cleaned up `" + count + "` undo files that were over `" + daysOld + "` days old (" + tooOld + ")");
     }
 
     private static void saveGameInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {

@@ -19,6 +19,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
@@ -642,5 +643,13 @@ public class Tile {
 
     public static Predicate<Tile> tileHasPlayerUnits(Player player) {
         return tile -> tile.containsPlayersUnits(player);
+    }
+
+    public String getHexTileSummary() {
+        // TILE +-X +-Y SPACE ; PLANET1 ; PLANET2 ;
+        StringBuilder sb = new StringBuilder();
+        sb.append(getTileID());
+        sb.append(AliasHandler.resolveTTPGPosition(getPosition()));
+        return sb.toString();
     }
 }

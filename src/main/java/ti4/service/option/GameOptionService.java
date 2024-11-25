@@ -15,7 +15,7 @@ public class GameOptionService {
     public static void offerGameOptionButtons(MessageChannel channel) {
         List<Button> factionReactButtons = new ArrayList<>();
         factionReactButtons.add(Buttons.green("enableAidReacts", "Enable Faction Reactions"));
-        factionReactButtons.add(Buttons.red("deleteButtons", "No Faction Reactions"));
+        factionReactButtons.add(Buttons.red("disableAidReacts", "No Faction Reactions"));
         MessageHelper.sendMessageToChannel(channel, "Enable to have the bot react to player messages with their faction emoji.", factionReactButtons);
 
         List<Button> hexBorderButtons = new ArrayList<>();
