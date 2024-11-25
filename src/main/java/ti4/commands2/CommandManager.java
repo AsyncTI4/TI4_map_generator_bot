@@ -1,19 +1,10 @@
-package ti4.commands;
+package ti4.commands2;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import ti4.commands.capture.CaptureCommand;
-import ti4.commands.units.AddUnitDamage;
-import ti4.commands.units.AddUnits;
-import ti4.commands.units.ModifyUnits;
-import ti4.commands.units.MoveUnits;
-import ti4.commands.units.RemoveAllUnitDamage;
-import ti4.commands.units.RemoveAllUnits;
-import ti4.commands.units.RemoveUnitDamage;
-import ti4.commands.units.RemoveUnits;
 import ti4.commands2.admin.AdminCommand;
 import ti4.commands2.agenda.AgendaCommand;
 import ti4.commands2.bothelper.BothelperCommand;
@@ -39,6 +30,7 @@ import ti4.commands2.planet.PlanetCommand;
 import ti4.commands2.player.PlayerCommand;
 import ti4.commands2.relic.RelicCommand;
 import ti4.commands2.search.SearchCommand;
+import ti4.commands2.special.Special2Command;
 import ti4.commands2.special.SpecialCommand;
 import ti4.commands2.statistics.StatisticsCommand;
 import ti4.commands2.status.StatusCommand;
@@ -55,11 +47,20 @@ import ti4.commands2.uncategorized.CardsInfoCommand;
 import ti4.commands2.uncategorized.SelectionBoxDemoCommand;
 import ti4.commands2.uncategorized.ShowDistancesCommand;
 import ti4.commands2.uncategorized.ShowGameCommand;
+import ti4.commands2.units.AddUnitDamage;
+import ti4.commands2.units.AddUnits;
+import ti4.commands2.units.CaptureCommand;
+import ti4.commands2.units.ModifyUnitsButtons;
+import ti4.commands2.units.MoveUnits;
+import ti4.commands2.units.RemoveAllUnitDamage;
+import ti4.commands2.units.RemoveAllUnits;
+import ti4.commands2.units.RemoveUnitDamage;
+import ti4.commands2.units.RemoveUnits;
 import ti4.commands2.user.UserCommand;
 
 public class CommandManager {
 
-    public static final Map<String, Command> commands = Stream.of(
+    public static final Map<String, ParentCommand> commands = Stream.of(
         new AddUnits(),
         new RemoveUnits(),
         new RemoveAllUnits(),
@@ -72,7 +73,7 @@ public class CommandManager {
         new RemoveAllCC(),
         new AddFrontierTokensCommand(),
         new MoveUnits(),
-        new ModifyUnits(),
+        new ModifyUnitsButtons(),
         new RemoveTokenCommand(),
         new AddTokenCommand(),
         new AddUnitDamage(),
@@ -99,6 +100,7 @@ public class CommandManager {
         new EventCommand(),
 
         new SpecialCommand(),
+        new Special2Command(),
         new LeaderCommand(),
         new CombatCommand(),
         new CustomCommand(),
@@ -115,13 +117,13 @@ public class CommandManager {
         new SelectionBoxDemoCommand(),
         new UserCommand(),
         new TIGLCommand()
-    ).collect(Collectors.toMap(Command::getName, command -> command));
+    ).collect(Collectors.toMap(ParentCommand::getName, command -> command));
 
-    public static Command getCommand(String name) {
+    public static ParentCommand getCommand(String name) {
         return commands.get(name);
     }
 
-    public static Collection<Command> getCommands() {
+    public static Collection<ParentCommand> getCommands() {
         return commands.values();
     }
 }

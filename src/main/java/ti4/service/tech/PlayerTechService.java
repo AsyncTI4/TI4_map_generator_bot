@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.units.AddUnits;
 import ti4.commands2.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -39,6 +38,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class PlayerTechService {
@@ -148,7 +148,7 @@ public class PlayerTechService {
                     String ident = player.getFactionEmoji();
                     String msg = ident + " removed CC from " + tileRep;
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                    RemoveCommandCounterService.removeCC(event, player.getColor(), tile, game);
+                    RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
                 }
             }
             case "td", "absol_td" -> { // Transit Diodes
@@ -279,7 +279,7 @@ public class PlayerTechService {
             case "lgf" -> { // Lazax Gate Folding
                 if (CollectionUtils.containsAny(player.getPlanetsAllianceMode(), Constants.MECATOLS)) {
                     deleteIfButtonEvent(event);
-                    new AddUnits().unitParsing(event, player.getColor(), game.getMecatolTile(), "inf mr", game);
+                    AddUnitService.addUnits(event, game.getMecatolTile(), game, player.getColor(), "inf mr");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
                     sendNextActionButtonsIfButtonEvent(event, game, player);

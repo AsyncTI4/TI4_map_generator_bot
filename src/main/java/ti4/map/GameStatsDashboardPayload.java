@@ -155,7 +155,7 @@ public class GameStatsDashboardPayload {
                         .flatMap(Collection::stream)
                         .map(Mapper::getPromissoryNote)
                         .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
-                        .map(pn -> "Support for the Throne (" + pn.getColor() + ")")
+                        .map(pn -> "Support for the Throne (" + pn.getColor().get() + ")")
                         .forEach(otherObjectives::add);
         game.getCustomPublicVP().keySet()
                 .forEach(customPublicVp -> {
@@ -242,6 +242,13 @@ public class GameStatsDashboardPayload {
         }
     }
 
+    public Long getEndedTimestamp() {
+        if (!game.isHasEnded()) {
+            return null;
+        }
+        return Instant.ofEpochMilli(game.getEndedDate()).getEpochSecond();
+    }
+
     public String getTurn() {
         Player activePlayer = game.getActivePlayer();
         if (activePlayer == null) return null;
@@ -261,8 +268,31 @@ public class GameStatsDashboardPayload {
         return game.getWinner().isPresent() ? game.getWinner().get().getUserID() : null;
     }
 
+    public boolean hasCompleted() {
+        return game.getWinner().isPresent() && game.isHasEnded();
+    }
+
     public boolean isHomebrew() {
         return game.hasHomebrew();
     }
 
+    public boolean isDiscordantStarsMode() {
+        return game.isDiscordantStarsMode();
+    }
+
+    public boolean isAbsolMode() {
+        return game.isAbsolMode();
+    }
+
+    public boolean isFrankenGame() {
+        return game.isFrankenGame();
+    }
+
+    public boolean isAllianceMode() {
+        return game.isAllianceMode();
+    }
+
+    public boolean isTIGLGame() {
+        return game.isCompetitiveTIGLGame();
+    }
 }

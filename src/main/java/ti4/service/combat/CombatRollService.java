@@ -10,15 +10,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.units.RemoveUnits;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -45,6 +43,7 @@ import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 public class CombatRollService {
@@ -441,11 +440,10 @@ public class CombatRollService {
                     String pos = thalnosUnit.split("_")[0];
                     String unitHolderName = thalnosUnit.split("_")[1];
                     Tile tile = game.getTileByPosition(pos);
-                    //int amount = game.getSpecificThalnosUnit(thalnosUnit);
                     String unitName = unitModel.getBaseType();
                     thalnosUnit = thalnosUnit.split("_")[2].replace("damaged", "");
                     if (thalnosUnit.equals(unitName)) {
-                        new RemoveUnits().unitParsing(event, player.getColor(), tile, misses + " " + unitName + " " + unitHolderName, game);
+                        RemoveUnitService.removeUnits(event, tile, game, player.getColor(), misses + " " + unitName + " " + unitHolderName);
                         if (unitName.equalsIgnoreCase("infantry")) {
                             ButtonHelper.resolveInfantryDeath(game, player, misses);
                         }

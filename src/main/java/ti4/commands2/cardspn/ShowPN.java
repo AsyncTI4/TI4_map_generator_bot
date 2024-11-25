@@ -10,9 +10,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -52,7 +52,7 @@ class ShowPN extends GameStateSubcommand {
         Game game = getGame();
         Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (targetPlayer == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Target player not found");
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
 

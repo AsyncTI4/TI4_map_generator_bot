@@ -49,7 +49,7 @@ public class StatusCleanupService {
                 game.setScTradeGood(sc, 0);
             }
             player.clearSCs();
-            player.setTurnCount(0);
+            player.setInRoundTurnCount(0);
             player.clearFollowedSCs();
             player.cleanExhaustedTechs();
             player.cleanExhaustedPlanets(true);

@@ -897,7 +897,7 @@ public class GameSaveLoadManager {
             writer.write(Constants.TOTAL_EXPENSES + " " + player.getTotalExpenses());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.TURN_COUNT + " " + player.getTurnCount());
+            writer.write(Constants.TURN_COUNT + " " + player.getInRoundTurnCount());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.ACTUAL_HITS + " " + player.getActualHits());
@@ -1137,7 +1137,8 @@ public class GameSaveLoadManager {
                             BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
                             return;
                         }
-                        if (file.getName().contains("pbd4765") || file.getName().contains("reference") || Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 60 || game.isCustodiansScored()) {
+                        // Temporarily not loading some dead games
+                        if (!game.isHasEnded() || file.getName().contains("pbd4765") || file.getName().contains("reference") || Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 60 || game.isCustodiansScored()) {
                             GameManager.addGame(game);
                         }
                     } catch (Exception e) {
@@ -2217,7 +2218,7 @@ public class GameSaveLoadManager {
                 case Constants.ACTUAL_HITS -> player.setActualHits(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.EXPECTED_HITS_TIMES_10 -> player.setExpectedHitsTimes10(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TOTAL_EXPENSES -> player.setTotalExpenses(Integer.parseInt(tokenizer.nextToken()));
-                case Constants.TURN_COUNT -> player.setTurnCount(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.TURN_COUNT -> player.setInRoundTurnCount(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.DEBT -> {
                     StringTokenizer debtToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     Map<String, Integer> debtTokens = new LinkedHashMap<>();

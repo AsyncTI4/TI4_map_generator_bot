@@ -115,8 +115,8 @@ public class ColorChangeHelper {
             if (unitKey.getColorID().equals(oldColorID)) {
                 Integer value = unitDmg.getValue();
                 Units.UnitKey replacedKey = Mapper.getUnitKey(unitKey.asyncID(), newColorID);
-                unitHolder.removeUnitDamage(unitKey, value);
-                unitHolder.addUnitDamage(replacedKey, value);
+                unitHolder.removeDamagedUnit(unitKey, value);
+                unitHolder.addDamagedUnit(replacedKey, value);
             }
         }
 

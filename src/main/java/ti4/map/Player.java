@@ -113,7 +113,7 @@ public class Player {
     private int tacticalCC = 3;
     private int fleetCC = 3;
     private int strategicCC = 2;
-    private int turnCount;
+    private int inRoundTurnCount;
     private int tg;
     private int commodities;
     private int commoditiesTotal;
@@ -1884,12 +1884,16 @@ public class Player {
         return tg;
     }
 
-    public int getTurnCount() {
-        return turnCount;
+    public int getInRoundTurnCount() {
+        return inRoundTurnCount;
     }
 
     public int getActualHits() {
         return actualHits;
+    }
+
+    public double getExpectedHits() {
+        return expectedHitsTimes10 / 10.0;
     }
 
     public int getExpectedHitsTimes10() {
@@ -1979,8 +1983,8 @@ public class Player {
         return message;
     }
 
-    public void setTurnCount(int turn) {
-        turnCount = turn;
+    public void setInRoundTurnCount(int turn) {
+        inRoundTurnCount = turn;
     }
 
     public void setActualHits(int tg) {
@@ -2019,7 +2023,7 @@ public class Player {
                 Player p2 = game.getActivePlayer();
                 EndTurnService.pingNextPlayer(event, game, p2);
                 if (!game.isFowMode()) {
-                    ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round "
+                    ButtonHelper.updateMap(game, event, "End of Turn " + p2.getInRoundTurnCount() + ", Round "
                         + game.getRound() + " for " + p2.getFactionEmoji());
                 }
             }
@@ -2967,10 +2971,10 @@ public class Player {
     public String getNextAvailableColorIgnoreCurrent() {
         Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
         String color = UserSettingsManager.get(getUserID()).getPreferredColourList().stream()
-            .filter(c -> getGame().getUnusedColors().stream().anyMatch(col -> col.getName().equals(c)))
+            .filter(c -> getGame().getUnusedColorsPreferringBase().stream().anyMatch(col -> col.getName().equals(c)))
             .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
             .findFirst()
-            .orElse(getGame().getUnusedColors().stream().filter(nonExclusive).findFirst().map(ColorModel::getName).orElse(null));
+            .orElse(getGame().getUnusedColorsPreferringBase().stream().filter(nonExclusive).findFirst().map(ColorModel::getName).orElse(null));
         return Mapper.getColorName(color);
     }
 

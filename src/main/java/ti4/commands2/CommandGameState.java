@@ -6,16 +6,15 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
-import ti4.service.ShowGameService;
 
-class CommandGameStateHelper {
+class CommandGameState {
 
     private final boolean saveGame;
     private final boolean isPlayerCommand;
     private final ThreadLocal<Game> game = new ThreadLocal<>();
     private final ThreadLocal<Player> player = new ThreadLocal<>();
 
-    public CommandGameStateHelper(boolean saveGame, boolean isPlayerCommand) {
+    public CommandGameState(boolean saveGame, boolean isPlayerCommand) {
         this.saveGame = saveGame;
         this.isPlayerCommand = isPlayerCommand;
     }
@@ -40,9 +39,8 @@ class CommandGameStateHelper {
     }
 
     public void postExecute(SlashCommandInteractionEvent event) {
-        if (saveGame) { // if gameLastModifiedDate.get() != game.get().getLastModifiedDate()
+        if (saveGame) {
             GameSaveLoadManager.saveGame(game.get(), event);
-            ShowGameService.simpleShowGame(game.get(), event);
         }
         game.remove();
         player.remove();

@@ -24,7 +24,7 @@ class ShowAllPN extends GameStateSubcommand {
         Game game = getGame();
         Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (targetPlayer == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Target player not found");
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
 

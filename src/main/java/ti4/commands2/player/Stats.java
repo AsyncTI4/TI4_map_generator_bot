@@ -166,7 +166,7 @@ class Stats extends GameStateSubcommand {
 
         Integer turnCount = event.getOption(Constants.TURN_COUNT, null, OptionMapping::getAsInt);
         if (turnCount != null) {
-            player.setTurnCount(turnCount);
+            player.setInRoundTurnCount(turnCount);
             String message = ">  set **Turn Count** to " + turnCount;
             MessageHelper.sendMessageToEventChannel(event, message);
         }

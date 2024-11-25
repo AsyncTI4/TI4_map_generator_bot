@@ -9,9 +9,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -30,6 +30,11 @@ class RelicSend extends GameStateSubcommand {
         Game game = getGame();
         Player player1 = getPlayer();
         Player player2 = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (player2 == null) {
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
+            return;
+        }
+
         if (player1.equals(player2)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "The two players provided are the same player");
             return;

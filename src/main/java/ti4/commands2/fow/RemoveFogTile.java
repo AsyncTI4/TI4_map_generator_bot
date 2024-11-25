@@ -27,6 +27,11 @@ class RemoveFogTile extends GameStateSubcommand {
             return;
         }
         Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(getGame(), event);
+        if (targetPlayer == null) {
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
+            return;
+        }
+
         String[] positions = positionMapping.replace(" ", "").split(",");
         for (String position : positions) {
             if (!PositionMapper.isTilePositionValid(position)) {

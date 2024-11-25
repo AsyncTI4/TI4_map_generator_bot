@@ -479,7 +479,7 @@ public class MapGenerator implements AutoCloseable {
         }
         DrawingUtil.superDrawString(bannerG, "#" + player.getInitiative(), 300 - mod, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
 
-        String turnOrdinal = StringHelper.ordinal(player.getTurnCount());
+        String turnOrdinal = StringHelper.ordinal(player.getInRoundTurnCount());
         String descr = player.getFlexibleDisplayName() + "'s " + turnOrdinal + " turn";
         FileUpload fileUpload = createFileUpload(bannerImage, 1.0f, player.getFaction() + player.getColor() + "banner").setDescription(descr);
         MessageHelper.sendFileUploadToChannel(player.getCorrectChannel(), fileUpload);
@@ -4641,6 +4641,61 @@ public class MapGenerator implements AutoCloseable {
             }
         }
         drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, rightAlign);
+    }
+
+    private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth)
+    {
+        // vertically prints text on one line, centred horizontally, if it fits,
+        // otherwise prints it over two lines
+        
+        // if the text contains a linebreak, print it over two lines
+        if (text.contains("\n"))
+        {
+            drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth);
+            return;
+        }
+        
+        int spacing = graphics.getFontMetrics().getAscent() + graphics.getFontMetrics().getLeading();
+        text = text.toUpperCase();
+        
+        // if the text is short enough to fit on one line, print it on one
+        if (text.equals(trimTextToPixelWidth(graphics, text, maxWidth)))
+        {
+            drawTextVertically(graphics, text, x + spacing/2, y, graphics.getFont());
+            return;
+        }
+        
+        // if there's a space in the text, try to split it
+        // as close to the centre as possible
+        if (text.contains(" "))
+        {
+            float center = text.length() / 2.0f + 0.5f;
+            String front = text.substring(0, (int) center);
+            String back = text.substring((int) (center - 0.5f));
+            int before = front.lastIndexOf(" ");
+            int after = text.indexOf(" ", (int) (center - 0.5f));
+            
+            // if there's only a space in the back half, replace the first space with a newline
+            if (before == -1)
+            {
+                text = text.substring(0, after) + "\n" + text.substring(after + 1);
+            }
+            // if there's only a space in the front half, or if the last space in the
+            // front half is closer to the centre than the first space in the back half,
+            // replace the last space in the front half with a newline
+            else if (after == -1 || (center - before - 1 <= after - center + 1))
+            {
+                text = text.substring(0, before) + "\n" + text.substring(before + 1);
+            }
+            // otherwise, the first space in the back half is closer to the centre
+            // than the last space in the front half, so replace
+            // the first space in the back half with a newline
+            else
+            {
+                text = text.substring(0, after) + "\n" + text.substring(after + 1);
+            }
+        }
+        drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth);
     }
 
     private static String trimTextToPixelWidth(Graphics graphics, String text, int pixelLength) {
