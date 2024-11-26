@@ -86,6 +86,7 @@ import ti4.service.fow.FowConstants;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 import ti4.website.WebsiteOverlay;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static ti4.image.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator implements AutoCloseable {
@@ -2129,7 +2130,7 @@ public class MapGenerator implements AutoCloseable {
             }
 
             String originalTechSpeciality = planet.getOriginalTechSpeciality();
-            if (!originalTechSpeciality.isEmpty() && !hasBentorEncryptionKey) {
+            if (isNotBlank(originalTechSpeciality) && !hasBentorEncryptionKey) {
                 String planetTypeName = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
                 drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName, planetName);
             } else if (!hasBentorEncryptionKey) {
@@ -3334,7 +3335,7 @@ public class MapGenerator implements AutoCloseable {
                     String traitFile = "";
                     List<String> traits = planetReal.getPlanetType();
 
-                    if (planetReal.getOriginalPlanetType().equals("faction") && traits.isEmpty()) {
+                    if ("faction".equals(planetReal.getOriginalPlanetType()) && traits.isEmpty()) {
                         if (custodiaVigilia.getFactionHomeworld() == null) {
                             traitFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
                         } else {

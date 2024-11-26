@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -21,6 +22,8 @@ import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel;
 import ti4.model.TechSpecialtyModel;
 import ti4.model.UnitModel;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @JsonTypeName("planet")
 public class Planet extends UnitHolder {
@@ -234,10 +237,12 @@ public class Planet extends UnitHolder {
         return getResources() + getInfluence();
     }
 
+    @Nullable
     public String getOriginalPlanetType() {
         return originalPlanetType;
     }
 
+    @Nullable
     public String getOriginalTechSpeciality() {
         return originalTechSpeciality;
     }
@@ -258,7 +263,7 @@ public class Planet extends UnitHolder {
         for (String type : planetType) {
             if (three.contains(type)) types.add(type);
         }
-        if (three.contains(originalPlanetType)) types.add(originalPlanetType);
+        if (isNotBlank(originalPlanetType) && three.contains(originalPlanetType)) types.add(originalPlanetType);
         return types;
     }
 
@@ -269,7 +274,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public Set<String> getTechSpecialities() {
         Set<String> specialties = new HashSet<>();
-        if (originalTechSpeciality != null && !originalTechSpeciality.isEmpty()) {
+        if (isNotBlank(originalTechSpeciality)) {
             specialties.add(originalTechSpeciality);
         }
         specialties.addAll(techSpeciality);
