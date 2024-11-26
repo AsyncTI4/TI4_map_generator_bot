@@ -30,6 +30,7 @@ public class CronManager {
 
             stopWatch.stop();
             Duration timeElapsed = stopWatch.getDuration();
+            BotLogger.log(clazz.getSimpleName() + " took " + timeElapsed + " seconds. Started at " + stopWatch.getStartInstant());
             if (timeElapsed.toSeconds() > EXECUTION_TIME_SECONDS_WARNING_THRESHOLD) {
                 BotLogger.log(clazz.getSimpleName() + " took longer than " + EXECUTION_TIME_SECONDS_WARNING_THRESHOLD + " seconds (" + timeElapsed.toSeconds() + ").");
             }
