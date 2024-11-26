@@ -22,10 +22,11 @@ import ti4.model.FactionModel;
 public class FactionRecordOfStrategyCardPickService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(new StatisticsPipeline.StatisticsEvent(event, () -> getRecord(event)));
+        StatisticsPipeline.queue(
+            new StatisticsPipeline.StatisticsEvent("getFactionStrategyCardPickRecord", event, () -> getFactionStrategyCardPickRecord(event)));
     }
 
-    private void getRecord(SlashCommandInteractionEvent event) {
+    private void getFactionStrategyCardPickRecord(SlashCommandInteractionEvent event) {
         StringBuilder text = new StringBuilder();
         for (int x = 1; x < 7; x++) {
             text.append(getSCPick(event, x));

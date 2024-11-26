@@ -18,7 +18,8 @@ import ti4.message.MessageHelper;
 public class ExportToCsvService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(new StatisticsPipeline.StatisticsEvent(event, () -> exportToCsv(event)));
+        StatisticsPipeline.queue(
+            new StatisticsPipeline.StatisticsEvent("exportToCsv", event, () -> exportToCsv(event)));
     }
 
     private void exportToCsv(SlashCommandInteractionEvent event) {

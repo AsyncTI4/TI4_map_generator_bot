@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.commands2.statistics.GameStatisticsFilterer;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.GamesPage;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -22,11 +23,11 @@ import ti4.model.FactionModel;
 public class GameWinsWithOtherFactionsService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(new StatisticsPipeline.StatisticsEvent(event, () -> getRecord(event)));
+        StatisticsPipeline.queue(
+            new StatisticsPipeline.StatisticsEvent("getGameWinsWithOtherFactions", event, () -> getGameWinsWithOtherFactions(event)));
     }
 
-    private void getRecord(SlashCommandInteractionEvent event) {
-        List<Game> filteredGames = GameStatisticsFilterer.getGamesFilter(event);
+    private void getGameWinsWithOtherFactions(SlashCommandInteractionEvent event) {
         Map<String, Integer> factionWinCount = new HashMap<>();
         Map<String, Integer> factionGameCount = new HashMap<>();
         List<String> reqFactions = new ArrayList<>();
@@ -38,34 +39,11 @@ public class GameWinsWithOtherFactionsService {
             }
         }
 
-        for (Game game : filteredGames) {
-            Optional<Player> winner = game.getWinner();
-            if (winner.isEmpty()) {
-                continue;
-            }
-            boolean count = true;
-            List<String> factions = new ArrayList<>();
-            for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
-                factions.add(player.getFaction());
-            }
-            for (String faction : reqFactions) {
-                if (!factions.contains(faction)) {
-                    count = false;
-                    break;
-                }
-            }
-            if (!count) {
-                continue;
-            }
-            String winningFaction = winner.get().getFaction();
-            factionWinCount.put(winningFaction,
-                1 + factionWinCount.getOrDefault(winningFaction, 0));
-            game.getRealAndEliminatedAndDummyPlayers().forEach(player -> {
-                String faction = player.getFaction();
-                factionGameCount.put(faction,
-                    1 + factionGameCount.getOrDefault(faction, 0));
-            });
-        }
+        GamesPage.consumeAllGames(
+            GameStatisticsFilterer.getGamesFilter(event),
+            game -> getGameWinsWithOtherFactions(game, factionWinCount, factionGameCount, reqFactions)
+        );
+
         StringBuilder sb = new StringBuilder();
         sb.append("Faction Win Percent:").append("\n");
 
@@ -86,5 +64,32 @@ public class GameWinsWithOtherFactionsService {
                 .append(entry.getKey().getFactionNameWithSourceEmoji())
                 .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
+    }
+
+    private void getGameWinsWithOtherFactions(Game game, Map<String, Integer> factionWinCount, Map<String, Integer> factionGameCount, List<String> reqFactions) {
+        Optional<Player> winner = game.getWinner();
+        if (winner.isEmpty()) {
+            return;
+        }
+        boolean count = true;
+        List<String> factions = new ArrayList<>();
+        for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
+            factions.add(player.getFaction());
+        }
+        for (String faction : reqFactions) {
+            if (!factions.contains(faction)) {
+                count = false;
+                break;
+            }
+        }
+        if (!count) {
+            return;
+        }
+        String winningFaction = winner.get().getFaction();
+        factionWinCount.put(winningFaction, 1 + factionWinCount.getOrDefault(winningFaction, 0));
+        game.getRealAndEliminatedAndDummyPlayers().forEach(player -> {
+            String faction = player.getFaction();
+            factionGameCount.put(faction, 1 + factionGameCount.getOrDefault(faction, 0));
+        });
     }
 }

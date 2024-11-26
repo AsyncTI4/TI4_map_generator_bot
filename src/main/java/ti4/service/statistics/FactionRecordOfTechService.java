@@ -15,6 +15,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.GamesPage;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -23,52 +24,29 @@ import ti4.model.FactionModel;
 public class FactionRecordOfTechService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(new StatisticsPipeline.StatisticsEvent(event, () -> getRecord(event)));
+        StatisticsPipeline.queue(
+            new StatisticsPipeline.StatisticsEvent("getFactionRecordOfTech", event, () -> getFactionRecordOfTech(event)));
     }
 
-    private void getRecord(SlashCommandInteractionEvent event) {
+    private void getFactionRecordOfTech(SlashCommandInteractionEvent event) {
         String text = getTechResearched(event);
         MessageHelper.sendMessageToThread(event.getChannel(), "Tech Acquisition Record", text);
     }
 
     private String getTechResearched(SlashCommandInteractionEvent event) {
-        List<Game> filteredGames = GameStatisticsFilterer.getGamesFilter(event);
-        String faction = event.getOption(Constants.FACTION, "eh", OptionMapping::getAsString);
+        String faction = event.getOption(Constants.FACTION, "", OptionMapping::getAsString);
         FactionModel factionM = Mapper.getFaction(faction);
         if (factionM == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No faction known as " + faction);
-            return "bleh";
-        }
-        boolean onlyIncludeWins = event.getOption("faction_won", false, OptionMapping::getAsBoolean);
-        if (onlyIncludeWins) {
-            filteredGames = filteredGames.stream()
-                .filter(game -> game.getWinner().get().getFaction().equalsIgnoreCase(faction))
-                .toList();
+            return "UNKNOWN FACTION";
         }
         Map<String, Integer> techsResearched = new HashMap<>();
-        int gamesThatHadThem = 0;
+        AtomicInteger gamesThatHadThem = new AtomicInteger();
 
-        for (Game game : filteredGames) {
-            for (Player player : game.getRealPlayers()) {
-                if (player.getFaction().equalsIgnoreCase(faction)) {
-                    gamesThatHadThem++;
-                    for (String tech : player.getTechs()) {
-                        List<String> startingTech = new ArrayList<>();
-                        if (factionM.getStartingTech() != null) {
-                            startingTech = factionM.getStartingTech();
-                        }
-                        if (startingTech != null && !startingTech.contains(tech)) {
-                            String techName = Mapper.getTech(tech).getName();
-                            if (techsResearched.containsKey(techName)) {
-                                techsResearched.put(techName, techsResearched.get(techName) + 1);
-                            } else {
-                                techsResearched.put(techName, 1);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        GamesPage.consumeAllGames(
+            GameStatisticsFilterer.getGamesFilter(event),
+            game -> getFactionRecordOfTech(game, techsResearched, gamesThatHadThem, factionM)
+        );
 
         StringBuilder sb = new StringBuilder();
 
@@ -94,5 +72,28 @@ public class FactionRecordOfTechService {
             });
 
         return sb.toString();
+    }
+
+    private void getFactionRecordOfTech(Game game, Map<String, Integer> techsResearched, AtomicInteger gamesThatHadThem, FactionModel factionModel) {
+        for (Player player : game.getRealPlayers()) {
+            if (!player.getFaction().equalsIgnoreCase(factionModel.getFactionName())) {
+                continue;
+            }
+            gamesThatHadThem.getAndIncrement();
+            for (String tech : player.getTechs()) {
+                List<String> startingTech = new ArrayList<>();
+                if (factionModel.getStartingTech() != null) {
+                    startingTech = factionModel.getStartingTech();
+                }
+                if (startingTech != null && !startingTech.contains(tech)) {
+                    String techName = Mapper.getTech(tech).getName();
+                    if (techsResearched.containsKey(techName)) {
+                        techsResearched.put(techName, techsResearched.get(techName) + 1);
+                    } else {
+                        techsResearched.put(techName, 1);
+                    }
+                }
+            }
+        }
     }
 }
