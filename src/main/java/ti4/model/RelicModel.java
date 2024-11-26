@@ -16,6 +16,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String shortName;
+    private Boolean shrinkName;
     private String text;
     private String flavourText;
     private String flavourTextFormatted;
@@ -44,6 +45,10 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
 
     public String getShortName() {
         return Optional.ofNullable(shortName).orElse(getName());
+    }
+
+    public boolean getShrinkName() {
+        return Optional.ofNullable(shrinkName).orElse(false);
     }
 
     private boolean getIsFakeRelic() {

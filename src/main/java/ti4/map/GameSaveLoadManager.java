@@ -1177,7 +1177,7 @@ public class GameSaveLoadManager {
                         // Temporarily not loading some dead games
                         if (!game.isHasEnded() || file.getName().contains("pbd4765") || file.getName().contains("reference") || Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 60 || game.isCustodiansScored()) {
                             GameManager.addGame(game);
-                        } else if (!AsyncTI4DiscordBot.guildPrimaryID.equals("943410040369479690")) {
+                        } else if (!AsyncTI4DiscordBot.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) {
                             GameManager.addGame(game);
                         }
                     } catch (Exception e) {

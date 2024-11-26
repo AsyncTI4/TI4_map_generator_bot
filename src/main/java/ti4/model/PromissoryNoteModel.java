@@ -16,6 +16,8 @@ import ti4.model.Source.ComponentSource;
 public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNoteModel>, EmbeddableModel {
     private String alias;
     private String name;
+    private String shortName;
+    private Boolean shrinkName;
     private String faction;
     private String color;
     private Boolean playArea;
@@ -41,6 +43,8 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         PromissoryNoteModel pn = new PromissoryNoteModel();
         pn.setAlias(this.alias.replaceAll("<color>", newColor.getName()));
         pn.setName(this.name);
+        pn.setShortName(this.shortName);
+        pn.setShrinkName(this.shrinkName);
         pn.setFaction(this.faction);
         pn.setColor(newColor.getName());
         pn.setPlayArea(this.playArea);
@@ -60,6 +64,14 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
             && (faction != null || color != null)
             && text != null
             && source != null;
+    }
+
+    public String getShortName() {
+        return Optional.ofNullable(shortName).orElse(getName());
+    }
+
+    public boolean getShrinkName() {
+        return Optional.ofNullable(shrinkName).orElse(false);
     }
 
     public Optional<String> getFaction() {

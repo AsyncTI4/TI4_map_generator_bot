@@ -32,7 +32,7 @@ class ServerGameStats extends Subcommand {
         skipGuilds.add("1062139934745559160"); //FoW
 
         boolean includeHub = event.getOption(Constants.INCLUDE_HUB, false, OptionMapping::getAsBoolean);
-        if (!includeHub) skipGuilds.add("943410040369479690");
+        if (!includeHub) skipGuilds.add(Constants.ASYNCTI4_HUB_SERVER_ID);
 
         int hostedGames = 0;
         int roomForGames = 0;
