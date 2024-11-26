@@ -18,8 +18,8 @@ public class CronManager {
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
     public static void register(Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
-        Runnable wrappedRunnable = wrapWithRuntimeWarning(clazz, runnable);
-        SCHEDULER.scheduleAtFixedRate(wrappedRunnable, initialDelay, period, unit);
+        //Runnable wrappedRunnable = wrapWithRuntimeWarning(clazz, runnable);
+        //SCHEDULER.scheduleAtFixedRate(wrappedRunnable, initialDelay, period, unit);
     }
 
     private static Runnable wrapWithRuntimeWarning(Class<?> clazz, Runnable runnable) {
