@@ -2,7 +2,7 @@
     "id": "archontau",
     "tileId": "14",
     "name": "Archon Tau",
-    "shortName": null,
+    "shrinkNamePNAttach": true,
     "aliases": [
         "archontau",
         "archon_tau",

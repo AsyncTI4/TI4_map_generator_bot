@@ -23,6 +23,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String faction;
     private String name;
     private String shortName;
+    private Boolean shrinkName;
     private String title;
     private String abilityName;
     private String abilityWindow;
@@ -55,6 +56,10 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     public String getShortName() {
         return Optional.ofNullable(shortName).orElse(getName());
+    }
+
+    public boolean getShrinkName() {
+        return Optional.ofNullable(shrinkName).orElse(false);
     }
 
     public String getLeaderEmoji() {

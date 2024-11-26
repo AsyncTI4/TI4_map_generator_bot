@@ -1,5 +1,6 @@
 package ti4.map;
 
+import javax.annotation.Nullable;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -40,7 +41,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
 import ti4.draft.BagDraft;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -654,20 +654,23 @@ public class GameSaveLoadManager {
         writer.write(Constants.GAME_TAGS + " " + String.join(",", game.getTags()));
         writer.write(System.lineSeparator());
 
-        MiltyDraftManager manager = game.getMiltyDraftManager();
-        if (manager != null) {
-            writer.write(Constants.MILTY_DRAFT_MANAGER + " " + manager.superSaveMessage());
-            writer.write(System.lineSeparator());
-        }
+        if (game.getRound() == 1 && !game.isHasEnded()) {
+            MiltyDraftManager manager = game.getMiltyDraftManager();
+            boolean miltyDraftFinished = manager == null || manager.isFinished();
+            if (!miltyDraftFinished) {
+                writer.write(Constants.MILTY_DRAFT_MANAGER + " " + manager.superSaveMessage());
+                writer.write(System.lineSeparator());
 
-        MiltySettings miltySettings = game.getMiltySettingsUnsafe();
-        if (miltySettings != null) {
-            writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + miltySettings.json());
-            writer.write(System.lineSeparator());
-        } else if (game.getMiltyJson() != null) {
-            // default to the already stored value, if we failed to read it previously
-            writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + game.getMiltyJson());
-            writer.write(System.lineSeparator());
+                MiltySettings miltySettings = game.getMiltySettingsUnsafe();
+                if (miltySettings != null) {
+                    writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + miltySettings.json());
+                    writer.write(System.lineSeparator());
+                } else if (game.getMiltyJson() != null) {
+                    // default to the already stored value, if we failed to read it previously
+                    writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + game.getMiltyJson());
+                    writer.write(System.lineSeparator());
+                }
+            }
         }
 
         writer.write(Constants.STRATEGY_CARD_SET + " " + game.getScSetID());
@@ -2115,9 +2118,16 @@ public class GameSaveLoadManager {
                 }
                 case Constants.MILTY_DRAFT_MANAGER -> {
                     try {
-                        MiltyDraftManager manager = game.getMiltyDraftManager();
-                        manager.init(game);
-                        manager.loadSuperSaveString(game, info);
+                        if (game.getRound() == 1 && !game.isHasEnded()) {
+                            MiltyDraftManager manager = game.getMiltyDraftManager();
+                            manager.init(game);
+                            manager.loadSuperSaveString(game, info);
+                            if (manager.isFinished()) {
+                                game.setMiltyJson(null);
+                                game.setMiltySettings(null);
+                                game.setMiltyDraftManager(null);
+                            }
+                        }
                     } catch (Exception e) {
                         // Do nothing
                     }

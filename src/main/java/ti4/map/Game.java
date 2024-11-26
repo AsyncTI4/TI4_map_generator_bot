@@ -94,7 +94,6 @@ public class Game extends GameProperties {
     private Map<String, Player> players = new LinkedHashMap<>();
 
     private final @JsonIgnore Map<String, Planet> planets = new HashMap<>();
-    private final MiltyDraftManager miltyDraftManager;
     private final Map<String, String> fowOptions = new HashMap<>();
     private final Map<Integer, Boolean> scPlayed = new HashMap<>();
     private final Map<String, String> checkingForAllReacts = new HashMap<>();
@@ -163,11 +162,12 @@ public class Game extends GameProperties {
     @Getter
     @Setter
     private Map<String, Integer> tileDistances = new HashMap<>();
+    private MiltyDraftManager miltyDraftManager;
     @Setter
-    private MiltySettings miltySettings = null;
+    private MiltySettings miltySettings;
     @Getter
     @Setter
-    private String miltyJson = null;
+    private String miltyJson;
     @Getter
     @Setter
     private TIGLRank minimumTIGLRankAtGameStart;
@@ -175,8 +175,6 @@ public class Game extends GameProperties {
     public Game() {
         setCreationDate(Helper.getDateRepresentation(System.currentTimeMillis()));
         setLastModifiedDate(System.currentTimeMillis());
-
-        miltyDraftManager = new MiltyDraftManager();
     }
 
     public void newGameSetup() {
@@ -305,10 +303,18 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public MiltyDraftManager getMiltyDraftManager() {
+        if (miltyDraftManager == null) {
+            miltyDraftManager = new MiltyDraftManager();
+        }
         return miltyDraftManager;
     }
 
+    public void setMiltyDraftManager(MiltyDraftManager miltyDraftManager) {
+        this.miltyDraftManager = miltyDraftManager;
+    }
+
     @JsonProperty("miltySettings")
+    @Nullable
     public MiltySettings getMiltySettingsUnsafe() {
         return miltySettings;
     }

@@ -64,6 +64,8 @@ public class MiltyDraftManager {
 
     private String mapTemplate = null;
 
+    private boolean finished;
+
     @Data
     public static class PlayerDraft {
         private String faction = null;
@@ -383,11 +385,11 @@ public class MiltyDraftManager {
             Player nextDrafter = getCurrentDraftPlayer(game);
             PlayerDraft pd = getPlayerDraft(nextDrafter);
             if (pd.getPosition() == null && pd.getFaction() != null && pd.getSlice() != null) {
-                fauxPlayerPick = getAutoButtonID(game, nextDrafter, getPositionButtons());
+                fauxPlayerPick = getAutoButtonID(getPositionButtons());
             } else if (pd.getSlice() == null && pd.getFaction() != null && pd.getPosition() != null) {
-                fauxPlayerPick = getAutoButtonID(game, nextDrafter, getSliceButtons());
+                fauxPlayerPick = getAutoButtonID(getSliceButtons());
             } else if (pd.getFaction() == null && pd.getPosition() != null && pd.getSlice() != null) {
-                fauxPlayerPick = getAutoButtonID(game, nextDrafter, getFactionButtons());
+                fauxPlayerPick = getAutoButtonID(getFactionButtons());
             }
 
             if (fauxPlayerPick != null) {
@@ -402,7 +404,7 @@ public class MiltyDraftManager {
         }
     }
 
-    private String getAutoButtonID(Game game, Player player, List<Button> buttons) {
+    private String getAutoButtonID(List<Button> buttons) {
         if (buttons.size() == 1) return buttons.getFirst().getId().replaceFirst("milty_", "miltyAuto_");
         return null;
     }
@@ -449,6 +451,7 @@ public class MiltyDraftManager {
             if (keleresExists) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " be sure to wait for keleres to get set up before dealing out secrets.");
             }
+            game.getMiltyDraftManager().setFinished(true);
         } catch (Exception e) {
             StringBuilder error = new StringBuilder("Something went wrong and the map could not be built automatically. Here are the slice strings if you want to try doing it manually: ");
             List<PlayerDraft> speakerOrdered = getDraft().values().stream()

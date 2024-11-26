@@ -991,6 +991,10 @@ public class MapGenerator implements AutoCloseable {
                     xDelta = abilityInfo(player, xDelta, yPlayArea);
                 }
 
+                if (!player.getPromissoryNotesOwned().isEmpty()) {
+                    xDelta = drawOwnedPromissoryNotes(player, xDelta, yPlayArea);
+                }
+
                 g2.setColor(color);
                 if (soCount >= 4) {
                     y += 23;
@@ -1198,6 +1202,7 @@ public class MapGenerator implements AutoCloseable {
             } else {
                 drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, promissoryNote);
             }
+
             for (Player player_ : player.getOtherRealPlayers()) {
                 String playerColor = player_.getColor();
                 String playerFaction = player_.getFaction();
@@ -1217,28 +1222,48 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
 
+            graphics.setColor(Color.WHITE);
             if (pn.endsWith("_sftt")) {
                 pn = "sftt";
             } else if (pn.endsWith("_an")) {
                 pn = "alliance";
                 if (!commanderUnlocked) {
                     pn += "_exh";
+                    graphics.setColor(Color.GRAY);
                 }
             }
 
-            String pnName = "pa_pn_name_" + pn + ".png";
-            drawPAImage(x + deltaX, y, pnName);
-            if (promissoryNote != null && promissoryNote.getAttachment().isPresent()
-                && !promissoryNote.getAttachment().get().isBlank()) {
+            boolean isAttached = (promissoryNote != null && promissoryNote.getAttachment().isPresent()
+                && !promissoryNote.getAttachment().get().isBlank());
+
+            if (isAttached) {
+                isAttached = false;
                 String tokenID = promissoryNote.getAttachment().get();
                 found: for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(tokenID))) {
-                            drawPlanetImage(x + deltaX + 17, y, "pc_planetname_" + unitHolder.getName() + "_rdy.png", unitHolder.getName());
+                            isAttached = true;
+                            PlanetModel p = Mapper.getPlanet(unitHolder.getName());
+                            if (promissoryNote.getShrinkName() || p.getShrinkNamePNAttach()) {
+                                graphics.setFont(Storage.getFont16());
+                                drawOneOrTwoLinesOfTextVertically(graphics, "\n@" + p.getShortNamePNAttach(), x + deltaX + 9, y + 4, 120, true);
+                            } else {
+                                graphics.setFont(Storage.getFont18());
+                                drawOneOrTwoLinesOfTextVertically(graphics, "\n@" + p.getShortNamePNAttach(), x + deltaX + 7, y + 4, 120, true);
+                            }
                             break found;
                         }
                     }
                 }
+            }
+
+            if (promissoryNote.getShrinkName()) {
+                graphics.setFont(Storage.getFont16());
+
+                drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName() + (isAttached ? "\n" : ""), x + deltaX + 9, y + 4, 120, true);
+            } else {
+                graphics.setFont(Storage.getFont18());
+                drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName() + (isAttached ? "\n" : ""), x + deltaX + 7, y + 4, 120, true);
             }
             deltaX += 48;
         }
@@ -1295,20 +1320,26 @@ public class MapGenerator implements AutoCloseable {
             if (relicID.equals("absol_quantumcore")) {
                 drawPAImage(x + deltaX, y, "pa_tech_techicons_cyberneticwarfare" + relicStatus + ".png");
             }
+            if (relicID.equals("titanprototype")) {
+                drawFactionIconImage(graphics, "relic", x + deltaX - 1, y + 108, 42, 42);
+            }
 
-            String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
-            String resourcePath = ResourceHelper.getInstance().getPAResource(relicFileName);
-            BufferedImage resourceBufferedImage;
-            try {
-                resourceBufferedImage = ImageHelper.read(resourcePath);
-                if (resourceBufferedImage == null) {
-                    g2.setFont(Storage.getFont20());
-                    drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 5, y + 140, 130);
-                } else {
-                    graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
+            if (relicID.equals("emelpar")) {
+                String empelar = "";
+                List<Character> letters = Arrays.asList('m', 'e', 'l', 'p', 'a');
+                Collections.shuffle(letters);
+                for (Character c : letters) {
+                    empelar += c;
                 }
-            } catch (Exception e) {
-                BotLogger.log("Bad file: " + relicFileName, e);
+                empelar = "Scepter of\nE" + empelar + "r";
+                graphics.setFont(Storage.getFont18());
+                drawOneOrTwoLinesOfTextVertically(g2, empelar, x + deltaX + 7, y + 30, 120, true);
+            } else if (relicModel.getShrinkName()) {
+                graphics.setFont(Storage.getFont16());
+                drawOneOrTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 9, y + 30, 120, true);
+            } else {
+                graphics.setFont(Storage.getFont18());
+                drawOneOrTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 7, y + 30, 120, true);
             }
 
             deltaX += 48;
@@ -1380,7 +1411,31 @@ public class MapGenerator implements AutoCloseable {
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
-        for (Leader leader : player.getLeaders()) {
+
+        Comparator<Leader> leaderComparator = (leader1, leader2) -> {
+            int leaderRank1 = switch (leader1.getType()) {
+                case Constants.AGENT -> 0;
+                case Constants.ENVOY -> 1;
+                case Constants.COMMANDER -> 2;
+                case Constants.HERO -> 3;
+                default -> -1;
+            };
+            int leaderRank2 = switch (leader2.getType()) {
+                case Constants.AGENT -> 0;
+                case Constants.ENVOY -> 1;
+                case Constants.COMMANDER -> 2;
+                case Constants.HERO -> 3;
+                default -> -1;
+            };
+            if (leaderRank1 == leaderRank2) {
+                return Mapper.getLeader(leader1.getId()).getName().compareToIgnoreCase(Mapper.getLeader(leader2.getId()).getName());
+            }
+            return leaderRank1 - leaderRank2;
+        };
+        List<Leader> allLeaders = new ArrayList<>(player.getLeaders());
+        allLeaders.sort(leaderComparator);
+
+        for (Leader leader : allLeaders) {
             boolean isExhaustedLocked = leader.isExhausted() || leader.isLocked();
             if (isExhaustedLocked) {
                 graphics.setColor(Color.GRAY);
@@ -1399,7 +1454,8 @@ public class MapGenerator implements AutoCloseable {
             if (leader.getTgCount() != 0) {
                 graphics.setColor(TradeGoodColor);
                 graphics.setFont(Storage.getFont32());
-                graphics.drawString(Integer.toString(leader.getTgCount()), x + deltaX + 3, y + 32);
+                Integer offset = 20 - graphics.getFontMetrics().stringWidth("" + leader.getTgCount()) / 2;
+                graphics.drawString(Integer.toString(leader.getTgCount()), x + deltaX + offset, y + 25);
             } else {
                 String pipID;
                 switch (leader.getType()) {
@@ -1421,23 +1477,21 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
 
-            String leaderInfoFileName = "pa_leaders_" + leader.getId() + status + ".png";
-            String resourcePath = ResourceHelper.getInstance().getPAResource(leaderInfoFileName);
-            try {
-                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
-                if (resourceBufferedImage == null) {
-                    LeaderModel leaderModel = Mapper.getLeader(leader.getId());
-                    g2.setFont(Storage.getFont16());
-                    drawTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 10, y + 148, 130);
-                } else {
-                    graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
-                }
-            } catch (Exception e) {
-                BotLogger.log("Bad file: " + leaderInfoFileName, e);
+            LeaderModel leaderModel = Mapper.getLeader(leader.getId());
+            if (leader.getId().equalsIgnoreCase("yssarilagent")) {
+                drawTextVertically(g2, "Clever, Clever".toUpperCase(), x + deltaX + 8, y + 30, Storage.getFont14(), true);
+                drawTextVertically(g2, "Ssruu".toUpperCase(), x + deltaX + 23, y + 30, Storage.getFont18(), true);
+            } else if (leaderModel.getShrinkName()) {
+                g2.setFont(Storage.getFont16());
+                drawOneOrTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 9, y + 30, 120, true);
+            } else {
+                g2.setFont(Storage.getFont18());
+                drawOneOrTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 7, y + 30, 120, true);
             }
 
             deltaX += 48;
         }
+
         if (player.hasAbility("imperia")) {
             deltaX += 5;
             List<String> mahactCCs = player.getMahactCC();
@@ -1464,6 +1518,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
         }
+
         return x + deltaX + 20;
     }
 
@@ -1540,7 +1595,7 @@ public class MapGenerator implements AutoCloseable {
         };
         List<String> allAbilities = new ArrayList<>(player.getAbilities());
         allAbilities.sort(abilityComparator);
-        
+
         for (String abilityID : allAbilities) {
             String abilityFileName = null;
             switch (abilityID) {
@@ -1580,6 +1635,37 @@ public class MapGenerator implements AutoCloseable {
             addedAbilities = true;
         }
         return x + deltaX + (addedAbilities ? 20 : 0);
+    }
+
+    private int drawOwnedPromissoryNotes(Player player, int x, int y) {
+        int deltaX = 10;
+
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(stroke2);
+        boolean addedPNs = false;
+        Comparator<String> pnComparator = (id1, id2) -> {
+            PromissoryNoteModel model1 = Mapper.getPromissoryNote(id1);
+            PromissoryNoteModel model2 = Mapper.getPromissoryNote(id2);
+            return model1.getName().compareToIgnoreCase(model2.getName());
+        };
+        List<String> ownedPNs = new ArrayList<>(player.getPromissoryNotesOwned());
+        ownedPNs.sort(pnComparator);
+
+        for (String pnID : ownedPNs) {
+            PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pnID);
+            if (pnModel.getFaction().isEmpty()) {
+                continue;
+            }
+            drawPAImageScaled(x + deltaX - 1 + 2, y + 30, "cardback_pn.png", 40, 40);
+            drawFactionIconImage(g2, pnModel.getFaction().get(), x + deltaX - 1, y, 42, 42);
+            g2.setFont(Storage.getFont18());
+            drawOneOrTwoLinesOfTextVertically(g2, pnModel.getShortName(), x + deltaX + 7, y + 144, 130);
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, pnModel);
+
+            deltaX += 48;
+            addedPNs = true;
+        }
+        return x + deltaX + (addedPNs ? 20 : 0);
     }
 
     private int reinforcements(Player player, int xDeltaFromRightSide, int y, Map<UnitKey, Integer> unitMapCount) {
@@ -2012,6 +2098,45 @@ public class MapGenerator implements AutoCloseable {
             }
         }
 
+        Tile homeTile = player.getHomeSystemTile();
+        if (homeTile.getTileID().equals("51")) {
+            Tile creussGate = game.getTile("17");
+            if (creussGate != null) {
+                homeTile = creussGate;
+            }
+        }
+        Point homePosition = PositionMapper.getTilePosition(homeTile.getPosition());
+        Comparator<String> planetComparator = (planet1, planet2) -> {
+            Tile tile1 = game.getTileFromPlanet(planet1);
+            if (tile1.getTileID().equals("51")) {
+                Tile creussGate = game.getTile("17");
+                if (creussGate != null) {
+                    tile1 = creussGate;
+                }
+            }
+            Point position1 = PositionMapper.getTilePosition(tile1.getPosition());
+            Integer distance1 = ((homePosition.x - position1.x) * (homePosition.x - position1.x)
+                + (homePosition.y - position1.y) * (homePosition.y - position1.y)) / 4000;
+            Tile tile2 = game.getTileFromPlanet(planet2);
+            if (tile2.getTileID().equals("51")) {
+                Tile creussGate = game.getTile("17");
+                if (creussGate != null) {
+                    tile2 = creussGate;
+                }
+            }
+            Point position2 = PositionMapper.getTilePosition(tile2.getPosition());
+            Integer distance2 = ((homePosition.x - position2.x) * (homePosition.x - position2.x)
+                + (homePosition.y - position2.y) * (homePosition.y - position2.y)) / 4000;
+            if (distance1 != distance2) {
+                return distance1 - distance2;
+            }
+            if (!tile1.getPosition().equalsIgnoreCase(tile2.getPosition())) {
+                return tile2.getPosition().compareToIgnoreCase(tile1.getPosition());
+            }
+            return planet1.compareToIgnoreCase(planet2);
+        };
+        realPlanets.sort(planetComparator);
+
         for (String planet : realPlanets) {
             deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
         }
@@ -2038,18 +2163,14 @@ public class MapGenerator implements AutoCloseable {
 
         try {
             Planet planet = planetsInfo.get(planetName);
+            PlanetModel planetModel = planet.getPlanetModel();
             if (planet == null) return deltaX;
 
             boolean isExhausted = exhaustedPlanets.contains(planetName);
-            if (isExhausted) graphics.setColor(Color.GRAY);
-            if (!isExhausted) graphics.setColor(Color.WHITE);
+            graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
 
-            int resources = planet.getResources();
-            int influence = planet.getInfluence();
             String statusOfPlanet = isExhausted ? "_exh" : "_rdy";
             String planetFileName = "pc_planetname_" + planetName + statusOfPlanet + ".png";
-            String resFileName = "pc_res_" + resources + statusOfPlanet + ".png";
-            String infFileName = "pc_inf_" + influence + statusOfPlanet + ".png";
 
             graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
 
@@ -2082,7 +2203,7 @@ public class MapGenerator implements AutoCloseable {
                     drawFactionIconImage(graphics, planetDisplayIcon, x + deltaX - 2, y - 2, 52, 52);
                 } else {
                     String planetTypeName = "pc_attribute_" + planetDisplayIcon + ".png";
-                    drawPlanetImage(x + deltaX + 1, y + 2, planetTypeName, planetName);
+                    drawPlanetCardDetail(x + deltaX + 1, y + 2, planetTypeName);
                 }
             }
 
@@ -2095,29 +2216,22 @@ public class MapGenerator implements AutoCloseable {
 
             boolean hasAttachment = planet.hasAttachment();
             if (hasAttachment) {
-                String planetTypeName = "pc_upgrade.png";
+                String planetChevrons = "pc_upgrade.png";
                 if (planet.getTokenList().contains("attachment_tombofemphidia.png")) {
-                    planetTypeName = "pc_upgrade_tomb.png";
+                    planetChevrons = "pc_upgrade_tomb.png";
                     ExploreModel tomb = Mapper.getExplore("toe");
                     addWebsiteOverlay(tomb, x + deltaX + 26, y + 40, 20, 20);
                 }
-                drawPlanetImage(x + deltaX + 26, y + 40, planetTypeName, planetName);
-            }
-
-            if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
-                String khraskGardenWorlds = "pc_ds_khraskbonus.png";
-                addWebsiteOverlay("Garden World", null, x + deltaX, y, 20, 20);
-                drawPlanetImage(x + deltaX, y, khraskGardenWorlds, planetName);
+                drawPlanetCardDetail(x + deltaX + 26, y + 40, planetChevrons);
             }
 
             if (planet.isLegendary()) {
-                PlanetModel planetModel = planet.getPlanetModel();
                 if (planetModel != null) {
                     addWebsiteOverlay(planetModel, x + deltaX + 26, y + 60, 20, 20);
                 }
                 String statusOfAbility = exhaustedPlanetsAbilities.contains(planetName) ? "_exh" : "_rdy";
-                String planetTypeName = "pc_legendary" + statusOfAbility + ".png";
-                drawPlanetImage(x + deltaX + 26, y + 60, planetTypeName, planetName);
+                String planetLegendaryCresent = "pc_legendary" + statusOfAbility + ".png";
+                drawPlanetCardDetail(x + deltaX + 26, y + 60, planetLegendaryCresent);
             }
 
             boolean hasBentorEncryptionKey = planet.getTokenList().stream()
@@ -2126,32 +2240,69 @@ public class MapGenerator implements AutoCloseable {
             if (hasBentorEncryptionKey) {
                 String imageFileName = "pc_tech_bentor_encryptionkey.png";
                 addWebsiteOverlay("Bentor Encryption Key", null, x + deltaX + 26, y + 82, 20, 20);
-                drawPlanetImage(x + deltaX + 26, y + 82, imageFileName, planetName);
+                drawPlanetCardDetail(x + deltaX + 26, y + 82, imageFileName);
             }
 
             String originalTechSpeciality = planet.getOriginalTechSpeciality();
             if (isNotBlank(originalTechSpeciality) && !hasBentorEncryptionKey) {
-                String planetTypeName = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
-                drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName, planetName);
+                String planetTechSkip = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
+                drawPlanetCardDetail(x + deltaX + 26, y + 82, planetTechSkip);
             } else if (!hasBentorEncryptionKey) {
                 List<String> techSpeciality = planet.getTechSpeciality();
                 for (String techSpec : techSpeciality) {
                     if (techSpec.isEmpty()) {
                         continue;
                     }
-                    String planetTypeName = "pc_tech_" + techSpec + statusOfPlanet + ".png";
-                    drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName, planetName);
+                    String planetTechSkip = "pc_tech_" + techSpec + statusOfPlanet + ".png";
+                    drawPlanetCardDetail(x + deltaX + 26, y + 82, planetTechSkip);
                 }
             }
 
-            drawPlanetImage(x + deltaX + 26, y + 103, resFileName, planetName);
-            drawPlanetImage(x + deltaX + 26, y + 125, infFileName, planetName);
-            drawPlanetImage(x + deltaX, y, planetFileName, planetName);
+            String resFileName = "pc_res" + statusOfPlanet + ".png";
+            String infFileName = "pc_inf" + statusOfPlanet + ".png";
+            int resources = planet.getResources();
+            int influence = planet.getInfluence();
+            if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
+                resFileName = "pc_res_khrask" + statusOfPlanet + ".png";
+                addWebsiteOverlay("Garden World", null, x + deltaX, y, 20, 20);
+            }
+
+            drawPlanetCardDetail(x + deltaX + 26, y + 103, resFileName);
+            drawPlanetCardDetail(x + deltaX + 26, y + 125, infFileName);
+
+            graphics.setFont(Storage.getFont12());
+            Integer offset = 10 - graphics.getFontMetrics().stringWidth("" + resources) / 2;
+            if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
+                graphics.setColor(Color.BLACK);
+                for (int i = -1; i <= 1; i++) {
+                    for (int j = -1; j <= 1; j++) {
+                        graphics.drawString("" + resources, x + deltaX + 26 + offset + i, y + 118 + j);
+                    }
+                }
+            }
+            graphics.setColor(Color.WHITE);
+            graphics.drawString("" + resources, x + deltaX + 26 + offset, y + 117);
+            offset = 10 - graphics.getFontMetrics().stringWidth("" + influence) / 2;
+            graphics.drawString("" + influence, x + deltaX + 26 + offset, y + 139);
+
+            graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
+            if (planetModel.getShrinkNamePNAttach()) {
+                drawTextVertically(graphics, planetModel.getShortName().toUpperCase(), x + deltaX + 9, y + 144, Storage.getFont16());
+            } else {
+                drawTextVertically(graphics, planetModel.getShortName().toUpperCase(), x + deltaX + 7, y + 144, Storage.getFont18());
+            }
+
             return deltaX + 56;
         } catch (Exception e) {
             BotLogger.log("could not print out planet: " + planetName.toLowerCase(), e);
         }
         return deltaX;
+    }
+
+    private void drawPlanetCardDetail(int x, int y, String resourceName) {
+        String resourcePath = ResourceHelper.getInstance().getPlanetResource(resourceName);
+        BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
+        graphics.drawImage(resourceBufferedImage, x, y, null);
     }
 
     private int techInfo(Player player, int x, int y, Game game) {
@@ -2218,14 +2369,7 @@ public class MapGenerator implements AutoCloseable {
         }
         for (String tech : techs) {
             boolean isExhausted = exhaustedTechs.contains(tech);
-            String techStatus;
-            if (isExhausted) {
-                graphics.setColor(Color.GRAY);
-                techStatus = "_exh.png";
-            } else {
-                graphics.setColor(Color.WHITE);
-                techStatus = "_rdy.png";
-            }
+            String techStatus = isExhausted ? "_exh.png" : "_rdy.png";
 
             TechnologyModel techModel = Mapper.getTech(tech);
 
@@ -2245,20 +2389,114 @@ public class MapGenerator implements AutoCloseable {
             // Draw Faction Tech Icon
             if (techModel.getFaction().isPresent()) {
                 drawFactionIconImage(graphics, techModel.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
+            } else {
+                Color foreground = Color.WHITE;
+                int types = 0;
+                if (techModel.isPropulsionTech()) {
+                    foreground = Color.decode("#509dce");
+                    types++;
+                }
+                if (techModel.isCyberneticTech()) {
+                    foreground = Color.decode("#e2da6a");
+                    types++;
+                }
+                if (techModel.isBioticTech()) {
+                    foreground = Color.decode("#7cba6b");
+                    types++;
+                }
+                if (techModel.isWarfareTech()) {
+                    foreground = Color.decode("#dc6569");
+                    types++;
+                }
+                if (types != 1) {
+                    foreground = Color.WHITE;
+                }
+                if (isExhausted) {
+                    foreground = Color.GRAY;
+                }
+
+                String initials = techModel.getInitials();
+                if (initials.length() == 2) {
+                    String left = initials.substring(0, 1);
+                    String right = initials.substring(1, 2);
+                    graphics.setFont(Storage.getFont32());
+                    int offsetLeft = Math.max(0, 10 - graphics.getFontMetrics().stringWidth(left) / 2);
+                    int offsetRight = Math.min(40 - graphics.getFontMetrics().stringWidth(right),
+                        30 - graphics.getFontMetrics().stringWidth(right) / 2);
+                    graphics.setColor(Color.BLACK);
+                    for (int i = -1; i <= 1; i++) {
+                        for (int j = -1; j <= 1; j++) {
+                            graphics.drawString(right, x + i + deltaX + offsetRight, y + j + 148);
+                        }
+                    }
+                    graphics.setColor(foreground);
+                    graphics.drawString(right, x + deltaX + offsetRight, y + 148);
+                    graphics.setColor(Color.BLACK);
+                    for (int i = -1; i <= 1; i++) {
+                        for (int j = -1; j <= 1; j++) {
+                            graphics.drawString(left, x + i + deltaX + offsetLeft, y + j + 139);
+                        }
+                    }
+                    graphics.setColor(foreground);
+                    graphics.drawString(left, x + deltaX + offsetLeft, y + 139);
+                } else if (initials.length() == 3) {
+                    String left = initials.substring(0, 1);
+                    String middle = initials.substring(1, 2);
+                    String right = initials.substring(2, 3);
+                    graphics.setFont(Storage.getFont24());
+                    int offsetLeft = Math.max(0, 7 - graphics.getFontMetrics().stringWidth(left) / 2);
+                    int offsetMiddle = 20 - graphics.getFontMetrics().stringWidth(middle) / 2;
+                    int offsetRight = Math.min(40 - graphics.getFontMetrics().stringWidth(right),
+                        33 - graphics.getFontMetrics().stringWidth(right) / 2);
+                    graphics.setColor(Color.BLACK);
+                    for (int i = -1; i <= 1; i++) {
+                        for (int j = -1; j <= 1; j++) {
+                            graphics.drawString(right, x + i + deltaX + offsetRight, y + j + 148);
+                        }
+                    }
+                    graphics.setColor(foreground);
+                    graphics.drawString(right, x + deltaX + offsetRight, y + 148);
+                    graphics.setColor(Color.BLACK);
+                    for (int i = -1; i <= 1; i++) {
+                        for (int j = -1; j <= 1; j++) {
+                            graphics.drawString(middle, x + i + deltaX + offsetMiddle, y + j + 141);
+                        }
+                    }
+                    graphics.setColor(foreground);
+                    graphics.drawString(middle, x + deltaX + offsetMiddle, y + 141);
+                    graphics.setColor(Color.BLACK);
+                    for (int i = -1; i <= 1; i++) {
+                        for (int j = -1; j <= 1; j++) {
+                            graphics.drawString(left, x + i + deltaX + offsetLeft, y + j + 134);
+                        }
+                    }
+                    graphics.setColor(foreground);
+                    graphics.drawString(left, x + deltaX + offsetLeft, y + 134);
+                } else {
+                    initials = initials.substring(0, 1);
+                    graphics.setFont(Storage.getFont48());
+                    int offset = 20 - graphics.getFontMetrics().stringWidth(initials) / 2;
+                    graphics.setColor(Color.BLACK);
+                    for (int i = -2; i <= 2; i++) {
+                        for (int j = -2; j <= 2; j++) {
+                            graphics.drawString(initials, x + i + deltaX + offset, y + j + 148);
+                        }
+                    }
+                    graphics.setColor(foreground);
+                    graphics.drawString(initials, x + deltaX + offset, y + 148);
+                }
             }
 
-            // Draw Tech Name
-            String techName = "pa_tech_techname_" + tech + techStatus;
-            String resourcePath = ResourceHelper.getInstance().getPAResource(techName);
-            if (resourcePath != null) {
-                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
-                graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
-                if ("dslaner".equalsIgnoreCase(tech)) {
-                    drawTextVertically(graphics, "" + player.getAtsCount(), x + deltaX + 15, y + 140, Storage.getFont16());
-                }
-            } else { //no special image, so draw the text
-                graphics.setFont(Storage.getFont20());
-                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 5, y + 148, 130);
+            graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
+            if (techModel.getShrinkName()) {
+                graphics.setFont(Storage.getFont16());
+                drawOneOrTwoLinesOfTextVertically(graphics, techModel.getShortName(), x + deltaX + 9, y + 116, 116);
+            } else {
+                graphics.setFont(Storage.getFont18());
+                drawOneOrTwoLinesOfTextVertically(graphics, techModel.getShortName(), x + deltaX + 7, y + 116, 116);
+            }
+            if ("dslaner".equalsIgnoreCase(tech)) {
+                drawTextVertically(graphics, "" + player.getAtsCount(), x + deltaX + 15, y + 140, Storage.getFont16());
             }
 
             drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, techModel);
@@ -2306,14 +2544,12 @@ public class MapGenerator implements AutoCloseable {
                 drawFactionIconImageOpaque(graphics, techModel.getFaction().get(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
             }
 
-            String techName = "pa_tech_techname_" + tech + "_exh.png";
-            String resourcePath = ResourceHelper.getInstance().getPAResource(techName);
-            if (resourcePath != null) {
-                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
-                graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
+            if (techModel.getShrinkName()) {
+                graphics.setFont(Storage.getFont16());
+                drawOneOrTwoLinesOfTextVertically(graphics, techModel.getShortName(), x + deltaX + 9, y + 116, 116);
             } else {
-                graphics.setFont(Storage.getFont20());
-                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 5, y + 130, 110);
+                graphics.setFont(Storage.getFont18());
+                drawOneOrTwoLinesOfTextVertically(graphics, techModel.getShortName(), x + deltaX + 7, y + 116, 116);
             }
 
             drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, techModel);
@@ -3852,6 +4088,9 @@ public class MapGenerator implements AutoCloseable {
                 width = g2.getFontMetrics().stringWidth(substringText);
             }
             if (index > 0) {
+                while (index < agendaTextLength && agendaText.charAt(agendaTextLength - index) != ' ') {
+                    index++;
+                }
                 graphics.drawString(agendaText.substring(0, agendaTextLength - index), x + 95, y + 70);
                 graphics.drawString(agendaText.substring(agendaTextLength - index), x + 95, y + 96);
             } else {
@@ -4266,10 +4505,18 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static void drawTextVertically(Graphics graphics, String text, int x, int y, Font font) {
+        drawTextVertically(graphics, text, x, y, font, false);
+    }
+
+    private static void drawTextVertically(Graphics graphics, String text, int x, int y, Font font, boolean rightAlign) {
         Graphics2D graphics2D = (Graphics2D) graphics;
         AffineTransform originalTransform = graphics2D.getTransform();
         graphics2D.rotate(Math.toRadians(-90));
         graphics2D.setFont(font);
+
+        if (rightAlign) {
+            y += graphics.getFontMetrics().stringWidth(text);
+        }
 
         // DRAW A 1px BLACK BORDER AROUND TEXT
         Color originalColor = graphics2D.getColor();
@@ -4290,78 +4537,78 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth) {
+        drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, false);
+
+    }
+
+    private static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth, boolean rightAlign) {
         int spacing = graphics.getFontMetrics().getAscent() + graphics.getFontMetrics().getLeading();
         text = text.toUpperCase();
         String firstRow = StringUtils.substringBefore(text, "\n");
         firstRow = trimTextToPixelWidth(graphics, firstRow, maxWidth);
         String secondRow = text.replace(firstRow, "").replace("\n", "");
         secondRow = trimTextToPixelWidth(graphics, secondRow, maxWidth);
-        drawTextVertically(graphics, firstRow, x, y, graphics.getFont());
+        drawTextVertically(graphics, firstRow, x, y, graphics.getFont(), rightAlign);
         if (StringUtils.isNotBlank(secondRow)) {
-            drawTextVertically(graphics, secondRow, x + spacing, y, graphics.getFont());
+            drawTextVertically(graphics, secondRow, x + spacing, y, graphics.getFont(), rightAlign);
         }
     }
 
-    private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth)
-    {
+    private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth) {
+        drawOneOrTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, false);
+    }
+
+    private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth, boolean rightAlign) {
         // vertically prints text on one line, centred horizontally, if it fits,
         // otherwise prints it over two lines
-        
+
         // if the text contains a linebreak, print it over two lines
-        if (text.contains("\n"))
-        {
-            drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth);
+        if (text.contains("\n")) {
+            drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, rightAlign);
             return;
         }
-        
+
         int spacing = graphics.getFontMetrics().getAscent() + graphics.getFontMetrics().getLeading();
         text = text.toUpperCase();
-        
+
         // if the text is short enough to fit on one line, print it on one
-        if (text.equals(trimTextToPixelWidth(graphics, text, maxWidth)))
-        {
-            drawTextVertically(graphics, text, x + spacing/2, y, graphics.getFont());
+        if (text.equals(trimTextToPixelWidth(graphics, text, maxWidth))) {
+            drawTextVertically(graphics, text, x + spacing / 2, y, graphics.getFont(), rightAlign);
             return;
         }
-        
+
         // if there's a space in the text, try to split it
         // as close to the centre as possible
-        if (text.contains(" "))
-        {
+        if (text.contains(" ")) {
             float center = text.length() / 2.0f + 0.5f;
             String front = text.substring(0, (int) center);
             String back = text.substring((int) (center - 0.5f));
             int before = front.lastIndexOf(" ");
             int after = text.indexOf(" ", (int) (center - 0.5f));
-            
+
             // if there's only a space in the back half, replace the first space with a newline
-            if (before == -1)
-            {
+            if (before == -1) {
                 text = text.substring(0, after) + "\n" + text.substring(after + 1);
             }
             // if there's only a space in the front half, or if the last space in the
             // front half is closer to the centre than the first space in the back half,
             // replace the last space in the front half with a newline
-            else if (after == -1 || (center - before - 1 <= after - center + 1))
-            {
+            else if (after == -1 || (center - before - 1 <= after - center + 1)) {
                 text = text.substring(0, before) + "\n" + text.substring(before + 1);
             }
             // otherwise, the first space in the back half is closer to the centre
             // than the last space in the front half, so replace
             // the first space in the back half with a newline
-            else
-            {
+            else {
                 text = text.substring(0, after) + "\n" + text.substring(after + 1);
             }
         }
-        drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth);
+        drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, rightAlign);
     }
 
     private static String trimTextToPixelWidth(Graphics graphics, String text, int pixelLength) {
-        int currentPixels = 0;
         for (int i = 0; i < text.length(); i++) {
-            currentPixels += graphics.getFontMetrics().charWidth(text.charAt(i));
-            if (currentPixels > pixelLength) {
+            if (graphics.getFontMetrics().stringWidth(text.substring(0, i + 1)) > pixelLength) {
                 return text.substring(0, i);
             }
         }

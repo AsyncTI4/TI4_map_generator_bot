@@ -2,7 +2,6 @@
     "id": "echo",
     "tileId": "d101",
     "name": "Echo",
-    "shortName": null,
     "aliases": [
         "echo",
         "ech"

@@ -748,7 +748,7 @@ public class MessageHelper {
 	 */
 	public static String getBotLogWebhookURL() {
 		return switch (AsyncTI4DiscordBot.guildPrimaryID) {
-			case "943410040369479690" -> // AsyncTI4 Primary HUB Production Server
+			case Constants.ASYNCTI4_HUB_SERVER_ID -> // AsyncTI4 Primary HUB Production Server
 				"https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v";
 			case "1059645656295292968" -> // PrisonerOne's Test Server
 				"https://discord.com/api/webhooks/1159478386998116412/NiyxcE-6TVkSH0ACNpEhwbbEdIBrvTWboZBTwuooVfz5n4KccGa_HRWTbCcOy7ivZuEp";
