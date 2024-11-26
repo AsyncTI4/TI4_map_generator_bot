@@ -2,7 +2,6 @@
     "id": "silence",
     "tileId": "d100",
     "name": "Silence",
-    "shortName": null,
     "aliases": [
         "silence"
     ],

@@ -53,7 +53,8 @@
         "text": "After you perform a tactical action, you may exhaust this card to explore 1 planet you control. At the end of the status phase, if you control the \"Tomb of Emphidia,\" you may purge this card to gain 1 victory point.",
         "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/the_crown_of_emphidia.jpg",
         "source": "pok",
-        "flavourText": "*The machines of the forgotten throne-world could only be controlled through the data-impulses of the black-barbed crown.*"
+        "flavourText": "*The machines of the forgotten throne-world could only be controlled through the data-impulses of the black-barbed crown.*",
+        "shrinkName": true
     },
     {
         "alias": "thalnos",
@@ -77,6 +78,7 @@
         "text": "When you research a technology, you may exhaust this card to ignore 1 prerequisite or draw 1 action card.",
         "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/the_prophets_tears.jpg",
         "source": "pok",
-        "flavourText": "*\"So you're going to drink a vial of murky liquid we found in a stasis vault on a dead world because you think it's the concentrated genetic essence of an entire species' most brilliant minds...and you think* I'm *being irrational?\"*"
+        "flavourText": "*\"So you're going to drink a vial of murky liquid we found in a stasis vault on a dead world because you think it's the concentrated genetic essence of an entire species' most brilliant minds...and you think* I'm *being irrational?\"*",
+        "shortName": "Prophet's\nTears"
     }
 ]
