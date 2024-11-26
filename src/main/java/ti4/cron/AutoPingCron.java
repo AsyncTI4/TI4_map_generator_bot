@@ -165,32 +165,33 @@ public class AutoPingCron {
             return;
         }
         long milliSinceLastPing = System.currentTimeMillis() - game.getLastActivePlayerPing().getTime();
-        if (milliSinceLastPing > ONE_HOUR_IN_MILLISECONDS * spacer || player.shouldPlayerBeTenMinReminded() && milliSinceLastPing > TEN_MINUTES_IN_MILLISECONDS) {
-            String realIdentity = player.getRepresentationUnfogged();
-            String pingMessage = realIdentity + " this is a gentle reminder that it is your turn.";
-            if (player.shouldPlayerBeTenMinReminded() && milliSinceLastPing > TEN_MINUTES_IN_MILLISECONDS) {
-                pingMessage = realIdentity + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinence";
-            }
-            String playersInCombat = game.getStoredValue("factionsInCombat");
-            if (!playersInCombat.isBlank() && playersInCombat.contains(player.getFaction())) {
-                for (Player p2 : game.getRealPlayers()) {
-                    if (p2 != player && playersInCombat.contains(p2.getFaction())) {
-                        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " the bot thinks you might be in combat and should receive a reminder ping as well. Ignore if not relevant");
-                    }
+        if (milliSinceLastPing <= ONE_HOUR_IN_MILLISECONDS * spacer && (!player.shouldPlayerBeTenMinReminded() || milliSinceLastPing <= TEN_MINUTES_IN_MILLISECONDS)) {
+            return;
+        }
+        String realIdentity = player.getRepresentationUnfogged();
+        String pingMessage = realIdentity + " this is a gentle reminder that it is your turn.";
+        if (player.shouldPlayerBeTenMinReminded() && milliSinceLastPing > TEN_MINUTES_IN_MILLISECONDS) {
+            pingMessage = realIdentity + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinence";
+        }
+        String playersInCombat = game.getStoredValue("factionsInCombat");
+        if (!playersInCombat.isBlank() && playersInCombat.contains(player.getFaction())) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 != player && playersInCombat.contains(p2.getFaction())) {
+                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " the bot thinks you might be in combat and should receive a reminder ping as well. Ignore if not relevant");
                 }
             }
-            long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange().getTime();
-            int pingNumber = (int) (milliSinceLastTurnChange / (ONE_HOUR_IN_MILLISECONDS * spacer));
-            pingMessage = getPingMessage(milliSinceLastTurnChange, spacer, pingMessage, realIdentity, pingNumber);
-
-            pingPlayer(game, player, milliSinceLastTurnChange, spacer, pingMessage, pingNumber, realIdentity);
-
-            Game mapReference = GameManager.getGame("finreference");
-            if (mapReference != null) ButtonHelper.increasePingCounter(mapReference, player.getUserID());
-            player.setWhetherPlayerShouldBeTenMinReminded(false);
-            game.setLastActivePlayerPing(new Date());
-            GameSaveLoadManager.saveGame(game, "Auto Ping");
         }
+        long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange().getTime();
+        int pingNumber = (int) (milliSinceLastTurnChange / (ONE_HOUR_IN_MILLISECONDS * spacer));
+        pingMessage = getPingMessage(milliSinceLastTurnChange, spacer, pingMessage, realIdentity, pingNumber);
+
+        pingPlayer(game, player, milliSinceLastTurnChange, spacer, pingMessage, pingNumber, realIdentity);
+
+        Game mapReference = GameManager.getGame("finreference");
+        if (mapReference != null) ButtonHelper.increasePingCounter(mapReference, player.getUserID());
+        player.setWhetherPlayerShouldBeTenMinReminded(false);
+        game.setLastActivePlayerPing(new Date());
+        GameSaveLoadManager.saveGame(game, "Auto Ping");
     }
 
     private static void pingPlayer(Game game, Player player, long milliSinceLastTurnChange, int spacer, String pingMessage, int pingNumber, String realIdentity) {

@@ -149,7 +149,6 @@ public class UserJoinServerListener extends ListenerAdapter {
             }
         }
 
-
         if (!gamesQuit.isEmpty()) {
             StringBuilder msg = new StringBuilder("User " + user.getName() + " has left the server " + guild.getName() + " with the following in-progress games:");
             for (ManagedGame g : gamesQuit) {
