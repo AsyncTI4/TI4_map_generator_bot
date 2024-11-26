@@ -912,13 +912,11 @@ public class Helper {
             if (planet.contains("ghoti") || planet.contains("custodia")) {
                 continue;
             }
-            Button button = Buttons.red("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet,
-                getPlanetRepresentation(planet, game));
+            Button button = Buttons.red("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet, getPlanetRepresentation(planet, game));
             String emoji = unit;
             if (emoji.equalsIgnoreCase("2gf") || emoji.equalsIgnoreCase("3gf")) {
-                emoji = "infantry";
+                button = button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
             }
-            button = button.withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(emoji)));
             planetButtons.add(button);
         }
         return planetButtons;
