@@ -333,7 +333,8 @@ public class EndGameService {
                     .append(playerCount).append("P)")
                     .append(", this path has been seen ")
                     .append(winningPathCount - 1)
-                    .append(" times before. It's the ").append(winningPathCommonality).append(" most common path (out of ").append(winningPathCounts.size()).append(" paths) at ")
+                    .append(" times before. It's the ").append(winningPathCommonality).append(" most common path (out of ")
+                    .append(winningPathCounts.size()).append(" paths) at ")
                     .append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
                 if (winningPathCount == 1) {
                     sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
