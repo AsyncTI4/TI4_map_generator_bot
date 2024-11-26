@@ -16,6 +16,7 @@ import ti4.model.Source.ComponentSource;
 public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNoteModel>, EmbeddableModel {
     private String alias;
     private String name;
+    private String shortName;
     private String faction;
     private String color;
     private Boolean playArea;
@@ -178,6 +179,10 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     public boolean isNotWellKnown() {
         return getFaction().isPresent()
             || (getSource() != ComponentSource.base && getSource() != ComponentSource.pok);
+    }
+
+    public String getShortName() {
+        return shortName == null ? getName() : shortName;
     }
 
     /**

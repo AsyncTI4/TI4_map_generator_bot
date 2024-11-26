@@ -990,6 +990,10 @@ public class MapGenerator implements AutoCloseable {
                     xDelta = abilityInfo(player, xDelta, yPlayArea);
                 }
 
+                if (!player.getPromissoryNotesOwned().isEmpty()) {
+                    xDelta = drawOwnedPromissoryNotes(player, xDelta, yPlayArea);
+                }
+
                 g2.setColor(color);
                 if (soCount >= 4) {
                     y += 23;
@@ -1539,7 +1543,7 @@ public class MapGenerator implements AutoCloseable {
         };
         List<String> allAbilities = new ArrayList<>(player.getAbilities());
         allAbilities.sort(abilityComparator);
-        
+
         for (String abilityID : allAbilities) {
             String abilityFileName = null;
             switch (abilityID) {
@@ -1579,6 +1583,37 @@ public class MapGenerator implements AutoCloseable {
             addedAbilities = true;
         }
         return x + deltaX + (addedAbilities ? 20 : 0);
+    }
+
+    private int drawOwnedPromissoryNotes(Player player, int x, int y) {
+        int deltaX = 10;
+
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(stroke2);
+        boolean addedPNs = false;
+        Comparator<String> pnComparator = (id1, id2) -> {
+            PromissoryNoteModel model1 = Mapper.getPromissoryNote(id1);
+            PromissoryNoteModel model2 = Mapper.getPromissoryNote(id2);
+            return model1.getName().compareToIgnoreCase(model2.getName());
+        };
+        List<String> ownedPNs = new ArrayList<>(player.getPromissoryNotesOwned());
+        ownedPNs.sort(pnComparator);
+
+        for (String pnID : ownedPNs) {
+            PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pnID);
+            if (pnModel.getFaction().isEmpty()) {
+                continue;
+            }
+            drawPAImageScaled(x + deltaX - 1 + 2, y + 30, "cardback_pn.png", 40, 40);
+            drawFactionIconImage(g2, pnModel.getFaction().get(), x + deltaX - 1, y, 42, 42);
+            g2.setFont(Storage.getFont18());
+            drawOneOrTwoLinesOfTextVertically(g2, pnModel.getShortName(), x + deltaX + 7, y + 144, 130);
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, pnModel);
+
+            deltaX += 48;
+            addedPNs = true;
+        }
+        return x + deltaX + (addedPNs ? 20 : 0);
     }
 
     private int reinforcements(Player player, int xDeltaFromRightSide, int y, Map<UnitKey, Integer> unitMapCount) {
@@ -4301,55 +4336,48 @@ public class MapGenerator implements AutoCloseable {
         }
     }
 
-    private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth)
-    {
+    private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth) {
         // vertically prints text on one line, centred horizontally, if it fits,
         // otherwise prints it over two lines
-        
+
         // if the text contains a linebreak, print it over two lines
-        if (text.contains("\n"))
-        {
+        if (text.contains("\n")) {
             drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth);
             return;
         }
-        
+
         int spacing = graphics.getFontMetrics().getAscent() + graphics.getFontMetrics().getLeading();
         text = text.toUpperCase();
-        
+
         // if the text is short enough to fit on one line, print it on one
-        if (text.equals(trimTextToPixelWidth(graphics, text, maxWidth)))
-        {
-            drawTextVertically(graphics, text, x + spacing/2, y, graphics.getFont());
+        if (text.equals(trimTextToPixelWidth(graphics, text, maxWidth))) {
+            drawTextVertically(graphics, text, x + spacing / 2, y, graphics.getFont());
             return;
         }
-        
+
         // if there's a space in the text, try to split it
         // as close to the centre as possible
-        if (text.contains(" "))
-        {
+        if (text.contains(" ")) {
             float center = text.length() / 2.0f + 0.5f;
             String front = text.substring(0, (int) center);
             String back = text.substring((int) (center - 0.5f));
             int before = front.lastIndexOf(" ");
             int after = text.indexOf(" ", (int) (center - 0.5f));
-            
+
             // if there's only a space in the back half, replace the first space with a newline
-            if (before == -1)
-            {
+            if (before == -1) {
                 text = text.substring(0, after) + "\n" + text.substring(after + 1);
             }
             // if there's only a space in the front half, or if the last space in the
             // front half is closer to the centre than the first space in the back half,
             // replace the last space in the front half with a newline
-            else if (after == -1 || (center - before - 1 <= after - center + 1))
-            {
+            else if (after == -1 || (center - before - 1 <= after - center + 1)) {
                 text = text.substring(0, before) + "\n" + text.substring(before + 1);
             }
             // otherwise, the first space in the back half is closer to the centre
             // than the last space in the front half, so replace
             // the first space in the back half with a newline
-            else
-            {
+            else {
                 text = text.substring(0, after) + "\n" + text.substring(after + 1);
             }
         }

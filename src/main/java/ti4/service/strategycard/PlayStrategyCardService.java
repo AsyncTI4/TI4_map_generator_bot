@@ -16,6 +16,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
 import ti4.helpers.Emojis;
@@ -402,6 +403,9 @@ public class PlayStrategyCardService {
             // cryypter
             case "cryypter_3" -> CryypterHelper.getCryypterSC3Buttons(sc);
 
+            // monuments
+            case "monuments4construction" -> getMonumentsConstructionButtons(sc);
+
             // unhandled
             default -> getGenericButtons(sc);
         };
@@ -480,6 +484,9 @@ public class PlayStrategyCardService {
         return assignSpeakerButtons;
     }
 
+    /**
+     * @return buttons which hit {@link ButtonHelperSCs#construction}
+     */
     private static List<Button> getConstructionButtons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
         Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", Emojis.spacedock);
@@ -533,5 +540,17 @@ public class PlayStrategyCardService {
         Button secondary = Buttons.green("ignisAuroraSC8Secondary", "Draw Unknown Relic Fragment", Emojis.UFrag);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(primary, followButton, secondary, noFollowButton);
+    }
+
+    /**
+     * @return buttons which hit {@link ButtonHelperSCs#construction}
+     */
+    private static List<Button> getMonumentsConstructionButtons(int sc) {
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", Emojis.spacedock);
+        Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", Emojis.pds);
+        Button monumentButton = Buttons.red("construction_monument", "Place 1 Monument", Emojis.Monument);
+        Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        return List.of(followButton, sdButton, pdsButton, monumentButton, noFollowButton);
     }
 }
