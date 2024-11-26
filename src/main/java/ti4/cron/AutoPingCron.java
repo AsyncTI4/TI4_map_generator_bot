@@ -1,7 +1,5 @@
 package ti4.cron;
 
-import static java.util.function.Predicate.*;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +25,8 @@ import ti4.model.StrategyCardModel;
 import ti4.service.player.PlayerReactService;
 import ti4.service.tech.PlayerTechService;
 import ti4.users.UserSettingsManager;
+
+import static java.util.function.Predicate.not;
 
 @UtilityClass
 public class AutoPingCron {
@@ -70,9 +70,9 @@ public class AutoPingCron {
                         ButtonHelper.addReaction(player, false, false, message, null, messageID, game);
                     }
                 }
-                if (shouldDoIt) {
-                    GameSaveLoadManager.saveGame(game, "No Sabo");
-                }
+//                if (shouldDoIt) {
+//                    GameSaveLoadManager.saveGame(game, "No Sabo");
+//                }
             }
             if ("agendawaiting".equals(game.getPhaseOfGame())) {
                 int highNum2 = player.getAutoSaboPassMedian() * 4 / 2;
