@@ -55,7 +55,7 @@ public class StatisticsPipeline {
     }
 
     public static void run(StatisticsEvent event) {
-        event.event.reply("Your statistics are being processed, please hold...").setEphemeral(true).queue();
+        event.event.getHook().sendMessage("Your statistics are being processed, please hold...").setEphemeral(true).queue();
         new TimedRunnable(event.name, event.runnable).run();
     }
 

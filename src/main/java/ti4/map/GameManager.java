@@ -22,7 +22,7 @@ public class GameManager {
 
     static {
         activeGameCache = Caffeine.newBuilder()
-                .maximumSize(200)
+                .maximumSize(500)
                 .expireAfterAccess(2, TimeUnit.HOURS)
                 .build(GameManager::loadGame);
         LogCacheStatsCron.registerCache("gameCache", activeGameCache);
