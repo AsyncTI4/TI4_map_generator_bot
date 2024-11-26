@@ -1245,6 +1245,9 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    /**
+     * Known sources: {@link Helper#getPlanetPlaceUnitButtons}
+     */
     @ButtonHandler("place_")
     public static void genericPlaceUnit(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String unitNPlanet = buttonID.replace("place_", "");
@@ -1289,6 +1292,14 @@ public class ButtonHelperModifyUnits {
                     game, player.getColor(), unitLong + " " + planetName);
                 successMessage = "Placed 1 " + Emojis.pds + " on "
                     + Helper.getPlanetRepresentation(planetName, game) + ".";
+            }
+        } else if ("monument".equalsIgnoreCase(unitLong)) {
+            if (player.ownsUnit("empyrean_monument")) {
+                AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), unitID);
+                successMessage = "Placed 1 " + Emojis.Monument + " in the space area of the " + Helper.getPlanetRepresentation(planetName, game) + " system.";
+            } else {
+                AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), unitLong + " " + planetName);
+                successMessage = "Placed 1 " + Emojis.Monument + " on " + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
         } else {
             Tile tile;
@@ -1388,13 +1399,11 @@ public class ButtonHelperModifyUnits {
 
             }
         }
-        if (("sd".equalsIgnoreCase(unitID) || "pds".equalsIgnoreCase(unitLong)) && event.getMessage().getContentRaw().contains("for construction")) {
-
+        if (("sd".equalsIgnoreCase(unitID) || "pds".equalsIgnoreCase(unitLong) || "monument".equalsIgnoreCase(unitLong)) && event.getMessage().getContentRaw().contains("for construction")) {
             if (game.isFowMode() || (!"action".equalsIgnoreCase(game.getPhaseOfGame()) && !"statusScoring".equalsIgnoreCase(game.getPhaseOfGame()))) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), playerRep + " " + successMessage);
             } else {
-                ButtonHelper.sendMessageToRightStratThread(player, game, playerRep + " " + successMessage,
-                    "construction");
+                ButtonHelper.sendMessageToRightStratThread(player, game, playerRep + " " + successMessage, "construction");
             }
 
             if (player.hasLeader("mahactagent") || player.hasExternalAccessToLeader("mahactagent")) {
@@ -1441,7 +1450,7 @@ public class ButtonHelperModifyUnits {
             }
             event.getMessage().delete().queue();
         } else {
-            if ("sd".equalsIgnoreCase(unitID) || "pds".equalsIgnoreCase(unitLong)) {
+            if ("sd".equalsIgnoreCase(unitID) || "pds".equalsIgnoreCase(unitLong) || "monument".equalsIgnoreCase(unitLong)) {
                 String producedInput = unitID + "_"
                     + game.getTile(AliasHandler.resolveTile(planetName)).getPosition() + "_"
                     + planetName;
@@ -1957,7 +1966,7 @@ public class ButtonHelperModifyUnits {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         int numff = Integer.parseInt(buttonID.split("_")[1]);
         if (numff > 0) {
-            RemoveUnitService.removeUnits(event, tile, game, player.getColor(),  numff + " infantry");
+            RemoveUnitService.removeUnits(event, tile, game, player.getColor(), numff + " infantry");
             AddUnitService.addUnits(event, tile, game, player.getColor(), numff + " fighters");
         }
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
