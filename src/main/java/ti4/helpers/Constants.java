@@ -20,6 +20,9 @@ public class Constants {
     public static final String sigmaId = "214326507458396161";
     public static final List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
 
+    // Server IDs
+    public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
+
     public static String jazzPing() {
         User jazz = AsyncTI4DiscordBot.jda.getUserById(jazzId);
         return jazz == null ? "" : jazz.getAsMention();
