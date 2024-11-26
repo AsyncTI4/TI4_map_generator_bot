@@ -1,17 +1,15 @@
 package ti4.service.statistics;
 
-import java.time.Duration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
-import org.apache.commons.lang3.time.StopWatch;
+import ti4.helpers.TimedRunnable;
 import ti4.message.BotLogger;
 
 public class StatisticsPipeline {
 
-    private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 20;
     private static final StatisticsPipeline instance = new StatisticsPipeline();
 
     private final BlockingQueue<StatisticsPipeline.StatisticsEvent> statisticsQueue = new LinkedBlockingQueue<>();
@@ -58,17 +56,8 @@ public class StatisticsPipeline {
 
     public static void run(StatisticsEvent event) {
         event.event.reply("Your statistics are being processed, please hold...").setEphemeral(true).queue();
-        StopWatch stopWatch = StopWatch.createStarted();
-
-        event.runner.run();
-
-        stopWatch.stop();
-        Duration timeElapsed = stopWatch.getDuration();
-        if (timeElapsed.toSeconds() > EXECUTION_TIME_SECONDS_WARNING_THRESHOLD) {
-            BotLogger.log("Render event for " + event.name + " took longer than " + EXECUTION_TIME_SECONDS_WARNING_THRESHOLD +
-                " seconds (" + timeElapsed.toSeconds() + ").");
-        }
+        new TimedRunnable(event.name, event.runnable).run();
     }
 
-    public record StatisticsEvent(String name, IReplyCallback event, Runnable runner) {}
+    public record StatisticsEvent(String name, IReplyCallback event, Runnable runnable) {}
 }

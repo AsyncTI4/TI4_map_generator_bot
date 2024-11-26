@@ -1,30 +1,29 @@
 package ti4.service.statistics.game;
 
-import java.util.Collections;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.statistics.GameStatisticsFilterer;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GamesPage;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
+
+import static ti4.helpers.StringHelper.ordinal;
 
 @UtilityClass
 class WinningPathsStatisticsService {
 
-    static void showWinningPath(SlashCommandInteractionEvent event) {
+    static void showWinningPaths(SlashCommandInteractionEvent event) {
         Map<String, Integer> winningPathCount = new HashMap<>();
 
         GamesPage.consumeAllGames(
             GameStatisticsFilterer.getGamesFilter(event),
-            game -> getWinningPaths(game, winningPathCount)
+            game -> getWinningPath(game, winningPathCount)
         );
 
         int gamesWithWinnerCount = winningPathCount.values().stream().reduce(0, Integer::sum);
@@ -44,62 +43,97 @@ class WinningPathsStatisticsService {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Winning Paths", sb.toString());
     }
 
-    private static void getWinningPaths(Game game, Map<String, Integer> winningPathCount) {
+    private static void getWinningPath(Game game, Map<String, Integer> winningPathCount) {
         game.getWinner().ifPresent(winner -> {
-            String path = buildWinningPath(game, winner);
+            String path = WinningPathHelper.buildWinningPath(game, winner);
             winningPathCount.put(path, 1 + winningPathCount.getOrDefault(path, 0));
         });
     }
 
-    private static String buildWinningPath(Game game, Player winner) {
-        int stage1Count = countPublicVictoryPoints(game, winner.getUserID(), 1);
-        int stage2Count = countPublicVictoryPoints(game, winner.getUserID(), 2);
-        int secretCount = winner.getSecretVictoryPoints();
-        int supportCount = winner.getSupportForTheThroneVictoryPoints();
-        String otherPoints = summarizeOtherVictoryPoints(game, winner.getUserID());
+    static void showWinsWithSupport(SlashCommandInteractionEvent event) {
+        Map<Integer, Integer> supportWinCount = new HashMap<>();
+        AtomicInteger gameWithWinnerCount = new AtomicInteger();
 
-        return String.format(
-            "%d stage 1s, %d stage 2s, %d secrets, %d supports%s",
-            stage1Count, stage2Count, secretCount, supportCount,
-            otherPoints.isEmpty() ? "" : ", " + otherPoints
+        GamesPage.consumeAllGames(
+            GameStatisticsFilterer.getGamesFilter(event),
+            game -> getWinsWithSupport(game, supportWinCount, gameWithWinnerCount)
         );
+
+        AtomicInteger atomicInteger = new AtomicInteger();
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**Winning Paths With SftT Count:**__").append("\n");
+        supportWinCount.entrySet().stream()
+            .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
+            .forEach(entry -> sb.append(atomicInteger.getAndIncrement() + 1)
+                .append(". `")
+                .append(entry.getValue().toString())
+                .append(" (")
+                .append(Math.round(100 * entry.getValue() / (double) gameWithWinnerCount.get()))
+                .append("%)` ")
+                .append(entry.getKey())
+                .append(" SftT wins")
+                .append("\n"));
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "SftT wins", sb.toString());
     }
 
-    private static int countPublicVictoryPoints(Game game, String userId, int stage) {
-        return (int) game.getScoredPublicObjectives().entrySet().stream()
-            .filter(entry -> entry.getValue().contains(userId))
-            .map(Map.Entry::getKey)
-            .map(Mapper::getPublicObjective)
-            .filter(po -> po != null && po.getPoints() == stage)
-            .count();
+    private static void getWinsWithSupport(Game game, Map<Integer, Integer> supportWinCount, AtomicInteger gameWithWinnerCount) {
+        game.getWinner().ifPresent(winner -> {
+            gameWithWinnerCount.getAndIncrement();
+            int supportCount = winner.getSupportForTheThroneVictoryPoints();
+            supportWinCount.put(supportCount, 1 + supportWinCount.getOrDefault(supportCount, 0));
+        });
     }
 
-    private static String summarizeOtherVictoryPoints(Game game, String userId) {
-        Map<String, Integer> otherVictoryPoints = game.getScoredPublicObjectives().entrySet().stream()
-            .filter(entry -> entry.getValue().contains(userId))
-            .map(Map.Entry::getKey)
-            .filter(poID -> Mapper.getPublicObjective(poID) == null)
-            .collect(Collectors.toMap(
-                WinningPathsStatisticsService::normalizeVictoryPointKey,
-                key -> Collections.frequency(game.getScoredPublicObjectives().get(key), userId),
-                Integer::sum
-            ));
-
-        return otherVictoryPoints.entrySet().stream()
-            .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()))
-            .map(entry -> entry.getValue() + " " + entry.getKey())
-            .collect(Collectors.joining(", "));
+    static String compareWinningPathToAllOthers(String winningPath, int playerCount, int victoryPointTotal) {
+        StringBuilder sb = new StringBuilder();
+        Map<String, Integer> winningPathCounts = getNormalGameWinningPaths(playerCount, victoryPointTotal);
+        int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
+        if (gamesWithWinnerCount >= 100) {
+            int winningPathCount = winningPathCounts.get(winningPath);
+            double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
+            String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
+            sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games (").append(victoryPointTotal).append("VP, ")
+                .append(playerCount).append("P)")
+                .append(", this path has been seen ")
+                .append(winningPathCount - 1)
+                .append(" times before. It's the ").append(winningPathCommonality).append(" most common path (out of ")
+                .append(winningPathCounts.size()).append(" paths) at ")
+                .append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
+            if (winningPathCount == 1) {
+                sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
+            } else if (winningPathPercent <= .005) {
+                sb.append("🎉__**Few have traveled your path! We celebrate your boldness!**__🎉").append("\n");
+            } else if (winningPathPercent <= .01) {
+                sb.append("🎉__**Who needs a conventional win? Not you!**__🎉").append("\n");
+            }
+        }
+        return sb.toString();
     }
 
-    private static String normalizeVictoryPointKey(String poID) {
-        String normalized = poID.toLowerCase().replaceAll("[^a-z]", "");
-        if (normalized.contains("seed")) return "seed";
-        if (normalized.contains("mutiny")) return "mutiny";
-        if (normalized.contains("shard")) return "shard";
-        if (normalized.contains("custodian")) return "custodian/imperial";
-        if (normalized.contains("imperial")) return "imperial rider";
-        if (normalized.contains("censure")) return "censure";
-        if (normalized.contains("crown") || normalized.contains("emph")) return "crown";
-        return "other (probably Classified Document Leaks)";
+    private static Map<String, Integer> getNormalGameWinningPaths(int playerCount, int victoryPointTotal) {
+        Map<String, Integer> winningPathCount = new HashMap<>();
+
+        GamesPage.consumeAllGames(
+            GameStatisticsFilterer.getNormalFinishedGamesFilter(playerCount, victoryPointTotal),
+            game -> getWinningPath(game, winningPathCount)
+        );
+
+        return winningPathCount;
+    }
+
+    private static String getWinningPathCommonality(Map<String, Integer> winningPathCounts, int winningPathCount) {
+        int commonality = 1;
+        for (int i : winningPathCounts.values()) {
+            if (i > winningPathCount) {
+                commonality++;
+            }
+        }
+        return commonality == 1 ? "" : ordinal(commonality);
+    }
+
+    private static String formatPercent(double d) {
+        NumberFormat numberFormat = NumberFormat.getPercentInstance();
+        numberFormat.setMinimumFractionDigits(1);
+        return numberFormat.format(d);
     }
 }

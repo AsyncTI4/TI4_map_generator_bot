@@ -40,6 +40,7 @@ import ti4.helpers.GlobalSettings;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
+import ti4.helpers.TimedRunnable;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -52,6 +53,7 @@ import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
 import ti4.listeners.UserJoinServerListener;
 import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
@@ -339,8 +341,9 @@ public class AsyncTI4DiscordBot {
         });
     }
 
-    public static void runAsync(Runnable runnable) {
-        THREAD_POOL.submit(runnable);
+    public static void runAsync(String name, Runnable runnable) {
+        var timedRunnable = new TimedRunnable(name, runnable);
+        THREAD_POOL.submit(timedRunnable);
     }
 
     public static List<Category> getAvailablePBDCategories() {

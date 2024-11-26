@@ -4,7 +4,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
-import ti4.helpers.GameStatsHelper;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.StatisticsPipeline;
 
@@ -38,13 +37,18 @@ public class GameStatisticsService {
             case FACTION_WIN_PERCENT -> FactionWinPercentStatisticsService.getFactionWinPercent(event);
             case COLOUR_WINS -> MostWinningColorStatisticsService.showMostWinningColor(event);
             case GAME_COUNT -> GameCountStatisticsService.getGameCount(event);
-            case WINNING_PATH -> WinningPathsStatisticsService.showWinningPath(event);
-            case SUPPORT_WIN_COUNT -> GameStatsHelper.showWinsWithSupport(event);
+            case WINNING_PATH -> WinningPathsStatisticsService.showWinningPaths(event);
+            case SUPPORT_WIN_COUNT -> WinningPathsStatisticsService.showWinsWithSupport(event);
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statType);
         }
     }
 
     private String getEventName(GameStatTypes statType) {
         return GameStatisticsService.class.getSimpleName() + ":" + statType;
+    }
+
+    // WARNING: This iterates over each game and is very slow.
+    public String getWinningPathComparison(String winningPath, int playerCount, int totalVictoryPoints) {
+        return WinningPathsStatisticsService.compareWinningPathToAllOthers(winningPath, playerCount, totalVictoryPoints);
     }
 }
