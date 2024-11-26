@@ -1201,7 +1201,7 @@ public class MapGenerator implements AutoCloseable {
             } else {
                 drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, promissoryNote);
             }
-            
+
             for (Player player_ : player.getOtherRealPlayers()) {
                 String playerColor = player_.getColor();
                 String playerFaction = player_.getFaction();
@@ -1231,9 +1231,9 @@ public class MapGenerator implements AutoCloseable {
                     graphics.setColor(Color.GRAY);
                 }
             }
-            
+
             boolean isAttached = (promissoryNote != null && promissoryNote.getAttachment().isPresent()
-                    && !promissoryNote.getAttachment().get().isBlank());
+                && !promissoryNote.getAttachment().get().isBlank());
 
             if (isAttached) {
                 isAttached = false;
@@ -1243,13 +1243,10 @@ public class MapGenerator implements AutoCloseable {
                         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(tokenID))) {
                             isAttached = true;
                             PlanetModel p = Mapper.getPlanet(unitHolder.getName());
-                            if (promissoryNote.getShrinkName() || p.getShrinkNamePNAttach())
-                            {
+                            if (promissoryNote.getShrinkName() || p.getShrinkNamePNAttach()) {
                                 graphics.setFont(Storage.getFont16());
                                 drawOneOrTwoLinesOfTextVertically(graphics, "\n@" + p.getShortNamePNAttach(), x + deltaX + 9, y + 4, 120, true);
-                            }
-                            else
-                            {
+                            } else {
                                 graphics.setFont(Storage.getFont18());
                                 drawOneOrTwoLinesOfTextVertically(graphics, "\n@" + p.getShortNamePNAttach(), x + deltaX + 7, y + 4, 120, true);
                             }
@@ -1258,15 +1255,12 @@ public class MapGenerator implements AutoCloseable {
                     }
                 }
             }
-            
-            if (promissoryNote.getShrinkName())
-            {
+
+            if (promissoryNote.getShrinkName()) {
                 graphics.setFont(Storage.getFont16());
 
                 drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName() + (isAttached ? "\n" : ""), x + deltaX + 9, y + 4, 120, true);
-            }
-            else
-            {
+            } else {
                 graphics.setFont(Storage.getFont18());
                 drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName() + (isAttached ? "\n" : ""), x + deltaX + 7, y + 4, 120, true);
             }
@@ -1325,31 +1319,24 @@ public class MapGenerator implements AutoCloseable {
             if (relicID.equals("absol_quantumcore")) {
                 drawPAImage(x + deltaX, y, "pa_tech_techicons_cyberneticwarfare" + relicStatus + ".png");
             }
-            if (relicID.equals("titanprototype"))
-            {
+            if (relicID.equals("titanprototype")) {
                 drawFactionIconImage(graphics, "relic", x + deltaX - 1, y + 108, 42, 42);
             }
-            
-            if (relicID.equals("emelpar"))
-            {
+
+            if (relicID.equals("emelpar")) {
                 String empelar = "";
-                List<Character> letters = Arrays.asList('m','e','l','p','a');
+                List<Character> letters = Arrays.asList('m', 'e', 'l', 'p', 'a');
                 Collections.shuffle(letters);
-                for (Character c: letters)
-                {
+                for (Character c : letters) {
                     empelar += c;
                 }
                 empelar = "Scepter of\nE" + empelar + "r";
                 graphics.setFont(Storage.getFont18());
                 drawOneOrTwoLinesOfTextVertically(g2, empelar, x + deltaX + 7, y + 30, 120, true);
-            }
-            else if (relicModel.getShrinkName())
-            {
+            } else if (relicModel.getShrinkName()) {
                 graphics.setFont(Storage.getFont16());
                 drawOneOrTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 9, y + 30, 120, true);
-            }
-            else
-            {
+            } else {
                 graphics.setFont(Storage.getFont18());
                 drawOneOrTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 7, y + 30, 120, true);
             }
@@ -1423,31 +1410,30 @@ public class MapGenerator implements AutoCloseable {
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
-        
+
         Comparator<Leader> leaderComparator = (leader1, leader2) -> {
-            int leaderRank1 = switch(leader1.getType()) {
+            int leaderRank1 = switch (leader1.getType()) {
                 case Constants.AGENT -> 0;
                 case Constants.ENVOY -> 1;
                 case Constants.COMMANDER -> 2;
                 case Constants.HERO -> 3;
                 default -> -1;
             };
-            int leaderRank2 = switch(leader2.getType()) {
+            int leaderRank2 = switch (leader2.getType()) {
                 case Constants.AGENT -> 0;
                 case Constants.ENVOY -> 1;
                 case Constants.COMMANDER -> 2;
                 case Constants.HERO -> 3;
                 default -> -1;
             };
-            if (leaderRank1 == leaderRank2)
-            {
+            if (leaderRank1 == leaderRank2) {
                 return Mapper.getLeader(leader1.getId()).getName().compareToIgnoreCase(Mapper.getLeader(leader2.getId()).getName());
             }
             return leaderRank1 - leaderRank2;
         };
         List<Leader> allLeaders = new ArrayList<>(player.getLeaders());
         allLeaders.sort(leaderComparator);
-        
+
         for (Leader leader : allLeaders) {
             boolean isExhaustedLocked = leader.isExhausted() || leader.isLocked();
             if (isExhaustedLocked) {
@@ -1467,7 +1453,7 @@ public class MapGenerator implements AutoCloseable {
             if (leader.getTgCount() != 0) {
                 graphics.setColor(TradeGoodColor);
                 graphics.setFont(Storage.getFont32());
-                Integer offset = 20 - graphics.getFontMetrics().stringWidth("" + leader.getTgCount())/2;
+                Integer offset = 20 - graphics.getFontMetrics().stringWidth("" + leader.getTgCount()) / 2;
                 graphics.drawString(Integer.toString(leader.getTgCount()), x + deltaX + offset, y + 25);
             } else {
                 String pipID;
@@ -1489,20 +1475,15 @@ public class MapGenerator implements AutoCloseable {
                     drawPAImage(x + deltaX, y, leaderPipInfo);
                 }
             }
-            
+
             LeaderModel leaderModel = Mapper.getLeader(leader.getId());
-            if (leader.getId().equalsIgnoreCase("yssarilagent"))
-            {
+            if (leader.getId().equalsIgnoreCase("yssarilagent")) {
                 drawTextVertically(g2, "Clever, Clever".toUpperCase(), x + deltaX + 8, y + 30, Storage.getFont14(), true);
                 drawTextVertically(g2, "Ssruu".toUpperCase(), x + deltaX + 23, y + 30, Storage.getFont18(), true);
-            }
-            else if (leaderModel.getShrinkName())
-            {
+            } else if (leaderModel.getShrinkName()) {
                 g2.setFont(Storage.getFont16());
                 drawOneOrTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 9, y + 30, 120, true);
-            }
-            else
-            {
+            } else {
                 g2.setFont(Storage.getFont18());
                 drawOneOrTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 7, y + 30, 120, true);
             }
@@ -2115,48 +2096,40 @@ public class MapGenerator implements AutoCloseable {
                 realPlanets.add(planet);
             }
         }
-        
+
         Tile homeTile = player.getHomeSystemTile();
-        if (homeTile.getTileID().equals("51"))
-        {
+        if (homeTile.getTileID().equals("51")) {
             Tile creussGate = game.getTile("17");
-            if (creussGate != null)
-            {
+            if (creussGate != null) {
                 homeTile = creussGate;
             }
         }
         Point homePosition = PositionMapper.getTilePosition(homeTile.getPosition());
         Comparator<String> planetComparator = (planet1, planet2) -> {
             Tile tile1 = game.getTileFromPlanet(planet1);
-            if (tile1.getTileID().equals("51"))
-            {
+            if (tile1.getTileID().equals("51")) {
                 Tile creussGate = game.getTile("17");
-                if (creussGate != null)
-                {
+                if (creussGate != null) {
                     tile1 = creussGate;
                 }
             }
             Point position1 = PositionMapper.getTilePosition(tile1.getPosition());
             Integer distance1 = ((homePosition.x - position1.x) * (homePosition.x - position1.x)
-                                 + (homePosition.y - position1.y) * (homePosition.y - position1.y))/4000;
+                + (homePosition.y - position1.y) * (homePosition.y - position1.y)) / 4000;
             Tile tile2 = game.getTileFromPlanet(planet2);
-            if (tile2.getTileID().equals("51"))
-            {
+            if (tile2.getTileID().equals("51")) {
                 Tile creussGate = game.getTile("17");
-                if (creussGate != null)
-                {
+                if (creussGate != null) {
                     tile2 = creussGate;
                 }
             }
             Point position2 = PositionMapper.getTilePosition(tile2.getPosition());
             Integer distance2 = ((homePosition.x - position2.x) * (homePosition.x - position2.x)
-                                 + (homePosition.y - position2.y) * (homePosition.y - position2.y))/4000;
-            if (distance1 != distance2)
-            {
+                + (homePosition.y - position2.y) * (homePosition.y - position2.y)) / 4000;
+            if (distance1 != distance2) {
                 return distance1 - distance2;
             }
-            if (!tile1.getPosition().equalsIgnoreCase(tile2.getPosition()))
-            {
+            if (!tile1.getPosition().equalsIgnoreCase(tile2.getPosition())) {
                 return tile2.getPosition().compareToIgnoreCase(tile1.getPosition());
             }
             return planet1.compareToIgnoreCase(planet2);
@@ -2292,44 +2265,39 @@ public class MapGenerator implements AutoCloseable {
                 resFileName = "pc_res_khrask" + statusOfPlanet + ".png";
                 addWebsiteOverlay("Garden World", null, x + deltaX, y, 20, 20);
             }
-            
+
             drawPlanetCardDetail(x + deltaX + 26, y + 103, resFileName);
             drawPlanetCardDetail(x + deltaX + 26, y + 125, infFileName);
-            
+
             graphics.setFont(Storage.getFont12());
-            Integer offset = 10 - graphics.getFontMetrics().stringWidth("" + resources)/2;
+            Integer offset = 10 - graphics.getFontMetrics().stringWidth("" + resources) / 2;
             if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                 graphics.setColor(Color.BLACK);
-                for (int i=-1; i<=1; i++)
-                {
-                    for (int j=-1; j<=1; j++)
-                    {
+                for (int i = -1; i <= 1; i++) {
+                    for (int j = -1; j <= 1; j++) {
                         graphics.drawString("" + resources, x + deltaX + 26 + offset + i, y + 118 + j);
                     }
                 }
             }
             graphics.setColor(Color.WHITE);
             graphics.drawString("" + resources, x + deltaX + 26 + offset, y + 117);
-            offset = 10 - graphics.getFontMetrics().stringWidth("" + influence)/2;
+            offset = 10 - graphics.getFontMetrics().stringWidth("" + influence) / 2;
             graphics.drawString("" + influence, x + deltaX + 26 + offset, y + 139);
-            
+
             graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
-            if (planetModel.getShrinkNamePNAttach())
-            {
+            if (planetModel.getShrinkNamePNAttach()) {
                 drawTextVertically(graphics, planetModel.getShortName().toUpperCase(), x + deltaX + 9, y + 144, Storage.getFont16());
-            }
-            else
-            {
+            } else {
                 drawTextVertically(graphics, planetModel.getShortName().toUpperCase(), x + deltaX + 7, y + 144, Storage.getFont18());
             }
-            
+
             return deltaX + 56;
         } catch (Exception e) {
             BotLogger.log("could not print out planet: " + planetName.toLowerCase(), e);
         }
         return deltaX;
     }
-    
+
     private void drawPlanetCardDetail(int x, int y, String resourceName) {
         String resourcePath = ResourceHelper.getInstance().getPlanetResource(resourceName);
         BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
@@ -2420,121 +2388,96 @@ public class MapGenerator implements AutoCloseable {
             // Draw Faction Tech Icon
             if (techModel.getFaction().isPresent()) {
                 drawFactionIconImage(graphics, techModel.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
-            }
-            else
-            {
+            } else {
                 Color foreground = Color.WHITE;
                 int types = 0;
-                if (techModel.isPropulsionTech())
-                {
+                if (techModel.isPropulsionTech()) {
                     foreground = Color.decode("#509dce");
                     types++;
                 }
-                if (techModel.isCyberneticTech())
-                {
+                if (techModel.isCyberneticTech()) {
                     foreground = Color.decode("#e2da6a");
                     types++;
                 }
-                if (techModel.isBioticTech())
-                {
+                if (techModel.isBioticTech()) {
                     foreground = Color.decode("#7cba6b");
                     types++;
                 }
-                if (techModel.isWarfareTech())
-                {
+                if (techModel.isWarfareTech()) {
                     foreground = Color.decode("#dc6569");
                     types++;
                 }
-                if (types != 1)
-                {
+                if (types != 1) {
                     foreground = Color.WHITE;
                 }
-                if (isExhausted)
-                {
+                if (isExhausted) {
                     foreground = Color.GRAY;
                 }
-                
+
                 String initials = techModel.getInitials();
-                if (initials.length() == 2)
-                {
-                    String left = initials.substring(0,1);
-                    String right = initials.substring(1,2);
+                if (initials.length() == 2) {
+                    String left = initials.substring(0, 1);
+                    String right = initials.substring(1, 2);
                     graphics.setFont(Storage.getFont32());
-                    int offsetLeft = Math.max(0, 10 - graphics.getFontMetrics().stringWidth(left)/2);
+                    int offsetLeft = Math.max(0, 10 - graphics.getFontMetrics().stringWidth(left) / 2);
                     int offsetRight = Math.min(40 - graphics.getFontMetrics().stringWidth(right),
-                                               30 - graphics.getFontMetrics().stringWidth(right)/2);
+                        30 - graphics.getFontMetrics().stringWidth(right) / 2);
                     graphics.setColor(Color.BLACK);
-                    for (int i=-1; i<=1; i++)
-                    {
-                        for (int j=-1; j<=1; j++)
-                        {
+                    for (int i = -1; i <= 1; i++) {
+                        for (int j = -1; j <= 1; j++) {
                             graphics.drawString(right, x + i + deltaX + offsetRight, y + j + 148);
                         }
                     }
                     graphics.setColor(foreground);
                     graphics.drawString(right, x + deltaX + offsetRight, y + 148);
                     graphics.setColor(Color.BLACK);
-                    for (int i=-1; i<=1; i++)
-                    {
-                        for (int j=-1; j<=1; j++)
-                        {
+                    for (int i = -1; i <= 1; i++) {
+                        for (int j = -1; j <= 1; j++) {
                             graphics.drawString(left, x + i + deltaX + offsetLeft, y + j + 139);
                         }
                     }
                     graphics.setColor(foreground);
                     graphics.drawString(left, x + deltaX + offsetLeft, y + 139);
-                }
-                else if (initials.length() == 3)
-                {
-                    String left = initials.substring(0,1);
-                    String middle = initials.substring(1,2);
-                    String right = initials.substring(2,3);
+                } else if (initials.length() == 3) {
+                    String left = initials.substring(0, 1);
+                    String middle = initials.substring(1, 2);
+                    String right = initials.substring(2, 3);
                     graphics.setFont(Storage.getFont24());
-                    int offsetLeft = Math.max(0, 7 - graphics.getFontMetrics().stringWidth(left)/2);
-                    int offsetMiddle = 20 - graphics.getFontMetrics().stringWidth(middle)/2;
+                    int offsetLeft = Math.max(0, 7 - graphics.getFontMetrics().stringWidth(left) / 2);
+                    int offsetMiddle = 20 - graphics.getFontMetrics().stringWidth(middle) / 2;
                     int offsetRight = Math.min(40 - graphics.getFontMetrics().stringWidth(right),
-                                               33 - graphics.getFontMetrics().stringWidth(right)/2);
+                        33 - graphics.getFontMetrics().stringWidth(right) / 2);
                     graphics.setColor(Color.BLACK);
-                    for (int i=-1; i<=1; i++)
-                    {
-                        for (int j=-1; j<=1; j++)
-                        {
+                    for (int i = -1; i <= 1; i++) {
+                        for (int j = -1; j <= 1; j++) {
                             graphics.drawString(right, x + i + deltaX + offsetRight, y + j + 148);
                         }
                     }
                     graphics.setColor(foreground);
                     graphics.drawString(right, x + deltaX + offsetRight, y + 148);
                     graphics.setColor(Color.BLACK);
-                    for (int i=-1; i<=1; i++)
-                    {
-                        for (int j=-1; j<=1; j++)
-                        {
+                    for (int i = -1; i <= 1; i++) {
+                        for (int j = -1; j <= 1; j++) {
                             graphics.drawString(middle, x + i + deltaX + offsetMiddle, y + j + 141);
                         }
                     }
                     graphics.setColor(foreground);
                     graphics.drawString(middle, x + deltaX + offsetMiddle, y + 141);
                     graphics.setColor(Color.BLACK);
-                    for (int i=-1; i<=1; i++)
-                    {
-                        for (int j=-1; j<=1; j++)
-                        {
+                    for (int i = -1; i <= 1; i++) {
+                        for (int j = -1; j <= 1; j++) {
                             graphics.drawString(left, x + i + deltaX + offsetLeft, y + j + 134);
                         }
                     }
                     graphics.setColor(foreground);
                     graphics.drawString(left, x + deltaX + offsetLeft, y + 134);
-                }
-                else
-                {
-                    initials = initials.substring(0,1);
+                } else {
+                    initials = initials.substring(0, 1);
                     graphics.setFont(Storage.getFont48());
-                    int offset = 20 - graphics.getFontMetrics().stringWidth(initials)/2;
+                    int offset = 20 - graphics.getFontMetrics().stringWidth(initials) / 2;
                     graphics.setColor(Color.BLACK);
-                    for (int i=-2; i<=2; i++)
-                    {
-                        for (int j=-2; j<=2; j++)
-                        {
+                    for (int i = -2; i <= 2; i++) {
+                        for (int j = -2; j <= 2; j++) {
                             graphics.drawString(initials, x + i + deltaX + offset, y + j + 148);
                         }
                     }
@@ -2542,15 +2485,12 @@ public class MapGenerator implements AutoCloseable {
                     graphics.drawString(initials, x + deltaX + offset, y + 148);
                 }
             }
-            
+
             graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
-            if (techModel.getShrinkName())
-            {
+            if (techModel.getShrinkName()) {
                 graphics.setFont(Storage.getFont16());
                 drawOneOrTwoLinesOfTextVertically(graphics, techModel.getShortName(), x + deltaX + 9, y + 116, 116);
-            }
-            else
-            {
+            } else {
                 graphics.setFont(Storage.getFont18());
                 drawOneOrTwoLinesOfTextVertically(graphics, techModel.getShortName(), x + deltaX + 7, y + 116, 116);
             }
@@ -2603,13 +2543,10 @@ public class MapGenerator implements AutoCloseable {
                 drawFactionIconImageOpaque(graphics, techModel.getFaction().get(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
             }
 
-            if (techModel.getShrinkName())
-            {
+            if (techModel.getShrinkName()) {
                 graphics.setFont(Storage.getFont16());
                 drawOneOrTwoLinesOfTextVertically(graphics, techModel.getShortName(), x + deltaX + 9, y + 116, 116);
-            }
-            else
-            {
+            } else {
                 graphics.setFont(Storage.getFont18());
                 drawOneOrTwoLinesOfTextVertically(graphics, techModel.getShortName(), x + deltaX + 7, y + 116, 116);
             }
@@ -4150,8 +4087,7 @@ public class MapGenerator implements AutoCloseable {
                 width = g2.getFontMetrics().stringWidth(substringText);
             }
             if (index > 0) {
-                while (index < agendaTextLength && agendaText.charAt(agendaTextLength - index) != ' ')
-                {
+                while (index < agendaTextLength && agendaText.charAt(agendaTextLength - index) != ' ') {
                     index++;
                 }
                 graphics.drawString(agendaText.substring(0, agendaTextLength - index), x + 95, y + 70);
@@ -4576,9 +4512,8 @@ public class MapGenerator implements AutoCloseable {
         AffineTransform originalTransform = graphics2D.getTransform();
         graphics2D.rotate(Math.toRadians(-90));
         graphics2D.setFont(font);
-        
-        if (rightAlign)
-        {
+
+        if (rightAlign) {
             y += graphics.getFontMetrics().stringWidth(text);
         }
 
@@ -4617,20 +4552,17 @@ public class MapGenerator implements AutoCloseable {
             drawTextVertically(graphics, secondRow, x + spacing, y, graphics.getFont(), rightAlign);
         }
     }
-    
-    private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth)
-    {
+
+    private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth) {
         drawOneOrTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, false);
     }
 
-    private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth, boolean rightAlign)
-    {
+    private static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth, boolean rightAlign) {
         // vertically prints text on one line, centred horizontally, if it fits,
         // otherwise prints it over two lines
 
         // if the text contains a linebreak, print it over two lines
-        if (text.contains("\n"))
-        {
+        if (text.contains("\n")) {
             drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, rightAlign);
             return;
         }
@@ -4639,9 +4571,8 @@ public class MapGenerator implements AutoCloseable {
         text = text.toUpperCase();
 
         // if the text is short enough to fit on one line, print it on one
-        if (text.equals(trimTextToPixelWidth(graphics, text, maxWidth)))
-        {
-            drawTextVertically(graphics, text, x + spacing/2, y, graphics.getFont(), rightAlign);
+        if (text.equals(trimTextToPixelWidth(graphics, text, maxWidth))) {
+            drawTextVertically(graphics, text, x + spacing / 2, y, graphics.getFont(), rightAlign);
             return;
         }
 
@@ -4676,7 +4607,7 @@ public class MapGenerator implements AutoCloseable {
 
     private static String trimTextToPixelWidth(Graphics graphics, String text, int pixelLength) {
         for (int i = 0; i < text.length(); i++) {
-            if (graphics.getFontMetrics().stringWidth(text.substring(0, i+1)) > pixelLength) {
+            if (graphics.getFontMetrics().stringWidth(text.substring(0, i + 1)) > pixelLength) {
                 return text.substring(0, i);
             }
         }
