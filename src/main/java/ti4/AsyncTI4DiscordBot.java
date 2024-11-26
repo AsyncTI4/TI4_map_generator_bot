@@ -30,6 +30,7 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import ti4.commands2.CommandManager;
 import ti4.cron.AutoPingCron;
+import ti4.cron.CronManager;
 import ti4.cron.GameCreationLockRemovalCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.UploadStatsCron;
@@ -194,6 +195,7 @@ public class AsyncTI4DiscordBot {
         BotLogger.logWithTimestamp(" LOADING GAMES");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
         GameSaveLoadManager.loadGame();
+        GameSaveLoadManager.cleanupOldUndoFiles();
 
         // RUN DATA MIGRATIONS
         BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
@@ -205,10 +207,10 @@ public class AsyncTI4DiscordBot {
         ImageIO.setUseCache(false);
 
         // START CRONS
-        AutoPingCron.start();
-        LogCacheStatsCron.start();
-        UploadStatsCron.start();
-        GameCreationLockRemovalCron.start();
+        AutoPingCron.register();
+        LogCacheStatsCron.register();
+        UploadStatsCron.register();
+        GameCreationLockRemovalCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
@@ -227,10 +229,7 @@ public class AsyncTI4DiscordBot {
                 if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.logWithTimestamp("DONE RENDERING MAPS");
                 }
-                AutoPingCron.shutdown();
-                LogCacheStatsCron.shutdown();
-                UploadStatsCron.shutdown();
-                GameCreationLockRemovalCron.shutdown();
+                CronManager.shutdown(); // will wait for up to an additional 20 seconds
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS COMPLETE");
                 TimeUnit.SECONDS.sleep(1); // wait for BotLogger
                 jda.shutdown();

@@ -192,6 +192,10 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
             || (getSource() != ComponentSource.base && getSource() != ComponentSource.pok);
     }
 
+    public String getShortName() {
+        return shortName == null ? getName() : shortName;
+    }
+
     /**
      * @deprecated This only exists to simulate the old text based promissory note .property files
      */

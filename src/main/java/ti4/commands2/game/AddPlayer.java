@@ -28,7 +28,6 @@ class AddPlayer extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        User user = getPlayer().getUser();
 
         addExtraUser(event, game, Constants.PLAYER1);
         addExtraUser(event, game, Constants.PLAYER2);
@@ -40,19 +39,19 @@ class AddPlayer extends GameStateSubcommand {
         addExtraUser(event, game, Constants.PLAYER8);
 
         Helper.fixGameChannelPermissions(event.getGuild(), game);
-
-        MessageHelper.replyToMessage(event, getResponseMessage(game, user));
     }
 
     private void addExtraUser(SlashCommandInteractionEvent event, Game game, String playerID) {
         OptionMapping option = event.getOption(playerID);
-        if (option != null) {
-            User extraUser = option.getAsUser();
-            game.addPlayer(extraUser.getId(), extraUser.getName());
+        if (option == null) {
+            return;
         }
-    }
-
-    private String getResponseMessage(Game game, User user) {
-        return user.getName() + " added players to game: " + game.getName() + " - successful";
+        User extraUser = option.getAsUser();
+        if (game.getPlayerIDs().contains(extraUser.getId())) {
+            MessageHelper.replyToMessage(event, extraUser.getName() + " is already a player in the game.");
+            return;
+        }
+        game.addPlayer(extraUser.getId(), extraUser.getName());
+        MessageHelper.sendMessageToEventChannel(event, extraUser.getName() + " added to game: " + game.getName() + " - successful");
     }
 }

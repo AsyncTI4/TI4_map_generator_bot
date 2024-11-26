@@ -21,7 +21,7 @@ public class ServerPromoteCommand implements ParentCommand {
     public static final String DEV_CHANNEL = "947520255826198549";
     public static final Map<String, String> Servers = new HashMap<>() {
         {
-            put("943410040369479690", "Async Hub");
+            put(Constants.ASYNCTI4_HUB_SERVER_ID, "Async Hub");
             put("1176104225932058694", "War Sun Tzu");
             put("1145823841227112598", "Dread Not!");
             put("1250131684393881610", "Tommer Hawk");
