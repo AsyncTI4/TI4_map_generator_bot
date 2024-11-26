@@ -2,7 +2,8 @@
     "id": "archonrenk",
     "tileId": "92new",
     "name": "Archon Ren Keleres",
-    "shortName": null,
+    "shortName": "Archon Ren",
+    "shrinkNamePNAttach": true,
     "aliases": [
         "archonrenk",
         "archonrenkeleres",

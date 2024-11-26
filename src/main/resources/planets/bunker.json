@@ -2,7 +2,6 @@
     "id": "bunker",
     "tileId": "m28",
     "name": "Bunker",
-    "shortName": null,
     "aliases": [
         "bunker"
     ],

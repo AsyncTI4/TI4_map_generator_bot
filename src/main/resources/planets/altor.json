@@ -2,7 +2,6 @@
     "id": "altor",
     "tileId": "m01",
     "name": "Altor",
-    "shortName": null,
     "aliases": ["altor", "alt"],
     "positionInTile": {
         "x": 170.0,

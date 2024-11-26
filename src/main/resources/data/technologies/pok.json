@@ -7,7 +7,9 @@
         ],
         "source": "base",
         "text": "Your ships can move into and through asteroid fields. When other players' units use SPACE CANNON against your units, apply -1 to the result of each die roll.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/blue/antimass_deflectors.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/blue/antimass_deflectors.jpg?raw=true",
+        "initials": "AMD",
+        "shortName": "Antimass Deflect'rs"
     },
     {
         "alias": "gd",
@@ -18,7 +20,8 @@
         "requirements": "B",
         "source": "base",
         "text": "After you activate a system, apply +1 to the move value of 1 of your ships during this tactical action.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/blue/gravity_drive.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/blue/gravity_drive.jpg?raw=true",
+        "initials": "GD"
     },
     {
         "alias": "fl",
@@ -29,7 +32,8 @@
         "requirements": "BB",
         "source": "base",
         "text": "During each of your turns of the action phase, you may perform 2 actions instead of 1.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/blue/fleet_logistics.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/blue/fleet_logistics.jpg?raw=true",
+        "initials": "FL"
     },
     {
         "alias": "lwd",
@@ -40,7 +44,8 @@
         "requirements": "BBB",
         "source": "base",
         "text": "Your ships can move through systems that contain other players' ships.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/blue/lightwave_deflector.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/blue/lightwave_deflector.jpg?raw=true",
+        "initials": "L/W"
     },
     {
         "alias": "det",
@@ -50,7 +55,9 @@
         ],
         "source": "pok",
         "text": "After you perform a tactical action in a system that contains a frontier token, if you have 1 or more ships in that system, explore that token. Your ships can retreat into adjacent systems that do not contain other players' units, even if you do not have units or control planets in that system.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/blue/dark_energy_tap.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/blue/dark_energy_tap.jpg?raw=true",
+        "initials": "DET",
+        "shortName": "Dark N.R.G. Tap"
     },
     {
         "alias": "sr",
@@ -61,7 +68,8 @@
         "requirements": "B",
         "source": "pok",
         "text": "ACTION: Exhaust this card to produce 1 ship in any system that contains one of your space docks.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/blue/sling_relay.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/blue/sling_relay.jpg?raw=true",
+        "initials": "SR"
     },
     {
         "alias": "nm",
@@ -71,7 +79,8 @@
         ],
         "source": "base",
         "text": "During the status phase, draw 2 action cards instead of 1.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/neural_motivator.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/neural_motivator.jpg?raw=true",
+        "initials": "NM"
     },
     {
         "alias": "dxa",
@@ -82,7 +91,8 @@
         "requirements": "G",
         "source": "base",
         "text": "After you win a ground combat, you may place 1 infantry from your reinforcements on that planet.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/dacxive_animators.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/dacxive_animators.jpg?raw=true",
+        "initials": "DA"
     },
     {
         "alias": "hm",
@@ -93,7 +103,10 @@
         "requirements": "GG",
         "source": "base",
         "text": "During the status phase, gain 3 command tokens instead of 2.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/hyper_metabolism.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/hyper_metabolism.jpg?raw=true",
+        "shrinkName": true,
+        "shortName": "Hyper\nMetabolism",
+        "initials": "HM"
     },
     {
         "alias": "x89_base",
@@ -104,7 +117,9 @@
         "requirements": "GGG",
         "source": "base",
         "text": "ACTION: Exhaust this card and choose 1 planet in a system that contains 1 or more of your ships that have BOMBARDMENT; destroy all infantry on that planet",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/x89_bacterial_weapon.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/x89_bacterial_weapon.jpg?raw=true",
+        "initials": "X89",
+        "shortName": "X-89 Bact. Weapon"
     },
     {
         "alias": "x89",
@@ -115,7 +130,9 @@
         "requirements": "GGG",
         "source": "codex1",
         "text": "After 1 or more of your units use BOMBARDMENT against a planet, if at least 1 of your opponent's infantry was destroyed, you may destroy all of your opponent's infantry on that planet.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/x89_bacterial_weapon.omega.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/x89_bacterial_weapon.omega.jpg?raw=true",
+        "initials": "X89",
+        "shortName": "X-89 Bact. Weapon"
     },
     {
         "alias": "pa",
@@ -125,7 +142,10 @@
         ],
         "source": "pok",
         "text": "You can use technology specialties on planets you control without exhausting them, even if those planets are exhausted. During the Action Phase, you can exhaust planets you control that have technology specialties to gain 1 Trade Good.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/psychoarchaeology.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/psychoarchaeology.jpg?raw=true",
+        "initials": "PSY",
+        "shortName": "Psychoarch\n-aeology",
+        "shrinkName": true
     },
     {
         "alias": "bs",
@@ -136,7 +156,8 @@
         "requirements": "G",
         "source": "pok",
         "text": "You may exhaust this card at the end of your turn to ready 1 of your planets that has a technology specialty or 1 of your other technologies.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/biostims.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/green/biostims.jpg?raw=true",
+        "initials": "BS"
     },
     {
         "alias": "ps",
@@ -146,7 +167,8 @@
         ],
         "source": "base",
         "text": "When 1 or more of your units use Bombardment or Space Cannon, 1 of those units may roll 1 additional die.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/plasma_scoring.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/plasma_scoring.jpg?raw=true",
+        "initials": "PS"
     },
     {
         "alias": "md_base",
@@ -157,7 +179,9 @@
         "requirements": "R",
         "source": "base",
         "text": "You may exhaust this card at the start of a round of ground combat on a planet that contains 1 or more of your units that have Planetary Shield; your opponent cannot make combat rolls this combat round.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/magen_defense_grid.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/magen_defense_grid.jpg?raw=true",
+        "initials": "MDG",
+        "shortName": "Magen Def. Grid"
     },
     {
         "alias": "md",
@@ -168,7 +192,9 @@
         "requirements": "R",
         "source": "codex1",
         "text": "At the start of ground combat on a planet that contains 1 or more of your structures, you may produce 1 hit and assign it to 1 of your opponent's ground forces.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/magen_defense_grid.omega.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/magen_defense_grid.omega.jpg?raw=true",
+        "initials": "MDG",
+        "shortName": "Magen Def. Grid"
     },
     {
         "alias": "da",
@@ -179,7 +205,8 @@
         "requirements": "RR",
         "source": "base",
         "text": "During each combat round, after you assign hits to your units, repair 1 of your damaged units that did not use Sustain Damage during this combat round.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/duranium_armor.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/duranium_armor.jpg?raw=true",
+        "initials": "DA"
     },
     {
         "alias": "asc",
@@ -190,7 +217,8 @@
         "requirements": "RRR",
         "source": "base",
         "text": "At the start of a space combat in a system that contains 3 or more of your non-fighter ships, your opponent must destroy 1 of their non-fighter ships.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/assault_cannon.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/assault_cannon.jpg?raw=true",
+        "initials": "AC"
     },
     {
         "alias": "aida",
@@ -200,7 +228,9 @@
         ],
         "source": "pok",
         "text": "When you research a unit upgrade technology, you may exhaust this card to ignore any 1 prerequisite. When 1 or more of your units use Production, you may exhaust this card to reduce the combined cost of the produced units by the number of unit upgrade technologies that you own.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/ai_development_algorithm.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/ai_development_algorithm.jpg?raw=true",
+        "initials": "AI",
+        "shortName": "AI Develop. Algorithm"
     },
     {
         "alias": "sar",
@@ -211,7 +241,9 @@
         "requirements": "R",
         "source": "pok",
         "text": "After 1 or more of your units use PRODUCTION, you may exhaust this card to place 1 mech from your reinforcements on a planet you control in that system. After 1 of your mechs is destroyed, gain 1 trade good.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/self_assembly_routines.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/self_assembly_routines.jpg?raw=true",
+        "initials": "SAR",
+        "shortName": "Self-Ass. Routines"
     },
     {
         "alias": "st",
@@ -221,7 +253,8 @@
         ],
         "source": "base",
         "text": "When 1 or more of your units use Production, reduce the combined cost of the produced units by 1.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/yellow/sarween_tools.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/yellow/sarween_tools.jpg?raw=true",
+        "initials": "ST"
     },
     {
         "alias": "gls",
@@ -232,7 +265,9 @@
         "requirements": "Y",
         "source": "base",
         "text": "You may exhaust this card before 1 or more of your units uses Space Cannon; hits produced by those units must be assigned to non-fighter ships if able.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/yellow/graviton_laser_system.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/yellow/graviton_laser_system.jpg?raw=true",
+        "initials": "GLS",
+        "shortName": "Graviton Laser Sys."
     },
     {
         "alias": "td",
@@ -243,7 +278,8 @@
         "requirements": "YY",
         "source": "base",
         "text": "You may exhaust this card at the start of your turn during the action phase; remove up to 4 of your ground forces from the game board and place them on 1 or more planets you control.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/yellow/transit_diodes.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/yellow/transit_diodes.jpg?raw=true",
+        "initials": "TD"
     },
     {
         "alias": "ie",
@@ -254,7 +290,9 @@
         "requirements": "YYY",
         "source": "base",
         "text": "After you gain control of a planet, you may produce any number of units on that planet that have a combined cost equal to or less than that planet's resource value.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/yellow/integrated_economy.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/yellow/integrated_economy.jpg?raw=true",
+        "initials": "IE",
+        "shortName": "Integr't'd Economy"
     },
     {
         "alias": "sdn",
@@ -264,7 +302,9 @@
         ],
         "source": "pok",
         "text": "When you activate a system, you may explore 1 planet in that system which contains 1 or more of your units.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/yellow/scanlink_drone_network.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/yellow/scanlink_drone_network.jpg?raw=true",
+        "initials": "SDN",
+        "shortName": "Scanlink Drone Net."
     },
     {
         "alias": "pi",
@@ -275,7 +315,9 @@
         "requirements": "Y",
         "source": "pok",
         "text": "At the end of your turn, you may exhaust this card to redistribute your command tokens.\n\nWhen you cast votes during the agenda phase, you may cast 3 additional votes; if you do, and the outcome you voted for is not resolved, exhaust this card.",
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/yellow/predictive_intelligence.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/yellow/predictive_intelligence.jpg?raw=true",
+        "initials": "PI",
+        "shortName": "Predictive Intell'ce"
     },
     {
         "alias": "ws",
@@ -330,7 +372,8 @@
         "requirements": "Y",
         "faction": "letnev",
         "source": "base",
-        "text": "During an invasion, units cannot use Space Cannon against your units."
+        "text": "During an invasion, units cannot use Space Cannon against your units.",
+        "shortName": "L4 Dis-\nruptors"
     },
     {
         "alias": "cm",
@@ -364,7 +407,9 @@
         "requirements": "YYY",
         "faction": "hacan",
         "source": "base",
-        "text": "At the end of the strategy phase, you may spend 1 token from your strategy pool and give another player 3 of your trade goods.  If you do, give 1 of your strategy cards to that player and take 1 of their strategy cards."
+        "text": "At the end of the strategy phase, you may spend 1 token from your strategy pool and give another player 3 of your trade goods.  If you do, give 1 of your strategy cards to that player and take 1 of their strategy cards.",
+        "shrinkName": true,
+        "shortName": "Quantum\nDatahub Nd"
     },
     {
         "alias": "as",
@@ -375,7 +420,8 @@
         "requirements": "BB",
         "faction": "empyrean",
         "source": "pok",
-        "text": "After you or one of your neighbors activates a system that is adjacent to an anomaly, you may apply +1 to the move value of all of that player's ships during this tactical action."
+        "text": "After you or one of your neighbors activates a system that is adjacent to an anomaly, you may apply +1 to the move value of all of that player's ships during this tactical action.",
+        "shortName": "Aether-\nstream"
     },
     {
         "alias": "ac2",
@@ -511,7 +557,9 @@
         "requirements": "BB",
         "faction": "jolnar",
         "source": "base",
-        "text": "You may exhaust this card after you activate a system that contains 1 or more of your units; that system is adjacent to all other systems that contain 1 or more of your units during this activation."
+        "text": "You may exhaust this card after you activate a system that contains 1 or more of your units; that system is adjacent to all other systems that contain 1 or more of your units during this activation.",
+        "shrinkName": false,
+        "shortName": "Spatial\nCond't Cyl."
     },
     {
         "alias": "dt2",
@@ -566,11 +614,12 @@
         "requirements": "GG",
         "faction": "arborec",
         "source": "base",
-        "text": "At the end of the status phase, you may remove any number of infantry from planets you control and place them on 1 or more planets you control in the same or adjacent systems."
+        "text": "At the end of the status phase, you may remove any number of infantry from planets you control and place them on 1 or more planets you control in the same or adjacent systems.",
+        "shortName": "Bio-\nplasmosis"
     },
     {
         "alias": "ah",
-        "name": "Aerie Hololattice",
+        "name": "Aerie Holo\n-lattice",
         "types": [
             "CYBERNETIC"
         ],
@@ -588,7 +637,9 @@
         "requirements": "RR",
         "faction": "letnev",
         "source": "base",
-        "text": "When 1 of your units uses Sustain Damage, cancel 2 hits instead of 1."
+        "text": "When 1 of your units uses Sustain Damage, cancel 2 hits instead of 1.",
+        "shortName": "Non-Euclid.\nShielding",
+        "shrinkName": false
     },
     {
         "alias": "ffac2",
@@ -622,7 +673,8 @@
         "requirements": "GG",
         "faction": "hacan",
         "source": "base",
-        "text": "ACTION: Exhaust this card and spend 1 token from your strategy pool to gain 4 trade goods and choose 1 other player; that player gains 2 trade goods."
+        "text": "ACTION: Exhaust this card and spend 1 token from your strategy pool to gain 4 trade goods and choose 1 other player; that player gains 2 trade goods.",
+        "shrinkName": true
     },
     {
         "alias": "vw",
@@ -667,7 +719,8 @@
         "requirements": "R",
         "faction": "ghost",
         "source": "base",
-        "text": "At the start of space combat in a system that contains a wormhole and 1 or more of your ships, you may produce 1 hit and assign it to 1 of your opponent's ships."
+        "text": "At the start of space combat in a system that contains a wormhole and 1 or more of your ships, you may produce 1 hit and assign it to 1 of your opponent's ships.",
+        "shrinkName": true
     },
     {
         "alias": "is",
@@ -678,7 +731,8 @@
         "requirements": "YY",
         "faction": "l1z1x",
         "source": "base",
-        "text": "You may exhaust this card and spend 2 resources when you research a technology; ignore all of that technology's prerequisites."
+        "text": "You may exhaust this card and spend 2 resources when you research a technology; ignore all of that technology's prerequisites.",
+        "shrinkName": true
     },
     {
         "alias": "gr",
@@ -689,7 +743,9 @@
         "requirements": "G",
         "faction": "mahact",
         "source": "pok",
-        "text": "You may exhaust this card before a player casts votes; that player must cast at least 1 vote for an outcome of your choice or remove 1 token from their fleet pool and return it to their reinforcements."
+        "text": "You may exhaust this card before a player casts votes; that player must cast at least 1 vote for an outcome of your choice or remove 1 token from their fleet pool and return it to their reinforcements.",
+        "shrinkName": true,
+        "shortName": "Genetic Re-\ncombination"
     },
     {
         "alias": "so",
@@ -700,7 +756,8 @@
         "requirements": "YY",
         "faction": "mentak",
         "source": "base",
-        "text": "After you win or lose a space combat, gain 1 trade good; if you won the combat, you may also produce 1 ship in that system of any ship type that was destroyed during the combat."
+        "text": "After you win or lose a space combat, gain 1 trade good; if you won the combat, you may also produce 1 ship in that system of any ship type that was destroyed during the combat.",
+        "shortName": "Salvage Operat'ns"
     },
     {
         "alias": "ng",
@@ -711,7 +768,8 @@
         "requirements": "GGG",
         "faction": "naalu",
         "source": "base",
-        "text": "After another player activates a system that contains 1 or more of your ships, that player removes 1 token from their fleet pool and returns it to their reinforcements."
+        "text": "After another player activates a system that contains 1 or more of your ships, that player removes 1 token from their fleet pool and returns it to their reinforcements.",
+        "shortName": "Neuro-\nglaive"
     },
     {
         "alias": "sc",
@@ -722,7 +780,8 @@
         "requirements": "R",
         "faction": "naaz",
         "source": "pok",
-        "text": "At the start of a combat round, you may exhaust this card to apply +1 to the result of each of your unit's combat rolls during this combat round."
+        "text": "At the start of a combat round, you may exhaust this card to apply +1 to the result of each of your unit's combat rolls during this combat round.",
+        "shortName": "Super-\ncharge"
     },
     {
         "alias": "vay",
@@ -743,7 +802,9 @@
         "requirements": "Y",
         "faction": "nomad",
         "source": "pok",
-        "text": "After any player's agent becomes exhausted, you may exhaust this card to ready that agent; if you ready another player's agent, you may perform a transaction with that player."
+        "text": "After any player's agent becomes exhausted, you may exhaust this card to ready that agent; if you ready another player's agent, you may perform a transaction with that player.",
+        "shrinkName": true,
+        "shortName": "Temporal\nC'mm'nd St."
     },
     {
         "alias": "vpw",
@@ -754,7 +815,9 @@
         "requirements": "RR",
         "faction": "sardakk",
         "source": "base",
-        "text": "After making combat rolls during a round of ground combat, if your opponent produced 1 or more hits, you produce 1 additional hit."
+        "text": "After making combat rolls during a round of ground combat, if your opponent produced 1 or more hits, you produce 1 additional hit.",
+        "shortName": "Valkyrie\nPtcl. Weave",
+        "shrinkName": true
     },
     {
         "alias": "ht2",
@@ -859,7 +922,9 @@
         "requirements": "YY",
         "faction": "winnu",
         "source": "base",
-        "text": "Exhaust this card when 1 or more of your units use PRODUCTION; swap the resource and influence values of 1 planet you control until the end of your turn."
+        "text": "Exhaust this card when 1 or more of your units use PRODUCTION; swap the resource and influence values of 1 planet you control until the end of your turn.",
+        "shrinkName": true,
+        "shortName": "Hegemonic Trade Plcy"
     },
     {
         "alias": "nf",
@@ -870,7 +935,9 @@
         "requirements": "YY",
         "faction": "xxcha",
         "source": "base",
-        "text": "After another player activates a system that contains 1 or more of your ships, you may exhaust this card and spend 1 token from your strategy pool; immediately end that player's turn."
+        "text": "After another player activates a system that contains 1 or more of your ships, you may exhaust this card and spend 1 token from your strategy pool; immediately end that player's turn.",
+        "shrinkName": true,
+        "shortName": "Nullificat'n\nField"
     },
     {
         "alias": "yso",
@@ -881,7 +948,8 @@
         "requirements": "GG",
         "faction": "yin",
         "source": "base",
-        "text": "After you produce units, place up to 2 infantry from your reinforcements on any planet you control or in any space area that contains 1 or more of your ships."
+        "text": "After you produce units, place up to 2 infantry from your reinforcements on any planet you control or in any space area that contains 1 or more of your ships.",
+        "shortName": "Yin Spinner"
     },
     {
         "alias": "ic",
@@ -903,7 +971,9 @@
         "requirements": "G",
         "faction": "yssaril",
         "source": "base",
-        "text": "During your turn of the action phase, players that have passed cannot play action cards."
+        "text": "During your turn of the action phase, players that have passed cannot play action cards.",
+        "shrinkName": true,
+        "shortName": "Transpara.\nPlating"
     },
     {
         "alias": "iihq",
@@ -914,7 +984,9 @@
         "requirements": "Y",
         "faction": "keleres",
         "source": "pok",
-        "text": "You are neighbors with all players that have units or control planets in or adjacent to the Mecatol Rex system. Gain the Custodia Vigilia planet card and its legendary planet ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it.\nLEGENDARY TEXT: While you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3. Gain 2 command tokens when another player scores Custodians VP using Imperial Primary."
+        "text": "You are neighbors with all players that have units or control planets in or adjacent to the Mecatol Rex system. Gain the Custodia Vigilia planet card and its legendary planet ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it.\nLEGENDARY TEXT: While you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3. Gain 2 command tokens when another player scores Custodians VP using Imperial Primary.",
+        "shortName": "I.I.H.Q. Mod-\nernization",
+        "shrinkName": true
     },
     {
         "alias": "asn",
@@ -925,6 +997,8 @@
         "requirements": "YY",
         "faction": "keleres",
         "source": "pok",
-        "text": "Whenever you resolve one of your PRODUCTION abilities, you may resolve an additional one of your PRODUCTION abilities in any system; the additional use does not trigger this ability."
+        "text": "Whenever you resolve one of your PRODUCTION abilities, you may resolve an additional one of your PRODUCTION abilities in any system; the additional use does not trigger this ability.",
+        "shortName": "Agency\nSupply Net.",
+        "shrinkName": false
     }
 ]

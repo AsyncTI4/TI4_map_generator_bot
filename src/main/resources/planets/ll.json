@@ -2,7 +2,6 @@
     "id": "ll",
     "tileId": "fin2",
     "name": "Lecatol Lex",
-    "shortName": null,
     "aliases": ["lex", "lecatol", "lecatollex", "lechatol"],
     "positionInTile": { "x": 170.0, "y": 150.0 },
     "resources": 1,

@@ -2,7 +2,6 @@
     "id": "cyon",
     "tileId": "m09",
     "name": "Cyon",
-    "shortName": null,
     "aliases": ["cy", "cyon"],
     "positionInTile": {
         "x": 220.0,

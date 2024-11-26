@@ -19,7 +19,8 @@
         "requirements": "YYY",
         "faction": "axis",
         "source": "ds",
-        "text": "ACTION: Exhaust this card to place or move 1 of your space docks onto a planet you control."
+        "text": "ACTION: Exhaust this card to place or move 1 of your space docks onto a planet you control.",
+        "shrinkName": true
     },
     {
         "alias": "dsbentg",
@@ -41,7 +42,8 @@
         "requirements": "YY",
         "faction": "bentor",
         "source": "ds",
-        "text": "When 1 or more of your units use PRODUCTION, you may exhaust this card to increase the PRODUCTION value of 1 of those units to match the PRODUCTION value of the unit on the game board with the highest PRODUCTION value, or apply +2 to the total PRODUCTION value of those units."
+        "text": "When 1 or more of your units use PRODUCTION, you may exhaust this card to increase the PRODUCTION value of 1 of those units to match the PRODUCTION value of the unit on the game board with the highest PRODUCTION value, or apply +2 to the total PRODUCTION value of those units.",
+        "shrinkName": true
     },
     {
         "alias": "dsceldr",
@@ -52,7 +54,9 @@
         "requirements": "RR",
         "faction": "celdauri",
         "source": "ds",
-        "text": "At the end of your turn, you may exhaust this card and spend 1 token from your strategy pool to remove a command token from a system that contains 1 or more of your space docks."
+        "text": "At the end of your turn, you may exhaust this card and spend 1 token from your strategy pool to remove a command token from a system that contains 1 or more of your space docks.",
+        "shortName": "Emergency\nMobil. Proto.",
+        "shrinkName": true
     },
     {
         "alias": "dsceldsd",
@@ -133,7 +137,9 @@
         "requirements": "YY",
         "faction": "dihmohn",
         "source": "ds",
-        "text": "When you explore a planet, you may produce 1 ship in that planet's system. ACTION: Exhaust this card and 1 planet you control to explore that planet. [Note: this cannot produce ships if enemy ships are present]"
+        "text": "When you explore a planet, you may produce 1 ship in that planet's system. ACTION: Exhaust this card and 1 planet you control to explore that planet. [Note: this cannot produce ships if enemy ships are present]",
+        "shortName": "Impress.\nPrograms",
+        "shrinkName": false
     },
     {
         "alias": "dsedyng",
@@ -200,7 +206,8 @@
         "requirements": "YY",
         "faction": "freesystems",
         "source": "ds",
-        "text": "At the start of a ground combat, you may roll 1 die for each of up to 2 of your ground forces on that planet. For each result equal to or greater than that unit's combat value, produce 1 hit; your opponent must assign it to 1 of their units on that planet."
+        "text": "At the start of a ground combat, you may roll 1 die for each of up to 2 of your ground forces on that planet. For each result equal to or greater than that unit's combat value, produce 1 hit; your opponent must assign it to 1 of their units on that planet.",
+        "shrinkName": true
     },
     {
         "alias": "dsghemcv",
@@ -234,7 +241,8 @@
         "requirements": "G",
         "faction": "ghoti",
         "source": "ds",
-        "text": "Up to 3 ships in your home system do not count against your fleet pool. When you cast 1 or more votes, you may exhaust this card to cast an additional number of votes equal to the number of command tokens in your fleet pool."
+        "text": "Up to 3 ships in your home system do not count against your fleet pool. When you cast 1 or more votes, you may exhaust this card to cast an additional number of votes equal to the number of command tokens in your fleet pool.",
+        "shrinkName": true
     },
     {
         "alias": "dsghoty",
@@ -245,7 +253,8 @@
         "requirements": "Y",
         "faction": "ghoti",
         "source": "ds",
-        "text": "When you produce 1 or more units, you may produce 1 additional unit in a system that contains 1 or more of your ships and 1 of your command tokens."
+        "text": "When you produce 1 or more units, you may produce 1 additional unit in a system that contains 1 or more of your ships and 1 of your command tokens.",
+        "shrinkName": true
     },
     {
         "alias": "dsgledb",
@@ -279,7 +288,8 @@
         "requirements": "GGG",
         "faction": "augers",
         "source": "ds",
-        "text": "During the status phase, you may score 1 additional public objective instead of a secret objective."
+        "text": "During the status phase, you may score 1 additional public objective instead of a secret objective.",
+        "shortName": "Psycho-\ngraphics"
     },
     {
         "alias": "dsauguy",
@@ -301,7 +311,8 @@
         "requirements": "G",
         "faction": "kjalengard",
         "source": "ds",
-        "text": "At the start of combat in a system that contains a Glory token, gain 1 trade good. After a player rolls combat dice, you may exhaust this card to allow that player to reroll any number of those dice. "
+        "text": "At the start of combat in a system that contains a Glory token, gain 1 trade good. After a player rolls combat dice, you may exhaust this card to allow that player to reroll any number of those dice. ",
+        "shortName": "Zhrgar Stimul'nts"
     },
     {
         "alias": "dskjalcv",
@@ -324,7 +335,8 @@
         "requirements": "B",
         "faction": "kollecc",
         "source": "ds",
-        "text": "At the start of a space combat, you may choose 1 of your ships in the active system that did not begin this action in that system; roll a die. On a result equal to or greater than that ship's combat value, produce 1 hit; your opponent must assign it to 1 of their ships."
+        "text": "At the start of a space combat, you may choose 1 of your ships in the active system that did not begin this action in that system; roll a die. On a result equal to or greater than that ship's combat value, produce 1 hit; your opponent must assign it to 1 of their ships.",
+        "shortName": "Shrouded Skirmish'rs"
     },
     {
         "alias": "dskolly",
@@ -346,7 +358,8 @@
         "requirements": "GG",
         "faction": "kolume",
         "source": "ds",
-        "text": "When you pass, you may gain 1 commodity for each other player who has already passed. ACTION: Exhaust this card."
+        "text": "When you pass, you may gain 1 commodity for each other player who has already passed. ACTION: Exhaust this card.",
+        "shrinkName": true
     },
     {
         "alias": "dskolur",
@@ -357,7 +370,8 @@
         "requirements": "RRR",
         "faction": "kolume",
         "source": "ds",
-        "text": "After a system is activated, you may exhaust this card to choose 1 player. Apply +1 or -1 to all rolls that player makes during this tactical action."
+        "text": "After a system is activated, you may exhaust this card to choose 1 player. Apply +1 or -1 to all rolls that player makes during this tactical action.",
+        "shrinkName": true
     },
     {
         "alias": "dskortg",
@@ -379,7 +393,8 @@
         "requirements": "RR",
         "faction": "kortali",
         "source": "ds",
-        "text": "Once per space combat, after 1 of your non-fighter ships is destroyed, you may produce 1 hit and assign it to 1 of your opponent's non-carrier ships."
+        "text": "Once per space combat, after 1 of your non-fighter ships is destroyed, you may produce 1 hit and assign it to 1 of your opponent's non-carrier ships.",
+        "shrinkName": true
     },
     {
         "alias": "dskyrog",
@@ -390,7 +405,9 @@
         "requirements": "GG",
         "faction": "kyro",
         "source": "ds",
-        "text": "During the agenda phase, after an outcome you voted for is resolved, place 2 infantry from your reinforcements on a planet you control."
+        "text": "During the agenda phase, after an outcome you voted for is resolved, place 2 infantry from your reinforcements on a planet you control.",
+        "shrinkName": true,
+        "shortName": "Indoctrin\n-ation Teams"
     },
     {
         "alias": "dskyroy",
@@ -423,7 +440,8 @@
         "requirements": "RR",
         "faction": "lanefir",
         "source": "ds",
-        "text": "After you explore, or purge 1 or more relic fragments, place 1 commodity token on this card. At the start of a round of combat, remove any number of tokens from this card to reroll up to that many of your dice during this round of combat."
+        "text": "After you explore, or purge 1 or more relic fragments, place 1 commodity token on this card. At the start of a round of combat, remove any number of tokens from this card to reroll up to that many of your dice during this round of combat.",
+        "shortName": "ATS Arm\n-aments"
     },
     {
         "alias": "dslizhb",
@@ -480,7 +498,8 @@
         "requirements": "RR",
         "faction": "mirveda",
         "source": "ds",
-        "text": "At the start of invasion, choose up to 1 unit you control in the active system; that unit gains PLANETARY SHIELD. When a player commits a unit to land on a planet you control, you may exhaust this card to destroy that unit."
+        "text": "At the start of invasion, choose up to 1 unit you control in the active system; that unit gains PLANETARY SHIELD. When a player commits a unit to land on a planet you control, you may exhaust this card to destroy that unit.",
+        "shortName": "Orbital\nDef. Grid"
     },
     {
         "alias": "dsmirvpds",
@@ -514,7 +533,8 @@
         "requirements": "YY",
         "faction": "mortheus",
         "source": "ds",
-        "text": "Each system that contains 1 or more of your ships and no planets gains PRODUCTION 2 as if it were a unit you control."
+        "text": "Each system that contains 1 or more of your ships and no planets gains PRODUCTION 2 as if it were a unit you control.",
+        "shortName": "Fabrica\n-tion Grid"
     },
     {
         "alias": "dsmykog",
@@ -525,7 +545,9 @@
         "requirements": "GG",
         "faction": "mykomentori",
         "source": "ds",
-        "text": "After your opponent makes a combat roll, you may exhaust this card. If you do, for each of their units that did not produce a hit, you may reroll that unit's combat roll; any hits that roll produces are produced against your opponent's units instead."
+        "text": "After your opponent makes a combat roll, you may exhaust this card. If you do, for each of their units that did not produce a hit, you may reroll that unit's combat roll; any hits that roll produces are produced against your opponent's units instead.",
+        "shrinkName": false,
+        "shortName": "Psychoact.\nArmaments"
     },
     {
         "alias": "dsmykosd",
@@ -593,7 +615,9 @@
         "requirements": "B",
         "faction": "olradin",
         "source": "ds",
-        "text": "After you activate a system, you may exhaust a planet you control of the same type as a planet in that system to apply +1 to the move value of each of your ships during this tactical action."
+        "text": "After you activate a system, you may exhaust a planet you control of the same type as a planet in that system to apply +1 to the move value of each of your ships during this tactical action.",
+        "shrinkName": true,
+        "shortName": "Geosympth.\nImpeller"
     },
     {
         "alias": "dsolrar",
@@ -604,7 +628,8 @@
         "requirements": "R",
         "faction": "olradin",
         "source": "ds",
-        "text": "At the start of your turn, you may exhaust this card and 1 planet you control to ready 1 non-home planet other than Mecatol Rex."
+        "text": "At the start of your turn, you may exhaust this card and 1 planet you control to ready 1 non-home planet other than Mecatol Rex.",
+        "shrinkName": true
     },
     {
         "alias": "dsrhodb",
@@ -626,7 +651,9 @@
         "requirements": "YYY",
         "faction": "zealots",
         "source": "ds",
-        "text": "When you activate a system, or a system that contains 1 or more of your units is activated, you may choose 1 technology or non-fighter, non-structure unit upgrade technology another player controls; until the end of this tactical action, that card is treated as though it had no ability text."
+        "text": "When you activate a system, or a system that contains 1 or more of your units is activated, you may choose 1 technology or non-fighter, non-structure unit upgrade technology another player controls; until the end of this tactical action, that card is treated as though it had no ability text.",
+        "shrinkName": true,
+        "shortName": "Sanctifica\n-tion Field"
     },
     {
         "alias": "dsrohdws",
@@ -649,7 +676,9 @@
         "requirements": "YY",
         "faction": "rohdhna",
         "source": "ds",
-        "text": "At the start of the agenda phase, for each unit upgrade technology you control, you may choose 1 player. Each of those players must produce 1 ship in a system that contains 1 or more of their space docks or war suns."
+        "text": "At the start of the agenda phase, for each unit upgrade technology you control, you may choose 1 player. Each of those players must produce 1 ship in a system that contains 1 or more of their space docks or war suns.",
+        "shrinkName": true,
+        "shortName": "Contract'l\nObligations"
     },
     {
         "alias": "dstneldd",
@@ -672,7 +701,8 @@
         "requirements": "Y",
         "faction": "tnelis",
         "source": "ds",
-        "text": "After a round of space combat in a system that contains 1 or more of your mechs, you may have 1 of those units become damaged to produce 1 hit and assign it to a cruiser, dreadnought, or destroyer you do not control in that system."
+        "text": "After a round of space combat in a system that contains 1 or more of your mechs, you may have 1 of those units become damaged to produce 1 hit and assign it to a cruiser, dreadnought, or destroyer you do not control in that system.",
+        "shortName": "Daedalon Flight Sys."
     },
     {
         "alias": "dsvadeb",
@@ -694,7 +724,8 @@
         "requirements": "YY",
         "faction": "vaden",
         "source": "ds",
-        "text": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities, you may exhaust this card to destroy that unit. After you produce 1 or more hits during a round of combat, you may spend 1 trade good to produce 1 additional hit."
+        "text": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities, you may exhaust this card to destroy that unit. After you produce 1 or more hits during a round of combat, you may spend 1 trade good to produce 1 additional hit.",
+        "shrinkName": true
     },
     {
         "alias": "dsvaylr",

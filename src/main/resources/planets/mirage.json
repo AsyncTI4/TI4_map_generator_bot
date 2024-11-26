@@ -2,7 +2,6 @@
     "id": "mirage",
     "tileId": null,
     "name": "Mirage",
-    "shortName": null,
     "aliases": ["mirage", "mirag", "miraj", "miraje", "mrag"],
     "positionInTile": null,
     "resources": 1,

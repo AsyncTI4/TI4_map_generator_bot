@@ -2,7 +2,6 @@
     "id": "apis",
     "tileId": "m32",
     "name": "Apis",
-    "shortName": null,
     "aliases": ["apis", "bees", "bee"],
     "positionInTile": {
         "x": 200.0,

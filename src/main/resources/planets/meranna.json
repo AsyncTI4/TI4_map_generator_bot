@@ -2,7 +2,6 @@
     "id": "meranna",
     "tileId": "er86",
     "name": "Meranna",
-    "shortName": null,
     "aliases": ["mera", "meranna", "anna"],
     "positionInTile": {
         "x": 80.0,

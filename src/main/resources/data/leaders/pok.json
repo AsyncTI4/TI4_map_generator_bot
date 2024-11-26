@@ -30,7 +30,8 @@
         "abilityWindow": "After another player replenishes commodities:",
         "abilityText": "You may exhaust this card to convert their commodities to trade goods and capture 1 unit from their reinforcements that has a cost equal to or lower than their commodity value.",
         "unlockCondition": "Always Unlocked",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Stillness of Stars"
     },
     {
         "id": "ghostagent",
@@ -63,7 +64,9 @@
         "abilityWindow": "During the action phase:",
         "abilityText": "You may exhaust this card to gain 2 commodities or replenish another player's commodities.",
         "unlockCondition": "Always Unlocked",
-        "source": "pok"
+        "source": "pok",
+        "shrinkName": true,
+        "shortName": "Carth of G'ld'n Sands"
     },
     {
         "id": "jolnaragent",
@@ -85,7 +88,8 @@
         "abilityWindow": "At any time:",
         "abilityText": "You may exhaust this card to allow any player to spend commodities as if they were trade goods.",
         "unlockCondition": "Always Unlocked",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Xander A. Victori III"
     },
     {
         "id": "l1z1xagent",
@@ -121,7 +125,8 @@
         "abilityWindow": "When you would spend a command token during the secondary ability of a strategic action:",
         "abilityText": "You may exhaust this card to remove 1 of the active player's command tokens from the board and use it instead.",
         "unlockCondition": "Always Unlocked",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Jae\nMir Kan"
     },
     {
         "id": "mentakagent",
@@ -198,7 +203,8 @@
         "abilityWindow": "At the end of a player's turn:",
         "abilityText": "You may exhaust this card to allow that player to remove up to 2 of their ground forces from the game board and place them on planets they control in the active system. [Note: The timing window of this agent should probably be end of tactical action, not end of turn. The bot treats it as such, and it is more consistent with the rules]",
         "unlockCondition": "Always Unlocked",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Fld Mrshl\nMercer"
     },
     {
         "id": "nomadagentthundarian",
@@ -209,7 +215,8 @@
         "abilityWindow": "After the \"Roll Dice\" step of combat:",
         "abilityText": "You may exhaust this card. If you do, hits are not assigned to either player's units. Return to the start of this combat round's \"Roll Dice\" step.",
         "unlockCondition": "Always Unlocked",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "The Thun\n-darian"
     },
     {
         "id": "sardakkagent",
@@ -341,7 +348,8 @@
         "abilityWindow": "When you produce fighter or infantry units:",
         "abilityText": "Up to 2 of those units do not count against your Production limit.",
         "unlockCondition": "Have units in 3 gravity rifts.",
-        "source": "pok"
+        "source": "pok",
+        "shrinkName": true
     },
     {
         "id": "ghostcommander",
@@ -374,7 +382,8 @@
         "abilityWindow": "When you cast votes:",
         "abilityText": "You may spend any number of trade goods: cast 2 additional votes for each trade good spent.",
         "unlockCondition": "Have 10 trade goods.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Gila the Sil\n-vertongue"
     },
     {
         "id": "jolnarcommander",
@@ -422,7 +431,8 @@
         "abilityWindow": "After 1 of your units uses Sustain Damage:",
         "abilityText": "You may gain 1 trade good.",
         "unlockCondition": "Have 5 non-fighter ships in 1 system.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Rear Adml Farran"
     },
     {
         "id": "mahactcommander",
@@ -543,7 +553,8 @@
         "abilityWindow": "When 1 or more of your units use Production:",
         "abilityText": "You may gain 1 trade good.",
         "unlockCondition": "Have 5 structures on the game board.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Tung-\nstantus"
     },
     {
         "id": "winnucommander",
@@ -635,7 +646,8 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Swap the positions of any 2 systems that contain wormholes or your units, other than the Creuss system and the wormhole nexus. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Riftwlkr\nMeian"
     },
     {
         "id": "empyreanhero",
@@ -647,7 +659,8 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Place 1 frontier token in each system that does not contain any planets and does not already have a frontier token. Then, explore each frontier token that is in a system that contains 1 or more of your ships. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Conservtr Procyon"
     },
     {
         "id": "hacanhero",
@@ -671,7 +684,8 @@
         "abilityWindow": "ACTION:",
         "abilityText": "For each non-unit upgrade technology you own, you may replace that technology with any technology of the same color from the deck. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Rin, the Mstr's Lgcy"
     },
     {
         "id": "keleresherokuuasi",
@@ -758,7 +772,9 @@
         "abilityWindow": "At the start of a space combat that you are participating in:",
         "abilityText": "You may purge this card. if you do, for each other player's ship that is destroyed during this combat, place 1 ship of that type from your reinforcements in the active system.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "pok"
+        "source": "pok",
+        "shrinkName": true,
+        "shortName": "Ipswitch, Loose C'nn'n"
     },
     {
         "id": "muaathero",
@@ -770,7 +786,8 @@
         "abilityWindow": "After you move a war sun into a non-home system other than Mecatol Rex:",
         "abilityText": "You may destroy all other players' units in that system and replace that system tile with the Muaat supernova tile. If you do, purge this card and each planet card that corresponds to the replaced system tile.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Adjudictr Ba'al"
     },
     {
         "id": "naaluhero",
@@ -806,7 +823,8 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Choose a planet that has a technology specialty in a system that contains your units. Destroy any other player's units on that planet. Gain trade goods equal to the planet's combined resource and influence values and gain 1 technology that matches the specialty of that planet. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "UNIT.DSGN.\nFLAYESH"
     },
     {
         "id": "nomadhero",
@@ -914,6 +932,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Each other player shows you 1 action card from their hand. For each player, you may either take that card or force that player to discard 3 random action cards from their hand. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "pok"
+        "source": "pok",
+        "shortName": "Kyver,\nBlade & Key"
     }
 ]

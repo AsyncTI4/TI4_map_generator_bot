@@ -2,7 +2,6 @@
     "id": "rexatolmec",
     "tileId": "rexmec",
     "name": "Rexatol Mec",
-    "shortName": null,
     "aliases": ["rexatolmec", "rexmec", "rm"],
     "positionInTile": { "x": 170.0, "y": 150.0 },
     "resources": 1,

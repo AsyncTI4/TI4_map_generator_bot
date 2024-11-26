@@ -2,7 +2,6 @@
     "id": "ghoti",
     "tileId": null,
     "name": "Ghoti",
-    "shortName": null,
     "aliases": ["ghoti"],
     "positionInTile": null,
     "resources": 3,

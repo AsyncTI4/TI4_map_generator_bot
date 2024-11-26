@@ -21,6 +21,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String shortName;
+    private Boolean shrinkName;
     private SortedSet<TechnologyType> types;
     private String requirements;
     private String faction;
@@ -30,6 +31,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
+    private String initials;
 
     public enum TechnologyType {
         PROPULSION, BIOTIC, CYBERNETIC, WARFARE, UNITUPGRADE, NONE;
@@ -203,6 +205,14 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public String getShortName() {
         return Optional.ofNullable(shortName).orElse(getName());
+    }
+
+    public boolean getShrinkName() {
+        return Optional.ofNullable(shrinkName).orElse(false);
+    }
+
+    public String getInitials() {
+        return Optional.ofNullable(initials).orElse(getName().substring(0,1));
     }
 
     public String getRepresentation(boolean includeCardText) {

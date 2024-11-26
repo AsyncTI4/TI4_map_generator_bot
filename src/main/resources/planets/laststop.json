@@ -2,7 +2,6 @@
     "id": "laststop",
     "tileId": "d09",
     "name": "Last Stop",
-    "shortName": null,
     "aliases": [
         "laststop"
     ],

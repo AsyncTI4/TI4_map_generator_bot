@@ -28,6 +28,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private String tileId;
     private String name;
     private String shortName;
+    private Boolean shrinkName;
+    private String shortNamePNAttach;
+    private Boolean shrinkNamePNAttach;
     private List<String> aliases = new ArrayList<>();
     private Point positionInTile;
     private int resources;
@@ -59,6 +62,22 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getAlias() {
         return getId();
+    }
+
+    public String getShortName() {
+        return Optional.ofNullable(shortName).orElse(getName());
+    }
+
+    public boolean getShrinkName() {
+        return Optional.ofNullable(shrinkName).orElse(false);
+    }
+
+    public String getShortNamePNAttach() {
+        return Optional.ofNullable(shortNamePNAttach).orElse(getShortName());
+    }
+
+    public boolean getShrinkNamePNAttach() {
+        return Optional.ofNullable(shrinkNamePNAttach).orElse(getShrinkName());
     }
 
     @Deprecated

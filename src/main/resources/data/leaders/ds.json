@@ -8,7 +8,8 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Exhaust this card to choose 1 player: that player may place 1 cruiser or 1 destroyer from their reinforcements in a system that contains their ships. Then, if you chose another player, gain 2 commodities.",
         "unlockCondition": "Always Unlocked",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Shipmngr Zxknck"
     },
     {
         "id": "bentoragent",
@@ -151,7 +152,9 @@
         "abilityWindow": "At the start of a combat:",
         "abilityText": "Exhaust this card to move a Glory token to the active system, if able. Then, the active player may gain a number of commodities equal to the number of neighbors they have.",
         "unlockCondition": "Always Unlocked",
-        "source": "ds"
+        "source": "ds",
+        "shrinkName": true,
+        "shortName": "Merkism'thr Asvand"
     },
     {
         "id": "kolleccagent",
@@ -481,7 +484,8 @@
         "abilityWindow": "After you win a space combat in a system that contains no planets or a planet with a structure",
         "abilityText": "You may gain 1 trade good.",
         "unlockCondition": "Have 2 flagships on the game board.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Jarls Vel & Jotrun"
     },
     {
         "id": "ghoticommander",
@@ -925,7 +929,8 @@
         "abilityWindow": "ACTION:",
         "abilityText": "For each system that contains a Glory token, remove up to 1 command token in or adjacent to that system from the game board and gain 1 command token, if able. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "ds"
+        "source": "ds",
+        "shrinkName": true
     },
     {
         "id": "kollecchero",
