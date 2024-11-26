@@ -61,14 +61,12 @@ public class MessageListener extends ListenerAdapter {
                 TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
                 MessageHelper.sendMessageToChannel(lfgPings, msg2);
             }
-            if (event.getChannel() instanceof ThreadChannel channel) {
-                if (channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
-                    Game mapreference = GameManager.getGame("finreference");
-                    if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
-                        mapreference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
-                        GameSaveLoadManager.saveGame(mapreference, "newChannel");
-                    }
+            if (event.getChannel() instanceof ThreadChannel channel && channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
+                Game mapreference = GameManager.getGame("finreference");
+                if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
+                    mapreference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
+                    GameSaveLoadManager.saveGame(mapreference, "newChannel");
                 }
             }
 

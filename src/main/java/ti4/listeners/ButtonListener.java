@@ -30,7 +30,7 @@ import ti4.message.MessageHelper;
 
 public class ButtonListener extends ListenerAdapter {
 
-    public static ButtonListener instance = null;
+    public static ButtonListener instance;
 
     public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
     private final Map<String, Consumer<ButtonContext>> knownButtons = new HashMap<>();
