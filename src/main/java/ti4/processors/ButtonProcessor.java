@@ -84,6 +84,7 @@ public class ButtonProcessor {
 
     private void process(ButtonInteractionEvent event) {
         BotLogger.logButton(event);
+        long eventTime = Math.min(event.getInteraction().getTimeCreated().toEpochSecond() * 1000, System.currentTimeMillis());
         long startTime = System.currentTimeMillis();
         try {
             ButtonContext context = new ButtonContext(event);
@@ -95,8 +96,12 @@ public class ButtonProcessor {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
         long endTime = System.currentTimeMillis();
-        if (endTime - startTime > 3000) {
-            BotLogger.log(event, "This button command took longer than 3000 ms (" + (endTime - startTime) + ")");
+        int milliThreshhold = 3000;
+        if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
+            String message = "This button took a while:\n> " +
+                Helper.getTimeRepresentationToMilliseconds(startTime - eventTime) + " for the bot to respond\n> " +
+                Helper.getTimeRepresentationToMilliseconds(endTime - startTime) + " for the bot to execute";
+            BotLogger.log(event, message);
         }
         instance.userButtonPressSet.remove(event.getUser().getId() + event.getButton().getId());
     }
