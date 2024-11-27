@@ -373,7 +373,7 @@ public class MessageListener extends ListenerAdapter {
         if (duration > warnIfLongerThanMillis) {
             String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(duration);
             String errorMessage = "`" + methodName + "` took over " + warnIfLongerThanMillis + "ms to process:\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + "start \n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " start \n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " end `" + executionTime + "` to execute";
             BotLogger.log(errorMessage);
         }
