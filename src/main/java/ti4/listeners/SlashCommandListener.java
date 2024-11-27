@@ -6,7 +6,6 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.joda.time.DateTime;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -118,11 +117,12 @@ public class SlashCommandListener extends ListenerAdapter {
         if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
             String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
             String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
-            String message = "This slash command took over " + milliThreshhold + " to respond or execute\n> " +
+            String message = event.getChannel().getAsMention() + " " + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: " +
+                "This slash command took over " + milliThreshhold + "ms to respond or execute\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " command was issued by user\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
-            BotLogger.log(event, message);
+            BotLogger.log(message);
         }
     }
 

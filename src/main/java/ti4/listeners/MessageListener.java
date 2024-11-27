@@ -1,15 +1,13 @@
 package ti4.listeners;
 
-import javax.annotation.Nonnull;
-import java.io.File;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
-import net.dv8tion.jda.api.entities.Guild;
+import javax.annotation.Nonnull;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.Role;
@@ -21,13 +19,11 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.GameCreationHelper;
-import ti4.helpers.Storage;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -46,46 +42,31 @@ public class MessageListener extends ListenerAdapter {
         if (!isAsyncServer(event.getGuild().getId())) {
             return;
         }
+
         long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getMessage());
         long startTime = System.currentTimeMillis();
+
         Message message = event.getMessage();
         try {
             if (message.getContentRaw().startsWith("[DELETE]")) {
                 message.delete().queue();
             }
-            if (!message.getAuthor().isBot() && (message.getContentRaw().contains("boldly go where no stroter has gone before") || message.getContentRaw().contains("go boldly where no stroter has gone before"))) {
-                message.reply("to explore strange new maps; to seek out new tiles and new factions\nhttps://discord.gg/RZ7qg9kbVZ").queue();
-            }
-            //947310962485108816
-            Role lfgRole = GameCreationHelper.getRole("LFG", event.getGuild());
-            if (!event.getAuthor().isBot() && lfgRole != null && event.getChannel() instanceof ThreadChannel && message.getContentRaw().contains(lfgRole.getAsMention())) {
-                String msg2 = lfgRole.getAsMention() + " this game is looking for more members (it's old if it has -launched [FULL] in its title) " + message.getJumpUrl();
-                TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
-                MessageHelper.sendMessageToChannel(lfgPings, msg2);
-            }
-            if (event.getChannel() instanceof ThreadChannel channel) {
-                if (channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
-                    Game mapreference = GameManager.getGame("finreference");
-                    if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
-                        mapreference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
-                        GameSaveLoadManager.saveGame(mapreference, "newChannel");
-                    }
-                }
-            }
-
-            handleFoWWhispersAndFowCombats(event, message);
-            mapLog(event, message);
-            saveJSONInTTPGExportsChannel(event);
+            timeIt(() -> checkForFogOfWarInvitePrompt(message), "MessageListener#checkForFogOfWarInvitePrompt", 1500);
+            timeIt(() -> copyLFGPingstoLFGPingsChannel(event, message), "MessageListener#copyLFGPingstoLFGPingsChannel", 1500);
+            timeIt(() -> checkIfNewMakingGamesPostAndPostIntroduction(event), "MessageListener#checkIfNewMakingGamesPostAndPostIntroduction", 1500);
+            timeIt(() -> handleFoWWhispersAndFowCombats(event, message), "MessageListener#handleFoWWhispersAndFowCombats", 1500);
+            timeIt(() -> mapLog(event, message), "MessageListener#mapLog", 1500);
+            timeIt(() -> saveJSONInTTPGExportsChannel(event), "MessageListener#saveJSONInTTPGExportsChannel", 1500);
         } catch (Exception e) {
             BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
         }
+
         long endTime = System.currentTimeMillis();
         final int milliThreshhold = 1500;
         if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
             String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
             String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
-            String errorMessage = message.getJumpUrl() + " message took over " + milliThreshhold + " to process:" +
+            String errorMessage = message.getJumpUrl() + " message took over " + milliThreshhold + "ms to process:\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " message was sent\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to receive\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
@@ -93,27 +74,59 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    private void saveJSONInTTPGExportsChannel(MessageReceivedEvent event) {
-        // TTPG-EXPORTS - Save attachment to ttpg_exports folder for later processing
-        if ("ttpg-exports".equalsIgnoreCase(event.getChannel().getName())) {
-            List<Message.Attachment> attachments = event.getMessage().getAttachments();
-            if (!attachments.isEmpty() && "json".equalsIgnoreCase(attachments.getFirst().getFileExtension())) { // write to
-                // file
-                String currentDateTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuu-MM-dd-HHmmss"));
-                String fileName = "ttpgexport_" + currentDateTime + ".json";
-                String filePath = Storage.getTTPGExportDirectory() + "/" + fileName;
-                File file = new File(filePath);
-                CompletableFuture<File> future = attachments.getFirst().getProxy().downloadToFile(file);
-                future.exceptionally(error -> { // handle possible errors
-                    error.printStackTrace();
-                    return null;
-                });
-                MessageHelper.sendMessageToChannel(event.getChannel(), "File imported as: `" + fileName + "`");
+    private static void checkForFogOfWarInvitePrompt(Message message) {
+        if (!message.getAuthor().isBot() && (message.getContentRaw().contains("boldly go where no stroter has gone before") || message.getContentRaw().contains("go boldly where no stroter has gone before"))) {
+            message.reply("to explore strange new maps; to seek out new tiles and new factions\nhttps://discord.gg/RZ7qg9kbVZ").queue();
+        }
+    }
+
+    private static void copyLFGPingstoLFGPingsChannel(MessageReceivedEvent event, Message message) {
+        //947310962485108816
+        Role lfgRole = GameCreationHelper.getRole("LFG", event.getGuild());
+        if (!event.getAuthor().isBot() && lfgRole != null && event.getChannel() instanceof ThreadChannel && message.getContentRaw().contains(lfgRole.getAsMention())) {
+            String msg2 = lfgRole.getAsMention() + " this game is looking for more members (it's old if it has -launched [FULL] in its title) " + message.getJumpUrl();
+            TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
+            MessageHelper.sendMessageToChannel(lfgPings, msg2);
+        }
+    }
+
+    private static void checkIfNewMakingGamesPostAndPostIntroduction(MessageReceivedEvent event) {
+        if (event.getChannel() instanceof ThreadChannel channel) {
+            if (channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
+                Game mapreference = GameManager.getGame("finreference");
+                if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
+                    mapreference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
+                    GameSaveLoadManager.saveGame(mapreference, "newChannel");
+                }
             }
         }
     }
 
+    private static void saveJSONInTTPGExportsChannel(MessageReceivedEvent event) {
+        return; // this isn't working right now, but don't want to lose this
+
+        // // TTPG-EXPORTS - Save attachment to ttpg_exports folder for later processing
+        // if ("ttpg-exports".equalsIgnoreCase(event.getChannel().getName())) {
+        //     List<Message.Attachment> attachments = event.getMessage().getAttachments();
+        //     if (!attachments.isEmpty() && "json".equalsIgnoreCase(attachments.getFirst().getFileExtension())) { // write to
+        //         // file
+        //         String currentDateTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuu-MM-dd-HHmmss"));
+        //         String fileName = "ttpgexport_" + currentDateTime + ".json";
+        //         String filePath = Storage.getTTPGExportDirectory() + "/" + fileName;
+        //         File file = new File(filePath);
+        //         CompletableFuture<File> future = attachments.getFirst().getProxy().downloadToFile(file);
+        //         future.exceptionally(error -> { // handle possible errors
+        //             error.printStackTrace();
+        //             return null;
+        //         });
+        //         MessageHelper.sendMessageToChannel(event.getChannel(), "File imported as: `" + fileName + "`");
+        //     }
+        // }
+    }
+
     private void handleFoWWhispersAndFowCombats(MessageReceivedEvent event, Message msg) {
+        long startTime = System.currentTimeMillis();
         if (!event.getAuthor().isBot() && event.getChannel().getName().contains("-")) {
             String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
 
@@ -347,10 +360,22 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private static boolean isAsyncServer(String guildID) {
-        for (Guild guild : AsyncTI4DiscordBot.guilds) {
-            if (guild.getId().equals(guildID))
-                return true;
+        return AsyncTI4DiscordBot.guilds.stream().anyMatch(g -> g.getId().equals(guildID));
+    }
+
+    public static void timeIt(Runnable runnable, String methodName, long warnIfLongerThanMillis) {
+        long startTime = System.currentTimeMillis();
+
+        runnable.run();
+
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+        if (duration > warnIfLongerThanMillis) {
+            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(duration);
+            String errorMessage = "`" + methodName + "` took over " + warnIfLongerThanMillis + "ms to process:\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " start \n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " end `" + executionTime + "` to execute";
+            BotLogger.log(errorMessage);
         }
-        return false;
     }
 }
