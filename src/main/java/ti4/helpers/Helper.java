@@ -2113,18 +2113,6 @@ public class Helper {
         return String.format("%-" + length + "." + length + "s", text);
     }
 
-    public static void checkThreadLimitAndArchive(Guild guild) {
-        if (guild == null) return;
-        long threadCount = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).count();
-        int closeCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.THREAD_AUTOCLOSE_COUNT.toString(), Integer.class, 25);
-        int maxThreadCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.MAX_THREAD_COUNT.toString(), Integer.class, 975);
-
-        if (threadCount >= maxThreadCount) {
-            BotLogger.log("AutoArchiving Threads on **" + guild.getName() + "** - (" + threadCount + " > " + maxThreadCount + ") -> archiving " + closeCount + " threads");
-            ThreadArchiveHelper.archiveOldThreads(guild, closeCount);
-        }
-    }
-
     public static boolean isInteger(String str) {
         if (str == null) {
             return false;
