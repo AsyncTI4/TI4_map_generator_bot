@@ -1055,9 +1055,9 @@ public class Player {
 
     public void setPromissoryNote(String id) {
         Collection<Integer> values = promissoryNotes.values();
-        int identifier = ThreadLocalRandom.current().nextInt(100);
+        int identifier = ThreadLocalRandom.current().nextInt(values.size() < 80 ? 100 : 1000);
         while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(100);
+            identifier = ThreadLocalRandom.current().nextInt(values.size() < 80 ? 100 : 1000);
         }
         promissoryNotes.put(id, identifier);
     }

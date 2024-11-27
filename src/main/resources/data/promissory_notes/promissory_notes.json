@@ -5,7 +5,8 @@
         "faction": "argent",
         "playArea": false,
         "source": "pok",
-        "text": "When 1 or more of your units make a roll for a unit ability: Choose 1 of those units to roll 1 additional die. Then, return this card to the Argent player."
+        "text": "When 1 or more of your units make a roll for a unit ability: Choose 1 of those units to roll 1 additional die. Then, return this card to the Argent player.",
+        "shrinkName": true
     },
     {
         "alias": "war_funding",
@@ -29,7 +30,8 @@
         "faction": "muaat",
         "playArea": false,
         "source": "base",
-        "text": "Action: Remove 1 token from the Muaat player's fleet pool and return it to their reinforcements. Then, gain your war sun unit upgrade technology card.  Then, return this card to the Muaat Player."
+        "text": "Action: Remove 1 token from the Muaat player's fleet pool and return it to their reinforcements. Then, gain your war sun unit upgrade technology card.  Then, return this card to the Muaat Player.",
+        "shrinkName": true
     },
     {
         "alias": "convoys",
@@ -71,7 +73,9 @@
         "faction": "l1z1x",
         "playArea": false,
         "source": "base",
-        "text": "When you gain command tokens during the status phase: Gain 1 additional command token. Then, return this card to the L1Z1X player."
+        "text": "When you gain command tokens during the status phase: Gain 1 additional command token. Then, return this card to the L1Z1X player.",
+        "shortName": "Cybernetic Enh'nc'm'nts",
+        "shrinkName": true
     },
     {
         "alias": "scepter",
@@ -105,7 +109,9 @@
         "faction": "naaz",
         "playArea": false,
         "source": "pok",
-        "text": "Action: Purge 2 of your relic fragments of the same type to gain 1 relic. Then, return this card to the Naaz-Rokha player."
+        "text": "Action: Purge 2 of your relic fragments of the same type to gain 1 relic. Then, return this card to the Naaz-Rokha player.",
+        "shortName": "Black M'rk't Forgery",
+        "shrinkName": true
     },
     {
         "alias": "antivirus",
@@ -164,7 +170,8 @@
         "faction": "winnu",
         "playArea": false,
         "source": "base",
-        "text": "When the Winnu player resolves a strategic action: You do not have to spend or place a command token to resolve the secondary ability of that strategy card. Then, return this card to the Winnu player."
+        "text": "When the Winnu player resolves a strategic action: You do not have to spend or place a command token to resolve the secondary ability of that strategy card. Then, return this card to the Winnu player.",
+        "shortName": "Acqui\n-escence"
     },
     {
         "alias": "favor",

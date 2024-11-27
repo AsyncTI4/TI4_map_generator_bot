@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
+import ti4.image.Mapper;
 
 @Data
 public class AbilityModel implements ModelInterface, EmbeddableModel {
@@ -23,6 +24,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     private String windowEffect;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
+    private String homebrewReplacesID;
 
     @Override
     public boolean isValid() {
@@ -38,7 +40,11 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getShortName() {
-        return Optional.ofNullable(shortName).orElse(getName());
+        if (!getHomebrewReplacesID().isPresent())
+        {
+            return Optional.ofNullable(shortName).orElse(getName());
+        }
+        return Optional.ofNullable(shortName).orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShortName());
     }
 
     public Optional<String> getPermanentEffect() {
@@ -51,6 +57,10 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getWindowEffect() {
         return Optional.ofNullable(windowEffect);
+    }
+
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
     }
 
     public MessageEmbed getRepresentationEmbed() {

@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
+import ti4.image.Mapper;
 
 @Data
 public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNoteModel>, EmbeddableModel {
@@ -67,11 +68,19 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     }
 
     public String getShortName() {
-        return Optional.ofNullable(shortName).orElse(getName());
+        if (!getHomebrewReplacesID().isPresent())
+        {
+            return Optional.ofNullable(shortName).orElse(getName());
+        }
+        return Optional.ofNullable(shortName).orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShortName());
     }
 
     public boolean getShrinkName() {
-        return Optional.ofNullable(shrinkName).orElse(false);
+        if (!getHomebrewReplacesID().isPresent())
+        {
+            return Optional.ofNullable(shrinkName).orElse(false);
+        }
+        return Optional.ofNullable(shrinkName).orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShrinkName());
     }
 
     public Optional<String> getFaction() {

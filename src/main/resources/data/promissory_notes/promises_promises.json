@@ -63,7 +63,8 @@
         "color": "",
         "playArea": false,
         "source": "promises_promises",
-        "text": "When you resolve the secondary ability of the \"Warfare\" strategy card: Reduce the combined cost of the produced units by 4. At the end of the strategic action, return this card to the Muaat player."
+        "text": "When you resolve the secondary ability of the \"Warfare\" strategy card: Reduce the combined cost of the produced units by 4. At the end of the strategic action, return this card to the Muaat player.",
+        "shortName": "Forge-\nmasters"
     },
     {
         "alias": "sigma_proliferate",
@@ -72,7 +73,8 @@
         "color": "",
         "playArea": false,
         "source": "promises_promises",
-        "text": "When you resolve the secondary ability of the \"Warfare\" strategy card: Increase the PRODUCTION value of your space dock by the total number of victory points on face up public objective cards in the common play area. At the end of the strategic action, return this card to the Arborec player."
+        "text": "When you resolve the secondary ability of the \"Warfare\" strategy card: Increase the PRODUCTION value of your space dock by the total number of victory points on face up public objective cards in the common play area. At the end of the strategic action, return this card to the Arborec player.",
+        "shortName": "Pro-\nliferate"
     },
     {
         "alias": "sigma_cyber",
@@ -100,7 +102,8 @@
         "color": "",
         "playArea": false,
         "source": "promises_promises",
-        "text": "When you resolve the secondary ability of the \"Imperial\" strategy card: Draw 1 additional secret objective card. Then, choose and discard 1 secret objective from your hand. At the end of the strategic action, return this card to the Winnu player."
+        "text": "When you resolve the secondary ability of the \"Imperial\" strategy card: Draw 1 additional secret objective card. Then, choose and discard 1 secret objective from your hand. At the end of the strategic action, return this card to the Winnu player.",
+        "shortName": "Syco-\nphancy"
     },
     {
         "alias": "sigma_antivirus",
@@ -128,7 +131,8 @@
         "color": "",
         "playArea": false,
         "source": "promises_promises",
-        "text": "At the start of a space combat: All fighters apply +3 to the result of their combat rolls during this combat. At the end of the combat, return this card to the Naalu player."
+        "text": "At the start of a space combat: All fighters apply +3 to the result of their combat rolls during this combat. At the end of the combat, return this card to the Naalu player.",
+        "shortName": "Pilot Con-\nditioning"
     },
     {
         "alias": "sigma_void_support",
@@ -241,7 +245,8 @@
         "color": "",
         "playArea": false,
         "source": "promises_promises",
-        "text": "When you resolve the primary ability of the \"Trade\" strategy card: Gain 3 additional trade goods. Then, return this card to the Hacan player."
+        "text": "When you resolve the primary ability of the \"Trade\" strategy card: Gain 3 additional trade goods. Then, return this card to the Hacan player.",
+        "shrinkName": true
     },
     {
         "alias": "sigma_weirdway",
@@ -269,7 +274,8 @@
         "color": "",
         "playArea": true,
         "source": "promises_promises",
-        "text": "At the start of the agenda phase: Place this card faceup in your play area. While this card is in your play area, gain 1 trade good after an outcome of an agenda is resolved if the Nomad player predicted or voted for that outcome. At the end of the agenda phase, return this card to the Nomad player."
+        "text": "At the start of the agenda phase: Place this card faceup in your play area. While this card is in your play area, gain 1 trade good after an outcome of an agenda is resolved if the Nomad player predicted or voted for that outcome. At the end of the agenda phase, return this card to the Nomad player.",
+        "shortName": "Machin-\nations"
     },
     {
         "alias": "sigma_offering",
@@ -342,7 +348,9 @@
         "playArea": true,
         "attachment": "sigma_senate_sanctuary",
         "source": "promises_promises",
-        "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player."
+        "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player.",
+        "shortName": "Sen. Sanct.",
+        "shrinkName": false
     },
     {
         "alias": "sigma_senate_sanctuary_m",
@@ -352,7 +360,9 @@
         "playArea": true,
         "attachment": "sigma_senate_sanctuary",
         "source": "promises_promises",
-        "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player."
+        "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player.",
+        "shortName": "Sen. Sanct.",
+        "shrinkName": false
     },
     {
         "alias": "sigma_senate_sanctuary_x",
@@ -362,7 +372,9 @@
         "playArea": true,
         "attachment": "sigma_senate_sanctuary",
         "source": "promises_promises",
-        "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player."
+        "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player.",
+        "shortName": "Sen. Sanct.",
+        "shrinkName": false
     }
 
 ]
