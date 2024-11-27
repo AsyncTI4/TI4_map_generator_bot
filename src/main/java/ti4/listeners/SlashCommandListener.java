@@ -19,7 +19,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Command;
 import ti4.commands2.CommandManager;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
+import ti4.helpers.DateTimeHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.BotLogger;
@@ -116,8 +116,8 @@ public class SlashCommandListener extends ListenerAdapter {
         int milliThreshhold = 3000;
         if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
             String message = "This slash command took a while:\n> " +
-                Helper.getTimeRepresentationToMilliseconds(startTime - eventTime) + " for the bot to respond\n> " +
-                Helper.getTimeRepresentationToMilliseconds(endTime - startTime) + " for the bot to execute";
+                DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime) + " for the bot to respond\n> " +
+                DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime) + " for the bot to execute";
             BotLogger.log(event, message);
         }
     }

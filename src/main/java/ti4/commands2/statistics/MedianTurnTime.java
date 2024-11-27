@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -79,7 +80,7 @@ class MedianTurnTime extends Subcommand {
             if (user == null || turnCount == 0 || totalMillis == 0) continue;
             
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
-            sb.append(Helper.getTimeRepresentationToSeconds(userMedianTurnTime.getValue()));
+            sb.append(DateTimeHelper.getTimeRepresentationToSeconds(userMedianTurnTime.getValue()));
             sb.append("` ").append(user.getEffectiveName());
             sb.append("   [").append(turnCount).append(" total turns]");
             sb.append("\n");
