@@ -80,6 +80,7 @@ import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.StrategyCardModel;
+import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.fow.FowConstants;
@@ -1310,7 +1311,11 @@ public class MapGenerator implements AutoCloseable {
 
             int rectX = x + deltaX - 2;
             drawRectWithOverlay(g2, rectX, rectY, rectW, rectH, relicModel);
-            drawPAImage(x + deltaX, y, "pa_relics_icon.png");
+            if (relicModel.getSource() == ComponentSource.absol)
+            {
+                drawPAImage(x + deltaX, y, "pa_source_absol.png");
+            }
+            drawPAImage(x + deltaX - 1, y - 2, "pa_relics_icon.png");
 
             String relicStatus = isExhausted ? "_exh" : "_rdy";
 
@@ -1318,11 +1323,11 @@ public class MapGenerator implements AutoCloseable {
             if (relicID.equals("absol_quantumcore")) {
                 drawPAImage(x + deltaX, y, "pa_tech_techicons_cyberneticwarfare" + relicStatus + ".png");
             }
-            if (relicID.equals("titanprototype")) {
+            if (relicID.equals("titanprototype") || relicModel.getHomebrewReplacesID().orElse("").equals("titanprototype")) {
                 drawFactionIconImage(graphics, "relic", x + deltaX - 1, y + 108, 42, 42);
             }
 
-            if (relicID.equals("emelpar")) {
+            if (relicID.equals("emelpar") || relicModel.getHomebrewReplacesID().orElse("").equals("emelpar")) {
                 String empelar = "";
                 List<Character> letters = Arrays.asList('m', 'e', 'l', 'p', 'a');
                 Collections.shuffle(letters);
@@ -1650,8 +1655,15 @@ public class MapGenerator implements AutoCloseable {
         ownedPNs.sort(pnComparator);
 
         for (String pnID : ownedPNs) {
-            drawGeneralImageScaled(x + deltaX, y + 1, "promissory_light.png", 38, 28);
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnID);
+            if (promissoryNote.getSource() == ComponentSource.promises_promises)
+            {
+                drawPAImageScaled(x + deltaX, y + 1, "pa_promissory_light_pp.png", 38, 28);
+            }
+            else
+            {
+                drawPAImageScaled(x + deltaX, y + 1, "pa_promissory_light.png", 38, 28);
+            }
             if (game.isFrankenGame() && !promissoryNote.getFaction().isEmpty()) {
                 drawFactionIconImage(graphics, promissoryNote.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
             }
@@ -1670,12 +1682,15 @@ public class MapGenerator implements AutoCloseable {
             }
             graphics.setColor(greyed ? Color.GRAY : Color.WHITE);
             
-            if (promissoryNote.getShrinkName()) {
+            if (pnID.equals("dspntnel")) { // for some reason "Plots Within Plots" gets cut off weirdly if handled normally
                 graphics.setFont(Storage.getFont16());
-                drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName(), x + deltaX + 9, y + 32, 116, true);
+                drawOneOrTwoLinesOfTextVertically(graphics, "Plots Within Plots", x + deltaX + 9, y + 144, 150);
+            } else if (promissoryNote.getShrinkName()) {
+                graphics.setFont(Storage.getFont16());
+                drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName(), x + deltaX + 9, y + 144, 120);
             } else {
                 graphics.setFont(Storage.getFont18());
-                drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName(), x + deltaX + 7, y + 32, 116, true);
+                drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName(), x + deltaX + 7, y + 144, 120);
             }
             drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, promissoryNote);
 
@@ -2401,6 +2416,12 @@ public class MapGenerator implements AutoCloseable {
             if (!techIcon.isEmpty()) {
                 String techSpec = "pa_tech_techicons_" + techIcon + techStatus;
                 drawPAImage(x + deltaX, y, techSpec);
+            }
+            
+                
+            if (techModel.getSource() == ComponentSource.absol)
+            {
+                drawPAImage(x + deltaX, y, "pa_source_absol" + (isExhausted ? "_exh" : "") + ".png");
             }
 
             // Draw Faction Tech Icon
@@ -4573,7 +4594,7 @@ public class MapGenerator implements AutoCloseable {
         text = text.toUpperCase();
         String firstRow = StringUtils.substringBefore(text, "\n");
         firstRow = trimTextToPixelWidth(graphics, firstRow, maxWidth);
-        String secondRow = text.replace(firstRow, "").replace("\n", "");
+        String secondRow = text.substring(firstRow.length()).replace("\n", "");
         secondRow = trimTextToPixelWidth(graphics, secondRow, maxWidth);
         drawTextVertically(graphics, firstRow, x, y, graphics.getFont(), rightAlign);
         if (StringUtils.isNotBlank(secondRow)) {
