@@ -627,10 +627,10 @@ public class Tile {
         // }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planetHolder) {
-                boolean oneOfThree = (unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_threetraits.png")) || (planetHolder.getOriginalPlanetType() != null
-                    && ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
+                boolean oneOfThree = (unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_threetraits.png")) ||
+                        ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
                         || "cultural".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
-                        || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType())));
+                        || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType()));
 
                 if (!Constants.MECATOLS.contains(planetHolder.getName()) && !oneOfThree) {
                     return true;
@@ -662,9 +662,8 @@ public class Tile {
 
     public String getHexTileSummary() {
         // TILE +-X +-Y SPACE ; PLANET1 ; PLANET2 ;
-        StringBuilder sb = new StringBuilder();
-        sb.append(getTileID());
-        sb.append(AliasHandler.resolveTTPGPosition(getPosition()));
-        return sb.toString();
+        String sb = getTileID() +
+            AliasHandler.resolveTTPGPosition(getPosition());
+        return sb;
     }
 }

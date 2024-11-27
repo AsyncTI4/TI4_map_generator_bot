@@ -103,6 +103,8 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class ButtonHelper {
 
     public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
@@ -2165,8 +2167,9 @@ public class ButtonHelper {
             if (onlyReady && player.getExhaustedPlanets().contains(plan)) {
                 continue;
             }
-            if (game.getPlanetsInfo().get(plan) != null && game.getPlanetsInfo().get(plan).getOriginalPlanetType() != null) {
-                List<Button> planetButtons = getPlanetExplorationButtons(game, game.getPlanetsInfo().get(plan), player);
+            var planet = game.getPlanetsInfo().get(plan);
+            if (planet != null && isNotBlank(planet.getOriginalPlanetType())) {
+                List<Button> planetButtons = getPlanetExplorationButtons(game, planet, player);
                 buttons.addAll(planetButtons);
             }
         }
@@ -2177,8 +2180,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         for (String plan : player.getPlanetsAllianceMode()) {
             Planet planetReal = game.getPlanetsInfo().get(plan);
-            if (planetReal != null && planetReal.getOriginalPlanetType() != null
-                && !player.getExhaustedPlanets().contains(planetReal.getName())) {
+            if (planetReal != null && isNotBlank(planetReal.getOriginalPlanetType()) && !player.getExhaustedPlanets().contains(planetReal.getName())) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
             }
@@ -3312,10 +3314,10 @@ public class ButtonHelper {
                 }
                 Planet planetReal = (Planet) planetUnit;
                 String planet = planetReal.getName();
-                if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)
-                    && Helper.getProductionValueOfUnitHolder(player, game, tile, planetUnit) > 0
-                    && !game.getStoredValue(player.getFaction() + "planetsExplored")
-                        .contains(planetUnit.getName() + "*")) {
+                if (isNotBlank(planetReal.getOriginalPlanetType())
+                        && player.getPlanetsAllianceMode().contains(planet)
+                        && Helper.getProductionValueOfUnitHolder(player, game, tile, planetUnit) > 0
+                        && !game.getStoredValue(player.getFaction() + "planetsExplored").contains(planetUnit.getName() + "*")) {
                     List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
                     buttons.addAll(planetButtons);
                 }
@@ -3446,8 +3448,7 @@ public class ButtonHelper {
                     Tile tile2 = game.getTileByPosition(pos);
                     for (Planet uH : tile2.getPlanetUnitHolders()) {
                         String planet = uH.getName();
-                        if (uH.getOriginalPlanetType() != null
-                            && player.getPlanetsAllianceMode().contains(planet)) {
+                        if (isNotBlank(uH.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)) {
                             List<Button> planetButtons = getPlanetExplorationButtons(game, uH, player);
                             buttons.addAll(planetButtons);
                         }
@@ -3595,7 +3596,7 @@ public class ButtonHelper {
             }
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
-            if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)
+            if (isNotBlank(planetReal.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)
                 && FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
@@ -3613,7 +3614,7 @@ public class ButtonHelper {
             }
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
-            if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)) {
+            if (isNotBlank(planetReal.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
             }
@@ -6211,8 +6212,8 @@ public class ButtonHelper {
 
         for (String planet : player.getPlanets()) {
             Planet planetReal = game.getPlanetsInfo().get(planet.toLowerCase());
-            boolean oneOfThree = planetReal != null
-                && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
+            boolean oneOfThree = planetReal != null && isNotBlank(planetReal.getOriginalPlanetType()) &&
+                List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
             if (!ignoredPlanets.contains(planet.toLowerCase()) && !oneOfThree) {
                 return game.getTileFromPlanet(planet);
             }

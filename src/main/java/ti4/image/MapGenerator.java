@@ -86,6 +86,7 @@ import ti4.service.fow.FowConstants;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 import ti4.website.WebsiteOverlay;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static ti4.image.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator implements AutoCloseable {
@@ -2243,7 +2244,7 @@ public class MapGenerator implements AutoCloseable {
             }
 
             String originalTechSpeciality = planet.getOriginalTechSpeciality();
-            if (!originalTechSpeciality.isEmpty() && !hasBentorEncryptionKey) {
+            if (isNotBlank(originalTechSpeciality) && !hasBentorEncryptionKey) {
                 String planetTechSkip = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
                 drawPlanetCardDetail(x + deltaX + 26, y + 82, planetTechSkip);
             } else if (!hasBentorEncryptionKey) {
@@ -3570,7 +3571,7 @@ public class MapGenerator implements AutoCloseable {
                     String traitFile = "";
                     List<String> traits = planetReal.getPlanetType();
 
-                    if (planetReal.getOriginalPlanetType().equals("faction") && traits.isEmpty()) {
+                    if ("faction".equalsIgnoreCase(planetReal.getOriginalPlanetType()) && traits.isEmpty()) {
                         if (custodiaVigilia.getFactionHomeworld() == null) {
                             traitFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
                         } else {
@@ -4548,7 +4549,7 @@ public class MapGenerator implements AutoCloseable {
         String secondRow = text.replace(firstRow, "").replace("\n", "");
         secondRow = trimTextToPixelWidth(graphics, secondRow, maxWidth);
         drawTextVertically(graphics, firstRow, x, y, graphics.getFont(), rightAlign);
-        if (StringUtils.isNotBlank(secondRow)) {
+        if (isNotBlank(secondRow)) {
             drawTextVertically(graphics, secondRow, x + spacing, y, graphics.getFont(), rightAlign);
         }
     }

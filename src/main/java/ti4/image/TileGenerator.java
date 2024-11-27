@@ -47,6 +47,8 @@ import ti4.model.ShipPositionModel;
 import ti4.model.UnitModel;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class TileGenerator {
 
     private static final int TILE_PADDING = 100;
@@ -827,13 +829,13 @@ public class TileGenerator {
                 for (Planet planet : tile.getPlanetUnitHolders()) {
                     String traitFile = "";
                     List<String> traits = planet.getPlanetType();
-                    if (traits.isEmpty()) {
+                    if (traits.isEmpty() && isNotBlank(planet.getOriginalPlanetType())) {
                         traits.add(planet.getOriginalPlanetType());
                     }
 
                     if (tile.isMecatol()) {
                         traitFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
-                    } else if (planet.getOriginalPlanetType().equals("faction")) {
+                    } else if ("faction".equalsIgnoreCase(planet.getOriginalPlanetType())) {
                         traitFile = ResourceHelper.getInstance().getFactionFile(Mapper.getPlanet(planet.getName()).getFactionHomeworld() + ".png");
                     } else if (traits.size() == 1) {
                         String t = planet.getPlanetType().getFirst();
@@ -917,7 +919,8 @@ public class TileGenerator {
                 boolean anySkips = false;
                 for (Planet planet : tile.getPlanetUnitHolders()) {
                     List<String> skips = planet.getTechSpeciality();
-                    if (!skips.contains(planet.getOriginalTechSpeciality())) {
+                    String originalTechSpeciality = planet.getOriginalTechSpeciality();
+                    if (isNotBlank(originalTechSpeciality) && !skips.contains(originalTechSpeciality)) {
                         skips.add(planet.getOriginalTechSpeciality());
                     }
                     skips.removeAll(Collections.singleton(null));
