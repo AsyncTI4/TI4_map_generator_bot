@@ -133,13 +133,14 @@ public class BotLogger {
             }
             case ButtonInteractionEvent buttonInteractionEvent -> { //BUTTON EVENT LOGS
                 String channelName = event.getChannel().getName();
-                String channelMention = event.getChannel().getAsMention();
-                Button button = ((ButtonInteraction) event).getButton();
+                Button button = buttonInteractionEvent.getButton();
+                String message = "[" + channelName + "](" + buttonInteractionEvent.getMessage().getJumpUrl() + ") " + event.getUser().getEffectiveName() + " pressed button: " + ButtonHelper.getButtonRepresentation(button) +
+                    "\n> Error: " + msg;
                 if (e == null) {
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue();
+                    botLogChannel.sendMessage(message).queue();
                 } else {
                     Helper.checkThreadLimitAndArchive(event.getGuild());
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
+                    botLogChannel.sendMessage(message).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
                     }));

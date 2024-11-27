@@ -29,7 +29,7 @@ public class DateTimeHelper {
     }
 
     public static String getTimeRepresentationToMilliseconds(long totalMillis) {
-        long millis = (totalMillis % 1000);
+        long millis = totalMillis % 1000;
         long totalSeconds = totalMillis / 1000; // total seconds (truncates)
         long seconds = totalSeconds % 60;
         long totalMinutes = totalSeconds / 60; // total minutes (truncates)

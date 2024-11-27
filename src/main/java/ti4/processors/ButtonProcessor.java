@@ -31,8 +31,7 @@ import ti4.message.MessageHelper;
 public class ButtonProcessor {
 
     private static final ButtonProcessor instance = new ButtonProcessor();
-    private static final Map<String, Consumer<ButtonContext>> knownButtons =
-        AnnotationHandler.findKnownHandlers(ButtonContext.class, ButtonHandler.class);
+    private static final Map<String, Consumer<ButtonContext>> knownButtons = AnnotationHandler.findKnownHandlers(ButtonContext.class, ButtonHandler.class);
 
     private final BlockingQueue<ButtonInteractionEvent> buttonInteractionQueue = new LinkedBlockingQueue<>();
     private final Set<String> userButtonPressSet = ConcurrentHashMap.newKeySet();
@@ -96,12 +95,16 @@ public class ButtonProcessor {
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
+
         long endTime = System.currentTimeMillis();
-        int milliThreshhold = 3000;
+        final int milliThreshhold = 3000;
         if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
-            String message = "This button took a while:\n> " +
-                DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime) + " for the bot to respond\n> " +
-                DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime) + " for the bot to execute";
+            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
+            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+            String message = "This button took over " + milliThreshhold + " to respond or execute\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " button was pressed by user\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
             BotLogger.log(event, message);
         }
         instance.userButtonPressSet.remove(event.getUser().getId() + event.getButton().getId());
