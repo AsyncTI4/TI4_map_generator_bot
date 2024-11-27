@@ -2643,6 +2643,16 @@ public class Helper {
         return String.format("%02dh:%02dm:%02ds", hours, minutes, seconds);
     }
 
+    public static String getTimeRepresentationToMilliseconds(long totalMillis) {
+        long millis = (totalMillis % 1000);
+        long totalSeconds = totalMillis / 1000; // total seconds (truncates)
+        long seconds = totalSeconds % 60;
+        long totalMinutes = totalSeconds / 60; // total minutes (truncates)
+        long minutes = totalMinutes % 60;
+
+        return String.format("%02dm:%02ds:%04dms", minutes, seconds, millis);
+    }
+
     public static String getTimeRepresentationNanoSeconds(long totalNanoSeconds) {
         long totalMicroSeconds = totalNanoSeconds / 1000;
         long totalMilliSeconds = totalMicroSeconds / 1000;
