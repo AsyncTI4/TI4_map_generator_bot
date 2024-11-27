@@ -1,5 +1,9 @@
 package ti4.helpers;
 
+import java.sql.Timestamp;
+
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.ISnowflake;
 
@@ -57,6 +61,14 @@ public class DateTimeHelper {
             String.format("%03d:", milleSeconds) +
             String.format("%03d:", microSeconds) +
             String.format("%03d", nanoSeconds);
+    }
+
+    public static String getCurrentTimestamp() {
+        return getTimestampFromMillesecondsEpoch(System.currentTimeMillis());
+    }
+
+    public static String getTimestampFromMillesecondsEpoch(long epochMillis) {
+        return "`" + StringUtils.rightPad(new Timestamp(epochMillis).toString(), 23) + "`";
     }
 
 }

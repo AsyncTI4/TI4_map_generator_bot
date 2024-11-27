@@ -1,8 +1,9 @@
 package ti4.message;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -16,10 +17,9 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.selections.SelectionMenuProvider;
@@ -35,7 +35,7 @@ public class BotLogger {
     }
 
     public static void logWithTimestamp(String msg) {
-        String timeStampedMessage = "`" + StringUtils.rightPad(new Timestamp(System.currentTimeMillis()).toString(), 23) + "`  " + msg;
+        String timeStampedMessage = DateTimeHelper.getCurrentTimestamp() + "  " + msg;
         log(null, timeStampedMessage, null);
     }
 
