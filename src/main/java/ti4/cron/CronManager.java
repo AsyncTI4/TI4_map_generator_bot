@@ -14,12 +14,12 @@ import ti4.message.BotLogger;
 @UtilityClass
 public class CronManager {
 
-    private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 20;
+    private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 5;
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
     public static void register(Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
-        //Runnable wrappedRunnable = wrapWithRuntimeWarning(clazz, runnable);
-        //SCHEDULER.scheduleAtFixedRate(wrappedRunnable, initialDelay, period, unit);
+        Runnable wrappedRunnable = wrapWithRuntimeWarning(clazz, runnable);
+        SCHEDULER.scheduleAtFixedRate(wrappedRunnable, initialDelay, period, unit);
     }
 
     private static Runnable wrapWithRuntimeWarning(Class<?> clazz, Runnable runnable) {

@@ -1,7 +1,16 @@
 package ti4.image;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
+import static ti4.image.ImageHelper.writeCompressedFormat;
+
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -29,17 +38,20 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.FileUpload;
+import javax.imageio.ImageIO;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands2.CommandHelper;
@@ -49,6 +61,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CalendarHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
@@ -86,8 +99,6 @@ import ti4.model.UnitModel;
 import ti4.service.fow.FowConstants;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 import ti4.website.WebsiteOverlay;
-
-import static ti4.image.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator implements AutoCloseable {
 
@@ -379,7 +390,7 @@ public class MapGenerator implements AutoCloseable {
 
         StringBuilder sb = new StringBuilder();
 
-        String totalTimeStr = Helper.getTimeRepresentationNanoSeconds(debugAbsoluteStartTime.getNanoTime());
+        String totalTimeStr = DateTimeHelper.getTimeRepresentationNanoSeconds(debugAbsoluteStartTime.getNanoTime());
         String totalLine = String.format("%-34s%s", "Total time (" + game.getName() + "):", totalTimeStr);
         sb.append(totalLine);
 
@@ -401,7 +412,7 @@ public class MapGenerator implements AutoCloseable {
         long subTime = subStopWatch.getNanoTime();
         long totalTime = totalStopWatch.getNanoTime();
         double percentage = ((double) subTime / totalTime) * 100.0;
-        String timeStr = Helper.getTimeRepresentationNanoSeconds(subTime);
+        String timeStr = DateTimeHelper.getTimeRepresentationNanoSeconds(subTime);
         return String.format("\n%-" + padRight + "s%s (%2.2f%%)", name, timeStr, percentage);
     }
 
