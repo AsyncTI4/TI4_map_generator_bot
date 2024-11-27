@@ -1,11 +1,10 @@
-package ti4.generator;
+package ti4.image;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Stream;
 
 import ti4.ResourceHelper;
 import ti4.helpers.*;
@@ -347,7 +346,7 @@ public class UnitRenderGenerator {
     }
 
     private String getUnitPath(UnitKey unitKey) {
-        String unitPath = Tile.getUnitPath(unitKey);
+        String unitPath = resourceHelper.getUnitFile(unitKey);
         if (unitPath == null) return null;
 
         // Handle bulk unit replacements
