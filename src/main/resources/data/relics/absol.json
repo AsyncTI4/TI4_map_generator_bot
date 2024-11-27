@@ -4,21 +4,24 @@
         "name": "Dominus Orb",
         "text": "After you activate a system, apply +1 to the move value of 1 of your ships during this tactical action.\nAfter you activate a system, you may move and transport units that are in systems that contain 1 of your command tokens.  If you do, purge this card.",
         "source": "absol",
-        "flavourText": "*Goldos hoisted the ivory orb at the head of their army. At once, the weariness that filled the bodies and minds of each soldier vanished. They strode forth as if fresh from a week's rest.*"
+        "flavourText": "*Goldos hoisted the ivory orb at the head of their army. At once, the weariness that filled the bodies and minds of each soldier vanished. They strode forth as if fresh from a week's rest.*",
+        "homebrewReplacesID": "dominusorb"
     },
     {
         "alias": "absol_dynamiscore",
         "name": "Dynamis Core",
         "text": "While this card is in your play area, your commodity value is increased by 2.\nACTION: Purge this card to gain trade goods equal to double your printed commodity value (max 10 trade goods).",
         "source": "absol",
-        "flavourText": "*Dart and Tai stood, mesmerized by the swirling mass. Neither had any idea what it was, but both were fairly sure they were about to retire.*"
+        "flavourText": "*Dart and Tai stood, mesmerized by the swirling mass. Neither had any idea what it was, but both were fairly sure they were about to retire.*",
+        "homebrewReplacesID": "dynamiscore"
     },
     {
         "alias": "absol_jr",
         "name": "JR-SX455-O",
         "text": "Action: Exhaust this agent and choose a planet. The player that controls that planet may place a structure on that planet. If they do not, they gain 1 trade good for each structure on that planet.",
         "source": "absol",
-        "flavourText": "*There was a long moment, stretching in silence until Dart blurted, “Can we help you somehow?”\nAll of the individuals seemed startled by the question, but the titan seemed the most perplexed.  “I do not know,” it said at last.  “I only remember that… I want to learn.  And… and to remember.”\n\n“I have no name. You,” it said, pointing to Dart. “Perhaps I shall be Dart II.”\n“H-how about Junior instead?” Dart offered. “I wouldn’t want anyone to get us confused, we already look so… uh… alike.”\nThe titan nodded solemnly.  “Yes. Yes, this is true.” It turned. “Junior. Yes. I like that name, and I would also like to come with you.”*"
+        "flavourText": "*There was a long moment, stretching in silence until Dart blurted, “Can we help you somehow?”\nAll of the individuals seemed startled by the question, but the titan seemed the most perplexed.  “I do not know,” it said at last.  “I only remember that… I want to learn.  And… and to remember.”\n\n“I have no name. You,” it said, pointing to Dart. “Perhaps I shall be Dart II.”\n“H-how about Junior instead?” Dart offered. “I wouldn’t want anyone to get us confused, we already look so… uh… alike.”\nThe titan nodded solemnly.  “Yes. Yes, this is true.” It turned. “Junior. Yes. I like that name, and I would also like to come with you.”*",
+        "homebrewReplacesID": "titanprototype"
     },
     {
         "alias": "absol_luxarchtreatise",
@@ -32,14 +35,16 @@
         "name": "Maw of Worlds",
         "text": "When you would exhaust a technology or legendary planet card, you may exhaust this card instead.\nAt the start of the agenda phase, you may purge this card and exhaust any number of your planets to gain a technology with the same number of prerequisites.",
         "source": "absol",
-        "flavourText": "*No larger than a carrier, the spherical lattice held a captive singularity at its heart. As they dumped the planet's entire energy grid into its core, the black hole began to spin, the complex logic-circuitry along the lattice slowly coming to life.*"
+        "flavourText": "*No larger than a carrier, the spherical lattice held a captive singularity at its heart. As they dumped the planet's entire energy grid into its core, the black hole began to spin, the complex logic-circuitry along the lattice slowly coming to life.*",
+        "homebrewReplacesID": "mawofworlds"
     },
     {
         "alias": "absol_nanoforge",
         "name": "Nanoforge",
         "text": "Action: Attach this card to a non-legendary, non-home planet you control. Its resource and influence values are increased by 2 and it is a legendary planet. Take the corresponding legendary planet ability card. This action cannot be performed once attached.\nRECONSTRUCTION MATRIX: After you exhaust the planet Nano-Forge is attached to, you may exhaust this card to ready that planet.",
         "source": "absol",
-        "flavourText": "*Intended to bring prosperity, the forge was twisted into an instrument of war.\nThe planet heaved and shuddered as it merged with the Nano-forge, sputtering as its atmosphere became breathable for the first time.*"
+        "flavourText": "*Intended to bring prosperity, the forge was twisted into an instrument of war.\nThe planet heaved and shuddered as it merged with the Nano-forge, sputtering as its atmosphere became breathable for the first time.*",
+        "homebrewReplacesID": "nanoforge"
     },
     {
         "alias": "absol_plenaryorbital",
@@ -53,84 +58,96 @@
         "name": "Quantumcore",
         "text": "Gain the following tech immediately: [Cybernetic][Warfare] During the movement step of your tactical actions, you may move 1 of your structures from a system that does not contain 1 of your command tokens to a planet you control in the active system.\nWhen an opponent commits ground forces to a planet that contains 1 or more of your structures, you may destroy 1 structure on that planet to return the committed units to the space area.  If you do, purge this card",
         "source": "absol",
-        "flavourText": "*Trilossa slipped the core into the hololattice's main terminal.  The lattice was ancient - as old as the Flight itself - and tampering with it was tantamount to sin.  Hopefully the rest of the Flight would would see the necessity of the upgrade.*"
+        "flavourText": "*Trilossa slipped the core into the hololattice's main terminal.  The lattice was ancient - as old as the Flight itself - and tampering with it was tantamount to sin.  Hopefully the rest of the Flight would would see the necessity of the upgrade.*",
+        "shortName": "Quantum\n-core"
     },
     {
         "alias": "absol_emelpar",
         "name": "Scepter of Emelpar",
         "text": "When you would spend a token from your strategy pool, you may exhaust this card to spend a token from your reinforcements instead.\nACTION: Spend a token from your strategy pool and purge this card to ready your strategy card.\n[Note: You can still use the ACTION if this card is exhausted]",
         "source": "absol",
-        "flavourText": "*As the hilt began to fuse with the flesh of her hand, she worried that she should set the scepter aside. But the whispered suggestions in her mind were too valuable and insightful to seriously consider such a rash and illogical act.*"
+        "flavourText": "*As the hilt began to fuse with the flesh of her hand, she worried that she should set the scepter aside. But the whispered suggestions in her mind were too valuable and insightful to seriously consider such a rash and illogical act.*",
+        "homebrewReplacesID": "emelpar"
     },
     {
         "alias": "absol_shardofthethrone1",
         "name": "Shard of the Throne (1)",
         "text": "When you gain this card, gain 1 victory point. When you lose this card, lose 1 victory point. When you cast votes during the agenda phase, you cast 2 additional votes. When a player gains control of a legendary planet you control or a planet you control in your home system, that player gains one Shard of the Throne from your play area.",
         "source": "absol",
-        "flavourText": "*\"What power does a broken piece of the Throne of Emperors hold? To me, none. But to everyone else...\"*"
+        "flavourText": "*\"What power does a broken piece of the Throne of Emperors hold? To me, none. But to everyone else...\"*",
+        "homebrewReplacesID": "shard"
     },
     {
         "alias": "absol_shardofthethrone2",
         "name": "Shard of the Throne (2)",
         "text": "When you gain this card, gain 1 victory point. When you lose this card, lose 1 victory point. When you cast votes during the agenda phase, you cast 2 additional votes. When a player gains control of a legendary planet you control or a planet you control in your home system, that player gains one Shard of the Throne from your play area.",
         "source": "absol",
-        "flavourText": "*Qanoj watched the light reflect off of the shard and dance about his chambers.  It was such a pretty thing.  And yet, so many had died for it.*"
+        "flavourText": "*Qanoj watched the light reflect off of the shard and dance about his chambers.  It was such a pretty thing.  And yet, so many had died for it.*",
+        "homebrewReplacesID": "shard"
     },
     {
         "alias": "absol_shardofthethrone3",
         "name": "Shard of the Throne (3)",
         "text": "When you gain this card, gain 1 victory point. When you lose this card, lose 1 victory point. When you cast votes during the agenda phase, you cast 2 additional votes. When a player gains control of a legendary planet you control or a planet you control in your home system, that player gains one Shard of the Throne from your play area.",
         "source": "absol",
-        "flavourText": "*Legends claim that only the one who can bring together all the scattered pieces of the Throne of Emperors will truly be wothy to claim the seat.*"
+        "flavourText": "*Legends claim that only the one who can bring together all the scattered pieces of the Throne of Emperors will truly be wothy to claim the seat.*",
+        "homebrewReplacesID": "shard"
     },
     {
         "alias": "absol_stellarconverter",
         "name": "Stellar Converter",
         "text": "Your ships may ignore the effects of supernovas.  When you ships move out of or through a supernova, apply +1 to their move value.\nACTION: Choose 1 non-home planet other than Mecatol Rex in a system that contains or is adjacent to 1 or more of your units that have BOMBARDMENT; destroy all units on that planet and purge its attachments, its planet card, and its legendary planet ability card(s). Then, place the destroyed planet token on that planet and purge this card.",
         "source": "absol",
-        "flavourText": "*A power great enough to envelop a star, such that its energies might be concentrated… and scattered.*"
+        "flavourText": "*A power great enough to envelop a star, such that its energies might be concentrated… and scattered.*",
+        "homebrewReplacesID": "stellarconverter"
     },
     {
         "alias": "absol_codex",
         "name": "The Codex",
         "text": "At the end of your turn, you may exhaust this card to discard up to 3 action cards and draw an equal number of action cards.\nACTION: Purge this card to take up to 3 action cards of your choice from the action card discard pile.",
         "source": "absol",
-        "flavourText": "*No single tome could contain the collected knowledge of millennia of rulers. Thus, the last Emperor built a massive cruiser, its holds bulging with crystal info-matrices. It roams the outer reaches of the Gul system, awaiting a summons that will never come.*"
+        "flavourText": "*No single tome could contain the collected knowledge of millennia of rulers. Thus, the last Emperor built a massive cruiser, its holds bulging with crystal info-matrices. It roams the outer reaches of the Gul system, awaiting a summons that will never come.*",
+        "homebrewReplacesID": "codex"
     },
     {
         "alias": "absol_emphidia",
         "name": "The Crown of Emphidia",
         "text": "After you perform a tactical action, you may explore 1 planet you control in that system. At the start of the status phase, if you control the 'Tomb of Emphidia', you may purge this card to gain 1 victory point.",
         "source": "absol",
-        "flavourText": "*The machines of the forgotten throne-world could only be controlled through the data-impulses of the black-barbed crown.*"
+        "flavourText": "*The machines of the forgotten throne-world could only be controlled through the data-impulses of the black-barbed crown.*",
+        "homebrewReplacesID": "emphidia"
     },
     {
         "alias": "absol_thalnos",
         "name": "The Crown of Thalnos",
         "text": "During the roll dice step of combat, you may also roll a number of dice up to the unused capacity of your ships in the active system. For each result of 5-10, generate 1 hit. For each result of 1-4, your opponent generates 1 additional hit. At the end of combat, if you used this ability, exhaust this card.",
         "source": "absol",
-        "flavourText": "*A cloud of satellites spewed from the dreadnought's hull, drifting into a halo around the vessel. The battle seemed to pause for one long moment, before the drones' weapons flared, unleashing beams of energy in all directions.*"
+        "flavourText": "*A cloud of satellites spewed from the dreadnought's hull, drifting into a halo around the vessel. The battle seemed to pause for one long moment, before the drones' weapons flared, unleashing beams of energy in all directions.*",
+        "homebrewReplacesID": "thalnos"
     },
     {
         "alias": "absol_obsidian",
         "name": "The Obsidian",
         "text": "When you gain this card, draw 1 secret objective. You can have 1 additional scored or unscored secret objective.",
         "source": "absol",
-        "flavourText": "*The inky blackness of the blade evoked feelings of discomfort and nausea in all who saw it. All but Sharsiss. It whispered to him promises of power. Promises of a reckoning that would see the Collective unmade. \"Good,\" he thought. \"Let them burn.\"*"
+        "flavourText": "*The inky blackness of the blade evoked feelings of discomfort and nausea in all who saw it. All but Sharsiss. It whispered to him promises of power. Promises of a reckoning that would see the Collective unmade. \"Good,\" he thought. \"Let them burn.\"*",
+        "homebrewReplacesID": "obsidian"
     },
     {
         "alias": "absol_prophetstears",
         "name": "The Prophet's Tears",
         "text": "When you would research a technology or use a faction ability instead of researching a technology, you may ignore 1 prerequisite or draw 1 action card.\nACTION: Research 2 technologies, then purge this card.  Faction abilities cannot prevent you from researching these technologies.",
         "source": "absol",
-        "flavourText": "*\"So you're going to drink a vial of murky liquid we found in a stasis vault on a dead world because you think it's the concentrated genetic essence of an entire species' most brilliant minds...and you think* I'm *being irrational?\"*"
+        "flavourText": "*\"So you're going to drink a vial of murky liquid we found in a stasis vault on a dead world because you think it's the concentrated genetic essence of an entire species' most brilliant minds...and you think* I'm *being irrational?\"*",
+        "homebrewReplacesID": "prophetstears"
     },
     {
         "alias": "absol_syncretone",
         "name": "The Syncretone",
         "text": "When you vote, you may exhaust this card as if it were a planet with an influence value equal to the number of players, even if you are prevented from voting.\nAfter you activate a system, you may purge this card.  If you do, your ships may move through other players' ships during this tactical action.",
         "source": "absol",
-        "flavourText": "*One of many Guild secrets involves a tiny object known as the Syncretone.  Connor had heard the damn thing referred to by the Yssaril as 'innocuous' so many times now that he was absolutely positive it must be his by day's end.*"
+        "flavourText": "*One of many Guild secrets involves a tiny object known as the Syncretone.  Connor had heard the damn thing referred to by the Yssaril as 'innocuous' so many times now that he was absolutely positive it must be his by day's end.*",
+        "shrinkName": true
     },
     {
         "alias": "absol_tyrantslament",
