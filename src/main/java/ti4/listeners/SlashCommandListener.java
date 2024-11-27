@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.joda.time.DateTime;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -19,7 +20,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Command;
 import ti4.commands2.CommandManager;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
+import ti4.helpers.DateTimeHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.BotLogger;
@@ -33,7 +34,7 @@ public class SlashCommandListener extends ListenerAdapter {
             return;
         }
 
-        long eventTime = Math.min(event.getInteraction().getTimeCreated().toEpochSecond() * 1000, System.currentTimeMillis());
+        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
 
         long startTime = System.currentTimeMillis();
 
@@ -113,11 +114,14 @@ public class SlashCommandListener extends ListenerAdapter {
         event.getHook().deleteOriginal().queue();
 
         long endTime = System.currentTimeMillis();
-        int milliThreshhold = 3000;
+        final int milliThreshhold = 3000;
         if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
-            String message = "This slash command took a while:\n> " +
-                Helper.getTimeRepresentationToMilliseconds(startTime - eventTime) + " for the bot to respond\n> " +
-                Helper.getTimeRepresentationToMilliseconds(endTime - startTime) + " for the bot to execute";
+            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
+            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+            String message = "This slash command took over " + milliThreshhold + " to respond or execute\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " command was issued by user\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
             BotLogger.log(event, message);
         }
     }
