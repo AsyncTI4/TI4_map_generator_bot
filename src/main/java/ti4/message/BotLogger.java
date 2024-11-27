@@ -120,12 +120,13 @@ public class BotLogger {
             case SlashCommandInteractionEvent slashCommandInteractionEvent -> { //SLASH COMMAND EVENT LOGS
                 String channelName = event.getChannel().getName();
                 String channelMention = event.getChannel().getAsMention();
-                String commandString = ((CommandInteractionPayload) event).getCommandString();
+                String commandString = slashCommandInteractionEvent.getCommandString();
+                String message = "[" + channelName + "](" + channelMention + ") " + event.getUser().getEffectiveName() + "used: `" + commandString + "`\n> Error: " + msg;
                 if (e == null) {
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [command: `" + commandString + "`]\n" + msg).queue();
+                    botLogChannel.sendMessage(message).queue();
                 } else {
                     Helper.checkThreadLimitAndArchive(event.getGuild());
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [command: `" + commandString + "`]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
+                    botLogChannel.sendMessage(message).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
                     }));
