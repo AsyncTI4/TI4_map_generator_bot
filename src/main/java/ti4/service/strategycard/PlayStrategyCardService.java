@@ -21,6 +21,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.ThreadHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -73,7 +74,7 @@ public class PlayStrategyCardService {
         if (!winnuHero) {
             game.setSCPlayed(scToPlay, true);
         }
-        Helper.checkThreadLimitAndArchive(event.getGuild());
+        ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
         StringBuilder message = new StringBuilder();
         message.append(Helper.getSCRepresentation(game, scToPlay));
         message.append(" played");
