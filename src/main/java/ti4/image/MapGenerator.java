@@ -2269,20 +2269,20 @@ public class MapGenerator implements AutoCloseable {
             drawPlanetCardDetail(x + deltaX + 26, y + 103, resFileName);
             drawPlanetCardDetail(x + deltaX + 26, y + 125, infFileName);
 
-            graphics.setFont(Storage.getFont12());
+            graphics.setFont(Storage.getFont16());
             Integer offset = 10 - graphics.getFontMetrics().stringWidth("" + resources) / 2;
             if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                 graphics.setColor(Color.BLACK);
                 for (int i = -1; i <= 1; i++) {
                     for (int j = -1; j <= 1; j++) {
-                        graphics.drawString("" + resources, x + deltaX + 26 + offset + i, y + 118 + j);
+                        graphics.drawString("" + resources, x + deltaX + 26 + offset + i, y + 115 + j);
                     }
                 }
             }
             graphics.setColor(Color.WHITE);
-            graphics.drawString("" + resources, x + deltaX + 26 + offset, y + 117);
+            graphics.drawString("" + resources, x + deltaX + 26 + offset, y + 115);
             offset = 10 - graphics.getFontMetrics().stringWidth("" + influence) / 2;
-            graphics.drawString("" + influence, x + deltaX + 26 + offset, y + 139);
+            graphics.drawString("" + influence, x + deltaX + 26 + offset, y + 137);
 
             graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
             if (planetModel.getShrinkNamePNAttach()) {
