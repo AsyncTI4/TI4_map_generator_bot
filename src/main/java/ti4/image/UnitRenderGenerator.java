@@ -450,7 +450,21 @@ public class UnitRenderGenerator {
         }
 
         // Default to spiral positioning
-        return calculateSpiralPosition(posCtx, radius, degree, degreeChange, rectangles);
+        Point position = calculateSpiralPosition(posCtx, radius, degree, degreeChange, rectangles);
+
+        // add found position to 'rectangles' to prevent any future units from being placed there
+        Point centerPosition = unitHolder.getHolderCenterPosition();
+        int unitWidth = posCtx.unitImage.getWidth();
+        int unitHeight = posCtx.unitImage.getHeight();
+        rectangles.add(
+            new Rectangle(
+                centerPosition.x + position.x - (unitWidth / 2),
+                centerPosition.y + position.y - (unitHeight / 2),
+                unitWidth,
+                unitHeight
+            )
+        );
+        return position;
     }
 
     private Point getTokenPosition(UnitKey unitKey, PositioningContext posCtx) {
@@ -465,19 +479,40 @@ public class UnitRenderGenerator {
         int degree,
         int degreeChange,
         List<Rectangle> rectangles) {
-        return Stream.iterate(degree, d -> d + degreeChange)
-            .limit((360 - degree) / degreeChange + 1)
-            .map(currentDegree -> {
-                int x = (int) (radius * Math.sin(currentDegree));
-                int y = (int) (radius * Math.cos(currentDegree));
-                return new Point(
-                    posCtx.centerPosition.x + x,
-                    posCtx.centerPosition.y + y);
-            })
-            .filter(point -> !intersectsExisting(point, posCtx.unitImage, rectangles))
-            .findFirst()
-            .orElseGet(() -> calculateSpiralPosition(posCtx, radius, degree + 3, degreeChange, rectangles));
+        Point centerPosition = posCtx.centerPosition;
+        int unitWidth = posCtx.unitImage.getWidth();
+        int unitHeight = posCtx.unitImage.getHeight();
+
+        int foundX = 0;
+        int foundY = 0;
+
+        boolean searchPosition = true;
+        while (searchPosition) {
+            int x = (int) (radius * Math.sin(degree));
+            int y = (int) (radius * Math.cos(degree));
+            int candidateX = centerPosition.x + x - (unitWidth / 2);
+            int candidateY = centerPosition.y + y - (unitHeight / 2);
+            if (rectangles.stream().noneMatch(rectangle -> rectangle.intersects(candidateX, candidateY,
+                    unitWidth, unitHeight))) {
+                searchPosition = false;
+            } else if (degree > 360) {
+                searchPosition = false;
+                degree += 3;// To change degree if we did not find place, might be better placement then
+            }
+            degree += degreeChange;
+
+            if(!searchPosition) {
+                foundX = candidateX;
+                foundY = candidateY;
+            }
+        }
+
+        rectangles.add(
+                new Rectangle(foundX, foundY, unitWidth, unitHeight));
+
+        return new Point(foundX, foundY);
     }
+
 
     private ImagePosition calculateImagePosition(PositioningContext posCtx, Point position) {
         int xOriginal = posCtx.centerPosition.x + position.x;
@@ -518,14 +553,6 @@ public class UnitRenderGenerator {
         return new ImagePosition(xOriginal, yOriginal, imageX, imageY);
     }
 
-    private boolean intersectsExisting(Point point, BufferedImage unitImage, List<Rectangle> rectangles) {
-        Rectangle proposedBounds = new Rectangle(
-            point.x - (unitImage.getWidth() / 2),
-            point.y - (unitImage.getHeight() / 2),
-            unitImage.getWidth(),
-            unitImage.getHeight());
-        return rectangles.stream().anyMatch(proposedBounds::intersects);
-    }
 
     private static Point getUnitTagLocation(String unitID) {
         return switch (unitID) {
