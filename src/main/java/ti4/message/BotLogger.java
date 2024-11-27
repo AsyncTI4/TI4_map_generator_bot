@@ -14,14 +14,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.GlobalSettings;
-import ti4.helpers.Helper;
+import ti4.helpers.ThreadHelper;
 import ti4.selections.SelectionMenuProvider;
 
 public class BotLogger {
@@ -125,7 +123,7 @@ public class BotLogger {
                 if (e == null) {
                     botLogChannel.sendMessage(message).queue();
                 } else {
-                    Helper.checkThreadLimitAndArchive(event.getGuild());
+                    ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
                     botLogChannel.sendMessage(message).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
@@ -140,7 +138,7 @@ public class BotLogger {
                 if (e == null) {
                     botLogChannel.sendMessage(message).queue();
                 } else {
-                    Helper.checkThreadLimitAndArchive(event.getGuild());
+                    ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
                     botLogChannel.sendMessage(message).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
@@ -156,7 +154,7 @@ public class BotLogger {
                 if (e == null) {
                     botLogChannel.sendMessage(logMsg).queue();
                 } else {
-                    Helper.checkThreadLimitAndArchive(event.getGuild());
+                    ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
                     botLogChannel.sendMessage(logMsg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
@@ -167,7 +165,7 @@ public class BotLogger {
                 if (e == null) {
                     botLogChannel.sendMessage("[unknown event]\n" + msg).queue();
                 } else {
-                    Helper.checkThreadLimitAndArchive(event.getGuild());
+                    ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
                     botLogChannel.sendMessage("[unknown event]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);

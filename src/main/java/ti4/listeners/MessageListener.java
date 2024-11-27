@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.GameCreationHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.async.RoundSummaryHelper;
@@ -45,19 +46,20 @@ public class MessageListener extends ListenerAdapter {
         if (!isAsyncServer(event.getGuild().getId())) {
             return;
         }
-        long timeNow = System.currentTimeMillis();
+        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getMessage());
+        long startTime = System.currentTimeMillis();
+        Message message = event.getMessage();
         try {
-            Message msg = event.getMessage();
-            if (msg.getContentRaw().startsWith("[DELETE]")) {
-                msg.delete().queue();
+            if (message.getContentRaw().startsWith("[DELETE]")) {
+                message.delete().queue();
             }
-            if (!msg.getAuthor().isBot() && (msg.getContentRaw().contains("boldly go where no stroter has gone before") || msg.getContentRaw().contains("go boldly where no stroter has gone before"))) {
-                msg.reply("to explore strange new maps; to seek out new tiles and new factions\nhttps://discord.gg/RZ7qg9kbVZ").queue();
+            if (!message.getAuthor().isBot() && (message.getContentRaw().contains("boldly go where no stroter has gone before") || message.getContentRaw().contains("go boldly where no stroter has gone before"))) {
+                message.reply("to explore strange new maps; to seek out new tiles and new factions\nhttps://discord.gg/RZ7qg9kbVZ").queue();
             }
             //947310962485108816
             Role lfgRole = GameCreationHelper.getRole("LFG", event.getGuild());
-            if (!event.getAuthor().isBot() && lfgRole != null && event.getChannel() instanceof ThreadChannel && msg.getContentRaw().contains(lfgRole.getAsMention())) {
-                String msg2 = lfgRole.getAsMention() + " this game is looking for more members (it's old if it has -launched [FULL] in its title) " + msg.getJumpUrl();
+            if (!event.getAuthor().isBot() && lfgRole != null && event.getChannel() instanceof ThreadChannel && message.getContentRaw().contains(lfgRole.getAsMention())) {
+                String msg2 = lfgRole.getAsMention() + " this game is looking for more members (it's old if it has -launched [FULL] in its title) " + message.getJumpUrl();
                 TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
                 MessageHelper.sendMessageToChannel(lfgPings, msg2);
             }
@@ -72,14 +74,22 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
 
-            handleFoWWhispersAndFowCombats(event, msg);
-            mapLog(event, msg);
+            handleFoWWhispersAndFowCombats(event, message);
+            mapLog(event, message);
             saveJSONInTTPGExportsChannel(event);
         } catch (Exception e) {
             BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
         }
-        if (System.currentTimeMillis() - timeNow > 1500) {
-            BotLogger.log(event.getMessage().getChannel().getName() + " A message in this channel took longer than 1500 ms (" + (System.currentTimeMillis() - timeNow) + ")");
+        long endTime = System.currentTimeMillis();
+        final int milliThreshhold = 1500;
+        if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
+            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
+            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+            String errorMessage = message.getJumpUrl() + " message took over " + milliThreshhold + " to process:" +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " message was sent\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to receive\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
+            BotLogger.log(errorMessage);
         }
     }
 
