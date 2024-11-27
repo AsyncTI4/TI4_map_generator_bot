@@ -64,7 +64,6 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
-import ti4.listeners.ButtonListener;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -105,6 +104,8 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelper {
+
+    public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
 
     public static String getButtonRepresentation(Button button) {
         String id = button.getId();
@@ -6085,7 +6086,7 @@ public class ButtonHelper {
             event.getChannel().sendMessage("Could not find server Emojis").queue();
             return;
         }
-        Map<String, Emoji> emojiMap = ButtonListener.emoteMap.get(guild);
+        Map<String, Emoji> emojiMap = emoteMap.get(guild);
         List<RichCustomEmoji> emojis = guild.getEmojis();
         if (emojiMap != null && emojiMap.size() != emojis.size()) {
             emojiMap.clear();
@@ -6150,7 +6151,7 @@ public class ButtonHelper {
         if (guild == null)
             return;
 
-        Map<String, Emoji> emojiMap = ButtonListener.emoteMap.get(guild);
+        Map<String, Emoji> emojiMap = emoteMap.get(guild);
         List<RichCustomEmoji> emojis = guild.getEmojis();
         if (emojiMap != null && emojiMap.size() != emojis.size()) {
             emojiMap.clear();
