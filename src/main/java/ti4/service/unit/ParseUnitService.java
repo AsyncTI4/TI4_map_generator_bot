@@ -1,7 +1,6 @@
 package ti4.service.unit;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -21,10 +20,7 @@ import ti4.service.PlanetService;
 public class ParseUnitService {
 
     public List<ParsedUnit> getParsedUnits(GenericInteractionCreateEvent event, String color, Tile tile, String unitList) {
-        if (!Mapper.isValidColor(color)) {
-            MessageHelper.replyToMessage(event, "The unit color is invalid: " + color);
-            return Collections.emptyList();
-        }
+        validateColor(color);
 
         unitList = preprocessUnitList(unitList);
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
@@ -39,6 +35,12 @@ public class ParseUnitService {
         }
 
         return parsedUnits;
+    }
+
+    private void validateColor(String color) {
+        if (!Mapper.isValidColor(color)) {
+            throw new IllegalStateException("Invalid color: " + color);
+        }
     }
 
     private String preprocessUnitList(String unitList) {

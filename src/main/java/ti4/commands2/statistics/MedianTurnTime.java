@@ -20,13 +20,12 @@ import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 class MedianTurnTime extends Subcommand {
 
     public MedianTurnTime() {
-        super(Constants.MEDIAN_TURN_TIME, "Median turn time across all games for all players");
+        super(Constants.MEDIAN_TURN_TIME, "Median turn time accross all games for all players");
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.MINIMUM_NUMBER_OF_TURNS, "Minimum number of turns to show (Default = 1)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.IGNORE_ENDED_GAMES, "True to exclude ended games from the calculation (default = false)"));
@@ -47,7 +46,7 @@ class MedianTurnTime extends Subcommand {
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
         for (Game game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
-            for (Player player : game.getRealPlayers()) {
+            for (var player : game.getRealPlayers()) {
                 Integer totalTurns = player.getNumberTurns();
                 Long totalTurnTime = player.getTotalTurnTime();
                 Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
@@ -66,7 +65,7 @@ class MedianTurnTime extends Subcommand {
         StringBuilder sb = new StringBuilder();
 
         sb.append("## __**Median Turn Time:**__\n");
-
+        
         int index = 1;
         int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
 
@@ -79,13 +78,13 @@ class MedianTurnTime extends Subcommand {
             int turnCount = playerTurnCount.get(userMedianTurnTime.getKey());
 
             if (user == null || turnCount == 0 || totalMillis == 0) continue;
-
+            
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
             sb.append(DateTimeHelper.getTimeRepresentationToSeconds(userMedianTurnTime.getValue()));
             sb.append("` ").append(user.getEffectiveName());
             sb.append("   [").append(turnCount).append(" total turns]");
             sb.append("\n");
-            index++;
+            index++;     
         }
 
         return sb.toString();

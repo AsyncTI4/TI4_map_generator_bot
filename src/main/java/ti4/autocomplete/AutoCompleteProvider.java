@@ -23,6 +23,8 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.statistics.GameStatTypes;
+import ti4.commands2.statistics.PlayerStatTypes;
 import ti4.commands2.uncategorized.ServerPromoteCommand;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
@@ -61,8 +63,6 @@ import ti4.service.UnitDecalService;
 import ti4.service.franken.FrankenDraftMode;
 import ti4.service.game.UndoService;
 import ti4.service.map.MapPresetService;
-import ti4.service.statistics.PlayerStatTypes;
-import ti4.service.statistics.game.GameStatTypes;
 
 public class AutoCompleteProvider {
 

@@ -1,4 +1,4 @@
-package ti4.service.statistics;
+package ti4.commands2.statistics;
 
 public enum PlayerStatTypes {
 

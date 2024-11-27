@@ -331,7 +331,7 @@ public class StartPhaseService {
             StatusCleanupService.runStatusCleanup(game);
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
-                MapRenderPipeline.queue(game, event, DisplayType.map,
+                MapRenderPipeline.render(game, event, DisplayType.map,
                     fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
         }

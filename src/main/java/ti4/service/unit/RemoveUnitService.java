@@ -56,7 +56,7 @@ public class RemoveUnitService {
         }
 
         if (toRemoveCount > 0) {
-            MessageHelper.replyToMessage(event, "Did not find enough units to remove, " + toRemoveCount + " missing.");
+            MessageHelper.replyToMessage(event, "Did not find enough units to remove, " + toRemoveCount + " were missing.");
         }
 
         tile.getUnitHolders().values().forEach(unitHolder ->

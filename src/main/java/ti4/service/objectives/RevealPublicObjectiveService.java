@@ -6,9 +6,9 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
+import ti4.helpers.DisplayType;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -48,7 +48,7 @@ public class RevealPublicObjectiveService {
                 game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
                 DisplayType displayType = DisplayType.map;
-                MapRenderPipeline.queue(game, event, displayType,
+                MapRenderPipeline.render(game, event, displayType,
                     fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
         }
@@ -105,7 +105,7 @@ public class RevealPublicObjectiveService {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
-                MapRenderPipeline.queue(game, event, DisplayType.map,
+                MapRenderPipeline.render(game, event, DisplayType.map,
                     fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
         }

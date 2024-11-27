@@ -48,7 +48,7 @@ public class ShowGameCommand extends GameStateCommand {
             String temp = statsOption.getAsString();
             if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
-                MapRenderPipeline.queue(game, event, displayType,
+                MapRenderPipeline.render(game, event, displayType,
                                 fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
                 displayType = DisplayType.stats;
             } else {
