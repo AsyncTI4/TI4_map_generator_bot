@@ -44,7 +44,7 @@ public class StatisticsPipeline {
             instance.worker.join(20000);
             return !instance.worker.isAlive();
         } catch (InterruptedException e) {
-            BotLogger.log("MapRenderPipeline shutdown interrupted.");
+            BotLogger.log("StatisticsPipeline shutdown interrupted.");
             Thread.currentThread().interrupt();
             return false;
         }
