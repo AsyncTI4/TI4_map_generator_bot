@@ -3580,8 +3580,7 @@ public class MapGenerator implements AutoCloseable {
                     } else if (traits.size() == 1) {
                         String t = planetReal.getPlanetType().getFirst();
                         traitFile = ResourceHelper.getInstance().getGeneralFile(("" + t.charAt(0)).toUpperCase() + t.substring(1).toLowerCase() + ".png");
-                    } else if (traits.isEmpty()) {
-                    } else {
+                    } else if (!traits.isEmpty()) {
                         String t = "";
                         t += traits.contains("cultural") ? "C" : "";
                         t += traits.contains("hazardous") ? "H" : "";
