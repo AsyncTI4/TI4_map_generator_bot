@@ -1,15 +1,13 @@
 package ti4.listeners;
 
-import javax.annotation.Nonnull;
-import java.io.File;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
-import net.dv8tion.jda.api.entities.Guild;
+import javax.annotation.Nonnull;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.Role;
@@ -21,13 +19,11 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.GameCreationHelper;
-import ti4.helpers.Storage;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -55,12 +51,12 @@ public class MessageListener extends ListenerAdapter {
             if (message.getContentRaw().startsWith("[DELETE]")) {
                 message.delete().queue();
             }
-            checkForFogOfWarInvitePrompt(message);
-            copyLFGPingstoLFGPingsChannel(event, message);
-            checkIfNewMakingGamesPostAndPostIntroduction(event);
-            handleFoWWhispersAndFowCombats(event, message);
-            mapLog(event, message);
-            saveJSONInTTPGExportsChannel(event);
+            timeIt(() -> checkForFogOfWarInvitePrompt(message), "MessageListener#checkForFogOfWarInvitePrompt", 1500);
+            timeIt(() -> copyLFGPingstoLFGPingsChannel(event, message), "MessageListener#copyLFGPingstoLFGPingsChannel", 1500);
+            timeIt(() -> checkIfNewMakingGamesPostAndPostIntroduction(event), "MessageListener#checkIfNewMakingGamesPostAndPostIntroduction", 1500);
+            timeIt(() -> handleFoWWhispersAndFowCombats(event, message), "MessageListener#handleFoWWhispersAndFowCombats", 1500);
+            timeIt(() -> mapLog(event, message), "MessageListener#mapLog", 1500);
+            timeIt(() -> saveJSONInTTPGExportsChannel(event), "MessageListener#saveJSONInTTPGExportsChannel", 1500);
         } catch (Exception e) {
             BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
         }
@@ -70,7 +66,7 @@ public class MessageListener extends ListenerAdapter {
         if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
             String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
             String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
-            String errorMessage = message.getJumpUrl() + " message took over " + milliThreshhold + " to process:\n> " +
+            String errorMessage = message.getJumpUrl() + " message took over " + milliThreshhold + "ms to process:\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " message was sent\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to receive\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
@@ -108,26 +104,29 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private static void saveJSONInTTPGExportsChannel(MessageReceivedEvent event) {
-        // TTPG-EXPORTS - Save attachment to ttpg_exports folder for later processing
-        if ("ttpg-exports".equalsIgnoreCase(event.getChannel().getName())) {
-            List<Message.Attachment> attachments = event.getMessage().getAttachments();
-            if (!attachments.isEmpty() && "json".equalsIgnoreCase(attachments.getFirst().getFileExtension())) { // write to
-                // file
-                String currentDateTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuu-MM-dd-HHmmss"));
-                String fileName = "ttpgexport_" + currentDateTime + ".json";
-                String filePath = Storage.getTTPGExportDirectory() + "/" + fileName;
-                File file = new File(filePath);
-                CompletableFuture<File> future = attachments.getFirst().getProxy().downloadToFile(file);
-                future.exceptionally(error -> { // handle possible errors
-                    error.printStackTrace();
-                    return null;
-                });
-                MessageHelper.sendMessageToChannel(event.getChannel(), "File imported as: `" + fileName + "`");
-            }
-        }
+        return; // this isn't working right now, but don't want to lose this
+
+        // // TTPG-EXPORTS - Save attachment to ttpg_exports folder for later processing
+        // if ("ttpg-exports".equalsIgnoreCase(event.getChannel().getName())) {
+        //     List<Message.Attachment> attachments = event.getMessage().getAttachments();
+        //     if (!attachments.isEmpty() && "json".equalsIgnoreCase(attachments.getFirst().getFileExtension())) { // write to
+        //         // file
+        //         String currentDateTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuu-MM-dd-HHmmss"));
+        //         String fileName = "ttpgexport_" + currentDateTime + ".json";
+        //         String filePath = Storage.getTTPGExportDirectory() + "/" + fileName;
+        //         File file = new File(filePath);
+        //         CompletableFuture<File> future = attachments.getFirst().getProxy().downloadToFile(file);
+        //         future.exceptionally(error -> { // handle possible errors
+        //             error.printStackTrace();
+        //             return null;
+        //         });
+        //         MessageHelper.sendMessageToChannel(event.getChannel(), "File imported as: `" + fileName + "`");
+        //     }
+        // }
     }
 
     private void handleFoWWhispersAndFowCombats(MessageReceivedEvent event, Message msg) {
+        long startTime = System.currentTimeMillis();
         if (!event.getAuthor().isBot() && event.getChannel().getName().contains("-")) {
             String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
 
@@ -362,5 +361,21 @@ public class MessageListener extends ListenerAdapter {
 
     private static boolean isAsyncServer(String guildID) {
         return AsyncTI4DiscordBot.guilds.stream().anyMatch(g -> g.getId().equals(guildID));
+    }
+
+    public static void timeIt(Runnable runnable, String methodName, long warnIfLongerThanMillis) {
+        long startTime = System.currentTimeMillis();
+
+        runnable.run();
+
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+        if (duration > warnIfLongerThanMillis) {
+            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(duration);
+            String errorMessage = "`" + methodName + "` took over " + warnIfLongerThanMillis + "ms to process:\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + "start \n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " end `" + executionTime + "` to execute";
+            BotLogger.log(errorMessage);
+        }
     }
 }
