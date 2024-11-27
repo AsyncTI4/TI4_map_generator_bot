@@ -4541,6 +4541,10 @@ public class MapGenerator implements AutoCloseable {
     private Point getTilePosition(String position, int x, int y) {
         int ringCount = game.getRingCount();
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
+        if (ringCount == RING_MIN_COUNT)
+        {
+            x += 520/2;
+        }
         if (ringCount < RING_MAX_COUNT) {
             int lower = RING_MAX_COUNT - ringCount;
 
@@ -4691,7 +4695,9 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static int getMapWidth(Game game) {
-        int mapWidth = (getRingCount(game) + 1) * 520 + EXTRA_X * 2;
+        float ringCount = getRingCount(game);
+        ringCount += ringCount == RING_MIN_COUNT ? 1.5 : 1;
+        int mapWidth = (int) (ringCount * 520 + EXTRA_X * 2);
         mapWidth += hasExtraRow(game) ? EXTRA_X : 0;
         return mapWidth;
     }
