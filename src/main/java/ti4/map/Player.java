@@ -277,10 +277,6 @@ public class Player {
         spentThingsThisWindow = new ArrayList<>();
     }
 
-    public void resetBombardUnits() {
-        bombardUnits = new ArrayList<>();
-    }
-
     public Map<String, Integer> getCurrentProducedUnits() {
         return producedUnits;
     }
@@ -297,16 +293,8 @@ public class Player {
         spentThingsThisWindow.add(thing);
     }
 
-    public void addBombardUnit(String thing) {
-        bombardUnits.add(thing);
-    }
-
     public void removeSpentThing(String thing) {
         spentThingsThisWindow.remove(thing);
-    }
-
-    public void removeBombardUnit(String thing) {
-        bombardUnits.remove(thing);
     }
 
     public int getInitiative() {
@@ -329,10 +317,6 @@ public class Player {
             }
         }
         return 0;
-    }
-
-    public void resetTransactionItems() {
-        transactionItems = new ArrayList<>();
     }
 
     public List<String> getTransactionItems() {
@@ -378,11 +362,6 @@ public class Player {
         transactionItems.remove(thing);
     }
 
-    public void replaceTransactionItem(String thingToRemove, String thingToAdd) {
-        removeTransactionItem(thingToRemove);
-        addTransactionItem(thingToAdd);
-    }
-
     public void setTransactionItems(List<String> things) {
         transactionItems = things;
     }
@@ -420,29 +399,6 @@ public class Player {
 
     public void setBombardUnits(List<String> things) {
         bombardUnits = things;
-    }
-
-    public void fillUpBombardUnits(Tile tile) {
-        for (UnitHolder uH : tile.getUnitHolders().values()) {
-            Map<UnitKey, Integer> units = uH.getUnits();
-            for (UnitKey unit : units.keySet()) {
-                if (unitBelongsToPlayer(unit) && getUnitFromUnitKey(unit).getBombardDieCount() > 0) {
-                    if (ButtonHelper.isLawInPlay(getGame(), "articles_war")
-                        && getUnitFromUnitKey(unit).getBaseType().equalsIgnoreCase("mech")) {
-                        continue;
-                    }
-                    for (int x = 0; x < units.get(unit); x++) {
-                        addBombardUnit(getUnitFromUnitKey(unit).getAsyncId());
-                    }
-                }
-            }
-        }
-        if (hasTech("aida") || hasTech("absol_aida")) {
-            addBombardUnit("aida");
-        }
-        if (getGame().playerHasLeaderUnlockedOrAlliance(this, "argentcommander")) {
-            addBombardUnit("argentcommander");
-        }
     }
 
     public void setProducedUnit(String unit, int count) {
@@ -514,7 +470,6 @@ public class Player {
             return null;
 
         }
-
     }
 
     @Nullable
@@ -756,8 +711,8 @@ public class Player {
         readyToPassBag = passed;
     }
 
-    public void setWhetherPlayerShouldBeTenMinReminded(boolean status) {
-        tenMinReminderPing = status;
+    public void setWhetherPlayerShouldBeTenMinReminded(boolean tenMinReminderPing) {
+        this.tenMinReminderPing = tenMinReminderPing;
     }
 
     public Set<String> getAbilities() {

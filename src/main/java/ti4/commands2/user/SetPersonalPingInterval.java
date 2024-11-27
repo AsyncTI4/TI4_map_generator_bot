@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands2.Subcommand;
 import ti4.service.player.PingIntervalService;
-import ti4.users.UserSettingsManager;
 
 class SetPersonalPingInterval extends Subcommand {
 
@@ -17,7 +16,6 @@ class SetPersonalPingInterval extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         int pingInterval = event.getOption("hours", 0, OptionMapping::getAsInt);
-        var userSettings = UserSettingsManager.get(event.getUser().getId());
-        PingIntervalService.set(event, userSettings, pingInterval);
+        PingIntervalService.set(event, pingInterval);
     }
 }
