@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.selections.SelectionMenuProvider;
@@ -201,10 +202,7 @@ public class BotLogger {
 
             StringBuilder sb = new StringBuilder();
             sb.append(event.getUser().getEffectiveName()).append(" ");
-            sb.append("[");
-            if (event.getButton().getEmoji() != null) sb.append(event.getButton().getEmoji().getFormatted());
-            sb.append(event.getButton().getLabel()).append("]");
-            sb.append(" `").append(event.getButton().getId()).append("` ");
+            sb.append(ButtonHelper.getButtonRepresentation(event.getButton()));
             sb.append(event.getMessage().getJumpUrl());
             MessageHelper.sendMessageToChannel(buttonLogThread, sb.toString());
         } catch (Exception e) {
@@ -238,8 +236,8 @@ public class BotLogger {
             if (slashCommandLogThread == null) return;
 
             String sb = event.getUser().getEffectiveName() + " " +
-                    "`" + event.getCommandString() + "` " +
-                    commandResponseMessage.getJumpUrl();
+                "`" + event.getCommandString() + "` " +
+                commandResponseMessage.getJumpUrl();
             MessageHelper.sendMessageToChannel(slashCommandLogThread, sb);
         } catch (Exception e) {
             // Do nothing
