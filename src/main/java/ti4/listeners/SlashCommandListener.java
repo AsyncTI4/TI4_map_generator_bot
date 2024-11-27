@@ -34,7 +34,7 @@ public class SlashCommandListener extends ListenerAdapter {
             return;
         }
 
-        long eventTime = Math.min(event.getInteraction().getTimeCreated().toEpochSecond() * 1000, System.currentTimeMillis());
+        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
 
         long startTime = System.currentTimeMillis();
 

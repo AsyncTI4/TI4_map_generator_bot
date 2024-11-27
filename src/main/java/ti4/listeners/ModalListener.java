@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.DateTimeHelper;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.listeners.context.ModalContext;
@@ -36,6 +37,7 @@ public class ModalListener extends ListenerAdapter {
             return;
         }
         event.deferEdit().queue();
+        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
         long startTime = System.currentTimeMillis();
         try {
             ModalContext context = new ModalContext(event);
@@ -45,9 +47,17 @@ public class ModalListener extends ListenerAdapter {
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
+        
         long endTime = System.currentTimeMillis();
-        if (endTime - startTime > 3000) {
-            BotLogger.log(event, "This button command took longer than 3000 ms (" + (endTime - startTime) + ")");
+        final int milliThreshhold = 3000;
+        if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
+            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
+            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+            String errorMessage = "Modal took over " + milliThreshhold + " to process:" +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " message was sent\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to receive\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
+            BotLogger.log(errorMessage);
         }
     }
 
