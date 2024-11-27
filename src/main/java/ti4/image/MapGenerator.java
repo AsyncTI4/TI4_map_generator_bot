@@ -1258,7 +1258,6 @@ public class MapGenerator implements AutoCloseable {
 
             if (promissoryNote.getShrinkName()) {
                 graphics.setFont(Storage.getFont16());
-
                 drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName() + (isAttached ? "\n" : ""), x + deltaX + 9, y + 4, 120, true);
             } else {
                 graphics.setFont(Storage.getFont18());
@@ -1651,15 +1650,34 @@ public class MapGenerator implements AutoCloseable {
         ownedPNs.sort(pnComparator);
 
         for (String pnID : ownedPNs) {
-            PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pnID);
-            if (pnModel.getFaction().isEmpty()) {
-                continue;
+            drawGeneralImageScaled(x + deltaX, y + 1, "promissory_light.png", 38, 28);
+            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnID);
+            if (game.isFrankenGame() && !promissoryNote.getFaction().isEmpty()) {
+                drawFactionIconImage(graphics, promissoryNote.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
             }
-            drawPAImageScaled(x + deltaX - 1 + 2, y + 30, "cardback_pn.png", 40, 40);
-            drawFactionIconImage(g2, pnModel.getFaction().get(), x + deltaX - 1, y, 42, 42);
-            g2.setFont(Storage.getFont18());
-            drawOneOrTwoLinesOfTextVertically(g2, pnModel.getShortName(), x + deltaX + 7, y + 144, 130);
-            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, pnModel);
+            boolean greyed = false;
+            if (promissoryNote.getPlayArea())
+            {
+                found: for (Player player_ : game.getRealPlayers()) {
+                    for (String pn_ : player_.getPromissoryNotesInPlayArea()) {
+                        if (pn_.equals(pnID))
+                        {
+                            greyed = true;
+                            break found;
+                        }
+                    }
+                }
+            }
+            graphics.setColor(greyed ? Color.GRAY : Color.WHITE);
+            
+            if (promissoryNote.getShrinkName()) {
+                graphics.setFont(Storage.getFont16());
+                drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName(), x + deltaX + 9, y + 32, 116, true);
+            } else {
+                graphics.setFont(Storage.getFont18());
+                drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName(), x + deltaX + 7, y + 32, 116, true);
+            }
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, promissoryNote);
 
             deltaX += 48;
             addedPNs = true;
@@ -2270,19 +2288,19 @@ public class MapGenerator implements AutoCloseable {
             drawPlanetCardDetail(x + deltaX + 26, y + 125, infFileName);
 
             graphics.setFont(Storage.getFont16());
-            Integer offset = 10 - graphics.getFontMetrics().stringWidth("" + resources) / 2;
+            Integer offset = 11 - graphics.getFontMetrics().stringWidth("" + resources) / 2;
             if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                 graphics.setColor(Color.BLACK);
                 for (int i = -1; i <= 1; i++) {
                     for (int j = -1; j <= 1; j++) {
-                        graphics.drawString("" + resources, x + deltaX + 26 + offset + i, y + 115 + j);
+                        graphics.drawString("" + resources, x + deltaX + 26 + offset + i, y + 119 + j);
                     }
                 }
             }
             graphics.setColor(Color.WHITE);
-            graphics.drawString("" + resources, x + deltaX + 26 + offset, y + 115);
+            graphics.drawString("" + resources, x + deltaX + 26 + offset, y + 119);
             offset = 10 - graphics.getFontMetrics().stringWidth("" + influence) / 2;
-            graphics.drawString("" + influence, x + deltaX + 26 + offset, y + 137);
+            graphics.drawString("" + influence, x + deltaX + 26 + offset, y + 141);
 
             graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
             if (planetModel.getShrinkNamePNAttach()) {
@@ -2769,6 +2787,16 @@ public class MapGenerator implements AutoCloseable {
             }
         } catch (Exception e) {
             BotLogger.log("Could not display planet: " + resourceName, e);
+        }
+    }
+
+    private void drawGeneralImageScaled(int x, int y, String resourceName, int width, int height) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getGeneralFile(resourceName);
+            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, width, height);
+            graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            BotLogger.log("Could not display play area: " + resourceName, e);
         }
     }
 
