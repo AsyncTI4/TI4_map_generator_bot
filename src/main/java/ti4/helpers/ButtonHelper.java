@@ -134,7 +134,7 @@ public class ButtonHelper {
         return false;
     }
 
-    public static void resolveInfantryDeath(Game game, Player player, int amount) {
+    public static void resolveInfantryDeath(Player player, int amount) {
         if (player.hasInf2Tech()) {
             for (int x = 0; x < amount; x++) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), rollInfantryRevival(player));
@@ -1164,7 +1164,7 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static List<Button> getAllTechsToReady(Game game, Player player) {
+    public static List<Button> getAllTechsToReady(Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getExhaustedTechs()) {
             buttons.add(Buttons.green("biostimsReady_tech_" + tech, "Ready " + Mapper.getTechs().get(tech).getName()));
@@ -1314,7 +1314,7 @@ public class ButtonHelper {
     public static void updateMap(Game game, GenericInteractionCreateEvent event, String message) {
         String threadName = game.getName() + "-bot-map-updates";
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
-        MapRenderPipeline.render(game, event, DisplayType.all, fileUpload -> {
+        MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
             boolean foundSomething = false;
             if (!game.isFowMode()) {
                 for (ThreadChannel threadChannel_ : threadChannels) {
@@ -1500,7 +1500,7 @@ public class ButtonHelper {
         return count;
     }
 
-    public static int checkNumberNonFighterShips(Player player, Game game, Tile tile) {
+    public static int checkNumberNonFighterShips(Player player, Tile tile) {
         int count = 0;
         UnitHolder space = tile.getUnitHolders().get("space");
         for (UnitKey unit : space.getUnits().keySet()) {
@@ -1533,7 +1533,7 @@ public class ButtonHelper {
         return count;
     }
 
-    public static int checkNumberNonFighterShipsWithoutSpaceCannon(Player player, Game game, Tile tile) {
+    public static int checkNumberNonFighterShipsWithoutSpaceCannon(Player player, Tile tile) {
         int count = 0;
         UnitHolder space = tile.getUnitHolders().get("space");
         for (UnitKey unit : space.getUnits().keySet()) {
@@ -3294,7 +3294,7 @@ public class ButtonHelper {
             }
         }
         if (doesPlayerHaveFSHere("lanefir_flagship", player, tile)) {
-            List<Button> button2 = scanlinkResolution(player, game, event);
+            List<Button> button2 = scanlinkResolution(player, game);
             if (!button2.isEmpty()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
                     + "Due to the Memory of Dusk (the Lanefir flagship), you may explore a planet you control in the system.");
@@ -3585,7 +3585,7 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static List<Button> scanlinkResolution(Player player, Game game, ButtonInteractionEvent event) {
+    public static List<Button> scanlinkResolution(Player player, Game game) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
@@ -5682,7 +5682,7 @@ public class ButtonHelper {
     }
 
     public static void showFeatureType(GenericInteractionCreateEvent event, Game game, DisplayType feature) {
-        MapRenderPipeline.render(game, event, feature,
+        MapRenderPipeline.queue(game, event, feature,
             fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 
@@ -5694,7 +5694,7 @@ public class ButtonHelper {
         List<Player> playersWithPds2 = new ArrayList<>();
         if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game)
             && player.hasAbility("starfall_gunnery")
-            && checkNumberNonFighterShipsWithoutSpaceCannon(player, game, game.getTileByPosition(tilePos)) > 0) {
+            && checkNumberNonFighterShipsWithoutSpaceCannon(player, game.getTileByPosition(tilePos)) > 0) {
             playersWithPds2.add(player);
         }
         for (String adjTilePos : adjTiles) {
