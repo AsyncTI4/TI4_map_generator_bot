@@ -35,7 +35,7 @@ public class DateTimeHelper {
         long totalMinutes = totalSeconds / 60; // total minutes (truncates)
         long minutes = totalMinutes % 60;
 
-        return String.format("%02dm:%02ds:%04dms", minutes, seconds, millis);
+        return String.format("%02dm:%02ds:%03dms", minutes, seconds, millis);
     }
 
     public static String getTimeRepresentationNanoSeconds(long totalNanoSeconds) {
