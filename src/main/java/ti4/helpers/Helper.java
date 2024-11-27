@@ -2101,6 +2101,10 @@ public class Helper {
      * @return left padded string
      */
     public static String leftpad(String text, int length) {
+        if (text.length() > length)
+        {
+            return text;
+        }
         return String.format("%" + length + "." + length + "s", text);
     }
 
