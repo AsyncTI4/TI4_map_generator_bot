@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.Subcommand;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.listeners.ButtonListener;
 import ti4.message.BotLogger;
 
 class ResetEmojiCache extends Subcommand {
@@ -22,6 +22,6 @@ class ResetEmojiCache extends Subcommand {
         for (Emoji emoji : emojis) {
             BotLogger.log(emoji.getName() + " " + emoji.getFormatted());
         }
-        ButtonListener.emoteMap.clear();
+        ButtonHelper.emoteMap.clear();
     }
 }

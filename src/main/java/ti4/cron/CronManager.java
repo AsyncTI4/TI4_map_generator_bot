@@ -14,7 +14,7 @@ import ti4.message.BotLogger;
 @UtilityClass
 public class CronManager {
 
-    private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 20;
+    private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 5;
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
     public static void register(Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
@@ -30,7 +30,6 @@ public class CronManager {
 
             stopWatch.stop();
             Duration timeElapsed = stopWatch.getDuration();
-            BotLogger.log(clazz.getSimpleName() + " took " + timeElapsed + " seconds. Started at " + stopWatch.getStartInstant());
             if (timeElapsed.toSeconds() > EXECUTION_TIME_SECONDS_WARNING_THRESHOLD) {
                 BotLogger.log(clazz.getSimpleName() + " took longer than " + EXECUTION_TIME_SECONDS_WARNING_THRESHOLD + " seconds (" + timeElapsed.toSeconds() + ").");
             }
