@@ -116,19 +116,19 @@ public class MessageHelper {
 		}
 		File mapUndoDirectory = Storage.getGameUndoDirectory();
 		if (mapUndoDirectory.exists() && !undoPresent) {
-			String gameName = game.getName();
-			String gameNameForUndoStart = gameName + "_";
-			String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
+			String mapName = game.getName();
+			String mapNameForUndoStart = mapName + "_";
+			String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
 			if (mapUndoFiles != null && mapUndoFiles.length > 0) {
 				try {
 					List<Integer> numbers = Arrays.stream(mapUndoFiles)
-						.map(fileName -> fileName.replace(gameNameForUndoStart, ""))
+						.map(fileName -> fileName.replace(mapNameForUndoStart, ""))
 						.map(fileName -> fileName.replace(Constants.TXT, ""))
 						.map(Integer::parseInt).toList();
 					int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
 					newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
 				} catch (Exception e) {
-					BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
+					BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
 				}
 			}
 		}

@@ -48,7 +48,7 @@ public class StellarConverterService {
                 int amountToKill;
                 amountToKill = unitHolder.getUnitCount(Units.UnitType.Infantry, p2.getColor());
                 if (p2.hasInf2Tech()) {
-                    ButtonHelper.resolveInfantryDeath(p2, amountToKill);
+                    ButtonHelper.resolveInfantryDeath(game, p2, amountToKill);
                     boolean cabalMech = unitHolder.getUnitCount(Units.UnitType.Mech,
                         p2.getColor()) > 0
                         && p2.hasUnit("cabal_mech")

@@ -37,7 +37,7 @@ public class PlayerPreferenceHelper {
                 offerSetAutoPassOnSaboButtons(game, player);
             }
             case "afkTimes" -> {
-                offerAFKTimeOptions(player);
+                offerAFKTimeOptions(game, player);
             }
             case "tacticalAction" -> {
                 List<Button> buttons = new ArrayList<>();
@@ -63,15 +63,43 @@ public class PlayerPreferenceHelper {
     }
 
     @ButtonHandler("playerPrefDecision_")
-    public static void resolvePlayerPrefDecision(Player player, ButtonInteractionEvent event, String buttonID) {
+    public static void resolvePlayerPrefDecision(Player player, ButtonInteractionEvent event, String buttonID,
+        Game game) {
         String trueOrFalse = buttonID.split("_")[1];
         String distanceOrAgenda = buttonID.split("_")[2];
-        if ("distance".equals(distanceOrAgenda)) {
-            player.setPreferenceForDistanceBasedTacticalActions("true".equals(trueOrFalse));
+        if ("true".equals(trueOrFalse)) {
+            if ("distance".equals(distanceOrAgenda)) {
+                player.setPreferenceForDistanceBasedTacticalActions(true);
+                Map<String, Game> mapList = GameManager.getGameNameToGame();
+                for (Game game2 : mapList.values()) {
+                    for (Player player2 : game2.getRealPlayers()) {
+                        if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                            player2.setPreferenceForDistanceBasedTacticalActions(true);
+                            GameSaveLoadManager.saveGame(game2, player2.getUserName() + " Updated Player Settings");
+                        }
+                    }
+                }
+            } else {
+                player.setAutoPassWhensAfters(true);
+            }
         } else {
-            player.setAutoPassWhensAfters("true".equals(trueOrFalse));
+            if ("distance".equals(distanceOrAgenda)) {
+                player.setPreferenceForDistanceBasedTacticalActions(false);
+                Map<String, Game> mapList = GameManager.getGameNameToGame();
+                for (Game game2 : mapList.values()) {
+                    for (Player player2 : game2.getRealPlayers()) {
+                        if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                            player2.setPreferenceForDistanceBasedTacticalActions(false);
+                            GameSaveLoadManager.saveGame(game2, player2.getUserName() + " Updated Player Settings");
+                        }
+                    }
+                }
+            } else {
+                player.setAutoPassWhensAfters(false);
+            }
         }
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
+
         ButtonHelper.deleteMessage(event);
     }
 
@@ -113,15 +141,15 @@ public class PlayerPreferenceHelper {
         }
     }
 
-    public static void offerAFKTimeOptions(Player player) {
-        List<Button> buttons = getSetAFKButtons();
+    public static void offerAFKTimeOptions(Game game, Player player) {
+        List<Button> buttons = getSetAFKButtons(game);
         player.setHoursThatPlayerIsAFK("");
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged()
             + " your afk times (if any) have been reset. Use buttons to select the hours (note they are in UTC) in which you're afk. If you select 8 for example, you will be set as AFK from 8:00 UTC to 8:59 UTC in every game you are in.",
             buttons);
     }
 
-    public static List<Button> getSetAFKButtons() {
+    public static List<Button> getSetAFKButtons(Game game) {
         List<Button> buttons = new ArrayList<>();
         for (int x = 0; x < 24; x++) {
             buttons.add(Buttons.gray("setHourAsAFK_" + x, "" + x));
@@ -196,7 +224,7 @@ public class PlayerPreferenceHelper {
     }
 
     @ButtonHandler("setHourAsAFK_")
-    public static void resolveSetAFKTime(Player player, String buttonID, ButtonInteractionEvent event) {
+    public static void resolveSetAFKTime(Game gameOG, Player player, String buttonID, ButtonInteractionEvent event) {
         String time = buttonID.split("_")[1];
         player.addHourThatIsAFK(time);
         ButtonHelper.deleteTheOneButton(event);
