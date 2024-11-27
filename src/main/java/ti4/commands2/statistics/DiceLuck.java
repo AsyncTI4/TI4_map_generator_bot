@@ -36,11 +36,6 @@ class DiceLuck extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         String text = getDiceLuck(event);
         MessageHelper.sendMessageToThread(event.getChannel(), "Dice Luck Record", text);
     }
