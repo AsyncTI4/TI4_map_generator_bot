@@ -11,17 +11,17 @@ import ti4.helpers.Constants;
 public class StatisticsCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-        new GameStatistics(),
-        new PlayerStatistics(),
+        new GameStats(),
+        new PlayerStats(),
         new AverageTurnTime(),
         new MedianTurnTime(),
-        //new CompareAFKTimes(),
+        new CompareAFKTimes(),
         new DiceLuck(),
         new LifetimeRecord(),
         new FactionRecordOfTech(),
         new FactionRecordOfSCPick(),
         new GameWinsWithOtherFactions(),
-        new StellarConverterStatistics(),
+        new StellarConverter(),
         new ListTitlesGiven(),
         new ExportToCSV()
     ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));

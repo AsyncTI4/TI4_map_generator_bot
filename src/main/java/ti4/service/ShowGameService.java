@@ -21,7 +21,7 @@ public class ShowGameService {
     }
 
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
-        MapRenderPipeline.queue(game, event, displayType, fileUpload -> {
+        MapRenderPipeline.render(game, event, displayType, fileUpload -> {
             if (includeButtons(displayType)) {
                 List<Button> buttons = new ArrayList<>();
                 if (!game.isFowMode()) {

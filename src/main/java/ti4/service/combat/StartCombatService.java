@@ -515,8 +515,8 @@ public class StartCombatService {
             return buttons;
 
         // Assault Cannon
-        if ((p1.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p1, tile) > 2 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p1, tile)))
-            || (p2.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p2, tile) > 2 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p2, tile)))) {
+        if ((p1.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p1, game, tile) > 2 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p1, tile)))
+            || (p2.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p2, game, tile) > 2 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p2, tile)))) {
             buttons.add(Buttons.blue("assCannonNDihmohn_asc_" + tile.getPosition(), "Use Assault Cannon", Emojis.WarfareTech));
         }
 
@@ -534,9 +534,9 @@ public class StartCombatService {
 
         // Dihmohn Commander
         if ((game.playerHasLeaderUnlockedOrAlliance(p1, "dihmohncommander")
-            && ButtonHelper.checkNumberNonFighterShips(p1, tile) > 2)
+            && ButtonHelper.checkNumberNonFighterShips(p1, game, tile) > 2)
             || (game.playerHasLeaderUnlockedOrAlliance(p2, "dihmohncommander")
-            && ButtonHelper.checkNumberNonFighterShips(p2, tile) > 2)) {
+            && ButtonHelper.checkNumberNonFighterShips(p2, game, tile) > 2)) {
             buttons.add(Buttons.blue("assCannonNDihmohn_dihmohn_" + tile.getPosition(), "Use Dih-Mohn Commander", Emojis.dihmohn));
         }
 
