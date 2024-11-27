@@ -58,7 +58,8 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "When 1 of your non-fighter ships is destroyed during combat: You may place 2 fighters from your reinforcements in the space area of the active system.\nAt the end of that combat, return this card to the Cheiran Hordes player."
+        "text": "When 1 of your non-fighter ships is destroyed during combat: You may place 2 fighters from your reinforcements in the space area of the active system.\nAt the end of that combat, return this card to the Cheiran Hordes player.",
+        "shortName": "Carcinis\n-ation"
     },
     {
         "alias": "dspncymi",
@@ -67,7 +68,8 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "Action: Choose 1 action card from the action card discard pile and add it to your hand.\nThen, purge this card."
+        "text": "Action: Choose 1 action card from the action card discard pile and add it to your hand.\nThen, purge this card.",
+        "shrinkName": true
     },
     {
         "alias": "dspndihm",
@@ -95,7 +97,9 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "When you would gain a relic: You may draw 1 additional card. Choose 1 to gain and return the rest to the relic deck. Then, shuffle the relic deck.\nThen, return this card to the Florzen player."
+        "text": "When you would gain a relic: You may draw 1 additional card. Choose 1 to gain and return the rest to the relic deck. Then, shuffle the relic deck.\nThen, return this card to the Florzen player.",
+        "shortName": "Undergr'nd Market",
+        "shrinkName": true
     },
     {
         "alias": "dspnfree",
@@ -377,6 +381,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "When 1 or more of your units would make a BOMBARDMENT roll: If you produce 1 or more hits during this BOMBARDMENT roll, produce 1 additional hit for that roll.\nThen, return this card to the Zelian player."
+        "text": "When 1 or more of your units would make a BOMBARDMENT roll: If you produce 1 or more hits during this BOMBARDMENT roll, produce 1 additional hit for that roll.\nThen, return this card to the Zelian player.",
+        "shortName": "Hyperkin. Ordinance"
     }
 ]
