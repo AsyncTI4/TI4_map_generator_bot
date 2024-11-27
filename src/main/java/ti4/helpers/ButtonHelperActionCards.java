@@ -1576,14 +1576,13 @@ public class ButtonHelperActionCards {
         if (p2.getReadiedPlanets().contains(planet)) {
             p2.exhaustPlanet(planet);
         }
-        int amountToKill = 3;
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        amountToKill = uH.getUnitCount(UnitType.Infantry, p2.getColor());
+        int amountToKill = uH.getUnitCount(UnitType.Infantry, p2.getColor());
         if (amountToKill > 3) {
             amountToKill = 3;
         }
         if (p2.hasInf2Tech()) {
-            ButtonHelper.resolveInfantryDeath(game, p2, amountToKill);
+            ButtonHelper.resolveInfantryDeath(player, amountToKill);
             boolean cabalMech = false;
             Tile tile = game.getTileFromPlanet(planet);
             if (p2.hasAbility("amalgamation")
@@ -1667,7 +1666,7 @@ public class ButtonHelperActionCards {
             var parsedUnit = new ParsedUnit(key, hits, planet);
             RemoveUnitService.removeUnit(event, game.getTileFromPlanet(planet), game, parsedUnit);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
-            ButtonHelper.resolveInfantryDeath(game, p2, hits);
+            ButtonHelper.resolveInfantryDeath(player, hits);
             if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
                 ButtonHelperFactionSpecific.offerMahactInfButtons(p2, game);
             }

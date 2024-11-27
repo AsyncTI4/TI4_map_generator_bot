@@ -392,7 +392,7 @@ public class ButtonHelperModifyUnits {
             ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
         }
         if (player.hasInf2Tech() && unitName.toLowerCase().contains("inf")) {
-            ButtonHelper.resolveInfantryDeath(game, player, min);
+            ButtonHelper.resolveInfantryDeath(player, min);
         }
     }
 
@@ -2054,7 +2054,7 @@ public class ButtonHelperModifyUnits {
                                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
                             }
                             if (player.hasInf2Tech() && unitName.toLowerCase().contains("inf")) {
-                                ButtonHelper.resolveInfantryDeath(game, player, amount);
+                                ButtonHelper.resolveInfantryDeath(player, amount);
                             }
                             if (unitKey.getUnitType() == UnitType.Mech && player.hasTech("sar")) {
                                 for (int x = 0; x < amount; x++) {
@@ -2198,7 +2198,7 @@ public class ButtonHelperModifyUnits {
                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
             }
             if (player.hasInf2Tech() && unitName.toLowerCase().contains("inf")) {
-                ButtonHelper.resolveInfantryDeath(game, player, amount);
+                ButtonHelper.resolveInfantryDeath(player, amount);
             }
         }
 

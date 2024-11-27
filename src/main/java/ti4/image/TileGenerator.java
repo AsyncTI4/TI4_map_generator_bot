@@ -663,7 +663,7 @@ public class TileGenerator {
                     int mod = (game.playerHasLeaderUnlockedOrAlliance(player, "kolumecommander") ? 1 : 0);
 
                     if (player.hasAbility("starfall_gunnery")) {
-                        for (int i = ButtonHelper.checkNumberNonFighterShipsWithoutSpaceCannon(player, game, tile); i > 0; i--) {
+                        for (int i = ButtonHelper.checkNumberNonFighterShipsWithoutSpaceCannon(player, tile); i > 0; i--) {
                             diceCount.add(8 - mod);
                         }
                     }
