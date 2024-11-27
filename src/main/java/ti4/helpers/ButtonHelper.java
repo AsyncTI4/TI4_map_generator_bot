@@ -2320,7 +2320,7 @@ public class ButtonHelper {
 
     public static void findOrCreateThreadWithMessage(Game game, String threadName, String message) {
         TextChannel channel = game.getMainGameChannel();
-        Helper.checkThreadLimitAndArchive(game.getGuild());
+        ThreadHelper.checkThreadLimitAndArchive(game.getGuild());
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : channel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
@@ -5102,7 +5102,7 @@ public class ButtonHelper {
     }
 
     public static void offerPlayerSetupButtons(MessageChannel channel, Game game) {
-        Helper.checkThreadLimitAndArchive(game.getGuild());
+        ThreadHelper.checkThreadLimitAndArchive(game.getGuild());
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("startPlayerSetup", "Setup a Player"));

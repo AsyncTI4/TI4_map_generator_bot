@@ -29,8 +29,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -39,13 +43,12 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.draft.BagDraft;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
@@ -89,7 +92,7 @@ public class GameSaveLoadManager {
     public static final String ENDPLAYER = "-endplayer-";
 
     private static String debugString(String prefix, long time, long total) {
-        return prefix + Helper.getTimeRepresentationNanoSeconds(time) + String.format(" (%2.2f%%)", (double) time / (double) total * 100.0);
+        return prefix + DateTimeHelper.getTimeRepresentationNanoSeconds(time) + String.format(" (%2.2f%%)", (double) time / (double) total * 100.0);
     }
 
     public static void saveGame(Game game, String reason) {
