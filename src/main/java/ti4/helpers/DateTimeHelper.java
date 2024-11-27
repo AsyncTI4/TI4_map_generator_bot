@@ -1,12 +1,17 @@
 package ti4.helpers;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.ISnowflake;
 
 @UtilityClass
 public class DateTimeHelper {
 
     public static long getLongDateTimeFromDiscordSnowflake(long snowflake) {
         return (snowflake >> 22) + 1420070400000L;
+    }
+
+    public static long getLongDateTimeFromDiscordSnowflake(ISnowflake snowflake) {
+        return getLongDateTimeFromDiscordSnowflake(snowflake.getIdLong());
     }
 
     public static String getTimeRepresentationToSeconds(long totalMillis) {
