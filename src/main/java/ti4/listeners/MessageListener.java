@@ -60,11 +60,11 @@ public class MessageListener extends ListenerAdapter {
         }
 
         long endTime = System.currentTimeMillis();
-        final int milliThreshhold = 1500;
-        if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
+        final int milliThreshold = 1500;
+        if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
             String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
             String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
-            String errorMessage = message.getJumpUrl() + " message took over " + milliThreshhold + "ms to process:\n> " +
+            String errorMessage = message.getJumpUrl() + " message took over " + milliThreshold + "ms to process:\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " message was sent\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to receive\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute " + (endTime - startTime > startTime - eventTime ? "😲" : "") ;
