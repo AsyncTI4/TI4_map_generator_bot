@@ -23,7 +23,7 @@
     {
         "alias": "sigma_forgotten",
         "name": "The Forgotten",
-        "text": "ACTION: Exhaust this card to produce up to 2 units in any system that that contains 1 of your space docks. Reduce the combined cost of the produced units by 8. This, give this card to another player.",
+        "text": "ACTION: Exhaust this card to produce up to 2 units in any system that that contains 1 of your space docks. Reduce the combined cost of the produced units by 8. Then, give this card to another player.",
         "source": "sigma",
         "flavourText": "*With the ability to access alternate realities, The Forgotten seemd to have a prefernce for thos in which it remained undiscovered, at least for a few extra years.*"
     }
