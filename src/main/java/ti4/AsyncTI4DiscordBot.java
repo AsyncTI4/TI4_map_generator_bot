@@ -232,7 +232,7 @@ public class AsyncTI4DiscordBot {
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS, WAITING 10 SECONDS FOR COMPLETION");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
-                if (shutdown()) {
+                if (shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.logWithTimestamp("FINISHED PROCESSING ASYNC THREADPOOL");
                 } else {
                     BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
@@ -249,6 +249,8 @@ public class AsyncTI4DiscordBot {
                 }
                 if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.logWithTimestamp("DONE PROCESSING STATISTICS");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING STATISTICS");
                 }
                 CronManager.shutdown(); // will wait for up to an additional 20 seconds
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS COMPLETE");
