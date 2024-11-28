@@ -255,25 +255,28 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private static void addFactionEmojiReactionsToMessages(MessageReceivedEvent event) {
-        if (!event.getAuthor().isBot() && event.getChannel().getName().contains("-")) {
-            String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
+        if (event.getAuthor().isBot() || !event.getChannel().getName().contains("-")) {
+            return;
+        }
+        String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
 
-            Game game = GameManager.getGame(gameName);
-            if (game != null && game.isBotFactionReacts() && !game.isFowMode()) {
-                Player player = getPlayer(event, game);
-                try {
-                    MessageHistory mHistory = event.getChannel().getHistory();
-                    RestAction<List<Message>> lis = mHistory.retrievePast(2);
-                    var messages = lis.complete();
-                    if (messages.size() == 2 && !event.getMessage().getAuthor().getId().equalsIgnoreCase(messages.get(1).getAuthor().getId()) &&
-                        player != null && player.isRealPlayer()) {
-                        event.getChannel().addReactionById(event.getMessageId(),
-                            Emoji.fromFormatted(player.getFactionEmoji())).queue();
-                    }
-                } catch (Exception e) {
-                    BotLogger.log("Reading previous message", e);
-                }
+        Game game = GameManager.getGame(gameName);
+        if (game == null || !game.isBotFactionReacts() || game.isFowMode()) {
+            return;
+        }
+        Player player = getPlayer(event, game);
+        if (player == null || !player.isRealPlayer()) {
+            return;
+        }
+        try {
+            MessageHistory mHistory = event.getChannel().getHistory();
+            RestAction<List<Message>> lis = mHistory.retrievePast(2);
+            var messages = lis.complete();
+            if (messages.size() == 2 && !event.getMessage().getAuthor().getId().equalsIgnoreCase(messages.get(1).getAuthor().getId())) {
+                event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted(player.getFactionEmoji())).queue();
             }
+        } catch (Exception e) {
+            BotLogger.log("Reading previous message", e);
         }
     }
 
