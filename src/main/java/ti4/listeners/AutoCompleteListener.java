@@ -17,7 +17,7 @@ public class AutoCompleteListener extends ListenerAdapter {
             return;
         }
         try {
-            AutoCompleteProvider.resolveAutoCompleteEvent(event, true);
+            AutoCompleteProvider.startNewAutoCompleteThread(event);
         } catch (Exception e) {
             String message = "Auto complete issue in event: " + event.getName() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getCommandString();
             BotLogger.log(message, e);
