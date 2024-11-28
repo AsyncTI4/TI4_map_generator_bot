@@ -3,6 +3,7 @@ package ti4.service.game;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -27,7 +28,10 @@ public class UndoService {
         String gameName = game.getName();
         String gameNameForUndoStart = gameName + "_";
         String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
-        return Arrays.stream(mapUndoFiles).map(Storage::getGameUndoStorage)
+        return Arrays.stream(mapUndoFiles)
+            .sorted(Comparator.reverseOrder())
+            .limit(25)
+            .map(Storage::getGameUndoStorage)
             .collect(Collectors.toMap(File::getName, UndoService::getLastModifiedDateAndLastCommandTextFromFile));
     }
 
