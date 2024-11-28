@@ -30,7 +30,6 @@ public class EditTagsButtonHandler {
         TextInput tags = TextInput.create(fieldID, "Edit Tags", TextInputStyle.SHORT)
             .setPlaceholder("Add tags here, separated by semicolons. Leave blank to delete all tags.")
             .setValue(currentTags)
-            
             .build();
         Modal modal = Modal.create(modalId, "Tags for Game " + game.getName()).addActionRow(tags).build();
         event.replyModal(modal).queue();

@@ -70,9 +70,6 @@ public class AutoPingCron {
                         ButtonHelper.addReaction(player, false, false, message, null, messageID, game);
                     }
                 }
-//                if (shouldDoIt) {
-//                    GameSaveLoadManager.saveGame(game, "No Sabo");
-//                }
             }
             if ("agendawaiting".equals(game.getPhaseOfGame())) {
                 int highNum2 = player.getAutoSaboPassMedian() * 4 / 2;
@@ -249,23 +246,20 @@ public class AutoPingCron {
                     if (timeDifference > twelveHoursInMilliseconds && timeDifference < twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("1")) {
                         StringBuilder sb = new StringBuilder();
                         sb.append(player.getRepresentationUnfogged());
-                        sb.append(" You are getting this ping because ").append(Helper.getSCName(sc, game)).append(" has been played and now it has been half the alloted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
+                        sb.append(" You are getting this ping because ").append(Helper.getSCName(sc, game))
+                            .append(" has been played and now it has been half the allotted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
                         appendScMessages(game, player, sc, sb);
                         game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
                     }
                     if (timeDifference > twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("2")) {
-                        String sb = player.getRepresentationUnfogged() +
-                            Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
+                        String sb = player.getRepresentationUnfogged() + Helper.getSCName(sc, game) +
+                            " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
 
-                        //MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), sb.toString());
                         ButtonHelper.sendMessageToRightStratThread(player, game, sb, ButtonHelper.getStratName(sc));
                         player.addFollowedSC(sc);
-                        game.setStoredValue("scPlayPingCount" + sc + player.getFaction(),
-                            "2");
-                        String messageID = game
-                            .getStoredValue("scPlayMsgID" + sc);
-                        ButtonHelper.addReaction(player, false, true, "Not following", "",
-                            messageID, game);
+                        game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
+                        String messageID = game.getStoredValue("scPlayMsgID" + sc);
+                        ButtonHelper.addReaction(player, false, true, "Not following", "", messageID, game);
 
                         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
                         if (scModel != null && scModel.usesAutomationForSCID("pok8imperial")) {

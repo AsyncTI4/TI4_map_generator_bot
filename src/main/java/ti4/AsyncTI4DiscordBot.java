@@ -228,11 +228,14 @@ public class AsyncTI4DiscordBot {
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS, WAITING 10 SECONDS FOR COMPLETION");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
+                if (shutdown()) {
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING ASYNC THREADPOOL");
+                }
                 if (ButtonProcessor.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.logWithTimestamp("DONE PROCESSING BUTTONS");
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING BUTTONS");
                 }
                 if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.logWithTimestamp("DONE RENDERING MAPS");
+                    BotLogger.logWithTimestamp("FINISHED RENDERING MAPS");
                 }
                 CronManager.shutdown(); // will wait for up to an additional 20 seconds
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS COMPLETE");
@@ -361,5 +364,20 @@ public class AsyncTI4DiscordBot {
                 .forEach(classes::add);
         }
         return classes;
+    }
+
+    public static boolean shutdown() {
+        THREAD_POOL.shutdown();
+        try {
+            if (!THREAD_POOL.awaitTermination(20, TimeUnit.SECONDS)) {
+                THREAD_POOL.shutdownNow();
+                return false;
+            }
+        } catch (InterruptedException e) {
+            THREAD_POOL.shutdownNow();
+            Thread.currentThread().interrupt();
+            return false;
+        }
+        return true;
     }
 }

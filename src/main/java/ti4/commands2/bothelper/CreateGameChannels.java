@@ -15,8 +15,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.GameCreationHelper;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameService;
 
 class CreateGameChannels extends Subcommand {
 
@@ -43,9 +43,9 @@ class CreateGameChannels extends Subcommand {
         if (gameNameOption != null) {
             gameName = gameNameOption.getAsString();
         } else {
-            gameName = GameCreationHelper.getNextGameName();
+            gameName = CreateGameService.getNextGameName();
         }
-        if (GameCreationHelper.gameOrRoleAlreadyExists(gameName)) {
+        if (CreateGameService.gameOrRoleAlreadyExists(gameName)) {
             MessageHelper.sendMessageToEventChannel(event, "Role or Game: **" + gameName
                 + "** already exists accross all supported servers. Try again with a new name.");
             return;
@@ -66,12 +66,12 @@ class CreateGameChannels extends Subcommand {
                 categoryChannel = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryChannelName, false).getFirst();
             }
         } else { // CATEGORY WAS NOT PROVIDED, FIND OR CREATE ONE
-            categoryChannelName = GameCreationHelper.getCategoryNameForGame(gameName);
+            categoryChannelName = CreateGameService.getCategoryNameForGame(gameName);
             if (categoryChannelName == null) {
                 MessageHelper.sendMessageToEventChannel(event, "Category could not be automatically determined. Please provide a category name for this game.");
                 return;
             }
-            List<Category> categories = GameCreationHelper.getAllAvailablePBDCategories();
+            List<Category> categories = CreateGameService.getAllAvailablePBDCategories();
             for (Category category : categories) {
                 if (category.getName().startsWith(categoryChannelName)) {
                     categoryChannel = category;
@@ -79,7 +79,7 @@ class CreateGameChannels extends Subcommand {
                 }
             }
             if (categoryChannel == null)
-                categoryChannel = GameCreationHelper.createNewCategory(categoryChannelName);
+                categoryChannel = CreateGameService.createNewCategory(categoryChannelName);
             if (categoryChannel == null) {
                 MessageHelper.sendMessageToEventChannel(event, "Could not automatically find a category that begins with **" + categoryChannelName
                     + "** - Please create this category.");
@@ -96,7 +96,7 @@ class CreateGameChannels extends Subcommand {
 
         // CHECK IF SERVER CAN SUPPORT A NEW GAME
         Guild guild = categoryChannel.getGuild();
-        if (!GameCreationHelper.serverCanHostNewGame(guild)) {
+        if (!CreateGameService.serverCanHostNewGame(guild)) {
             MessageHelper.sendMessageToEventChannel(event, "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
@@ -125,6 +125,6 @@ class CreateGameChannels extends Subcommand {
         }
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
 
-        GameCreationHelper.createGameChannels(members, event, gameFunName, gameName, gameOwner, categoryChannel);
+        CreateGameService.createGameChannels(members, event, gameFunName, gameName, gameOwner, categoryChannel);
     }
 }

@@ -14,10 +14,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.GameCreationHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameService;
 
 class Observer extends Subcommand {
 
@@ -49,7 +49,7 @@ class Observer extends Subcommand {
         Member member = guild.getMemberById(user.getId());
 
         // INVITE TO GAME SERVER IF MISSING
-        if (!GameCreationHelper.inviteUsersToServer(guild, List.of(member), event.getChannel()).isEmpty()) {
+        if (!CreateGameService.inviteUsersToServer(guild, List.of(member), event.getChannel()).isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User was not a member of the Game's server (" + guild.getName() + ")\nPlease run this command again once the user joins the server.");
             return;
         }

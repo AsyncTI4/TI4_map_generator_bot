@@ -4,8 +4,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.Subcommand;
 import ti4.message.MessageHelper;
-
-import static ti4.helpers.GameCreationHelper.getNewPlayerInfoText;
+import ti4.service.game.CreateGameService;
 
 class NewPlayerInfo extends Subcommand {
 
@@ -19,7 +18,6 @@ class NewPlayerInfo extends Subcommand {
     }
 
     public static void sendNewPlayerInfoText(GenericInteractionCreateEvent event) {
-        MessageHelper.sendMessageToThread(event.getMessageChannel(), "Info for Players new to AsyncTI4", getNewPlayerInfoText());
+        MessageHelper.sendMessageToThread(event.getMessageChannel(), "Info for Players new to AsyncTI4", CreateGameService.getNewPlayerInfoText());
     }
-
 }

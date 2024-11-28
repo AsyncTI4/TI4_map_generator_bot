@@ -16,9 +16,9 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.buttons.Buttons;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.GameCreationHelper;
 import ti4.helpers.SearchGameHelper;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameService;
 
 class CreateGameButton extends Subcommand {
 
@@ -38,12 +38,12 @@ class CreateGameButton extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         // GAME NAME
-        String gameName = GameCreationHelper.getNextGameName();
+        String gameName = CreateGameService.getNextGameName();
 
         // CHECK IF GIVEN CATEGORY IS VALID
-        String categoryChannelName = GameCreationHelper.getCategoryNameForGame(gameName);
+        String categoryChannelName = CreateGameService.getCategoryNameForGame(gameName);
         Category categoryChannel = null;
-        List<Category> categories = GameCreationHelper.getAllAvailablePBDCategories();
+        List<Category> categories = CreateGameService.getAllAvailablePBDCategories();
         for (Category category : categories) {
             if (category.getName().toUpperCase().startsWith(categoryChannelName)) {
                 categoryChannel = category;
@@ -51,7 +51,7 @@ class CreateGameButton extends Subcommand {
             }
         }
         if (categoryChannel == null)
-            categoryChannel = GameCreationHelper.createNewCategory(categoryChannelName);
+            categoryChannel = CreateGameService.createNewCategory(categoryChannelName);
         if (categoryChannel == null) {
             MessageHelper.sendMessageToEventChannel(event, "Could not automatically find a category that begins with **" + categoryChannelName
                 + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
@@ -84,7 +84,7 @@ class CreateGameButton extends Subcommand {
         }
 
         // CHECK IF GUILD HAS ALL PLAYERS LISTED
-        GameCreationHelper.inviteUsersToServer(guild, members, event.getMessageChannel());
+        CreateGameService.inviteUsersToServer(guild, members, event.getMessageChannel());
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("createGameChannels", "Create Game"));
