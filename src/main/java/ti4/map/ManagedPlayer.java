@@ -25,8 +25,6 @@ public class ManagedPlayer {
             throw new IllegalArgumentException("Player " + player.getUserID() + " attempted merge with " + id);
         }
         games.add(game);
-        afkHours = player.getHoursThatPlayerIsAFK();
-        distanceBasedTacticalActions = player.doesPlayerPreferDistanceBasedTacticalActions();
     }
 
     @Override

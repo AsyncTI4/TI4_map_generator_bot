@@ -12,6 +12,7 @@ import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
+import ti4.users.UserSettingsManager;
 
 class CompareAFKTimes extends Subcommand {
 
@@ -41,9 +42,9 @@ class CompareAFKTimes extends Subcommand {
             .map(User::getId)
             .map(GameManager::getManagedPlayer)
             .forEach(player -> {
-                var afkTime = player.getAfkHours();
+                var afkTime = UserSettingsManager.get(player.getId()).getAfkHours();
                 if (afkTime != null) {
-                    stringBuilder.append(player.getName()).append(" afk hours are: ").append(player.getAfkHours().replace(";", ", ")).append("\n");
+                    stringBuilder.append(player.getName()).append(" afk hours are: ").append(afkTime.replace(";", ", ")).append("\n");
                 } else {
                     stringBuilder.append("AFK hours are not set for: ").append(player.getName()).append("\n");
                 }

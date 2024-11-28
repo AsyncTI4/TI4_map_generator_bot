@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import lombok.Data;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 @Data
 public class UserSettings {
 
@@ -37,7 +39,7 @@ public class UserSettings {
     }
 
     public void addAfkHour(String hour) {
-        if (afkHours.isEmpty()) {
+        if (isBlank(afkHours)) {
             afkHours = hour;
         } else {
             afkHours += ";" + hour;

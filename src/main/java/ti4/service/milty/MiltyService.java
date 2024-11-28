@@ -10,12 +10,11 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Function;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
@@ -39,7 +38,6 @@ import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -657,20 +655,6 @@ public class MiltyService {
                 "Player: " + player.getRepresentation() + " has been set up");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
-        }
-
-        for (var managedGame : GameManager.getManagedGames()) {
-            for (var managedPlayer : managedGame.getRealPlayers()) {
-                if (managedPlayer.getId().equalsIgnoreCase(player.getUserID())) {
-                    if (!managedPlayer.getAfkHours().isEmpty()) {
-                        player.setHoursThatPlayerIsAFK(managedPlayer.getAfkHours());
-                    }
-                    if (managedPlayer.isDistanceBasedTacticalActions()) {
-                        player.setPreferenceForDistanceBasedTacticalActions(true);
-                    }
-                    break;
-                }
-            }
         }
 
         if (!game.isFowMode()) {
