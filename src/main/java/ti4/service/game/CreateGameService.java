@@ -43,6 +43,7 @@ import ti4.helpers.ThreadHelper;
 import ti4.image.ImageHelper;
 import ti4.image.MapGenerator;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -292,7 +293,7 @@ public class CreateGameService {
 
         // Find new players
         for (Player player : game.getPlayers().values()) {
-            if (ButtonHelper.isPlayerNew(game, player)) {
+            if (ButtonHelper.isPlayerNew(player.getUserID())) {
                 newPlayers.add(player);
             }
         }
