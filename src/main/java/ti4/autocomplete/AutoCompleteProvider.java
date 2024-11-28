@@ -66,7 +66,33 @@ import ti4.service.map.MapPresetService;
 
 public class AutoCompleteProvider {
 
-    public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
+    public static void startNewAutoCompleteThread(CommandAutoCompleteInteractionEvent event) {
+        new Thread(() -> {
+            try {
+                long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
+                long startTime = System.currentTimeMillis();
+
+                resolveAutoCompleteEvent(event);
+
+                long endTime = System.currentTimeMillis();
+                final int milliThreshhold = 2000;
+                if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
+                    String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
+                    String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+                    String message = event.getChannel().getAsMention() + " " + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: " +
+                        "This AutoComplete event took over " + milliThreshhold + "ms to respond or execute\n> " +
+                        DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " event received\n> " +
+                        DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
+                        DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
+                    BotLogger.log(message);
+                }
+            } catch (Exception e) {
+                BotLogger.log("Error in resolveAutoCompleteEvent", e);
+            }
+        }).start();
+    }
+
+    public static void resolveAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         String commandName = event.getName();
         String subCommandName = event.getSubcommandName();
         String optionName = event.getFocusedOption().getName();
