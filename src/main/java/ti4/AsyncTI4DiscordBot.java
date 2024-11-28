@@ -230,12 +230,18 @@ public class AsyncTI4DiscordBot {
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
                 if (shutdown()) {
                     BotLogger.logWithTimestamp("FINISHED PROCESSING ASYNC THREADPOOL");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
                 }
                 if (ButtonProcessor.shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.logWithTimestamp("FINISHED PROCESSING BUTTONS");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING BUTTONS");
                 }
                 if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.logWithTimestamp("FINISHED RENDERING MAPS");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH RENDERING MAPS");
                 }
                 CronManager.shutdown(); // will wait for up to an additional 20 seconds
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS COMPLETE");

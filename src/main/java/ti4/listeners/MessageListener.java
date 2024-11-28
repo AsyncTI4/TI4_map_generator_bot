@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -14,7 +13,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.requests.RestAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.AliasHandler;
@@ -40,16 +38,19 @@ public class MessageListener extends ListenerAdapter {
             return;
         }
 
+        Message message = event.getMessage();
+        if (message.getContentRaw().startsWith("[DELETE]")) {
+            message.delete().queue();
+        }
+        AsyncTI4DiscordBot.runAsync(() -> processMessage(event, message));
+    }
+
+    private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getMessage());
         long startTime = System.currentTimeMillis();
-
-        Message message = event.getMessage();
         try {
-            if (message.getContentRaw().startsWith("[DELETE]")) {
-                message.delete().queue();
-            }
             timeIt(() -> checkForFogOfWarInvitePrompt(message), "MessageListener#checkForFogOfWarInvitePrompt", 1000);
-            timeIt(() -> copyLFGPingstoLFGPingsChannel(event, message), "MessageListener#copyLFGPingstoLFGPingsChannel", 1000);
+            timeIt(() -> copyLFGPingsToLFGPingsChannel(event, message), "MessageListener#copyLFGPingstoLFGPingsChannel", 1000);
             timeIt(() -> checkIfNewMakingGamesPostAndPostIntroduction(event), "MessageListener#checkIfNewMakingGamesPostAndPostIntroduction", 1000);
             timeIt(() -> handleWhispers(event, message), "MessageListener#handleWhispers", 1000);
             timeIt(() -> handleFogOfWarCombatThreadMirroring(event), "MessageListener#handleFogOfWarCombatThreadMirroring", 1000);
@@ -60,7 +61,7 @@ public class MessageListener extends ListenerAdapter {
         }
 
         long endTime = System.currentTimeMillis();
-        final int milliThreshold = 1500;
+        final int milliThreshold = 3000;
         if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
             String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
             String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
@@ -115,7 +116,7 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    private static void copyLFGPingstoLFGPingsChannel(MessageReceivedEvent event, Message message) {
+    private static void copyLFGPingsToLFGPingsChannel(MessageReceivedEvent event, Message message) {
         //947310962485108816
         Role lfgRole = CreateGameService.getRole("LFG", event.getGuild());
         if (!event.getAuthor().isBot() && lfgRole != null && event.getChannel() instanceof ThreadChannel && message.getContentRaw().contains(lfgRole.getAsMention())) {
@@ -269,13 +270,14 @@ public class MessageListener extends ListenerAdapter {
             return;
         }
         try {
-            MessageHistory mHistory = event.getChannel().getHistory();
-            RestAction<List<Message>> lis = mHistory.retrievePast(2);
-            var messages = lis.complete();
-            if (messages.size() == 2 && !event.getMessage().getAuthor().getId().equalsIgnoreCase(messages.get(1).getAuthor().getId())) {
-                var emoji = Emoji.fromFormatted(player.getFactionEmoji());
-                event.getChannel().addReactionById(event.getMessageId(), emoji).queue();
-            }
+            event.getChannel().getHistory()
+                .retrievePast(2)
+                .queue(messages -> {
+                    if (messages.size() == 2 && !event.getMessage().getAuthor().getId().equalsIgnoreCase(messages.get(1).getAuthor().getId())) {
+                        var emoji = Emoji.fromFormatted(player.getFactionEmoji());
+                        messages.getFirst().addReaction(emoji).queue();
+                    }
+                });
         } catch (Exception e) {
             BotLogger.log("Reading previous message", e);
         }
