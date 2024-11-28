@@ -1669,11 +1669,11 @@ public class MapGenerator implements AutoCloseable {
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnID);
             if (promissoryNote.getSource() == ComponentSource.promises_promises)
             {
-                drawPAImageScaled(x + deltaX, y + 1, "pa_promissory_light_pp.png", 38, 28);
+                drawPAImageScaled(x + deltaX + 1, y + 1, "pa_promissory_light_pp.png", 38, 28);
             }
             else
             {
-                drawPAImageScaled(x + deltaX, y + 1, "pa_promissory_light.png", 38, 28);
+                drawPAImageScaled(x + deltaX + 1, y + 1, "pa_promissory_light.png", 38, 28);
             }
             if (game.isFrankenGame() && !promissoryNote.getFaction().isEmpty()) {
                 drawFactionIconImage(graphics, promissoryNote.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
