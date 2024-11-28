@@ -74,6 +74,8 @@ import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.users.UserSettingsManager;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 public class Player {
 
     private String userID;
@@ -86,7 +88,6 @@ public class Player {
     private boolean readyToPassBag;
     private boolean searchWarrant;
     private boolean isDummy;
-    private boolean prefersDistanceBasedTacticalActions;
     private boolean autoPassOnWhensAfters;
     private boolean eliminated;
 
@@ -102,7 +103,6 @@ public class Player {
     @Setter
     private String homeSystemPosition;
     private String allianceMembers = "";
-    private String hoursThatPlayerIsAFK = "";
     private String color;
 
     @Getter
@@ -683,16 +683,8 @@ public class Player {
         return readyToPassBag;
     }
 
-    public boolean doesPlayerPreferDistanceBasedTacticalActions() {
-        return prefersDistanceBasedTacticalActions;
-    }
-
     public boolean doesPlayerAutoPassOnWhensAfters() {
         return autoPassOnWhensAfters;
-    }
-
-    public void setPreferenceForDistanceBasedTacticalActions(boolean preference) {
-        prefersDistanceBasedTacticalActions = preference;
     }
 
     public void setAutoPassWhensAfters(boolean preference) {
@@ -1614,10 +1606,11 @@ public class Player {
     }
 
     public boolean isAFK() {
-        if (getHoursThatPlayerIsAFK().isEmpty()) {
+        String afkHours = UserSettingsManager.get(userID).getAfkHours();
+        if (isBlank(afkHours)) {
             return false;
         }
-        String[] hoursAFK = getHoursThatPlayerIsAFK().split(";");
+        String[] hoursAFK = afkHours.split(";");
         int currentHour = Helper.getCurrentHour();
         for (String hour : hoursAFK) {
             int h = Integer.parseInt(hour);
@@ -1745,22 +1738,6 @@ public class Player {
         if (!"null".equals(color)) {
             allianceMembers = allianceMembers + color;
         }
-    }
-
-    public void addHourThatIsAFK(String hour) {
-        if (hoursThatPlayerIsAFK.isEmpty()) {
-            hoursThatPlayerIsAFK = hour;
-        } else {
-            hoursThatPlayerIsAFK = hoursThatPlayerIsAFK + ";" + hour;
-        }
-    }
-
-    public void setHoursThatPlayerIsAFK(String hours) {
-        hoursThatPlayerIsAFK = hours;
-    }
-
-    public String getHoursThatPlayerIsAFK() {
-        return hoursThatPlayerIsAFK;
     }
 
     public void setAllianceMembers(String color) {

@@ -6078,11 +6078,12 @@ public class ButtonHelper {
             event.getChannel().addReactionById(messageId, emojiToUse).queue(Consumers.nop(), BotLogger::catchRestError);
             if (game.getStoredValue(messageId) != null) {
                 if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-                    game.setStoredValue(messageId,
-                        game.getStoredValue(messageId) + "_" + player.getFaction());
+                    game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
+                    GameSaveLoadManager.saveGame(game, "Stored reaction.");
                 }
             } else {
                 game.setStoredValue(messageId, player.getFaction());
+                GameSaveLoadManager.saveGame(game, "Stored reaction.");
             }
 
             UnfiledButtonHandlers.checkForAllReactions(event, game);

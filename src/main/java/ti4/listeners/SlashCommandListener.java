@@ -18,6 +18,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -53,9 +55,9 @@ public class SlashCommandListener extends ListenerAdapter {
             }
             Game game = GameManager.getGame(gameName);
             game.incrementSpecificSlashCommandCount(event.getFullCommandName());
+            GameSaveLoadManager.saveGame(game, "Increment slash command count.");
         }
 
-        long deferTime = System.currentTimeMillis();
         event.getInteraction().deferReply().queue();
 
         Member member = event.getMember();
@@ -64,7 +66,7 @@ public class SlashCommandListener extends ListenerAdapter {
             event.getChannel().sendMessage(commandText).queue(m -> {
                 BotLogger.logSlashCommand(event, m);
                 String gameName = CommandHelper.getGameNameFromChannel(event);
-                Game game = GameManager.getGame(gameName);
+                ManagedGame game = GameManager.getManagedGame(gameName);
                 boolean harmless = event.getInteraction().getName().equals(Constants.HELP)
                     || event.getInteraction().getName().equals(Constants.STATISTICS)
                     || event.getInteraction().getName().equals(Constants.BOTHELPER)
