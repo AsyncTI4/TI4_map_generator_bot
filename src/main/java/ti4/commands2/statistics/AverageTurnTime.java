@@ -118,6 +118,9 @@ class AverageTurnTime extends Subcommand {
         sb.append("## __**Average Turn Time:**__\n");
         int index = 1;
         for (User user : users) {
+            if (!playerTurnTimes.containsKey(user.getId())) {
+                continue;
+            }
             int turnCount = playerTurnTimes.get(user.getId()).getKey();
             long totalMillis = playerTurnTimes.get(user.getId()).getValue();
 
