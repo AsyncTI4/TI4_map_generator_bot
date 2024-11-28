@@ -114,6 +114,7 @@ public class AutoCompleteProvider {
             case Constants.MAP -> resolveMapAutoComplete(event, subCommandName, optionName, game);
             case Constants.EVENT -> resolveEventAutoComplete(event, subCommandName, optionName, player);
             case Constants.EXPLORE -> resolveExploreAutoComplete(event, subCommandName, optionName, game);
+            case Constants.STATUS -> resolveStatusAutoComplete(event, subCommandName, optionName, game);
         }
 
         // DON'T APPLY GENERIC HANDLING IF SPECIFIC HANDLING WAS APPLIED
@@ -1055,6 +1056,23 @@ public class AutoCompleteProvider {
                     .limit(25)
                     .sorted(Comparator.comparing(ExploreModel::getAutoCompleteName))
                     .map(e -> new Command.Choice(e.getAutoCompleteName(), e.getId()))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+        }
+    }
+
+    private static void resolveStatusAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Game game) {
+        if (subCommandName.equals(Constants.SHUFFLE_OBJECTIVE_BACK) ||
+            subCommandName.equals(Constants.SCORE_OBJECTIVE) ||
+            subCommandName.equals(Constants.UNSCORE_OBJECTIVE)) {
+            if (optionName.equals(Constants.PO_ID)) {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                List<Command.Choice> options = game.getRevealedPublicObjectives().entrySet().stream()
+                    .filter(entry -> (entry.getValue() + entry.getKey()).toLowerCase().contains(enteredValue))
+                    .sorted(Map.Entry.comparingByValue())
+                    .limit(25)
+                    .map(e -> new Command.Choice(e.getValue() + " - " + e.getKey(), e.getValue()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
