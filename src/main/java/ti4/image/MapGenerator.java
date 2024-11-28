@@ -2048,7 +2048,7 @@ public class MapGenerator implements AutoCloseable {
         }
         for (int i = -2; i <= 2; i++)
         {
-            for (int j = -2; j <= 2; j++)
+            for (int j = (i == -2 || i == 2 ? -1 : -2); j <= (i == -2 || i == 2 ? 1 : 2); j++)
             {
                 graphics.drawString("" + reinforcementsCount, x + position.x + offset + i, y + position.y + j + 28);
             }
