@@ -121,7 +121,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 "This slash command took over " + milliThreshhold + "ms to respond or execute\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " command was issued by user\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
             BotLogger.log(message);
         }
     }

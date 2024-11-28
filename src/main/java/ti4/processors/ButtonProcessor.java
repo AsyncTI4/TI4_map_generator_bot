@@ -105,7 +105,7 @@ public class ButtonProcessor {
                 "\n> Warning: This button took over " + milliThreshhold + "ms to respond or execute\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " button was pressed by user\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
             BotLogger.log(message);
         }
         instance.userButtonPressSet.remove(event.getUser().getId() + event.getButton().getId());
