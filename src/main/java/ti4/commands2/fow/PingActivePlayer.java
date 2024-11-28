@@ -8,6 +8,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -46,6 +47,11 @@ class PingActivePlayer extends GameStateSubcommand {
             }
             game.setLastActivePlayerPing(new Date());
         }
-        ButtonHelper.increasePingCounter(GameManager.getGame("finreference"), player.getUserID());
+
+        var referenceGame = GameManager.getGame("finreference");
+        if (referenceGame != null) {
+            ButtonHelper.increasePingCounter(referenceGame, player.getUserID());
+            GameSaveLoadManager.saveGame(referenceGame, "Ping Active Player command");
+        }
     }
 }

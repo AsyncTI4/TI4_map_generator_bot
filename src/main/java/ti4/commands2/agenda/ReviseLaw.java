@@ -18,7 +18,7 @@ class ReviseLaw extends GameStateSubcommand {
         super(Constants.REVISE_LAW, "Revise a law", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected PO or anything other than Faction"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Elected Faction").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Elected Faction").setAutoComplete(true));
     }
 
     @Override
@@ -30,7 +30,7 @@ class ReviseLaw extends GameStateSubcommand {
         }
 
         Game game = getGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
+        Player player = CommandHelper.getOtherPlayerFromEvent(game, event);
 
         String optionText;
         boolean playerWasElected = !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));

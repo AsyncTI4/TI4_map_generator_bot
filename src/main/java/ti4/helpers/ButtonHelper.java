@@ -5567,7 +5567,7 @@ public class ButtonHelper {
     }
 
     public static void increasePingCounter(Game reference, String playerID) {
-        int count = 0;
+        int count;
         if (reference.getStoredValue("pingsFor" + playerID).isEmpty()) {
             count = 1;
         } else {
