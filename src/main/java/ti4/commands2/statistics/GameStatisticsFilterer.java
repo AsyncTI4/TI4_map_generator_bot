@@ -88,47 +88,21 @@ public class GameStatisticsFilterer {
         if (gameTypeFilter == null) {
             return true;
         }
-        switch (gameTypeFilter) {
-            case "base" -> {
-                return game.isBaseGameMode();
-            }
-            case "absol" -> {
-                return game.isAbsolMode();
-            }
-            case "ds" -> {
-                return isDiscordantStarsGame(game);
-            }
-            case "pok" -> {
-                return !game.isBaseGameMode();
-            }
-            case "action_deck_2" -> {
-                return "action_deck_2".equals(game.getAcDeckID());
-            }
-            case "little_omega" -> {
-                return game.isLittleOmega();
-            }
-            case "franken" -> {
-                return game.isFrankenGame();
-            }
-            case "milty_mod" -> {
-                return game.isMiltyModMode();
-            }
-            case "red_tape" -> {
-                return game.isRedTapeMode();
-            }
-            case "age_of_exploration" -> {
-                return game.isAgeOfExplorationMode();
-            }
-            case "minor_factions" -> {
-                return game.isMinorFactionsMode();
-            }
-            case "alliance" -> {
-                return game.isAllianceMode();
-            }
-            default -> {
-                return false;
-            }
-        }
+        return switch (gameTypeFilter) {
+            case "base" -> game.isBaseGameMode();
+            case "absol" -> game.isAbsolMode();
+            case "ds" -> isDiscordantStarsGame(game);
+            case "pok" -> !game.isBaseGameMode();
+            case "action_deck_2" -> "action_deck_2".equals(game.getAcDeckID());
+            case "little_omega" -> game.isLittleOmega();
+            case "franken" -> game.isFrankenGame();
+            case "milty_mod" -> game.isMiltyModMode();
+            case "red_tape" -> game.isRedTapeMode();
+            case "age_of_exploration" -> game.isAgeOfExplorationMode();
+            case "minor_factions" -> game.isMinorFactionsMode();
+            case "alliance" -> game.isAllianceMode();
+            default -> false;
+        };
     }
 
     private static boolean filterOnHasWinner(Boolean hasWinnerFilter, Game game) {

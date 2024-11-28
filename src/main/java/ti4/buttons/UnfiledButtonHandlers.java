@@ -89,6 +89,8 @@ import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
  */
@@ -488,7 +490,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 absolPAButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard", Emojis.ActionCard));
                 for (String planetID : player.getReadiedPlanets()) {
                     Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
-                    if (planet != null && planet.getOriginalPlanetType() != null) {
+                    if (planet != null && isNotBlank(planet.getOriginalPlanetType())) {
                         List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planet, player);
                         absolPAButtons.addAll(planetButtons);
                     }

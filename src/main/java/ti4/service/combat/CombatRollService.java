@@ -380,10 +380,10 @@ public class CombatRollService {
             int toHit = unitModel.getCombatDieHitsOnForAbility(rollType, player, game);
             int modifierToHit = CombatModHelper.getCombinedModifierForUnit(unitModel, numOfUnit, mods, player, opponent,
                 game,
-                playerUnitsList, opponentUnitsList, rollType, activeSystem);
+                playerUnitsList, rollType, activeSystem);
             int extraRollsForUnit = CombatModHelper.getCombinedModifierForUnit(unitModel, numOfUnit, extraRolls, player,
                 opponent,
-                game, playerUnitsList, opponentUnitsList, rollType, activeSystem);
+                game, playerUnitsList, rollType, activeSystem);
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player, game);
             boolean extraRollsCount = false;
             if ((numRollsPerUnit > 1 || extraRollsForUnit > 0) && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {

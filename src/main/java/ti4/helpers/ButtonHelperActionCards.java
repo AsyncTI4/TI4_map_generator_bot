@@ -1576,9 +1576,8 @@ public class ButtonHelperActionCards {
         if (p2.getReadiedPlanets().contains(planet)) {
             p2.exhaustPlanet(planet);
         }
-        int amountToKill = 3;
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        amountToKill = uH.getUnitCount(UnitType.Infantry, p2.getColor());
+        int amountToKill = uH.getUnitCount(UnitType.Infantry, p2.getColor());
         if (amountToKill > 3) {
             amountToKill = 3;
         }

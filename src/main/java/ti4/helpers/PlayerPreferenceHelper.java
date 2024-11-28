@@ -39,7 +39,7 @@ public class PlayerPreferenceHelper {
                 offerSetAutoPassOnSaboButtons(game, player);
             }
             case "afkTimes" -> {
-                offerAFKTimeOptions(game, player);
+                offerAFKTimeOptions(player);
             }
             case "tacticalAction" -> {
                 List<Button> buttons = new ArrayList<>();
@@ -74,7 +74,6 @@ public class PlayerPreferenceHelper {
             player.setAutoPassWhensAfters("true".equals(trueOrFalse));
         }
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
-
         ButtonHelper.deleteMessage(event);
     }
 
@@ -116,15 +115,15 @@ public class PlayerPreferenceHelper {
         }
     }
 
-    public static void offerAFKTimeOptions(Game game, Player player) {
-        List<Button> buttons = getSetAFKButtons(game);
+    public static void offerAFKTimeOptions(Player player) {
+        List<Button> buttons = getSetAFKButtons();
         player.setHoursThatPlayerIsAFK("");
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged()
             + " your afk times (if any) have been reset. Use buttons to select the hours (note they are in UTC) in which you're afk. If you select 8 for example, you will be set as AFK from 8:00 UTC to 8:59 UTC in every game you are in.",
             buttons);
     }
 
-    public static List<Button> getSetAFKButtons(Game game) {
+    public static List<Button> getSetAFKButtons() {
         List<Button> buttons = new ArrayList<>();
         for (int x = 0; x < 24; x++) {
             buttons.add(Buttons.gray("setHourAsAFK_" + x, "" + x));

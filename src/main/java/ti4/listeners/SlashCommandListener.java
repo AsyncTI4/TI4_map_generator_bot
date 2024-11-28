@@ -15,6 +15,7 @@ import ti4.commands2.Command;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.CommandManager;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.BotLogger;
@@ -28,6 +29,8 @@ public class SlashCommandListener extends ListenerAdapter {
             event.getInteraction().reply("Please try again in a moment.\nThe bot is rebooting and is not ready to receive commands.").setEphemeral(true).queue();
             return;
         }
+
+        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
 
         long startTime = System.currentTimeMillis();
 
@@ -52,6 +55,7 @@ public class SlashCommandListener extends ListenerAdapter {
             game.incrementSpecificSlashCommandCount(event.getFullCommandName());
         }
 
+        long deferTime = System.currentTimeMillis();
         event.getInteraction().deferReply().queue();
 
         Member member = event.getMember();
@@ -66,7 +70,7 @@ public class SlashCommandListener extends ListenerAdapter {
                     || event.getInteraction().getName().equals(Constants.BOTHELPER)
                     || event.getInteraction().getName().equals(Constants.DEVELOPER)
                     || (event.getInteraction().getSubcommandName() != null && event.getInteraction()
-                    .getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
+                        .getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
                     || event.getInteraction().getName().equals(Constants.SEARCH)
                     || !(!event.getInteraction().getName().equals(Constants.USER) && !event.getInteraction().getName().equals(Constants.SHOW_GAME))
                     || event.getOption(Constants.GAME_NAME) != null;
@@ -102,8 +106,16 @@ public class SlashCommandListener extends ListenerAdapter {
         event.getHook().deleteOriginal().queue();
 
         long endTime = System.currentTimeMillis();
-        if (endTime - startTime > 3000) {
-            BotLogger.log(event, "This slash command took longer than 3000 ms (" + (endTime - startTime) + ")");
+        final int milliThreshhold = 3000;
+        if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
+            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
+            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+            String message = event.getChannel().getAsMention() + " " + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: " +
+                "This slash command took over " + milliThreshhold + "ms to respond or execute\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " command was issued by user\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
+            BotLogger.log(message);
         }
     }
 

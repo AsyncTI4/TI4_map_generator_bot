@@ -89,10 +89,6 @@ public class GameSaveLoadManager {
 
     private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
 
-    private static String debugString(String prefix, long time) {
-        return prefix + Helper.getTimeRepresentationNanoSeconds(time);
-    }
-
     public static void saveGame(Game game, String reason) {
         saveGame(game, false, reason);
     }

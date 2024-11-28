@@ -25,6 +25,7 @@ import ti4.commands2.CommandHelper;
 import ti4.commands2.statistics.GameStatisticsFilterer;
 import ti4.commands2.uncategorized.ServerPromoteCommand;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
@@ -699,7 +700,7 @@ public class AutoCompleteProvider {
                     .limit(25)
                     .map(entry -> new Command.Choice(
                         StringUtils.left(
-                            entry.getKey() + " (" + Helper.getTimeRepresentationToSeconds(datetime - entry.getValue().getLastModifiedDate()) + " ago):  " + entry.getValue().getLatestCommand(), 100),
+                            entry.getKey() + " (" + DateTimeHelper.getTimeRepresentationToSeconds(datetime - entry.getValue().getLastModifiedDate()) + " ago):  " + entry.getValue().getLatestCommand(), 100),
                         entry.getKey()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();

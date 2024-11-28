@@ -10,11 +10,12 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
@@ -22,6 +23,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Emojis;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
@@ -359,8 +361,8 @@ public class MiltyService {
         if (!slicesCreated || elapsed >= 10000000000L || debug) {
             StringBuilder sb = new StringBuilder();
             sb.append("Milty draft took a while... jazz, take a look:\n");
-            sb.append("`        Elapsed time:` ").append(Helper.getTimeRepresentationNanoSeconds(elapsed)).append("\n");
-            sb.append("`           Quit time:` ").append(Helper.getTimeRepresentationNanoSeconds(quitDiff)).append("\n");
+            sb.append("`        Elapsed time:` ").append(DateTimeHelper.getTimeRepresentationNanoSeconds(elapsed)).append("\n");
+            sb.append("`           Quit time:` ").append(DateTimeHelper.getTimeRepresentationNanoSeconds(quitDiff)).append("\n");
             sb.append("`    Number of cycles:` ").append(i).append("\n");
             for (Map.Entry<String, Integer> reason : reasons.entrySet()) {
                 sb.append("`").append(Helper.leftpad(reason.getKey(), 15)).append(" fail:` ").append(reason.getValue()).append("\n");

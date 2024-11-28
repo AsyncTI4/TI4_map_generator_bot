@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -13,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -24,6 +25,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.ThreadHelper;
 import ti4.helpers.Units;
 import ti4.image.TileGenerator;
 import ti4.map.Game;
@@ -153,7 +155,7 @@ public class StartCombatService {
 
     private static void findOrCreateCombatThread(Game game, MessageChannel channel, Player player1, Player player2, String threadName, Tile tile,
                                                     GenericInteractionCreateEvent event, String spaceOrGround, String unitHolderName) {
-        Helper.checkThreadLimitAndArchive(event.getGuild());
+        ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
         if (threadName == null)
             threadName = combatThreadName(game, player1, player2, tile);
         if (!game.isFowMode()) {
@@ -273,7 +275,7 @@ public class StartCombatService {
     }
 
     private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
-        Helper.checkThreadLimitAndArchive(event.getGuild());
+        ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
         FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
 
         // Use existing thread, if it exists

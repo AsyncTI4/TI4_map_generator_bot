@@ -33,6 +33,8 @@ import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class ButtonHelperCommanders {
 
     @ButtonHandler("cheiranCommanderBlock_")
@@ -379,8 +381,7 @@ public class ButtonHelperCommanders {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
             Planet planetReal = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            if (planetReal != null && planetReal.getOriginalPlanetType() != null
-                && player.getPlanetsAllianceMode().contains(planet)) {
+            if (planetReal != null && isNotBlank(planetReal.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
             }

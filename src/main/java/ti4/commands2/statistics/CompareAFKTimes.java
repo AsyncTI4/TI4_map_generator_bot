@@ -34,6 +34,7 @@ class CompareAFKTimes extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         StringBuilder stringBuilder = new StringBuilder();
+
         PLAYER_OPTIONS_TO_CHECK.stream()
             .map(playerOptionName -> event.getOption(playerOptionName, null, OptionMapping::getAsUser))
             .filter(Objects::nonNull)
@@ -47,6 +48,7 @@ class CompareAFKTimes extends Subcommand {
                     stringBuilder.append("AFK hours are not set for: ").append(player.getName()).append("\n");
                 }
             });
+
         MessageHelper.sendMessageToChannel(event.getChannel(), stringBuilder.toString());
     }
 }

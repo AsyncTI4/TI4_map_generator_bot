@@ -6,14 +6,16 @@
         "permanentEffect": "Your space docks cannot produce ground forces.",
         "window": "At the start of the status phase",
         "windowEffect": "Place 1 ground force from your reinforcements on any planet you control.",
-        "source": "miltymod"
+        "source": "miltymod",
+        "homebrewReplacesID": "mitosis"
     },
     {
         "id": "miltymod_quantum_entanglement",
         "name": "Quantum Entanglement",
         "faction": "ghost",
         "permanentEffect": "You treat all systems that contain a non-delta wormhole as adjacent to each other. Game effects cannot prevent you from using this ability.",
-        "source": "miltymod"
+        "source": "miltymod",
+        "homebrewReplacesID": "quantum_entanglement"
     },
     {
         "id": "miltymod_slipstream",
@@ -21,7 +23,8 @@
         "faction": "ghost",
         "window": "During your tactical actions",
         "windowEffect": "Apply +1 to the move value of each of your ships that starts its movement in your home system or in a system that contains a non-delta wormhole.",
-        "source": "miltymod"
+        "source": "miltymod",
+        "homebrewReplacesID": "slipstream"
     },
     {
         "id": "miltymod_munitions",
@@ -29,7 +32,8 @@
         "faction": "letnev",
         "window": "At the start of each round of space combat",
         "windowEffect": "You may spend 2 resources; you may reroll any number of your dice during that combat round.",
-        "source": "miltymod"
+        "source": "miltymod",
+        "homebrewReplacesID": "munitions"
     },
     {
         "id": "miltymod_ambush",
@@ -37,7 +41,8 @@
         "faction": "mentak",
         "window": "At the start of a space combat",
         "windowEffect": "You may roll 1 die for each of up to 2 of your cruisers or destroyers in the system. For each result equal to or greater than that ship's combat value produce 1 hit; your opponent must assign it to 1 of their non-fighter ships.",
-        "source": "miltymod"
+        "source": "miltymod",
+        "homebrewReplacesID": "ambush"
     },
     {
         "id": "miltymod_star_forge",
@@ -45,7 +50,8 @@
         "faction": "muaat",
         "window": "ACTION",
         "windowEffect": "Spend 1 token from your strategy pool to place either 2 fighters or 1 destroyer from your reinforcements in a system that contains 1 or more of your war suns or your flagship.",
-        "source": "miltymod"
+        "source": "miltymod",
+        "homebrewReplacesID": "star_forge"
     },
     {
         "id": "miltymod_galactic_threat",
@@ -54,7 +60,8 @@
         "permanentEffect": "You cannot vote on agendas",
         "window": "Once per agenda, after an agenda is revealed",
         "windowEffect": "You may predict aloud the outcome of that agenda. If your prediction is correct, gain 1 technology that is owned by a player who voted how you predicted.",
-        "source": "miltymod"
+        "source": "miltymod",
+        "homebrewReplacesID": "galactic_threat"
     },
     {
         "id": "miltymod_reclamation",
@@ -62,6 +69,7 @@
         "faction": "winnu",
         "window": "After you gain control of Mecatol Rex",
         "windowEffect": "You may place 1 PDS and 1 space dock from your reinforcements on Mecatol Rex.",
-        "source": "miltymod"
+        "source": "miltymod",
+        "homebrewReplacesID": "reclamation"
     }
 ]

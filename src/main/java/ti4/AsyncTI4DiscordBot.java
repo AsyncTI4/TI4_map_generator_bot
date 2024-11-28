@@ -56,6 +56,7 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.processors.ButtonProcessor;
 import ti4.selections.SelectionManager;
 import ti4.service.statistics.StatisticsPipeline;
 
@@ -195,6 +196,7 @@ public class AsyncTI4DiscordBot {
         TIGLHelper.validateTIGLness();
 
         // LOAD GAMES NAMES
+        BotLogger.logWithTimestamp(" LOADING GAMES");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
         GameManager.initialize();
         GameSaveLoadManager.cleanupOldUndoFiles();
@@ -208,6 +210,7 @@ public class AsyncTI4DiscordBot {
         ImageIO.setUseCache(false);
         MapRenderPipeline.start();
         StatisticsPipeline.start();
+        ButtonProcessor.start();
 
         // START CRONS
         AutoPingCron.register();
@@ -229,8 +232,25 @@ public class AsyncTI4DiscordBot {
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS, WAITING 10 SECONDS FOR COMPLETION");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
+                if (shutdown()) { // will wait for up to an additional 20 seconds
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING ASYNC THREADPOOL");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
+                }
+                if (ButtonProcessor.shutdown()) { // will wait for up to an additional 20 seconds
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING BUTTONS");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING BUTTONS");
+                }
                 if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.logWithTimestamp("DONE RENDERING MAPS");
+                    BotLogger.logWithTimestamp("FINISHED RENDERING MAPS");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH RENDERING MAPS");
+                }
+                if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
+                    BotLogger.logWithTimestamp("DONE PROCESSING STATISTICS");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING STATISTICS");
                 }
                 if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.logWithTimestamp("DONE PROCESSING STATISTICS");
@@ -367,5 +387,20 @@ public class AsyncTI4DiscordBot {
 
     public static Guild getGuild(String guildId) {
         return guilds.stream().filter(guild -> guild.getId().equals(guildId)).findFirst().orElse(null);
+    }
+  
+    public static boolean shutdown() {
+        THREAD_POOL.shutdown();
+        try {
+            if (!THREAD_POOL.awaitTermination(20, TimeUnit.SECONDS)) {
+                THREAD_POOL.shutdownNow();
+                return false;
+            }
+        } catch (InterruptedException e) {
+            THREAD_POOL.shutdownNow();
+            Thread.currentThread().interrupt();
+            return false;
+        }
+        return true;
     }
 }

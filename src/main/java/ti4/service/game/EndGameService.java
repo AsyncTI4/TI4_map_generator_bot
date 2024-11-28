@@ -26,6 +26,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
 import ti4.helpers.TIGLHelper;
+import ti4.helpers.ThreadHelper;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
@@ -254,10 +255,10 @@ public class EndGameService {
     private static TextChannel getGameSummaryChannel(Game game) {
         List<TextChannel> textChannels;
         if (game.isFowMode() && AsyncTI4DiscordBot.guildFogOfWar != null) {
-            Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildFogOfWar);
+            ThreadHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildFogOfWar);
             textChannels = AsyncTI4DiscordBot.guildFogOfWar.getTextChannelsByName("fow-war-stories", true);
         } else {
-            Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
+            ThreadHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
             textChannels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true);
         }
         return textChannels.isEmpty() ? null : textChannels.getFirst();

@@ -72,9 +72,6 @@ public class AutoPingCron {
                         ButtonHelper.addReaction(player, false, false, message, null, messageID, game);
                     }
                 }
-//                if (shouldDoIt) {
-//                    GameSaveLoadManager.saveGame(game, "No Sabo");
-//                }
             }
             if ("agendawaiting".equals(game.getPhaseOfGame())) {
                 int highNum2 = player.getAutoSaboPassMedian() * 4 / 2;
