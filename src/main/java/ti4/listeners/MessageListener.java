@@ -54,7 +54,7 @@ public class MessageListener extends ListenerAdapter {
             timeIt(() -> handleWhispers(event, message), "MessageListener#handleWhispers", 1000);
             timeIt(() -> handleFogOfWarCombatThreadMirroring(event), "MessageListener#handleFogOfWarCombatThreadMirroring", 1000);
             timeIt(() -> endOfRoundSummary(event, message), "MessageListener#endOfRoundSummary", 1000);
-            AsyncTI4DiscordBot.runAsync(() -> addFactionEmojiReactionsToMessages(event));
+            timeIt(() -> addFactionEmojiReactionsToMessages(event), "MessageListener#addFactionEmojiReactionsToMessages", 1000);
         } catch (Exception e) {
             BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
         }
@@ -260,7 +260,6 @@ public class MessageListener extends ListenerAdapter {
             return;
         }
         String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
-
         Game game = GameManager.getGame(gameName);
         if (game == null || !game.isBotFactionReacts() || game.isFowMode()) {
             return;
@@ -274,7 +273,8 @@ public class MessageListener extends ListenerAdapter {
             RestAction<List<Message>> lis = mHistory.retrievePast(2);
             var messages = lis.complete();
             if (messages.size() == 2 && !event.getMessage().getAuthor().getId().equalsIgnoreCase(messages.get(1).getAuthor().getId())) {
-                event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted(player.getFactionEmoji())).queue();
+                var emoji = Emoji.fromFormatted(player.getFactionEmoji());
+                event.getChannel().addReactionById(event.getMessageId(), emoji).queue();
             }
         } catch (Exception e) {
             BotLogger.log("Reading previous message", e);
