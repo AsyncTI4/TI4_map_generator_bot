@@ -603,7 +603,7 @@ public class AutoCompleteProvider {
                 List<Command.Choice> options = UndoService.getAllUndoSavedGamesForAutoComplete(game).entrySet().stream()
                     .sorted(Map.Entry.comparingByValue())
                     .limit(25)
-                    .map(entry -> new Command.Choice(StringUtils.left(entry.getKey() + entry.getValue(), 100), entry.getKey()))
+                    .map(entry -> new Command.Choice(StringUtils.left(entry.getKey() + " " + entry.getValue(), 100), entry.getKey()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }

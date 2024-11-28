@@ -3,9 +3,12 @@ package ti4.service.game;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.experimental.UtilityClass;
 import ti4.helpers.DateTimeHelper;
@@ -16,7 +19,8 @@ import ti4.message.BotLogger;
 @UtilityClass
 public class UndoService {
 
-    private static final Pattern descrRegex = Pattern.compile("^(?<=latest_command ).*$");
+    private static final Pattern lastestCommandPattern = Pattern.compile("^(?>latest_command ).*$");
+    private static final Pattern lastModifiedPattern = Pattern.compile("^(?>last_modified_date ).*$");
 
     public static Map<String, String> getAllUndoSavedGamesForAutoComplete(Game game) {
         File mapUndoDirectory = Storage.getGameUndoDirectory();
@@ -29,18 +33,30 @@ public class UndoService {
 
     public static String getLastModifiedDateAndLastCommandTextFromFile(File file) {
         long dateTime = System.currentTimeMillis();
-        long lastModifiedDate = file.lastModified();
-        
+        long fileLastModifiedDate = file.lastModified();
+        System.out.println(DateTimeHelper.getTimeRepresentationToSeconds(fileLastModifiedDate));
+
         String latestCommand = "Latest Command not Found";
+        String lastModifiedDateString = "";
         try {
-            latestCommand = Files.readAllLines(file.toPath()).stream()
-                .filter(line -> descrRegex.matcher(line).find())
+            List<String> fileLines = Files.readAllLines(file.toPath());
+            latestCommand = fileLines.stream()
+                .filter(line -> lastestCommandPattern.matcher(line).matches())
                 .findFirst()
+                .map(s -> StringUtils.substringAfter(s, " "))
                 .orElse("Latest Command not Found");
+
+            lastModifiedDateString = fileLines.stream()
+                .filter(line -> lastModifiedPattern.matcher(line).matches())
+                .findFirst()
+                .map(s -> StringUtils.substringAfter(s, " "))
+                .map(Long::parseLong)
+                .map(lastModifiedDate -> DateTimeHelper.getTimeRepresentationToSeconds(dateTime - lastModifiedDate))
+                .orElse(DateTimeHelper.getTimeRepresentationToSeconds(fileLastModifiedDate));
         } catch (Exception e) {
-           BotLogger.log("Could not find latest command from undo file: " + file.getName());
+            BotLogger.log("Could not get AutoComplete data from undo file: " + file.getName());
         }
 
-        return "(" + DateTimeHelper.getTimeRepresentationToSeconds(dateTime - lastModifiedDate) + " ago):  " + latestCommand;
+        return "(" + lastModifiedDateString + " ago):  " + latestCommand;
     }
 }
