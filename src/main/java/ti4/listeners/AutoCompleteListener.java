@@ -16,9 +16,8 @@ public class AutoCompleteListener extends ListenerAdapter {
             event.replyChoice("Please try again in a moment. The bot is not ready to serve AutoComplete.", 0).queue();
             return;
         }
-
         try {
-            AutoCompleteProvider.autoCompleteListener(event);
+            AutoCompleteProvider.resolveAutoCompleteEvent(event, true);
         } catch (Exception e) {
             String message = "Auto complete issue in event: " + event.getName() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getCommandString();
             BotLogger.log(message, e);

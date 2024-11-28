@@ -66,7 +66,21 @@ import ti4.service.map.MapPresetService;
 
 public class AutoCompleteProvider {
 
-    public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
+    public static void resolveAutoCompleteEvent(CommandAutoCompleteInteractionEvent event, boolean threaded) {
+        if (threaded) {
+            new Thread(() -> {
+                try {
+                    resolveAutoCompleteEvent(event);
+                } catch (Exception e) {
+                    BotLogger.log("Error in checkThreadLimitAndArchive", e);
+                }
+            }).start();
+        } else {
+            resolveAutoCompleteEvent(event);
+        }
+    }
+    
+    public static void resolveAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         String commandName = event.getName();
         String subCommandName = event.getSubcommandName();
         String optionName = event.getFocusedOption().getName();
