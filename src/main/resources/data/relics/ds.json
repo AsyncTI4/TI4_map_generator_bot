@@ -3,13 +3,16 @@
         "alias": "boon_of_the_cerulean_god",
         "name": "Boon of the Cerulean God",
         "text": "Apply +1 to the PRODUCTION value of each of your units with PRODUCTION. When you produce 1 or more units reduce the combined cost of the produced units by 1.",
-        "source": "ds"
+        "source": "ds",
+        "shrinkName": true,
+        "shortName": "Boon of the Cerul'n God"
     },
     {
         "alias": "decrypted_cartoglyph",
         "name": "Decrypted Cartoglyph",
         "text": "ACTION: Purge this card to draw 3 system tiles with a blue-colored back at random. Place 1 of those tiles at the edge of the game board, adjacent to at least 2 other systems. Purge the rest.",
-        "source": "ds"
+        "source": "ds",
+        "shrinkName": true
     },
     {
         "alias": "e6-g0_network",
@@ -33,7 +36,9 @@
         "alias": "throne_of_the_false_emperor",
         "name": "Throne of the False Emperor",
         "text": "ACTION: Purge this card to either gain 1 relic or immediately score 1 scored secret objective, or 1 of your unscored secret objectives, if you fulfill its requirements. [Note, this does not allow you to score the same secret twice, or to have more than 3 scored secrets]",
-        "source": "ds"
+        "source": "ds",
+        "shrinkName": true,
+        "shortName": "Throne of False Emp'r."
     },
     {
         "alias": "twilight_mirror",

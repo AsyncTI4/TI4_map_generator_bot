@@ -47,13 +47,13 @@ public class ModalListener extends ListenerAdapter {
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
-        
+
         long endTime = System.currentTimeMillis();
         final int milliThreshhold = 3000;
         if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
             String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
             String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
-            String errorMessage = "Modal took over " + milliThreshhold + " to process:" +
+            String errorMessage = "Modal took over " + milliThreshhold + "ms to process:\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " message was sent\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to receive\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";

@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.GameCreationHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -139,7 +138,7 @@ class CreateFOWGameChannels extends Subcommand {
             .addRolePermissionOverride(gameRoleGMID, permission, 0)
             .complete();
         MessageHelper.sendMessageToChannel(gmChannel, roleGM.getAsMention() + " - gm room");
-        GameCreationHelper.offerGameHomebrewButtons(gmChannel);
+        CreateGameService.offerGameHomebrewButtons(gmChannel);
 
         // CREATE Anon Announcements CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
@@ -221,7 +220,7 @@ class CreateFOWGameChannels extends Subcommand {
     private static boolean serverHasRoomForNewRole(Guild guild) {
         int roleCount = guild.getRoles().size();
         if (roleCount >= 250) {
-            BotLogger.log("`GameCreationHelper.serverHasRoomForNewRole` Cannot create a new role. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
+            BotLogger.log("`CreateGameService.serverHasRoomForNewRole` Cannot create a new role. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
         return true;
@@ -232,7 +231,7 @@ class CreateFOWGameChannels extends Subcommand {
         int channelMax = 500;
         int channelsCountRequiredForNewGame = 2;
         if (channelCount > (channelMax - channelsCountRequiredForNewGame)) {
-            BotLogger.log("`GameCreationHelper.serverHasRoomForNewChannels` Cannot create new channels. Server **" + guild.getName() + "** currently has " + channelCount + " channels.");
+            BotLogger.log("`CreateGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **" + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;
         }
         return true;

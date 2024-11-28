@@ -1660,17 +1660,17 @@ public class MapGenerator implements AutoCloseable {
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnID);
             if (promissoryNote.getSource() == ComponentSource.promises_promises)
             {
-                drawPAImageScaled(x + deltaX, y + 1, "pa_promissory_light_pp.png", 38, 28);
+                drawPAImageScaled(x + deltaX + 1, y + 1, "pa_promissory_light_pp.png", 38, 28);
             }
             else
             {
-                drawPAImageScaled(x + deltaX, y + 1, "pa_promissory_light.png", 38, 28);
+                drawPAImageScaled(x + deltaX + 1, y + 1, "pa_promissory_light.png", 38, 28);
             }
             if (game.isFrankenGame() && !promissoryNote.getFaction().isEmpty()) {
                 drawFactionIconImage(graphics, promissoryNote.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
             }
             boolean greyed = false;
-            if (promissoryNote.getPlayArea())
+            if (!game.isFowMode() && promissoryNote.getPlayArea())
             {
                 found: for (Player player_ : game.getRealPlayers()) {
                     for (String pn_ : player_.getPromissoryNotesInPlayArea()) {
@@ -1746,14 +1746,15 @@ public class MapGenerator implements AutoCloseable {
                 int numInReinforcements = unitCap - count;
                 BufferedImage image = ImageHelper.read(getUnitPath(unitKey));
                 String decal = player.getDecalFile(unitID);
+                BufferedImage decalImage = null;
                 if (decal != null) {
-                    var decalImage = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decal));
-                    for (int i = 0; i < numInReinforcements; i++) {
-                        Point position = reinforcementsPosition.getPosition(unitID);
-                        graphics.drawImage(image, x + position.x, y + position.y, null);
-                        graphics.drawImage(decalImage, x + position.x, y + position.y, null);
-                        if (onlyPaintOneUnit) break;
-                    }
+                    decalImage = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decal));
+                }
+                for (int i = 0; i < numInReinforcements; i++) {
+                    Point position = reinforcementsPosition.getPosition(unitID);
+                    graphics.drawImage(image, x + position.x, y + position.y, null);
+                    if (decalImage != null) {graphics.drawImage(decalImage, x + position.x, y + position.y, null);}
+                    if (onlyPaintOneUnit) break;
                 }
                 String unitName = unitKey.getUnitType().humanReadableName();
                 if (numInReinforcements < 0 && !game.isDiscordantStarsMode() && game.isCcNPlasticLimit()) {
@@ -2020,13 +2021,39 @@ public class MapGenerator implements AutoCloseable {
         String id = "number_" + unitID;
         UnitTokenPosition textPosition = PositionMapper.getReinforcementsPosition(id);
         if (textPosition == null)
+        {
             return;
-
-        String text = "pa_reinforcements_numbers_" + reinforcementsCount;
-        String colorID = Mapper.getColorID(color);
-        text += DrawingUtil.getBlackWhiteFileSuffix(colorID);
+        }
         Point position = textPosition.getPosition(id);
-        drawPAImage(x + position.x, y + position.y, text);
+
+        graphics.setFont(Storage.getFont35());
+        Integer offset = 20 - graphics.getFontMetrics().stringWidth("" + reinforcementsCount) / 2;
+        if (reinforcementsCount <= 0)
+        {
+            graphics.setColor(Color.YELLOW);
+        }
+        else
+        {
+            String colorID = Mapper.getColorID(color);
+            graphics.setColor("_blk.png".equalsIgnoreCase(DrawingUtil.getBlackWhiteFileSuffix(colorID)) ? Color.WHITE : Color.BLACK);
+        }
+        for (int i = -2; i <= 2; i++)
+        {
+            for (int j = (i == -2 || i == 2 ? -1 : -2); j <= (i == -2 || i == 2 ? 1 : 2); j++)
+            {
+                graphics.drawString("" + reinforcementsCount, x + position.x + offset + i, y + position.y + j + 28);
+            }
+        }
+        if (reinforcementsCount <= 0)
+        {
+            graphics.setColor(Color.RED);
+        }
+        else
+        {
+            String colorID = Mapper.getColorID(color);
+            graphics.setColor("_blk.png".equalsIgnoreCase(DrawingUtil.getBlackWhiteFileSuffix(colorID)) ? Color.BLACK : Color.WHITE);
+        }
+        graphics.drawString("" + reinforcementsCount, x + position.x + offset, y + position.y + 28);
     }
 
     private int planetInfo(Player player, int x, int y) {
@@ -4527,6 +4554,10 @@ public class MapGenerator implements AutoCloseable {
     private Point getTilePosition(String position, int x, int y) {
         int ringCount = game.getRingCount();
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
+        if (ringCount == RING_MIN_COUNT)
+        {
+            x += 520/2;
+        }
         if (ringCount < RING_MAX_COUNT) {
             int lower = RING_MAX_COUNT - ringCount;
 
@@ -4677,7 +4708,9 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static int getMapWidth(Game game) {
-        int mapWidth = (getRingCount(game) + 1) * 520 + EXTRA_X * 2;
+        float ringCount = getRingCount(game);
+        ringCount += ringCount == RING_MIN_COUNT ? 1.5 : 1;
+        int mapWidth = (int) (ringCount * 520 + EXTRA_X * 2);
         mapWidth += hasExtraRow(game) ? EXTRA_X : 0;
         return mapWidth;
     }
