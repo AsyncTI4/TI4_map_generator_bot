@@ -1,12 +1,9 @@
 package ti4.listeners;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-
-import javax.annotation.Nonnull;
-
-import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -18,11 +15,11 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
-import ti4.helpers.GameCreationHelper;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -33,6 +30,7 @@ import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.fow.WhisperService;
+import ti4.service.game.CreateGameService;
 
 public class MessageListener extends ListenerAdapter {
 
@@ -55,9 +53,8 @@ public class MessageListener extends ListenerAdapter {
             timeIt(() -> checkIfNewMakingGamesPostAndPostIntroduction(event), "MessageListener#checkIfNewMakingGamesPostAndPostIntroduction", 1000);
             timeIt(() -> handleWhispers(event, message), "MessageListener#handleWhispers", 1000);
             timeIt(() -> handleFogOfWarCombatThreadMirroring(event), "MessageListener#handleFogOfWarCombatThreadMirroring", 1000);
-            timeIt(() -> addFactionEmojiReactionsToMessages(event), "MessageListener#addFactionEmojiReactionsToMessages", 1000);
             timeIt(() -> endOfRoundSummary(event, message), "MessageListener#endOfRoundSummary", 1000);
-            timeIt(() -> saveJSONInTTPGExportsChannel(event), "MessageListener#saveJSONInTTPGExportsChannel", 1000);
+            AsyncTI4DiscordBot.runAsync(() -> addFactionEmojiReactionsToMessages(event));
         } catch (Exception e) {
             BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
         }
@@ -119,7 +116,7 @@ public class MessageListener extends ListenerAdapter {
 
     private static void copyLFGPingstoLFGPingsChannel(MessageReceivedEvent event, Message message) {
         //947310962485108816
-        Role lfgRole = GameCreationHelper.getRole("LFG", event.getGuild());
+        Role lfgRole = CreateGameService.getRole("LFG", event.getGuild());
         if (!event.getAuthor().isBot() && lfgRole != null && event.getChannel() instanceof ThreadChannel && message.getContentRaw().contains(lfgRole.getAsMention())) {
             String msg2 = lfgRole.getAsMention() + " this game is looking for more members (it's old if it has -launched [FULL] in its title) " + message.getJumpUrl();
             TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
@@ -138,30 +135,6 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
         }
-    }
-
-    /**
-     * TTPG-EXPORTS - Save attachment to ttpg_exports folder for later processing
-     */
-    private static void saveJSONInTTPGExportsChannel(MessageReceivedEvent event) {
-        return; // this isn't working right now, but don't want to lose this
-
-        // if ("ttpg-exports".equalsIgnoreCase(event.getChannel().getName())) {
-        //     List<Message.Attachment> attachments = event.getMessage().getAttachments();
-        //     if (!attachments.isEmpty() && "json".equalsIgnoreCase(attachments.getFirst().getFileExtension())) { // write to
-        //         // file
-        //         String currentDateTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuu-MM-dd-HHmmss"));
-        //         String fileName = "ttpgexport_" + currentDateTime + ".json";
-        //         String filePath = Storage.getTTPGExportDirectory() + "/" + fileName;
-        //         File file = new File(filePath);
-        //         CompletableFuture<File> future = attachments.getFirst().getProxy().downloadToFile(file);
-        //         future.exceptionally(error -> { // handle possible errors
-        //             error.printStackTrace();
-        //             return null;
-        //         });
-        //         MessageHelper.sendMessageToChannel(event.getChannel(), "File imported as: `" + fileName + "`");
-        //     }
-        // }
     }
 
     private static void endOfRoundSummary(MessageReceivedEvent event, Message msg) {
