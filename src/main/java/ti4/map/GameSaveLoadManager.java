@@ -197,7 +197,7 @@ public class GameSaveLoadManager {
                     MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(),
                         loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                 } else {
-                    System.out.println("Boop" + loadedGame.getSavedButtons().size());
+                    // System.out.println("Boop" + loadedGame.getSavedButtons().size());
                 }
             } catch (Exception e) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
