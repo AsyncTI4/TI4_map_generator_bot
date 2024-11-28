@@ -595,17 +595,15 @@ public class AutoCompleteProvider {
                     event.replyChoiceStrings("No Active Map for this Channel").queue();
                     return;
                 }
-                if (game.isFowMode()) {
+                if (game.isFowMode() && !game.getFogOfWarGMIDs().contains(event.getUser().getId())) {
                     event.replyChoiceStrings("Game is Fog of War mode - you can't see what you are undoing.").queue();
+                    return;
                 }
-                long datetime = System.currentTimeMillis();
-                List<Command.Choice> options = UndoService.getAllUndoSavedGames(game).entrySet().stream()
-                    .sorted(Map.Entry.<String, Game>comparingByValue(Comparator.comparing(Game::getLastModifiedDate)).reversed())
+
+                List<Command.Choice> options = UndoService.getAllUndoSavedGamesForAutoComplete(game).entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue())
                     .limit(25)
-                    .map(entry -> new Command.Choice(
-                        StringUtils.left(
-                            entry.getKey() + " (" + DateTimeHelper.getTimeRepresentationToSeconds(datetime - entry.getValue().getLastModifiedDate()) + " ago):  " + entry.getValue().getLatestCommand(), 100),
-                        entry.getKey()))
+                    .map(entry -> new Command.Choice(StringUtils.left(entry.getKey() + entry.getValue(), 100), entry.getKey()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
