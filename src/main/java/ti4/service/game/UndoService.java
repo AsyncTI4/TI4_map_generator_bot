@@ -22,7 +22,7 @@ public class UndoService {
     private static final Pattern lastestCommandPattern = Pattern.compile("^(?>latest_command ).*$");
     private static final Pattern lastModifiedPattern = Pattern.compile("^(?>last_modified_date ).*$");
 
-    public static Map<String, String> getAllUndoSavedGamesForAutoComplete(Game game) {
+    public static Map<String, String> getAllUndoSavedGames(Game game) {
         File mapUndoDirectory = Storage.getGameUndoDirectory();
         String gameName = game.getName();
         String gameNameForUndoStart = gameName + "_";
@@ -34,9 +34,8 @@ public class UndoService {
     public static String getLastModifiedDateAndLastCommandTextFromFile(File file) {
         long dateTime = System.currentTimeMillis();
         long fileLastModifiedDate = file.lastModified();
-        System.out.println(DateTimeHelper.getTimeRepresentationToSeconds(fileLastModifiedDate));
 
-        String latestCommand = "Latest Command not Found";
+        String latestCommand = "";
         String lastModifiedDateString = "";
         try {
             List<String> fileLines = Files.readAllLines(file.toPath());
@@ -52,11 +51,11 @@ public class UndoService {
                 .map(s -> StringUtils.substringAfter(s, " "))
                 .map(Long::parseLong)
                 .map(lastModifiedDate -> DateTimeHelper.getTimeRepresentationToSeconds(dateTime - lastModifiedDate))
-                .orElse(DateTimeHelper.getTimeRepresentationToSeconds(fileLastModifiedDate));
+                .orElse(DateTimeHelper.getTimestampFromMillesecondsEpoch(fileLastModifiedDate));
         } catch (Exception e) {
             BotLogger.log("Could not get AutoComplete data from undo file: " + file.getName());
         }
 
-        return "(" + lastModifiedDateString + " ago):  " + latestCommand;
+        return file.getName() + " (" + lastModifiedDateString + " ago):  " + latestCommand;
     }
 }
