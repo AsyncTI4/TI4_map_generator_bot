@@ -94,15 +94,16 @@ public class MessageListener extends ListenerAdapter {
 
     private static Player getPlayer(MessageReceivedEvent event, Game game) {
         Player player = game.getPlayer(event.getAuthor().getId());
-        if (game.isCommunityMode()) {
-            List<Role> roles = event.getMember().getRoles();
-            for (Player player2 : game.getRealPlayers()) {
-                if (roles.contains(player2.getRoleForCommunity())) {
-                    player = player2;
-                }
-                if (player2.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
-                    player = player2;
-                }
+        if (!game.isCommunityMode()) {
+            return player;
+        }
+        List<Role> roles = event.getMember().getRoles();
+        for (Player player2 : game.getRealPlayers()) {
+            if (roles.contains(player2.getRoleForCommunity())) {
+                player = player2;
+            }
+            if (player2.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
+                player = player2;
             }
         }
         return player;
@@ -125,32 +126,32 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private static void checkIfNewMakingGamesPostAndPostIntroduction(MessageReceivedEvent event) {
-        if (event.getChannel() instanceof ThreadChannel channel) {
-            if (channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
-                Game mapreference = GameManager.getGame("finreference");
-                if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
-                    mapreference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
-                    GameSaveLoadManager.saveGame(mapreference, "newChannel");
-                }
-            }
+        if (!(event.getChannel() instanceof ThreadChannel channel) || !channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
+            return;
+        }
+        Game mapreference = GameManager.getGame("finreference");
+        if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
+            mapreference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
+            GameSaveLoadManager.saveGame(mapreference, "newChannel");
         }
     }
 
     private static void endOfRoundSummary(MessageReceivedEvent event, Message msg) {
-        if (msg.getContentRaw().toLowerCase().startsWith("endofround")) {
-            String gameName = event.getChannel().getName();
-            gameName = gameName.replace("Cards Info-", "");
-            gameName = gameName.substring(0, gameName.indexOf("-"));
-            Game game = GameManager.getGame(gameName);
+        if (!msg.getContentRaw().toLowerCase().startsWith("endofround")) {
+            return;
+        }
+        String gameName = event.getChannel().getName();
+        gameName = gameName.replace("Cards Info-", "");
+        gameName = gameName.substring(0, gameName.indexOf("-"));
+        Game game = GameManager.getGame(gameName);
 
-            String messageText = msg.getContentRaw();
-            String messageBeginning = StringUtils.substringBefore(messageText, " ");
-            String messageContent = StringUtils.substringAfter(messageText, " ");
-            if (game != null) {
-                Player player = getPlayer(event, game);
-                RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true, event.getChannel());
-            }
+        String messageText = msg.getContentRaw();
+        String messageBeginning = StringUtils.substringBefore(messageText, " ");
+        String messageContent = StringUtils.substringAfter(messageText, " ");
+        if (game != null) {
+            Player player = getPlayer(event, game);
+            RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true, event.getChannel());
         }
     }
 
@@ -173,7 +174,7 @@ public class MessageListener extends ListenerAdapter {
         String whoIsItTo = StringUtils.substringBetween(messageLowerCase, "to", " ");
         boolean future = whoIsItTo.startsWith("future");
         whoIsItTo = whoIsItTo.replaceFirst("future", "");
-        if (whoIsItTo == null || whoIsItTo.isEmpty()) {
+        if (whoIsItTo.isEmpty()) {
             return;
         }
 
@@ -296,65 +297,66 @@ public class MessageListener extends ListenerAdapter {
         boolean isFowCombatThread = event.getChannel() instanceof ThreadChannel
             && event.getChannel().getName().contains("vs")
             && event.getChannel().getName().contains("private");
-        if (isFowCombatThread) {
-            String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
+        if (!isFowCombatThread) {
+            return;
+        }
+        String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
 
-            Game game = GameManager.getGame(gameName);
-            Player player3 = game.getPlayer(event.getAuthor().getId());
-            if (game.isCommunityMode()) {
-                Collection<Player> players = game.getPlayers().values();
-                List<Role> roles = event.getMember().getRoles();
-                for (Player player2 : players) {
-                    if (roles.contains(player2.getRoleForCommunity())) {
-                        player3 = player2;
-                    }
-
+        Game game = GameManager.getGame(gameName);
+        Player player3 = game.getPlayer(event.getAuthor().getId());
+        if (game.isCommunityMode()) {
+            Collection<Player> players = game.getPlayers().values();
+            List<Role> roles = event.getMember().getRoles();
+            for (Player player2 : players) {
+                if (roles.contains(player2.getRoleForCommunity())) {
+                    player3 = player2;
                 }
+
             }
+        }
 
-            if (game.isFowMode() &&
-                ((player3 != null && player3.isRealPlayer()
-                    && event.getChannel().getName().contains(player3.getColor()) && !event.getAuthor().isBot())
-                    || (event.getAuthor().isBot() && messageText.contains("Total hits ")))) {
+        if (game.isFowMode() &&
+            ((player3 != null && player3.isRealPlayer()
+                && event.getChannel().getName().contains(player3.getColor()) && !event.getAuthor().isBot())
+                || (event.getAuthor().isBot() && messageText.contains("Total hits ")))) {
 
-                String systemPos;
-                if (StringUtils.countMatches(event.getChannel().getName(), "-") > 4) {
-                    systemPos = event.getChannel().getName().split("-")[4];
-                } else {
-                    return;
+            String systemPos;
+            if (StringUtils.countMatches(event.getChannel().getName(), "-") > 4) {
+                systemPos = event.getChannel().getName().split("-")[4];
+            } else {
+                return;
+            }
+            Tile tile = game.getTileByPosition(systemPos);
+            for (Player player : game.getRealPlayers()) {
+                if (player3 != null && player == player3) {
+                    continue;
                 }
-                Tile tile = game.getTileByPosition(systemPos);
-                for (Player player : game.getRealPlayers()) {
-                    if (player3 != null && player == player3) {
-                        continue;
+                if (!tile.getRepresentationForButtons(game, player).contains("(")) {
+                    continue;
+                }
+                MessageChannel pChannel = player.getPrivateChannel();
+                TextChannel pChan = (TextChannel) pChannel;
+                if (pChan != null) {
+                    String threadName = event.getChannel().getName();
+                    boolean combatParticipant = threadName.contains("-" + player.getColor() + "-");
+                    String newMessage = player.getRepresentation(true, combatParticipant) + " Someone said: " + messageText;
+                    if (event.getAuthor().isBot() && messageText.contains("Total hits ")) {
+                        String hits = StringUtils.substringAfter(messageText, "Total hits ");
+                        String location = StringUtils.substringAfter(messageText, "rolls for ");
+                        location = StringUtils.substringBefore(location, " Combat");
+                        newMessage = player.getRepresentation(true, combatParticipant) + " Someone rolled dice for " + location
+                            + " and got a total of **" + hits + " hit" + (hits.equals("1") ? "" : "s");
                     }
-                    if (!tile.getRepresentationForButtons(game, player).contains("(")) {
-                        continue;
+                    if (!event.getAuthor().isBot() && player3 != null && player3.isRealPlayer()) {
+                        newMessage = player.getRepresentation(true, combatParticipant) + " "
+                            + StringUtils.capitalize(player3.getColor()) + " said: " + messageText;
                     }
-                    MessageChannel pChannel = player.getPrivateChannel();
-                    TextChannel pChan = (TextChannel) pChannel;
-                    if (pChan != null) {
-                        String threadName = event.getChannel().getName();
-                        boolean combatParticipant = threadName.contains("-" + player.getColor() + "-");
-                        String newMessage = player.getRepresentation(true, combatParticipant) + " Someone said: " + messageText;
-                        if (event.getAuthor().isBot() && messageText.contains("Total hits ")) {
-                            String hits = StringUtils.substringAfter(messageText, "Total hits ");
-                            String location = StringUtils.substringAfter(messageText, "rolls for ");
-                            location = StringUtils.substringBefore(location, " Combat");
-                            newMessage = player.getRepresentation(true, combatParticipant) + " Someone rolled dice for " + location
-                                + " and got a total of **" + hits + " hit" + (hits.equals("1") ? "" : "s");
-                        }
-                        if (!event.getAuthor().isBot() && player3 != null && player3.isRealPlayer()) {
-                            newMessage = player.getRepresentation(true, combatParticipant) + " "
-                                + StringUtils.capitalize(player3.getColor()) + " said: " + messageText;
-                        }
 
-                        newMessage = newMessage.replace("Total hits", "");
-                        List<ThreadChannel> threadChannels = pChan.getThreadChannels();
-                        for (ThreadChannel threadChannel_ : threadChannels) {
-                            if (threadChannel_.getName().contains(threadName) && threadChannel_ != event.getChannel()) {
-                                MessageHelper.sendMessageToChannel(threadChannel_, newMessage);
-                            }
+                    newMessage = newMessage.replace("Total hits", "");
+                    List<ThreadChannel> threadChannels = pChan.getThreadChannels();
+                    for (ThreadChannel threadChannel_ : threadChannels) {
+                        if (threadChannel_.getName().contains(threadName) && threadChannel_ != event.getChannel()) {
+                            MessageHelper.sendMessageToChannel(threadChannel_, newMessage);
                         }
                     }
                 }
