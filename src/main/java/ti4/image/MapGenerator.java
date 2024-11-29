@@ -2358,7 +2358,7 @@ public class MapGenerator implements AutoCloseable {
             graphics.setColor(Color.WHITE);
             graphics.drawString("" + resources, x + deltaX + 26 + offset, y + 119);
             offset = 10 - graphics.getFontMetrics().stringWidth("" + influence) / 2;
-            graphics.drawString("" + influence, x + deltaX + 26 + offset, y + 141);
+            graphics.drawString("" + influence, x + deltaX + 27 + offset, y + 141);
 
             graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
             if (planetModel.getShrinkNamePNAttach()) {
