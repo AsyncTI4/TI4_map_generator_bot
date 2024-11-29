@@ -12,11 +12,10 @@ import ti4.helpers.TimedRunnable;
 @UtilityClass
 public class CronManager {
 
-    private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 5;
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
     public static void register(Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
-        TimedRunnable timedRunnable = new TimedRunnable(clazz.getName(), runnable);
+        TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
         SCHEDULER.scheduleAtFixedRate(timedRunnable, initialDelay, period, unit);
     }
 

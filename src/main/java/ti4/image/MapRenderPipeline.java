@@ -1,7 +1,6 @@
 package ti4.image;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -10,16 +9,16 @@ import java.util.function.Consumer;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.Nullable;
 import ti4.helpers.DisplayType;
 import ti4.helpers.GlobalSettings;
+import ti4.helpers.TimedRunnable;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 
 public class MapRenderPipeline {
 
-    private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 20;
+    private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 10;
     private static final MapRenderPipeline instance = new MapRenderPipeline();
 
     private final BlockingQueue<RenderEvent> gameRenderQueue = new LinkedBlockingQueue<>();
@@ -61,26 +60,21 @@ public class MapRenderPipeline {
     }
 
     private static void queue(RenderEvent renderEvent) {
-        StopWatch stopWatch = StopWatch.createStarted();
-
-        try (var mapGenerator = new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
-            mapGenerator.draw();
-            if (renderEvent.uploadToDiscord) {
-                uploadToDiscord(mapGenerator, renderEvent.callback());
-            }
-            if (renderEvent.uploadToWebsite) {
-                mapGenerator.uploadToWebsite();
-            }
-        } catch (Exception e) {
-            BotLogger.log("Render event threw an exception. Game '" + renderEvent.game.getName() + "'", e);
-        }
-
-        stopWatch.stop();
-        Duration timeElapsed = stopWatch.getDuration();
-        if (timeElapsed.toSeconds() > EXECUTION_TIME_SECONDS_WARNING_THRESHOLD) {
-            BotLogger.log("Render event for " + renderEvent.game.getName() + " took longer than " + EXECUTION_TIME_SECONDS_WARNING_THRESHOLD +
-                " seconds (" + timeElapsed.toSeconds() + ").");
-        }
+        var timedRunnable = new TimedRunnable("Render event task for " + renderEvent.game.getName(),
+                () -> {
+                    try (var mapGenerator = new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
+                        mapGenerator.draw();
+                        if (renderEvent.uploadToDiscord) {
+                            uploadToDiscord(mapGenerator, renderEvent.callback());
+                        }
+                        if (renderEvent.uploadToWebsite) {
+                            mapGenerator.uploadToWebsite();
+                        }
+                    } catch (Exception e) {
+                        BotLogger.log("Render event threw an exception. Game '" + renderEvent.game.getName() + "'", e);
+                    }
+                });
+        timedRunnable.run();
     }
 
     private static void uploadToDiscord(MapGenerator mapGenerator, Consumer<FileUpload> callback) {
