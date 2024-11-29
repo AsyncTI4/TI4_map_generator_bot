@@ -2103,7 +2103,10 @@ public class Player {
     }
 
     public List<String> getNotResearchedFactionTechs() {
-        return getFactionTechs().stream().filter(tech -> !hasTech(tech)).toList();
+        return getFactionTechs().stream()
+            .filter(tech -> !hasTech(tech))
+            .filter(tech -> !getPurgedTechs().contains(tech))
+            .toList();
     }
 
     public DraftBag getDraftHand() {
@@ -2418,8 +2421,8 @@ public class Player {
     public void purgeTech(String tech) {
         if (techs.contains(tech)) {
             removeTech(tech);
-            purgedTechs.add(tech);
         }
+        purgedTechs.add(tech);
     }
 
     public void addPlanet(String planet) {
