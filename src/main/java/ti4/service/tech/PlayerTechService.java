@@ -59,6 +59,11 @@ public class PlayerTechService {
         MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " removed tech: " + Mapper.getTech(techID).getRepresentation(false));
     }
 
+    public static void purgeTech(GenericInteractionCreateEvent event, Player player, String techID) {
+        player.purgeTech(techID);
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " purged tech: " + Mapper.getTech(techID).getRepresentation(false));
+    }
+
     public static void refreshTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.refreshTech(techID);
         MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " readied tech: " + Mapper.getTech(techID).getRepresentation(false));

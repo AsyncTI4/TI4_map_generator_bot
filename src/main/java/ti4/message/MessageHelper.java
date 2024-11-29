@@ -98,10 +98,18 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageToChannelWithEmbedsAndButtons(MessageChannel channel, String messageText, List<MessageEmbed> embeds, List<Button> buttons) {
+		if (messageText.contains("NO_UNDO")) {
+			messageText = messageText.replaceFirst("NO_UNDO", "");
+			splitAndSent(messageText, channel, embeds, buttons);
+			return;
+		}
+
+		// Add UNDO button
 		Game game = getGameFromChannelName(channel.getName());
 		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")
 			&& !messageText.contains("end of turn ability") && game != null && game.isUndoButtonOffered()) {
 			buttons = addUndoButtonToList(buttons, game);
+
 		}
 		splitAndSent(messageText, channel, embeds, buttons);
 	}
@@ -109,31 +117,35 @@ public class MessageHelper {
 	public static List<Button> addUndoButtonToList(List<Button> buttons, Game game) {
 		if (game == null) return buttons;
 
-		boolean undoPresent = false;
-		List<Button> newButtons = new ArrayList<>(buttons);
 		for (Button button : buttons) {
 			if (button.getId().contains("ultimateUndo")) {
-				undoPresent = true;
+				return buttons;
 			}
 		}
 		File mapUndoDirectory = Storage.getGameUndoDirectory();
-		if (mapUndoDirectory.exists() && !undoPresent) {
-			String mapName = game.getName();
-			String mapNameForUndoStart = mapName + "_";
-			String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
-			if (mapUndoFiles != null && mapUndoFiles.length > 0) {
-				try {
-					List<Integer> numbers = Arrays.stream(mapUndoFiles)
-						.map(fileName -> fileName.replace(mapNameForUndoStart, ""))
-						.map(fileName -> fileName.replace(Constants.TXT, ""))
-						.map(Integer::parseInt).toList();
-					int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
-					newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
-				} catch (Exception e) {
-					BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
-				}
-			}
+		if (!mapUndoDirectory.exists()) {
+			return buttons;
 		}
+
+		String mapName = game.getName();
+		String mapNameForUndoStart = mapName + "_";
+		String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+		if (mapUndoFiles == null || mapUndoFiles.length == 0) {
+			return buttons;
+		}
+
+		List<Button> newButtons = new ArrayList<>(buttons);
+		try {
+			List<Integer> numbers = Arrays.stream(mapUndoFiles)
+				.map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+				.map(fileName -> fileName.replace(Constants.TXT, ""))
+				.map(Integer::parseInt).toList();
+			int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
+			newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
+		} catch (Exception e) {
+			BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
+		}
+
 		return newButtons;
 	}
 
@@ -526,7 +538,7 @@ public class MessageHelper {
 		// GET CARDS INFO THREAD
 		ThreadChannel threadChannel = player.getCardsInfoThread();
 
-        sendMessageToChannel(threadChannel, messageText);
+		sendMessageToChannel(threadChannel, messageText);
 	}
 
 	/**

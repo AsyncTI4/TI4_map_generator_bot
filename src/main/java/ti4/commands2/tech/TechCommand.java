@@ -15,6 +15,7 @@ public class TechCommand implements ParentCommand {
     private final Map<String, Subcommand> subcommands = Stream.of(
             new TechAdd(),
             new TechRemove(),
+            new TechPurge(),
             new TechExhaust(),
             new TechRefresh(),
             new TechInfo(),
@@ -30,7 +31,7 @@ public class TechCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Add/remove/exhaust/ready Technologies";
+        return "Add/remove/exhaust/ready/purge Technologies";
     }
 
     @Override

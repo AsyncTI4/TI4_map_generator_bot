@@ -13,6 +13,6 @@ class GameOptions extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        GameOptionService.offerGameOptionButtons(event.getChannel());
+        GameOptionService.offerGameOptionButtons(getGame(), event.getChannel());
     }
 }
