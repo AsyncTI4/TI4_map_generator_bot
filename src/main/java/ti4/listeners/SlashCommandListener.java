@@ -32,7 +32,7 @@ public class SlashCommandListener extends ListenerAdapter {
             return;
         }
         event.getInteraction().deferReply().queue();
-        AsyncTI4DiscordBot.runAsync(() -> process(event));
+        AsyncTI4DiscordBot.runAsync("Slash command task", () -> process(event));
     }
     
     private static void process(SlashCommandInteractionEvent event) {

@@ -40,6 +40,7 @@ import ti4.helpers.GlobalSettings;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
+import ti4.helpers.TimedRunnable;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -56,6 +57,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.processors.ButtonProcessor;
 import ti4.selections.SelectionManager;
+import ti4.service.statistics.StatisticsPipeline;
 
 import static org.reflections.scanners.Scanners.SubTypes;
 
@@ -194,6 +196,7 @@ public class AsyncTI4DiscordBot {
 
         // LOAD GAMES
         BotLogger.logWithTimestamp(" LOADING GAMES");
+        // LOAD GAMES NAMES
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
         GameSaveLoadManager.loadGame();
         GameSaveLoadManager.cleanupOldUndoFiles();
@@ -206,6 +209,7 @@ public class AsyncTI4DiscordBot {
         // START MAP GENERATION
         ImageIO.setUseCache(false);
         MapRenderPipeline.start();
+        StatisticsPipeline.start();
         ButtonProcessor.start();
 
         // START CRONS
@@ -228,7 +232,7 @@ public class AsyncTI4DiscordBot {
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS, WAITING 10 SECONDS FOR COMPLETION");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
-                if (shutdown()) {
+                if (shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.logWithTimestamp("FINISHED PROCESSING ASYNC THREADPOOL");
                 } else {
                     BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
@@ -242,6 +246,11 @@ public class AsyncTI4DiscordBot {
                     BotLogger.logWithTimestamp("FINISHED RENDERING MAPS");
                 } else {
                     BotLogger.logWithTimestamp("DID NOT FINISH RENDERING MAPS");
+                }
+                if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
+                    BotLogger.logWithTimestamp("DONE PROCESSING STATISTICS");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING STATISTICS");
                 }
                 CronManager.shutdown(); // will wait for up to an additional 20 seconds
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS COMPLETE");
@@ -349,8 +358,9 @@ public class AsyncTI4DiscordBot {
         });
     }
 
-    public static void runAsync(Runnable runnable) {
-        THREAD_POOL.submit(runnable);
+    public static void runAsync(String name, Runnable runnable) {
+        var timedRunnable = new TimedRunnable(name, runnable);
+        THREAD_POOL.submit(timedRunnable);
     }
 
     public static List<Category> getAvailablePBDCategories() {
@@ -372,6 +382,11 @@ public class AsyncTI4DiscordBot {
         return classes;
     }
 
+
+    public static Guild getGuild(String guildId) {
+        return guilds.stream().filter(guild -> guild.getId().equals(guildId)).findFirst().orElse(null);
+    }
+  
     public static boolean shutdown() {
         THREAD_POOL.shutdown();
         try {

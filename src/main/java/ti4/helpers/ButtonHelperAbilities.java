@@ -34,6 +34,8 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class ButtonHelperAbilities {
 
     public static void autoneticMemoryStep1(Game game, Player player, int count) {
@@ -1030,7 +1032,7 @@ public class ButtonHelperAbilities {
             UnitHolder planetUnit = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             Planet planetReal = (Planet) planetUnit;
             List<Button> buttons = new ArrayList<>();
-            if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)
+            if (planetReal != null && isNotBlank(planetReal.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)
                 && FoWHelper.playerHasUnitsOnPlanet(player, game.getTileFromPlanet(planet), planet)) {
                 List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
 

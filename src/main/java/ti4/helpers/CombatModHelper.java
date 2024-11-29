@@ -177,15 +177,13 @@ public class CombatModHelper {
         return new ArrayList<>(set);
     }
 
-    public static Integer getCombinedModifierForUnit(UnitModel unit, Integer numOfUnit,
-        List<NamedCombatModifierModel> modifiers, Player player,
-        Player opponent, Game game, List<UnitModel> playerUnits, List<UnitModel> opponentUnits,
-        CombatRollType rollType, Tile tile) {
+    public static Integer getCombinedModifierForUnit(UnitModel unit, Integer numOfUnit, List<NamedCombatModifierModel> modifiers, Player player,
+                                                     Player opponent, Game game, List<UnitModel> playerUnits, CombatRollType rollType, Tile tile) {
         int modsValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
             if (modifier.isInScopeForUnit(unit, playerUnits, rollType, game, player)) {
-                Integer modValue = getVariableModValue(modifier, player, opponent, game, opponentUnits, unit, tile);
+                Integer modValue = getVariableModValue(modifier, player, opponent, game, unit, tile);
                 Integer perUnitCount = 1;
                 if (modifier.getApplyEachForQuantity()) {
                     perUnitCount = numOfUnit;
@@ -369,19 +367,8 @@ public class CombatModHelper {
         return meetsCondition;
     }
 
-    ///
-    /// The amount of the mod is usually static (eg +2 fighters)
-    /// But for some (mostly flagships), the value is scaled depending on game state
-    /// like how many fragments you have
-    /// or how many POs the opponent has scored that you haven't etc.
-    ///
-    public static Integer getVariableModValue(CombatModifierModel mod, Player player, Player opponent,
-        Game game, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit) {
-        return getVariableModValue(mod, player, opponent, game, opponentUnitsInCombat, origUnit, null);
-    }
-
-    public static Integer getVariableModValue(CombatModifierModel mod, Player player, Player opponent,
-        Game game, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit, Tile activeSystem) {
+    public static Integer getVariableModValue(CombatModifierModel mod, Player player, Player opponent, Game game,
+                                                UnitModel origUnit, Tile activeSystem) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
         long scalingCount = 0;
@@ -429,10 +416,10 @@ public class CombatModHelper {
                     scalingCount = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false);
                 }
                 case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP -> {
-                    scalingCount += ButtonHelper.checkNumberNonFighterShips(opponent, game, activeSystem);
+                    scalingCount += ButtonHelper.checkNumberNonFighterShips(opponent, activeSystem);
                 }
                 case "combat_round" -> {
-                    int round = 0;
+                    int round;
                     String combatName = "combatRoundTracker" + player.getFaction() + activeSystem.getPosition() + "space";
                     if (game.getStoredValue(combatName).isEmpty()) {
                         round = 0;

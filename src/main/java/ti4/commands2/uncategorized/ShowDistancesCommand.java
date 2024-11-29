@@ -67,7 +67,7 @@ public class ShowDistancesCommand extends GameStateCommand {
         int maxDistance = event.getOption(Constants.MAX_DISTANCE, 10, OptionMapping::getAsInt);
         game.setTileDistances(CheckDistanceHelper.getTileDistances(game, player, tile.getPosition(), maxDistance, true));
 
-        MapRenderPipeline.render(game, event, DisplayType.map,
+        MapRenderPipeline.queue(game, event, DisplayType.map,
                 fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 }

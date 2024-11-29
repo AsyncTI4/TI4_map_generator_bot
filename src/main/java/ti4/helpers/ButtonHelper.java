@@ -103,6 +103,8 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class ButtonHelper {
 
     public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
@@ -135,7 +137,7 @@ public class ButtonHelper {
         return false;
     }
 
-    public static void resolveInfantryDeath(Game game, Player player, int amount) {
+    public static void resolveInfantryDeath(Player player, int amount) {
         if (player.hasInf2Tech()) {
             for (int x = 0; x < amount; x++) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), rollInfantryRevival(player));
@@ -1164,7 +1166,7 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static List<Button> getAllTechsToReady(Game game, Player player) {
+    public static List<Button> getAllTechsToReady(Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getExhaustedTechs()) {
             buttons.add(Buttons.green("biostimsReady_tech_" + tech, "Ready " + Mapper.getTechs().get(tech).getName()));
@@ -1314,7 +1316,7 @@ public class ButtonHelper {
     public static void updateMap(Game game, GenericInteractionCreateEvent event, String message) {
         String threadName = game.getName() + "-bot-map-updates";
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
-        MapRenderPipeline.render(game, event, DisplayType.all, fileUpload -> {
+        MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
             boolean foundSomething = false;
             if (!game.isFowMode()) {
                 for (ThreadChannel threadChannel_ : threadChannels) {
@@ -1500,7 +1502,7 @@ public class ButtonHelper {
         return count;
     }
 
-    public static int checkNumberNonFighterShips(Player player, Game game, Tile tile) {
+    public static int checkNumberNonFighterShips(Player player, Tile tile) {
         int count = 0;
         UnitHolder space = tile.getUnitHolders().get("space");
         for (UnitKey unit : space.getUnits().keySet()) {
@@ -1533,7 +1535,7 @@ public class ButtonHelper {
         return count;
     }
 
-    public static int checkNumberNonFighterShipsWithoutSpaceCannon(Player player, Game game, Tile tile) {
+    public static int checkNumberNonFighterShipsWithoutSpaceCannon(Player player, Tile tile) {
         int count = 0;
         UnitHolder space = tile.getUnitHolders().get("space");
         for (UnitKey unit : space.getUnits().keySet()) {
@@ -2164,8 +2166,9 @@ public class ButtonHelper {
             if (onlyReady && player.getExhaustedPlanets().contains(plan)) {
                 continue;
             }
-            if (game.getPlanetsInfo().get(plan) != null && game.getPlanetsInfo().get(plan).getOriginalPlanetType() != null) {
-                List<Button> planetButtons = getPlanetExplorationButtons(game, game.getPlanetsInfo().get(plan), player);
+            var planet = game.getPlanetsInfo().get(plan);
+            if (planet != null && isNotBlank(planet.getOriginalPlanetType())) {
+                List<Button> planetButtons = getPlanetExplorationButtons(game, planet, player);
                 buttons.addAll(planetButtons);
             }
         }
@@ -2176,8 +2179,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         for (String plan : player.getPlanetsAllianceMode()) {
             Planet planetReal = game.getPlanetsInfo().get(plan);
-            if (planetReal != null && planetReal.getOriginalPlanetType() != null
-                && !player.getExhaustedPlanets().contains(planetReal.getName())) {
+            if (planetReal != null && isNotBlank(planetReal.getOriginalPlanetType()) && !player.getExhaustedPlanets().contains(planetReal.getName())) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
             }
@@ -3294,7 +3296,7 @@ public class ButtonHelper {
             }
         }
         if (doesPlayerHaveFSHere("lanefir_flagship", player, tile)) {
-            List<Button> button2 = scanlinkResolution(player, game, event);
+            List<Button> button2 = scanlinkResolution(player, game);
             if (!button2.isEmpty()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
                     + "Due to the Memory of Dusk (the Lanefir flagship), you may explore a planet you control in the system.");
@@ -3311,10 +3313,10 @@ public class ButtonHelper {
                 }
                 Planet planetReal = (Planet) planetUnit;
                 String planet = planetReal.getName();
-                if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)
-                    && Helper.getProductionValueOfUnitHolder(player, game, tile, planetUnit) > 0
-                    && !game.getStoredValue(player.getFaction() + "planetsExplored")
-                        .contains(planetUnit.getName() + "*")) {
+                if (isNotBlank(planetReal.getOriginalPlanetType())
+                        && player.getPlanetsAllianceMode().contains(planet)
+                        && Helper.getProductionValueOfUnitHolder(player, game, tile, planetUnit) > 0
+                        && !game.getStoredValue(player.getFaction() + "planetsExplored").contains(planetUnit.getName() + "*")) {
                     List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
                     buttons.addAll(planetButtons);
                 }
@@ -3445,8 +3447,7 @@ public class ButtonHelper {
                     Tile tile2 = game.getTileByPosition(pos);
                     for (Planet uH : tile2.getPlanetUnitHolders()) {
                         String planet = uH.getName();
-                        if (uH.getOriginalPlanetType() != null
-                            && player.getPlanetsAllianceMode().contains(planet)) {
+                        if (isNotBlank(uH.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)) {
                             List<Button> planetButtons = getPlanetExplorationButtons(game, uH, player);
                             buttons.addAll(planetButtons);
                         }
@@ -3585,7 +3586,7 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static List<Button> scanlinkResolution(Player player, Game game, ButtonInteractionEvent event) {
+    public static List<Button> scanlinkResolution(Player player, Game game) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
@@ -3594,7 +3595,7 @@ public class ButtonHelper {
             }
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
-            if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)
+            if (isNotBlank(planetReal.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)
                 && FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
@@ -3612,7 +3613,7 @@ public class ButtonHelper {
             }
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
-            if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)) {
+            if (isNotBlank(planetReal.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
             }
@@ -5682,7 +5683,7 @@ public class ButtonHelper {
     }
 
     public static void showFeatureType(GenericInteractionCreateEvent event, Game game, DisplayType feature) {
-        MapRenderPipeline.render(game, event, feature,
+        MapRenderPipeline.queue(game, event, feature,
             fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 
@@ -5694,7 +5695,7 @@ public class ButtonHelper {
         List<Player> playersWithPds2 = new ArrayList<>();
         if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game)
             && player.hasAbility("starfall_gunnery")
-            && checkNumberNonFighterShipsWithoutSpaceCannon(player, game, game.getTileByPosition(tilePos)) > 0) {
+            && checkNumberNonFighterShipsWithoutSpaceCannon(player, game.getTileByPosition(tilePos)) > 0) {
             playersWithPds2.add(player);
         }
         for (String adjTilePos : adjTiles) {
@@ -6210,8 +6211,8 @@ public class ButtonHelper {
 
         for (String planet : player.getPlanets()) {
             Planet planetReal = game.getPlanetsInfo().get(planet.toLowerCase());
-            boolean oneOfThree = planetReal != null
-                && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
+            boolean oneOfThree = planetReal != null && isNotBlank(planetReal.getOriginalPlanetType()) &&
+                List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
             if (!ignoredPlanets.contains(planet.toLowerCase()) && !oneOfThree) {
                 return game.getTileFromPlanet(planet);
             }

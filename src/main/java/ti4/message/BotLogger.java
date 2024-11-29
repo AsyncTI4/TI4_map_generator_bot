@@ -3,8 +3,6 @@ package ti4.message;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -15,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
@@ -119,7 +118,7 @@ public class BotLogger {
                 String channelName = event.getChannel().getName();
                 String channelMention = event.getChannel().getAsMention();
                 String commandString = slashCommandInteractionEvent.getCommandString();
-                String message = "[" + channelName + "](" + channelMention + ") " + event.getUser().getEffectiveName() + "used: `" + commandString + "`\n> Error: " + msg;
+                String message = "[" + channelName + "](" + channelMention + ") " + event.getUser().getEffectiveName() + " used: `" + commandString + "`\n> Error: " + msg;
                 if (e == null) {
                     botLogChannel.sendMessage(message).queue();
                 } else {
@@ -200,11 +199,10 @@ public class BotLogger {
             }
             if (buttonLogThread == null) return;
 
-            StringBuilder sb = new StringBuilder();
-            sb.append(event.getUser().getEffectiveName()).append(" ");
-            sb.append(ButtonHelper.getButtonRepresentation(event.getButton()));
-            sb.append(event.getMessage().getJumpUrl());
-            MessageHelper.sendMessageToChannel(buttonLogThread, sb.toString());
+            String sb = event.getUser().getEffectiveName() + " " +
+                ButtonHelper.getButtonRepresentation(event.getButton()) +
+                event.getMessage().getJumpUrl();
+            MessageHelper.sendMessageToChannel(buttonLogThread, sb);
         } catch (Exception e) {
             // Do nothing
         }

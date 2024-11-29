@@ -246,7 +246,7 @@ public class PromissoryNoteHelper {
             ButtonHelperFactionSpecific.offerAutomatonsButtons(player, game, event);
         }
         if ("dspnbent".equalsIgnoreCase(id)) {
-            ButtonHelperFactionSpecific.offerBentorPNButtons(player, game, event);
+            ButtonHelperFactionSpecific.offerBentorPNButtons(player, game);
         }
         if ("dspngled".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerGledgeBaseButtons(player, game);
