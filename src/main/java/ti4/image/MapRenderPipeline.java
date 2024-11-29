@@ -60,8 +60,7 @@ public class MapRenderPipeline {
     }
 
     private static void queue(RenderEvent renderEvent) {
-        new TimedRunnable("Render event task",
-                EXECUTION_TIME_SECONDS_WARNING_THRESHOLD,
+        var timedRunnable = new TimedRunnable("Render event task for " + renderEvent.game.getName(),
                 () -> {
                     try (var mapGenerator = new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
                         mapGenerator.draw();
@@ -75,6 +74,7 @@ public class MapRenderPipeline {
                         BotLogger.log("Render event threw an exception. Game '" + renderEvent.game.getName() + "'", e);
                     }
                 });
+        timedRunnable.run();
     }
 
     private static void uploadToDiscord(MapGenerator mapGenerator, Consumer<FileUpload> callback) {
