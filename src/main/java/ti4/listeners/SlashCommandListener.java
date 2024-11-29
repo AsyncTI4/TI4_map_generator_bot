@@ -24,13 +24,17 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class SlashCommandListener extends ListenerAdapter {
+    
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
             event.getInteraction().reply("Please try again in a moment.\nThe bot is rebooting and is not ready to receive commands.").setEphemeral(true).queue();
-            return;
         }
-
+        event.getInteraction().deferReply().queue();
+        AsyncTI4DiscordBot.runAsync(() -> process(event));
+    }
+    
+    private static void process(SlashCommandInteractionEvent event) {
         long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
 
         long startTime = System.currentTimeMillis();
@@ -43,7 +47,7 @@ public class SlashCommandListener extends ListenerAdapter {
             && !event.getInteraction().getName().equals(Constants.SEARCH)
             && !event.getInteraction().getName().equals(Constants.TIGL)
             && (event.getInteraction().getSubcommandName() == null
-                || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
+            || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
             && event.getOption(Constants.GAME_NAME) == null) {
 
             boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
@@ -61,9 +65,6 @@ public class SlashCommandListener extends ListenerAdapter {
             }
         }
 
-        long deferTime = System.currentTimeMillis();
-        event.getInteraction().deferReply().queue();
-
         Member member = event.getMember();
         if (member != null) {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
@@ -75,7 +76,7 @@ public class SlashCommandListener extends ListenerAdapter {
                     || event.getInteraction().getName().equals(Constants.BOTHELPER)
                     || event.getInteraction().getName().equals(Constants.DEVELOPER)
                     || (event.getInteraction().getSubcommandName() != null && event.getInteraction()
-                        .getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
+                    .getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
                     || event.getInteraction().getName().equals(Constants.SEARCH)
                     || !(!event.getInteraction().getName().equals(Constants.USER) && !event.getInteraction().getName().equals(Constants.SHOW_GAME))
                     || event.getOption(Constants.GAME_NAME) != null;
