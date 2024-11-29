@@ -6,6 +6,7 @@ import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
+import java.awt.RenderingHints;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -258,7 +259,7 @@ public class MapGenerator implements AutoCloseable {
         if (debug) debugDiscordTime = StopWatch.createStarted();
         AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(game.getName()));
         game.incrementMapImageGenerationCount();
-        FileUpload fileUpload = createFileUpload(mainImage, .2f, game.getName());
+        FileUpload fileUpload = createFileUpload(mainImage, 0.25f, game.getName());
         if (debug) debugDiscordTime.stop();
         return fileUpload;
     }
@@ -560,6 +561,11 @@ public class MapGenerator implements AutoCloseable {
         int deltaX = 0;
         List<Player> players = new ArrayList<>(game.getPlayers().values());
         int yDelta = 0;
+        
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setRenderingHint(
+            RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
         // GAME MODES
         int deltaY = -150;
@@ -628,7 +634,6 @@ public class MapGenerator implements AutoCloseable {
 
         if (displayTypeBasic == DisplayType.all || displayTypeBasic == DisplayType.stats) {
             graphics.setFont(Storage.getFont32());
-            Graphics2D g2 = (Graphics2D) graphics;
             int realX = x;
             Map<UnitKey, Integer> unitCount = new HashMap<>();
             for (Player player : players) {
@@ -2343,7 +2348,7 @@ public class MapGenerator implements AutoCloseable {
             graphics.setColor(Color.WHITE);
             graphics.drawString("" + resources, x + deltaX + 26 + offset, y + 119);
             offset = 10 - graphics.getFontMetrics().stringWidth("" + influence) / 2;
-            graphics.drawString("" + influence, x + deltaX + 26 + offset, y + 141);
+            graphics.drawString("" + influence, x + deltaX + 27 + offset, y + 141);
 
             graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
             if (planetModel.getShrinkNamePNAttach()) {
