@@ -15,7 +15,7 @@ class AddLaw extends GameStateSubcommand {
 
     public AddLaw() {
         super(Constants.ADD_LAW, "Add Agenda as Law", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected PO or anything other than Faction"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Elected Faction").setAutoComplete(true));
     }

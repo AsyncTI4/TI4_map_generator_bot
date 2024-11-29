@@ -16,7 +16,7 @@ class ReviseLaw extends GameStateSubcommand {
 
     public ReviseLaw() {
         super(Constants.REVISE_LAW, "Revise a law", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected PO or anything other than Faction"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Elected Faction").setAutoComplete(true));
     }
