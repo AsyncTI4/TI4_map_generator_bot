@@ -31,7 +31,7 @@ public class SlashCommandListener extends ListenerAdapter {
             event.getInteraction().reply("Please try again in a moment.\nThe bot is rebooting and is not ready to receive commands.").setEphemeral(true).queue();
         }
         event.getInteraction().deferReply().queue();
-        AsyncTI4DiscordBot.runAsync(() -> process(event));
+        AsyncTI4DiscordBot.runAsync("Slash command task", () -> process(event));
     }
     
     private static void process(SlashCommandInteractionEvent event) {
