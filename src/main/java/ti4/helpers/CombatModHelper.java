@@ -177,10 +177,8 @@ public class CombatModHelper {
         return new ArrayList<>(set);
     }
 
-    public static Integer getCombinedModifierForUnit(UnitModel unit, Integer numOfUnit,
-        List<NamedCombatModifierModel> modifiers, Player player,
-        Player opponent, Game game, List<UnitModel> playerUnits,
-        CombatRollType rollType, Tile tile) {
+    public static Integer getCombinedModifierForUnit(UnitModel unit, Integer numOfUnit, List<NamedCombatModifierModel> modifiers, Player player,
+                                                     Player opponent, Game game, List<UnitModel> playerUnits, CombatRollType rollType, Tile tile) {
         int modsValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
