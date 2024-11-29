@@ -681,6 +681,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_UNIT_TAGS + " " + game.isShowUnitTags());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_OWNED_PNS_IN_PLAYER_AREA + " " + game.isShowOwnedPNsInPlayerArea());
+        writer.write(System.lineSeparator());
 
         writer.write(Constants.AC_DECK_ID + " " + game.getAcDeckID());
         writer.write(System.lineSeparator());
@@ -1980,6 +1982,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setShowUnitTags(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.SHOW_OWNED_PNS_IN_PLAYER_AREA -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        game.setShowOwnedPNsInPlayerArea(value);
                     } catch (Exception e) {
                         // Do nothing
                     }

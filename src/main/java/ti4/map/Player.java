@@ -2103,7 +2103,10 @@ public class Player {
     }
 
     public List<String> getNotResearchedFactionTechs() {
-        return getFactionTechs().stream().filter(tech -> !hasTech(tech)).toList();
+        return getFactionTechs().stream()
+            .filter(tech -> !hasTech(tech))
+            .filter(tech -> !getPurgedTechs().contains(tech))
+            .toList();
     }
 
     public DraftBag getDraftHand() {
@@ -2347,8 +2350,7 @@ public class Player {
         }
     }
 
-    // Provided because people make mistakes, also nekro exists, also weird homebrew
-    // exists
+    // Provided because people make mistakes, also nekro exists, also weird homebrew exists
     private void doAdditionalThingsWhenRemovingTech(String techID) {
         // Remove Custodia Vigilia when un-researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
@@ -2411,15 +2413,16 @@ public class Player {
 
     public void removeTech(String tech) {
         exhaustedTechs.remove(tech);
-        techs.remove(tech);
-        doAdditionalThingsWhenRemovingTech(tech);
+        if (techs.remove(tech)) {
+            doAdditionalThingsWhenRemovingTech(tech);
+        }
     }
 
     public void purgeTech(String tech) {
         if (techs.contains(tech)) {
             removeTech(tech);
-            purgedTechs.add(tech);
         }
+        purgedTechs.add(tech);
     }
 
     public void addPlanet(String planet) {
