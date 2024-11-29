@@ -14,13 +14,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.statistics.GameStatTypes;
@@ -67,33 +66,31 @@ import ti4.service.map.MapPresetService;
 
 public class AutoCompleteProvider {
 
-    public static void startNewAutoCompleteThread(CommandAutoCompleteInteractionEvent event) {
-        new Thread(() -> {
-            try {
-                long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
-                long startTime = System.currentTimeMillis();
+    public static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
+        try {
+            long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
+            long startTime = System.currentTimeMillis();
 
-                resolveAutoCompleteEvent(event);
+            resolveAutoCompleteEvent(event);
 
-                long endTime = System.currentTimeMillis();
-                final int milliThreshhold = 2000;
-                if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
-                    String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
-                    String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
-                    String message = event.getChannel().getAsMention() + " " + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: " +
-                        "This AutoComplete event took over " + milliThreshhold + "ms to respond or execute\n> " +
-                        DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " event received\n> " +
-                        DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
-                        DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
-                    BotLogger.log(message);
-                }
-            } catch (Exception e) {
-                BotLogger.log("Error in resolveAutoCompleteEvent", e);
+            long endTime = System.currentTimeMillis();
+            final int milliThreshold = 2000;
+            if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
+                String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
+                String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+                String message = event.getChannel().getAsMention() + " " + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: " +
+                    "This AutoComplete event took over " + milliThreshold + "ms to respond or execute\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " event received\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
+                BotLogger.log(message);
             }
-        }).start();
+        } catch (Exception e) {
+            BotLogger.log("Error in handleAutoCompleteEvent", e);
+        }
     }
 
-    public static void resolveAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
+    private static void resolveAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         String commandName = event.getName();
         String subCommandName = event.getSubcommandName();
         String optionName = event.getFocusedOption().getName();
