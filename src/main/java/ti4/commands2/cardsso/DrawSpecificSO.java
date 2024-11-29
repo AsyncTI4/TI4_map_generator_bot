@@ -17,7 +17,7 @@ class DrawSpecificSO extends GameStateSubcommand {
 
     public DrawSpecificSO() {
         super(Constants.DRAW_SPECIFIC_SO, "Draw specific SO", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "SO ID").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "SO ID").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do draw SO. Default yourself"));
         addOptions(new OptionData(OptionType.STRING, Constants.PURGE_SO, "Enter YES to purge SO instead of drawing it"));
     }
@@ -42,7 +42,7 @@ class DrawSpecificSO extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "SO not retrieved");
             return;
         }
-        MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand - please check `/ac info`");
+        MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand");
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
     }
 }

@@ -11,7 +11,7 @@ class ScoreSO extends GameStateSubcommand {
 
     public ScoreSO() {
         super(Constants.SCORE_SO, "Score Secret Objective", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true).setAutoComplete(true));
     }
 
     @Override
