@@ -26,11 +26,11 @@ import ti4.service.game.CreateGameService;
 class CreateGameButtonHandler {
 
     @ButtonHandler("createGameChannels")
-    public static void decodeButtonMsg(ButtonInteractionEvent event) {
-        AsyncTI4DiscordBot.runAsync(() -> decodeButtonMessage(event));
+    public static void createGameChannelsButton(ButtonInteractionEvent event) {
+        AsyncTI4DiscordBot.runAsync("Create game channels button task", () -> createGameChannels(event));
     }
 
-    private static void decodeButtonMessage(ButtonInteractionEvent event) {
+    private static void createGameChannels(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " pressed the [Create Game] button");
         Game mapreference = GameManager.getGame("finreference");
 

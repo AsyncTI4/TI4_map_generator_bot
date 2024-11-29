@@ -16,7 +16,7 @@ class OfferAFKTimeOptions extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
-        PlayerPreferenceHelper.offerAFKTimeOptions(getGame(), player);
+        PlayerPreferenceHelper.offerAFKTimeOptions(player);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Offered AFK options to " + player.getFactionEmoji());
     }
 }

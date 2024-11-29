@@ -47,6 +47,9 @@ import ti4.model.ShipPositionModel;
 import ti4.model.UnitModel;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class TileGenerator {
 
     private static final int TILE_PADDING = 100;
@@ -663,7 +666,7 @@ public class TileGenerator {
                     int mod = (game.playerHasLeaderUnlockedOrAlliance(player, "kolumecommander") ? 1 : 0);
 
                     if (player.hasAbility("starfall_gunnery")) {
-                        for (int i = ButtonHelper.checkNumberNonFighterShipsWithoutSpaceCannon(player, game, tile); i > 0; i--) {
+                        for (int i = ButtonHelper.checkNumberNonFighterShipsWithoutSpaceCannon(player, tile); i > 0; i--) {
                             diceCount.add(8 - mod);
                         }
                     }
@@ -827,13 +830,13 @@ public class TileGenerator {
                 for (Planet planet : tile.getPlanetUnitHolders()) {
                     String traitFile = "";
                     List<String> traits = planet.getPlanetType();
-                    if (traits.isEmpty()) {
+                    if (traits.isEmpty() && isNotBlank(planet.getOriginalPlanetType())) {
                         traits.add(planet.getOriginalPlanetType());
                     }
 
                     if (tile.isMecatol()) {
                         traitFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
-                    } else if (planet.getOriginalPlanetType().equals("faction")) {
+                    } else if ("faction".equalsIgnoreCase(planet.getOriginalPlanetType())) {
                         traitFile = ResourceHelper.getInstance().getFactionFile(Mapper.getPlanet(planet.getName()).getFactionHomeworld() + ".png");
                     } else if (traits.size() == 1) {
                         String t = planet.getPlanetType().getFirst();
@@ -917,7 +920,8 @@ public class TileGenerator {
                 boolean anySkips = false;
                 for (Planet planet : tile.getPlanetUnitHolders()) {
                     List<String> skips = planet.getTechSpeciality();
-                    if (!skips.contains(planet.getOriginalTechSpeciality())) {
+                    String originalTechSpeciality = planet.getOriginalTechSpeciality();
+                    if (isNotBlank(originalTechSpeciality) && !skips.contains(originalTechSpeciality)) {
                         skips.add(planet.getOriginalTechSpeciality());
                     }
                     skips.removeAll(Collections.singleton(null));
@@ -1251,8 +1255,7 @@ public class TileGenerator {
         }
     }
 
-    private static void addSleeperToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder,
-        Function<String, Boolean> isValid, Game game) {
+    private static void addSleeperToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Function<String, Boolean> isValid, Game game) {
         BufferedImage tokenImage;
         Point centerPosition = unitHolder.getHolderCenterPosition();
         if (unitHolder.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3 + 1)) {
@@ -1262,7 +1265,7 @@ public class TileGenerator {
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.remove(null);
         tokenList.sort((o1, o2) -> {
-            if ((o1.contains(Constants.SLEEPER) || o2.contains(Constants.SLEEPER))) {
+            if (o1.contains(Constants.SLEEPER) || o2.contains(Constants.SLEEPER)) {
                 return -1;
             } else if (o1.contains(Constants.DMZ_LARGE) || o2.contains(Constants.DMZ_LARGE)) {
                 return 1;
@@ -1270,7 +1273,7 @@ public class TileGenerator {
             return o1.compareTo(o2);
         });
         if (game.isShowBubbles() && unitHolder instanceof Planet planetHolder && shouldPlanetHaveShield(unitHolder, game)) {
-            String tokenPath = switch (planetHolder.getContrastColor()) {
+            String tokenPath = switch (defaultString(planetHolder.getContrastColor())) {
                 case "orange" -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield_orange.png");
                 default -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
             };

@@ -1,16 +1,7 @@
 package ti4.image;
 
-import static ti4.image.ImageHelper.writeCompressedFormat;
-
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -39,20 +30,17 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import javax.imageio.ImageIO;
-
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands2.CommandHelper;
@@ -93,13 +81,16 @@ import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
-import ti4.model.StrategyCardModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.fow.FowConstants;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 import ti4.website.WebsiteOverlay;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static ti4.image.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator implements AutoCloseable {
 
@@ -2181,7 +2172,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
             Point position1 = PositionMapper.getTilePosition(tile1.getPosition());
-            Integer distance1 = ((homePosition.x - position1.x) * (homePosition.x - position1.x)
+            int distance1 = ((homePosition.x - position1.x) * (homePosition.x - position1.x)
                 + (homePosition.y - position1.y) * (homePosition.y - position1.y)) / 4000;
             Tile tile2 = game.getTileFromPlanet(planet2);
             if (tile2.getTileID().equals("51")) {
@@ -2191,7 +2182,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
             Point position2 = PositionMapper.getTilePosition(tile2.getPosition());
-            Integer distance2 = ((homePosition.x - position2.x) * (homePosition.x - position2.x)
+            int distance2 = ((homePosition.x - position2.x) * (homePosition.x - position2.x)
                 + (homePosition.y - position2.y) * (homePosition.y - position2.y)) / 4000;
             if (distance1 != distance2) {
                 return distance1 - distance2;
@@ -2230,7 +2221,6 @@ public class MapGenerator implements AutoCloseable {
         try {
             Planet planet = planetsInfo.get(planetName);
             PlanetModel planetModel = planet.getPlanetModel();
-            if (planet == null) return deltaX;
 
             boolean isExhausted = exhaustedPlanets.contains(planetName);
             graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
@@ -2310,7 +2300,7 @@ public class MapGenerator implements AutoCloseable {
             }
 
             String originalTechSpeciality = planet.getOriginalTechSpeciality();
-            if (!originalTechSpeciality.isEmpty() && !hasBentorEncryptionKey) {
+            if (isNotBlank(originalTechSpeciality) && !hasBentorEncryptionKey) {
                 String planetTechSkip = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
                 drawPlanetCardDetail(x + deltaX + 26, y + 82, planetTechSkip);
             } else if (!hasBentorEncryptionKey) {
@@ -2337,7 +2327,7 @@ public class MapGenerator implements AutoCloseable {
             drawPlanetCardDetail(x + deltaX + 26, y + 125, infFileName);
 
             graphics.setFont(Storage.getFont16());
-            Integer offset = 11 - graphics.getFontMetrics().stringWidth("" + resources) / 2;
+            int offset = 11 - graphics.getFontMetrics().stringWidth("" + resources) / 2;
             if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                 graphics.setColor(Color.BLACK);
                 for (int i = -1; i <= 1; i++) {
@@ -2375,9 +2365,6 @@ public class MapGenerator implements AutoCloseable {
         List<String> techs = player.getTechs();
         List<String> exhaustedTechs = player.getExhaustedTechs();
         List<String> purgedTechs = player.getPurgedTechs();
-        // if (techs.isEmpty()) {
-        // return y;
-        // }
 
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
@@ -3663,7 +3650,7 @@ public class MapGenerator implements AutoCloseable {
                     String traitFile = "";
                     List<String> traits = planetReal.getPlanetType();
 
-                    if (planetReal.getOriginalPlanetType().equals("faction") && traits.isEmpty()) {
+                    if ("faction".equalsIgnoreCase(planetReal.getOriginalPlanetType()) && traits.isEmpty()) {
                         if (custodiaVigilia.getFactionHomeworld() == null) {
                             traitFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
                         } else {
@@ -3672,8 +3659,7 @@ public class MapGenerator implements AutoCloseable {
                     } else if (traits.size() == 1) {
                         String t = planetReal.getPlanetType().getFirst();
                         traitFile = ResourceHelper.getInstance().getGeneralFile(("" + t.charAt(0)).toUpperCase() + t.substring(1).toLowerCase() + ".png");
-                    } else if (traits.isEmpty()) {
-                    } else {
+                    } else if (!traits.isEmpty()) {
                         String t = "";
                         t += traits.contains("cultural") ? "C" : "";
                         t += traits.contains("hazardous") ? "H" : "";
@@ -4644,7 +4630,7 @@ public class MapGenerator implements AutoCloseable {
         String secondRow = text.substring(firstRow.length()).replace("\n", "");
         secondRow = trimTextToPixelWidth(graphics, secondRow, maxWidth);
         drawTextVertically(graphics, firstRow, x, y, graphics.getFont(), rightAlign);
-        if (StringUtils.isNotBlank(secondRow)) {
+        if (isNotBlank(secondRow)) {
             drawTextVertically(graphics, secondRow, x + spacing, y, graphics.getFont(), rightAlign);
         }
     }

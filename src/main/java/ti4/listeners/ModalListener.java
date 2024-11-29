@@ -38,7 +38,7 @@ public class ModalListener extends ListenerAdapter {
             return;
         }
         event.deferEdit().queue();
-        AsyncTI4DiscordBot.runAsync(() -> {
+        AsyncTI4DiscordBot.runAsync("Modal listener task", () -> {
             long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
             long startTime = System.currentTimeMillis();
             try {

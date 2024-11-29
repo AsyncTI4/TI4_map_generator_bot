@@ -22,6 +22,7 @@ import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 class AverageTurnTime extends Subcommand {
@@ -94,11 +95,12 @@ class AverageTurnTime extends Subcommand {
     }
 
     private void mapPlayerTurnTimes(Map<String, Entry<Integer, Long>> playerTurnTimes, Map<String, Set<Long>> playerAverageTurnTimes, Game game) {
-        for (var player : game.getRealPlayers()) {
-            Integer totalTurns = game.getPlayer(player.getUserID()).getNumberTurns();
-            Long totalTurnTime = game.getPlayer(player.getUserID()).getTotalTurnTime();
+        for (Player player : game.getRealPlayers()) {
+            Integer totalTurns = player.getNumberTurns();
+            Long totalTurnTime = player.getTotalTurnTime();
             Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
-            playerTurnTimes.merge(player.getUserID(), playerTurnTime, (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerTurnTime.getKey(), oldEntry.getValue() + playerTurnTime.getValue()));
+            playerTurnTimes.merge(player.getUserID(), playerTurnTime,
+                (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerTurnTime.getKey(), oldEntry.getValue() + playerTurnTime.getValue()));
 
             if (playerTurnTime.getKey() == 0) continue;
             Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
@@ -140,7 +142,7 @@ class AverageTurnTime extends Subcommand {
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
         Map<String, Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
         Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
-        for (var game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
+        for (Game game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
             mapPlayerTurnTimes(playerTurnTimes, playerAverageTurnTimes, game);
         }
         return playerTurnTimes;
