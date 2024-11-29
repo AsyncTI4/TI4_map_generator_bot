@@ -27,43 +27,47 @@ import ti4.message.MessageHelper;
 
 public class UserJoinServerListener extends ListenerAdapter {
 
-    private static boolean validateEvent(GenericGuildEvent event) {
-        String eventGuild = event.getGuild().getId();
-        List<String> asyncGuilds = AsyncTI4DiscordBot.guilds.stream().map(Guild::getId).toList();
-        // Do not process these events in guilds that we aren't initialized in
-        return asyncGuilds.contains(eventGuild);
-    }
-
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
         if (!validateEvent(event)) return;
-        try {
-            checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
-        } catch (Exception e) {
-            BotLogger.log("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
-        }
+        AsyncTI4DiscordBot.runAsync(() -> {
+            try {
+                checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
+            } catch (Exception e) {
+                BotLogger.log("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
+            }
+        });
     }
 
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
         if (!validateEvent(event)) return;
-        try {
-            event.getGuild().retrieveAuditLogs().queueAfter(1, TimeUnit.SECONDS, (logs) -> {
-                boolean voluntary = true;
-                for (AuditLogEntry log : logs) {
-                    if (log.getTargetIdLong() == event.getUser().getIdLong()) {
-                        if (log.getType() == ActionType.BAN || log.getType() == ActionType.KICK) {
-                            voluntary = false;
-                            break;
+        AsyncTI4DiscordBot.runAsync(() -> {
+            try {
+                event.getGuild().retrieveAuditLogs().queueAfter(1, TimeUnit.SECONDS, (logs) -> {
+                    boolean voluntary = true;
+                    for (AuditLogEntry log : logs) {
+                        if (log.getTargetIdLong() == event.getUser().getIdLong()) {
+                            if (log.getType() == ActionType.BAN || log.getType() == ActionType.KICK) {
+                                voluntary = false;
+                                break;
+                            }
                         }
                     }
-                }
 
-                checkIfUserLeftActiveGames(event.getGuild(), event.getUser(), voluntary);
-            }, BotLogger::catchRestError);
-        } catch (Exception e) {
-            BotLogger.log("Error in `UserJoinServerListener.onGuildMemberRemove`", e);
-        }
+                    checkIfUserLeftActiveGames(event.getGuild(), event.getUser(), voluntary);
+                }, BotLogger::catchRestError);
+            } catch (Exception e) {
+                BotLogger.log("Error in `UserJoinServerListener.onGuildMemberRemove`", e);
+            }
+        });
+    }
+
+    private static boolean validateEvent(GenericGuildEvent event) {
+        String eventGuild = event.getGuild().getId();
+        List<String> asyncGuilds = AsyncTI4DiscordBot.guilds.stream().map(Guild::getId).toList();
+        // Do not process these events in guilds that we aren't initialized in
+        return asyncGuilds.contains(eventGuild);
     }
 
     private void checkIfNewUserIsInExistingGamesAndAutoAddRole(Guild guild, User user) {

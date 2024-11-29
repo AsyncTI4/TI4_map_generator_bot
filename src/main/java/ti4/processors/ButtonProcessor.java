@@ -97,12 +97,12 @@ public class ButtonProcessor {
         }
 
         long endTime = System.currentTimeMillis();
-        final int milliThreshhold = 3000;
-        if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
+        final int milliThreshold = 3000;
+        if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
             String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
             String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
             String message = "[" + event.getChannel().getName() + "](" + event.getMessage().getJumpUrl() + ") " + event.getUser().getEffectiveName() + " pressed button: " + ButtonHelper.getButtonRepresentation(event.getButton()) +
-                "\n> Warning: This button took over " + milliThreshhold + "ms to respond or execute\n> " +
+                "\n> Warning: This button took over " + milliThreshold + "ms to respond or execute\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " button was pressed by user\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
