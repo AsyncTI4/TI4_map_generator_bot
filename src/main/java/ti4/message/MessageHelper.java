@@ -98,7 +98,7 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageToChannelWithEmbedsAndButtons(MessageChannel channel, String messageText, List<MessageEmbed> embeds, List<Button> buttons) {
-		if (messageText.contains("NO_UNDO")) {
+		if (messageText != null && messageText.contains("NO_UNDO")) {
 			messageText = messageText.replaceFirst("NO_UNDO", "");
 			splitAndSent(messageText, channel, embeds, buttons);
 			return;
