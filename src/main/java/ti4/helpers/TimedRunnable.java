@@ -14,7 +14,7 @@ public class TimedRunnable implements Runnable {
     public TimedRunnable(String name, Runnable delegate) {
         this.name = Objects.requireNonNull(name, "Runnable name cannot be null");
         this.delegate = Objects.requireNonNull(delegate, "Runnable cannot be null");
-        warningThresholdSeconds = 20;
+        warningThresholdSeconds = 5;
     }
 
     public TimedRunnable(String name, Runnable delegate, int warningThresholdSeconds) {
