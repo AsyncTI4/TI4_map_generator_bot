@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jetbrains.annotations.Nullable;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -15,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -115,7 +114,7 @@ public class StartCombatService {
     }
 
     public static void startGroundCombat(Player player, Player player2, Game game, GenericInteractionCreateEvent event, UnitHolder unitHolder, Tile tile) {
-        String threadName = combatThreadName(game, player, player2, tile);
+        String threadName = combatThreadName(game, player, player2, tile, null);
         if (!game.isFowMode()) {
             findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,
                 threadName, tile, event, "ground", unitHolder.getName());
@@ -157,7 +156,7 @@ public class StartCombatService {
                                                     GenericInteractionCreateEvent event, String spaceOrGround, String unitHolderName) {
         ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
         if (threadName == null)
-            threadName = combatThreadName(game, player1, player2, tile);
+            threadName = combatThreadName(game, player1, player2, tile, null);
         if (!game.isFowMode()) {
             channel = game.getMainGameChannel();
         }
@@ -980,22 +979,6 @@ public class StartCombatService {
                 sb.append("-vs-").append(player2.getFaction());
             }
             sb.append(specialCombatTitle != null ? specialCombatTitle : "");
-        }
-        return sb.toString();
-    }
-
-    private static String combatThreadName(Game game, Player player1, @Nullable Player player2, Tile tile) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(game.getName()).append("-round-").append(game.getRound()).append("-system-")
-            .append(tile.getPosition()).append("-turn-").append(player1.getInRoundTurnCount()).append("-");
-        if (game.isFowMode()) {
-            sb.append(player1.getColor());
-            if (player2 != null)
-                sb.append("-vs-").append(player2.getColor()).append("-private");
-        } else {
-            sb.append(player1.getFaction());
-            if (player2 != null)
-                sb.append("-vs-").append(player2.getFaction());
         }
         return sb.toString();
     }
