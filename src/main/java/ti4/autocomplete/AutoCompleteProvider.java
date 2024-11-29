@@ -115,6 +115,7 @@ public class AutoCompleteProvider {
             case Constants.EVENT -> resolveEventAutoComplete(event, subCommandName, optionName, player);
             case Constants.EXPLORE -> resolveExploreAutoComplete(event, subCommandName, optionName, game);
             case Constants.STATUS -> resolveStatusAutoComplete(event, subCommandName, optionName, game);
+            case Constants.AGENDA -> resolveAgendaAutoComplete(event, subCommandName, optionName, game);
         }
 
         // DON'T APPLY GENERIC HANDLING IF SPECIFIC HANDLING WAS APPLIED
@@ -1076,6 +1077,34 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+        }
+    }
+
+    private static void resolveAgendaAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Game game) {
+        if (Constants.AGENDA_ID.equals(optionName)) {
+            switch (subCommandName) {
+                case Constants.ADD_LAW, Constants.PUT_DISCARD_BACK_INTO_DECK -> { // Agendas in Discard
+                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                    List<Command.Choice> options = game.getDiscardAgendas().entrySet().stream()
+                        .filter(entry -> (entry.getValue() + entry.getKey()).toLowerCase().contains(enteredValue))
+                        .sorted(Map.Entry.comparingByKey())
+                        .limit(25)
+                        .map(e -> new Command.Choice(e.getValue() + " - " + e.getKey(), e.getValue()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
+                case Constants.REVISE_LAW, Constants.ADD_CONTROL_TOKEN, Constants.REMOVE_LAW -> { // Agendas In Play
+                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                    List<Command.Choice> options = game.getLaws().entrySet().stream()
+                        .filter(entry -> (entry.getValue() + entry.getKey()).toLowerCase().contains(enteredValue))
+                        .sorted(Map.Entry.comparingByKey())
+                        .limit(25)
+                        .map(e -> new Command.Choice(e.getValue() + " - " + e.getKey(), e.getValue()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
+            }
+
         }
     }
 }
