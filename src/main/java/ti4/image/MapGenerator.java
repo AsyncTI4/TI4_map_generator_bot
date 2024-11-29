@@ -1671,6 +1671,10 @@ public class MapGenerator implements AutoCloseable {
 
         for (String pnID : ownedPNs) {
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnID);
+            if (!game.isShowOwnedPNsInPlayerArea() && promissoryNote.getFaction().isEmpty()) {
+                continue;
+            }
+            
             if (promissoryNote.getSource() == ComponentSource.promises_promises) {
                 drawPAImageScaled(x + deltaX + 1, y + 1, "pa_promissory_light_pp.png", 38, 28);
             } else {
