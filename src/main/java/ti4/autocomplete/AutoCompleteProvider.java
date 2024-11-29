@@ -14,13 +14,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.uncategorized.ServerPromoteCommand;
@@ -66,7 +65,31 @@ import ti4.service.statistics.game.GameStatTypes;
 
 public class AutoCompleteProvider {
 
-    public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
+    public static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
+        try {
+            long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
+            long startTime = System.currentTimeMillis();
+
+            resolveAutoCompleteEvent(event);
+
+            long endTime = System.currentTimeMillis();
+            final int milliThreshold = 2000;
+            if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
+                String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
+                String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+                String message = event.getChannel().getAsMention() + " " + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: " +
+                    "This AutoComplete event took over " + milliThreshold + "ms to respond or execute\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " event received\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
+                BotLogger.log(message);
+            }
+        } catch (Exception e) {
+            BotLogger.log("Error in handleAutoCompleteEvent", e);
+        }
+    }
+
+    private static void resolveAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         String commandName = event.getName();
         String subCommandName = event.getSubcommandName();
         String optionName = event.getFocusedOption().getName();
@@ -569,17 +592,15 @@ public class AutoCompleteProvider {
                     event.replyChoiceStrings("No Active Map for this Channel").queue();
                     return;
                 }
-                if (game.isFowMode()) {
+                if (game.isFowMode() && !game.getFogOfWarGMIDs().contains(event.getUser().getId())) {
                     event.replyChoiceStrings("Game is Fog of War mode - you can't see what you are undoing.").queue();
+                    return;
                 }
-                long datetime = System.currentTimeMillis();
+
                 List<Command.Choice> options = UndoService.getAllUndoSavedGames(game).entrySet().stream()
-                    .sorted(Map.Entry.<String, Game>comparingByValue(Comparator.comparing(Game::getLastModifiedDate)).reversed())
+                    .sorted(Map.Entry.<String, String>comparingByValue().reversed())
                     .limit(25)
-                    .map(entry -> new Command.Choice(
-                        StringUtils.left(
-                            entry.getKey() + " (" + DateTimeHelper.getTimeRepresentationToSeconds(datetime - entry.getValue().getLastModifiedDate()) + " ago):  " + entry.getValue().getLatestCommand(), 100),
-                        entry.getKey()))
+                    .map(entry -> new Command.Choice(StringUtils.left(entry.getValue(), 100), entry.getKey()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }

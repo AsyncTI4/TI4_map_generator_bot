@@ -2382,7 +2382,6 @@ public class Player {
             // }
             if (relevantTechs.isEmpty() && unitModel.getBaseType() != null) {
                 // No other relevant unit upgrades
-                System.out.println("boop");
                 FactionModel factionSetup = getFactionSetupInfo();
                 replacementUnit = factionSetup.getUnits().stream().map(Mapper::getUnit)
                     .map(UnitModel::getId)
