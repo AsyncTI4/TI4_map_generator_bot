@@ -528,11 +528,8 @@ public class FoWHelper {
 				}
 				for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
 					if (tokenName.contains(wh.getWhString())) {
-						wormholeIDs.add(wh.getWhString());
-						if (!wh.toString().contains("eta") || wh.toString().contains("beta")) {
 							wormholeIDs.add(wh.toString());
-						}
-						break;
+  						break;
 					}
 				}
 			}
@@ -569,7 +566,8 @@ public class FoWHelper {
 				Set<String> tokenList = unitHolder.getTokenList();
 				for (String token : tokenList) {
 					for (String wormholeID : wormholeIDs) {
-						if (token.contains(wormholeID) && !(wormholeID.equals("eta") && token.contains("beta"))) {
+						if (token.contains(wormholeID) && !(wormholeID.equals("eta") 
+              && (token.contains("beta") || token.contains("theta") || token.contains("zeta") ))) {
 							adjacentPositions.add(position_);
 						}
 					}
