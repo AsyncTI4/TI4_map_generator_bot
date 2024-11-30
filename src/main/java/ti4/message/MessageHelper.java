@@ -76,11 +76,11 @@ public class MessageHelper {
 		sendMessageToChannel(event.getMessageChannel(), messageText);
 	}
 
-	public static void sendMessageToBotLogChannel(GenericInteractionCreateEvent event, String messageText) {
+	public static void sendMessageToEventServerBotLogChannel(GenericInteractionCreateEvent event, String messageText) {
 		splitAndSent(messageText, BotLogger.getBotLogChannel(event));
 	}
 
-	public static void sendMessageToBotLogChannel(String messageText) {
+	public static void sendMessageToPrimaryBotLogChannel(String messageText) {
 		splitAndSent(messageText, BotLogger.getPrimaryBotLogChannel());
 	}
 

@@ -33,7 +33,7 @@ public class LogCacheStatsCron {
         var cacheStats = cacheNameToCache.entrySet().stream()
                 .map(entry -> cacheStatsToString(entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining("\n\n"));
-        MessageHelper.sendMessageToBotLogChannel("```\n" + cacheStats + "\n```");
+        MessageHelper.sendMessageToPrimaryBotLogChannel("```\n" + cacheStats + "\n```");
     }
 
     private static String cacheStatsToString(String name, Cache<?, ?> cache) {

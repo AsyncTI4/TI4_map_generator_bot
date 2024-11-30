@@ -18,6 +18,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.GlobalSettings;
+import ti4.helpers.ThreadGetter;
 import ti4.helpers.ThreadHelper;
 import ti4.selections.SelectionMenuProvider;
 
@@ -178,30 +179,10 @@ public class BotLogger {
         TextChannel primaryBotLogChannel = getPrimaryBotLogChannel();
         if (primaryBotLogChannel == null) return;
         try {
-            List<ThreadChannel> threadChannels = primaryBotLogChannel.getThreadChannels();
             String threadName = "button-log";
-            ThreadChannel buttonLogThread = null;
-            // SEARCH FOR EXISTING OPEN THREAD
-            for (ThreadChannel threadChannel : threadChannels) {
-                if (threadChannel.getName().equals(threadName)) {
-                    buttonLogThread = threadChannel;
-                }
-            }
+            ThreadChannel buttonLogThread = ThreadGetter.getThreadInChannel(primaryBotLogChannel, threadName);
 
-            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-            if (buttonLogThread == null) {
-                List<ThreadChannel> hiddenThreadChannels = primaryBotLogChannel.retrieveArchivedPrivateThreadChannels().complete();
-                for (ThreadChannel threadChannel : hiddenThreadChannels) {
-                    if (threadChannel.getName().equals(threadName)) {
-                        buttonLogThread = threadChannel;
-                    }
-                }
-            }
-            if (buttonLogThread == null) return;
-
-            String sb = event.getUser().getEffectiveName() + " " +
-                ButtonHelper.getButtonRepresentation(event.getButton()) +
-                event.getMessage().getJumpUrl();
+            String sb = event.getUser().getEffectiveName() + " " + ButtonHelper.getButtonRepresentation(event.getButton()) + event.getMessage().getJumpUrl();
             MessageHelper.sendMessageToChannel(buttonLogThread, sb);
         } catch (Exception e) {
             // Do nothing
@@ -212,30 +193,10 @@ public class BotLogger {
         TextChannel primaryBotLogChannel = getPrimaryBotLogChannel();
         if (primaryBotLogChannel == null) return;
         try {
-            List<ThreadChannel> threadChannels = primaryBotLogChannel.getThreadChannels();
             String threadName = "slash-command-log";
-            ThreadChannel slashCommandLogThread = null;
-            // SEARCH FOR EXISTING OPEN THREAD
-            for (ThreadChannel threadChannel : threadChannels) {
-                if (threadChannel.getName().equals(threadName)) {
-                    slashCommandLogThread = threadChannel;
-                }
-            }
+            ThreadChannel slashCommandLogThread = ThreadGetter.getThreadInChannel(primaryBotLogChannel, threadName);
 
-            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-            if (slashCommandLogThread == null) {
-                List<ThreadChannel> hiddenThreadChannels = primaryBotLogChannel.retrieveArchivedPrivateThreadChannels().complete();
-                for (ThreadChannel threadChannel : hiddenThreadChannels) {
-                    if (threadChannel.getName().equals(threadName)) {
-                        slashCommandLogThread = threadChannel;
-                    }
-                }
-            }
-            if (slashCommandLogThread == null) return;
-
-            String sb = event.getUser().getEffectiveName() + " " +
-                "`" + event.getCommandString() + "` " +
-                commandResponseMessage.getJumpUrl();
+            String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + commandResponseMessage.getJumpUrl();
             MessageHelper.sendMessageToChannel(slashCommandLogThread, sb);
         } catch (Exception e) {
             // Do nothing
