@@ -18,13 +18,14 @@ import ti4.commands2.Command;
 import ti4.commands2.CommandManager;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
+import ti4.helpers.ThreadGetter;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class SlashCommandListener extends ListenerAdapter {
-    
+
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
@@ -34,7 +35,7 @@ public class SlashCommandListener extends ListenerAdapter {
         event.getInteraction().deferReply().queue();
         AsyncTI4DiscordBot.runAsync("Slash command task", () -> process(event));
     }
-    
+
     private static void process(SlashCommandInteractionEvent event) {
         long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
 
@@ -48,7 +49,7 @@ public class SlashCommandListener extends ListenerAdapter {
             && !event.getInteraction().getName().equals(Constants.SEARCH)
             && !event.getInteraction().getName().equals(Constants.TIGL)
             && (event.getInteraction().getSubcommandName() == null
-            || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
+                || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
             && event.getOption(Constants.GAME_NAME) == null) {
 
             boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
@@ -71,28 +72,7 @@ public class SlashCommandListener extends ListenerAdapter {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
             event.getChannel().sendMessage(commandText).queue(m -> {
                 BotLogger.logSlashCommand(event, m);
-                Game userActiveGame = GameManager.getUserActiveGame(userID);
-                boolean harmless = event.getInteraction().getName().equals(Constants.HELP)
-                    || event.getInteraction().getName().equals(Constants.STATISTICS)
-                    || event.getInteraction().getName().equals(Constants.BOTHELPER)
-                    || event.getInteraction().getName().equals(Constants.DEVELOPER)
-                    || (event.getInteraction().getSubcommandName() != null && event.getInteraction()
-                    .getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
-                    || event.getInteraction().getName().equals(Constants.SEARCH)
-                    || !(!event.getInteraction().getName().equals(Constants.USER) && !event.getInteraction().getName().equals(Constants.SHOW_GAME))
-                    || event.getOption(Constants.GAME_NAME) != null;
-                if (userActiveGame != null && !userActiveGame.isFowMode() && !harmless
-                    && userActiveGame.getName().contains("pbd") && !userActiveGame.getName().contains("pbd1000") && !userActiveGame.getName().contains("pbd100two")) {
-                    if (event.getMessageChannel() instanceof ThreadChannel thread) {
-                        if (!thread.isPublic()) {
-                            reportSusSlashCommand(event, m);
-                        }
-                    } else if (event.getMessageChannel() != userActiveGame.getActionsChannel()
-                        && event.getMessageChannel() != userActiveGame.getTableTalkChannel()
-                        && !event.getMessageChannel().getName().contains("bot-map-updates")) {
-                        reportSusSlashCommand(event, m);
-                    }
-                }
+                checkIfShouldReportSusSlashCommand(event, userID, m);
             }, BotLogger::catchRestError);
         }
 
@@ -126,25 +106,40 @@ public class SlashCommandListener extends ListenerAdapter {
         }
     }
 
-    private static void reportSusSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
-        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary
-            .getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
-        if (bothelperLoungeChannel == null)
-            return;
-        List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
-        if (threadChannels.isEmpty())
-            return;
-        String threadName = "sus-slash-commands";
-        // SEARCH FOR EXISTING OPEN THREAD
-        for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equals(threadName)) {
-                String sb = event.getUser().getEffectiveName() + " " +
-                    "`" + event.getCommandString() + "` " +
-                    commandResponseMessage.getJumpUrl();
-                MessageHelper.sendMessageToChannel(threadChannel_, sb);
-                break;
-            }
+    private static void checkIfShouldReportSusSlashCommand(SlashCommandInteractionEvent event, String userID, Message m) {
+        Game game = GameManager.getUserActiveGame(userID);
+        if (game == null) return;
+        if (game.isFowMode()) return;
+
+        final List<String> harmlessCommands = List.of(Constants.HELP, Constants.STATISTICS, Constants.BOTHELPER, Constants.DEVELOPER, Constants.SEARCH, Constants.USER, Constants.SHOW_GAME);
+        if (harmlessCommands.contains(event.getInteraction().getName())) return;
+
+        final List<String> harmlessSubcommands = List.of(Constants.CREATE_GAME_BUTTON);
+        if (event.getInteraction().getSubcommandName() != null && harmlessSubcommands.contains(event.getInteraction().getSubcommandName())) return;
+
+        final List<String> harmlessCommandOptions = List.of(Constants.GAME_NAME);
+        if (harmlessCommandOptions.stream().anyMatch(cmd -> event.getOption(cmd) != null)) return;
+
+        final List<String> excludedGames = List.of("pbd1000", "pbd100two");
+        if (excludedGames.contains(game.getName())) return;
+
+        boolean isPrivateThread = (event.getMessageChannel() instanceof ThreadChannel thread && !thread.isPublic());
+        boolean isGameChannel = event.getMessageChannel() != game.getActionsChannel()
+            && event.getMessageChannel() != game.getTableTalkChannel()
+            && !event.getMessageChannel().getName().contains("bot-map-updates");
+
+        if (isPrivateThread || isGameChannel) {
+            reportSusSlashCommand(event, m);
         }
+    }
+
+    private static void reportSusSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
+        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
+        if (bothelperLoungeChannel == null) return;
+        ThreadChannel threadChannel = ThreadGetter.getThreadInChannel(bothelperLoungeChannel, "sus-slash-commands", true, true);
+        String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + commandResponseMessage.getJumpUrl();
+        MessageHelper.sendMessageToChannel(threadChannel, sb);
+
     }
 
     public static boolean setActiveGame(MessageChannel channel, String userID, String eventName, String subCommandName) {
