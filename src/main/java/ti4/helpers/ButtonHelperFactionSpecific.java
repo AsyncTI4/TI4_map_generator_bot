@@ -31,6 +31,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.AgendaModel;
 import ti4.model.ExploreModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
@@ -38,6 +39,7 @@ import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 import ti4.service.game.StartPhaseService;
+import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.planet.AddPlanetService;
@@ -647,7 +649,7 @@ public class ButtonHelperFactionSpecific {
             if (unitHolder instanceof Planet) {
                 if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
                     int numff = unitHolder.getUnitCount(UnitType.Fighter, player.getColor());
-                    AddUnitService.addUnits(event,  tile, game, player.getColor(),numff + " ff");
+                    AddUnitService.addUnits(event, tile, game, player.getColor(), numff + " ff");
                     RemoveUnitService.removeUnits(event, tile, game, player.getColor(), numff + " ff " + unitHolder.getName());
                 }
             }
@@ -1093,7 +1095,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getRepresentationUnfogged() + " put 1 captured " + unit + " in the space area of "
                 + tile.getRepresentationForButtons(game, player) + " using Shroud of Lith abiility");
-        AddUnitService.addUnits(event, tile, game, player.getColor(),unit);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), unit);
         if (!player.getNomboxTile().getUnitHolders().get("space").getUnits()
             .containsKey(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor()))) {
             ButtonHelper.deleteTheOneButton(event);
@@ -1576,7 +1578,7 @@ public class ButtonHelperFactionSpecific {
         String planet = buttonID;
         String message = player.getFactionEmojiOrColor() + " replaced " + Emojis.pds + " on " + Helper.getPlanetRepresentation(planet, game) + " with a " + Emojis.flagship;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planet)), game, player.getColor(),  "flagship");
+        AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planet)), game, player.getColor(), "flagship");
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), player.getColor());
         game.getTile(AliasHandler.resolveTile(planet)).removeUnit(planet, unitKey, 1);
         event.getMessage().delete().queue();
@@ -2496,5 +2498,66 @@ public class ButtonHelperFactionSpecific {
         ButtonHelperAgents.resolveArtunoCheck(player, game, toGain);
 
         event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("edynCommanderSODraw")
+    public static void edynCommanderSODraw(ButtonInteractionEvent event, Player player, Game game) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " you don't have Kadryn, the Edyn commander, silly.");
+        }
+        String message = "Drew A Secret Objective instead of scoring PO, using Kadryn, the Edyn commander.";
+        game.drawSecretObjective(player.getUserID());
+        if (player.hasAbility("plausible_deniability")) {
+            game.drawSecretObjective(player.getUserID());
+            message += ". Drew a second SO due to Plausible Deniability";
+        }
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
+        ButtonHelper.addReaction(event, false, false, message, "");
+    }
+
+    @ButtonHandler("quash")
+    public static void quash(ButtonInteractionEvent event, Player player, Game game) {
+        int stratCC = player.getStrategicCC();
+        player.setStrategicCC(stratCC - 1);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            "Quashed agenda. Strategic CCs went from " + stratCC + " -> " + (stratCC - 1));
+        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Quash");
+        String agendaCount = game.getStoredValue("agendaCount");
+        int aCount = 0;
+        if (agendaCount.isEmpty()) {
+            aCount = 0;
+        } else {
+            aCount = Integer.parseInt(agendaCount) - 1;
+        }
+        game.setStoredValue("agendaCount", aCount + "");
+        String agendaid = game.getCurrentAgendaInfo().split("_")[2];
+        if ("CL".equalsIgnoreCase(agendaid)) {
+            String id2 = game.revealAgenda(false);
+            Map<String, Integer> discardAgendas = game.getDiscardAgendas();
+            AgendaModel agendaDetails = Mapper.getAgenda(id2);
+            String agendaName = agendaDetails.getName();
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                "# The hidden agenda was " + agendaName + "! You may find it in the discard.");
+        }
+        AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("nullificationField_")
+    public static void nullificationField(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String pos = buttonID.split("_")[1];
+        String color = buttonID.split("_")[2];
+        Tile tile = game.getTileByPosition(pos);
+        Player attacker = game.getPlayerFromColorOrFaction(color);
+        ButtonHelper.resolveNullificationFieldUse(player, attacker, game, tile, event);
+    }
+
+    @ButtonHandler("mahactMechHit_")
+    public static void mahactMechHit(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String pos = buttonID.split("_")[1];
+        String color = buttonID.split("_")[2];
+        Tile tile = game.getTileByPosition(pos);
+        Player attacker = game.getPlayerFromColorOrFaction(color);
+        ButtonHelper.resolveMahactMechAbilityUse(player, attacker, game, tile, event);
     }
 }

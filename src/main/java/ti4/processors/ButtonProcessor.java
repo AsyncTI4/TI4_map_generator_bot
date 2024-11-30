@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperStats;
@@ -196,7 +197,7 @@ public class ButtonProcessor {
                 case "convert_4_comms" -> ButtonHelperStats.convertComms(event, game, player, 4);
                 case "convert_2_comms_stay" -> ButtonHelperStats.convertComms(event, game, player, 2, false);
                 // Don't add anymore cases - use @ButtonHandler
-                case "play_when" -> UnfiledButtonHandlers.playWhen(event, game, mainGameChannel);
+                case "play_when" -> AgendaHelper.playWhen(event, game, mainGameChannel);
                 case "gain_1_tg" -> UnfiledButtonHandlers.gain1TG(event, player, game, mainGameChannel);
                 case "gain1tgFromLetnevCommander" -> UnfiledButtonHandlers.gain1tgFromLetnevCommander(event, player, game, mainGameChannel);
                 case "gain1tgFromMuaatCommander" -> UnfiledButtonHandlers.gain1tgFromMuaatCommander(event, player, game, mainGameChannel);
