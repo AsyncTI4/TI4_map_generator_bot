@@ -2180,25 +2180,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         event.getMessage().editMessage(exhaustedMessage).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons)).queue();
     }
 
-    @ButtonHandler("eraseMyVote")
-    public static void eraseMyVote(Player player, Game game) {
-        String pfaction = player.getFaction();
-        if (game.isFowMode()) {
-            pfaction = player.getColor();
-        }
-        Helper.refreshPlanetsOnTheRevote(player, game);
-        AgendaHelper.eraseVotesOfFaction(game, pfaction);
-        String eraseMsg = "Erased previous votes made by " + player.getFactionEmoji() + " and readied the planets they previously exhausted\n\n" + AgendaHelper.getSummaryOfVotes(game, true);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), eraseMsg);
-        Button vote = Buttons.green(player.getFinsFactionCheckerPrefix() + "vote", player.getFlexibleDisplayName() + " Choose To Vote");
-        Button abstain = Buttons.red(player.getFinsFactionCheckerPrefix() + "resolveAgendaVote_0", player.getFlexibleDisplayName() + " Choose To Abstain");
-        Button forcedAbstain = Buttons.gray("forceAbstainForPlayer_" + player.getFaction(), "(For Others) Abstain for this player");
-
-        String buttonMsg = "Use buttons to vote again. Reminder that this erasing of old votes did not refresh any planets.";
-        List<Button> buttons = Arrays.asList(vote, abstain, forcedAbstain);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), buttonMsg, buttons);
-    }
-
     @ButtonHandler("setOrder")
     public static void setOrder(ButtonInteractionEvent event, Game game) {
         Helper.setOrder(game);
