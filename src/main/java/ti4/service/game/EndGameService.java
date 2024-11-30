@@ -1,5 +1,7 @@
 package ti4.service.game;
 
+import static ti4.helpers.StringHelper.ordinal;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -7,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
@@ -18,17 +22,15 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands2.statistics.GameStatisticFilterer;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
-import ti4.helpers.GameStatsHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
 import ti4.helpers.TIGLHelper;
+import ti4.helpers.ThreadHelper;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
@@ -37,8 +39,8 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-
-import static ti4.helpers.StringHelper.ordinal;
+import ti4.service.statistics.game.GameStatisticsService;
+import ti4.service.statistics.game.WinningPathHelper;
 
 @UtilityClass
 public class EndGameService {
@@ -159,60 +161,66 @@ public class EndGameService {
     public static void gameEndStuff(Game game, GenericInteractionCreateEvent event, boolean publish) {
         String gameName = game.getName();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
+
         game.setHasEnded(true);
         game.setEndedDate(System.currentTimeMillis());
-        GameSaveLoadManager.saveGame(game, event);
-        String gameEndText = getGameEndText(game, event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
         game.setAutoPing(false);
         game.setAutoPingSpacer(0);
+        GameSaveLoadManager.saveGame(game, event);
+
         if (!game.isFowMode()) {
             PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
         }
 
-        TextChannel summaryChannel = getGameSummaryChannel(game);
-        if (!game.isFowMode()) {
-            // SEND THE MAP IMAGE
-            MapRenderPipeline.render(game, event, DisplayType.all, fileUpload -> {
-                MessageHelper.replyToMessage(event, fileUpload);
-                // CREATE POST
-                if (publish) {
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
+
+        AsyncTI4DiscordBot.runAsync("Async game chronicle task",
+            () -> {
+                String gameEndText = getGameEndText(game, event);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
+                TextChannel summaryChannel = getGameSummaryChannel(game);
+                if (!game.isFowMode()) {
+                    MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
+                        MessageHelper.replyToMessage(event, fileUpload);
+                        // CREATE POST
+                        if (publish) {
+                            if (summaryChannel == null) {
+                                BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
+                                return;
+                            }
+
+                            // INFORM PLAYERS
+                            summaryChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
+                                m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
+                                m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS, t -> {
+                                    sendFeedbackMessage(t, game);
+                                    sendRoundSummariesToThread(t, game);
+                                });
+                                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                                    "Game summary has been posted in the " + summaryChannel.getAsMention() + " channel: " + m.getJumpUrl());
+                            });
+                        }
+
+                        // TIGL Extras
+                        if (game.isCompetitiveTIGLGame() && game.getWinner().isPresent()) {
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.BLT + Constants.bltPing());
+                            TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
+                        }
+                    });
+                } else if (publish) { //FOW SUMMARY
                     if (summaryChannel == null) {
-                        BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
+                        BotLogger.log(event, "`#fow-war-stories` channel not found - `/game end` cannot post summary");
                         return;
                     }
-
-                    // INFORM PLAYERS
-                    summaryChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
-                        m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
-                        m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS, t -> {
-                            sendFeedbackMessage(t, game);
-                            sendRoundSummariesToThread(t, game);
-                        });
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                            "Game summary has been posted in the " + summaryChannel.getAsMention() + " channel: " + m.getJumpUrl());
+                    MessageHelper.sendMessageToChannel(summaryChannel, gameEndText);
+                    summaryChannel.createThreadChannel(gameName, true).queue(t -> {
+                        MessageHelper.sendMessageToChannel(t, gameEndText);
+                        sendFeedbackMessage(t, game);
+                        sendRoundSummariesToThread(t, game);
                     });
                 }
-
-                // TIGL Extras
-                if (game.isCompetitiveTIGLGame() && game.getWinner().isPresent()) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.BLT + Constants.bltPing());
-                    TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
-                }
             });
-        } else if (publish) { //FOW SUMMARY
-            if (summaryChannel == null) {
-                BotLogger.log(event, "`#fow-war-stories` channel not found - `/game end` cannot post summary");
-                return;
-            }
-            MessageHelper.sendMessageToChannel(summaryChannel, gameEndText);
-            summaryChannel.createThreadChannel(gameName, true).queue(t -> {
-                MessageHelper.sendMessageToChannel(t, gameEndText);
-                sendFeedbackMessage(t, game);
-                sendRoundSummariesToThread(t, game);
-            });
-        }
     }
 
     private static void sendRoundSummariesToThread(ThreadChannel t, Game game) {
@@ -251,10 +259,10 @@ public class EndGameService {
     private static TextChannel getGameSummaryChannel(Game game) {
         List<TextChannel> textChannels;
         if (game.isFowMode() && AsyncTI4DiscordBot.guildFogOfWar != null) {
-            Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildFogOfWar);
+            ThreadHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildFogOfWar);
             textChannels = AsyncTI4DiscordBot.guildFogOfWar.getTextChannelsByName("fow-war-stories", true);
         } else {
-            Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
+            ThreadHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
             textChannels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true);
         }
         return textChannels.isEmpty() ? null : textChannels.getFirst();
@@ -314,54 +322,18 @@ public class EndGameService {
         String gameModesText = game.getGameModesText();
         if (gameModesText.isEmpty())
             gameModesText = "None";
+        int vpCount = game.getVp();
         sb.append("**Game Modes:** ").append(gameModesText).append(", ")
-            .append(game.getVp()).append(" victory points")
+            .append(vpCount).append(" victory points")
             .append("\n");
 
         if (winner.isPresent() && !game.hasHomebrew()) {
-            String winningPath = GameStatsHelper.getWinningPath(game, winner.get());
+            String winningPath = WinningPathHelper.buildWinningPath(game, winner.get());
             sb.append("**Winning Path:** ").append(winningPath).append("\n");
-            int playerCount = game.getRealAndEliminatedAndDummyPlayers().size();
-            List<Game> games = GameStatisticFilterer.getNormalFinishedGames(playerCount, game.getVp());
-            Map<String, Integer> winningPathCounts = GameStatsHelper.getAllWinningPathCounts(games);
-            int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
-            if (gamesWithWinnerCount >= 100) {
-                int winningPathCount = winningPathCounts.get(winningPath);
-                double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
-                String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
-                sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games (").append(game.getVp()).append("VP, ")
-                    .append(playerCount).append("P)")
-                    .append(", this path has been seen ")
-                    .append(winningPathCount - 1)
-                    .append(" times before. It's the ").append(winningPathCommonality).append(" most common path (out of ").append(winningPathCounts.size()).append(" paths) at ")
-                    .append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
-                if (winningPathCount == 1) {
-                    sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
-                } else if (winningPathPercent <= .005) {
-                    sb.append("🎉__**Few have traveled your path! We celebrate your boldness!**__🎉").append("\n");
-                } else if (winningPathPercent <= .01) {
-                    sb.append("🎉__**Who needs a conventional win? Not you!**__🎉").append("\n");
-                }
-            }
+            sb.append(GameStatisticsService.getWinningPathComparison(winningPath, game.getRealPlayers().size(), vpCount));
         }
 
         return sb.toString();
-    }
-
-    private static String getWinningPathCommonality(Map<String, Integer> winningPathCounts, int winningPathCount) {
-        int commonality = 1;
-        for (int i : winningPathCounts.values()) {
-            if (i > winningPathCount) {
-                commonality++;
-            }
-        }
-        return commonality == 1 ? "" : ordinal(commonality);
-    }
-
-    private static String formatPercent(double d) {
-        NumberFormat numberFormat = NumberFormat.getPercentInstance();
-        numberFormat.setMinimumFractionDigits(1);
-        return numberFormat.format(d);
     }
 
     public static String getTIGLFormattedGameEndText(Game game, GenericInteractionCreateEvent event) {

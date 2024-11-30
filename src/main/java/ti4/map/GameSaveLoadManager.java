@@ -29,8 +29,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -39,13 +43,12 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.draft.BagDraft;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
@@ -89,7 +92,7 @@ public class GameSaveLoadManager {
     public static final String ENDPLAYER = "-endplayer-";
 
     private static String debugString(String prefix, long time, long total) {
-        return prefix + Helper.getTimeRepresentationNanoSeconds(time) + String.format(" (%2.2f%%)", (double) time / (double) total * 100.0);
+        return prefix + DateTimeHelper.getTimeRepresentationNanoSeconds(time) + String.format(" (%2.2f%%)", (double) time / (double) total * 100.0);
     }
 
     public static void saveGame(Game game, String reason) {
@@ -194,7 +197,7 @@ public class GameSaveLoadManager {
                     MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(),
                         loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                 } else {
-                    System.out.println("Boop" + loadedGame.getSavedButtons().size());
+                    // System.out.println("Boop" + loadedGame.getSavedButtons().size());
                 }
             } catch (Exception e) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -677,6 +680,8 @@ public class GameSaveLoadManager {
         writer.write(Constants.SPIN_MODE + " " + game.isSpinMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_UNIT_TAGS + " " + game.isShowUnitTags());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_OWNED_PNS_IN_PLAYER_AREA + " " + game.isShowOwnedPNsInPlayerArea());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.AC_DECK_ID + " " + game.getAcDeckID());
@@ -1977,6 +1982,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setShowUnitTags(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.SHOW_OWNED_PNS_IN_PLAYER_AREA -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        game.setShowOwnedPNsInPlayerArea(value);
                     } catch (Exception e) {
                         // Do nothing
                     }

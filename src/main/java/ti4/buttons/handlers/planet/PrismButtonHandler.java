@@ -23,10 +23,10 @@ class PrismButtonHandler {
     @ButtonHandler("newPrism@")
     public static void newPrismPart2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String techOut = buttonID.split("@")[1];
-        player.removeTech(techOut);
+        player.purgeTech(techOut);
         TechnologyModel techM1 = Mapper.getTech(techOut);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " removed the tech " + techM1.getName());
-        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech with the same number of prerequisites", Buttons.GET_A_FREE_TECH);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " purged the tech " + techM1.getName());
+        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech with the same number of prerequisites: " + techM1.getRequirements().orElse("None"), Buttons.GET_A_FREE_TECH);
         event.getMessage().delete().queue();
         String message2 = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);

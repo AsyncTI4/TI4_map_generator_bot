@@ -6,6 +6,7 @@ import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
+import java.awt.RenderingHints;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -49,6 +50,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CalendarHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
@@ -79,6 +81,7 @@ import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
+import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -86,6 +89,7 @@ import ti4.service.fow.FowConstants;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 import ti4.website.WebsiteOverlay;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static ti4.image.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator implements AutoCloseable {
@@ -255,7 +259,7 @@ public class MapGenerator implements AutoCloseable {
         if (debug) debugDiscordTime = StopWatch.createStarted();
         AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(game.getName()));
         game.incrementMapImageGenerationCount();
-        FileUpload fileUpload = createFileUpload(mainImage, .2f, game.getName());
+        FileUpload fileUpload = createFileUpload(mainImage, 0.25f, game.getName());
         if (debug) debugDiscordTime.stop();
         return fileUpload;
     }
@@ -378,7 +382,7 @@ public class MapGenerator implements AutoCloseable {
 
         StringBuilder sb = new StringBuilder();
 
-        String totalTimeStr = Helper.getTimeRepresentationNanoSeconds(debugAbsoluteStartTime.getNanoTime());
+        String totalTimeStr = DateTimeHelper.getTimeRepresentationNanoSeconds(debugAbsoluteStartTime.getNanoTime());
         String totalLine = String.format("%-34s%s", "Total time (" + game.getName() + "):", totalTimeStr);
         sb.append(totalLine);
 
@@ -400,7 +404,7 @@ public class MapGenerator implements AutoCloseable {
         long subTime = subStopWatch.getNanoTime();
         long totalTime = totalStopWatch.getNanoTime();
         double percentage = ((double) subTime / totalTime) * 100.0;
-        String timeStr = Helper.getTimeRepresentationNanoSeconds(subTime);
+        String timeStr = DateTimeHelper.getTimeRepresentationNanoSeconds(subTime);
         return String.format("\n%-" + padRight + "s%s (%2.2f%%)", name, timeStr, percentage);
     }
 
@@ -558,6 +562,11 @@ public class MapGenerator implements AutoCloseable {
         List<Player> players = new ArrayList<>(game.getPlayers().values());
         int yDelta = 0;
 
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setRenderingHint(
+            RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
         // GAME MODES
         int deltaY = -150;
         if (game.isCompetitiveTIGLGame()) {
@@ -625,7 +634,6 @@ public class MapGenerator implements AutoCloseable {
 
         if (displayTypeBasic == DisplayType.all || displayTypeBasic == DisplayType.stats) {
             graphics.setFont(Storage.getFont32());
-            Graphics2D g2 = (Graphics2D) graphics;
             int realX = x;
             Map<UnitKey, Integer> unitCount = new HashMap<>();
             for (Player player : players) {
@@ -1258,7 +1266,6 @@ public class MapGenerator implements AutoCloseable {
 
             if (promissoryNote.getShrinkName()) {
                 graphics.setFont(Storage.getFont16());
-
                 drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName() + (isAttached ? "\n" : ""), x + deltaX + 9, y + 4, 120, true);
             } else {
                 graphics.setFont(Storage.getFont18());
@@ -1311,7 +1318,10 @@ public class MapGenerator implements AutoCloseable {
 
             int rectX = x + deltaX - 2;
             drawRectWithOverlay(g2, rectX, rectY, rectW, rectH, relicModel);
-            drawPAImage(x + deltaX, y, "pa_relics_icon.png");
+            if (relicModel.getSource() == ComponentSource.absol) {
+                drawPAImage(x + deltaX, y, "pa_source_absol.png");
+            }
+            drawPAImage(x + deltaX - 1, y - 2, "pa_relics_icon.png");
 
             String relicStatus = isExhausted ? "_exh" : "_rdy";
 
@@ -1319,11 +1329,11 @@ public class MapGenerator implements AutoCloseable {
             if (relicID.equals("absol_quantumcore")) {
                 drawPAImage(x + deltaX, y, "pa_tech_techicons_cyberneticwarfare" + relicStatus + ".png");
             }
-            if (relicID.equals("titanprototype")) {
+            if (relicID.equals("titanprototype") || relicModel.getHomebrewReplacesID().orElse("").equals("titanprototype")) {
                 drawFactionIconImage(graphics, "relic", x + deltaX - 1, y + 108, 42, 42);
             }
 
-            if (relicID.equals("emelpar")) {
+            if (relicID.equals("emelpar") || relicModel.getHomebrewReplacesID().orElse("").equals("emelpar")) {
                 String empelar = "";
                 List<Character> letters = Arrays.asList('m', 'e', 'l', 'p', 'a');
                 Collections.shuffle(letters);
@@ -1651,15 +1661,43 @@ public class MapGenerator implements AutoCloseable {
         ownedPNs.sort(pnComparator);
 
         for (String pnID : ownedPNs) {
-            PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pnID);
-            if (pnModel.getFaction().isEmpty()) {
+            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnID);
+            if (!game.isShowOwnedPNsInPlayerArea() && promissoryNote.getFaction().isEmpty()) {
                 continue;
             }
-            drawPAImageScaled(x + deltaX - 1 + 2, y + 30, "cardback_pn.png", 40, 40);
-            drawFactionIconImage(g2, pnModel.getFaction().get(), x + deltaX - 1, y, 42, 42);
-            g2.setFont(Storage.getFont18());
-            drawOneOrTwoLinesOfTextVertically(g2, pnModel.getShortName(), x + deltaX + 7, y + 144, 130);
-            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, pnModel);
+            
+            if (promissoryNote.getSource() == ComponentSource.promises_promises) {
+                drawPAImageScaled(x + deltaX + 1, y + 1, "pa_promissory_light_pp.png", 38, 28);
+            } else {
+                drawPAImageScaled(x + deltaX + 1, y + 1, "pa_promissory_light.png", 38, 28);
+            }
+            if (game.isFrankenGame() && !promissoryNote.getFaction().isEmpty()) {
+                drawFactionIconImage(graphics, promissoryNote.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
+            }
+            boolean greyed = false;
+            if (!game.isFowMode() && promissoryNote.getPlayArea()) {
+                found: for (Player player_ : game.getRealPlayers()) {
+                    for (String pn_ : player_.getPromissoryNotesInPlayArea()) {
+                        if (pn_.equals(pnID)) {
+                            greyed = true;
+                            break found;
+                        }
+                    }
+                }
+            }
+            graphics.setColor(greyed ? Color.GRAY : Color.WHITE);
+
+            if (pnID.equals("dspntnel")) { // for some reason "Plots Within Plots" gets cut off weirdly if handled normally
+                graphics.setFont(Storage.getFont16());
+                drawOneOrTwoLinesOfTextVertically(graphics, "Plots Within Plots", x + deltaX + 9, y + 144, 150);
+            } else if (promissoryNote.getShrinkName()) {
+                graphics.setFont(Storage.getFont16());
+                drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName(), x + deltaX + 9, y + 144, 120);
+            } else {
+                graphics.setFont(Storage.getFont18());
+                drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName(), x + deltaX + 7, y + 144, 120);
+            }
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, promissoryNote);
 
             deltaX += 48;
             addedPNs = true;
@@ -1711,14 +1749,17 @@ public class MapGenerator implements AutoCloseable {
                 int numInReinforcements = unitCap - count;
                 BufferedImage image = ImageHelper.read(getUnitPath(unitKey));
                 String decal = player.getDecalFile(unitID);
+                BufferedImage decalImage = null;
                 if (decal != null) {
-                    var decalImage = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decal));
-                    for (int i = 0; i < numInReinforcements; i++) {
-                        Point position = reinforcementsPosition.getPosition(unitID);
-                        graphics.drawImage(image, x + position.x, y + position.y, null);
+                    decalImage = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decal));
+                }
+                for (int i = 0; i < numInReinforcements; i++) {
+                    Point position = reinforcementsPosition.getPosition(unitID);
+                    graphics.drawImage(image, x + position.x, y + position.y, null);
+                    if (decalImage != null) {
                         graphics.drawImage(decalImage, x + position.x, y + position.y, null);
-                        if (onlyPaintOneUnit) break;
                     }
+                    if (onlyPaintOneUnit) break;
                 }
                 String unitName = unitKey.getUnitType().humanReadableName();
                 if (numInReinforcements < 0 && !game.isDiscordantStarsMode() && game.isCcNPlasticLimit()) {
@@ -1984,14 +2025,31 @@ public class MapGenerator implements AutoCloseable {
     private void paintNumber(String unitID, int x, int y, int reinforcementsCount, String color) {
         String id = "number_" + unitID;
         UnitTokenPosition textPosition = PositionMapper.getReinforcementsPosition(id);
-        if (textPosition == null)
+        if (textPosition == null) {
             return;
-
-        String text = "pa_reinforcements_numbers_" + reinforcementsCount;
-        String colorID = Mapper.getColorID(color);
-        text += DrawingUtil.getBlackWhiteFileSuffix(colorID);
+        }
         Point position = textPosition.getPosition(id);
-        drawPAImage(x + position.x, y + position.y, text);
+
+        graphics.setFont(Storage.getFont35());
+        Integer offset = 20 - graphics.getFontMetrics().stringWidth("" + reinforcementsCount) / 2;
+        if (reinforcementsCount <= 0) {
+            graphics.setColor(Color.YELLOW);
+        } else {
+            String colorID = Mapper.getColorID(color);
+            graphics.setColor("_blk.png".equalsIgnoreCase(DrawingUtil.getBlackWhiteFileSuffix(colorID)) ? Color.WHITE : Color.BLACK);
+        }
+        for (int i = -2; i <= 2; i++) {
+            for (int j = (i == -2 || i == 2 ? -1 : -2); j <= (i == -2 || i == 2 ? 1 : 2); j++) {
+                graphics.drawString("" + reinforcementsCount, x + position.x + offset + i, y + position.y + j + 28);
+            }
+        }
+        if (reinforcementsCount <= 0) {
+            graphics.setColor(Color.RED);
+        } else {
+            String colorID = Mapper.getColorID(color);
+            graphics.setColor("_blk.png".equalsIgnoreCase(DrawingUtil.getBlackWhiteFileSuffix(colorID)) ? Color.BLACK : Color.WHITE);
+        }
+        graphics.drawString("" + reinforcementsCount, x + position.x + offset, y + position.y + 28);
     }
 
     private int planetInfo(Player player, int x, int y) {
@@ -2114,7 +2172,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
             Point position1 = PositionMapper.getTilePosition(tile1.getPosition());
-            Integer distance1 = ((homePosition.x - position1.x) * (homePosition.x - position1.x)
+            int distance1 = ((homePosition.x - position1.x) * (homePosition.x - position1.x)
                 + (homePosition.y - position1.y) * (homePosition.y - position1.y)) / 4000;
             Tile tile2 = game.getTileFromPlanet(planet2);
             if (tile2.getTileID().equals("51")) {
@@ -2124,7 +2182,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
             Point position2 = PositionMapper.getTilePosition(tile2.getPosition());
-            Integer distance2 = ((homePosition.x - position2.x) * (homePosition.x - position2.x)
+            int distance2 = ((homePosition.x - position2.x) * (homePosition.x - position2.x)
                 + (homePosition.y - position2.y) * (homePosition.y - position2.y)) / 4000;
             if (distance1 != distance2) {
                 return distance1 - distance2;
@@ -2163,7 +2221,6 @@ public class MapGenerator implements AutoCloseable {
         try {
             Planet planet = planetsInfo.get(planetName);
             PlanetModel planetModel = planet.getPlanetModel();
-            if (planet == null) return deltaX;
 
             boolean isExhausted = exhaustedPlanets.contains(planetName);
             graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
@@ -2243,7 +2300,7 @@ public class MapGenerator implements AutoCloseable {
             }
 
             String originalTechSpeciality = planet.getOriginalTechSpeciality();
-            if (!originalTechSpeciality.isEmpty() && !hasBentorEncryptionKey) {
+            if (isNotBlank(originalTechSpeciality) && !hasBentorEncryptionKey) {
                 String planetTechSkip = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
                 drawPlanetCardDetail(x + deltaX + 26, y + 82, planetTechSkip);
             } else if (!hasBentorEncryptionKey) {
@@ -2269,20 +2326,20 @@ public class MapGenerator implements AutoCloseable {
             drawPlanetCardDetail(x + deltaX + 26, y + 103, resFileName);
             drawPlanetCardDetail(x + deltaX + 26, y + 125, infFileName);
 
-            graphics.setFont(Storage.getFont12());
-            Integer offset = 10 - graphics.getFontMetrics().stringWidth("" + resources) / 2;
+            graphics.setFont(Storage.getFont16());
+            int offset = 11 - graphics.getFontMetrics().stringWidth("" + resources) / 2;
             if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                 graphics.setColor(Color.BLACK);
                 for (int i = -1; i <= 1; i++) {
                     for (int j = -1; j <= 1; j++) {
-                        graphics.drawString("" + resources, x + deltaX + 26 + offset + i, y + 118 + j);
+                        graphics.drawString("" + resources, x + deltaX + 26 + offset + i, y + 119 + j);
                     }
                 }
             }
             graphics.setColor(Color.WHITE);
-            graphics.drawString("" + resources, x + deltaX + 26 + offset, y + 117);
+            graphics.drawString("" + resources, x + deltaX + 26 + offset, y + 119);
             offset = 10 - graphics.getFontMetrics().stringWidth("" + influence) / 2;
-            graphics.drawString("" + influence, x + deltaX + 26 + offset, y + 139);
+            graphics.drawString("" + influence, x + deltaX + 27 + offset, y + 141);
 
             graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
             if (planetModel.getShrinkNamePNAttach()) {
@@ -2307,9 +2364,7 @@ public class MapGenerator implements AutoCloseable {
     private int techInfo(Player player, int x, int y, Game game) {
         List<String> techs = player.getTechs();
         List<String> exhaustedTechs = player.getExhaustedTechs();
-        // if (techs.isEmpty()) {
-        // return y;
-        // }
+        List<String> purgedTechs = player.getPurgedTechs();
 
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
@@ -2334,6 +2389,7 @@ public class MapGenerator implements AutoCloseable {
             List<String> list = entry.getValue();
             list.sort(techComparator);
         }
+        purgedTechs.sort(techComparator);
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
@@ -2345,6 +2401,7 @@ public class MapGenerator implements AutoCloseable {
         deltaX = techField(x, y, techsFiltered.get(Constants.BIOTIC), exhaustedTechs, deltaX, player);
         deltaX = techFieldUnit(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), deltaX, player, game);
         deltaX = techGenSynthesis(x, y, deltaX, player, techsFiltered.get(Constants.UNIT_UPGRADE));
+        deltaX = techField(x, y, purgedTechs, Collections.emptyList(), deltaX, player);
         return x + deltaX + 20;
     }
 
@@ -2368,6 +2425,7 @@ public class MapGenerator implements AutoCloseable {
         }
         for (String tech : techs) {
             boolean isExhausted = exhaustedTechs.contains(tech);
+            boolean isPurged = player.getPurgedTechs().contains(tech);
             String techStatus = isExhausted ? "_exh.png" : "_rdy.png";
 
             TechnologyModel techModel = Mapper.getTech(tech);
@@ -2383,6 +2441,10 @@ public class MapGenerator implements AutoCloseable {
             if (!techIcon.isEmpty()) {
                 String techSpec = "pa_tech_techicons_" + techIcon + techStatus;
                 drawPAImage(x + deltaX, y, techSpec);
+            }
+
+            if (techModel.getSource() == ComponentSource.absol) {
+                drawPAImage(x + deltaX, y, "pa_source_absol" + (isExhausted ? "_exh" : "") + ".png");
             }
 
             // Draw Faction Tech Icon
@@ -2410,7 +2472,7 @@ public class MapGenerator implements AutoCloseable {
                 if (types != 1) {
                     foreground = Color.WHITE;
                 }
-                if (isExhausted) {
+                if (isExhausted || isPurged) {
                     foreground = Color.GRAY;
                 }
 
@@ -2487,6 +2549,8 @@ public class MapGenerator implements AutoCloseable {
             }
 
             graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
+            if (isPurged) graphics.setColor(Color.RED);
+
             if (techModel.getShrinkName()) {
                 graphics.setFont(Storage.getFont16());
                 drawOneOrTwoLinesOfTextVertically(graphics, techModel.getShortName(), x + deltaX + 9, y + 116, 116);
@@ -2712,11 +2776,12 @@ public class MapGenerator implements AutoCloseable {
 
         // Add the blank warsun if player has no warsun
         List<UnitModel> playerUnitModels = new ArrayList<>(player.getUnitModels());
-        if (player.getUnitsByAsyncID("warsun").isEmpty()) {
+        if (player.getUnitsByAsyncID("ws").isEmpty()) {
             playerUnitModels.add(Mapper.getUnit("nowarsun"));
         }
         // Add faction icons on top of upgraded or upgradable units
         for (UnitModel unit : playerUnitModels) {
+            boolean isPurged = unit.getRequiredTechId().isPresent() && player.getPurgedTechs().contains(unit.getRequiredTechId());
             Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
             if (unit.getFaction().isPresent()) {
                 boolean unitHasUpgrade = unit.getUpgradesFromUnitId().isPresent() || unit.getUpgradesToUnitId().isPresent();
@@ -2725,6 +2790,11 @@ public class MapGenerator implements AutoCloseable {
                     drawFactionIconImage(graphics, unit.getFaction().get().toLowerCase(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
                 }
             }
+
+            if (isPurged) {
+                DrawingUtil.superDrawString(graphics, "X", deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, Color.RED, null, null, stroke2, Color.BLACK);
+            }
+
             // Unit Overlays
             addWebsiteOverlay(unit, deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
             // graphics.drawRect(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32); //debug
@@ -2769,6 +2839,16 @@ public class MapGenerator implements AutoCloseable {
             }
         } catch (Exception e) {
             BotLogger.log("Could not display planet: " + resourceName, e);
+        }
+    }
+
+    private void drawGeneralImageScaled(int x, int y, String resourceName, int width, int height) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getGeneralFile(resourceName);
+            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, width, height);
+            graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            BotLogger.log("Could not display play area: " + resourceName, e);
         }
     }
 
@@ -3570,7 +3650,7 @@ public class MapGenerator implements AutoCloseable {
                     String traitFile = "";
                     List<String> traits = planetReal.getPlanetType();
 
-                    if (planetReal.getOriginalPlanetType().equals("faction") && traits.isEmpty()) {
+                    if ("faction".equalsIgnoreCase(planetReal.getOriginalPlanetType()) && traits.isEmpty()) {
                         if (custodiaVigilia.getFactionHomeworld() == null) {
                             traitFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
                         } else {
@@ -3579,8 +3659,7 @@ public class MapGenerator implements AutoCloseable {
                     } else if (traits.size() == 1) {
                         String t = planetReal.getPlanetType().getFirst();
                         traitFile = ResourceHelper.getInstance().getGeneralFile(("" + t.charAt(0)).toUpperCase() + t.substring(1).toLowerCase() + ".png");
-                    } else if (traits.isEmpty()) {
-                    } else {
+                    } else if (!traits.isEmpty()) {
                         String t = "";
                         t += traits.contains("cultural") ? "C" : "";
                         t += traits.contains("hazardous") ? "H" : "";
@@ -4481,6 +4560,9 @@ public class MapGenerator implements AutoCloseable {
     private Point getTilePosition(String position, int x, int y) {
         int ringCount = game.getRingCount();
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
+        if (ringCount == RING_MIN_COUNT) {
+            x += 520 / 2;
+        }
         if (ringCount < RING_MAX_COUNT) {
             int lower = RING_MAX_COUNT - ringCount;
 
@@ -4545,10 +4627,10 @@ public class MapGenerator implements AutoCloseable {
         text = text.toUpperCase();
         String firstRow = StringUtils.substringBefore(text, "\n");
         firstRow = trimTextToPixelWidth(graphics, firstRow, maxWidth);
-        String secondRow = text.replace(firstRow, "").replace("\n", "");
+        String secondRow = text.substring(firstRow.length()).replace("\n", "");
         secondRow = trimTextToPixelWidth(graphics, secondRow, maxWidth);
         drawTextVertically(graphics, firstRow, x, y, graphics.getFont(), rightAlign);
-        if (StringUtils.isNotBlank(secondRow)) {
+        if (isNotBlank(secondRow)) {
             drawTextVertically(graphics, secondRow, x + spacing, y, graphics.getFont(), rightAlign);
         }
     }
@@ -4631,7 +4713,9 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static int getMapWidth(Game game) {
-        int mapWidth = (getRingCount(game) + 1) * 520 + EXTRA_X * 2;
+        float ringCount = getRingCount(game);
+        ringCount += ringCount == RING_MIN_COUNT ? 1.5 : 1;
+        int mapWidth = (int) (ringCount * 520 + EXTRA_X * 2);
         mapWidth += hasExtraRow(game) ? EXTRA_X : 0;
         return mapWidth;
     }

@@ -24,6 +24,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.ThreadHelper;
 import ti4.helpers.Units;
 import ti4.image.TileGenerator;
 import ti4.map.Game;
@@ -113,7 +114,7 @@ public class StartCombatService {
     }
 
     public static void startGroundCombat(Player player, Player player2, Game game, GenericInteractionCreateEvent event, UnitHolder unitHolder, Tile tile) {
-        String threadName = combatThreadName(game, player, player2, tile);
+        String threadName = combatThreadName(game, player, player2, tile, null);
         if (!game.isFowMode()) {
             findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,
                 threadName, tile, event, "ground", unitHolder.getName());
@@ -153,9 +154,9 @@ public class StartCombatService {
 
     private static void findOrCreateCombatThread(Game game, MessageChannel channel, Player player1, Player player2, String threadName, Tile tile,
                                                     GenericInteractionCreateEvent event, String spaceOrGround, String unitHolderName) {
-        Helper.checkThreadLimitAndArchive(event.getGuild());
+        ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
         if (threadName == null)
-            threadName = combatThreadName(game, player1, player2, tile);
+            threadName = combatThreadName(game, player1, player2, tile, null);
         if (!game.isFowMode()) {
             channel = game.getMainGameChannel();
         }
@@ -273,7 +274,7 @@ public class StartCombatService {
     }
 
     private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
-        Helper.checkThreadLimitAndArchive(event.getGuild());
+        ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
         FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
 
         // Use existing thread, if it exists
@@ -515,8 +516,8 @@ public class StartCombatService {
             return buttons;
 
         // Assault Cannon
-        if ((p1.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p1, game, tile) > 2 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p1, tile)))
-            || (p2.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p2, game, tile) > 2 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p2, tile)))) {
+        if ((p1.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p1, tile) > 2 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p1, tile)))
+            || (p2.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p2, tile) > 2 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p2, tile)))) {
             buttons.add(Buttons.blue("assCannonNDihmohn_asc_" + tile.getPosition(), "Use Assault Cannon", Emojis.WarfareTech));
         }
 
@@ -534,9 +535,9 @@ public class StartCombatService {
 
         // Dihmohn Commander
         if ((game.playerHasLeaderUnlockedOrAlliance(p1, "dihmohncommander")
-            && ButtonHelper.checkNumberNonFighterShips(p1, game, tile) > 2)
+            && ButtonHelper.checkNumberNonFighterShips(p1, tile) > 2)
             || (game.playerHasLeaderUnlockedOrAlliance(p2, "dihmohncommander")
-            && ButtonHelper.checkNumberNonFighterShips(p2, game, tile) > 2)) {
+            && ButtonHelper.checkNumberNonFighterShips(p2, tile) > 2)) {
             buttons.add(Buttons.blue("assCannonNDihmohn_dihmohn_" + tile.getPosition(), "Use Dih-Mohn Commander", Emojis.dihmohn));
         }
 
@@ -978,22 +979,6 @@ public class StartCombatService {
                 sb.append("-vs-").append(player2.getFaction());
             }
             sb.append(specialCombatTitle != null ? specialCombatTitle : "");
-        }
-        return sb.toString();
-    }
-
-    private static String combatThreadName(Game game, Player player1, @Nullable Player player2, Tile tile) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(game.getName()).append("-round-").append(game.getRound()).append("-system-")
-            .append(tile.getPosition()).append("-turn-").append(player1.getInRoundTurnCount()).append("-");
-        if (game.isFowMode()) {
-            sb.append(player1.getColor());
-            if (player2 != null)
-                sb.append("-vs-").append(player2.getColor()).append("-private");
-        } else {
-            sb.append(player1.getFaction());
-            if (player2 != null)
-                sb.append("-vs-").append(player2.getFaction());
         }
         return sb.toString();
     }

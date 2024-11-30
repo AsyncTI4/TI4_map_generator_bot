@@ -1,6 +1,5 @@
 package ti4.cron;
 
-import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.concurrent.Executors;
@@ -8,32 +7,16 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.time.StopWatch;
-import ti4.message.BotLogger;
+import ti4.helpers.TimedRunnable;
 
 @UtilityClass
 public class CronManager {
 
-    private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 5;
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
     public static void register(Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
-        Runnable wrappedRunnable = wrapWithRuntimeWarning(clazz, runnable);
-        SCHEDULER.scheduleAtFixedRate(wrappedRunnable, initialDelay, period, unit);
-    }
-
-    private static Runnable wrapWithRuntimeWarning(Class<?> clazz, Runnable runnable) {
-        return () -> {
-            StopWatch stopWatch = StopWatch.createStarted();
-
-            runnable.run();
-
-            stopWatch.stop();
-            Duration timeElapsed = stopWatch.getDuration();
-            if (timeElapsed.toSeconds() > EXECUTION_TIME_SECONDS_WARNING_THRESHOLD) {
-                BotLogger.log(clazz.getSimpleName() + " took longer than " + EXECUTION_TIME_SECONDS_WARNING_THRESHOLD + " seconds (" + timeElapsed.toSeconds() + ").");
-            }
-        };
+        TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
+        SCHEDULER.scheduleAtFixedRate(timedRunnable, initialDelay, period, unit);
     }
 
     public static void register(Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId) {

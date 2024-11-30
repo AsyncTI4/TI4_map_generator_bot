@@ -147,7 +147,7 @@ public class AddPlanetService {
                     ButtonHelper.getDacxiveButtons(planet, player));
         }
         if (!alreadyOwned && game.isMinorFactionsMode() && player.isRealPlayer()
-                && (unitHolder.getOriginalPlanetType().equalsIgnoreCase("FACTION"))) {
+                && ("faction".equalsIgnoreCase(unitHolder.getOriginalPlanetType()))) {
             PlanetModel p = Mapper.getPlanet(unitHolder.getName());
             if (!p.getFactionHomeworld().equalsIgnoreCase(player.getFaction())) {
                 unitHolder.addToken("attachment_threetraits.png");

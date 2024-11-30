@@ -2101,6 +2101,10 @@ public class Helper {
      * @return left padded string
      */
     public static String leftpad(String text, int length) {
+        if (text.length() > length)
+        {
+            return text;
+        }
         return String.format("%" + length + "." + length + "s", text);
     }
 
@@ -2111,18 +2115,6 @@ public class Helper {
      */
     public static String rightpad(String text, int length) {
         return String.format("%-" + length + "." + length + "s", text);
-    }
-
-    public static void checkThreadLimitAndArchive(Guild guild) {
-        if (guild == null) return;
-        long threadCount = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).count();
-        int closeCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.THREAD_AUTOCLOSE_COUNT.toString(), Integer.class, 25);
-        int maxThreadCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.MAX_THREAD_COUNT.toString(), Integer.class, 975);
-
-        if (threadCount >= maxThreadCount) {
-            BotLogger.log("AutoArchiving Threads on **" + guild.getName() + "** - (" + threadCount + " > " + maxThreadCount + ") -> archiving " + closeCount + " threads");
-            ThreadArchiveHelper.archiveOldThreads(guild, closeCount);
-        }
     }
 
     public static boolean isInteger(String str) {
@@ -2631,51 +2623,6 @@ public class Helper {
                 .getUrl();
         }
         return "Whoops invalid url. Have one of the players on the server generate an invite";
-    }
-
-    public static String getTimeRepresentationToSeconds(long totalMillis) {
-        long totalSeconds = totalMillis / 1000; // total seconds (truncates)
-        long seconds = totalSeconds % 60;
-        long totalMinutes = totalSeconds / 60; // total minutes (truncates)
-        long minutes = totalMinutes % 60;
-        long hours = totalMinutes / 60; // total hours (truncates)
-
-        return String.format("%02dh:%02dm:%02ds", hours, minutes, seconds);
-    }
-
-    public static String getTimeRepresentationToMilliseconds(long totalMillis) {
-        long millis = (totalMillis % 1000);
-        long totalSeconds = totalMillis / 1000; // total seconds (truncates)
-        long seconds = totalSeconds % 60;
-        long totalMinutes = totalSeconds / 60; // total minutes (truncates)
-        long minutes = totalMinutes % 60;
-
-        return String.format("%02dm:%02ds:%04dms", minutes, seconds, millis);
-    }
-
-    public static String getTimeRepresentationNanoSeconds(long totalNanoSeconds) {
-        long totalMicroSeconds = totalNanoSeconds / 1000;
-        long totalMilliSeconds = totalMicroSeconds / 1000;
-        long totalSeconds = totalMilliSeconds / 1000;
-        // long totalMinutes = totalSeconds / 60;
-        // long totalHours = totalMinutes / 60;
-        // long totalDays = totalHours / 24;
-
-        long nanoSeconds = totalNanoSeconds % 1000;
-        long microSeconds = totalMicroSeconds % 1000;
-        long milleSeconds = totalMilliSeconds % 1000;
-        // long minutes = totalMinutes % 60;
-        // long hours = totalHours % 24;
-        // long days = totalDays;
-
-        // sb.append(String.format("%d:", days));
-        // sb.append(String.format("%02dh:", hours));
-        // sb.append(String.format("%02dm:", minutes));
-
-        return String.format("%02ds:", totalSeconds) +
-            String.format("%03d:", milleSeconds) +
-            String.format("%03d:", microSeconds) +
-            String.format("%03d", nanoSeconds);
     }
 
     public static long median(List<Long> turnTimes) {

@@ -45,6 +45,8 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class ButtonHelperHeroes {
 
     public static void argentHeroStep1(Game game, Player player, GenericInteractionCreateEvent event) {
@@ -744,10 +746,9 @@ public class ButtonHelperHeroes {
     public static void offerFreeSystemsButtons(Player player, Game game, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            boolean oneOfThree = game.getPlanetsInfo().get(planet) != null && game.getPlanetsInfo().get(planet).getOriginalPlanetType() != null
-                && ("industrial".equalsIgnoreCase(game.getPlanetsInfo().get(planet).getOriginalPlanetType())
-                    || "cultural".equalsIgnoreCase(game.getPlanetsInfo().get(planet).getOriginalPlanetType())
-                    || "hazardous".equalsIgnoreCase(game.getPlanetsInfo().get(planet).getOriginalPlanetType()));
+            Planet planetReal = game.getPlanetsInfo().get(planet);
+            boolean oneOfThree = planetReal != null && isNotBlank(planetReal.getOriginalPlanetType()) &&
+                List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
             if (oneOfThree || planet.contains("custodiavigilia") || planet.contains("ghoti")) {
                 buttons.add(Buttons.green("freeSystemsHeroPlanet_" + planet,
                     Helper.getPlanetRepresentation(planet, game)));
@@ -935,7 +936,7 @@ public class ButtonHelperHeroes {
                 if (tile.containsPlayersUnits(p2)) {
                     int amountInf = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
                     if (p2.hasInf2Tech()) {
-                        ButtonHelper.resolveInfantryDeath(game, p2, amountInf);
+                        ButtonHelper.resolveInfantryDeath(player, amountInf);
                     }
                     if (amountInf > 0) {
                         RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountInf + " inf " + name);

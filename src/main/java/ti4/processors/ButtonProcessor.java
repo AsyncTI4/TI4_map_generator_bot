@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.SearchGameHelper;
 import ti4.listeners.annotations.AnnotationHandler;
@@ -30,8 +31,7 @@ import ti4.message.MessageHelper;
 public class ButtonProcessor {
 
     private static final ButtonProcessor instance = new ButtonProcessor();
-    private static final Map<String, Consumer<ButtonContext>> knownButtons =
-        AnnotationHandler.findKnownHandlers(ButtonContext.class, ButtonHandler.class);
+    private static final Map<String, Consumer<ButtonContext>> knownButtons = AnnotationHandler.findKnownHandlers(ButtonContext.class, ButtonHandler.class);
 
     private final BlockingQueue<ButtonInteractionEvent> buttonInteractionQueue = new LinkedBlockingQueue<>();
     private final Set<String> userButtonPressSet = ConcurrentHashMap.newKeySet();
@@ -84,6 +84,7 @@ public class ButtonProcessor {
 
     private void process(ButtonInteractionEvent event) {
         BotLogger.logButton(event);
+        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
         long startTime = System.currentTimeMillis();
         try {
             ButtonContext context = new ButtonContext(event);
@@ -94,9 +95,18 @@ public class ButtonProcessor {
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
+
         long endTime = System.currentTimeMillis();
-        if (endTime - startTime > 3000) {
-            BotLogger.log(event, "This button command took longer than 3000 ms (" + (endTime - startTime) + ")");
+        final int milliThreshold = 3000;
+        if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
+            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
+            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+            String message = "[" + event.getChannel().getName() + "](" + event.getMessage().getJumpUrl() + ") " + event.getUser().getEffectiveName() + " pressed button: " + ButtonHelper.getButtonRepresentation(event.getButton()) +
+                "\n> Warning: This button took over " + milliThreshold + "ms to respond or execute\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " button was pressed by user\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
+            BotLogger.log(message);
         }
         instance.userButtonPressSet.remove(event.getUser().getId() + event.getButton().getId());
     }

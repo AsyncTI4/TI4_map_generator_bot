@@ -57,7 +57,6 @@ public class BigSelectDemo implements Selection {
     }
 
     public static void serveDemoSelectMenu(GenericInteractionCreateEvent event, List<String> preselected, int startIdx) {
-
         StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(selectionID);
         int padding = 0;
         if (preselected != null) {
