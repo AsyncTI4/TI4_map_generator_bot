@@ -107,6 +107,8 @@ public class UnitRenderGenerator {
 
         BufferedImage dmgImage = ImageHelper.readScaled(Helper.getDamagePath(), 0.8f);
 
+        Map<UnitType, Integer> unitTypeCounts = new HashMap<>();
+
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             UnitKey unitKey = unitEntry.getKey();
             if (shouldSkipInvalidUnit(unitKey)) continue;
@@ -116,6 +118,8 @@ public class UnitRenderGenerator {
             Integer unitCount = unitEntry.getValue();
             Integer bulkUnitCount = getBulkUnitCount(unitKey, unitCount);
             String unitPath = getUnitPath(unitKey);
+
+            unitTypeCounts.putIfAbsent(unitKey.getUnitType(), 0);
 
             try {
                 float scale = (bulkUnitCount != null && bulkUnitCount > 9) ? 1.2f : 1.0f;
@@ -142,10 +146,10 @@ public class UnitRenderGenerator {
                 unitImage,
                 tile.getPlanetUnitHolders().size(),
                 Set.of(UnitType.Infantry, UnitType.Fighter).contains(unitKey.getUnitType()));
-
+            
             // DRAW UNITS
             for (int i = 0; i < unitCount; i++) {
-                Point position = calculateUnitPosition(posCtx, unitKey, i);
+                Point position = calculateUnitPosition(posCtx, unitKey, i + unitTypeCounts.get(unitKey.getUnitType()));
                 ImagePosition imagePos = calculateImagePosition(posCtx, position);
                 int imageX = imagePos.x();
                 int imageY = imagePos.y();
@@ -177,13 +181,20 @@ public class UnitRenderGenerator {
                         case "black" -> Color.BLACK;
                         default -> Color.WHITE;
                     };
-                    drawBulkUnitCount(tileGraphics, bulkUnitCount, groupUnitColor, imagePos);
+                    drawBulkUnitCount(tileGraphics, bulkUnitCount, groupUnitColor, imagePos); // TODO: can only show two player's Fighter/Infantry
                 }
 
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
                     drawDamageIcon(position, imagePos, unitImage, dmgImage, unitKey.getUnitType());
                     unitDamageCount--;
                 }
+            }
+
+            // Persist unit type counts
+            if (unitTypeCounts.containsKey(unitKey.getUnitType())) {
+                unitTypeCounts.put(unitKey.getUnitType(), unitTypeCounts.get(unitKey.getUnitType()) + unitCount);
+            } else {
+                unitTypeCounts.put(unitKey.getUnitType(), unitCount);
             }
         }
     }
@@ -438,6 +449,10 @@ public class UnitRenderGenerator {
         for (UnitKey key : sortedUnits.keySet()) {
             tempUnits.remove(key);
         }
+
+        // TODO: "active" player should appear on "top" of the stacks
+
+        // TODO: larger units should probably be drawn first
 
         // Add remaining units
         sortedUnits.putAll(tempUnits);
