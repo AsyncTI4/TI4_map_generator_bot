@@ -2012,7 +2012,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(target.getCorrectChannel(), target.getRepresentation(true,
             true)
             + " You've been hit by"
-            + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "")
+            + (RandomHelper.isOneInX(1000) ? ", you've been struck by" : "")
             + " the Mahact Starlancer mech ability. You gain 1 CC to any command pool. Then, use the buttons to resolve end of turn abilities and then end turn.",
             conclusionButtons);
         deleteMessage(event);
@@ -2043,7 +2043,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(target.getCorrectChannel(), target
             .getRepresentationUnfogged()
             + " You've been hit by"
-            + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "")
+            + (RandomHelper.isOneInX(1000) ? ", you've been struck by" : "")
             + " *Nullification Field*. 1 CC has been placed from your tactic pool in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
             conclusionButtons);
         deleteMessage(event);
@@ -2089,7 +2089,7 @@ public class ButtonHelper {
         }
 
         MessageHelper.sendMessageToChannelWithButtons(target.getCorrectChannel(), target.getRepresentationUnfogged()
-            + " You've been hit by" + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "")
+            + " You've been hit by" + (RandomHelper.isOneInX(1000) ? ", you've been struck by" : "")
             + " *Minister of Peace*. 1 CC has been placed from your tactic pool in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
             conclusionButtons);
         deleteTheOneButton(event);

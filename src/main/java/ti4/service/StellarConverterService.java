@@ -1,7 +1,5 @@
 package ti4.service;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -9,6 +7,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.DisasterWatchHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -37,7 +36,7 @@ public class StellarConverterService {
             return;
         }
 
-        String message1 = (ThreadLocalRandom.current().nextInt(20) == 0 ? "# _Hey, Stellar!_" : "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
+        String message1 = (RandomHelper.isOneInX(20) ? "# _Hey, Stellar!_" : "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, "Moments before disaster in game " + game.getName());
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message1);
 

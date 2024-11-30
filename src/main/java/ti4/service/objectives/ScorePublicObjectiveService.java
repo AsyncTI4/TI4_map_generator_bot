@@ -21,6 +21,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.info.ListPlayerInfoService;
+import ti4.service.leader.HeroUnlockCheckService;
 
 @UtilityClass
 public class ScorePublicObjectiveService {
@@ -105,7 +106,7 @@ public class ScorePublicObjectiveService {
         if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
         }
-        Helper.checkIfHeroUnlocked(game, player);
+        HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
         if (poName.toLowerCase().contains("sway the council") || poName.toLowerCase().contains("erect a monument")
             || poName.toLowerCase().contains("found a golden age")
             || poName.toLowerCase().contains("amass wealth")

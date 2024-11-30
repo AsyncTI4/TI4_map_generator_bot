@@ -1,8 +1,5 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.defaultString;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -25,10 +22,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,6 +38,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -536,7 +534,7 @@ public class TileGenerator {
                 } else {
                     x += (isSpiral ? 36 : 0);
                     y += (isSpiral ? 43 : 0);
-                    String batFile = ResourceHelper.getInstance().getGeneralFile("zobat" + (ThreadLocalRandom.current().nextInt(4096) == 0 ? "_shiny" : "") + ".png");
+                    String batFile = ResourceHelper.getInstance().getGeneralFile("zobat" + (RandomHelper.isOneInX(4096) ? "_shiny" : "") + ".png");
                     BufferedImage bufferedImage = ImageHelper.read(batFile);
                     x += (345 - bufferedImage.getWidth()) / 2;
                     y += (300 - bufferedImage.getHeight()) / 2;
@@ -835,7 +833,7 @@ public class TileGenerator {
                 for (Planet planet : tile.getPlanetUnitHolders()) {
                     String traitFile = "";
                     List<String> traits = planet.getPlanetType();
-                    if (traits.isEmpty() && isNotBlank(planet.getOriginalPlanetType())) {
+                    if (traits.isEmpty() && StringUtils.isNotBlank(planet.getOriginalPlanetType())) {
                         traits.add(planet.getOriginalPlanetType());
                     }
 
@@ -926,7 +924,7 @@ public class TileGenerator {
                 for (Planet planet : tile.getPlanetUnitHolders()) {
                     List<String> skips = planet.getTechSpeciality();
                     String originalTechSpeciality = planet.getOriginalTechSpeciality();
-                    if (isNotBlank(originalTechSpeciality) && !skips.contains(originalTechSpeciality)) {
+                    if (StringUtils.isNotBlank(originalTechSpeciality) && !skips.contains(originalTechSpeciality)) {
                         skips.add(planet.getOriginalTechSpeciality());
                     }
                     skips.removeAll(Collections.singleton(null));
@@ -1278,7 +1276,7 @@ public class TileGenerator {
             return o1.compareTo(o2);
         });
         if (game.isShowBubbles() && unitHolder instanceof Planet planetHolder && shouldPlanetHaveShield(unitHolder, game)) {
-            String tokenPath = switch (defaultString(planetHolder.getContrastColor())) {
+            String tokenPath = switch (StringUtils.defaultString(planetHolder.getContrastColor())) {
                 case "orange" -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield_orange.png");
                 default -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
             };

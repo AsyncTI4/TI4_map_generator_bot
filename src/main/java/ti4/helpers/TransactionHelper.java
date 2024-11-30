@@ -362,7 +362,7 @@ public class TransactionHelper {
         "Some Free Candy, From My Windowless Van");
 
     public static String getNothingMessage() {
-        if (ThreadLocalRandom.current().nextInt(1000000) == 0) {
+        if (RandomHelper.isOneInX(1000000)) {
             return "The joy of sharing a one in a million empty transaction offer message";
         }
 

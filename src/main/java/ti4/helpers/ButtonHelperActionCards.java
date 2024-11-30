@@ -429,12 +429,28 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("getRepealLawButtons")
+    public static void getRepealLawButtons(ButtonInteractionEvent event, Player player, Game game) {
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
+            "Use buttons to select Law to repeal",
+            ButtonHelperActionCards.getRepealLawButtons(game, player));
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static List<Button> getRepealLawButtons(Game game, Player player) {
         List<Button> lawButtons = new ArrayList<>();
         for (String law : game.getLaws().keySet()) {
             lawButtons.add(Buttons.green("repealLaw_" + game.getLaws().get(law), Mapper.getAgendaTitle(law)));
         }
         return lawButtons;
+    }
+
+    @ButtonHandler("getDivertFundingButtons")
+    public static void getDivertFundingButtons(ButtonInteractionEvent event, Player player, Game game) {
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
+            "Use buttons to select tech to return",
+            ButtonHelperActionCards.getDivertFundingLoseTechOptions(player, game));
+        ButtonHelper.deleteMessage(event);
     }
 
     public static List<Button> getDivertFundingLoseTechOptions(Player player, Game game) {
@@ -778,7 +794,7 @@ public class ButtonHelperActionCards {
     public static void resolveGhostShipStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         tile = FlipTileService.flipTileIfNeeded(event, tile, game);
-        AddUnitService.addUnits(event, tile, game, player.getColor(),  "destroyer");
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "destroyer");
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " put 1 destroyer in " + tile.getRepresentation());
@@ -1069,7 +1085,7 @@ public class ButtonHelperActionCards {
         buttons.add(Buttons.green("spyStep3_" + player.getFaction(), "Send random AC"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
             p2.getRepresentationUnfogged()
-                + " you have been hit by" + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "") + " an ability which forces you to send a random AC. Press the button to send a random AC to the person.",
+                + " you have been hit by" + (RandomHelper.isOneInX(1000) ? ", you've been struck by" : "") + " an ability which forces you to send a random AC. Press the button to send a random AC to the person.",
             buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -1360,7 +1376,7 @@ public class ButtonHelperActionCards {
     public static void resolveUpgrade(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "cruiser");
-        AddUnitService.addUnits(event, tile, game, player.getColor(),  "dread");
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "dread");
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " replaced 1 cruiser with 1 dreadnought in " + tile.getRepresentation());
@@ -1833,6 +1849,17 @@ public class ButtonHelperActionCards {
                 Mapper.getAgendaTitle(name) + " was repealed");
         }
         game.removeLaw(name);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("getPlagiarizeButtons")
+    public static void getPlagiarizeButtons(ButtonInteractionEvent event, Player player, Game game) {
+        game.setComponentAction(true);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Select the tech you want", ButtonHelperActionCards.getPlagiarizeButtons(game, player));
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
+        Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        buttons.add(doneExhausting);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Click the names of the planets you wish to exhaust to pay the 5 influence", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
