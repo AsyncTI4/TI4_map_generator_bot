@@ -1,13 +1,25 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Map;
+import java.util.Set;
 
 import ti4.ResourceHelper;
-import ti4.helpers.*;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.CalendarHelper;
+import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
+import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -386,7 +398,8 @@ public class UnitRenderGenerator {
         BufferedImage spoopy = null;
 
         // Random spoopy warsun
-        if (unitKey.getUnitType() == UnitType.Warsun && ThreadLocalRandom.current().nextInt(1000) == 0) {
+        int spoopyChance = CalendarHelper.isNearHalloween() ? 10 : 1000;
+        if (unitKey.getUnitType() == UnitType.Warsun && RandomHelper.isOneInX(spoopyChance)) {
             String spoopypath = resourceHelper.getSpoopyFile();
             spoopy = ImageHelper.read(spoopypath);
         }
