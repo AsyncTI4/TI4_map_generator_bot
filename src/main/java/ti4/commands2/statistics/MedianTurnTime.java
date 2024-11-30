@@ -47,7 +47,7 @@ class MedianTurnTime extends Subcommand {
         Predicate<ManagedGame> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
         for (ManagedGame game : GameManager.getManagedGames().stream().filter(endedGamesFilter).toList()) {
-            for (ManagedPlayer player : game.getPlayers()) {
+            for (ManagedPlayer player : game.getRealPlayers()) {
                 Integer totalTurns = game.getPlayerToTotalTurns().get(player);
                 Long totalTurnTime = game.getPlayerToTurnTime().get(player);
                 Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);

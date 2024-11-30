@@ -73,7 +73,7 @@ class DiceLuck extends Subcommand {
         Predicate<ManagedGame> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
         for (ManagedGame game : GameManager.getManagedGames().stream().filter(endedGamesFilter).toList()) {
-            for (ManagedPlayer player : game.getPlayers()) {
+            for (ManagedPlayer player : game.getRealPlayers()) {
                 Entry<Double, Integer> playerDiceLuck = Map.entry(
                     game.getPlayerToExpectedHitsTimes10().get(player) / 10.0,
                     game.getPlayerToActualHits().get(player));
