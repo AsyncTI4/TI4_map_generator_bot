@@ -122,14 +122,16 @@ public class SlashCommandListener extends ListenerAdapter {
         final List<String> excludedGames = List.of("pbd1000", "pbd100two");
         if (excludedGames.contains(game.getName())) return;
 
-        boolean isPrivateThread = (event.getMessageChannel() instanceof ThreadChannel thread && !thread.isPublic());
-        boolean isGameChannel = event.getMessageChannel() != game.getActionsChannel()
+        boolean isPrivateThread = event.getMessageChannel() instanceof ThreadChannel thread && !thread.isPublic();
+        boolean isPublicThread = event.getMessageChannel() instanceof ThreadChannel thread && thread.isPublic();
+        boolean isNotGameChannel = event.getMessageChannel() != game.getActionsChannel()
             && event.getMessageChannel() != game.getTableTalkChannel()
             && !event.getMessageChannel().getName().contains("bot-map-updates");
 
-        if (isPrivateThread || isGameChannel) {
+        if ((isPrivateThread || isNotGameChannel) && !isPublicThread) {
             reportSusSlashCommand(event, m);
         }
+
     }
 
     private static void reportSusSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
