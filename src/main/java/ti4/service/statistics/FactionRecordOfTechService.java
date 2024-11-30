@@ -35,8 +35,8 @@ public class FactionRecordOfTechService {
 
     private String getTechResearched(SlashCommandInteractionEvent event) {
         String faction = event.getOption(Constants.FACTION, "", OptionMapping::getAsString);
-        FactionModel factionM = Mapper.getFaction(faction);
-        if (factionM == null) {
+        FactionModel factionModel = Mapper.getFaction(faction);
+        if (factionModel == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No faction known as " + faction);
             return "UNKNOWN FACTION";
         }
@@ -45,12 +45,12 @@ public class FactionRecordOfTechService {
 
         GamesPage.consumeAllGames(
             GameStatisticsFilterer.getGamesFilter(event),
-            game -> getFactionRecordOfTech(game, techsResearched, gamesThatHadThem, factionM)
+            game -> getFactionRecordOfTech(game, techsResearched, gamesThatHadThem, faction, factionModel)
         );
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("## __**Techs Researched By ").append(factionM.getFactionName()).append(" (From ").append(gamesThatHadThem).append(" Games)**__\n");
+        sb.append("## __**Techs Researched By ").append(factionModel.getFactionName()).append(" (From ").append(gamesThatHadThem).append(" Games)**__\n");
 
         boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
         Comparator<Map.Entry<String, Integer>> comparator = (o1, o2) -> {
@@ -74,9 +74,9 @@ public class FactionRecordOfTechService {
         return sb.toString();
     }
 
-    private void getFactionRecordOfTech(Game game, Map<String, Integer> techsResearched, AtomicInteger gamesThatHadThem, FactionModel factionModel) {
+    private void getFactionRecordOfTech(Game game, Map<String, Integer> techsResearched, AtomicInteger gamesThatHadThem, String faction, FactionModel factionModel) {
         for (Player player : game.getRealPlayers()) {
-            if (!player.getFaction().equalsIgnoreCase(factionModel.getFactionName())) {
+            if (!player.getFaction().equalsIgnoreCase(faction)) {
                 continue;
             }
             gamesThatHadThem.getAndIncrement();
