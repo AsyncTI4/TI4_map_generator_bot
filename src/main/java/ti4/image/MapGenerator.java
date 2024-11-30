@@ -394,7 +394,7 @@ public class MapGenerator implements AutoCloseable {
         sb.append("\n");
 
         String message = "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```";
-        MessageHelper.sendMessageToBotLogChannel(event, message);
+        MessageHelper.sendMessageToEventServerBotLogChannel(event, message);
     }
 
     private static String debugString(String name, int padRight, StopWatch subStopWatch, StopWatch totalStopWatch) {
