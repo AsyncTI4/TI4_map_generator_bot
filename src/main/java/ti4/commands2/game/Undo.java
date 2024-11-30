@@ -57,7 +57,7 @@ class Undo extends GameStateSubcommand {
 
         int gameToUndoBackToNumber = Integer.parseInt(intToUndoBackTo);
 
-        Map<String, Game> undoFiles = UndoService.getAllUndoSavedGames(game);
+        Map<String, String> undoFiles = UndoService.getAllUndoSavedGames(game);
         int maxSaveNumber = undoFiles.keySet().stream().map(s -> s.replace(game.getName() + "_", "").replace(".txt", ""))
             .mapToInt(Integer::parseInt).max().orElseThrow(NoSuchElementException::new);
 
@@ -81,7 +81,7 @@ class Undo extends GameStateSubcommand {
             File undoFileToBeDeleted = new File(Storage.getGameUndoDirectory(), undoFile);
             if (undoFileToBeDeleted.exists()) {
                 sb.append("> `").append(i).append("` ")
-                    .append(undoFiles.get(undoFileToBeDeleted.getName()).getLatestCommand()).append("\n");
+                    .append(undoFiles.get(undoFileToBeDeleted.getName())).append("\n");
                 undoFileToBeDeleted.delete();
             }
         }

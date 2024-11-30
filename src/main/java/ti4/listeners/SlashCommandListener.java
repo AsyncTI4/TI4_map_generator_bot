@@ -31,7 +31,11 @@ public class SlashCommandListener extends ListenerAdapter {
             event.getInteraction().reply("Please try again in a moment.\nThe bot is rebooting and is not ready to receive commands.").setEphemeral(true).queue();
             return;
         }
-
+        event.getInteraction().deferReply().queue();
+        AsyncTI4DiscordBot.runAsync("Slash command task", () -> process(event));
+    }
+    
+    private static void process(SlashCommandInteractionEvent event) {
         long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
 
         long startTime = System.currentTimeMillis();
@@ -43,7 +47,7 @@ public class SlashCommandListener extends ListenerAdapter {
             && !event.getInteraction().getName().equals(Constants.SEARCH)
             && !event.getInteraction().getName().equals(Constants.TIGL)
             && (event.getInteraction().getSubcommandName() == null
-                || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
+            || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
             && event.getOption(Constants.GAME_NAME) == null) {
 
             String gameName = CommandHelper.getGameNameFromChannel(event);
@@ -58,8 +62,6 @@ public class SlashCommandListener extends ListenerAdapter {
             GameSaveLoadManager.saveGame(game, "Increment slash command count.");
         }
 
-        event.getInteraction().deferReply().queue();
-
         Member member = event.getMember();
         if (member != null) {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
@@ -72,7 +74,7 @@ public class SlashCommandListener extends ListenerAdapter {
                     || event.getInteraction().getName().equals(Constants.BOTHELPER)
                     || event.getInteraction().getName().equals(Constants.DEVELOPER)
                     || (event.getInteraction().getSubcommandName() != null && event.getInteraction()
-                        .getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
+                    .getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
                     || event.getInteraction().getName().equals(Constants.SEARCH)
                     || !(!event.getInteraction().getName().equals(Constants.USER) && !event.getInteraction().getName().equals(Constants.SHOW_GAME))
                     || event.getOption(Constants.GAME_NAME) != null;
@@ -108,15 +110,15 @@ public class SlashCommandListener extends ListenerAdapter {
         event.getHook().deleteOriginal().queue();
 
         long endTime = System.currentTimeMillis();
-        final int milliThreshhold = 3000;
-        if (startTime - eventTime > milliThreshhold || endTime - startTime > milliThreshhold) {
+        final int milliThreshold = 3000;
+        if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
             String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
             String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
             String message = event.getChannel().getAsMention() + " " + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: " +
-                "This slash command took over " + milliThreshhold + "ms to respond or execute\n> " +
+                "This slash command took over " + milliThreshold + "ms to respond or execute\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " command was issued by user\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
             BotLogger.log(message);
         }
     }

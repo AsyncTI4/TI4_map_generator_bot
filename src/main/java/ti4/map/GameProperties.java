@@ -82,6 +82,7 @@ public class GameProperties {
     private boolean stratPings = true;
     private boolean testBetaFeaturesMode;
     private boolean undoButtonOffered = true;
+    private boolean showOwnedPNsInPlayerArea = false;
     private String hexBorderStyle = "off";
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;

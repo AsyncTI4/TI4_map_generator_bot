@@ -47,6 +47,7 @@ import ti4.model.ShipPositionModel;
 import ti4.model.UnitModel;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class TileGenerator {
@@ -1254,8 +1255,7 @@ public class TileGenerator {
         }
     }
 
-    private static void addSleeperToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder,
-        Function<String, Boolean> isValid, Game game) {
+    private static void addSleeperToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Function<String, Boolean> isValid, Game game) {
         BufferedImage tokenImage;
         Point centerPosition = unitHolder.getHolderCenterPosition();
         if (unitHolder.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3 + 1)) {
@@ -1265,7 +1265,7 @@ public class TileGenerator {
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.remove(null);
         tokenList.sort((o1, o2) -> {
-            if ((o1.contains(Constants.SLEEPER) || o2.contains(Constants.SLEEPER))) {
+            if (o1.contains(Constants.SLEEPER) || o2.contains(Constants.SLEEPER)) {
                 return -1;
             } else if (o1.contains(Constants.DMZ_LARGE) || o2.contains(Constants.DMZ_LARGE)) {
                 return 1;
@@ -1273,7 +1273,7 @@ public class TileGenerator {
             return o1.compareTo(o2);
         });
         if (game.isShowBubbles() && unitHolder instanceof Planet planetHolder && shouldPlanetHaveShield(unitHolder, game)) {
-            String tokenPath = switch (planetHolder.getContrastColor()) {
+            String tokenPath = switch (defaultString(planetHolder.getContrastColor())) {
                 case "orange" -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield_orange.png");
                 default -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
             };

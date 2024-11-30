@@ -17,7 +17,7 @@ public class TimedRunnable implements Runnable {
         warningThresholdSeconds = 5;
     }
 
-    public TimedRunnable(String name, Runnable delegate, int warningThresholdSeconds) {
+    public TimedRunnable(String name, int warningThresholdSeconds, Runnable delegate) {
         this.name = Objects.requireNonNull(name, "Runnable name cannot be null");
         this.delegate = Objects.requireNonNull(delegate, "Runnable cannot be null");
         this.warningThresholdSeconds = warningThresholdSeconds;
@@ -32,7 +32,7 @@ public class TimedRunnable implements Runnable {
             stopWatch.stop();
             long secondsElapsed = stopWatch.getDuration().toSeconds();
             if (secondsElapsed >= warningThresholdSeconds) {
-                BotLogger.log("Runnable " + name + " took longer than " + warningThresholdSeconds + " seconds (" + secondsElapsed + ").");
+                BotLogger.log("'" + name + "' took longer than " + warningThresholdSeconds + " seconds (" + secondsElapsed + ").");
             }
         }
     }

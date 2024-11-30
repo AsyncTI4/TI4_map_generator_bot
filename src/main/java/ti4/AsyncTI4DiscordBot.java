@@ -197,6 +197,7 @@ public class AsyncTI4DiscordBot {
 
         // LOAD GAMES NAMES
         BotLogger.logWithTimestamp(" LOADING GAMES");
+        // LOAD GAMES NAMES
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
         GameManager.initialize();
         GameSaveLoadManager.cleanupOldUndoFiles();
@@ -251,9 +252,6 @@ public class AsyncTI4DiscordBot {
                     BotLogger.logWithTimestamp("DONE PROCESSING STATISTICS");
                 } else {
                     BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING STATISTICS");
-                }
-                if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.logWithTimestamp("DONE PROCESSING STATISTICS");
                 }
                 CronManager.shutdown(); // will wait for up to an additional 20 seconds
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS COMPLETE");
@@ -384,6 +382,7 @@ public class AsyncTI4DiscordBot {
         }
         return classes;
     }
+
 
     public static Guild getGuild(String guildId) {
         return guilds.stream().filter(guild -> guild.getId().equals(guildId)).findFirst().orElse(null);

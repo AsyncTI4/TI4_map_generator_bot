@@ -647,8 +647,6 @@ public class Tile {
 
     public String getHexTileSummary() {
         // TILE +-X +-Y SPACE ; PLANET1 ; PLANET2 ;
-        String sb = getTileID() +
-            AliasHandler.resolveTTPGPosition(getPosition());
-        return sb;
+        return getTileID() + AliasHandler.resolveTTPGPosition(getPosition());
     }
 }

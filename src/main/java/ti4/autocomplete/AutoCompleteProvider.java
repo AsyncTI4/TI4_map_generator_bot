@@ -48,6 +48,7 @@ import ti4.model.PlanetTypeModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
+import ti4.model.SecretObjectiveModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.Source;
 import ti4.model.Source.ComponentSource;
@@ -65,7 +66,31 @@ import ti4.service.statistics.game.GameStatTypes;
 
 public class AutoCompleteProvider {
 
-    public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
+    public static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
+        try {
+            long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
+            long startTime = System.currentTimeMillis();
+
+            resolveAutoCompleteEvent(event);
+
+            long endTime = System.currentTimeMillis();
+            final int milliThreshold = 2000;
+            if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
+                String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
+                String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+                String message = event.getChannel().getAsMention() + " " + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: " +
+                    "This AutoComplete event took over " + milliThreshold + "ms to respond or execute\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " event received\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
+                BotLogger.log(message);
+            }
+        } catch (Exception e) {
+            BotLogger.log("Error in handleAutoCompleteEvent", e);
+        }
+    }
+
+    private static void resolveAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         String commandName = event.getName();
         String subCommandName = event.getSubcommandName();
         String optionName = event.getFocusedOption().getName();
@@ -691,18 +716,15 @@ public class AutoCompleteProvider {
                     event.replyChoiceStrings("No Active Map for this Channel").queue();
                     return;
                 }
-                if (game.isFowMode()) {
+                if (game.isFowMode() && !game.getFogOfWarGMIDs().contains(event.getUser().getId())) {
                     event.replyChoiceStrings("Game is Fog of War mode - you can't see what you are undoing.").queue();
+                    return;
                 }
-                long datetime = System.currentTimeMillis();
                 List<Command.Choice> options = UndoService.getAllUndoSavedGames(game).entrySet().stream()
-                    .sorted(Map.Entry.<String, Game>comparingByValue(Comparator.comparing(Game::getLastModifiedDate)).reversed())
-                    .limit(25)
-                    .map(entry -> new Command.Choice(
-                        StringUtils.left(
-                            entry.getKey() + " (" + DateTimeHelper.getTimeRepresentationToSeconds(datetime - entry.getValue().getLastModifiedDate()) + " ago):  " + entry.getValue().getLatestCommand(), 100),
-                        entry.getKey()))
-                    .collect(Collectors.toList());
+                        .sorted(Map.Entry.<String, String>comparingByValue().reversed())
+                        .limit(25)
+                        .map(entry -> new Command.Choice(StringUtils.left(entry.getValue(), 100), entry.getKey()))
+                        .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
             case Constants.TILE_NAME, Constants.TILE_NAME_FROM, Constants.TILE_NAME_TO, Constants.HS_TILE_POSITION -> {
@@ -1029,6 +1051,90 @@ public class AutoCompleteProvider {
                     .map(e -> new Command.Choice(e.getAutoCompleteName(), e.getId()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
+            }
+        }
+    }
+
+    private static void resolveStatusAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Game game) {
+        if (subCommandName.equals(Constants.SHUFFLE_OBJECTIVE_BACK) ||
+            subCommandName.equals(Constants.SCORE_OBJECTIVE) ||
+            subCommandName.equals(Constants.UNSCORE_OBJECTIVE)) {
+            if (optionName.equals(Constants.PO_ID)) {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                List<Command.Choice> options = game.getRevealedPublicObjectives().entrySet().stream()
+                    .filter(entry -> (entry.getValue() + entry.getKey()).toLowerCase().contains(enteredValue))
+                    .sorted(Map.Entry.comparingByValue())
+                    .limit(25)
+                    .map(e -> new Command.Choice(e.getValue() + " - " + e.getKey(), e.getValue()))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+        }
+    }
+
+    private static void resolveAgendaAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Game game) {
+        if (Constants.AGENDA_ID.equals(optionName)) {
+            switch (subCommandName) {
+                case Constants.ADD_LAW, Constants.PUT_DISCARD_BACK_INTO_DECK -> { // Agendas in Discard
+                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                    List<Command.Choice> options = game.getDiscardAgendas().entrySet().stream()
+                        .filter(entry -> (entry.getValue() + entry.getKey()).toLowerCase().contains(enteredValue))
+                        .sorted(Map.Entry.comparingByKey())
+                        .limit(25)
+                        .map(e -> new Command.Choice(e.getValue() + " - " + Mapper.getAgenda(e.getKey()).getAutoCompleteName(), e.getValue()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
+                case Constants.REVISE_LAW, Constants.ADD_CONTROL_TOKEN, Constants.REMOVE_LAW -> { // Agendas In Play
+                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                    List<Command.Choice> options = game.getLaws().entrySet().stream()
+                        .filter(entry -> (entry.getValue() + entry.getKey()).toLowerCase().contains(enteredValue))
+                        .sorted(Map.Entry.comparingByKey())
+                        .limit(25)
+                        .map(e -> new Command.Choice(e.getValue() + " - " + Mapper.getAgenda(e.getKey()).getAutoCompleteName(), e.getValue()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
+            }
+
+        }
+    }
+
+    private static void resolveSecretObjectiveAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Player player) {
+        if (Constants.SECRET_OBJECTIVE_ID.equals(optionName) || Constants.SO_ID.equals(optionName)) {
+            switch (subCommandName) {
+                case Constants.UNSCORE_SO -> { // Scored, safe to show Name/ID
+                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                    List<Command.Choice> options = player.getSecretsScored().entrySet().stream()
+                        .filter(entry -> (entry.getValue() + entry.getKey()).toLowerCase().contains(enteredValue))
+                        .sorted(Map.Entry.comparingByKey())
+                        .limit(25)
+                        .map(e -> new Command.Choice(e.getValue() + " - " + Mapper.getSecretObjective(e.getKey()).getAutoCompleteName(), e.getValue()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
+                case Constants.SCORE_SO, Constants.DISCARD_SO, Constants.SHOW_SO, Constants.SHOW_SO_TO_ALL -> { // In hand, not safe to show Name/ID
+                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                    List<Command.Choice> options = player.getSecretsUnscored().entrySet().stream()
+                        .filter(entry -> (entry.getValue() + entry.getKey()).toLowerCase().contains(enteredValue))
+                        .sorted(Map.Entry.comparingByValue())
+                        .limit(25)
+                        .map(e -> new Command.Choice(e.getValue() + "", e.getValue()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
+                case Constants.DRAW_SPECIFIC_SO -> {
+                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                    DeckModel soDeck = Mapper.getDeck(player.getGame().getSoDeckID());
+                    List<SecretObjectiveModel> possibleSecretObjectives = soDeck.getNewDeck().stream().map(Mapper::getSecretObjective).toList();
+                    List<Command.Choice> options = possibleSecretObjectives.stream()
+                        .filter(soModel -> soModel.search(enteredValue))
+                        .sorted(Comparator.comparing(SecretObjectiveModel::getName))
+                        .limit(25)
+                        .map(soModel -> new Command.Choice(soModel.getAutoCompleteName(), soModel.getAlias()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
             }
         }
     }
