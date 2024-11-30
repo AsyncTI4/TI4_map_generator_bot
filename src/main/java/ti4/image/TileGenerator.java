@@ -1,6 +1,15 @@
 package ti4.image;
 
-import java.awt.*;
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -13,19 +22,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.ButtonHelper;
@@ -46,9 +54,6 @@ import ti4.model.BorderAnomalyModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.UnitModel;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
-
-import static org.apache.commons.lang3.StringUtils.defaultString;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class TileGenerator {
 
@@ -115,7 +120,7 @@ public class TileGenerator {
                     tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
                 }
             }
-       }
+        }
 
         int width = TILE_WIDTH + (TILE_EXTRA_WIDTH * 2 * context) + EXTRA_X;
         int height = TILE_HEIGHT * (2 * context + 1) + EXTRA_Y;
@@ -413,8 +418,7 @@ public class TileGenerator {
                         addPlanetToken(tile, tileGraphics, unitHolder, rectangles);
                     }
                     new UnitRenderGenerator(
-                            game, displayType, tile, tileGraphics, rectangles, degree, degreeChange, unitHolder, radius, fowPlayer
-                    ).render();
+                        game, displayType, tile, tileGraphics, rectangles, degree, degreeChange, unitHolder, radius, fowPlayer).render();
                 }
             }
             case Distance -> {

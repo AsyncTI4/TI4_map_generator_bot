@@ -460,9 +460,7 @@ public class UnitRenderGenerator {
                 centerPosition.x + position.x - (unitWidth / 2),
                 centerPosition.y + position.y - (unitHeight / 2),
                 unitWidth,
-                unitHeight
-            )
-        );
+                unitHeight));
         return position;
     }
 
@@ -492,7 +490,7 @@ public class UnitRenderGenerator {
             int candidateX = centerPosition.x + x - (unitWidth / 2);
             int candidateY = centerPosition.y + y - (unitHeight / 2);
             if (rectangles.stream().noneMatch(rectangle -> rectangle.intersects(candidateX, candidateY,
-                    unitWidth, unitHeight))) {
+                unitWidth, unitHeight))) {
                 searchPosition = false;
             } else if (degree > 360) {
                 searchPosition = false;
@@ -500,18 +498,17 @@ public class UnitRenderGenerator {
 
             degree += degreeChange;
 
-            if(!searchPosition) {
+            if (!searchPosition) {
                 foundX = candidateX;
                 foundY = candidateY;
             }
         }
 
         rectangles.add(
-                new Rectangle(foundX, foundY, unitWidth, unitHeight));
+            new Rectangle(foundX, foundY, unitWidth, unitHeight));
 
         return new Point(foundX, foundY);
     }
-
 
     private ImagePosition calculateImagePosition(PositioningContext posCtx, Point position) {
         int xOriginal = posCtx.centerPosition.x + position.x;
@@ -551,7 +548,6 @@ public class UnitRenderGenerator {
 
         return new ImagePosition(xOriginal, yOriginal, imageX, imageY);
     }
-
 
     private static Point getUnitTagLocation(String unitID) {
         return switch (unitID) {
