@@ -22,7 +22,8 @@
         "playArea": true,
         "playImmediately": true,
         "source": "base",
-        "text": "When you receive this card, if you are not the <color> player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the <color> player's units, or if the <color> player is eliminated, lose 1 victory point and return this card to the <color> player."
+        "text": "When you receive this card, if you are not the <color> player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the <color> player's units, or if the <color> player is eliminated, lose 1 victory point and return this card to the <color> player.",
+        "shrinkName": true
     },
     {
         "alias": "<color>_ta",

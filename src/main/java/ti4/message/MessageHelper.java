@@ -1,5 +1,28 @@
 package ti4.message;
 
+import java.io.File;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -22,10 +45,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessagePollBuilder;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -34,25 +53,13 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
+import ti4.helpers.ThreadHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
 
-import java.io.File;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.StringTokenizer;
-import java.util.concurrent.TimeUnit;
-
 public class MessageHelper {
+
 	public interface MessageFunction {
 		void run(Message msg);
 	}
@@ -69,11 +76,11 @@ public class MessageHelper {
 		sendMessageToChannel(event.getMessageChannel(), messageText);
 	}
 
-	public static void sendMessageToBotLogChannel(GenericInteractionCreateEvent event, String messageText) {
+	public static void sendMessageToEventServerBotLogChannel(GenericInteractionCreateEvent event, String messageText) {
 		splitAndSent(messageText, BotLogger.getBotLogChannel(event));
 	}
 
-	public static void sendMessageToBotLogChannel(String messageText) {
+	public static void sendMessageToPrimaryBotLogChannel(String messageText) {
 		splitAndSent(messageText, BotLogger.getPrimaryBotLogChannel());
 	}
 
@@ -93,11 +100,19 @@ public class MessageHelper {
 		sendMessageToChannelWithEmbedsAndButtons(channel, messageText, null, buttons);
 	}
 
-	public static void sendMessageToChannelWithEmbedsAndButtons(MessageChannel channel, String messageText, List<MessageEmbed> embeds, List<Button> buttons) {
+	public static void sendMessageToChannelWithEmbedsAndButtons(@Nonnull MessageChannel channel, @Nullable String messageText, @Nullable List<MessageEmbed> embeds, @Nullable List<Button> buttons) {
+		if (messageText != null && messageText.contains("NO_UNDO")) {
+			messageText = messageText.replaceFirst("NO_UNDO", "");
+			splitAndSent(messageText, channel, embeds, buttons);
+			return;
+		}
+
+		// Add UNDO button
 		Game game = getGameFromChannelName(channel.getName());
 		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")
-			&& !messageText.contains("end of turn ability") && game != null && game.isUndoButtonOffered()) {
+			&& messageText != null && !messageText.contains("end of turn ability") && game != null && game.isUndoButtonOffered()) {
 			buttons = addUndoButtonToList(buttons, game);
+
 		}
 		splitAndSent(messageText, channel, embeds, buttons);
 	}
@@ -105,31 +120,35 @@ public class MessageHelper {
 	public static List<Button> addUndoButtonToList(List<Button> buttons, Game game) {
 		if (game == null) return buttons;
 
-		boolean undoPresent = false;
-		List<Button> newButtons = new ArrayList<>(buttons);
 		for (Button button : buttons) {
 			if (button.getId().contains("ultimateUndo")) {
-				undoPresent = true;
+				return buttons;
 			}
 		}
 		File mapUndoDirectory = Storage.getGameUndoDirectory();
-		if (mapUndoDirectory.exists() && !undoPresent) {
-			String mapName = game.getName();
-			String mapNameForUndoStart = mapName + "_";
-			String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
-			if (mapUndoFiles != null && mapUndoFiles.length > 0) {
-				try {
-					List<Integer> numbers = Arrays.stream(mapUndoFiles)
-						.map(fileName -> fileName.replace(mapNameForUndoStart, ""))
-						.map(fileName -> fileName.replace(Constants.TXT, ""))
-						.map(Integer::parseInt).toList();
-					int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
-					newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
-				} catch (Exception e) {
-					BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
-				}
-			}
+		if (!mapUndoDirectory.exists()) {
+			return buttons;
 		}
+
+		String mapName = game.getName();
+		String mapNameForUndoStart = mapName + "_";
+		String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+		if (mapUndoFiles == null || mapUndoFiles.length == 0) {
+			return buttons;
+		}
+
+		List<Button> newButtons = new ArrayList<>(buttons);
+		try {
+			List<Integer> numbers = Arrays.stream(mapUndoFiles)
+				.map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+				.map(fileName -> fileName.replace(Constants.TXT, ""))
+				.map(Integer::parseInt).toList();
+			int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
+			newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
+		} catch (Exception e) {
+			BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
+		}
+
 		return newButtons;
 	}
 
@@ -338,11 +357,18 @@ public class MessageHelper {
 			return;
 		}
 
+		List<MessageEmbed> sanitizedEmbeds;
+		if (embeds == null) {
+			sanitizedEmbeds = Collections.emptyList();
+		} else {
+			sanitizedEmbeds = embeds.stream().filter(Objects::nonNull).collect(Collectors.toList());
+		}
+
 		if (channel instanceof ThreadChannel thread) {
 			if (thread.isArchived() && !thread.isLocked()) {
 				String txt = messageText;
 				List<Button> butts = buttons;
-				thread.getManager().setArchived(false).queue((v) -> splitAndSentWithAction(txt, channel, restAction, embeds, butts), BotLogger::catchRestError);
+				thread.getManager().setArchived(false).queue((v) -> splitAndSentWithAction(txt, channel, restAction, sanitizedEmbeds, butts), BotLogger::catchRestError);
 				return;
 			} else if (thread.isLocked()) {
 				BotLogger.log("WARNING: Attempting to send a message to locked thread: " + thread.getJumpUrl());
@@ -356,7 +382,7 @@ public class MessageHelper {
 			messageText = injectRules(messageText);
 		}
 		final String message = messageText;
-		List<MessageCreateData> objects = getMessageCreateDataObjects(message, embeds, buttons);
+		List<MessageCreateData> objects = getMessageCreateDataObjects(message, sanitizedEmbeds, buttons);
 		Iterator<MessageCreateData> iterator = objects.iterator();
 		while (iterator.hasNext()) {
 			MessageCreateData messageCreateData = iterator.next();
@@ -515,7 +541,7 @@ public class MessageHelper {
 		// GET CARDS INFO THREAD
 		ThreadChannel threadChannel = player.getCardsInfoThread();
 
-        sendMessageToChannel(threadChannel, messageText);
+		sendMessageToChannel(threadChannel, messageText);
 	}
 
 	/**
@@ -669,15 +695,11 @@ public class MessageHelper {
 		if (embeds == null) {
 			return new ArrayList<>();
 		}
-		try {
-			embeds.removeIf(Objects::isNull);
-		} catch (Exception e) {
-			// Do nothing
-		}
 		if (embeds.isEmpty()) {
 			return new ArrayList<>();
 		}
-		return ListUtils.partition(embeds, 9); //max 10, but we've had issues with 6k char limit, so max 9
+		embeds = embeds.stream().filter(Objects::nonNull).collect(Collectors.toList());
+		return ListUtils.partition(embeds, 8); //max is 10, but we've had issues with 6k char limit in embeds in single message
 	}
 
 	public static void sendMessageToThread(MessageChannel channel, String threadName, String messageToSend) {
@@ -693,7 +715,7 @@ public class MessageHelper {
 		if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty() || messageToSend.isEmpty())
 			return;
 		if (channel instanceof TextChannel) {
-			Helper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
+			ThreadHelper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
 			channel.asTextChannel().createThreadChannel(threadName)
 				.setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queueAfter(500, TimeUnit.MILLISECONDS,
 					t -> sendMessageToChannel(t, messageToSend));
@@ -707,7 +729,7 @@ public class MessageHelper {
 			return;
 		}
 		if (channel instanceof TextChannel) {
-			Helper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
+			ThreadHelper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
 			channel.asTextChannel().createThreadChannel(threadName)
 				.setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
 				.queueAfter(500, TimeUnit.MILLISECONDS, t -> sendMessageToChannelWithEmbedsAndButtons(t, null, embeds, null), error -> BotLogger.log("Error creating thread channel: " + threadName + " in channel: " + channel.getAsMention(), error));
@@ -743,7 +765,7 @@ public class MessageHelper {
 	 */
 	public static String getBotLogWebhookURL() {
 		return switch (AsyncTI4DiscordBot.guildPrimaryID) {
-			case "943410040369479690" -> // AsyncTI4 Primary HUB Production Server
+			case Constants.ASYNCTI4_HUB_SERVER_ID -> // AsyncTI4 Primary HUB Production Server
 				"https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v";
 			case "1059645656295292968" -> // PrisonerOne's Test Server
 				"https://discord.com/api/webhooks/1159478386998116412/NiyxcE-6TVkSH0ACNpEhwbbEdIBrvTWboZBTwuooVfz5n4KccGa_HRWTbCcOy7ivZuEp";
@@ -836,7 +858,7 @@ public class MessageHelper {
 		String gameName = channelName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 		gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
 		gameName = StringUtils.substringBefore(gameName, "-");
-		return GameManager.getInstance().getGame(gameName);
+		return GameManager.getGame(gameName);
 	}
 
 	/**

@@ -27,7 +27,7 @@ public class TIGLHelper {
         AGENT("Async Rank - Agent", 2), //
         COMMANDER("Async Rank - Commander", 3), //
         HERO("Async Rank - Hero", 4), //
-        EMPEROR("Async Rank - Galactic Emperor", 5), //
+        EMPEROR("Async Rank - Galactic Emperor", 99), // this is only obtainable once per TIGL season, not per HERO rankup game
         HERO_ARBOREC("Async Rank - Letani Miasmiala", -1), //
         HERO_ARGENT("Async Rank - Mirik Aun Sissiri", -1), //
         HERO_CABAL("Async Rank - It Feeds on Carrion", -1), //
@@ -122,12 +122,6 @@ public class TIGLHelper {
 
     public static boolean validateTIGLness() {
         boolean tiglProblem = false;
-        for (TIGLRank rank : TIGLRank.values()) {
-            if (rank.getRole() == null) {
-                BotLogger.log("TIGLHelper.validateTIGLness: missing Role: `" + rank.name + "`");
-                tiglProblem = true;
-            }
-        }
         if (getTIGLChannel() == null) {
             BotLogger.log("TIGLHelper.validateTIGLness: missing channel: `" + TIGL_CHANNEL_NAME + "`");
             tiglProblem = true;
@@ -135,6 +129,15 @@ public class TIGLHelper {
         if (getTIGLAdminThread() == null) {
             BotLogger.log("TIGLHelper.validateTIGLness: missing thread: `" + TIGL_ADMIN_THREAD + "`");
             tiglProblem = true;
+        }
+        if (!AsyncTI4DiscordBot.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) {
+            return tiglProblem;
+        }
+        for (TIGLRank rank : TIGLRank.values()) {
+            if (rank.getRole() == null) {
+                BotLogger.log("TIGLHelper.validateTIGLness: missing Role: `" + rank.name + "`");
+                tiglProblem = true;
+            }
         }
         return tiglProblem;
     }
@@ -197,7 +200,7 @@ public class TIGLHelper {
     }
 
     private static TIGLRank getLowestCommonRankBetweenPlayers(List<User> users) {
-        TIGLRank lowestRank = TIGLRank.EMPEROR;
+        TIGLRank lowestRank = TIGLRank.HERO;
         for (User user : users) {
             TIGLRank rank = getUsersHighestTIGLRank(user);
             if (lowestRank.getIndex() > rank.getIndex()) {

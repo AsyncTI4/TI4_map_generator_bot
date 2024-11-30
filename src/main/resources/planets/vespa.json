@@ -2,7 +2,6 @@
     "id": "vespa",
     "tileId": "m32",
     "name": "Vespa",
-    "shortName": null,
     "aliases": ["vespa", "wasp", "wasps"],
     "positionInTile": {
         "x": 135.0,

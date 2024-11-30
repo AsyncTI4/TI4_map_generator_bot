@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 public class PromissoryNoteModelTest extends BaseTi4Test {

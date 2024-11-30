@@ -49,21 +49,19 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.cardsso.SOInfo;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.planet.PlanetRemove;
+import ti4.commands2.planet.PlanetRemove;
 import ti4.draft.BagDraft;
-import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
@@ -71,6 +69,7 @@ import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
+import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -86,16 +85,18 @@ import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.milty.MiltyDraftManager;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public class Game extends GameProperties {
+
     // TODO (Jazz): Sort through these and add to GameProperties
     private Map<String, Tile> tileMap = new HashMap<>(); // Position, Tile
     private Map<String, Player> players = new LinkedHashMap<>();
 
     private final @JsonIgnore Map<String, Planet> planets = new HashMap<>();
-    private final MiltyDraftManager miltyDraftManager;
     private final Map<String, String> fowOptions = new HashMap<>();
     private final Map<Integer, Boolean> scPlayed = new HashMap<>();
     private final Map<String, String> checkingForAllReacts = new HashMap<>();
@@ -164,11 +165,12 @@ public class Game extends GameProperties {
     @Getter
     @Setter
     private Map<String, Integer> tileDistances = new HashMap<>();
+    private MiltyDraftManager miltyDraftManager;
     @Setter
-    private MiltySettings miltySettings = null;
+    private MiltySettings miltySettings;
     @Getter
     @Setter
-    private String miltyJson = null;
+    private String miltyJson;
     @Getter
     @Setter
     private TIGLRank minimumTIGLRankAtGameStart;
@@ -176,8 +178,6 @@ public class Game extends GameProperties {
     public Game() {
         setCreationDate(Helper.getDateRepresentation(System.currentTimeMillis()));
         setLastModifiedDate(System.currentTimeMillis());
-
-        miltyDraftManager = new MiltyDraftManager();
     }
 
     public void newGameSetup() {
@@ -230,10 +230,13 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Player setupNeutralPlayer(String color) {
-        if (players.get(Constants.dicecordId) != null)
+        Player neutral = players.get(Constants.dicecordId);
+        if (neutral != null) {
+            ColorChangeHelper.changePlayerColor(this, neutral, neutral.getColor(), color);
             return players.get(Constants.dicecordId);
+        }
         addPlayer(Constants.dicecordId, "Dicecord"); //Dicecord
-        Player neutral = getPlayer(Constants.dicecordId);
+        neutral = getPlayer(Constants.dicecordId);
         neutral.setColor(color);
         neutral.setFaction("neutral");
         neutral.setDummy(true);
@@ -241,39 +244,6 @@ public class Game extends GameProperties {
         Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         neutral.setUnitsOwned(playerOwnedUnits);
         return neutral;
-    }
-
-    @JsonIgnore
-    public Player getNeutralPlayer(String fallbackColor) {
-        if (players.get(Constants.dicecordId) != null)
-            return players.get(Constants.dicecordId);
-        return setupNeutralPlayer(fallbackColor);
-    }
-
-    @JsonIgnore
-    public Player getNeutralPlayer() {
-        if (players.get(Constants.dicecordId) != null)
-            return players.get(Constants.dicecordId);
-        return null;
-    }
-
-    public String pickNeutralColorID(List<String> exclusions) {
-        // Start with the preferred colors, but then add all the colors to the list anyway
-        List<String> colorPriority = new ArrayList<>(List.of("gray", "red", "blue", "green", "orange", "yellow", "black", "pink", "purple", "rose", "lime", "brown", "teal", "spring", "petrol", "lightgray"));
-        colorPriority.addAll(Mapper.getColorNames());
-        List<String> preferredNeutralColors = new ArrayList<>(colorPriority.stream().map(Mapper::getColorID).toList());
-
-        // Build the full set of exclusions based on the argument plus the list of players
-        Set<String> excludedColorIDs = new HashSet<>();
-        if (exclusions != null) excludedColorIDs.addAll(exclusions);
-        excludedColorIDs.addAll(getPlayers().values().stream().map(Player::getColorID).toList());
-
-        // Finally, pick a color
-        String neutralColorID = preferredNeutralColors.stream().filter(colorID -> !excludedColorIDs.contains(colorID)).findFirst().orElse(null);
-        if (neutralColorID == null) {
-            MessageHelper.sendMessageToChannel(getActionsChannel(), "Could not determine a good neutral unit color " + Constants.jazzPing());
-        }
-        return neutralColorID;
     }
 
     public int getNumberOfSOsInTheDeck() {
@@ -336,10 +306,18 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public MiltyDraftManager getMiltyDraftManager() {
+        if (miltyDraftManager == null) {
+            miltyDraftManager = new MiltyDraftManager();
+        }
         return miltyDraftManager;
     }
 
+    public void setMiltyDraftManager(MiltyDraftManager miltyDraftManager) {
+        this.miltyDraftManager = miltyDraftManager;
+    }
+
     @JsonProperty("miltySettings")
+    @Nullable
     public MiltySettings getMiltySettingsUnsafe() {
         return miltySettings;
     }
@@ -626,8 +604,7 @@ public class Game extends GameProperties {
 
     public ThreadChannel getLaunchPostThread() {
         if (StringUtils.isNumeric(getLaunchPostThreadID())) {
-            ThreadChannel threadChannel = AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(getLaunchPostThreadID());
-            return threadChannel;
+            return AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(getLaunchPostThreadID());
         }
         return null;
     }
@@ -1650,6 +1627,9 @@ public class Game extends GameProperties {
         return soToPoList;
     }
 
+    /**
+     * @param soToPoList - a list of Secret Objective IDs that have been turned into Public Objectives (typically via Classified Document Leaks)
+     */
     public void setSoToPoList(List<String> soToPoList) {
         this.soToPoList = soToPoList;
     }
@@ -2009,30 +1989,28 @@ public class Game extends GameProperties {
                 break;
             }
         }
-        if (!id.isEmpty()) {
-            if ("warrant".equalsIgnoreCase(id)) {
-                for (Player p2 : getRealPlayers()) {
-                    if (ButtonHelper.isPlayerElected(this, p2, id)) {
-                        p2.setSearchWarrant(false);
-                    }
-                }
-            }
-            if ("censure".equalsIgnoreCase(id)) {
-
-                Map<String, Integer> customPOs = new HashMap<>(getRevealedPublicObjectives());
-                for (String customPO : customPOs.keySet()) {
-                    if (customPO.toLowerCase().contains("political censure")) {
-                        removeCustomPO(customPOs.get(customPO));
-                    }
-                }
-
-            }
-            laws.remove(id);
-            lawsInfo.remove(id);
-            addDiscardAgenda(id);
-            return true;
+        if (id.isEmpty()) {
+            return false;
         }
-        return false;
+        if ("warrant".equalsIgnoreCase(id)) {
+            for (Player p2 : getRealPlayers()) {
+                if (ButtonHelper.isPlayerElected(this, p2, id)) {
+                    p2.setSearchWarrant(false);
+                }
+            }
+        }
+        if ("censure".equalsIgnoreCase(id)) {
+            Map<String, Integer> customPOs = new HashMap<>(getRevealedPublicObjectives());
+            for (String customPO : customPOs.keySet()) {
+                if (customPO.toLowerCase().contains("political censure")) {
+                    removeCustomPO(customPOs.get(customPO));
+                }
+            }
+        }
+        laws.remove(id);
+        lawsInfo.remove(id);
+        addDiscardAgenda(id);
+        return true;
     }
 
     public boolean removeLaw(String id) {
@@ -2561,7 +2539,7 @@ public class Game extends GameProperties {
                 + ") and should discard one. If your game is playing with a higher SO limit, you may change that in /game setup.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
             String secretScoreMsg = "Click a button below to discard your Secret Objective";
-            List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(this, player);
+            List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
             if (!soButtons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), secretScoreMsg,
                     soButtons);
@@ -3194,24 +3172,20 @@ public class Game extends GameProperties {
             .count() > 1;
     }
 
-    @JsonIgnore
-    public Map<String, Player> getPlayerControlMap() {
-        Map<String, Player> controlMap = new HashMap<>();
-        for (Tile tile : getTileMap().values()) {
-            Player controllingPlayer = null;
-            for (Player p : getRealPlayers()) {
-                if (FoWHelper.playerHasActualShipsInSystem(p, tile)) {
-                    if (controllingPlayer == null) {
-                        controllingPlayer = p;
-                    } else {
-                        controllingPlayer = null;
-                        break;
-                    }
-                }
-            }
-            controlMap.put(tile.getPosition(), controllingPlayer);
+    public Player getPlayerThatControlsTile(String tileId) {
+        return getPlayerThatControlsTile(tileMap.get(tileId));
+    }
+
+    public Player getPlayerThatControlsTile(Tile tile) {
+        if (tile == null) {
+            return null;
         }
-        return controlMap;
+        for (Player player : getRealPlayers()) {
+            if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                return player;
+            }
+        }
+        return null;
     }
 
     public void addPlayer(String id, String name) {
@@ -3788,6 +3762,11 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
+    public int getHazardousExploreDiscardSize() {
+        return getExploreDiscard(Constants.HAZARDOUS).size();
+    }
+
+    @JsonIgnore
     public int getHazardousExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.HAZARDOUS);
     }
@@ -3795,6 +3774,11 @@ public class Game extends GameProperties {
     @JsonIgnore
     public int getCulturalExploreDeckSize() {
         return getExploreDeckSize(Constants.CULTURAL);
+    }
+
+    @JsonIgnore
+    public int getCulturalExploreDiscardSize() {
+        return getExploreDiscard(Constants.CULTURAL).size();
     }
 
     @JsonIgnore
@@ -3808,6 +3792,11 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
+    public int getIndustrialExploreDiscardSize() {
+        return getExploreDiscard(Constants.INDUSTRIAL).size();
+    }
+
+    @JsonIgnore
     public int getIndustrialExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.INDUSTRIAL);
     }
@@ -3815,6 +3804,11 @@ public class Game extends GameProperties {
     @JsonIgnore
     public int getFrontierExploreDeckSize() {
         return getExploreDeckSize(Constants.FRONTIER);
+    }
+
+    @JsonIgnore
+    public int getFrontierExploreDiscardSize() {
+        return getExploreDiscard(Constants.FRONTIER).size();
     }
 
     @JsonIgnore
@@ -4156,7 +4150,7 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
-    public List<ColorModel> getUnusedColors() {
+    public List<ColorModel> getUnusedColorsPreferringBase() {
         List<String> priorityColourIDs = List.of("red", "blue", "yellow", "purple", "green", "orange", "pink", "black");
         List<ColorModel> priorityColours = priorityColourIDs.stream()
             .map(Mapper::getColor)
@@ -4165,6 +4159,10 @@ public class Game extends GameProperties {
         if (!priorityColours.isEmpty()) {
             return priorityColours;
         }
+        return getUnusedColors();
+    }
+
+    public List<ColorModel> getUnusedColors() {
         return Mapper.getColors().stream()
             .filter(color -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(color.getName())))
             .toList();
@@ -4179,7 +4177,7 @@ public class Game extends GameProperties {
     }
 
     public void checkCommanderUnlocks(String factionToCheck) {
-        CommanderUnlockCheck.checkAllPlayersInGame(this, factionToCheck);
+        CommanderUnlockCheckService.checkAllPlayersInGame(this, factionToCheck);
     }
 
     /**
@@ -4235,6 +4233,15 @@ public class Game extends GameProperties {
         }
         setMapString(sb.toString().trim());
         return sb.toString().trim();
+    }
+
+    public String getHexSummary() {
+        // 18+0+0*b;Bio,71+0+2Rct;Ro;Ri,36+1+1Kcf;Km*I;Ki,76+1-1;;;,72+0-2; ......
+        // CSV of {tileID}{+x+yCoords}??{list;of;tokens} ?? 
+        // See ConvertTTPGtoAsync.ConvertTTPGHexToAsyncTile() and reverse it!
+        return getTileMap().values().stream()
+            .map(Tile::getHexTileSummary)
+            .collect(Collectors.joining(","));
     }
 
     public boolean hasUser(User user) {

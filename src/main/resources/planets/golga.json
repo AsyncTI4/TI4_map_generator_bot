@@ -2,7 +2,6 @@
     "id": "golga",
     "tileId": "s06",
     "name": "Golga",
-    "shortName": null,
     "aliases": ["golga"],
     "positionInTile": {
         "x": 136.0,

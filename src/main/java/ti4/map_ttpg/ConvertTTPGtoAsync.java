@@ -21,13 +21,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import ti4.commands.tokens.AddToken;
-import ti4.generator.Mapper;
+import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
@@ -590,10 +590,6 @@ public class ConvertTTPGtoAsync {
             case "17" -> { //DeltaWH
                 //TODO: move Creuss if exists in tileList - i.e. if 17 is near BL, put 51 in BL
             }
-            case "54" -> { //Cabal, add S11 cabal prison nearby - i.e. if 54 is near BR, put S11 in BR
-                Tile prison = new Tile("s11", "br"); //hardcode bottom right for now
-                asyncGame.setTile(prison);
-            }
         }
 
         if (asyncPosition == null) {
@@ -706,7 +702,7 @@ public class ConvertTTPGtoAsync {
                     if ("e".equals(str)) { //frontier token
                         System.out.println("attempt to add frontier token to " + tile.getPosition());
                         // tile.addToken(Mapper.getTokenPath(Constants.FRONTIER), Constants.SPACE);
-                        AddToken.addToken(null, tile, Constants.FRONTIER, null);
+                        AddTokenCommand.addToken(null, tile, Constants.FRONTIER, null);
                     }
                 } else {
                     System.out.println("                character not recognized:  " + str);

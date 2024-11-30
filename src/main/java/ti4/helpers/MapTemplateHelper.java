@@ -9,13 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.commands.map.AddTile;
-import ti4.commands.map.AddTileList;
-import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.milty.MiltyDraftManager.PlayerDraft;
-import ti4.commands.milty.MiltyDraftSlice;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -23,6 +18,11 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
+import ti4.service.map.AddTileListService;
+import ti4.service.map.AddTileService;
+import ti4.service.milty.MiltyDraftManager;
+import ti4.service.milty.MiltyDraftManager.PlayerDraft;
+import ti4.service.milty.MiltyDraftSlice;
 
 public class MapTemplateHelper {
 
@@ -44,12 +44,12 @@ public class MapTemplateHelper {
             }
         }
 
-        List<String> badTiles = AddTileList.addTileMapToGame(game, positionMap);
+        List<String> badTiles = AddTileListService.addTileMapToGame(game, positionMap);
         if (!badTiles.isEmpty()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles + "\n");
             throw new Exception("Bad tiles, aborting setup: " + game.getName());
         }
-        AddTileList.finishSetup(game, null);
+        AddTileListService.finishSetup(game, null);
     }
 
     private static Entry<String, String> inferTileFromTemplateAndDraft(MapTemplateTile templateTile, List<PlayerDraft> draft) throws Exception {
@@ -150,7 +150,7 @@ public class MapTemplateHelper {
 
                 if (tile.getPos() != null && tile.getCustodians() != null && tile.getCustodians()) {
                     Tile newgametile = game.getTileByPosition(tile.getPos());
-                    if (newgametile != null) AddTile.addCustodianToken(newgametile); //only works on MR for now
+                    if (newgametile != null) AddTileService.addCustodianToken(newgametile); //only works on MR for now
                 }
             }
         }

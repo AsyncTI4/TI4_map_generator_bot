@@ -7,20 +7,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
+import java.util.SortedSet;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
+import ti4.image.Mapper;
 
 @Data
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
+
     private String alias;
     private String name;
     private String shortName;
-    private List<TechnologyType> types;
+    private Boolean shrinkName;
+    private SortedSet<TechnologyType> types;
     private String requirements;
     private String faction;
     private String baseUpgrade;
@@ -29,9 +32,10 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
+    private String initials;
 
     public enum TechnologyType {
-        PROPULSION, CYBERNETIC, WARFARE, BIOTIC, UNITUPGRADE, NONE;
+        PROPULSION, BIOTIC, CYBERNETIC, WARFARE, UNITUPGRADE, NONE;
 
         public String toString() {
             return super.toString().toLowerCase();
@@ -73,15 +77,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public TechnologyType getFirstType() {
-        List<TechnologyType> priority = List.of(
-            TechnologyType.PROPULSION,
-            TechnologyType.BIOTIC,
-            TechnologyType.CYBERNETIC,
-            TechnologyType.WARFARE,
-            TechnologyType.UNITUPGRADE);
-        for (TechnologyType t : priority)
-            if (types.contains(t)) return t;
-        return TechnologyType.NONE;
+        return types.getFirst();
     }
 
     @JsonIgnore
@@ -209,7 +205,27 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getShortName() {
-        return Optional.ofNullable(shortName).orElse(getName());
+        if (!getHomebrewReplacesID().isPresent())
+        {
+            return Optional.ofNullable(shortName).orElse(getName());
+        }
+        return Optional.ofNullable(shortName).orElse(Mapper.getTech(getHomebrewReplacesID().get()).getShortName());
+    }
+
+    public boolean getShrinkName() {
+        if (!getHomebrewReplacesID().isPresent())
+        {
+            return Optional.ofNullable(shrinkName).orElse(false);
+        }
+        return Optional.ofNullable(shrinkName).orElse(Mapper.getTech(getHomebrewReplacesID().get()).getShrinkName());
+    }
+
+    public String getInitials() {
+        if (!getHomebrewReplacesID().isPresent())
+        {
+            return Optional.ofNullable(initials).orElse(getName().substring(0,1));
+        }
+        return Optional.ofNullable(initials).orElse(Mapper.getTech(getHomebrewReplacesID().get()).getInitials());
     }
 
     public String getRepresentation(boolean includeCardText) {

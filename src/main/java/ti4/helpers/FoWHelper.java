@@ -20,11 +20,10 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.combat.StartCombat;
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -34,6 +33,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
+import ti4.service.combat.StartCombatService;
 
 public class FoWHelper {
 
@@ -67,7 +67,7 @@ public class FoWHelper {
 			String gameName = channel.getName();
 			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
-			game = GameManager.getInstance().getGame(gameName);
+			game = GameManager.getGame(gameName);
 			if (game == null) {
 				return false;
 			}
@@ -103,10 +103,7 @@ public class FoWHelper {
 			return true;
 		}
 
-		return viewingPlayer != null && player != null && game != null &&
-			(hasHomeSystemInView(game, player, viewingPlayer)
-				|| hasPlayersPromInPlayArea(player, viewingPlayer)
-				|| hasMahactCCInFleet(player, viewingPlayer) || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
+		return game != null && (hasHomeSystemInView(game, player, viewingPlayer) || hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer) || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
 	}
 
 	/**
@@ -531,11 +528,8 @@ public class FoWHelper {
 				}
 				for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
 					if (tokenName.contains(wh.getWhString())) {
-						wormholeIDs.add(wh.getWhString());
-						if (!wh.toString().contains("eta") || wh.toString().contains("beta")) {
 							wormholeIDs.add(wh.toString());
-						}
-						break;
+  						break;
 					}
 				}
 			}
@@ -572,7 +566,8 @@ public class FoWHelper {
 				Set<String> tokenList = unitHolder.getTokenList();
 				for (String token : tokenList) {
 					for (String wormholeID : wormholeIDs) {
-						if (token.contains(wormholeID) && !(wormholeID.equals("eta") && token.contains("beta"))) {
+						if (token.contains(wormholeID) && !(wormholeID.equals("eta") 
+              && (token.contains("beta") || token.contains("theta") || token.contains("zeta") ))) {
 							adjacentPositions.add(position_);
 						}
 					}
@@ -750,11 +745,14 @@ public class FoWHelper {
 	}
 
 	public static boolean playerHasUnitsOnPlanet(Player player, Tile tile, String planet) {
+		return playerHasUnitsOnPlanet(player, tile.getUnitHolders().get(planet));
+	}
+
+	public static boolean playerHasUnitsOnPlanet(Player player, UnitHolder unitHolder) {
 		String colorID = Mapper.getColorID(player.getColor());
 		if (colorID == null)
 			return false; // player doesn't have a color
 
-		UnitHolder unitHolder = tile.getUnitHolders().get(planet);
 		Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
 		for (UnitKey unitKey : units.keySet()) {
@@ -797,7 +795,7 @@ public class FoWHelper {
 				success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
 				MessageChannel channel = player_.getPrivateChannel();
 				MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
-					StartCombat.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
+					StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
 			}
 			successfulCount += success ? 1 : 0;
 		}
@@ -885,10 +883,7 @@ public class FoWHelper {
 				sb.append("???");
 			}
 			sb.append(" sent ").append(transactedObject).append(" to ");
-			if (receivingPlayer == null) {
-				BotLogger.log(event, "`FoWHelper.pingPlayersTransaction` Warning, receivingPlayer is null");
-			}
-			if (receiverVisible && receivingPlayer != null) {
+            if (receiverVisible) {
 				sb.append(receivingPlayer.getRepresentation());
 			} else {
 				sb.append("???");

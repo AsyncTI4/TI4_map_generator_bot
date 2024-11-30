@@ -15,8 +15,8 @@ import java.util.StringTokenizer;
 
 import lombok.Getter;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.message.BotLogger;
 import ti4.model.ColorModel;
 import ti4.model.PlanetModel;
@@ -165,6 +165,7 @@ public class AliasHandler {
     public static void addNewPlanetAliases(PlanetModel planetModel) {
         Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>())
             .forEach(alias -> allPlanetAliases.put(alias.toLowerCase(), planetModel.getId()));
+        allPlanetAliases.put(planetModel.getId(), planetModel.getId()); // add the planet itself to aliashandler
     }
 
     public static void addNewTileAliases(TileModel tileModel) {
@@ -182,7 +183,6 @@ public class AliasHandler {
         if (tileId != null) {
             return tileId;
         }
-        System.out.println("Could not find an alias for Tile: " + name);
         return name;
     }
 
@@ -228,10 +228,9 @@ public class AliasHandler {
         String aliasID = allPlanetAliases.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
-        } else {
-            System.out.println("Could not find an alias for Planet: " + name);
-            return name;
         }
+        System.out.println("Could not find an alias for Planet: " + name);
+        return name;
     }
 
     public static String resolveAttachment(String name) {

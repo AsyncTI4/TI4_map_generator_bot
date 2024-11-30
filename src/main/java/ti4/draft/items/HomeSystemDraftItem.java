@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -66,7 +66,7 @@ public class HomeSystemDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(DraftItem.Generate(Category.HOMESYSTEM, faction.getAlias()));
+            allItems.add(DraftItem.generate(Category.HOMESYSTEM, faction.getAlias()));
         }
         return allItems;
     }

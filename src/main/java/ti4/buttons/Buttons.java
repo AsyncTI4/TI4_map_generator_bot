@@ -2,16 +2,16 @@ package ti4.buttons;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.message.BotLogger;
 
 public class Buttons {
+
     public static final Button GET_A_TECH = green("acquireATech", "Get a Tech");
     public static final Button GET_A_UNIT_TECH_WITH_INF = green("acquireAUnitTechWithInf", "Get a Unit Tech");
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Tech");
@@ -34,6 +34,8 @@ public class Buttons {
     public static final Button REFRESH_ALL_UNIT_INFO = green(Constants.REFRESH_ALL_UNIT_INFO, "Show All Units");
     public static final Button REFRESH_TECH_INFO = green(Constants.REFRESH_TECH_INFO, "Tech Info");
     public static final Button REFRESH_PLANET_INFO = green(Constants.REFRESH_PLANET_INFO, "Planet Info", Emojis.SemLor);
+
+    public static final Button OFFER_PING_OPTIONS_BUTTON = Buttons.gray("playerPref_personalPingInterval", "Change Personal Ping Interval");
 
     public static final List<Button> REFRESH_INFO_BUTTONS = List.of(
         REFRESH_AC_INFO,
@@ -95,7 +97,7 @@ public class Buttons {
         }
         if (e == null && (label == null || label.isBlank())) {
             // BotLogger.log("Button sanitized: " + id);
-            return Button.of(style, id, " ", e);
+            return Button.of(style, id, " ", null);
         }
         return Button.of(style, id, label, e);
     }
@@ -103,8 +105,7 @@ public class Buttons {
     private static Emoji getEmoji(String emoji) {
         if (StringUtils.isBlank(emoji)) return null; // no need to error on null/blank
         try {
-            Emoji output = Emoji.fromFormatted(emoji);
-            return output;
+            return Emoji.fromFormatted(emoji);
         } catch (Exception e) {
             BotLogger.log("Failed to load emoji [" + emoji + "]", e);
         }

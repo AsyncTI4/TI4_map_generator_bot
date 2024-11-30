@@ -5,9 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.AbilityModel;
 import ti4.model.DraftErrataModel;
@@ -69,7 +68,7 @@ public class AbilityDraftItem extends DraftItem {
                 if (Arrays.asList(results).contains(ability)) {
                     continue;
                 }
-                allItems.add(DraftItem.Generate(DraftItem.Category.ABILITY, ability));
+                allItems.add(DraftItem.generate(DraftItem.Category.ABILITY, ability));
             }
         }
         return allItems;
@@ -79,7 +78,7 @@ public class AbilityDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             for (String ability : faction.getAbilities()) {
-                allItems.add(DraftItem.Generate(DraftItem.Category.ABILITY, ability));
+                allItems.add(DraftItem.generate(DraftItem.Category.ABILITY, ability));
             }
         }
         return allItems;

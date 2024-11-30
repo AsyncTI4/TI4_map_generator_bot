@@ -13,11 +13,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsso.SOInfo;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.status.ScorePublic;
-import ti4.commands.tech.GetTechButton;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -25,6 +20,10 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
+import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.objectives.ScorePublicObjectiveService;
+import ti4.service.tech.PlayerTechService;
 
 public class ButtonHelperSCs {
 
@@ -142,7 +141,7 @@ public class ButtonHelperSCs {
             return;
         }
         ButtonHelperFactionSpecific.KeleresIIHQCCGainCheck(player, game);
-        ScorePublic.scorePO(event, player.getCorrectChannel(), game, player, 0);
+        ScorePublicObjectiveService.scorePO(event, player.getCorrectChannel(), game, player, 0);
     }
 
     @ButtonHandler("sc_trade_follow")
@@ -214,7 +213,6 @@ public class ButtonHelperSCs {
         if (game.getPhaseOfGame().contains("agenda")) {
             imperialHolder = game.getPlayer(game.getSpeakerUserID());
         }
-        String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
         String message = "Drew A Secret Objective";
@@ -225,7 +223,7 @@ public class ButtonHelperSCs {
                     game.drawSecretObjective(player.getUserID());
                     message = message + ". Drew a second SO due to Plausible Deniability";
                 }
-                SOInfo.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
                 break;
             }
             if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
@@ -547,8 +545,16 @@ public class ButtonHelperSCs {
                 }
             }
         } else {
+            StringBuilder empelar = new StringBuilder();
+            List<Character> letters = Arrays.asList('m','e','l','p','a');
+            Collections.shuffle(letters);
+            for (Character c: letters)
+            {
+                empelar.append(c);
+            }
+            empelar = new StringBuilder("E" + empelar + "r");
             MessageHelper.sendMessageToChannel(channel,
-                player.getRepresentationUnfogged() + " exhausted Scepter of Silly Spelling to follow " + Helper.getSCName(scNum, game));
+                player.getRepresentationUnfogged() + " exhausted Scepter of " + empelar + " to follow " + Helper.getSCName(scNum, game) + ".");
             player.addExhaustedRelic("emelpar");
         }
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
@@ -580,7 +586,7 @@ public class ButtonHelperSCs {
         if (setStatus) {
             player.addFollowedSC(scNum, event);
             if (scNum == 7 || scNum / 10 == 7) {
-                GetTechButton.postTechSummary(game);
+                PlayerTechService.postTechSummary(game);
             }
         }
         ButtonHelper.addReaction(event, false, false, "Not Following", "");
@@ -704,17 +710,17 @@ public class ButtonHelperSCs {
             for (int i = 0; i < count; i++) {
                 game.drawActionCard(player.getUserID());
             }
-            ACInfo.sendActionCardInfo(game, player, event);
-            ButtonHelper.checkACLimit(game, event, player);
+            ActionCardHelper.sendActionCardInfo(game, player, event);
+            ButtonHelper.checkACLimit(game, player);
         }
 
         ButtonHelper.addReaction(event, false, false, message, "");
         if (hasSchemingAbility) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(player, false));
+                ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
-        CommanderUnlockCheck.checkPlayer(player, "yssaril");
+        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         if (player.hasAbility("contagion")) {
             List<Button> buttons2 = ButtonHelperAbilities.getKyroContagionButtons(game, player,
                 event, player.getFinsFactionCheckerPrefix());

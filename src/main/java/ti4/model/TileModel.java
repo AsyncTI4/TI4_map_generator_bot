@@ -1,17 +1,19 @@
 package ti4.model;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 
@@ -22,13 +24,15 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private List<String> aliases;
     private String imagePath;
     private List<String> planets;
+    @Nullable
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
-    private Boolean isAsteroidField;
-    private Boolean isSupernova;
-    private Boolean isNebula;
-    private Boolean isGravityRift;
+    @JsonProperty("isHyperlane") private boolean hyperlane = false;
+    @JsonProperty("isAsteroidField") private boolean asteroidField = false;
+    @JsonProperty("isSupernova") private boolean supernova = false;
+    @JsonProperty("isNebula") private boolean nebula = false;
+    @JsonProperty("isGravityRift") private boolean gravityRift = false;
     private String imageURL;
     private ComponentSource source;
     private String tileBack;
@@ -89,28 +93,38 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
+    public int getNumPlanets() {
+        return getPlanets() == null ? 0 : getPlanets().size();
+    }
+
+    @JsonIgnore
     public boolean isEmpty() {
         return !hasPlanets();
     }
 
     @JsonIgnore
     public boolean isAsteroidField() {
-        return Optional.ofNullable(isAsteroidField).orElse(false);
+        return asteroidField;
     }
 
     @JsonIgnore
     public boolean isSupernova() {
-        return Optional.ofNullable(isSupernova).orElse(false);
+        return supernova;
     }
 
     @JsonIgnore
     public boolean isNebula() {
-        return Optional.ofNullable(isNebula).orElse(false);
+        return nebula;
     }
 
     @JsonIgnore
     public boolean isGravityRift() {
-        return Optional.ofNullable(isGravityRift).orElse(false);
+        return gravityRift;
+    }
+
+    @JsonIgnore
+    public boolean isAnomaly() {
+        return isAsteroidField() || isGravityRift() || isNebula() || isSupernova();
     }
 
     @JsonIgnore

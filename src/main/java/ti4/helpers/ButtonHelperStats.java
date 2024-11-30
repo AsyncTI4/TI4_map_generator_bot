@@ -7,11 +7,11 @@ import java.util.regex.Pattern;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelperStats {
 
@@ -20,7 +20,7 @@ public class ButtonHelperStats {
         boolean deleteMsg = true;
         if (buttonID.endsWith("_stay")) {
             deleteMsg = false;
-            buttonID.replace("_stay", "");
+            buttonID = buttonID.replace("_stay", "");
         }
         String regex = "convertComms_" + RegexHelper.intRegex("amt");
         Matcher matcher = Pattern.compile(regex).matcher(buttonID);
@@ -35,7 +35,7 @@ public class ButtonHelperStats {
         boolean deleteMsg = true;
         if (buttonID.endsWith("_stay")) {
             deleteMsg = false;
-            buttonID.replace("_stay", "");
+            buttonID = buttonID.replace("_stay", "");
         }
         String regex = "gainComms_" + RegexHelper.intRegex("amt");
         Matcher matcher = Pattern.compile(regex).matcher(buttonID);
@@ -66,7 +66,7 @@ public class ButtonHelperStats {
         }
         if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 
-        CommanderUnlockCheck.checkPlayer(player, "hacan");
+        CommanderUnlockCheckService.checkPlayer(player, "hacan");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " " + message);
 
         if (deleteMsg) ButtonHelper.deleteMessage(event);
@@ -131,7 +131,7 @@ public class ButtonHelperStats {
             String axis = player.getRepresentationUnfogged() + " you have the opportunity to buy axis orders";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), axis, ButtonHelperAbilities.getBuyableAxisOrders(player, game));
         }
-        CommanderUnlockCheck.checkPlayer(player, "mykomentori");
+        CommanderUnlockCheckService.checkPlayer(player, "mykomentori");
     }
 
     public static void sendGainCCButtons(Game game, Player player, boolean redistribute) {

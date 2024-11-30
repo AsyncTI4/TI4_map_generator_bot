@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -65,7 +65,7 @@ public class AgentDraftItem extends DraftItem {
             List<String> agents = faction.getLeaders();
             agents.removeIf((String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
             for (String agent : agents) {
-                allItems.add(DraftItem.Generate(Category.AGENT, agent));
+                allItems.add(DraftItem.generate(Category.AGENT, agent));
             }
         }
         return allItems;

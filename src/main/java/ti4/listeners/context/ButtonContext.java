@@ -47,10 +47,13 @@ public class ButtonContext extends ListenerContext {
     }
 
     public void save(ButtonInteractionEvent event) {
-        boolean isUndo = componentID.contains("ultimateUndo");
-        boolean isShow = "showGameAgain".equalsIgnoreCase(componentID);
-        boolean isNoSabo = "no_sabotage".equalsIgnoreCase(componentID);
-        if (game != null && !isUndo && !isShow && !isNoSabo) {
+        boolean skippableButton = componentID.contains("ultimateUndo") ||
+            "showGameAgain".equalsIgnoreCase(componentID) ||
+            "cardsInfo".equalsIgnoreCase(componentID) ||
+            componentID.contains("showDeck") ||
+            componentID.contains("FactionInfo") ||
+            componentID.contains("offerDeckButtons");
+        if (game != null && !skippableButton) {
             ButtonHelper.saveButtons(event, game, player);
             GameSaveLoadManager.saveGame(game, event);
         }

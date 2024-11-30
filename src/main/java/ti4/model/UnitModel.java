@@ -2,19 +2,20 @@ package ti4.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.CombatRollType;
 import ti4.helpers.Emojis;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.Source.ComponentSource;
+import ti4.service.combat.CombatRollType;
 
 @Data
 public class UnitModel implements ModelInterface, EmbeddableModel {
@@ -70,7 +71,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             && asyncId != null
             && source != null
             && (getFaction().isEmpty() || Mapper.isValidFaction(getFaction().orElse("").toLowerCase()))
-            && getEligiblePlanetTypes().stream().allMatch(type -> List.of("CULTURAL", "HAZARDOUS", "INDUSTRIAL", "TECH_SPECIALTY", "LEGENDARY", "MECATOL_REX", "EMPTY_NONANOMALY").contains(type));
+            && new HashSet<>(List.of("CULTURAL", "HAZARDOUS", "INDUSTRIAL", "TECH_SPECIALTY", "LEGENDARY", "MECATOL_REX", "EMPTY_NONANOMALY")).containsAll(getEligiblePlanetTypes());
     }
 
     public String getAlias() {
@@ -113,8 +114,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         String name = getName();
-        StringBuilder title = new StringBuilder(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji());
-        eb.setTitle(title.toString(), null);
+        eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji(), null);
         if (getSubtitle().isPresent()) eb.setDescription("-# " + getSubtitle().get() + " " + getEligiblePlanetEmojis());
 
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
@@ -323,6 +323,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             return "Combat: " + getCombatHitsOn() + "\n";
         } else if (getCombatDieCount() > 1) {
             return "Combat: " + getCombatHitsOn() + " (x" + getCombatDieCount() + ")\n";
+        } else if ("winnu_flagship".equals(getId())) {
+            return "Combat: " + getCombatHitsOn() + " (x # of opponent's non-fighter ships)\n";
         }
         return "";
     }

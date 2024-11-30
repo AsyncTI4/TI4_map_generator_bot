@@ -1,5 +1,23 @@
 package ti4.map;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -22,19 +40,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.player.ChangeColor;
-import ti4.commands.player.TurnEnd;
-import ti4.commands.player.TurnStart;
-import ti4.commands.user.UserSettings;
-import ti4.commands.user.UserSettingsManager;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
-import ti4.generator.DrawingUtil;
-import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -42,6 +53,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.DrawingUtil;
+import ti4.image.Mapper;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
@@ -56,24 +69,10 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.turn.EndTurnService;
+import ti4.service.turn.StartTurnService;
+import ti4.users.UserSettingsManager;
 
 public class Player {
 
@@ -114,7 +113,7 @@ public class Player {
     private int tacticalCC = 3;
     private int fleetCC = 3;
     private int strategicCC = 2;
-    private int turnCount;
+    private int inRoundTurnCount;
     private int tg;
     private int commodities;
     private int commoditiesTotal;
@@ -238,7 +237,7 @@ public class Player {
 
     @JsonIgnore
     public Game getGame() {
-        return GameManager.getInstance().getGame(gameID);
+        return GameManager.getGame(gameID);
     }
 
     @JsonIgnore
@@ -248,9 +247,14 @@ public class Player {
 
     @JsonIgnore
     public String getDecalFile(String unitType) {
-        if (getDecalSet() == null)
+        if (decalSet == null)
             return null;
-        return String.format("%s_%s%s", getDecalSet(), unitType, DrawingUtil.getBlackWhiteFileSuffix(getColorID()));
+        // TODO: Eventually remove if we stop setting values to string literal null, which is not good...
+        if (decalSet.equals("null")) {
+            decalSet = null;
+            return null;
+        }
+        return String.format("%s_%s%s", decalSet, unitType, DrawingUtil.getBlackWhiteFileSuffix(getColorID()));
     }
 
     public Tile getNomboxTile() {
@@ -273,10 +277,6 @@ public class Player {
         spentThingsThisWindow = new ArrayList<>();
     }
 
-    public void resetBombardUnits() {
-        bombardUnits = new ArrayList<>();
-    }
-
     public Map<String, Integer> getCurrentProducedUnits() {
         return producedUnits;
     }
@@ -293,16 +293,8 @@ public class Player {
         spentThingsThisWindow.add(thing);
     }
 
-    public void addBombardUnit(String thing) {
-        bombardUnits.add(thing);
-    }
-
     public void removeSpentThing(String thing) {
         spentThingsThisWindow.remove(thing);
-    }
-
-    public void removeBombardUnit(String thing) {
-        bombardUnits.remove(thing);
     }
 
     public int getInitiative() {
@@ -325,10 +317,6 @@ public class Player {
             }
         }
         return 0;
-    }
-
-    public void resetTransactionItems() {
-        transactionItems = new ArrayList<>();
     }
 
     public List<String> getTransactionItems() {
@@ -374,11 +362,6 @@ public class Player {
         transactionItems.remove(thing);
     }
 
-    public void replaceTransactionItem(String thingToRemove, String thingToAdd) {
-        removeTransactionItem(thingToRemove);
-        addTransactionItem(thingToAdd);
-    }
-
     public void setTransactionItems(List<String> things) {
         transactionItems = things;
     }
@@ -418,29 +401,6 @@ public class Player {
         bombardUnits = things;
     }
 
-    public void fillUpBombardUnits(Tile tile) {
-        for (UnitHolder uH : tile.getUnitHolders().values()) {
-            Map<UnitKey, Integer> units = uH.getUnits();
-            for (UnitKey unit : units.keySet()) {
-                if (unitBelongsToPlayer(unit) && getUnitFromUnitKey(unit).getBombardDieCount() > 0) {
-                    if (ButtonHelper.isLawInPlay(getGame(), "articles_war")
-                        && getUnitFromUnitKey(unit).getBaseType().equalsIgnoreCase("mech")) {
-                        continue;
-                    }
-                    for (int x = 0; x < units.get(unit); x++) {
-                        addBombardUnit(getUnitFromUnitKey(unit).getAsyncId());
-                    }
-                }
-            }
-        }
-        if (hasTech("aida") || hasTech("absol_aida")) {
-            addBombardUnit("aida");
-        }
-        if (getGame().playerHasLeaderUnlockedOrAlliance(this, "argentcommander")) {
-            addBombardUnit("argentcommander");
-        }
-    }
-
     public void setProducedUnit(String unit, int count) {
         producedUnits.put(unit, count);
     }
@@ -472,11 +432,12 @@ public class Player {
         mahactCC.remove(cc);
     }
 
+    @Nullable
     public String getRoleIDForCommunity() {
         return roleIDForCommunity;
     }
 
-    public void setRoleIDForCommunity(String roleIDForCommunity) {
+    public void setRoleIDForCommunity(@Nullable String roleIDForCommunity) {
         this.roleIDForCommunity = roleIDForCommunity;
     }
 
@@ -491,11 +452,12 @@ public class Player {
         return null;
     }
 
+    @Nullable
     public String getPrivateChannelID() {
         return privateChannelID;
     }
 
-    public void setPrivateChannelID(String privateChannelID) {
+    public void setPrivateChannelID(@Nullable String privateChannelID) {
         this.privateChannelID = privateChannelID;
     }
 
@@ -508,13 +470,14 @@ public class Player {
             return null;
 
         }
-
     }
 
+    @Nullable
     public String getCardsInfoThreadID() {
         return cardsInfoThreadID;
     }
 
+    @Nullable
     public String getBagInfoThreadID() {
         return bagInfoThreadID;
     }
@@ -570,11 +533,11 @@ public class Player {
         return false;
     }
 
-    public void setCardsInfoThreadID(String cardsInfoThreadID) {
+    public void setCardsInfoThreadID(@Nullable String cardsInfoThreadID) {
         this.cardsInfoThreadID = cardsInfoThreadID;
     }
 
-    public void setBagInfoThreadID(String bagInfoThreadID) {
+    public void setBagInfoThreadID(@Nullable String bagInfoThreadID) {
         this.bagInfoThreadID = bagInfoThreadID;
     }
 
@@ -748,8 +711,8 @@ public class Player {
         readyToPassBag = passed;
     }
 
-    public void setWhetherPlayerShouldBeTenMinReminded(boolean status) {
-        tenMinReminderPing = status;
+    public void setWhetherPlayerShouldBeTenMinReminded(boolean tenMinReminderPing) {
+        this.tenMinReminderPing = tenMinReminderPing;
     }
 
     public Set<String> getAbilities() {
@@ -883,9 +846,8 @@ public class Player {
 
     @JsonIgnore
     public Set<String> getSpecialUnitsOwned() {
-        Set<String> specialUnits = unitsOwned.stream()
+        return unitsOwned.stream()
             .filter(u -> Mapper.getUnit(u).getFaction().isPresent()).collect(Collectors.toSet());
-        return specialUnits;
     }
 
     public boolean hasUnit(String unit) {
@@ -1048,9 +1010,9 @@ public class Player {
 
     public void setPromissoryNote(String id) {
         Collection<Integer> values = promissoryNotes.values();
-        int identifier = ThreadLocalRandom.current().nextInt(100);
+        int identifier = ThreadLocalRandom.current().nextInt(values.size() < 80 ? 100 : 1000);
         while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(100);
+            identifier = ThreadLocalRandom.current().nextInt(values.size() < 80 ? 100 : 1000);
         }
         promissoryNotes.put(id, identifier);
     }
@@ -1527,7 +1489,6 @@ public class Player {
         } else {
             sb.append(getUserName());
         }
-        sb.append(getGlobalUserSetting("emojiAfterName").orElse(""));
         if (getColor() != null && !"null".equals(getColor()) && !noColor) {
             sb.append(" ").append(Emojis.getColorEmojiWithName(getColor()));
         }
@@ -1878,16 +1839,16 @@ public class Player {
         return tg;
     }
 
-    public int getPersonalPingInterval() {
-        return getGlobalUserSettings().getPersonalPingInterval();
-    }
-
-    public int getTurnCount() {
-        return turnCount;
+    public int getInRoundTurnCount() {
+        return inRoundTurnCount;
     }
 
     public int getActualHits() {
         return actualHits;
+    }
+
+    public double getExpectedHits() {
+        return expectedHitsTimes10 / 10.0;
     }
 
     public int getExpectedHitsTimes10() {
@@ -1977,8 +1938,8 @@ public class Player {
         return message;
     }
 
-    public void setTurnCount(int turn) {
-        turnCount = turn;
+    public void setInRoundTurnCount(int turn) {
+        inRoundTurnCount = turn;
     }
 
     public void setActualHits(int tg) {
@@ -2015,9 +1976,9 @@ public class Player {
                 }
                 game.setStoredValue("endTurnWhenSCFinished", "");
                 Player p2 = game.getActivePlayer();
-                TurnEnd.pingNextPlayer(event, game, p2);
+                EndTurnService.pingNextPlayer(event, game, p2);
                 if (!game.isFowMode()) {
-                    ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round "
+                    ButtonHelper.updateMap(game, event, "End of Turn " + p2.getInRoundTurnCount() + ", Round "
                         + game.getRound() + " for " + p2.getFactionEmoji());
                 }
             }
@@ -2031,7 +1992,7 @@ public class Player {
                 game.setStoredValue("fleetLogWhenSCFinished", "");
                 Player p2 = game.getActivePlayer();
                 String message = p2.getRepresentation() + " Use buttons to end turn or do another action.";
-                List<Button> systemButtons = TurnStart.getStartOfTurnButtons(p2, game, true, event);
+                List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(p2, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, systemButtons);
             }
         }
@@ -2142,7 +2103,10 @@ public class Player {
     }
 
     public List<String> getNotResearchedFactionTechs() {
-        return getFactionTechs().stream().filter(tech -> !hasTech(tech)).toList();
+        return getFactionTechs().stream()
+            .filter(tech -> !hasTech(tech))
+            .filter(tech -> !getPurgedTechs().contains(tech))
+            .toList();
     }
 
     public DraftBag getDraftHand() {
@@ -2212,7 +2176,7 @@ public class Player {
     public void loadDraftHand(List<String> saveString) {
         DraftBag newBag = new DraftBag();
         for (String item : saveString) {
-            newBag.Contents.add(DraftItem.GenerateFromAlias(item));
+            newBag.Contents.add(DraftItem.generateFromAlias(item));
         }
         draftHand = newBag;
     }
@@ -2220,7 +2184,7 @@ public class Player {
     public void loadCurrentDraftBag(List<String> saveString) {
         DraftBag newBag = new DraftBag();
         for (String item : saveString) {
-            newBag.Contents.add(DraftItem.GenerateFromAlias(item));
+            newBag.Contents.add(DraftItem.generateFromAlias(item));
         }
         currentDraftBag = newBag;
     }
@@ -2228,7 +2192,7 @@ public class Player {
     public void loadItemsToDraft(List<String> saveString) {
         List<DraftItem> items = new ArrayList<>();
         for (String item : saveString) {
-            items.add(DraftItem.GenerateFromAlias(item));
+            items.add(DraftItem.generateFromAlias(item));
         }
         draftItemQueue.Contents = items;
     }
@@ -2386,8 +2350,7 @@ public class Player {
         }
     }
 
-    // Provided because people make mistakes, also nekro exists, also weird homebrew
-    // exists
+    // Provided because people make mistakes, also nekro exists, also weird homebrew exists
     private void doAdditionalThingsWhenRemovingTech(String techID) {
         // Remove Custodia Vigilia when un-researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
@@ -2421,7 +2384,6 @@ public class Player {
             // }
             if (relevantTechs.isEmpty() && unitModel.getBaseType() != null) {
                 // No other relevant unit upgrades
-                System.out.println("boop");
                 FactionModel factionSetup = getFactionSetupInfo();
                 replacementUnit = factionSetup.getUnits().stream().map(Mapper::getUnit)
                     .map(UnitModel::getId)
@@ -2451,15 +2413,16 @@ public class Player {
 
     public void removeTech(String tech) {
         exhaustedTechs.remove(tech);
-        techs.remove(tech);
-        doAdditionalThingsWhenRemovingTech(tech);
+        if (techs.remove(tech)) {
+            doAdditionalThingsWhenRemovingTech(tech);
+        }
     }
 
     public void purgeTech(String tech) {
         if (techs.contains(tech)) {
             removeTech(tech);
-            purgedTechs.add(tech);
         }
+        purgedTechs.add(tech);
     }
 
     public void addPlanet(String planet) {
@@ -2509,7 +2472,7 @@ public class Player {
         refreshPlanetAbility(planet);
     }
 
-    public int getStasisInfantry() {
+    public int getGenSynthesisInfantry() {
         return stasisInfantry;
     }
 
@@ -2638,8 +2601,8 @@ public class Player {
 
     public void updateTurnStatsWithAverage() {
         numberOfTurns++;
-        long averagetime = (totalTimeSpent / numberOfTurns);
-        totalTimeSpent += averagetime;
+        long averageTime = (totalTimeSpent / numberOfTurns);
+        totalTimeSpent += averageTime;
     }
 
     public int getNumberTurns() {
@@ -2913,7 +2876,7 @@ public class Player {
     public float getTotalResourceValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkValuesOfUnits(this, getGame(), tile, type);
+            count = count + ButtonHelper.checkValuesOfUnits(this, tile, type);
         }
         return count;
     }
@@ -2922,7 +2885,7 @@ public class Player {
     public int getTotalHPValueOfUnits(String type) {
         int count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkHPOfUnits(this, getGame(), tile, type);
+            count = count + ButtonHelper.checkHPOfUnits(this, tile, type);
         }
         return count;
     }
@@ -2931,7 +2894,7 @@ public class Player {
     public float getTotalCombatValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkCombatValuesOfUnits(this, getGame(), tile, type);
+            count = count + ButtonHelper.checkCombatValuesOfUnits(this, tile, type);
         }
         return Math.round(count * 10) / (float) 10.0;
     }
@@ -2953,15 +2916,6 @@ public class Player {
         this.eliminated = eliminated;
     }
 
-    /**
-     * @return a list of colours the user would prefer to play as, in order of
-     *         preference - the colours should all be "valid"- colourIDs
-     */
-    @JsonIgnore
-    public List<String> getPreferredColours() {
-        return UserSettingsManager.getInstance().getUserSettings(getUserID()).getPreferredColourList();
-    }
-
     @JsonIgnore
     public String getNextAvailableColour() {
         if (getColor() != null && !getColor().equals("null")) {
@@ -2972,28 +2926,13 @@ public class Player {
 
     @JsonIgnore
     public String getNextAvailableColorIgnoreCurrent() {
-        Predicate<ColorModel> nonExclusive = cm -> !ChangeColor.colorIsExclusive(cm.getAlias(), this);
-        String color = getPreferredColours().stream()
-            .filter(c -> getGame().getUnusedColors().stream().anyMatch(col -> col.getName().equals(c)))
-            .filter(c -> !ChangeColor.colorIsExclusive(c, this))
+        Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
+        String color = UserSettingsManager.get(getUserID()).getPreferredColourList().stream()
+            .filter(c -> getGame().getUnusedColorsPreferringBase().stream().anyMatch(col -> col.getName().equals(c)))
+            .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
             .findFirst()
-            .orElse(getGame().getUnusedColors().stream().filter(nonExclusive).findFirst().map(ColorModel::getName).orElse(null));
+            .orElse(getGame().getUnusedColorsPreferringBase().stream().filter(nonExclusive).findFirst().map(ColorModel::getName).orElse(null));
         return Mapper.getColorName(color);
-    }
-
-    public Optional<String> getGlobalUserSetting(String setting) {
-        return getGlobalUserSettings().getStoredValue(setting);
-    }
-
-    @JsonIgnore
-    public UserSettings getGlobalUserSettings() {
-        return UserSettingsManager.getInstance().getUserSettings(getUserID());
-    }
-
-    public void setGlobalUserSetting(String setting, String value) {
-        UserSettings userSetting = UserSettingsManager.getInstance().getUserSettings(getUserID());
-        userSetting.putStoredValue(setting, value);
-        UserSettingsManager.getInstance().saveUserSetting(userSetting);
     }
 
     @JsonIgnore
@@ -3161,7 +3100,7 @@ public class Player {
     }
 
     public void checkCommanderUnlock(String factionToCheck) {
-        CommanderUnlockCheck.checkPlayer(this, factionToCheck);
+        CommanderUnlockCheckService.checkPlayer(this, factionToCheck);
     }
 
     @JsonIgnore
@@ -3174,5 +3113,10 @@ public class Player {
     @JsonIgnore
     public boolean isActivePlayer() {
         return this.equals(getGame().getActivePlayer());
+    }
+
+    public void clearDebt(Player player, int count) {
+        String clearedPlayerColor = player.getColor();
+        removeDebtTokens(clearedPlayerColor, count);
     }
 }

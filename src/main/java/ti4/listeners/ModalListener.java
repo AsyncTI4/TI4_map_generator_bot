@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.DateTimeHelper;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.listeners.context.ModalContext;
@@ -15,6 +16,7 @@ import ti4.map.Game;
 import ti4.message.BotLogger;
 
 public class ModalListener extends ListenerAdapter {
+
     public static ModalListener instance = null;
 
     private final Map<String, Consumer<ModalContext>> knownModals = new HashMap<>();
@@ -36,19 +38,30 @@ public class ModalListener extends ListenerAdapter {
             return;
         }
         event.deferEdit().queue();
-        long startTime = System.currentTimeMillis();
-        try {
-            ModalContext context = new ModalContext(event);
-            if (context.isValid()) {
-                resolveModalInteractionEvent(context);
+        AsyncTI4DiscordBot.runAsync("Modal listener task", () -> {
+            long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
+            long startTime = System.currentTimeMillis();
+            try {
+                ModalContext context = new ModalContext(event);
+                if (context.isValid()) {
+                    resolveModalInteractionEvent(context);
+                }
+            } catch (Exception e) {
+                BotLogger.log(event, "Something went wrong with button interaction", e);
             }
-        } catch (Exception e) {
-            BotLogger.log(event, "Something went wrong with button interaction", e);
-        }
-        long endTime = System.currentTimeMillis();
-        if (endTime - startTime > 3000) {
-            BotLogger.log(event, "This button command took longer than 3000 ms (" + (endTime - startTime) + ")");
-        }
+
+            long endTime = System.currentTimeMillis();
+            final int milliThreshold = 3000;
+            if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
+                String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
+                String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+                String errorMessage = "Modal took over " + milliThreshold + "ms to process:\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " message was sent\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to receive\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
+                BotLogger.log(errorMessage);
+            }
+        });
     }
 
     private boolean handleKnownModals(ModalContext context) {

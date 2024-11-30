@@ -23,7 +23,6 @@ import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.helpers.DiceHelper.Die;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.message.BotLogger;
@@ -120,12 +119,12 @@ public class Emojis {
         return new ArrayList<>(); // TODO (Jazz): fill this in when we get the JDA update
     }
 
-    private static void deleteApplicationEmoji(String name) {
-        // TODO (Jazz): fill this in when we get the JDA update
-    }
-
     private static EmojiUnion createApplicationEmoji(File emoji) {
         return null; // TODO (Jazz): fill this in when we get the JDA update
+    }
+
+    private static void deleteApplicationEmoji(String name) {
+        // TODO (Jazz): fill this in when we get the JDA update
     }
 
     // src/main/resources/emojis
@@ -1802,17 +1801,17 @@ public class Emojis {
             case "sleeperb" -> SleeperB;
 
             // UNITS
-            case "warsun" -> warsun;
-            case "spacedock" -> spacedock;
-            case "pds" -> pds;
-            case "mech" -> mech;
-            case "infantry" -> infantry;
-            case "flagship", "lady", "cavalry" -> flagship;
-            case "fighter" -> fighter;
-            case "dreadnought" -> dreadnought;
-            case "destroyer" -> destroyer;
-            case "carrier" -> carrier;
-            case "cruiser" -> cruiser;
+            case "warsun", "ws" -> warsun;
+            case "spacedock", "sd" -> spacedock;
+            case "pds", "pd" -> pds;
+            case "mech", "mf" -> mech;
+            case "infantry", "gf" -> infantry;
+            case "flagship", "lady", "cavalry", "fs" -> flagship;
+            case "fighter", "ff" -> fighter;
+            case "dreadnought", "dn" -> dreadnought;
+            case "destroyer", "dd" -> destroyer;
+            case "carrier", "cv" -> carrier;
+            case "cruiser", "ca" -> cruiser;
             case "tyrantslament" -> TyrantsLament;
             case "plenaryorbital" -> PlenaryOrbital;
             case "monument" -> Monument;

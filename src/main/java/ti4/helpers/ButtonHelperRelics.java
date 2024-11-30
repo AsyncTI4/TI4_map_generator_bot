@@ -3,18 +3,18 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelperRelics {
 
@@ -50,19 +50,19 @@ public class ButtonHelperRelics {
                     + " Drew 2 ACs With Scheming. Please Discard 1 AC with the blue buttons";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " use buttons to discard",
-                    ACInfo.getDiscardActionCardButtons(player, false));
+                    ActionCardHelper.getDiscardActionCardButtons(player, false));
             } else if (player.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
                 message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
             } else {
                 game.drawActionCard(player.getUserID());
                 message = player.getFactionEmoji() + " Drew 1 AC";
-                ACInfo.sendActionCardInfo(game, player, event);
+                ActionCardHelper.sendActionCardInfo(game, player, event);
             }
-            CommanderUnlockCheck.checkPlayer(player, "yssaril");
+            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-            ButtonHelper.checkACLimit(game, event, player);
+            ButtonHelper.checkACLimit(game, player);
             ButtonHelper.deleteTheOneButton(event);
         } else {
             String msg = " exhausted the Prophet's Tears";
@@ -87,13 +87,27 @@ public class ButtonHelperRelics {
         }
     }
 
+    public static void offerNanoforgeButtons(Player player, Game game, GenericInteractionCreateEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanetsAllianceMode()) {
+            if (game.getPlanetsInfo().get(planet) == null)
+                continue;
+
+            boolean legendaryOrHome = ButtonHelper.isPlanetLegendaryOrHome(planet, game, false, null);
+            if (!legendaryOrHome) {
+                buttons.add(Buttons.green("nanoforgePlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
+            }
+        }
+        String message = "Use buttons to select which planet to nanoforge";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+    }
+
     @ButtonHandler("nanoforgePlanet_")
     public static void nanoforgePlanet(ButtonInteractionEvent event, String buttonID, Game game) {
         String planet = buttonID.replace("nanoforgePlanet_", "");
         Planet planetReal = game.getPlanetsInfo().get(planet);
         planetReal.addToken("attachment_nanoforge.png");
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            "Attached Nano-Forge to " + Helper.getPlanetRepresentation(planet, game));
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Attached Nano-Forge to " + Helper.getPlanetRepresentation(planet, game));
         ButtonHelper.deleteMessage(event);
     }
 

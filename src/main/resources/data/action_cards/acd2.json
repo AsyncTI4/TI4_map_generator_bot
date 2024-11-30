@@ -319,7 +319,7 @@
     "name": "Discord",
     "phase": "Action",
     "window": "When you perform a strategic action",
-    "text": "Choose another player. If that player spends a command token during this strategic action, they must spend 1 additional token from their strategy pool, if able.",
+    "text": "Choose another player. If that player spends a command token during this strategic action, they must spend 1 additional token from their command sheet, if able.",
     "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their human minions had done well.",
     "source": "action_deck_2"
   },
@@ -346,7 +346,7 @@
     "name": "Energy Pulse",
     "phase": "Action",
     "window": "After the \"Move Ships\" substep of a tactical action in a system that contains your units",
-    "text": "Choose up to 2 units in that system. Those units lose their unit abilities during this tactical action.",
+    "text": "Choose up to 2 units in that system. Those units lose their printed unit abilities during this tactical action.",
     "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
     "source": "action_deck_2"
   },
@@ -427,7 +427,7 @@
     "name": "Flawless Strategy",
     "phase": "Action",
     "window": "After you exhaust your strategy card",
-    "text": "Perform the secondary ability of that strategy card; do not spend or place a command token to resolve that ability.",
+    "text": "Resolve the secondary ability of that strategy card; do not spend or place a command token to resolve that ability.",
     "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
     "source": "action_deck_2"
   },
@@ -435,8 +435,8 @@
     "alias": "foreign_aid",
     "name": "Foreign Aid",
     "phase": "Action",
-    "window": "When you perform the primary ability of your strategy card",
-    "text": "Choose up to 2 other players. Those players do not have to spend or place a command token to resolve the secondary ability of that strategy card.",
+    "window": "When you perform a strategic action",
+    "text": "Choose up to 2 other players. During this strategic action, those players do not have to spend or place a command token to resolve the secondary ability of your strategy card.",
     "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
     "source": "action_deck_2"
   },
@@ -490,7 +490,7 @@
     "name": "Hostile World",
     "phase": "Action",
     "window": "After another player commits units to land on a planet you control",
-    "text": "Roll a number of dice equal to the resource value of that planet. For each result of 6 or greater, produce 1 hit against those units.",
+    "text": "Roll 3 dice. For each result of 6 or greater, produce 1 hit and assign it to 1 of those units.",
     "flavorText": "The old soldier interrupted the discussion of N'orr ground tactics with a snort. \"It's not the enemy you need to be worried about, lads. It's the godforsaken planet.\"",
     "source": "action_deck_2"
   },
@@ -588,7 +588,7 @@
     "alias": "outgun1",
     "name": "Outgun",
     "phase": "Action",
-    "window": "When you produce a hit",
+    "window": "When you produce 1 or more hits",
     "text": "Produce 1 additional hit.",
     "flavorText": "The planet's defense system was formidable, far exceeding their expectations. Sek'kus wondered how many of her warriors would perish during the descent.",
     "source": "action_deck_2"
@@ -597,7 +597,7 @@
     "alias": "outgun2",
     "name": "Outgun",
     "phase": "Action",
-    "window": "When you produce a hit",
+    "window": "When you produce 1 or more hits",
     "text": "Produce 1 additional hit.",
     "flavorText": "C-beams glittered in the dark as the N'orr vanguard descended upon their enemies like rain, their exoskeletons reflecting death.",
     "source": "action_deck_2"
@@ -606,7 +606,7 @@
     "alias": "outgun3",
     "name": "Outgun",
     "phase": "Action",
-    "window": "When you produce a hit",
+    "window": "When you produce 1 or more hits",
     "text": "Produce 1 additional hit.",
     "flavorText": "The sight of Sek'kus on her untouchable rampage filled the others with passion. The explosions that illuminated her were a crescendo to the madness.",
     "source": "action_deck_2"
@@ -615,7 +615,7 @@
     "alias": "outgun4",
     "name": "Outgun",
     "phase": "Action",
-    "window": "When you produce a hit",
+    "window": "When you produce 1 or more hits",
     "text": "Produce 1 additional hit.",
     "flavorText": "The fury and majesty of G'hom Sek'kus and her Valkyrie broke the enemy. It was clear they were no match for such reckless hate.",
     "source": "action_deck_2"
@@ -624,8 +624,8 @@
     "alias": "outmaneuver1",
     "name": "Outmaneuver",
     "phase": "Action",
-    "window": "When a hit is produced against your units",
-    "text": "Cancel that hit.",
+    "window": "When 1 or more hits are produced against your units",
+    "text": "Cancel 1 hit.",
     "flavorText": "T'esla reflexively flinched away from the danger she sensed. \"All ships commence evasive maneuvers. Zere's flak comin'.\"",
     "source": "action_deck_2"
   },
@@ -633,8 +633,8 @@
     "alias": "outmaneuver2",
     "name": "Outmaneuver",
     "phase": "Action",
-    "window": "When a hit is produced against your units",
-    "text": "Cancel that hit.",
+    "window": "When 1 or more hits are produced against your units",
+    "text": "Cancel 1 hit.",
     "flavorText": "Fortunately, T'esla's warning gave the cruiser's helmsman just enough time to roll the ship to port. \"Zat would've cut us in half,\" he muttered.",
     "source": "action_deck_2"
   },
@@ -642,8 +642,8 @@
     "alias": "outmaneuver3",
     "name": "Outmaneuver",
     "phase": "Action",
-    "window": "When a hit is produced against your units",
-    "text": "Cancel that hit.",
+    "window": "When 1 or more hits are produced against your units",
+    "text": "Cancel 1 hit.",
     "flavorText": "T'esla checked her wingman, relieved to see that he had managed to dodge the flak as well. \"Close in and open fire!\"",
     "source": "action_deck_2"
   },
@@ -651,8 +651,8 @@
     "alias": "outmaneuver4",
     "name": "Outmaneuver",
     "phase": "Action",
-    "window": "When a hit is produced against your units",
-    "text": "Cancel that hit.",
+    "window": "When 1 or more hits are produced against your units",
+    "text": "Cancel 1 hit.",
     "flavorText": "The capital ship's massive cannons were unable to track the brigades of fighters swarming it like insects.",
     "source": "action_deck_2"
   },
@@ -831,7 +831,7 @@
     "alias": "sensor_jam",
     "name": "Sensor Jam",
     "phase": "Action",
-    "window": "After a player moves ships into the active system",
+    "window": "After the \"Move Ships\" substep of a tactical action",
     "text": "Your cruisers and destroyers in the active system gain SUSTAIN DAMAGE during this tactical action.",
     "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
     "source": "action_deck_2"

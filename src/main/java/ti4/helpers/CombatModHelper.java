@@ -11,8 +11,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -26,6 +26,7 @@ import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollType;
 
 public class CombatModHelper {
 
@@ -39,7 +40,7 @@ public class CombatModHelper {
         return false;
     }
 
-    public static List<NamedCombatModifierModel> GetModifiers(Player player, Player opponent,
+    public static List<NamedCombatModifierModel> getModifiers(Player player, Player opponent,
         Map<UnitModel, Integer> unitsByQuantity,
         TileModel tile,
         Game game,
@@ -172,20 +173,17 @@ public class CombatModHelper {
             }
         }
         Set<NamedCombatModifierModel> set = new HashSet<>(modifiers);
-        List<NamedCombatModifierModel> uniqueList = new ArrayList<>(set);
 
-        return uniqueList;
+        return new ArrayList<>(set);
     }
 
-    public static Integer GetCombinedModifierForUnit(UnitModel unit, Integer numOfUnit,
-        List<NamedCombatModifierModel> modifiers, Player player,
-        Player opponent, Game game, List<UnitModel> playerUnits, List<UnitModel> opponentUnits,
-        CombatRollType rollType, Tile tile) {
+    public static Integer getCombinedModifierForUnit(UnitModel unit, Integer numOfUnit, List<NamedCombatModifierModel> modifiers, Player player,
+                                                     Player opponent, Game game, List<UnitModel> playerUnits, CombatRollType rollType, Tile tile) {
         int modsValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
             if (modifier.isInScopeForUnit(unit, playerUnits, rollType, game, player)) {
-                Integer modValue = GetVariableModValue(modifier, player, opponent, game, opponentUnits, unit, tile);
+                Integer modValue = getVariableModValue(modifier, player, opponent, game, unit, tile);
                 Integer perUnitCount = 1;
                 if (modifier.getApplyEachForQuantity()) {
                     perUnitCount = numOfUnit;
@@ -255,7 +253,7 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
                 if (game.getTile(onTile.getId()) != null) {
-                    if (ButtonHelper.isTileLegendary(game.getTile(onTile.getId()), game)) {
+                    if (ButtonHelper.isTileLegendary(game.getTile(onTile.getId()))) {
                         meetsCondition = true;
                     }
                 }
@@ -369,19 +367,8 @@ public class CombatModHelper {
         return meetsCondition;
     }
 
-    ///
-    /// The amount of the mod is usually static (eg +2 fighters)
-    /// But for some (mostly flagships), the value is scaled depending on game state
-    /// like how many fragments you have
-    /// or how many POs the opponent has scored that you haven't etc.
-    ///
-    public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
-        Game game, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit) {
-        return GetVariableModValue(mod, player, opponent, game, opponentUnitsInCombat, origUnit, null);
-    }
-
-    public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
-        Game game, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit, Tile activeSystem) {
+    public static Integer getVariableModValue(CombatModifierModel mod, Player player, Player opponent, Game game,
+                                                UnitModel origUnit, Tile activeSystem) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
         long scalingCount = 0;
@@ -429,10 +416,10 @@ public class CombatModHelper {
                     scalingCount = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false);
                 }
                 case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP -> {
-                    scalingCount += ButtonHelper.checkNumberNonFighterShips(opponent, game, activeSystem);
+                    scalingCount += ButtonHelper.checkNumberNonFighterShips(opponent, activeSystem);
                 }
                 case "combat_round" -> {
-                    int round = 0;
+                    int round;
                     String combatName = "combatRoundTracker" + player.getFaction() + activeSystem.getPosition() + "space";
                     if (game.getStoredValue(combatName).isEmpty()) {
                         round = 0;

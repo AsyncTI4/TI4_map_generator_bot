@@ -7,17 +7,16 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.milty.StartMilty;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.model.Source.ComponentSource;
+import ti4.service.milty.MiltyService;
 
 @Getter
 public class MiltySettings extends SettingsMenu {
@@ -84,9 +83,8 @@ public class MiltySettings extends SettingsMenu {
 
     @Override
     protected List<SettingInterface> settings() {
-        List<SettingInterface> implemented = new ArrayList<>();
         // implemented.add(draftMode);
-        return implemented;
+        return new ArrayList<>();
     }
 
     @Override
@@ -138,7 +136,6 @@ public class MiltySettings extends SettingsMenu {
     }
 
     protected String startMilty(GenericInteractionCreateEvent event) {
-        String errorMessage = StartMilty.startFromSettings(event, this);
-        return errorMessage;
+        return MiltyService.startFromSettings(event, this);
     }
 }

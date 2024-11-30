@@ -2,7 +2,6 @@
     "id": "shul",
     "tileId": "er07",
     "name": "Shul",
-    "shortName": null,
     "aliases": ["shul"],
     "positionInTile": {
         "x": 200.0,

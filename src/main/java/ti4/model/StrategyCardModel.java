@@ -1,16 +1,16 @@
 package ti4.model;
 
+import java.awt.*;
+import java.util.List;
+import java.util.Optional;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
-
-import java.awt.*;
-import java.util.List;
-import java.util.Optional;
 
 @Data
 public class StrategyCardModel implements ModelInterface, EmbeddableModel {
@@ -148,12 +148,10 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean hasImageFile() {
-        return imageFileName != null
-            && ResourceHelper.getInstance().getResourceFromFolder("strat_cards/",
-                imageFileName + ".png", null) != null;
+        return imageFileName != null && ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png") != null;
     }
 
     public String getImageFilePath() {
-        return ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", getImageFileName() + ".png", "Could not find SC image!");
+        return ResourceHelper.getResourceFromFolder("strat_cards/", getImageFileName() + ".png");
     }
 }

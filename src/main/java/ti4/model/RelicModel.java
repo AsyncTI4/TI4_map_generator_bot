@@ -10,12 +10,14 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
+import ti4.image.Mapper;
 
 @Data
 public class RelicModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String shortName;
+    private Boolean shrinkName;
     private String text;
     private String flavourText;
     private String flavourTextFormatted;
@@ -23,6 +25,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
+    private String homebrewReplacesID;
 
     public boolean isValid() {
         return alias != null
@@ -43,7 +46,23 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getShortName() {
-        return Optional.ofNullable(shortName).orElse(getName());
+        if (!getHomebrewReplacesID().isPresent())
+        {
+            return Optional.ofNullable(shortName).orElse(getName());
+        }
+        return Optional.ofNullable(shortName).orElse(Mapper.getRelic(getHomebrewReplacesID().get()).getShortName());
+    }
+
+    public boolean getShrinkName() {
+        if (!getHomebrewReplacesID().isPresent())
+        {
+            return Optional.ofNullable(shrinkName).orElse(false);
+        }
+        return Optional.ofNullable(shrinkName).orElse(Mapper.getRelic(getHomebrewReplacesID().get()).getShrinkName());
+    }
+
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
     }
 
     private boolean getIsFakeRelic() {

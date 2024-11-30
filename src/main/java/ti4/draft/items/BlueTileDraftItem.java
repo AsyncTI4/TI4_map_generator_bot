@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.milty.MiltyDraftTile;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
 import ti4.helpers.Emojis;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.model.DraftErrataModel;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel;
 import ti4.model.TechSpecialtyModel;
 import ti4.model.TileModel;
+import ti4.service.milty.MiltyDraftManager;
+import ti4.service.milty.MiltyDraftTile;
 
 public class BlueTileDraftItem extends DraftItem {
     public BlueTileDraftItem(String itemId) {
@@ -87,7 +87,7 @@ public class BlueTileDraftItem extends DraftItem {
     public static List<DraftItem> buildAllDraftableItems(MiltyDraftManager draftManager) {
         List<DraftItem> allItems = new ArrayList<>();
         for (MiltyDraftTile tile : draftManager.getBlue()) {
-            allItems.add(DraftItem.Generate(DraftItem.Category.BLUETILE, tile.getTile().getTileID()));
+            allItems.add(DraftItem.generate(DraftItem.Category.BLUETILE, tile.getTile().getTileID()));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.BLUETILE);
         return allItems;

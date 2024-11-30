@@ -1,20 +1,5 @@
 package ti4.helpers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
-import software.amazon.awssdk.core.async.AsyncRequestBody;
-import software.amazon.awssdk.core.exception.SdkClientException;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import ti4.ResourceHelper;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameStatsDashboardPayload;
-import ti4.map.Player;
-import ti4.message.BotLogger;
-import ti4.website.WebsiteOverlay;
-
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -32,7 +17,22 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
-import static ti4.helpers.ImageHelper.writeCompressedFormat;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.core.async.AsyncRequestBody;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import ti4.ResourceHelper;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameStatsDashboardPayload;
+import ti4.map.Player;
+import ti4.message.BotLogger;
+import ti4.website.WebsiteOverlay;
+
+import static ti4.image.ImageHelper.writeCompressedFormat;
 
 public class WebHelper {
 
@@ -63,16 +63,16 @@ public class WebHelper {
                 .build();
 
             httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                    .exceptionally(e -> {
-                        BotLogger.log("An exception occurred while performing an async send of game data to the website.", e);
-                        return null;
-                    });
+                .exceptionally(e -> {
+                    BotLogger.log("An exception occurred while performing an async send of game data to the website.", e);
+                    return null;
+                });
         } catch (IOException e) {
             BotLogger.log("Could not put data to web server", e);
         }
     }
 
-    public static void putOverlays(String gameId, Map<String, WebsiteOverlay> overlays) {
+    public static void putOverlays(String gameId, List<WebsiteOverlay> overlays) {
         if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
             return;
 
@@ -87,10 +87,10 @@ public class WebHelper {
                 .build();
 
             s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
-                    .exceptionally(e -> {
-                        BotLogger.log("An exception occurred while performing an async send of overlay data to the website.", e);
-                        return null;
-                    });
+                .exceptionally(e -> {
+                    BotLogger.log("An exception occurred while performing an async send of overlay data to the website.", e);
+                    return null;
+                });
         } catch (Exception e) {
             BotLogger.log("Could not put overlay to web server", e);
         }
@@ -103,8 +103,8 @@ public class WebHelper {
         List<GameStatsDashboardPayload> payloads = new ArrayList<>();
         List<String> badGames = new ArrayList<>();
         int count = 0;
-        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
-            if (game.isHasEnded() && game.hasWinner()) {
+        for (Game game : GameManager.getGameNameToGame().values()) {
+            if (game.getRound() > 2 || (game.isHasEnded() && game.hasWinner())) {
                 count++;
                 try {
                     // Quick & Dirty bypass for failed json creation
@@ -126,16 +126,16 @@ public class WebHelper {
             String json = objectMapper.writeValueAsString(payloads);
             PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(webProperties.getProperty("bucket"))
-                .key(String.format("statistics/%s.json", "test")) // TODO: when this export is final/good, change from "test", tell ParsleySage (stats dashboard dev)
+                .key("statistics/statistics.json")
                 .contentType("application/json")
                 .cacheControl("no-cache, no-store, must-revalidate")
                 .build();
 
             s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
-                    .exceptionally(e -> {
-                        BotLogger.log("An exception occurred while performing an async send of game stats to the website.", e);
-                        return null;
-                    });
+                .exceptionally(e -> {
+                    BotLogger.log("An exception occurred while performing an async send of game stats to the website.", e);
+                    return null;
+                });
         } catch (Exception e) {
             BotLogger.log("Could not put statistics to web server", e);
         }
@@ -171,10 +171,10 @@ public class WebHelper {
                     .contentType("image/" + format)
                     .build();
                 s3AsyncClient.putObject(request, AsyncRequestBody.fromBytes(out.toByteArray()))
-                        .exceptionally(e -> {
-                            BotLogger.log("An exception occurred while performing an async send of the game image to the website.", e);
-                            return null;
-                        });
+                    .exceptionally(e -> {
+                        BotLogger.log("An exception occurred while performing an async send of the game image to the website.", e);
+                        return null;
+                    });
             }
         } catch (SdkClientException e) {
             BotLogger.log("Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.", e);

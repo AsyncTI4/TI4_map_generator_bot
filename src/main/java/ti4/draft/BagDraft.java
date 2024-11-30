@@ -9,11 +9,11 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
-import ti4.helpers.FrankenDraftHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.franken.FrankenDraftBagService;
 
 public abstract class BagDraft {
     protected final Game owner;
@@ -21,12 +21,13 @@ public abstract class BagDraft {
     public static BagDraft GenerateDraft(String draftType, Game game) {
         if ("franken".equals(draftType)) {
             return new FrankenDraft(game);
-        } else if ("powered_franken".equals(draftType)) {
+        }
+        if ("powered_franken".equals(draftType)) {
             return new PoweredFrankenDraft(game);
-        } else if ("onepick_franken".equals(draftType)) {
+        }
+        if ("onepick_franken".equals(draftType)) {
             return new OnePickFrankenDraft(game);
         }
-
         return null;
     }
 
@@ -81,7 +82,7 @@ public abstract class BagDraft {
         player.setReadyToPassBag(!newBagCanBeDraftedFrom);
         MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " you have been passed a new draft bag!",
-            Buttons.gray(FrankenDraftHelper.ActionName + "show_bag", "Click here to show your current bag"));
+            Buttons.gray(FrankenDraftBagService.ACTION_NAME + "show_bag", "Click here to show your current bag"));
     }
 
     public boolean allPlayersReadyToPass() {
@@ -100,32 +101,15 @@ public abstract class BagDraft {
     public void setPlayerReadyToPass(Player player, boolean ready) {
         if (ready && !player.isReadyToPassBag()) {
             player.setReadyToPassBag(true);
-            FrankenDraftHelper.updateDraftStatusMessage(owner);
+            FrankenDraftBagService.updateDraftStatusMessage(owner);
         }
         player.setReadyToPassBag(ready);
-    }
-
-    public String getShortBagRepresentation(DraftBag bag) {
-        StringBuilder sb = new StringBuilder();
-        for (DraftItem.Category cat : DraftItem.Category.values()) {
-            sb.append("### ").append(cat.toString()).append(" (");
-            sb.append(bag.getCategoryCount(cat)).append("/").append(getItemLimitForCategory(cat));
-            sb.append("):\n");
-            for (DraftItem item : bag.Contents) {
-                if (item.ItemCategory != cat) {
-                    continue;
-                }
-                sb.append(" - ").append(item.getItemEmoji()).append(item.getShortDescription()).append("\n");
-            }
-        }
-        sb.append("**Total Cards: ").append(bag.Contents.size()).append("**\n");
-        return sb.toString();
     }
 
     public String getLongBagRepresentation(DraftBag bag) {
         StringBuilder sb = new StringBuilder();
         for (DraftItem.Category cat : DraftItem.Category.values()) {
-            sb.append(FrankenDraftHelper.getLongCategoryRepresentation(this, bag, cat));
+            sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat));
         }
         sb.append("**Total Cards: ").append(bag.Contents.size()).append("**\n");
         return sb.toString();

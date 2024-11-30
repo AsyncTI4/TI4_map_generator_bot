@@ -20,10 +20,10 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.player.ChangeColor;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Game;
@@ -624,7 +624,7 @@ public class DataMigrationManager {
         if (game.getPlayerFromColorOrFaction(newColor) != null) return false;
         String oldColor = rift.getColor();
         MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), rift.getRepresentation(false, false) + " has had their color changed to " + Emojis.getColorEmojiWithName(newColor));
-        ChangeColor.changePlayerColor(game, rift, oldColor, newColor);
+        ColorChangeHelper.changePlayerColor(game, rift, oldColor, newColor);
         return true;
     }
 
@@ -640,7 +640,7 @@ public class DataMigrationManager {
                 migrationDateString), e);
         }
         List<String> migrationsAppliedThisTime = new ArrayList<>();
-        Map<String, Game> loadedMaps = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> loadedMaps = GameManager.getGameNameToGame();
         for (Game game : loadedMaps.values()) {
             DateFormat mapCreatedOnFormat = new SimpleDateFormat("yyyy.MM.dd");
             Date mapCreatedOn = null;
@@ -690,7 +690,7 @@ public class DataMigrationManager {
         for (int i = 0; i < bag.Contents.size(); i++) {
             DraftItem item = bag.Contents.get(i);
             if ("keleres".equals(item.ItemId)) {
-                var newItem = DraftItem.Generate(item.ItemCategory, "keleresa");
+                var newItem = DraftItem.generate(item.ItemCategory, "keleresa");
                 swapBagItem(bag, i, newItem);
                 item = newItem;
             }
@@ -699,41 +699,41 @@ public class DataMigrationManager {
                     var faction = Mapper.getFaction(item.ItemId);
                     var units = faction.getUnits();
                     units.removeIf((String unit) -> !"mech".equals(Mapper.getUnit(unit).getBaseType()));
-                    swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.MECH, units.getFirst()));
+                    swapBagItem(bag, i, DraftItem.generate(DraftItem.Category.MECH, units.getFirst()));
                 }
             } else if (item.ItemCategory == DraftItem.Category.FLAGSHIP) {
                 if (Mapper.getUnit(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     var units = faction.getUnits();
                     units.removeIf((String unit) -> !"flagship".equals(Mapper.getUnit(unit).getBaseType()));
-                    swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.FLAGSHIP, units.getFirst()));
+                    swapBagItem(bag, i, DraftItem.generate(DraftItem.Category.FLAGSHIP, units.getFirst()));
                 }
             } else if (item.ItemCategory == DraftItem.Category.AGENT) {
                 if (Mapper.getLeader(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> agents = faction.getLeaders();
                     agents.removeIf((String leader) -> !"agent".equals(Mapper.getLeader(leader).getType()));
-                    swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.AGENT, agents.getFirst()));
+                    swapBagItem(bag, i, DraftItem.generate(DraftItem.Category.AGENT, agents.getFirst()));
                 }
             } else if (item.ItemCategory == DraftItem.Category.COMMANDER) {
                 if (Mapper.getLeader(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> agents = faction.getLeaders();
                     agents.removeIf((String leader) -> !"commander".equals(Mapper.getLeader(leader).getType()));
-                    swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.COMMANDER, agents.getFirst()));
+                    swapBagItem(bag, i, DraftItem.generate(DraftItem.Category.COMMANDER, agents.getFirst()));
                 }
             } else if (item.ItemCategory == DraftItem.Category.HERO) {
                 if (Mapper.getLeader(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> agents = faction.getLeaders();
                     agents.removeIf((String leader) -> !"hero".equals(Mapper.getLeader(leader).getType()));
-                    swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.HERO, agents.getFirst()));
+                    swapBagItem(bag, i, DraftItem.generate(DraftItem.Category.HERO, agents.getFirst()));
                 }
             } else if (item.ItemCategory == DraftItem.Category.PN) {
                 if (Mapper.getPromissoryNote(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> pns = faction.getPromissoryNotes();
-                    swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.PN, pns.getFirst()));
+                    swapBagItem(bag, i, DraftItem.generate(DraftItem.Category.PN, pns.getFirst()));
                 }
             }
         }

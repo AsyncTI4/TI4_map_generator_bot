@@ -8,13 +8,12 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.DrawAC;
-import ti4.commands.cardsso.SOInfo;
-import ti4.commands.tokens.AddCC;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Emojis;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -26,7 +25,7 @@ public class IgnisAuroraHelperTechs {
     public static void handleExhaustIgnisAuroraTech(GenericInteractionCreateEvent event, Game game, Player player, String tech) {
         boolean deleteMsg = true, deleteButton = true;
         switch (tech) {
-            case "baldrick_nm" -> DrawAC.drawActionCards(game, player, 1, true);
+            case "baldrick_nm" -> ActionCardHelper.drawActionCards(game, player, 1, true);
             case "baldrick_hm" -> ButtonHelperStats.sendGainCCButtons(game, player, false);
             case "baldrick_lwd" -> deleteMsg = false;
             case "baldrick_gd" -> {
@@ -46,20 +45,20 @@ public class IgnisAuroraHelperTechs {
         }
         if (deleteMsg) {
             ButtonHelper.deleteMessage(event);
-        } else if (deleteButton) {
+        } else {
             ButtonHelper.deleteTheOneButton(event);
         }
     }
 
     @ButtonHandler("fibrileRealign_AC")
     public static void handleFibrileAC(ButtonInteractionEvent event, Game game, Player player) {
-        ACInfo.sendDiscardAndDrawActionCardButtons(player);
+        ActionCardHelper.sendDiscardAndDrawActionCardButtons(player);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("fibrileRealign_SO")
     public static void handleFibrileSO(ButtonInteractionEvent event, Game game, Player player) {
-        SOInfo.sendSODiscardButtons(game, player, "redraw");
+        SecretObjectiveHelper.sendSODiscardButtons(player, "redraw");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -67,7 +66,7 @@ public class IgnisAuroraHelperTechs {
         // At the start of your turn you may exhaust this card to remove 1 of your command tokens
         // from a system that does not contain a planet owned by another player or another player's units
         Predicate<Tile> pred = tile -> {
-            if (!AddCC.hasCC(event, player.getColor(), tile)) return false;
+            if (!CommandCounterHelper.hasCC(event, player.getColor(), tile)) return false;
             for (Player p : game.getRealPlayers()) {
                 if (p == player) continue;
                 for (Planet planet : tile.getPlanetUnitHolders()) {

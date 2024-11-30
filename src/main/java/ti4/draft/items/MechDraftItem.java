@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -76,7 +76,7 @@ public class MechDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             var units = faction.getUnits();
             units.removeIf((String unit) -> !"mech".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(DraftItem.Generate(Category.MECH, units.getFirst()));
+            allItems.add(DraftItem.generate(Category.MECH, units.getFirst()));
         }
         return allItems;
     }

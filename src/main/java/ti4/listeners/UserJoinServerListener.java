@@ -1,10 +1,9 @@
 package ti4.listeners;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
@@ -20,6 +19,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.ThreadGetter;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -28,6 +28,46 @@ import ti4.message.MessageHelper;
 
 public class UserJoinServerListener extends ListenerAdapter {
 
+    @Override
+    public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
+        if (!validateEvent(event)) return;
+        AsyncTI4DiscordBot.runAsync(
+            "Guild member join task",
+            () -> {
+                try {
+                    checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
+                } catch (Exception e) {
+                    BotLogger.log("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
+                }
+            });
+    }
+
+    @Override
+    public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
+        if (!validateEvent(event)) return;
+        AsyncTI4DiscordBot.runAsync(
+            "Guild member remove task",
+            () -> {
+                try {
+                    event.getGuild().retrieveAuditLogs().queueAfter(1, TimeUnit.SECONDS, (logs) -> {
+                        boolean voluntary = true;
+                        for (AuditLogEntry log : logs) {
+                            if (log.getTargetIdLong() == event.getUser().getIdLong()) {
+                                if (log.getType() == ActionType.BAN || log.getType() == ActionType.KICK) {
+                                    voluntary = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        checkIfUserLeftActiveGames(event.getGuild(), event.getUser(), voluntary);
+                    }, BotLogger::catchRestError);
+                } catch (Exception e) {
+                    BotLogger.log("Error in `UserJoinServerListener.onGuildMemberRemove`", e);
+                }
+            });
+    }
+
     private static boolean validateEvent(GenericGuildEvent event) {
         String eventGuild = event.getGuild().getId();
         List<String> asyncGuilds = AsyncTI4DiscordBot.guilds.stream().map(Guild::getId).toList();
@@ -35,41 +75,9 @@ public class UserJoinServerListener extends ListenerAdapter {
         return asyncGuilds.contains(eventGuild);
     }
 
-    @Override
-    public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
-        if (!validateEvent(event)) return;
-        try {
-            checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
-        } catch (Exception e) {
-            BotLogger.log("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
-        }
-    }
-
-    @Override
-    public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
-        if (!validateEvent(event)) return;
-        try {
-            event.getGuild().retrieveAuditLogs().queueAfter(1, TimeUnit.SECONDS, (logs) -> {
-                boolean voluntary = true;
-                for (AuditLogEntry log : logs) {
-                    if (log.getTargetIdLong() == event.getUser().getIdLong()) {
-                        if (log.getType() == ActionType.BAN || log.getType() == ActionType.KICK) {
-                            voluntary = false;
-                            break;
-                        }
-                    }
-                }
-
-                checkIfUserLeftActiveGames(event.getGuild(), event.getUser(), voluntary);
-            }, BotLogger::catchRestError);
-        } catch (Exception e) {
-            BotLogger.log("Error in `UserJoinServerListener.onGuildMemberRemove`", e);
-        }
-    }
-
     private void checkIfNewUserIsInExistingGamesAndAutoAddRole(Guild guild, User user) {
         List<Game> mapsJoined = new ArrayList<>();
-        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
+        for (Game game : GameManager.getGameNameToGame().values()) {
             Guild gameGuild = game.getGuild();
             if (gameGuild != null && gameGuild.equals(guild) && game.getPlayers().containsKey(user.getId())) {
                 mapsJoined.add(game);
@@ -107,7 +115,7 @@ public class UserJoinServerListener extends ListenerAdapter {
             return;
         }
         String threadID = game.getLaunchPostThreadID();
-        if (threadID == null || !ButtonHelper.isNumeric(threadID)) {
+        if (!ButtonHelper.isNumeric(threadID)) {
             return;
         }
         ThreadChannel threadChannel = AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(threadID);
@@ -129,7 +137,7 @@ public class UserJoinServerListener extends ListenerAdapter {
 
     private void checkIfUserLeftActiveGames(Guild guild, User user, boolean voluntary) {
         List<Game> gamesQuit = new ArrayList<>();
-        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
+        for (Game game : GameManager.getGameNameToGame().values()) {
             boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
             if (game.isHasEnded() || endVPReachedButNotEnded) continue;
             Guild gameGuild = game.getGuild();
@@ -164,18 +172,12 @@ public class UserJoinServerListener extends ListenerAdapter {
 
     private static void reportUserLeftServer(String message) {
         TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
-        if (bothelperLoungeChannel == null)
-            return;
+        if (bothelperLoungeChannel == null) return;
         List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
-        if (threadChannels.isEmpty())
-            return;
+        if (threadChannels.isEmpty()) return;
         String threadName = "in-progress-games-left";
-        // SEARCH FOR EXISTING OPEN THREAD
-        for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equals(threadName)) {
-                MessageHelper.sendMessageToChannel(threadChannel_, message);
-                return;
-            }
-        }
+        ThreadChannel threadChannel = ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName);
+        MessageHelper.sendMessageToChannel(threadChannel, message);
+
     }
 }
