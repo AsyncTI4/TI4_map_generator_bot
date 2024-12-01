@@ -15,11 +15,11 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.player.PlayerStatsService;
-import ti4.users.UserSettingsManager;
 
 class Stats extends GameStateSubcommand {
 
@@ -146,9 +146,17 @@ class Stats extends GameStateSubcommand {
 
         OptionMapping optionPref = event.getOption(Constants.PREFERS_DISTANCE);
         if (optionPref != null) {
-            var userSettings = UserSettingsManager.get(getPlayer().getUserID());
-            userSettings.setPrefersDistanceBasedTacticalActions(optionPref.getAsBoolean());
-            UserSettingsManager.save(userSettings);
+            player.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
+            for (var managedGame : GameManager.getGameNameToGame().values()) {
+                if (!managedGame.isHasEnded()) {
+                    var gameToUpdate = GameManager.getGame(managedGame.getName());
+                    for (Player playerToUpdate : gameToUpdate.getRealPlayers()) {
+                        if (playerToUpdate.getUserID().equalsIgnoreCase(player.getUserID())) {
+                            playerToUpdate.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
+                        }
+                    }
+                }
+            }
         }
 
         Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);
@@ -181,6 +189,7 @@ class Stats extends GameStateSubcommand {
             String value = optionPassed.getAsString().toLowerCase();
             if ("y".equals(value) || "yes".equals(value)) {
                 player.setPassed(true);
+                // Turn.pingNextPlayer(event, activeMap, player);
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
                     ButtonHelperCommanders.olradinCommanderStep1(player, game);
                 }

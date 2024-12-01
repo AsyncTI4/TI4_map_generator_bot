@@ -5,12 +5,11 @@ import java.util.List;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import ti4.map.GameSaveLoadManager;
 
 @Getter
 public class SelectionMenuContext extends ListenerContext {
-
-    private String menuID;
-    private String messageID;
+    private String menuID, messageID;
     private List<String> values;
 
     public StringSelectInteractionEvent getEvent() {
@@ -31,5 +30,9 @@ public class SelectionMenuContext extends ListenerContext {
         this.menuID = this.componentID; // ID after checking faction
         this.messageID = event.getMessageId();
         this.values = new ArrayList<>(event.getValues());
+
+        if (game != null) {
+            GameSaveLoadManager.saveGame(game, event);
+        }
     }
 }

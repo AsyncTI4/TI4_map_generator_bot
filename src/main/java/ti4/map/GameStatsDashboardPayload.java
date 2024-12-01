@@ -1,5 +1,6 @@
 package ti4.map;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -76,6 +77,10 @@ public class GameStatsDashboardPayload {
 
     public String getHexSummary() {
         return game.getHexSummary();
+    }
+
+    public Map<Timestamp, GameStatsDashboardPayload> getHistory() {
+        return game.getHistoricalGameStatsDashboardPayloads();
     }
 
     @JsonProperty("isPoK")

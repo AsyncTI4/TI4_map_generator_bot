@@ -619,6 +619,21 @@ public class Tile {
         if ("0g".equalsIgnoreCase(tileID)) {
             return true;
         }
+
+        //TileModel model = getTileModel();
+        // if (model != null) {
+        //     if (StringUtils.isNotBlank(model.getTileBack())) {
+        //         // if the tile back is defined, that is the source of truth
+        //         return "green".equals(model.getTileBack());
+        //     }
+        //     for (String p : model.getPlanets()) {
+        //         PlanetModel planet = Mapper.getPlanet(p);
+        //         if (StringUtils.isNotBlank(planet.getFactionHomeworld())) {
+        //             return true;
+        //         }
+        //     }
+        //     return false;
+        // }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planetHolder) {
                 boolean oneOfThree = (unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_threetraits.png")) ||

@@ -20,9 +20,6 @@ class PingCounterStatisticsService {
 
     static void listPingCounterList(SlashCommandInteractionEvent event) {
         Game reference = GameManager.getGame("finreference");
-        if (reference == null) {
-            return;
-        }
         Map<String, Integer> pings = new HashMap<>();
         for (String pingsFor : reference.getMessagesThatICheckedForAllReacts().keySet()) {
             if (pingsFor.contains("pingsFor")) {

@@ -8,7 +8,6 @@ import ti4.map.GameSaveLoadManager;
 
 @Getter
 public class ButtonContext extends ListenerContext {
-
     private String messageID;
 
     @JsonIgnore

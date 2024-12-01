@@ -18,9 +18,9 @@ import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
+import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.ManagedGame;
-import ti4.map.ManagedPlayer;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 class MedianTurnTime extends Subcommand {
@@ -44,21 +44,21 @@ class MedianTurnTime extends Subcommand {
         Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
 
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
-        Predicate<ManagedGame> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
+        Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (ManagedGame game : GameManager.getManagedGames().stream().filter(endedGamesFilter).toList()) {
-            for (ManagedPlayer player : game.getRealPlayers()) {
-                Integer totalTurns = game.getPlayerToTotalTurns().get(player);
-                Long totalTurnTime = game.getPlayerToTurnTime().get(player);
+        for (Game game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
+            for (Player player : game.getRealPlayers()) {
+                Integer totalTurns = player.getNumberTurns();
+                Long totalTurnTime = player.getTotalTurnTime();
                 Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
                 if (playerTurnTime.getKey() == 0) continue;
                 Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
-                playerAverageTurnTimes.compute(player.getId(), (key, value) -> {
+                playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
                     if (value == null) value = new HashSet<>();
                     value.add(averageTurnTime);
                     return value;
                 });
-                playerTurnCount.merge(player.getId(), playerTurnTime.getKey(), Integer::sum);
+                playerTurnCount.merge(player.getUserID(), playerTurnTime.getKey(), Integer::sum);
             }
         }
 

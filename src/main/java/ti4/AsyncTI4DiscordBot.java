@@ -52,7 +52,6 @@ import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
 import ti4.listeners.UserJoinServerListener;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -195,11 +194,11 @@ public class AsyncTI4DiscordBot {
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
 
-        // LOAD GAMES NAMES
+        // LOAD GAMES
         BotLogger.logWithTimestamp(" LOADING GAMES");
         // LOAD GAMES NAMES
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
-        GameManager.initialize();
+        GameSaveLoadManager.loadGame();
         GameSaveLoadManager.cleanupOldUndoFiles();
 
         // RUN DATA MIGRATIONS
@@ -249,7 +248,7 @@ public class AsyncTI4DiscordBot {
                     BotLogger.logWithTimestamp("DID NOT FINISH RENDERING MAPS");
                 }
                 if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.logWithTimestamp("FINISHED PROCESSING STATISTICS");
+                    BotLogger.logWithTimestamp("DONE PROCESSING STATISTICS");
                 } else {
                     BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING STATISTICS");
                 }

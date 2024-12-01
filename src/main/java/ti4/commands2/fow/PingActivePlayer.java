@@ -46,12 +46,8 @@ class PingActivePlayer extends GameStateSubcommand {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);
             }
             game.setLastActivePlayerPing(new Date());
+            GameSaveLoadManager.saveGame(game, "Auto Ping");
         }
-
-        var referenceGame = GameManager.getGame("finreference");
-        if (referenceGame != null) {
-            ButtonHelper.increasePingCounter(referenceGame, player.getUserID());
-            GameSaveLoadManager.saveGame(referenceGame, "Ping Active Player command");
-        }
+        ButtonHelper.increasePingCounter(GameManager.getGame("finreference"), player.getUserID());
     }
 }
