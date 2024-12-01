@@ -75,6 +75,11 @@ public class CommandHelper {
 
     public static boolean acceptIfPlayerInGameAndGameChannel(SlashCommandInteractionEvent event) {
         var game = GameManager.getGame(getGameName(event));
+        if (game == null) {
+            MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' command canceled. Execute command in correctly named channel that " +
+                "starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`");
+            return false;
+        }
         var player = getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.replyToMessage(event, "Command must be ran by a player in the game, please use `/join gameName` or `/special2 setup_neutral_player`.");

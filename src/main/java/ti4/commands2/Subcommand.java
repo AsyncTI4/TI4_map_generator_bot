@@ -11,7 +11,7 @@ public abstract class Subcommand extends SubcommandData implements Command {
     }
 
     public boolean accept(SlashCommandInteractionEvent event) {
-        return getName().equals(event.getInteraction().getSubcommandName());
+        return Command.super.accept(event) && getName().equals(event.getInteraction().getSubcommandName());
     }
 
     public abstract void execute(SlashCommandInteractionEvent event);
