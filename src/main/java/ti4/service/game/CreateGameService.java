@@ -61,7 +61,12 @@ public class CreateGameService {
         newGame.setName(gameName);
         newGame.setAutoPing(true);
         newGame.setAutoPingSpacer(24);
+        GameManager.addGame(newGame);
+        boolean setMapSuccessful = GameManager.setGameForUser(ownerID, gameName);
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
+        if (!setMapSuccessful) {
+            MessageHelper.replyToMessage(event, "Could not assign active Game " + gameName);
+        }
         GameSaveLoadManager.saveGame(newGame, event);
         return newGame;
     }
@@ -293,7 +298,7 @@ public class CreateGameService {
 
         // Find new players
         for (Player player : game.getPlayers().values()) {
-            if (ButtonHelper.isPlayerNew(player.getUserID())) {
+            if (ButtonHelper.isPlayerNew(game, player)) {
                 newPlayers.add(player);
             }
         }

@@ -24,6 +24,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -135,7 +136,7 @@ class EliminatePlayer extends GameStateSubcommand {
             player.setEliminated(true);
             player.setDummy(true);
             if (!game.isFowMode()) {
-                Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game);
+                Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), GameManager.getGame(game.getName()));
             }
         } else {
             game.removePlayer(player.getUserID());

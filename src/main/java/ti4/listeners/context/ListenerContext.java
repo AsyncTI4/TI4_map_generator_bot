@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
+import ti4.listeners.SlashCommandListener;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -18,7 +19,6 @@ import ti4.message.MessageHelper;
 
 @Getter
 public abstract class ListenerContext {
-
     protected boolean contextIsValid = true;
     protected final String origComponentID;
     protected String componentID;
@@ -44,14 +44,21 @@ public abstract class ListenerContext {
         this.event = event;
         this.componentID = this.origComponentID = compID;
 
-        String gameName = CommandHelper.getGameNameFromChannel(event);
+        String userID = event.getUser().getId();
+        SlashCommandListener.setActiveGame(event.getMessageChannel(), userID, getContextType(), getSubCommand());
+
+        // Find game
+        String gameName = event.getChannel().getName();
+        gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
+        gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
+        gameName = StringUtils.substringBefore(gameName, "-");
         game = GameManager.getGame(gameName);
+
         player = null;
         privateChannel = event.getMessageChannel();
         mainGameChannel = event.getMessageChannel();
 
-        if (GameManager.isValidGame(gameName)) {
-            String userID = event.getUser().getId();
+        if (game != null) {
             player = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
 
             if (player == null && !"showGameAgain".equalsIgnoreCase(componentID)) {
@@ -98,6 +105,7 @@ public abstract class ListenerContext {
             }
         }
 
+        // newstuff
         if (componentID.startsWith("anonDeclare_")) {
             String declaration = componentID.split("_")[1];
             String old = game.getStoredValue(player.getUserID() + "anonDeclare");
@@ -123,18 +131,17 @@ public abstract class ListenerContext {
 
     public boolean checkFinsFactionChecker() {
         GenericInteractionCreateEvent event = getEvent();
-        if (factionChecked || componentID == null || !componentID.startsWith("FFCC_")) {
-            return true;
+        if (!factionChecked && componentID != null && componentID.startsWith("FFCC_")) {
+            componentID = componentID.replace("FFCC_", "");
+            String factionWhoPressedButton = player == null ? "nullPlayer" : player.getFaction();
+            if (player != null && !componentID.startsWith(factionWhoPressedButton + "_")) {
+                String message = "To " + player.getFactionEmoji() + ": these buttons are for someone else";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                return false;
+            }
+            componentID = componentID.replaceFirst(factionWhoPressedButton + "_", "");
+            factionChecked = true;
         }
-        componentID = componentID.replace("FFCC_", "");
-        String factionWhoPressedButton = player == null ? "nullPlayer" : player.getFaction();
-        if (player != null && !componentID.startsWith(factionWhoPressedButton + "_")) {
-            String message = "To " + player.getFactionEmoji() + ": these buttons are for someone else";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-            return false;
-        }
-        componentID = componentID.replaceFirst(factionWhoPressedButton + "_", "");
-        factionChecked = true;
         return true;
     }
 }

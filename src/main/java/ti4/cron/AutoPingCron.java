@@ -18,7 +18,6 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-import ti4.map.ManagedGame;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -41,19 +40,18 @@ public class AutoPingCron {
     }
 
     private static void autoPingGames() {
-        GameManager.getManagedGames().stream().filter(not(ManagedGame::isHasEnded))
-            .forEach(managedGame -> {
-                var game = GameManager.getGame(managedGame.getName());
-                handleTechSummary(game); // TODO, move this?
-                checkAllSaboWindows(game);
-                if (game.isFastSCFollowMode()) {
-                    handleFastScFollowMode(game);
-                }
-                Player player = game.getActivePlayer();
-                if (game.getAutoPingStatus() && !game.isTemporaryPingDisable()) {
-                    handleAutoPing(game, player);
-                }
-            });
+        var games = GameManager.getGameNameToGame().values().stream().filter(not(Game::isHasEnded)).toList();
+        for (Game game : games) {
+            handleTechSummary(game); // TODO, move this?
+            checkAllSaboWindows(game);
+            if (game.isFastSCFollowMode()) {
+                handleFastScFollowMode(game);
+            }
+            Player player = game.getActivePlayer();
+            if (game.getAutoPingStatus() && !game.isTemporaryPingDisable()) {
+                handleAutoPing(game, player);
+            }
+        }
     }
 
     private static void checkAllSaboWindows(Game game) {
@@ -162,36 +160,32 @@ public class AutoPingCron {
             return;
         }
         long milliSinceLastPing = System.currentTimeMillis() - game.getLastActivePlayerPing().getTime();
-        if (milliSinceLastPing <= ONE_HOUR_IN_MILLISECONDS * spacer && (!player.shouldPlayerBeTenMinReminded() || milliSinceLastPing <= TEN_MINUTES_IN_MILLISECONDS)) {
-            return;
-        }
-        String realIdentity = player.getRepresentationUnfogged();
-        String pingMessage = realIdentity + " this is a gentle reminder that it is your turn.";
-        if (player.shouldPlayerBeTenMinReminded() && milliSinceLastPing > TEN_MINUTES_IN_MILLISECONDS) {
-            pingMessage = realIdentity + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinence";
-        }
-        String playersInCombat = game.getStoredValue("factionsInCombat");
-        if (!playersInCombat.isBlank() && playersInCombat.contains(player.getFaction())) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2 != player && playersInCombat.contains(p2.getFaction())) {
-                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " the bot thinks you might be in combat and should receive a reminder ping as well. Ignore if not relevant");
+        if (milliSinceLastPing > ONE_HOUR_IN_MILLISECONDS * spacer || player.shouldPlayerBeTenMinReminded() && milliSinceLastPing > TEN_MINUTES_IN_MILLISECONDS) {
+            String realIdentity = player.getRepresentationUnfogged();
+            String pingMessage = realIdentity + " this is a gentle reminder that it is your turn.";
+            if (player.shouldPlayerBeTenMinReminded() && milliSinceLastPing > TEN_MINUTES_IN_MILLISECONDS) {
+                pingMessage = realIdentity + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinence";
+            }
+            String playersInCombat = game.getStoredValue("factionsInCombat");
+            if (!playersInCombat.isBlank() && playersInCombat.contains(player.getFaction())) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2 != player && playersInCombat.contains(p2.getFaction())) {
+                        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " the bot thinks you might be in combat and should receive a reminder ping as well. Ignore if not relevant");
+                    }
                 }
             }
-        }
-        long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange().getTime();
-        int pingNumber = (int) (milliSinceLastTurnChange / (ONE_HOUR_IN_MILLISECONDS * spacer));
-        pingMessage = getPingMessage(milliSinceLastTurnChange, spacer, pingMessage, realIdentity, pingNumber);
+            long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange().getTime();
+            int pingNumber = (int) (milliSinceLastTurnChange / (ONE_HOUR_IN_MILLISECONDS * spacer));
+            pingMessage = getPingMessage(milliSinceLastTurnChange, spacer, pingMessage, realIdentity, pingNumber);
 
-        pingPlayer(game, player, milliSinceLastTurnChange, spacer, pingMessage, pingNumber, realIdentity);
+            pingPlayer(game, player, milliSinceLastTurnChange, spacer, pingMessage, pingNumber, realIdentity);
 
-        Game mapReference = GameManager.getGame("finreference");
-        if (mapReference != null) {
-            ButtonHelper.increasePingCounter(mapReference, player.getUserID());
-            GameSaveLoadManager.saveGame(mapReference, "Auto Ping");
+            Game mapReference = GameManager.getGame("finreference");
+            if (mapReference != null) ButtonHelper.increasePingCounter(mapReference, player.getUserID());
+            player.setWhetherPlayerShouldBeTenMinReminded(false);
+            game.setLastActivePlayerPing(new Date());
+            GameSaveLoadManager.saveGame(game, "Auto Ping");
         }
-        player.setWhetherPlayerShouldBeTenMinReminded(false);
-        game.setLastActivePlayerPing(new Date());
-        GameSaveLoadManager.saveGame(game, "Auto Ping");
     }
 
     private static void pingPlayer(Game game, Player player, long milliSinceLastTurnChange, int spacer, String pingMessage, int pingNumber, String realIdentity) {
@@ -235,10 +229,6 @@ public class AutoPingCron {
         for (Player player : game.getRealPlayers()) {
             for (int sc : game.getPlayedSCsInOrder(player)) {
                 if (player.hasFollowedSC(sc)) continue;
-
-                String scTime = game.getStoredValue("scPlayMsgTime" + game.getRound() + sc);
-                if (scTime.isEmpty()) continue;
-
                 int twenty4 = 24;
                 int half = 12;
                 if (!game.getStoredValue("fastSCFollow").isEmpty()) {
@@ -247,30 +237,34 @@ public class AutoPingCron {
                 }
                 long twelveHoursInMilliseconds = (long) half * ONE_HOUR_IN_MILLISECONDS;
                 long twentyFourHoursInMilliseconds = (long) twenty4 * ONE_HOUR_IN_MILLISECONDS;
+                String scTime = game.getStoredValue("scPlayMsgTime" + game.getRound() + sc);
+                if (!scTime.isEmpty()) {
+                    long scPlayTime = Long.parseLong(scTime);
+                    long timeDifference = System.currentTimeMillis() - scPlayTime;
+                    String timesPinged = game
+                        .getStoredValue("scPlayPingCount" + sc + player.getFaction());
+                    if (timeDifference > twelveHoursInMilliseconds && timeDifference < twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("1")) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(player.getRepresentationUnfogged());
+                        sb.append(" You are getting this ping because ").append(Helper.getSCName(sc, game))
+                            .append(" has been played and now it has been half the allotted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
+                        appendScMessages(game, player, sc, sb);
+                        game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
+                    }
+                    if (timeDifference > twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("2")) {
+                        String sb = player.getRepresentationUnfogged() + Helper.getSCName(sc, game) +
+                            " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
 
-                long scPlayTime = Long.parseLong(scTime);
-                long timeDifference = System.currentTimeMillis() - scPlayTime;
-                String timesPinged = game.getStoredValue("scPlayPingCount" + sc + player.getFaction());
-                if (timeDifference > twelveHoursInMilliseconds && timeDifference < twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("1")) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(player.getRepresentationUnfogged());
-                    sb.append(" You are getting this ping because ").append(Helper.getSCName(sc, game)).append(" has been played and now it has been half the alloted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
-                    appendScMessages(game, player, sc, sb);
-                    game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
-                }
-                if (timeDifference > twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("2")) {
-                    String sb = player.getRepresentationUnfogged() +
-                        Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
+                        ButtonHelper.sendMessageToRightStratThread(player, game, sb, ButtonHelper.getStratName(sc));
+                        player.addFollowedSC(sc);
+                        game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
+                        String messageID = game.getStoredValue("scPlayMsgID" + sc);
+                        ButtonHelper.addReaction(player, false, true, "Not following", "", messageID, game);
 
-                    ButtonHelper.sendMessageToRightStratThread(player, game, sb, ButtonHelper.getStratName(sc));
-                    player.addFollowedSC(sc);
-                    game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
-                    String messageID = game.getStoredValue("scPlayMsgID" + sc);
-                    ButtonHelper.addReaction(player, false, true, "Not following", "", messageID, game);
-
-                    StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
-                    if (scModel != null && scModel.usesAutomationForSCID("pok8imperial")) {
-                        handleSecretObjectiveDrawOrder(game, player);
+                        StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
+                        if (scModel != null && scModel.usesAutomationForSCID("pok8imperial")) {
+                            handleSecretObjectiveDrawOrder(game, player);
+                        }
                     }
                 }
             }

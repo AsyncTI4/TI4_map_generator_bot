@@ -10,4 +10,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ ElementType.FIELD })
 @Retention(RUNTIME)
 @Documented
-public @interface ExportableField {}
+public @interface ExportableField {
+    // Blank on purpose
+}

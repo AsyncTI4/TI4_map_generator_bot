@@ -1,111 +1,65 @@
 package ti4.map;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Nullable;
-import ti4.cron.LogCacheStatsCron;
-import ti4.message.BotLogger;
 
+@UtilityClass
 public class GameManager {
 
-    private static final CopyOnWriteArrayList<String> allGameNames = new CopyOnWriteArrayList<>();
-    private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>();
-    private static final ConcurrentMap<String, ManagedPlayer> playerNameToManagedPlayer = new ConcurrentHashMap<>();
-    private static final LoadingCache<String, Game> activeGameCache;
+    private static final ConcurrentMap<String, String> userNameToGameName = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Game> gameNameToGame = new ConcurrentHashMap<>();
 
-    static {
-        activeGameCache = Caffeine.newBuilder()
-                .maximumSize(500)
-                .expireAfterAccess(2, TimeUnit.HOURS)
-                .build(GameManager::loadGame);
-        LogCacheStatsCron.registerCache("gameCache", activeGameCache);
+    public static Map<String, Game> getGameNameToGame() {
+        return gameNameToGame;
     }
 
-    public static void initialize() {
-        GameSaveLoadManager.loadManagedGames()
-                .forEach(managedGame -> gameNameToManagedGame.put(managedGame.getName(), managedGame));
-        allGameNames.addAll(gameNameToManagedGame.keySet());
+    public static void addGame(Game game) {
+        gameNameToGame.put(game.getName(), game);
     }
 
-    private static Game loadGame(String gameName) {
-        return GameSaveLoadManager.loadGame(gameName);
+    public static Game getGame(String gameName) {
+        return gameNameToGame.get(gameName);
+    }
+
+    public static Game deleteGame(String gameName) {
+        return gameNameToGame.remove(gameName);
+    }
+
+    public static boolean isValidGame(String game) {
+        return gameNameToGame.containsKey(game);
+    }
+
+    public static boolean setGameForUser(String userID, String gameName) {
+        if (gameNameToGame.get(gameName) != null) {
+            userNameToGameName.put(userID, gameName);
+            return true;
+        }
+        return false;
+    }
+
+    public static void resetGameForUser(String userID) {
+        userNameToGameName.remove(userID);
+    }
+
+    public static boolean isUserWithActiveGame(String userID) {
+        return userNameToGameName.containsKey(userID);
     }
 
     @Nullable
-    public static Game getGame(String gameName) {
-        if (!isValidGame(gameName)) {
+    public static Game getUserActiveGame(String userID) {
+        String mapName = userNameToGameName.get(userID);
+        if (mapName == null) {
             return null;
         }
-        if (gameNameToManagedGame.get(gameName).isHasEnded()) {
-            activeGameCache.invalidate(gameName);
-            return loadGame(gameName);
-        }
-        return activeGameCache.get(gameName);
-    }
-
-    static void addOrReplaceGame(Game game) {
-        allGameNames.addIfAbsent(game.getName());
-        if (!hasMatchingManagedGame(game)) {
-            gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
-        }
-        if (activeGameCache.getIfPresent(game.getName()) != null) {
-            activeGameCache.put(game.getName(), game);
-        }
-    }
-
-    static void invalidateGame(String gameName) {
-        allGameNames.remove(gameName);
-        var managedGame = gameNameToManagedGame.remove(gameName);
-        managedGame.getPlayers().forEach(player -> player.getGames().remove(managedGame));
-        activeGameCache.invalidate(gameName);
-    }
-
-    public static boolean isValidGame(String gameName) {
-        return gameName != null && allGameNames.contains(gameName);
+        return gameNameToGame.get(mapName);
     }
 
     public static List<String> getGameNames() {
-        return new ArrayList<>(allGameNames);
-    }
-
-    public static int getNumberOfGames() {
-        return allGameNames.size();
-    }
-
-    public static ManagedGame getManagedGame(String gameName) {
-        return gameNameToManagedGame.get(gameName);
-    }
-
-    public static List<ManagedGame> getManagedGames() {
-        if (gameNameToManagedGame.size() != allGameNames.size()) {
-            BotLogger.log("gameNameToManagedGame size " + gameNameToManagedGame.size() +
-                    " does not match allGameNames size " + allGameNames.size() +
-                    ". Something is very off...");
-        }
-        return new ArrayList<>(gameNameToManagedGame.values());
-    }
-
-    private static boolean hasMatchingManagedGame(Game game) {
-        var managedGame = gameNameToManagedGame.get(game.getName());
-        return managedGame != null && managedGame.matches(game);
-    }
-
-    public static ManagedPlayer getManagedPlayer(String playerId) {
-        return playerNameToManagedPlayer.get(playerId);
-    }
-
-    public static ManagedPlayer addOrMergePlayer(ManagedGame game, Player player) {
-        var managedPlayer = playerNameToManagedPlayer.computeIfAbsent(player.getUserID(), k -> new ManagedPlayer(game, player));
-        if (!managedPlayer.getGames().contains(game)) {
-            managedPlayer.merge(game, player);
-        }
-        return managedPlayer;
+        return getGameNameToGame().keySet().stream().sorted().toList();
     }
 }

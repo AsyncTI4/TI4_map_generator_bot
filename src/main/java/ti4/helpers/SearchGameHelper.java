@@ -3,7 +3,6 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import lombok.experimental.UtilityClass;
@@ -14,7 +13,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.ManagedGame;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -24,36 +22,28 @@ public class SearchGameHelper {
     public static int searchGames(User user, GenericInteractionCreateEvent event, boolean onlyMyTurn, boolean includeEndedGames, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes, boolean ignoreSpectate, boolean ignoreAborted, boolean wantNum) {
         String userID = user.getId();
 
-        Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate ?
-            game -> game.getPlayers().stream().anyMatch(player -> player.getId().equals(user.getId())) :
-            game -> game.getPlayers().stream().anyMatch(player -> player.getId().equals(user.getId()));
-        Predicate<ManagedGame> onlyMyTurnFilter = onlyMyTurn ?
-            game -> Objects.equals(game.getActivePlayerId(), user.getId()) :
-            game -> true;
-        Predicate<ManagedGame> endedGamesFilter = includeEndedGames ?
-            game -> true :
-            game -> !game.isHasEnded() && !game.isFowMode();
-        Predicate<ManagedGame> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
-        Predicate<ManagedGame> ignoreAbortedFilter = ignoreAborted ?
-            game -> !game.isHasEnded() || game.isHasWinner() :
-            game -> true;
-        Predicate<ManagedGame> allFilterPredicates = ignoreSpectateFilter.and(onlyMyTurnFilter).and(endedGamesFilter).and(onlyEndedFoWGames)
-            .and(ignoreAbortedFilter);
+        Predicate<Game> ignoreSpectateFilter = ignoreSpectate ? game -> game.getRealPlayerIDs().contains(userID) : game -> game.getPlayerIDs().contains(userID);
+        Predicate<Game> onlyMyTurnFilter = onlyMyTurn ? game -> game.getActivePlayerID() != null && game.getActivePlayerID().equals(userID) : game -> true;
+        Predicate<Game> endedGamesFilter = includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();
+        Predicate<Game> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
+        Predicate<Game> ignoreAbortedFilter = ignoreAborted ? game -> !game.isHasEnded() || game.getWinner().isPresent() : game -> true;
+        Predicate<Game> allFilterPredicates = ignoreSpectateFilter.and(onlyMyTurnFilter).and(endedGamesFilter).and(onlyEndedFoWGames).and(ignoreAbortedFilter);
 
-        var filteredManagedGames = GameManager.getManagedGames().stream()
+        Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
+
+        List<Game> games = GameManager.getGameNameToGame().values().stream()
             .filter(allFilterPredicates)
-            .sorted(Comparator.comparing(ManagedGame::getGameNameForSorting))
+            .sorted(mapSort)
             .toList();
 
         int index = 1;
         if (wantNum) {
-            return filteredManagedGames.size();
+            return games.size();
         }
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
-        for (var managedGame : filteredManagedGames) {
+        for (Game playerGame : games) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
-            var game = GameManager.getGame(managedGame.getName());
-            sb.append(getPlayerMapListRepresentation(game, userID, showAverageTurnTime, showSecondaries, showGameModes));
+            sb.append(getPlayerMapListRepresentation(playerGame, userID, showAverageTurnTime, showSecondaries, showGameModes));
             sb.append("\n");
             index++;
         }
@@ -63,7 +53,7 @@ public class SearchGameHelper {
         if (event instanceof ButtonInteractionEvent butt) {
             MessageHelper.sendMessageToThread(butt.getChannel(), user.getName() + "'s Game List", sb.toString());
         }
-        return filteredManagedGames.size();
+        return games.size();
 
     }
 
