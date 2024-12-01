@@ -156,7 +156,7 @@
     "alias": "classified_weapons_acd2",
     "name": "Classified Weapons",
     "phase": "Action",
-    "window": "When 1 of your units makes a roll for a unit ability",
+    "window": "When 1 of your units make a combat or unit ability roll",
     "text": "That unit rolls 2 additional dice.",
     "flavorText": "The warnings came too late for the Hylar. When an investigator from the Universities arrived weeks later to survey the carnage, naught was left but smoldering craters. The Gashlai's message was clear.",
     "source": "action_deck_2"
