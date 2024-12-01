@@ -79,5 +79,15 @@
                     "det","sr","pa","bs","aida","sar","sdn","pi","swa2","as","cl2","pfa","m2","se2","dt2","ah","vw","gr","sc","tcs","ht2","vtx","iihq","asn"
         ],
         "source": "pok"
-    }
+    },
+        {
+        "alias": "techs_pok_basemagen",
+        "name": "PoK Techs with Base Magen",
+        "type": "technology",
+        "description": "All techs available in PoK + Codexes EXCEPT using Base Magen.",
+        "cardIDs": ["amd","gd","fl","lwd","nm","dxa","hm","x89","ps","md_base","da","asc","st","gls","td","ie","ws","sd2","lw2","l4","cm","pws2","qdn","ac2","sdn2","mc","hcf2","vax","exo2","cr2","scc","lgf","it","mi","bio","nes","ffac2","mr","pm","so2","wg","ds","is","so","ng","vay","vpw","ers","dn2","dd2","pds2","cv2","ff2","inf2","htp","nf","yso","ic","tp",
+                    "det","sr","pa","bs","aida","sar","sdn","pi","swa2","as","cl2","pfa","m2","se2","dt2","ah","vw","gr","sc","tcs","ht2","vtx","iihq","asn"
+        ],
+        "source": "pok"
+        }
 ]
