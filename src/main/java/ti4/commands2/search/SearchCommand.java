@@ -12,11 +12,11 @@ public class SearchCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
             new SearchAbilitiesSubcommand(),
-            new SearchGames(),
+            //new SearchGames(),
             new SearchPlanetsSubcommand(),
             new SearchTilesSubcommand(),
             new SearchUnitsSubcommand(),
-            new SearchCommands(),
+            new SearchCommandsSubcommand(),
             new SearchMyGames(),
             new SearchForGame(),
             new SearchMyTitles(),

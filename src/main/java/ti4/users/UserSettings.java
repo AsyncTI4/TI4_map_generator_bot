@@ -8,12 +8,16 @@ import java.util.Optional;
 
 import lombok.Data;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 @Data
 public class UserSettings {
 
     private String userId;
     private List<String> preferredColourList = new ArrayList<>();
     private int personalPingInterval;
+    private boolean prefersDistanceBasedTacticalActions;
+    private String afkHours;
     private Map<String, String> storedValues = new HashMap<>();
 
     public UserSettings() {} // needed for ObjectMapper
@@ -32,5 +36,13 @@ public class UserSettings {
 
     public String removeStoredValue(String settingKey) {
         return storedValues.remove(settingKey);
+    }
+
+    public void addAfkHour(String hour) {
+        if (isBlank(afkHours)) {
+            afkHours = hour;
+        } else {
+            afkHours += ";" + hour;
+        }
     }
 }

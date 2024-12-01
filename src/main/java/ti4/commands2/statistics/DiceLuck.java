@@ -15,13 +15,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.Player;
+import ti4.map.ManagedGame;
+import ti4.map.ManagedPlayer;
 import ti4.message.MessageHelper;
 
 class DiceLuck extends Subcommand {
@@ -56,11 +55,11 @@ class DiceLuck extends Subcommand {
             .sorted(comparator)
             .limit(topLimit)
             .forEach(entry  -> {
-                var user = AsyncTI4DiscordBot.jda.getUserById(entry.getKey());
+                var managedPlayer = GameManager.getManagedPlayer(entry.getKey());
                 double expectedHits = entry.getValue().getKey();
                 int actualHits = entry.getValue().getValue();
                 if (expectedHits > 0 && actualHits > 0) {
-                    appendDiceLuck(sb, index, user.getName(), expectedHits, actualHits);
+                    appendDiceLuck(sb, index, managedPlayer.getName(), expectedHits, actualHits);
                 }
             });
 
@@ -71,17 +70,21 @@ class DiceLuck extends Subcommand {
         Map<String, Entry<Double, Integer>> playerDiceLucks = new HashMap<>();
         Map<String, Set<Double>> playerAverageDiceLucks = new HashMap<>();
 
-        Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
+        Predicate<ManagedGame> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (Game game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
-            for (Player player : game.getRealPlayers()) {
-                Entry<Double, Integer> playerDiceLuck = Map.entry(player.getExpectedHitsTimes10() / 10.0, player.getActualHits());
-                playerDiceLucks.merge(player.getUserID(), playerDiceLuck,
-                    (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerDiceLuck.getKey(), oldEntry.getValue() + playerDiceLuck.getValue()));
+        for (ManagedGame game : GameManager.getManagedGames().stream().filter(endedGamesFilter).toList()) {
+            for (ManagedPlayer player : game.getRealPlayers()) {
+                Entry<Double, Integer> playerDiceLuck = Map.entry(
+                    game.getPlayerToExpectedHitsTimes10().get(player) / 10.0,
+                    game.getPlayerToActualHits().get(player));
+                playerDiceLucks.merge(player.getId(), playerDiceLuck,
+                    (oldEntry, newEntry) -> Map.entry(
+                        oldEntry.getKey() + playerDiceLuck.getKey(),
+                        oldEntry.getValue() + playerDiceLuck.getValue()));
 
                 if (playerDiceLuck.getKey() == 0) continue;
                 Double averageDiceLuck = playerDiceLuck.getValue() / playerDiceLuck.getKey();
-                playerAverageDiceLucks.compute(player.getUserID(), (key, value) -> {
+                playerAverageDiceLucks.compute(player.getId(), (key, value) -> {
                     if (value == null) value = new HashSet<>();
                     value.add(averageDiceLuck);
                     return value;

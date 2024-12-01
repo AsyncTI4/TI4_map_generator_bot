@@ -14,8 +14,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
 
@@ -44,7 +44,7 @@ class Observer extends Subcommand {
             return;
         }
 
-        Game game = GameManager.getGame(gameName);
+        ManagedGame game = GameManager.getManagedGame(gameName);
         Guild guild = game.getGuild();
         Member member = guild.getMemberById(user.getId());
 

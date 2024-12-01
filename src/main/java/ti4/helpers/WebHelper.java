@@ -25,14 +25,14 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.ResourceHelper;
+import ti4.image.ImageHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameStatsDashboardPayload;
+import ti4.map.ManagedGame;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.website.WebsiteOverlay;
-
-import static ti4.image.ImageHelper.writeCompressedFormat;
 
 public class WebHelper {
 
@@ -103,17 +103,18 @@ public class WebHelper {
         List<GameStatsDashboardPayload> payloads = new ArrayList<>();
         List<String> badGames = new ArrayList<>();
         int count = 0;
-        for (Game game : GameManager.getGameNameToGame().values()) {
-            if (game.getRound() > 2 || (game.isHasEnded() && game.hasWinner())) {
+
+        for (ManagedGame managedGame : GameManager.getManagedGames()) {
+            if (managedGame.isHasEnded() && managedGame.isHasWinner()) {
                 count++;
                 try {
-                    // Quick & Dirty bypass for failed json creation
+                    var game = GameManager.getGame(managedGame.getName());
                     GameStatsDashboardPayload payload = new GameStatsDashboardPayload(game);
                     objectMapper.writeValueAsString(payload);
                     payloads.add(new GameStatsDashboardPayload(game));
                 } catch (Exception e) {
-                    badGames.add(game.getID());
-                    BotLogger.log("Failed to create GameStatsDashboardPayload for game: `" + game.getID() + "`", e);
+                    badGames.add(managedGame.getName());
+                    BotLogger.log("Failed to create GameStatsDashboardPayload for game: `" + managedGame.getName() + "`", e);
                 }
             }
         }
@@ -163,7 +164,7 @@ public class WebHelper {
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 // TODO: Use webp one day, ImageHelper.writeWebpOrDefaultTo
                 String format = "png";
-                writeCompressedFormat(img, out, format, 0.1f);
+                ImageHelper.writeCompressedFormat(img, out, format, 0.1f);
                 mapPath += format;
                 PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(webProperties.getProperty("bucket"))
