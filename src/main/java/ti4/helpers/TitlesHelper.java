@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.listeners.annotations.ButtonHandler;
+import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.ManagedGame;
 
@@ -54,5 +57,11 @@ public class TitlesHelper {
         }
 
         return sb;
+    }
+
+    @ButtonHandler("offerToGiveTitles")
+    public static void offerToGiveTitles(ButtonInteractionEvent event, Game game) {
+        PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
+        ButtonHelper.deleteMessage(event);
     }
 }

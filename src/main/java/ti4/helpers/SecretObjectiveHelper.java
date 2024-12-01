@@ -19,6 +19,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.HeroUnlockCheckService;
 
 public class SecretObjectiveHelper {
 
@@ -109,7 +110,7 @@ public class SecretObjectiveHelper {
         String headerText = player.getRepresentation();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
-        Helper.checkIfHeroUnlocked(game, player);
+        HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
         CommanderUnlockCheckService.checkPlayer(player, "nomad");
         Helper.checkEndGame(game, player);
     }

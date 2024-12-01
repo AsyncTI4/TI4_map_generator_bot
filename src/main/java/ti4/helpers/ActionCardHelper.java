@@ -127,8 +127,8 @@ public class ActionCardHelper {
         Map<String, Integer> actionCards = player.getActionCards();
 
         if (actionCards != null && !actionCards.isEmpty()
-                && !ButtonHelper.isPlayerElected(game, player, "censure")
-                && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+            && !ButtonHelper.isPlayerElected(game, player, "censure")
+            && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
@@ -144,8 +144,8 @@ public class ActionCardHelper {
             acButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard an AC"));
         }
         if (actionCards != null && !actionCards.isEmpty()
-                && !ButtonHelper.isPlayerElected(game, player, "censure")
-                && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace") || actionCards.containsKey("special_session")
+            && !ButtonHelper.isPlayerElected(game, player, "censure")
+            && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace") || actionCards.containsKey("special_session")
                 || actionCards.containsKey("investments") || actionCards.containsKey("last_minute_deliberation") || actionCards.containsKey("revolution") || actionCards.containsKey("deflection") || actionCards.containsKey("summit"))) {
             acButtons.add(Buttons.gray("checkForAllACAssignments", "Pre assign ACs"));
         }
@@ -1067,6 +1067,12 @@ public class ActionCardHelper {
         ActionCardHelper.sendActionCardInfo(game, player);
     }
 
+    @ButtonHandler("riseOfAMessiah")
+    public static void riseOfAMessiah(ButtonInteractionEvent event, Player player, Game game) {
+        ActionCardHelper.doRise(player, event, game);
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static void doRise(Player player, GenericInteractionCreateEvent event, Game game) {
         List<String> planets = player.getPlanetsAllianceMode();
         StringBuilder sb = new StringBuilder();
@@ -1101,6 +1107,12 @@ public class ActionCardHelper {
             sb.append("\n> Total of ").append(count);
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+    }
+
+    @ButtonHandler("fighterConscription")
+    public static void fighterConscription(ButtonInteractionEvent event, Player player, Game game) {
+        ActionCardHelper.doFfCon(event, player, game);
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void doFfCon(GenericInteractionCreateEvent event, Player player, Game game) {

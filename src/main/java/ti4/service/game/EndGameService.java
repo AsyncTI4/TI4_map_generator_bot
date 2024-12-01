@@ -26,6 +26,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
 import ti4.helpers.TIGLHelper;
+import ti4.helpers.ThreadGetter;
 import ti4.helpers.ThreadHelper;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
@@ -132,13 +133,9 @@ public class EndGameService {
         TextChannel bothelperLoungeChannel = !bothelperLoungeChannels.isEmpty() ? bothelperLoungeChannels.getFirst() : null;
         if (bothelperLoungeChannel != null) {
             // POST GAME END TO BOTHELPER LOUNGE GAME STARTS & ENDS THREAD
-            List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
             String threadName = "game-starts-and-ends";
-            for (ThreadChannel threadChannel_ : threadChannels) {
-                if (threadChannel_.getName().equals(threadName)) {
-                    MessageHelper.sendMessageToChannel(threadChannel_, "Game: **" + gameName + "** on server **" + game.getGuild().getName() + "** has concluded.");
-                }
-            }
+            ThreadChannel threadChannel = ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName);
+            MessageHelper.sendMessageToChannel(threadChannel, "Game: **" + gameName + "** on server **" + game.getGuild().getName() + "** has concluded.");     
         }
 
         // Archive Game Channels

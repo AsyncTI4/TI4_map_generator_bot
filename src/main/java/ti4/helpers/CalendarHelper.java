@@ -34,6 +34,6 @@ public class CalendarHelper {
     }
 
     public static boolean isNearChristmas() {
-        return isBetween(Calendar.DECEMBER, 1, Calendar.DECEMBER, 26);
+        return isBetween(Calendar.DECEMBER, 1, Calendar.DECEMBER, 29);
     }
 }

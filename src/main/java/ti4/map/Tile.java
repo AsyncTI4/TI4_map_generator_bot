@@ -1,6 +1,6 @@
 package ti4.map;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,18 +10,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.CalendarHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -254,8 +257,14 @@ public class Tile {
     public String getTilePath() {
         String tileName = Mapper.getTileID(tileID);
         if (("44".equals(tileID) || ("45".equals(tileID)))
-            && (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0)) {
+            && (RandomHelper.isOneInX(Constants.EYE_CHANCE))) {
             tileName = "S15_Cucumber.png";
+        }
+        if (("43".equals(tileID) || "80".equals(tileID))) {
+            int baubleChance = CalendarHelper.isNearChristmas() ? 5 : 10000;
+            if (RandomHelper.isOneInX(baubleChance)) {
+                tileName = tileName.replace(".png", "_xmas.png");
+            }
         }
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
@@ -613,7 +622,7 @@ public class Tile {
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planetHolder) {
                 boolean oneOfThree = (unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_threetraits.png")) ||
-                        ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
+                    ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
                         || "cultural".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
                         || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType()));
 

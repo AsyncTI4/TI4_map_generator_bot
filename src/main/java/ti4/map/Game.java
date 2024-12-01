@@ -1623,6 +1623,9 @@ public class Game extends GameProperties {
         return soToPoList;
     }
 
+    /**
+     * @param soToPoList - a list of Secret Objective IDs that have been turned into Public Objectives (typically via Classified Document Leaks)
+     */
     public void setSoToPoList(List<String> soToPoList) {
         this.soToPoList = soToPoList;
     }

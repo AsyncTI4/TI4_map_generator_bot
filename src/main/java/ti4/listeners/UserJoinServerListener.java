@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.ThreadGetter;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.ManagedGame;
@@ -187,18 +188,12 @@ public class UserJoinServerListener extends ListenerAdapter {
 
     private static void reportUserLeftServer(String message) {
         TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
-        if (bothelperLoungeChannel == null)
-            return;
+        if (bothelperLoungeChannel == null) return;
         List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
-        if (threadChannels.isEmpty())
-            return;
+        if (threadChannels.isEmpty()) return;
         String threadName = "in-progress-games-left";
-        // SEARCH FOR EXISTING OPEN THREAD
-        for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equals(threadName)) {
-                MessageHelper.sendMessageToChannel(threadChannel_, message);
-                return;
-            }
-        }
+        ThreadChannel threadChannel = ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName);
+        MessageHelper.sendMessageToChannel(threadChannel, message);
+
     }
 }
