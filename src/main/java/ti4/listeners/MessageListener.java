@@ -34,7 +34,7 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        if (!isAsyncServer(event.getGuild().getId())) {
+        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() || !isAsyncServer(event.getGuild().getId())) {
             return;
         }
 
@@ -46,8 +46,6 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
-        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getMessage());
-        long startTime = System.currentTimeMillis();
         try {
             timeIt(() -> checkForFogOfWarInvitePrompt(message), "MessageListener#checkForFogOfWarInvitePrompt", 1000);
             timeIt(() -> copyLFGPingsToLFGPingsChannel(event, message), "MessageListener#copyLFGPingstoLFGPingsChannel", 1000);
@@ -58,18 +56,6 @@ public class MessageListener extends ListenerAdapter {
             timeIt(() -> addFactionEmojiReactionsToMessages(event), "MessageListener#addFactionEmojiReactionsToMessages", 1000);
         } catch (Exception e) {
             BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
-        }
-
-        long endTime = System.currentTimeMillis();
-        final int milliThreshold = 3000;
-        if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
-            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
-            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
-            String errorMessage = message.getJumpUrl() + " message took over " + milliThreshold + "ms to process:\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " message was sent\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to receive\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute " + (endTime - startTime > startTime - eventTime ? "😲" : "") ;
-            BotLogger.log(errorMessage);
         }
     }
 
@@ -153,6 +139,7 @@ public class MessageListener extends ListenerAdapter {
         if (game != null) {
             Player player = getPlayer(event, game);
             RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true, event.getChannel());
+            GameSaveLoadManager.saveGame(game, "End of round summary.");
         }
     }
 
@@ -252,6 +239,7 @@ public class MessageListener extends ListenerAdapter {
             previousThoughts = game.getStoredValue("futureMessageFor" + player.getFaction()) + "\n\n";
         }
         game.setStoredValue("futureMessageFor" + player.getFaction(), previousThoughts + messageContent);
+        GameSaveLoadManager.saveGame(game, "Whisper to future.");
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
         event.getMessage().delete().queue();
     }
@@ -313,7 +301,6 @@ public class MessageListener extends ListenerAdapter {
                 if (roles.contains(player2.getRoleForCommunity())) {
                     player3 = player2;
                 }
-
             }
         }
 

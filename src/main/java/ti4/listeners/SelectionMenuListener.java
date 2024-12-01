@@ -9,6 +9,7 @@ import ti4.message.BotLogger;
 import ti4.selections.SelectionMenuProvider;
 
 public class SelectionMenuListener extends ListenerAdapter {
+
     @Override
     public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {

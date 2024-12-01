@@ -12,9 +12,9 @@ import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-class SearchCommands extends Subcommand {
+class SearchCommandsSubcommand extends Subcommand {
 
-    public SearchCommands() {
+    public SearchCommandsSubcommand() {
         super(Constants.SEARCH_COMMANDS, "List all of the bot's commands and subcommands");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_OPTIONS, "True to include command options"));
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));

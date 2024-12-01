@@ -2,8 +2,6 @@ package ti4.map;
 
 import java.awt.*;
 import java.lang.reflect.Field;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -24,7 +22,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -88,6 +85,7 @@ import ti4.model.UnitModel;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 
+import static java.util.function.Predicate.not;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public class Game extends GameProperties {
@@ -159,7 +157,7 @@ public class Game extends GameProperties {
     private List<String> relics;
     @JsonIgnore
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
-    private final List<String> runDataMigrations = new ArrayList<>();
+    private final Set<String> runDataMigrations = new HashSet<>();
     private BagDraft activeDraft;
     @JsonIgnore
     @Getter
@@ -425,7 +423,6 @@ public class Game extends GameProperties {
         listOfTilePinged[count] = tileName;
     }
 
-    // Overrides
     @Override
     public void setRound(int round) {
         super.setRound(Math.max(1, round));
@@ -476,9 +473,10 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public String getGameModesText() {
+        boolean isNormalGame = isNormalGame();
         Map<String, Boolean> gameModes = new HashMap<>() {
             {
-                put(Emojis.TI4PoK + "Normal", isNormalGame());
+                put(Emojis.TI4PoK + "Normal", isNormalGame);
                 put(Emojis.TI4BaseGame + "Base Game", isBaseGameMode());
                 put(Emojis.MiltyMod + "MiltyMod", isMiltyModMode());
                 put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
@@ -494,7 +492,7 @@ public class Game extends GameProperties {
                 put("HomebrewSC", isHomebrewSCMode());
                 put("Little Omega", isLittleOmega());
                 put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
-                put("Homebrew", hasHomebrew());
+                put("Homebrew", !isNormalGame);
             }
         };
         for (String tag : getTags()) {
@@ -521,7 +519,7 @@ public class Game extends GameProperties {
             TextChannel tableTalkChannel;
             List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda.getTextChannels().stream()
                 .filter(c -> c.getName().startsWith(getName()))
-                .filter(Predicate.not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
+                .filter(not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
                 .toList();
             if (gameChannels.size() == 1) {
                 tableTalkChannel = gameChannels.getFirst();
@@ -589,7 +587,6 @@ public class Game extends GameProperties {
 
         // CHECK IF ARCHIVED
         if (getActionsChannel() == null) {
-            BotLogger.log(getName() + " does not have an actions channel and therefore can't find the bot-map-updates channel");
             return null;
         }
         for (ThreadChannel archivedChannel : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
@@ -651,9 +648,8 @@ public class Game extends GameProperties {
     public String getFactionsThatReactedToThis(String messageID) {
         if (checkingForAllReacts.get(messageID) != null) {
             return checkingForAllReacts.get(messageID);
-        } else {
-            return "";
         }
+        return "";
     }
 
     public void clearAllEmptyStoredValues() {
@@ -3188,13 +3184,8 @@ public class Game extends GameProperties {
         return null;
     }
 
-    public void addPlayer(String id, String name) {
-        Player player = new Player(id, name, getName());
-        players.put(id, player);
-    }
-
-    public Player addPlayerLoad(String id, String name) {
-        Player player = new Player(id, name, getName());
+    public Player addPlayer(String id, String name) {
+        Player player = new Player(id, name, this);
         players.put(id, player);
         return player;
     }
@@ -3241,7 +3232,7 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public List<Player> getNotRealPlayers() {
-        return getPlayers().values().stream().filter(Player::isNotRealPlayer).collect(Collectors.toList());
+        return getPlayers().values().stream().filter(not(Player::isRealPlayer)).collect(Collectors.toList());
     }
 
     @JsonIgnore
@@ -3618,7 +3609,7 @@ public class Game extends GameProperties {
         runDataMigrations.add(string);
     }
 
-    public List<String> getRunMigrations() {
+    public Set<String> getRunMigrations() {
         return runDataMigrations;
     }
 
@@ -4085,9 +4076,12 @@ public class Game extends GameProperties {
                 .map(Mapper::getFaction)
                 .filter(Objects::nonNull)
                 .anyMatch(faction -> !faction.getSource().isOfficial())
-            || Mapper.getLeaders().values().stream()
-                .filter(leader -> !leader.getSource().isOfficial())
-                .anyMatch(leader -> isLeaderInGame(leader.getID()))
+            || getRealAndEliminatedAndDummyPlayers().stream()
+                .map(Player::getLeaderIDs)
+                .flatMap(Collection::stream)
+                .map(Mapper::getLeader)
+                .filter(Objects::nonNull)
+                .anyMatch(leader -> !leader.getSource().isOfficial())
             || (publicObjectives1 != null && publicObjectives1.size() < 5 && getRound() >= 4)
             || (publicObjectives2 != null && publicObjectives2.size() < (getRound() - 4))
             || getRealPlayers().stream()
@@ -4256,15 +4250,5 @@ public class Game extends GameProperties {
             }
         }
         return false;
-    }
-
-    @JsonIgnore
-    public String getGameStatsDashboardJSON() {
-        return new GameStatsDashboardPayload(this).getJson();
-    }
-
-    public void addHistoricalGameStatsDashboardPayload() {
-        GameStatsDashboardPayload payload = new GameStatsDashboardPayload(this);
-        getHistoricalGameStatsDashboardPayloads().put(Timestamp.from(Instant.now()), payload);
     }
 }

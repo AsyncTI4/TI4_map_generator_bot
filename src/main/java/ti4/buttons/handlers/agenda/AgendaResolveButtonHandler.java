@@ -433,8 +433,7 @@ class AgendaResolveButtonHandler {
                                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
                             }
                             if (player.hasInf2Tech()) {
-                                ButtonHelper.resolveInfantryDeath(player,
-                                    uH.getUnitCount(Units.UnitType.Infantry, player.getColor()));
+                                ButtonHelper.resolveInfantryDeath(player, uH.getUnitCount(Units.UnitType.Infantry, player.getColor()));
                             }
                             if (cabalFS || cabalMech) {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabalFSOwner,
@@ -505,8 +504,7 @@ class AgendaResolveButtonHandler {
                                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
                             }
                             if (player.hasInf2Tech()) {
-                                ButtonHelper.resolveInfantryDeath(player,
-                                    uH.getUnitCount(Units.UnitType.Infantry, player.getColor()));
+                                ButtonHelper.resolveInfantryDeath(player, uH.getUnitCount(Units.UnitType.Infantry, player.getColor()));
                             }
                             if (cabalFS || cabalMech) {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabalFSOwner,
@@ -975,10 +973,6 @@ class AgendaResolveButtonHandler {
         if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);
-            if ("action_deck_2".equals(game.getAcDeckID()) && aCount > 2) {
-                String acd2Shenanigans = getAcd2Shenanigans(game);
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), acd2Shenanigans);
-            }
         } else {
             game.removeLaw(winner);
             game.putAgendaBackIntoDeckOnTop(winner);
@@ -986,12 +980,5 @@ class AgendaResolveButtonHandler {
         }
 
         ButtonHelper.deleteMessage(event);
-    }
-
-    private static String getAcd2Shenanigans(Game game) {
-        if (game.isACInDiscard("Last Minute Deliberation")) {
-            return "This is the window for *Last Minute Deliberation*! " + game.getPing();
-        }
-        return "*Last Minute Deliberation* is in the discard pile. Feel free to move forward.";
     }
 }

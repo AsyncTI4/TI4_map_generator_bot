@@ -74,19 +74,20 @@ import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.users.UserSettingsManager;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 public class Player {
 
     private String userID;
     private String userName;
 
-    private String gameID;
+    private final Game game;
     private boolean tenMinReminderPing;
 
     private boolean passed;
     private boolean readyToPassBag;
     private boolean searchWarrant;
     private boolean isDummy;
-    private boolean prefersDistanceBasedTacticalActions;
     private boolean autoPassOnWhensAfters;
     private boolean eliminated;
 
@@ -102,7 +103,6 @@ public class Player {
     @Setter
     private String homeSystemPosition;
     private String allianceMembers = "";
-    private String hoursThatPlayerIsAFK = "";
     private String color;
 
     @Getter
@@ -225,19 +225,15 @@ public class Player {
 
     private final Tile nomboxTile = new Tile("nombox", "nombox");
 
-    public Player() {
-    }
-
-    public Player(@JsonProperty("userID") String userID, @JsonProperty("userName") String userName,
-        @JsonProperty("gameID") String gameID) {
+    public Player(String userID, String userName, Game game) {
         this.userID = userID;
         this.userName = userName;
-        this.gameID = gameID;
+        this.game = game;
     }
 
     @JsonIgnore
     public Game getGame() {
-        return GameManager.getGame(gameID);
+        return game;
     }
 
     @JsonIgnore
@@ -687,16 +683,8 @@ public class Player {
         return readyToPassBag;
     }
 
-    public boolean doesPlayerPreferDistanceBasedTacticalActions() {
-        return prefersDistanceBasedTacticalActions;
-    }
-
     public boolean doesPlayerAutoPassOnWhensAfters() {
         return autoPassOnWhensAfters;
-    }
-
-    public void setPreferenceForDistanceBasedTacticalActions(boolean preference) {
-        prefersDistanceBasedTacticalActions = preference;
     }
 
     public void setAutoPassWhensAfters(boolean preference) {
@@ -1458,8 +1446,6 @@ public class Player {
                     }
                     if (ping) {
                         sb.append(" ").append(userById.getAsMention());
-                    } else {
-                        //sb.append(" ").append(userById.getEffectiveName());
                     }
                 }
                 if (getColor() != null && !"null".equals(getColor()) && !noColor) {
@@ -1620,10 +1606,11 @@ public class Player {
     }
 
     public boolean isAFK() {
-        if (getHoursThatPlayerIsAFK().isEmpty()) {
+        String afkHours = UserSettingsManager.get(userID).getAfkHours();
+        if (isBlank(afkHours)) {
             return false;
         }
-        String[] hoursAFK = getHoursThatPlayerIsAFK().split(";");
+        String[] hoursAFK = afkHours.split(";");
         int currentHour = Helper.getCurrentHour();
         for (String hour : hoursAFK) {
             int h = Integer.parseInt(hour);
@@ -1751,22 +1738,6 @@ public class Player {
         if (!"null".equals(color)) {
             allianceMembers = allianceMembers + color;
         }
-    }
-
-    public void addHourThatIsAFK(String hour) {
-        if (hoursThatPlayerIsAFK.isEmpty()) {
-            hoursThatPlayerIsAFK = hour;
-        } else {
-            hoursThatPlayerIsAFK = hoursThatPlayerIsAFK + ";" + hour;
-        }
-    }
-
-    public void setHoursThatPlayerIsAFK(String hours) {
-        hoursThatPlayerIsAFK = hours;
-    }
-
-    public String getHoursThatPlayerIsAFK() {
-        return hoursThatPlayerIsAFK;
     }
 
     public void setAllianceMembers(String color) {
@@ -2568,22 +2539,9 @@ public class Player {
         this.isDummy = isDummy;
     }
 
-    /**
-     * @return true if the player is: not a "dummy", faction != null, color != null,
-     *         & color != "null"
-     */
     @JsonIgnore
     public boolean isRealPlayer() {
         return !(isDummy || faction == null || color == null || "null".equals(color));
-    }
-
-    /**
-     * @return true if the player is: a "dummy", faction == null, color == null, &
-     *         color == "null"
-     */
-    @JsonIgnore
-    public boolean isNotRealPlayer() {
-        return !isRealPlayer();
     }
 
     public void setFogFilter(String preference) {
