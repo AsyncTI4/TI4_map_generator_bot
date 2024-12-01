@@ -21,7 +21,7 @@
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <jackson.version>2.18.1</jackson.version>
+        <jackson.version>2.18.2</jackson.version>
     </properties>
 
     <dependencies>
