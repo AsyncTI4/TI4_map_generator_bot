@@ -51,7 +51,7 @@ public class ButtonProcessor {
                     Thread.currentThread().interrupt();
                     break;
                 } catch (Exception e) {
-                    BotLogger.log("MapRenderPipeline worker threw an exception.", e);
+                    BotLogger.log("ButtonProcessor worker threw an exception.", e);
                 }
             }
         });
