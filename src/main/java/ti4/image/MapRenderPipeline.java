@@ -61,7 +61,6 @@ public class MapRenderPipeline {
 
     private static void queue(RenderEvent renderEvent) {
         var timedRunnable = new TimedRunnable("Render event task for " + renderEvent.game.getName(),
-                EXECUTION_TIME_SECONDS_WARNING_THRESHOLD,
                 () -> {
                     try (var mapGenerator = new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
                         mapGenerator.draw();

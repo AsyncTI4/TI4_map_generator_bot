@@ -18,19 +18,17 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
+import ti4.image.Mapper;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-import ti4.map.ManagedGame;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -42,8 +40,6 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
 public class DataMigrationManager {
-
-    private static final DateFormat MAP_CREATED_ON_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
 
     ///
     /// To add a new migration,
@@ -63,103 +59,30 @@ public class DataMigrationManager {
     /// format: migrationName_DDMMYY
     /// The migration will be run on any game created on or before that date
     /// Migration will not be run on finished games
-    private static final Map<String, Function<Game, Boolean>> migrations;
-    static {
-        migrations = new HashMap<>();
-        migrations.put("migrateRenameDSExplores_061023", DataMigrationManager::migrateRenameDSExplores_061023);
-        migrations.put("migrateRenameVeldyrAttachments_270923", DataMigrationManager::migrateRenameVeldyrAttachments_270923);
-        migrations.put("migrateGheminaAddCarrier_190923", DataMigrationManager::migrateGheminaAddCarrier_190923);
-        migrations.put("migrateNaaluMechsToOmega_180923", DataMigrationManager::migrateNaaluMechsToOmega_180923);
-        migrations.put("migrateFixkeleresUnits_010823", DataMigrationManager::migrateFixkeleresUnits_010823);
-        migrations.put("migrateOwnedUnits_010823", DataMigrationManager::migrateOwnedUnits_010823);
-        migrations.put("migrateOwnedUnitsV2_210823", DataMigrationManager::migrateOwnedUnitsV2_210823);
-        migrations.put("migrateNullSCDeckToPoK_210823", DataMigrationManager::migrateNullSCDeckToPoK_210823);
-        migrations.put("migrateAbsolDeckIDs_210823", DataMigrationManager::migrateAbsolDeckIDs_210823);
-        migrations.put("migratePlayerStatsBlockPositions_300823", DataMigrationManager::migratePlayerStatsBlockPositions_300823);
-        migrations.put("migrateRelicDecksForEnigmaticStarCharts_110923", DataMigrationManager::migrateRelicDecksForEnigmaticStarChartsAndUnderscoresFromExploreDecks_110923);
-        migrations.put("migrateForceShuffleAllRelicsDecks_241223", DataMigrationManager::migrateForceShuffleAllRelicsDecks_241223);
-        migrations.put("migrateInitializeFactionTechs_181023", DataMigrationManager::migrateInitializeFactionTechs_181023);
-        migrations.put("migrateRemoveOldArcaneShieldID_111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_111223);
-        migrations.put("migrateFrankenItems_111223", DataMigrationManager::migrateFrankenItems_111223);
-        migrations.put("resetMinorFactionCommanders_130624", DataMigrationManager::resetMinorFactionCommanders_130624);
-        migrations.put("removeBadCVToken_290624", DataMigrationManager::removeBadCVToken_290624);
-        migrations.put("migrateCreationDate_311024", DataMigrationManager::migrateCreationDate_311024);
-        migrations.put("noMoreRiftset_311024", DataMigrationManager::noMoreRiftset_311024);
-    }
-
     public static void runMigrations() {
-        Map<String, List<String>> migrationNamesToAppliedGameNames = new HashMap<>();
-
         try {
-            Map<String, Optional<Date>> migrationNamesToCutoffDates = migrations.entrySet().stream()
-                    .collect(Collectors.toMap(Entry::getKey, entry -> getMigrationForGamesBeforeDate(entry.getKey())));
-
-            for (Entry<String, Function<Game, Boolean>> entry : migrations.entrySet()) {
-                Date migrationCutoffDate = migrationNamesToCutoffDates.get(entry.getKey()).orElse(null);
-                if (migrationCutoffDate == null) {
-                    continue;
-                }
-                var migratedGames = migrateGames(GameManager.getManagedGames(), entry.getKey(), entry.getValue(), migrationCutoffDate);
-                migrationNamesToAppliedGameNames
-                        .computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
-                        .addAll(migratedGames);
-            }
+            runMigration("migrateRenameDSExplores_061023", DataMigrationManager::migrateRenameDSExplores_061023);
+            runMigration("migrateRenameVeldyrAttachments_270923", DataMigrationManager::migrateRenameVeldyrAttachments_270923);
+            runMigration("migrateGheminaAddCarrier_190923", DataMigrationManager::migrateGheminaAddCarrier_190923);
+            runMigration("migrateNaaluMechsToOmega_180923", DataMigrationManager::migrateNaaluMechsToOmega_180923);
+            runMigration("migrateFixkeleresUnits_010823", DataMigrationManager::migrateFixkeleresUnits_010823);
+            runMigration("migrateOwnedUnits_010823", DataMigrationManager::migrateOwnedUnits_010823);
+            runMigration("migrateOwnedUnitsV2_210823", DataMigrationManager::migrateOwnedUnitsV2_210823);
+            runMigration("migrateNullSCDeckToPoK_210823", DataMigrationManager::migrateNullSCDeckToPoK_210823);
+            runMigration("migrateAbsolDeckIDs_210823", DataMigrationManager::migrateAbsolDeckIDs_210823);
+            runMigration("migratePlayerStatsBlockPositions_300823", DataMigrationManager::migratePlayerStatsBlockPositions_300823);
+            runMigration("migrateRelicDecksForEnigmaticStarCharts_110923", DataMigrationManager::migrateRelicDecksForEnigmaticStarChartsAndUnderscoresFromExploreDecks_110923);
+            runMigration("migrateForceShuffleAllRelicsDecks_241223", DataMigrationManager::migrateForceShuffleAllRelicsDecks_241223);
+            runMigration("migrateInitializeFactionTechs_181023", DataMigrationManager::migrateInitializeFactionTechs_181023);
+            runMigration("migrateRemoveOldArcaneShieldID_111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_111223);
+            runMigration("migrateFrankenItems_111223", DataMigrationManager::migrateFrankenItems_111223);
+            runMigration("resetMinorFactionCommanders_130624", DataMigrationManager::resetMinorFactionCommanders_130624);
+            runMigration("removeBadCVToken_290624", DataMigrationManager::removeBadCVToken_290624);
+            runMigration("migrateCreationDate_311024", DataMigrationManager::migrateCreationDate_311024);
+            runMigration("noMoreRiftset_311024", DataMigrationManager::noMoreRiftset_311024);
         } catch (Exception e) {
             BotLogger.log("Issue running migrations:", e);
         }
-
-        for (Entry<String, List<String>> entry : migrationNamesToAppliedGameNames.entrySet()) {
-            if (!entry.getValue().isEmpty()) {
-                String gameNames = String.join(", ", entry.getValue());
-                BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", entry.getKey(), gameNames));
-            }
-        }
-    }
-
-    private static Optional<Date> getMigrationForGamesBeforeDate(String migrationName) {
-        String migrationDateString = migrationName.substring(migrationName.indexOf("_") + 1);
-        DateFormat format = new SimpleDateFormat("ddMMyy");
-        try {
-            return Optional.of(format.parse(migrationDateString));
-        } catch (ParseException e) {
-            BotLogger.log(String.format(
-                    "Migration needs a name ending in _DDMMYY (eg 251223 for 25th dec, 2023) (migration name: %s)",
-                    migrationDateString), e);
-        }
-        return Optional.empty();
-    }
-
-    private static List<String> migrateGames(List<ManagedGame> games, String migrationName, Function<Game, Boolean> migrationMethod,
-                                             Date migrationForGamesBeforeDate) {
-        List<String> migrationsApplied = new ArrayList<>();
-        for (var managedGame : games) {
-            if (managedGame.isHasEnded()) {
-                continue;
-            }
-
-            Date mapCreatedOn = null;
-            try {
-                mapCreatedOn = MAP_CREATED_ON_FORMAT.parse(managedGame.getCreationDate());
-            } catch (ParseException ignored) {
-            }
-            if (mapCreatedOn == null || mapCreatedOn.after(migrationForGamesBeforeDate)) {
-                continue;
-            }
-
-            var game = GameManager.getGame(managedGame.getName());
-
-            if (game == null || game.hasRunMigration(migrationName)) {
-                continue;
-            }
-
-            var changesMade = migrationMethod.apply(game);
-            game.addMigration(migrationName);
-            GameSaveLoadManager.saveGame(game, "Data Migration - " + migrationName);
-            if (changesMade) {
-                migrationsApplied.add(game.getName());
-            }
-        }
-        return migrationsApplied;
     }
 
     /// MIGRATION: Example Migration method
@@ -703,6 +626,50 @@ public class DataMigrationManager {
         MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), rift.getRepresentation(false, false) + " has had their color changed to " + Emojis.getColorEmojiWithName(newColor));
         ColorChangeHelper.changePlayerColor(game, rift, oldColor, newColor);
         return true;
+    }
+
+    private static void runMigration(String migrationName, Function<Game, Boolean> migrationMethod) {
+        String migrationDateString = migrationName.substring(migrationName.indexOf("_") + 1);
+        DateFormat format = new SimpleDateFormat("ddMMyy");
+        Date migrationForGamesBeforeDate = null;
+        try {
+            migrationForGamesBeforeDate = format.parse(migrationDateString);
+        } catch (ParseException e) {
+            BotLogger.log(String.format(
+                "Migration needs a name ending in _DDMMYY (eg 251223 for 25th dec, 2023) (migration name: %s)",
+                migrationDateString), e);
+        }
+        List<String> migrationsAppliedThisTime = new ArrayList<>();
+        Map<String, Game> loadedMaps = GameManager.getGameNameToGame();
+        for (Game game : loadedMaps.values()) {
+            DateFormat mapCreatedOnFormat = new SimpleDateFormat("yyyy.MM.dd");
+            Date mapCreatedOn = null;
+            try {
+                mapCreatedOn = mapCreatedOnFormat.parse(game.getCreationDate());
+            } catch (ParseException ignored) {
+            }
+            if (mapCreatedOn == null || mapCreatedOn.after(migrationForGamesBeforeDate)) {
+                continue;
+            }
+            boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
+            if (game.isHasEnded() || endVPReachedButNotEnded) {
+                continue;
+            }
+
+            if (!game.hasRunMigration(migrationName)) {
+                Boolean changesMade = migrationMethod.apply(game);
+                game.addMigration(migrationName);
+
+                if (changesMade) {
+                    migrationsAppliedThisTime.add(game.getName());
+                    GameSaveLoadManager.saveGame(game, "Data Migration - " + migrationName);
+                }
+            }
+        }
+        if (!migrationsAppliedThisTime.isEmpty()) {
+            String mapNames = String.join(", ", migrationsAppliedThisTime);
+            BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", migrationName, mapNames));
+        }
     }
 
     public static boolean migrateFrankenItems_111223(Game game) {

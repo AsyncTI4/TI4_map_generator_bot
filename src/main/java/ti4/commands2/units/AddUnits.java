@@ -32,7 +32,8 @@ public class AddUnits extends GameStateCommand {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return super.accept(event) && CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
+        return super.accept(event) &&
+            CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
     }
 
     @Override
