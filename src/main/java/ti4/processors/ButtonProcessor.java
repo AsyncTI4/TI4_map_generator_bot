@@ -216,10 +216,10 @@ public class ButtonProcessor {
         }
     }
 
-    public static void logButtonProcessingStatistics() {
-        BotLogger.log("Button queue size: " + instance.buttonInteractionQueue.size() + ".\n" +
-                "Total button presses: " + instance.runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" +
-                "Average preprocessing time: " + instance.runtimeWarningService.getAveragePreprocessingTime() + "ms.\n" +
-                "Average processing time: " + instance.runtimeWarningService.getAverageProcessingTime() + "ms.");
+    public static String getButtonProcessingStatistics() {
+        return "Button queue size: " + instance.buttonInteractionQueue.size() + ".\n" +
+            "Total button presses: " + instance.runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" +
+            "Average preprocessing time: " + instance.runtimeWarningService.getAveragePreprocessingTime() + "ms.\n" +
+            "Average processing time: " + instance.runtimeWarningService.getAverageProcessingTime() + "ms.";
     }
 }

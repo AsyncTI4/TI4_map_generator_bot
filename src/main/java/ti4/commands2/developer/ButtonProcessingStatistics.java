@@ -12,6 +12,7 @@ public class ButtonProcessingStatistics extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        ButtonProcessor.logButtonProcessingStatistics();
+        String buttonProcessingStatistics = ButtonProcessor.getButtonProcessingStatistics();
+        event.reply(buttonProcessingStatistics).queue();
     }
 }
