@@ -3,8 +3,6 @@ package ti4.listeners;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.audit.ActionType;
@@ -30,46 +28,44 @@ import ti4.message.MessageHelper;
 
 public class UserJoinServerListener extends ListenerAdapter {
 
-    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
         if (!validateEvent(event)) return;
-        executorService.submit(() -> handleGuildMemberJoin(event));
-    }
-
-    private void handleGuildMemberJoin(GuildMemberJoinEvent event) {
-        try {
-            checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
-        } catch (Exception e) {
-            BotLogger.log("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
-        }
+        AsyncTI4DiscordBot.runAsync(
+            "Guild member join task",
+            () -> {
+                try {
+                    checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
+                } catch (Exception e) {
+                    BotLogger.log("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
+                }
+            });
     }
 
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
         if (!validateEvent(event)) return;
-        executorService.submit(() -> handleGuildMemberRemove(event));
-    }
-
-    private void handleGuildMemberRemove(GuildMemberRemoveEvent event) {
-        try {
-            event.getGuild().retrieveAuditLogs().queueAfter(1, TimeUnit.SECONDS, (logs) -> {
-                boolean voluntary = true;
-                for (AuditLogEntry log : logs) {
-                    if (log.getTargetIdLong() == event.getUser().getIdLong()) {
-                        if (log.getType() == ActionType.BAN || log.getType() == ActionType.KICK) {
-                            voluntary = false;
-                            break;
+        AsyncTI4DiscordBot.runAsync(
+            "Guild member remove task",
+            () -> {
+                try {
+                    event.getGuild().retrieveAuditLogs().queueAfter(1, TimeUnit.SECONDS, (logs) -> {
+                        boolean voluntary = true;
+                        for (AuditLogEntry log : logs) {
+                            if (log.getTargetIdLong() == event.getUser().getIdLong()) {
+                                if (log.getType() == ActionType.BAN || log.getType() == ActionType.KICK) {
+                                    voluntary = false;
+                                    break;
+                                }
+                            }
                         }
-                    }
-                }
 
-                checkIfUserLeftActiveGames(event.getGuild(), event.getUser(), voluntary);
-            }, BotLogger::catchRestError);
-        } catch (Exception e) {
-            BotLogger.log("Error in `UserJoinServerListener.onGuildMemberRemove`", e);
-        }
+                        checkIfUserLeftActiveGames(event.getGuild(), event.getUser(), voluntary);
+                    }, BotLogger::catchRestError);
+                } catch (Exception e) {
+                    BotLogger.log("Error in `UserJoinServerListener.onGuildMemberRemove`", e);
+                }
+            });
     }
 
     private static boolean validateEvent(GenericGuildEvent event) {
@@ -182,20 +178,5 @@ public class UserJoinServerListener extends ListenerAdapter {
         String threadName = "in-progress-games-left";
         ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName,
             threadChannel -> MessageHelper.sendMessageToChannel(threadChannel, message));
-    }
-
-    public static boolean shutdown() {
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(20, TimeUnit.SECONDS)) {
-                executorService.shutdownNow();
-                return false;
-            }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
-            Thread.currentThread().interrupt();
-            return false;
-        }
-        return true;
     }
 }

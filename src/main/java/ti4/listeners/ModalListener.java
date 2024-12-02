@@ -3,9 +3,6 @@ package ti4.listeners;
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -19,8 +16,6 @@ import ti4.map.Game;
 import ti4.message.BotLogger;
 
 public class ModalListener extends ListenerAdapter {
-
-    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public static ModalListener instance = null;
 
@@ -42,35 +37,31 @@ public class ModalListener extends ListenerAdapter {
             event.reply("Please try again in a moment. The bot is not ready to handle button presses.").setEphemeral(true).queue();
             return;
         }
-
         event.deferEdit().queue();
-
-        executorService.submit(() -> handleModalInteraction(event));
-    }
-
-    private void handleModalInteraction(ModalInteractionEvent event) {
-        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
-        long startTime = System.currentTimeMillis();
-        try {
-            ModalContext context = new ModalContext(event);
-            if (context.isValid()) {
-                resolveModalInteractionEvent(context);
+        AsyncTI4DiscordBot.runAsync("Modal listener task", () -> {
+            long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
+            long startTime = System.currentTimeMillis();
+            try {
+                ModalContext context = new ModalContext(event);
+                if (context.isValid()) {
+                    resolveModalInteractionEvent(context);
+                }
+            } catch (Exception e) {
+                BotLogger.log(event, "Something went wrong with button interaction", e);
             }
-        } catch (Exception e) {
-            BotLogger.log(event, "Something went wrong with button interaction", e);
-        }
 
-        long endTime = System.currentTimeMillis();
-        final int milliThreshold = 3000;
-        if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
-            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
-            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
-            String errorMessage = "Modal took over " + milliThreshold + "ms to process:\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " message was sent\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to receive\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
-            BotLogger.log(errorMessage);
-        }
+            long endTime = System.currentTimeMillis();
+            final int milliThreshold = 3000;
+            if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
+                String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
+                String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+                String errorMessage = "Modal took over " + milliThreshold + "ms to process:\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " message was sent\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to receive\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
+                BotLogger.log(errorMessage);
+            }
+        });
     }
 
     private boolean handleKnownModals(ModalContext context) {
@@ -100,20 +91,5 @@ public class ModalListener extends ListenerAdapter {
         if (modalID.startsWith("jmfA_")) {
             game.initializeMiltySettings().parseInput(context);
         }
-    }
-
-    public static boolean shutdown() {
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(20, TimeUnit.SECONDS)) {
-                executorService.shutdownNow();
-                return false;
-            }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
-            Thread.currentThread().interrupt();
-            return false;
-        }
-        return true;
     }
 }
