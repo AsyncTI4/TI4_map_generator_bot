@@ -15,7 +15,8 @@ public class DeveloperCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
                     new SetGlobalSetting(),
-                    new RunManualDataMigration())
+                    new RunManualDataMigration(),
+                    new GiveTheBotABreather())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
