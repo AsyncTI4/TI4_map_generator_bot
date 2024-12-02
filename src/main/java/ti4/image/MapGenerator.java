@@ -1556,12 +1556,13 @@ public class MapGenerator implements AutoCloseable {
         deltaX += 24;
         deltaY += 2;
 
-        boolean hideFactionIcon = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
-
         int tokenDeltaY = 0;
         int playerCount = 0;
         int maxTokenDeltaX = 0;
         for (Entry<String, Integer> debtToken : player.getDebtTokens().entrySet()) {
+            Player debtPlayer = game.getPlayerByColorID(Mapper.getColorID(debtToken.getKey())).orElse(null);
+            boolean hideFactionIcon = isFoWPrivate && debtPlayer != null && !FoWHelper.canSeeStatsOfPlayer(game, debtPlayer, fowPlayer);
+
             int tokenDeltaX = 0;
             String controlID = hideFactionIcon ? Mapper.getControlID("gray") : Mapper.getControlID(debtToken.getKey());
             if (controlID.contains("null")) {

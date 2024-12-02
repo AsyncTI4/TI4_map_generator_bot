@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateCommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CheckDistanceHelper;
@@ -40,12 +39,6 @@ public class ShowDistancesCommand extends GameStateCommand {
         return List.of(
             new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true),
             new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check"));
-    }
-
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return super.accept(event) &&
-            CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
     }
 
     @Override

@@ -66,7 +66,7 @@ class ExploreButtonHandler {
 
         if (!failed && !event.getMessage().getContentRaw().contains("fragment")) {
             ButtonHelper.deleteMessage(event);
-            if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
+            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " " + mechOrInfCheckMessage);
             }
         }
