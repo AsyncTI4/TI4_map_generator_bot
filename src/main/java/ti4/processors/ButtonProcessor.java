@@ -1,5 +1,6 @@
 package ti4.processors;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +39,10 @@ public class ButtonProcessor {
     private final Set<String> userButtonPressSet = ConcurrentHashMap.newKeySet();
     private final Thread worker;
     private boolean running = true;
+
+    private int runtimeWarningCount;
+    private LocalDateTime pauseWarningsUntil = LocalDateTime.now();
+    private LocalDateTime lastWarningTime = LocalDateTime.now();
 
     private ButtonProcessor() {
         worker = new Thread(() -> {
@@ -99,7 +104,12 @@ public class ButtonProcessor {
 
         long endTime = System.currentTimeMillis();
         final int milliThreshold = 2000;
-        if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
+        var now = LocalDateTime.now();
+        if (now.minusMinutes(1).isAfter(lastWarningTime)) {
+            runtimeWarningCount = 0;
+        }
+        if (pauseWarningsUntil.isBefore(now) &&
+                (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold)) {
             String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
             String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
             String message = "[" + event.getChannel().getName() + "](" + event.getMessage().getJumpUrl() + ") " + event.getUser().getEffectiveName() + " pressed button: " + ButtonHelper.getButtonRepresentation(event.getButton()) +
@@ -108,6 +118,12 @@ public class ButtonProcessor {
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
                 DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
             BotLogger.log(message);
+            if (++runtimeWarningCount > 20) {
+                pauseWarningsUntil = now.plusMinutes(5);
+                BotLogger.log("**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
+                runtimeWarningCount = 0;
+            }
+            lastWarningTime = now;
         }
         instance.userButtonPressSet.remove(event.getUser().getId() + event.getButton().getId());
     }
