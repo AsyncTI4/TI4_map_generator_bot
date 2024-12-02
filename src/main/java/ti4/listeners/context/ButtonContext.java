@@ -53,6 +53,8 @@ public class ButtonContext extends ListenerContext {
             "cardsInfo".equalsIgnoreCase(componentID) ||
             componentID.contains("showDeck") ||
             componentID.contains("FactionInfo") ||
+            componentID.contains("searchMyGames") ||
+            componentID.contains("decline_explore") ||
             componentID.contains("offerDeckButtons");
         if (game != null && !skippableButton) {
             ButtonHelper.saveButtons(event, game, player);
