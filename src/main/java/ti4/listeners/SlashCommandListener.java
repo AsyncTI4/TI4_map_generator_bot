@@ -2,9 +2,6 @@ package ti4.listeners;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -29,18 +26,14 @@ import ti4.message.MessageHelper;
 
 public class SlashCommandListener extends ListenerAdapter {
 
-    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
             event.getInteraction().reply("Please try again in a moment.\nThe bot is rebooting and is not ready to receive commands.").setEphemeral(true).queue();
             return;
         }
-
         event.getInteraction().deferReply().queue();
-
-        executorService.submit(() -> process(event));
+        AsyncTI4DiscordBot.runAsync("Slash command task", () -> process(event));
     }
 
     private static void process(SlashCommandInteractionEvent event) {
@@ -164,21 +157,6 @@ public class SlashCommandListener extends ListenerAdapter {
                 // or do action in neutral channel");
                 GameManager.resetGameForUser(userID);
             }
-        }
-        return true;
-    }
-
-    public static boolean shutdown() {
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(20, TimeUnit.SECONDS)) {
-                executorService.shutdownNow();
-                return false;
-            }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
-            Thread.currentThread().interrupt();
-            return false;
         }
         return true;
     }
