@@ -74,10 +74,11 @@ public class CommandHelper {
     }
 
     public static boolean acceptIfPlayerInGameAndGameChannel(SlashCommandInteractionEvent event) {
-        var game = GameManager.getGame(getGameName(event));
+        var gameName = getGameName(event);
+        var game = GameManager.getGame(gameName);
         if (game == null) {
-            MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' command canceled. Execute command in correctly named channel that " +
-                    "starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`");
+            MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' command canceled. Game name '" + gameName + "' is not valid. " +
+                "Execute command in correctly named channel that starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`");
             return false;
         }
         var player = getPlayerFromEvent(game, event);
