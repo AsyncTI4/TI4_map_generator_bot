@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -369,5 +370,20 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
         }
+    }
+
+    public static boolean shutdown() {
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(20, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+                return false;
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+            return false;
+        }
+        return true;
     }
 }
