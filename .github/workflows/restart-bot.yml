@@ -12,13 +12,16 @@ jobs:
       env:
         AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
         AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
+        DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        DISCORD_BOT_USERID: ${{ secrets.DISCORD_BOT_USERID }}
+        REPO_DISPATCH_TOKEN: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
       with:
         host: ${{ secrets.SSH_HOST }}
-        username: root
+        username: ${{ secrets.SSH_USERNAME }}
         password: ${{ secrets.SSH_PASSWORD }}
-        port: 22
+        port: ${{ secrets.SSH_PORT }}
         script_stop: true
-        envs: AWS_KEY, AWS_SECRET
+        envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN
         script: |
           cd /root/ti4bot
           ./scheduled_upload.sh
