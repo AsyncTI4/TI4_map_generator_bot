@@ -78,6 +78,7 @@ public class AsyncTI4DiscordBot {
     public static Guild guildQuaternary;
     public static Guild guildQuinary;
     public static Guild guildSenary;
+    public static Guild guildSeptenary;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
     public static final Set<Guild> guilds = new HashSet<>();
@@ -180,6 +181,13 @@ public class AsyncTI4DiscordBot {
             guildSenary = jda.getGuildById(args[9]);
             startBot(guildSenary);
             serversToCreateNewGamesOn.add(guildSenary);
+        }
+
+        // Async: Duder's Domain
+        if (args.length >= 11) {
+            guildSeptenary = jda.getGuildById(args[10]);
+            startBot(guildSeptenary);
+            // serversToCreateNewGamesOn.add(guildsSeptenary); // TODO: enable this server for new games
         }
 
         // LOAD DATA
