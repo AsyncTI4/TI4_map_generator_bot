@@ -8,7 +8,6 @@ import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 class SwapTwoSystems extends GameStateSubcommand {
@@ -31,7 +30,7 @@ class SwapTwoSystems extends GameStateSubcommand {
 
         Tile tileTo = CommandHelper.getTile(event, game, event.getOption(Constants.TILE_NAME_TO).getAsString());
         if (tileTo == null) {
-            BotLogger.log("Could not find the tile you're moving to.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the tile you're moving to.");
             return;
         }
 
