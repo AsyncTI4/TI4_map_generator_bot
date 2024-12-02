@@ -82,7 +82,7 @@ public class CommandHelper {
             return false;
         }
         if (checkChannel && !event.getChannel().getName().startsWith(game.getName() + "-")) {
-            MessageHelper.replyToMessage(event, "Commands can be executed only in game specific channels");
+            MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' can only be executed in a game channel.");
             return false;
         }
         if (checkPlayer && getPlayerFromEvent(game, event) == null) {
