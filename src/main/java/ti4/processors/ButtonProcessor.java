@@ -76,7 +76,7 @@ public class ButtonProcessor {
     public static void queue(ButtonInteractionEvent event) {
         String key = event.getUser().getId() + event.getButton().getId();
         if (instance.userButtonPressSet.contains(key)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "We ignored your excess button press.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "The bot hasn't processed this button press since you last pressed it. Please wait.");
             return;
         }
         instance.userButtonPressSet.add(key);
