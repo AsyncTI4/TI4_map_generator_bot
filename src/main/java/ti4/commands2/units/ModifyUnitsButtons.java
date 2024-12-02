@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateCommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -26,12 +25,6 @@ public class ModifyUnitsButtons extends GameStateCommand {
     @Override
     public String getDescription() {
         return "Modify units on map";
-    }
-
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return super.accept(event) &&
-            CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
     }
 
     @Override

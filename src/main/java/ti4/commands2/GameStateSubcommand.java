@@ -8,15 +8,19 @@ import ti4.map.Player;
 public abstract class GameStateSubcommand extends Subcommand {
 
     private final CommandGameState commandGameState;
+    private final boolean saveGame;
+    private final boolean playerCommand;
 
-    public GameStateSubcommand(@NotNull String name, @NotNull String description, boolean saveGame, boolean isPlayerCommand) {
+    public GameStateSubcommand(@NotNull String name, @NotNull String description, boolean saveGame, boolean playerCommand) {
         super(name, description);
-        commandGameState = new CommandGameState(saveGame, isPlayerCommand);
+        this.saveGame = saveGame;
+        this.playerCommand = playerCommand;
+        commandGameState = new CommandGameState(saveGame, playerCommand);
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return super.accept(event) && CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
+        return super.accept(event) && CommandHelper.acceptIfValidGame(event, saveGame, playerCommand);
     }
 
     @Override

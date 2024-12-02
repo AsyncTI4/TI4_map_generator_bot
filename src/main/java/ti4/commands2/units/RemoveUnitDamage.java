@@ -29,12 +29,6 @@ public class RemoveUnitDamage extends GameStateCommand {
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return super.accept(event) &&
-            CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
-    }
-
-    @Override
     public List<OptionData> getOptions() {
         return List.of(
             new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
