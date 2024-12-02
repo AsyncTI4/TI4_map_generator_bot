@@ -22,10 +22,12 @@ class ButtonRuntimeWarningService {
     @Getter
     private long averagePreprocessingTime;
 
-    void submitNewRuntime(ButtonInteractionEvent event, long eventStartTime, long startTime, long endTime) {
+    void submitNewRuntime(ButtonInteractionEvent event, long startTime, long endTime) {
         totalRuntimeSubmissionCount++;
         long processingTime = endTime - startTime;
         averageProcessingTime = ((averageProcessingTime * (totalRuntimeSubmissionCount - 1)) + processingTime) / totalRuntimeSubmissionCount;
+
+        long eventStartTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
         long preprocessingTime = startTime - eventStartTime;
         averagePreprocessingTime = ((averagePreprocessingTime * (totalRuntimeSubmissionCount - 1)) + preprocessingTime) / totalRuntimeSubmissionCount;
 

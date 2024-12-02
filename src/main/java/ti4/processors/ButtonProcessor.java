@@ -18,7 +18,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
-import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.SearchGameHelper;
 import ti4.listeners.annotations.AnnotationHandler;
@@ -98,8 +97,7 @@ public class ButtonProcessor {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
 
-        long eventStarTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
-        runtimeWarningService.submitNewRuntime(event, eventStarTime, startTime, System.currentTimeMillis());
+        runtimeWarningService.submitNewRuntime(event, startTime, System.currentTimeMillis());
 
         instance.userButtonPressSet.remove(event.getUser().getId() + event.getButton().getId());
     }
