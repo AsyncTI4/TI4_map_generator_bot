@@ -134,8 +134,8 @@ public class EndGameService {
         if (bothelperLoungeChannel != null) {
             // POST GAME END TO BOTHELPER LOUNGE GAME STARTS & ENDS THREAD
             String threadName = "game-starts-and-ends";
-            ThreadChannel threadChannel = ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName);
-            MessageHelper.sendMessageToChannel(threadChannel, "Game: **" + gameName + "** on server **" + game.getGuild().getName() + "** has concluded.");     
+            ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName,
+                threadChannel -> MessageHelper.sendMessageToChannel(threadChannel, "Game: **" + gameName + "** on server **" + game.getGuild().getName() + "** has concluded."));
         }
 
         // Archive Game Channels
