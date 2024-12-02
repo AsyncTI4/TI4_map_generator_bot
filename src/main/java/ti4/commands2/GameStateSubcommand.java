@@ -15,6 +15,11 @@ public abstract class GameStateSubcommand extends Subcommand {
     }
 
     @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return super.accept(event) && CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
+    }
+
+    @Override
     public void preExecute(SlashCommandInteractionEvent event) {
         super.preExecute(event);
         commandGameState.preExecute(event);

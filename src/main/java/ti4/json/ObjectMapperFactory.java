@@ -16,7 +16,7 @@ final public class ObjectMapperFactory {
     public static ObjectMapper build() {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        // Beacuse UnitKey objects are used as keys within Java maps, we need special
+        // Because UnitKey objects are used as keys within Java maps, we need special
         // serialization logic for them as JSON map keys can only be strings.
         // So we must make the "key" a JSON string which we then unwrap when deserializing.
         SimpleModule simpleMod = new SimpleModule();
