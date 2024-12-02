@@ -1,0 +1,54 @@
+package ti4.processors;
+
+import java.time.LocalDateTime;
+
+import lombok.Getter;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.DateTimeHelper;
+import ti4.message.BotLogger;
+
+class ButtonRuntimeWarningService {
+
+    private static final int warningThresholdMilliseconds = 2000;
+
+    private int runtimeWarningCount;
+    private LocalDateTime pauseWarningsUntil = LocalDateTime.now();
+    private LocalDateTime lastWarningTime = LocalDateTime.now();
+    @Getter
+    private int totalRuntimeSubmissionCount;
+    @Getter
+    private long averageProcessingTime;
+    @Getter
+    private long averagePreprocessingTime;
+
+    void submitNewRuntime(ButtonInteractionEvent event, long eventStartTime, long startTime, long endTime) {
+        totalRuntimeSubmissionCount++;
+        long processingTime = endTime - startTime;
+        averageProcessingTime = ((averageProcessingTime * (totalRuntimeSubmissionCount - 1)) + processingTime) / totalRuntimeSubmissionCount;
+        long preprocessingTime = startTime - eventStartTime;
+        averagePreprocessingTime = ((averagePreprocessingTime * (totalRuntimeSubmissionCount - 1)) + preprocessingTime) / totalRuntimeSubmissionCount;
+
+        var now = LocalDateTime.now();
+        if (now.minusMinutes(1).isAfter(lastWarningTime)) {
+            runtimeWarningCount = 0;
+        }
+        if (pauseWarningsUntil.isBefore(now) &&
+                (startTime - eventStartTime > warningThresholdMilliseconds || endTime - startTime > warningThresholdMilliseconds)) {
+            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventStartTime);
+            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+            String message = "[" + event.getChannel().getName() + "](" + event.getMessage().getJumpUrl() + ") " + event.getUser().getEffectiveName() + " pressed button: " + ButtonHelper.getButtonRepresentation(event.getButton()) +
+                "\n> Warning: This button took over " + warningThresholdMilliseconds + "ms to respond or execute\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(eventStartTime) + " button was pressed by user\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventStartTime ? "😲" : "");
+            BotLogger.log(message);
+            if (++runtimeWarningCount > 20) {
+                pauseWarningsUntil = now.plusMinutes(5);
+                BotLogger.log("**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
+                runtimeWarningCount = 0;
+            }
+            lastWarningTime = now;
+        }
+    }
+}

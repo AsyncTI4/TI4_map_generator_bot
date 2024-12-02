@@ -1,6 +1,5 @@
 package ti4.processors;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,14 +34,12 @@ public class ButtonProcessor {
     private static final ButtonProcessor instance = new ButtonProcessor();
     private static final Map<String, Consumer<ButtonContext>> knownButtons = AnnotationHandler.findKnownHandlers(ButtonContext.class, ButtonHandler.class);
 
+
     private final BlockingQueue<ButtonInteractionEvent> buttonInteractionQueue = new LinkedBlockingQueue<>();
     private final Set<String> userButtonPressSet = ConcurrentHashMap.newKeySet();
+    private final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
     private final Thread worker;
     private boolean running = true;
-
-    private int runtimeWarningCount;
-    private LocalDateTime pauseWarningsUntil = LocalDateTime.now();
-    private LocalDateTime lastWarningTime = LocalDateTime.now();
 
     private ButtonProcessor() {
         worker = new Thread(() -> {
@@ -91,7 +88,6 @@ public class ButtonProcessor {
     private void process(ButtonInteractionEvent event) {
         long startTime = System.currentTimeMillis();
         BotLogger.logButton(event);
-        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
         try {
             ButtonContext context = new ButtonContext(event);
             if (context.isValid()) {
@@ -102,29 +98,9 @@ public class ButtonProcessor {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
 
-        long endTime = System.currentTimeMillis();
-        final int milliThreshold = 2000;
-        var now = LocalDateTime.now();
-        if (now.minusMinutes(1).isAfter(lastWarningTime)) {
-            runtimeWarningCount = 0;
-        }
-        if (pauseWarningsUntil.isBefore(now) &&
-                (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold)) {
-            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
-            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
-            String message = "[" + event.getChannel().getName() + "](" + event.getMessage().getJumpUrl() + ") " + event.getUser().getEffectiveName() + " pressed button: " + ButtonHelper.getButtonRepresentation(event.getButton()) +
-                "\n> Warning: This button took over " + milliThreshold + "ms to respond or execute\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " button was pressed by user\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
-            BotLogger.log(message);
-            if (++runtimeWarningCount > 20) {
-                pauseWarningsUntil = now.plusMinutes(5);
-                BotLogger.log("**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
-                runtimeWarningCount = 0;
-            }
-            lastWarningTime = now;
-        }
+        long eventStarTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
+        runtimeWarningService.submitNewRuntime(event, eventStarTime, startTime, System.currentTimeMillis());
+
         instance.userButtonPressSet.remove(event.getUser().getId() + event.getButton().getId());
     }
 
@@ -238,5 +214,12 @@ public class ButtonProcessor {
                 default -> MessageHelper.sendMessageToEventChannel(event, "Button " + ButtonHelper.getButtonRepresentation(event.getButton()) + " pressed. This button does not do anything.");
             }
         }
+    }
+
+    public static void logButtonProcessingStatistics() {
+        BotLogger.log("Button queue size: " + instance.buttonInteractionQueue.size() + ".\n" +
+                "Total button presses: " + instance.runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" +
+                "Average preprocessing time: " + instance.runtimeWarningService.getAveragePreprocessingTime() + "ms.\n" +
+                "Average processing time: " + instance.runtimeWarningService.getAverageProcessingTime() + "ms.");
     }
 }
