@@ -38,7 +38,7 @@ jobs:
               echo "Restarting TIBot... giving 600 seconds to shutdown"
               docker stop $(docker ps -q) --time 600
               echo "Starting Container..."
-              docker run -v /root/ti4bot/ti4bot_saves:/opt/STORAGE -d --restart unless-stopped -m 7g -e REPO_DISPATCH_TOKEN=$REPO_DISPATCH_TOKEN tibot $DISCORD_BOT_TOKEN $DISCORD_BOT_USERID 943410040369479690 847560709730730064 1062139934745559160 1090910555327434774 1145823841227112598 1176104225932058694 1209956332380229672 1250131684393881610
+              docker run -v /root/ti4bot/ti4bot_saves:/opt/STORAGE -d --restart unless-stopped -m 7g -e REPO_DISPATCH_TOKEN=$REPO_DISPATCH_TOKEN tibot $DISCORD_BOT_TOKEN $DISCORD_BOT_USERID 943410040369479690 847560709730730064 1062139934745559160 1090910555327434774 1145823841227112598 1176104225932058694 1209956332380229672 1250131684393881610 1312882116597518416
               echo "Cleaning up docker stuff..."
               docker rm $(docker ps --filter status=exited -q) || true
               docker rmi -f $(docker images --filter "dangling=true" -q) || true
