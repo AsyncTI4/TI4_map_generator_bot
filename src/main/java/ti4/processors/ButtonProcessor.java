@@ -84,9 +84,9 @@ public class ButtonProcessor {
     }
 
     private void process(ButtonInteractionEvent event) {
+        long startTime = System.currentTimeMillis();
         BotLogger.logButton(event);
         long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
-        long startTime = System.currentTimeMillis();
         try {
             ButtonContext context = new ButtonContext(event);
             if (context.isValid()) {
