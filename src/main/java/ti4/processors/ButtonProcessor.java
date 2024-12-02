@@ -18,7 +18,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
-import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.SearchGameHelper;
 import ti4.listeners.annotations.AnnotationHandler;
@@ -88,18 +87,24 @@ public class ButtonProcessor {
     private void process(ButtonInteractionEvent event) {
         long startTime = System.currentTimeMillis();
         BotLogger.logButton(event);
+        long logButtonTime = System.currentTimeMillis();
+        long contextTime = 0;
+        long resolveTime = 0;
+        long saveTime = 0;
         try {
             ButtonContext context = new ButtonContext(event);
+            contextTime = System.currentTimeMillis();
             if (context.isValid()) {
                 resolveButtonInteractionEvent(context);
             }
+            resolveTime = System.currentTimeMillis();
             context.save(event);
+            saveTime = System.currentTimeMillis();
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
 
-        long eventStarTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
-        runtimeWarningService.submitNewRuntime(event, eventStarTime, startTime, System.currentTimeMillis());
+        runtimeWarningService.submitNewRuntime(event, startTime, System.currentTimeMillis(), contextTime, resolveTime, saveTime);
 
         instance.userButtonPressSet.remove(event.getUser().getId() + event.getButton().getId());
     }
@@ -216,10 +221,10 @@ public class ButtonProcessor {
         }
     }
 
-    public static void logButtonProcessingStatistics() {
-        BotLogger.log("Button queue size: " + instance.buttonInteractionQueue.size() + ".\n" +
-                "Total button presses: " + instance.runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" +
-                "Average preprocessing time: " + instance.runtimeWarningService.getAveragePreprocessingTime() + "ms.\n" +
-                "Average processing time: " + instance.runtimeWarningService.getAverageProcessingTime() + "ms.");
+    public static String getButtonProcessingStatistics() {
+        return "Button queue size: " + instance.buttonInteractionQueue.size() + ".\n" +
+            "Total button presses: " + instance.runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" +
+            "Average preprocessing time: " + instance.runtimeWarningService.getAveragePreprocessingTime() + "ms.\n" +
+            "Average processing time: " + instance.runtimeWarningService.getAverageProcessingTime() + "ms.";
     }
 }

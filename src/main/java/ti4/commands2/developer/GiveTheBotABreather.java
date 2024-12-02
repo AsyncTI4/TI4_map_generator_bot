@@ -10,9 +10,9 @@ import ti4.helpers.GlobalSettings;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.message.BotLogger;
 
-public class GiveTheBotABreather extends Subcommand {
+class GiveTheBotABreather extends Subcommand {
 
-     GiveTheBotABreather() {
+    GiveTheBotABreather() {
         super("give_the_bot_a_breather", "Stop the bot from processing commands for a few seconds.");
         addOptions(new OptionData(OptionType.INTEGER, Constants.SECONDS, "Number of seconds to sleep the bot - default 10"));
     }
@@ -22,7 +22,7 @@ public class GiveTheBotABreather extends Subcommand {
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
         int seconds = event.getOption(Constants.SECONDS, 10, OptionMapping::getAsInt);
         try {
-            Thread.sleep(seconds * 1000);
+            Thread.sleep(seconds * 1000L);
         } catch (InterruptedException e) {
             BotLogger.log("Forced Sleep interrupted", e);
         }
