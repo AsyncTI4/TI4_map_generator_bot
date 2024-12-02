@@ -42,30 +42,6 @@ public class SlashCommandListener extends ListenerAdapter {
         long startTime = System.currentTimeMillis();
 
         String userID = event.getUser().getId();
-        // CHECK IF CHANNEL IS MATCHED TO A GAME
-        boolean isGameCommand = !event.getInteraction().getName().equals(Constants.HELP)
-            && !event.getInteraction().getName().equals(Constants.STATISTICS)
-            && !event.getInteraction().getName().equals(Constants.USER)
-            && !event.getInteraction().getName().equals(Constants.SEARCH)
-            && !event.getInteraction().getName().equals(Constants.TIGL)
-            && (event.getInteraction().getSubcommandName() == null
-                || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
-            && event.getOption(Constants.GAME_NAME) == null;
-
-        if (isGameCommand) {
-            boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
-            if (!isChannelOK) {
-                event.reply("Command canceled. Execute command in correctly named channel that starts with the game name.\n> For example, for game `pbd123`, the channel name should start with `pbd123-`")
-                    .setEphemeral(true).queue();
-                return;
-            } else {
-                Game userActiveGame = GameManager.getUserActiveGame(userID);
-                if (userActiveGame != null) {
-                    userActiveGame.incrementSpecificSlashCommandCount(event.getFullCommandName());
-                }
-            }
-        }
-
         Member member = event.getMember();
         if (member != null) {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
