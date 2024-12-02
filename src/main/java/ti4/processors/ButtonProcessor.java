@@ -87,17 +87,24 @@ public class ButtonProcessor {
     private void process(ButtonInteractionEvent event) {
         long startTime = System.currentTimeMillis();
         BotLogger.logButton(event);
+        long logButtonTime = System.currentTimeMillis();
+        long contextTime = 0;
+        long resolveTime = 0;
+        long saveTime = 0;
         try {
             ButtonContext context = new ButtonContext(event);
+            contextTime = System.currentTimeMillis();
             if (context.isValid()) {
                 resolveButtonInteractionEvent(context);
             }
+            resolveTime = System.currentTimeMillis();
             context.save(event);
+            saveTime = System.currentTimeMillis();
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
 
-        runtimeWarningService.submitNewRuntime(event, startTime, System.currentTimeMillis());
+        runtimeWarningService.submitNewRuntime(event, startTime, System.currentTimeMillis(), contextTime, resolveTime, saveTime);
 
         instance.userButtonPressSet.remove(event.getUser().getId() + event.getButton().getId());
     }
