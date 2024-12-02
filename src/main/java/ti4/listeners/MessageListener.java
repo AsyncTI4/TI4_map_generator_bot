@@ -111,15 +111,17 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private static void checkForFogOfWarInvitePrompt(Message message) {
-        if (!message.getAuthor().isBot() && (message.getContentRaw().contains("boldly go where no stroter has gone before") || message.getContentRaw().contains("go boldly where no stroter has gone before"))) {
+        if (message.getAuthor().isBot()) return;
+        if ((message.getContentRaw().contains("boldly go where no stroter has gone before") || message.getContentRaw().contains("go boldly where no stroter has gone before"))) {
             message.reply("to explore strange new maps; to seek out new tiles and new factions\nhttps://discord.gg/RZ7qg9kbVZ").queue();
         }
     }
 
     private static void copyLFGPingsToLFGPingsChannel(MessageReceivedEvent event, Message message) {
+        if (message.getAuthor().isBot()) return;
         //947310962485108816
         Role lfgRole = CreateGameService.getRole("LFG", event.getGuild());
-        if (!event.getAuthor().isBot() && lfgRole != null && event.getChannel() instanceof ThreadChannel && message.getContentRaw().contains(lfgRole.getAsMention())) {
+        if (lfgRole != null && event.getChannel() instanceof ThreadChannel && message.getContentRaw().contains(lfgRole.getAsMention())) {
             String msg2 = lfgRole.getAsMention() + " this game is looking for more members (it's old if it has -launched [FULL] in its title) " + message.getJumpUrl();
             TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
             MessageHelper.sendMessageToChannel(lfgPings, msg2);
@@ -138,8 +140,9 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    private static void endOfRoundSummary(MessageReceivedEvent event, Message msg) {
-        if (!msg.getContentRaw().toLowerCase().startsWith("endofround")) {
+    private static void endOfRoundSummary(MessageReceivedEvent event, Message message) {
+        if (message.getAuthor().isBot()) return;
+        if (!message.getContentRaw().toLowerCase().startsWith("endofround")) {
             return;
         }
         String gameName = event.getChannel().getName();
@@ -147,7 +150,7 @@ public class MessageListener extends ListenerAdapter {
         gameName = gameName.substring(0, gameName.indexOf("-"));
         Game game = GameManager.getGame(gameName);
 
-        String messageText = msg.getContentRaw();
+        String messageText = message.getContentRaw();
         String messageBeginning = StringUtils.substringBefore(messageText, " ");
         String messageContent = StringUtils.substringAfter(messageText, " ");
         if (game != null) {
@@ -157,12 +160,14 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    private static void handleWhispers(MessageReceivedEvent event, Message msg) {
-        if (msg.getContentRaw().contains("used /fow whisper")) {
-            msg.delete().queue();
+    private static void handleWhispers(MessageReceivedEvent event, Message message) {
+        if (message.getAuthor().isBot()) return;
+
+        if (message.getContentRaw().contains("used /fow whisper")) {
+            message.delete().queue();
         }
 
-        String messageText = msg.getContentRaw();
+        String messageText = message.getContentRaw();
         if (!messageText.toLowerCase().startsWith("to") || !messageText.contains(" ")) {
             return;
         }
@@ -195,7 +200,7 @@ public class MessageListener extends ListenerAdapter {
 
         String messageContent = StringUtils.substringAfter(messageText, " ");
         if (messageContent.isEmpty()) {
-            msg.reply("No message content?").queue();
+            message.reply("No message content?").queue();
             return;
         }
 
@@ -220,7 +225,7 @@ public class MessageListener extends ListenerAdapter {
                 return;
             }
             WhisperService.sendWhisper(game, player, player_, messageContent, "n", event.getChannel(), event.getGuild());
-            msg.delete().queue();
+            message.delete().queue();
         }
     }
 

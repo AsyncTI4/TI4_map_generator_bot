@@ -54,7 +54,6 @@ import ti4.helpers.Storage;
 import ti4.helpers.ThreadHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 
 public class MessageHelper {
@@ -166,11 +165,11 @@ public class MessageHelper {
 			&& !game.getStoredValue(messageId).isEmpty()) {
 			if (!game.getStoredValue(messageId).contains(player.getFaction())) {
 				game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
-				GameSaveLoadManager.saveGame(game, "Stored reaction.");
+				//GameSaveLoadManager.saveGame(game, "Stored reaction."); TODO: this should save, I think, but saving is heavy...
 			}
 		} else {
 			game.setStoredValue(messageId, player.getFaction());
-			GameSaveLoadManager.saveGame(game, "Stored reaction.");
+			//GameSaveLoadManager.saveGame(game, "Stored reaction."); TODO: this should save, I think, but saving is heavy...
 		}
 	}
 
@@ -400,9 +399,6 @@ public class MessageHelper {
 							if (game.getLatestUpNextMsg() != null && !"".equalsIgnoreCase(game.getLatestUpNextMsg())) {
 								String id = game.getLatestUpNextMsg().split("_")[0];
 								String msg = game.getLatestUpNextMsg().substring(game.getLatestUpNextMsg().indexOf("_") + 1);
-								// if (message.contains("# ")) {
-								// 	msg = game.getLatestUpNextMsg().substring(game.getLatestUpNextMsg().indexOf("_") + 1).replace("#", "");
-								// }
 								msg = msg.replace("UP NEXT", "started their turn");
 								game.getActionsChannel().editMessageById(id, msg).queue(null,
 									error -> BotLogger.log(getRestActionFailureMessage(channel, "Error editing message", messageCreateData, error)));
