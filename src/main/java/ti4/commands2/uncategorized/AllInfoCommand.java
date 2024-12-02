@@ -34,12 +34,6 @@ public class AllInfoCommand extends GameStateCommand {
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return super.accept(event) &&
-                CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player player = getPlayer();

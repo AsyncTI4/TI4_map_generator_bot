@@ -25,12 +25,14 @@ class CommandGameState {
             throw new IllegalArgumentException("Invalid game name: " + gameName + " while attempting to run event " + event.getName() +
                     " in channel " + event.getChannel().getName());
         }
-        game.set(GameManager.getGame(gameName));
+        Game game = GameManager.getGame(gameName);
+        this.game.set(game);
+        game.incrementSpecificSlashCommandCount(event.getFullCommandName()); // TODO: This only works for commands that save...
 
         if (!isPlayerCommand) {
             return;
         }
-        var gamePlayer = CommandHelper.getPlayerFromEvent(getGame(), event);
+        var gamePlayer = CommandHelper.getPlayerFromEvent(game, event);
         if (gamePlayer == null) {
             throw new IllegalArgumentException("Unable to determine player while attempting to run event " + event.getName() +
                     " in channel " + event.getChannel().getName() + " for game " + gameName);

@@ -73,7 +73,7 @@ public class CommandHelper {
         return gameName;
     }
 
-    public static boolean acceptIfPlayerInGameAndGameChannel(SlashCommandInteractionEvent event) {
+    public static boolean acceptIfValidGame(SlashCommandInteractionEvent event, boolean checkChannel, boolean checkPlayer) {
         var gameName = getGameName(event);
         var game = GameManager.getGame(gameName);
         if (game == null) {
@@ -81,13 +81,12 @@ public class CommandHelper {
                 "Execute command in correctly named channel that starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`");
             return false;
         }
-        var player = getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.replyToMessage(event, "Command must be ran by a player in the game, please use `/join gameName` or `/special2 setup_neutral_player`.");
+        if (checkChannel && !event.getChannel().getName().startsWith(game.getName() + "-")) {
+            MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' can only be executed in a game channel.");
             return false;
         }
-        if (!event.getChannel().getName().startsWith(game.getName() + "-")) {
-            MessageHelper.replyToMessage(event, "Commands can be executed only in game specific channels");
+        if (checkPlayer && getPlayerFromEvent(game, event) == null) {
+            MessageHelper.replyToMessage(event, "Command must be ran by a player in the game, please use `/game join gameName` or `/special2 setup_neutral_player`.");
             return false;
         }
         return true;
