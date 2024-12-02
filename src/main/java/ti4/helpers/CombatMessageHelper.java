@@ -85,8 +85,13 @@ public class CombatMessageHelper {
             .collect(Collectors.joining(" "));
 
         String unitEmoji = unitModel.getUnitEmoji();
-
+        
         String resultRollsString = "[" + resultRolls.stream().map(Die::getRedDieIfSuccessOrGrayDieIfFailure).collect(Collectors.joining("")) + "]";
+        if ("jolnar_flagship".equals(unitModel.getId()))
+        {
+            resultRollsString = resultRollsString.replace(Emojis.d10red_9, Emojis.d10blue_9).replace(Emojis.d10red_0, Emojis.d10blue_0);
+        }
+        
         return String.format("> `%sx`%s %s %s - %s hit%s\n", unitQuantity, unitEmoji, optionalText, resultRollsString, numHit, hitsSuffix);
     }
 
