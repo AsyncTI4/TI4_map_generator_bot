@@ -1,5 +1,6 @@
 package ti4.users;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,13 @@ public class UserSettings {
 
     public UserSettings(String userId) {
         this.userId = userId;
+    }
+
+    public List<String> getPreferredColourList() {
+        if (preferredColourList == null) {
+            return Collections.emptyList();
+        }
+        return preferredColourList;
     }
 
     public void putStoredValue(String settingKey, String settingValue) {
