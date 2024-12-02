@@ -121,8 +121,7 @@ public class EndGameService {
         }
         if (actionsChannel != null) {
             for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
-                if (threadChannel.getName().contains("Cards Info")) {
-                } else {
+                if (!threadChannel.getName().contains("Cards Info")) {
                     threadChannel.getManager().setArchived(true).queue();
                 }
             }
