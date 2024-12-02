@@ -245,6 +245,36 @@ public class AsyncTI4DiscordBot {
                 } else {
                     BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
                 }
+                if (AutoCompleteListener.shutdown()) {
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING AUTOCOMPLETES");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING AUTOCOMPLETES");
+                }
+                if (MessageListener.shutdown()) {
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING MESSAGES");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING MESSAGES");
+                }
+                if (ModalListener.shutdown()) {
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING MODALS");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING MODALS");
+                }
+                if (SelectionMenuListener.shutdown()) {
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING SELECTIONS");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING SELECTIONS");
+                }
+                if (UserJoinServerListener.shutdown()) {
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING USER JOIN/LEAVE");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING USER JOIN/LEAVE");
+                }
+                if (SlashCommandListener.shutdown()) {
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING SLASH COMMANDS");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING SLASH COMMANDS");
+                }
                 if (ButtonProcessor.shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.logWithTimestamp("FINISHED PROCESSING BUTTONS");
                 } else {
@@ -256,7 +286,7 @@ public class AsyncTI4DiscordBot {
                     BotLogger.logWithTimestamp("DID NOT FINISH RENDERING MAPS");
                 }
                 if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.logWithTimestamp("DONE PROCESSING STATISTICS");
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING STATISTICS");
                 } else {
                     BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING STATISTICS");
                 }
