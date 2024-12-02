@@ -4,9 +4,6 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -35,8 +32,6 @@ import ti4.service.game.CreateGameService;
 
 public class MessageListener extends ListenerAdapter {
 
-    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() || !isAsyncServer(event.getGuild().getId())) {
@@ -47,7 +42,7 @@ public class MessageListener extends ListenerAdapter {
         if (message.getContentRaw().startsWith("[DELETE]")) {
             message.delete().queue();
         }
-        executorService.submit(() -> processMessage(event, message));
+        AsyncTI4DiscordBot.runAsync("Message listener task", () -> processMessage(event, message));
     }
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
@@ -370,20 +365,5 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
         }
-    }
-
-    public static boolean shutdown() {
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(20, TimeUnit.SECONDS)) {
-                executorService.shutdownNow();
-                return false;
-            }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
-            Thread.currentThread().interrupt();
-            return false;
-        }
-        return true;
     }
 }
