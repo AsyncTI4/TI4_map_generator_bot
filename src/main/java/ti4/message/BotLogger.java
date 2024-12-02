@@ -1,11 +1,9 @@
 package ti4.message;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -180,10 +178,11 @@ public class BotLogger {
         if (primaryBotLogChannel == null) return;
         try {
             String threadName = "button-log";
-            ThreadChannel buttonLogThread = ThreadGetter.getThreadInChannel(primaryBotLogChannel, threadName);
-
-            String sb = event.getUser().getEffectiveName() + " " + ButtonHelper.getButtonRepresentation(event.getButton()) + event.getMessage().getJumpUrl();
-            MessageHelper.sendMessageToChannel(buttonLogThread, sb);
+            ThreadGetter.getThreadInChannel(primaryBotLogChannel, threadName,
+                threadChannel -> {
+                    String sb = event.getUser().getEffectiveName() + " " + ButtonHelper.getButtonRepresentation(event.getButton()) + event.getMessage().getJumpUrl();
+                    MessageHelper.sendMessageToChannel(threadChannel, sb);
+                });
         } catch (Exception e) {
             // Do nothing
         }
@@ -194,10 +193,11 @@ public class BotLogger {
         if (primaryBotLogChannel == null) return;
         try {
             String threadName = "slash-command-log";
-            ThreadChannel slashCommandLogThread = ThreadGetter.getThreadInChannel(primaryBotLogChannel, threadName);
-
-            String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + commandResponseMessage.getJumpUrl();
-            MessageHelper.sendMessageToChannel(slashCommandLogThread, sb);
+            ThreadGetter.getThreadInChannel(primaryBotLogChannel, threadName,
+                threadChannel -> {
+                    String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + commandResponseMessage.getJumpUrl();
+                    MessageHelper.sendMessageToChannel(threadChannel, sb);
+                });
         } catch (Exception e) {
             // Do nothing
         }

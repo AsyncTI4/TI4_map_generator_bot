@@ -261,8 +261,8 @@ public class Storage {
     }
 
     @NotNull
-    public static File getGameUndoStorage(String mapName) {
-        return new File(getStoragePath() + GAMES_UNDO + mapName);
+    public static File getGameUndoStorage(String gameName) {
+        return new File(getStoragePath() + GAMES_UNDO + gameName);
     }
 
     @NotNull

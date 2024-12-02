@@ -22,10 +22,10 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
-import ti4.image.Mapper;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -667,8 +667,8 @@ public class DataMigrationManager {
             }
         }
         if (!migrationsAppliedThisTime.isEmpty()) {
-            String mapNames = String.join(", ", migrationsAppliedThisTime);
-            BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", migrationName, mapNames));
+            String gameNames = String.join(", ", migrationsAppliedThisTime);
+            BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", migrationName, gameNames));
         }
     }
 

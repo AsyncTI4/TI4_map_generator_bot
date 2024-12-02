@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,11 +42,16 @@ public class CommandHelper {
     }
 
     @NotNull
-    public static String getGameName(SlashCommandInteraction event) {
+    public static String getGameName(SlashCommandInteractionEvent event) {
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
         if (gameNameOption != null) {
             return gameNameOption.getAsString();
         }
+        return getGameNameFromChannel(event);
+    }
+
+    @NotNull
+    private static String getGameNameFromChannel(GenericInteractionCreateEvent event) {
         // try to get game name from channel name
         var channel = event.getChannel();
         String gameName = getGameNameFromChannelName(channel.getName());
@@ -70,7 +74,13 @@ public class CommandHelper {
     }
 
     public static boolean acceptIfPlayerInGameAndGameChannel(SlashCommandInteractionEvent event) {
-        var game = GameManager.getGame(getGameName(event));
+        var gameName = getGameName(event);
+        var game = GameManager.getGame(gameName);
+        if (game == null) {
+            MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' command canceled. Game name '" + gameName + "' is not valid. " +
+                "Execute command in correctly named channel that starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`");
+            return false;
+        }
         var player = getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.replyToMessage(event, "Command must be ran by a player in the game, please use `/join gameName` or `/special2 setup_neutral_player`.");

@@ -137,9 +137,11 @@ public class SlashCommandListener extends ListenerAdapter {
     private static void reportSusSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
         TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
         if (bothelperLoungeChannel == null) return;
-        ThreadChannel threadChannel = ThreadGetter.getThreadInChannel(bothelperLoungeChannel, "sus-slash-commands", true, true);
-        String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + commandResponseMessage.getJumpUrl();
-        MessageHelper.sendMessageToChannel(threadChannel, sb);
+        ThreadGetter.getThreadInChannel(bothelperLoungeChannel, "sus-slash-commands", true, true,
+            threadChannel -> {
+                String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + commandResponseMessage.getJumpUrl();
+                MessageHelper.sendMessageToChannel(threadChannel, sb);
+            });
 
     }
 

@@ -1003,7 +1003,7 @@
     "name": "Strategic Focus",
     "phase": "Action",
     "window": "After you pass",
-    "text": "Perform the secondary ability of 1 readied or unchosen strategy card; do not spend or place a command token to resolve that ability.",
+    "text": "Resolve the secondary ability of 1 readied or unchosen strategy card; do not spend or place a command token to resolve that ability.",
     "flavorText": "\"With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
     "source": "action_deck_2"
   },

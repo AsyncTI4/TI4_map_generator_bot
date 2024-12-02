@@ -1,5 +1,7 @@
 package ti4.message;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -14,14 +16,6 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -45,6 +39,10 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessagePollBuilder;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -56,6 +54,7 @@ import ti4.helpers.Storage;
 import ti4.helpers.ThreadHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 
 public class MessageHelper {
@@ -130,9 +129,9 @@ public class MessageHelper {
 			return buttons;
 		}
 
-		String mapName = game.getName();
-		String mapNameForUndoStart = mapName + "_";
-		String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+		String gameName = game.getName();
+		String gameNameForUndoStart = gameName + "_";
+		String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
 		if (mapUndoFiles == null || mapUndoFiles.length == 0) {
 			return buttons;
 		}
@@ -140,13 +139,13 @@ public class MessageHelper {
 		List<Button> newButtons = new ArrayList<>(buttons);
 		try {
 			List<Integer> numbers = Arrays.stream(mapUndoFiles)
-				.map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+				.map(fileName -> fileName.replace(gameNameForUndoStart, ""))
 				.map(fileName -> fileName.replace(Constants.TXT, ""))
 				.map(Integer::parseInt).toList();
 			int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
 			newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
 		} catch (Exception e) {
-			BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
+			BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
 		}
 
 		return newButtons;
@@ -166,11 +165,12 @@ public class MessageHelper {
 		if (game.getStoredValue(messageId) != null
 			&& !game.getStoredValue(messageId).isEmpty()) {
 			if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-				game.setStoredValue(messageId,
-					game.getStoredValue(messageId) + "_" + player.getFaction());
+				game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
+				GameSaveLoadManager.saveGame(game, "Stored reaction.");
 			}
 		} else {
 			game.setStoredValue(messageId, player.getFaction());
+			GameSaveLoadManager.saveGame(game, "Stored reaction.");
 		}
 	}
 
@@ -185,9 +185,8 @@ public class MessageHelper {
 			saboable);
 	}
 
-	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText,
-		Game game, Player player, List<MessageEmbed> embeds, List<Button> buttons,
-		boolean saboable) {
+	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game game, Player player,
+																	 List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
 		MessageFunction addFactionReact = (msg) -> {
 			addFactionReactToMessage(game, player, msg);
 			if (saboable) {

@@ -133,9 +133,9 @@ class SearchGames extends Subcommand {
         return bool ? "✅" : "❌";
     }
 
-    private String getRepresentationText(Map<String, Game> games, String mapName) {
-        Game game = games.get(mapName);
-        StringBuilder sb = new StringBuilder("- **" + mapName + "**").append(" ");
+    private String getRepresentationText(Map<String, Game> games, String gameName) {
+        Game game = games.get(gameName);
+        StringBuilder sb = new StringBuilder("- **" + gameName + "**").append(" ");
         sb.append("`").append(game.getCreationDate()).append("`-`");
         if (game.isHasEnded() && game.getEndedDate() > 100) {
             sb.append(Helper.getDateRepresentation(game.getEndedDate()));

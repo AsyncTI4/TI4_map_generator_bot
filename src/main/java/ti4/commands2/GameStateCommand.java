@@ -14,6 +14,11 @@ public abstract class GameStateCommand implements ParentCommand {
     }
 
     @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return ParentCommand.super.accept(event) && CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
+    }
+
+    @Override
     public void preExecute(SlashCommandInteractionEvent event) {
         ParentCommand.super.preExecute(event);
         commandGameState.preExecute(event);
