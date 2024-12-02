@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import javax.annotation.Nonnull;
+import java.util.function.Consumer;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -11,48 +12,44 @@ import ti4.message.BotLogger;
 @UtilityClass
 public class ThreadGetter {
 
-    /**
-     * @return {@link ThreadChannel} with the given name in the given channel. WARNING: Uses two RestAction.complete() to check archived threads and another to create the thread
-     */
-    @Nonnull
-    public static ThreadChannel getThreadInChannel(@Nonnull TextChannel channel, @Nonnull String threadName) {
-        return getThreadInChannel(channel, threadName, true, false);
+    public static void getThreadInChannel(@Nonnull TextChannel channel, @Nonnull String threadName, Consumer<ThreadChannel> consumer) {
+        getThreadInChannel(channel, threadName, true, false, consumer);
     }
 
-    /**
-     * @return {@link ThreadChannel} with the given name in the given channel. NULL if thead doesn't exist. WARNING: Uses one RestAction.complete() to check archived threads, and another if createIfDoesntExist is true to create the thread
-     */
-    public static ThreadChannel getThreadInChannel(@Nonnull TextChannel channel, @Nonnull String threadName, boolean createIfDoesntExist, boolean createAsPrivate) {
+    public static void getThreadInChannel(@Nonnull TextChannel channel, @Nonnull String threadName, boolean createIfDoesntExist, boolean createAsPrivate,
+                                            Consumer<ThreadChannel> consumer) {
         // ATTEMPT TO FIND BY NAME
         try {
             // SEARCH FOR EXISTING OPEN THREAD
-            for (ThreadChannel threadChannel_ : channel.getThreadChannels()) {
-                if (threadChannel_.getName().equals(threadName)) {
-                    return threadChannel_;
-                }
-            }
-
-            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-            for (ThreadChannel threadChannel_ : channel.retrieveArchivedPrivateThreadChannels().complete()) {
-                if (threadChannel_.getName().equals(threadName)) {
-                    return threadChannel_;
-                }
-            }
+            channel.getThreadChannels().stream()
+                .filter(threadChannel -> threadChannel.getName().equals(threadName))
+                .findFirst()
+                .ifPresentOrElse(consumer, () -> searchForArchivedThreadOrCreateNew(channel, threadName, createIfDoesntExist, createAsPrivate, consumer));
         } catch (Exception e) {
             BotLogger.log("Could not find existing Cards Info thread using name: " + threadName, e);
         }
-        if (createIfDoesntExist) {
-            return createNewThreadChannel(channel, threadName, createAsPrivate);
-        }
-        return null;
+
     }
 
-    @Nonnull
-    private static ThreadChannel createNewThreadChannel(@Nonnull TextChannel channel, @Nonnull String threadName, boolean createAsPrivate) {
+    private static void searchForArchivedThreadOrCreateNew(@Nonnull TextChannel channel, @Nonnull String threadName, boolean createIfDoesntExist, boolean createAsPrivate,
+                                                            @Nonnull Consumer<ThreadChannel> consumer) {
+        channel.retrieveArchivedPrivateThreadChannels().queue(threadChannels ->
+            threadChannels.stream()
+                .filter(threadChannel -> threadChannel.getName().equals(threadName))
+                .findFirst()
+                .ifPresentOrElse(consumer, () -> {
+                    if (createIfDoesntExist) {
+                        createNewThreadChannel(channel, threadName, createAsPrivate, consumer);
+                    }
+                }));
+    }
+
+    private static void createNewThreadChannel(@Nonnull TextChannel channel, @Nonnull String threadName, boolean createAsPrivate,
+                                                @Nonnull Consumer<ThreadChannel> consumer) {
         ThreadChannelAction threadAction = channel.createThreadChannel(threadName, createAsPrivate);
         if (createAsPrivate) {
             threadAction.setInvitable(false);
         }
-        return threadAction.complete();
+        threadAction.queue(consumer);
     }
 }

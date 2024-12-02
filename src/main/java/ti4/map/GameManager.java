@@ -52,11 +52,11 @@ public class GameManager {
 
     @Nullable
     public static Game getUserActiveGame(String userID) {
-        String mapName = userNameToGameName.get(userID);
-        if (mapName == null) {
+        String gameName = userNameToGameName.get(userID);
+        if (gameName == null) {
             return null;
         }
-        return gameNameToGame.get(mapName);
+        return gameNameToGame.get(gameName);
     }
 
     public static List<String> getGameNames() {

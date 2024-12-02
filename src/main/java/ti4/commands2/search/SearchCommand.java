@@ -16,7 +16,7 @@ public class SearchCommand implements ParentCommand {
             new SearchPlanetsSubcommand(),
             new SearchTilesSubcommand(),
             new SearchUnitsSubcommand(),
-            new SearchCommands(),
+            new SearchCommandsSubcommand(),
             new SearchMyGames(),
             new SearchForGame(),
             new SearchMyTitles(),

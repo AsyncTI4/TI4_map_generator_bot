@@ -22,19 +22,18 @@ class GameTest {
     private Game createThreePlayerGame() {
         var game = new Game();
         game.setName("threePlayerGame");
-        var naaluPnPlayer = createPlayer("naaluPnPlayer", Set.of(7, 3), game.getName());
+        var naaluPnPlayer = createPlayer("naaluPnPlayer", Set.of(7, 3), game);
         naaluPnPlayer.setPromissoryNotesInPlayArea(Constants.NAALU_PN);
         game.setPlayers(Map.of(
-                "hasThe2", createPlayer("hasThe2", Set.of(2, 5), game.getName()),
-                "hasThe1", createPlayer("hasThe1", Set.of(8, 1), game.getName()),
+                "hasThe2", createPlayer("hasThe2", Set.of(2, 5), game),
+                "hasThe1", createPlayer("hasThe1", Set.of(8, 1), game),
                 "naaluPnPlayer", naaluPnPlayer
         ));
-        GameManager.addGame(game);
         return game;
     }
 
-    private Player createPlayer(String userId, Set<Integer> strategyCards, String gameName) {
-        var player = new Player(userId, "", gameName);
+    private Player createPlayer(String userId, Set<Integer> strategyCards, Game game) {
+        var player = new Player(userId, "", game);
         player.setSCs(strategyCards);
         return player;
     }

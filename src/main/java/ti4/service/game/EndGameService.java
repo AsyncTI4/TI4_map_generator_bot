@@ -1,16 +1,11 @@
 package ti4.service.game;
 
-import static ti4.helpers.StringHelper.ordinal;
-
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
@@ -22,6 +17,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -125,8 +121,7 @@ public class EndGameService {
         }
         if (actionsChannel != null) {
             for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
-                if (threadChannel.getName().contains("Cards Info")) {
-                } else {
+                if (!threadChannel.getName().contains("Cards Info")) {
                     threadChannel.getManager().setArchived(true).queue();
                 }
             }
@@ -138,8 +133,8 @@ public class EndGameService {
         if (bothelperLoungeChannel != null) {
             // POST GAME END TO BOTHELPER LOUNGE GAME STARTS & ENDS THREAD
             String threadName = "game-starts-and-ends";
-            ThreadChannel threadChannel = ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName);
-            MessageHelper.sendMessageToChannel(threadChannel, "Game: **" + gameName + "** on server **" + game.getGuild().getName() + "** has concluded.");     
+            ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName,
+                threadChannel -> MessageHelper.sendMessageToChannel(threadChannel, "Game: **" + gameName + "** on server **" + game.getGuild().getName() + "** has concluded."));
         }
 
         // Archive Game Channels

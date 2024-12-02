@@ -176,8 +176,7 @@ public class UserJoinServerListener extends ListenerAdapter {
         List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
         if (threadChannels.isEmpty()) return;
         String threadName = "in-progress-games-left";
-        ThreadChannel threadChannel = ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName);
-        MessageHelper.sendMessageToChannel(threadChannel, message);
-
+        ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName,
+            threadChannel -> MessageHelper.sendMessageToChannel(threadChannel, message));
     }
 }

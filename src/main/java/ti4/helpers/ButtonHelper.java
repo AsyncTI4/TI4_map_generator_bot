@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -4924,7 +4923,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
             String userId = player.getUserID();
-            if (player.isNotRealPlayer() || player.getSo() < 1) {
+            if (!player.isRealPlayer() || player.getSo() < 1) {
                 buttons.add(Buttons.green("setupStep1_" + userId, player.getUserName()));
             }
         }
@@ -4945,9 +4944,6 @@ public class ButtonHelper {
                     case 6 -> MiltyService.secondHalfOfPlayerSetup(player, game, "yellow", "franken6", "206", event, false);
                     case 7 -> MiltyService.secondHalfOfPlayerSetup(player, game, "red", "franken7", "207", event, false);
                     case 8 -> MiltyService.secondHalfOfPlayerSetup(player, game, "blue", "franken8", "208", event, false);
-                    default -> {
-
-                    }
                 }
             }
             x++;
@@ -5047,20 +5043,20 @@ public class ButtonHelper {
             return;
         }
 
-        String mapName = game.getName();
-        String mapNameForUndoStart = mapName + "_";
-        String[] mapUndoFiles = mapUndoDirectory.list((dir, name2) -> name2.startsWith(mapNameForUndoStart));
+        String gameName = game.getName();
+        String gameNameForUndoStart = gameName + "_";
+        String[] mapUndoFiles = mapUndoDirectory.list((dir, name2) -> name2.startsWith(gameNameForUndoStart));
         if (mapUndoFiles != null && mapUndoFiles.length > 0) {
             try {
                 List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                    .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+                    .map(fileName -> fileName.replace(gameNameForUndoStart, ""))
                     .map(fileName -> fileName.replace(Constants.TXT, ""))
                     .map(Integer::parseInt).toList();
                 int maxNumber = numbers.isEmpty() ? 0
                     : numbers.stream().mapToInt(value -> value)
                         .max().orElseThrow(NoSuchElementException::new);
 
-                File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
+                File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + maxNumber + Constants.TXT);
                 CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
                 Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
                 Game gameToRestore = GameSaveLoadManager.loadGame(originalMapFile);
@@ -5500,8 +5496,9 @@ public class ButtonHelper {
     public static void resolveSetupColorChecker(Game game) {
         @Data
         class Collision {
-            Player p1, p2;
-            double contrast;
+            final Player p1;
+            final Player p2;
+            final double contrast;
 
             Collision(Player p1, Player p2, double contrast) {
                 this.p1 = p1;
@@ -5588,7 +5585,7 @@ public class ButtonHelper {
     }
 
     public static void increasePingCounter(Game reference, String playerID) {
-        int count = 0;
+        int count;
         if (reference.getStoredValue("pingsFor" + playerID).isEmpty()) {
             count = 1;
         } else {
@@ -6104,15 +6101,13 @@ public class ButtonHelper {
 
         if (!skipReaction) {
             if (event.getMessageChannel() instanceof ThreadChannel) {
-
                 game.getActionsChannel().addReactionById(event.getChannel().getId(), emojiToUse).queue();
             }
 
             event.getChannel().addReactionById(messageId, emojiToUse).queue(Consumers.nop(), BotLogger::catchRestError);
             if (game.getStoredValue(messageId) != null) {
                 if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-                    game.setStoredValue(messageId,
-                        game.getStoredValue(messageId) + "_" + player.getFaction());
+                    game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
                 }
             } else {
                 game.setStoredValue(messageId, player.getFaction());

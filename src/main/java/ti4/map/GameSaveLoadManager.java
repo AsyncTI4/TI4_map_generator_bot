@@ -29,12 +29,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -43,6 +39,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.draft.BagDraft;
 import ti4.helpers.ButtonHelper;
@@ -172,20 +170,20 @@ public class GameSaveLoadManager {
             return;
         }
 
-        String mapName = game.getName();
-        String mapNameForUndoStart = mapName + "_";
-        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+        String gameName = game.getName();
+        String gameNameForUndoStart = gameName + "_";
+        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
         if (mapUndoFiles == null || mapUndoFiles.length <= 0) {
             return;
         }
         try {
             List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+                .map(fileName -> fileName.replace(gameNameForUndoStart, ""))
                 .map(fileName -> fileName.replace(Constants.TXT, ""))
                 .map(Integer::parseInt).toList();
             int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
-            File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + (maxNumber - 1) + Constants.TXT);
-            File mapUndoStorage2 = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
+            File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + (maxNumber - 1) + Constants.TXT);
+            File mapUndoStorage2 = Storage.getGameUndoStorage(gameName + "_" + maxNumber + Constants.TXT);
             CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
             Files.copy(mapUndoStorage2.toPath(), originalMapFile.toPath(), options);
             Game loadedGame = loadGame(originalMapFile);
@@ -228,10 +226,10 @@ public class GameSaveLoadManager {
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
             } else {
-                ButtonHelper.findOrCreateThreadWithMessage(game, mapName + "-undo-log", sb.toString());
+                ButtonHelper.findOrCreateThreadWithMessage(game, gameName + "-undo-log", sb.toString());
             }
         } catch (Exception e) {
-            BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
+            BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
         }
     }
 
@@ -251,17 +249,17 @@ public class GameSaveLoadManager {
     private static void saveUndo(Game game, File originalMapFile) {
         File mapUndoDirectory = getMapUndoDirectory();
 
-        String mapName = game.getName();
-        String mapNameForUndoStart = mapName + "_";
+        String gameName = game.getName();
+        String gameNameForUndoStart = gameName + "_";
         int maxUndoFilesPerGame = game.isHasEnded() ? 10 : 100;
-        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
         if (mapUndoFiles == null) {
             return;
         }
 
         try {
             List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                .map(fileName -> StringUtils.substringBetween(fileName, mapNameForUndoStart, Constants.TXT))
+                .map(fileName -> StringUtils.substringBetween(fileName, gameNameForUndoStart, Constants.TXT))
                 .map(Integer::parseInt).toList();
 
             int maxUndoNumber = numbers.isEmpty() ? 0
@@ -272,21 +270,21 @@ public class GameSaveLoadManager {
 
             // Delete old undo copies
             for (String mapFilePath : mapUndoFiles) {
-                int undoNumber = Integer.parseInt(StringUtils.substringBetween(mapFilePath, mapNameForUndoStart, Constants.TXT));
+                int undoNumber = Integer.parseInt(StringUtils.substringBetween(mapFilePath, gameNameForUndoStart, Constants.TXT));
                 if (undoNumber >= oldestUndoNumberThatShouldExist) {
                     break;
                 }
-                File mapToDelete = Storage.getGameUndoStorage(mapName + "_" + undoNumber + Constants.TXT);
+                File mapToDelete = Storage.getGameUndoStorage(gameName + "_" + undoNumber + Constants.TXT);
                 mapToDelete.delete();
             }
 
             // Create new undo copy
             int nextNumber = maxUndoNumber + 1;
-            File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + nextNumber + Constants.TXT);
+            File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + nextNumber + Constants.TXT);
             CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
             Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), options);
         } catch (Exception e) {
-            BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
+            BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
         }
     }
 
@@ -803,9 +801,6 @@ public class GameSaveLoadManager {
             writer.write(Constants.ALLIANCE_MEMBERS + " " + player.getAllianceMembers());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.AFK_HOURS + " " + player.getHoursThatPlayerIsAFK());
-            writer.write(System.lineSeparator());
-
             writer.write(Constants.ROLE_FOR_COMMUNITY + " " + player.getRoleIDForCommunity());
             writer.write(System.lineSeparator());
 
@@ -823,9 +818,6 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TEN_MIN_REMINDER + " " + player.shouldPlayerBeTenMinReminded());
-            writer.write(System.lineSeparator());
-
-            writer.write(Constants.PREFERS_DISTANCE + " " + player.doesPlayerPreferDistanceBasedTacticalActions());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.AUTO_PASS_WHENS_N_AFTERS + " " + player.doesPlayerAutoPassOnWhensAfters());
@@ -1157,12 +1149,12 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
     }
 
-    public static boolean deleteGame(String mapName) {
-        File mapStorage = Storage.getGameFile(mapName + TXT);
+    public static boolean deleteGame(String gameName) {
+        File mapStorage = Storage.getGameFile(gameName + TXT);
         if (!mapStorage.exists()) {
             return false;
         }
-        File deletedMapStorage = Storage.getDeletedGame(mapName + "_" + System.currentTimeMillis() + TXT);
+        File deletedMapStorage = Storage.getDeletedGame(gameName + "_" + System.currentTimeMillis() + TXT);
         return mapStorage.renameTo(deletedMapStorage);
     }
 
@@ -1248,7 +1240,7 @@ public class GameSaveLoadManager {
                         data = tmpData != null ? tmpData : gameFileLines.next();
                         tmpData = null;
                         if (PLAYER.equals(data)) {
-                            player = game.addPlayerLoad(gameFileLines.next(), gameFileLines.next());
+                            player = game.addPlayer(gameFileLines.next(), gameFileLines.next());
                             continue;
                         }
                         if (ENDPLAYER.equals(data)) {
@@ -2266,7 +2258,6 @@ public class GameSaveLoadManager {
                 case Constants.STATS_ANCHOR_LOCATION -> player.setPlayerStatsAnchorPosition(tokenizer.nextToken());
                 case Constants.HS_TILE_POSITION -> player.setHomeSystemPosition(tokenizer.nextToken());
                 case Constants.ALLIANCE_MEMBERS -> player.setAllianceMembers(tokenizer.nextToken());
-                case Constants.AFK_HOURS -> player.setHoursThatPlayerIsAFK(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
                 case Constants.PLAYER_PRIVATE_CHANNEL -> player.setPrivateChannelID(tokenizer.nextToken());
                 case Constants.NOTEPAD -> player.setNotes(tokenizer.nextToken());
@@ -2475,7 +2466,6 @@ public class GameSaveLoadManager {
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.READY_TO_PASS_BAG -> player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.TEN_MIN_REMINDER -> player.setWhetherPlayerShouldBeTenMinReminded(Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.PREFERS_DISTANCE -> player.setPreferenceForDistanceBasedTacticalActions(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.AUTO_PASS_WHENS_N_AFTERS -> player.setAutoPassWhensAfters(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
