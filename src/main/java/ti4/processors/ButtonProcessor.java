@@ -81,7 +81,7 @@ public class ButtonProcessor {
     public static void queue(ButtonInteractionEvent event) {
         String key = event.getUser().getId() + event.getButton().getId();
         if (instance.userButtonPressSet.contains(key)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "We ignored your excess button press.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "The bot hasn't processed this button press since you last pressed it. Please wait.");
             return;
         }
         instance.userButtonPressSet.add(key);
@@ -89,9 +89,9 @@ public class ButtonProcessor {
     }
 
     private void process(ButtonInteractionEvent event) {
+        long startTime = System.currentTimeMillis();
         BotLogger.logButton(event);
         long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
-        long startTime = System.currentTimeMillis();
         try {
             ButtonContext context = new ButtonContext(event);
             if (context.isValid()) {
