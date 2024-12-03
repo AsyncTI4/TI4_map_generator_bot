@@ -278,8 +278,6 @@ public class GameSaveLoadManager {
                 .forEach(fileName -> deleteFile(Storage.getGameUndoStoragePath(fileName)));
 
             createUndoCopy(originalMapFile, gameName, maxUndoNumber + 1);
-        } catch (IOException e) {
-            BotLogger.log("Error trying to access undo directory for game: " + gameName, e);
         } catch (Exception e) {
             BotLogger.log("Error trying to save undo for game: " + gameName, e);
         }
@@ -297,7 +295,7 @@ public class GameSaveLoadManager {
         try {
             File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + undoNumber + Constants.TXT);
             Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
+        } catch (Exception e) {
             BotLogger.log("Error copying undo file for " + gameName, e);
         }
     }
