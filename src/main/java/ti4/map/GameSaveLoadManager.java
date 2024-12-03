@@ -249,40 +249,43 @@ public class GameSaveLoadManager {
 
         String gameName = game.getName();
         String gameNameForUndoStart = gameName + "_";
-        int maxUndoFilesPerGame = game.isHasEnded() ? 10 : 100;
         String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
-        if (mapUndoFiles == null) {
+        if (mapUndoFiles == null || mapUndoFiles.length == 0) {
+            createUndoCopy(originalMapFile, gameName, 1);
             return;
         }
 
         try {
-            List<Integer> numbers = Arrays.stream(mapUndoFiles)
+            List<Integer> undoNumbers = Arrays.stream(mapUndoFiles)
                 .map(fileName -> StringUtils.substringBetween(fileName, gameNameForUndoStart, Constants.TXT))
-                .map(Integer::parseInt).toList();
+                .map(Integer::parseInt)
+                .sorted()
+                .toList();
 
-            int maxUndoNumber = numbers.isEmpty() ? 0
-                : numbers.stream().mapToInt(value -> value)
-                    .max().orElseThrow(NoSuchElementException::new);
-
+            int maxUndoNumber = undoNumbers.getLast();
+            int maxUndoFilesPerGame = game.isHasEnded() ? 10 : 100;
             int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;
 
             // Delete old undo copies
-            for (String mapFilePath : mapUndoFiles) {
-                int undoNumber = Integer.parseInt(StringUtils.substringBetween(mapFilePath, gameNameForUndoStart, Constants.TXT));
-                if (undoNumber >= oldestUndoNumberThatShouldExist) {
-                    break;
-                }
-                File mapToDelete = Storage.getGameUndoStorage(gameName + "_" + undoNumber + Constants.TXT);
-                mapToDelete.delete();
-            }
+            undoNumbers.stream()
+                .filter(undoNumber -> undoNumber < oldestUndoNumberThatShouldExist)
+                .forEach(undoNumber -> {
+                    File mapToDelete = Storage.getGameUndoStorage(gameName + "_" + undoNumber + Constants.TXT);
+                    mapToDelete.delete();
+                });
 
-            // Create new undo copy
-            int nextNumber = maxUndoNumber + 1;
-            File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + nextNumber + Constants.TXT);
-            CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
-            Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), options);
+            createUndoCopy(originalMapFile, gameName, maxUndoNumber + 1);
         } catch (Exception e) {
             BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
+        }
+    }
+
+    private static void createUndoCopy(File originalMapFile, String gameName, int undoNumber) {
+        try {
+            File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + undoNumber + Constants.TXT);
+            Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            BotLogger.log("Error copying undo file for " + gameName, e);
         }
     }
 
