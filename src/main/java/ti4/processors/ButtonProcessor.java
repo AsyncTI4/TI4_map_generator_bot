@@ -1,5 +1,6 @@
 package ti4.processors;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,7 +88,6 @@ public class ButtonProcessor {
     private void process(ButtonInteractionEvent event) {
         long startTime = System.currentTimeMillis();
         BotLogger.logButton(event);
-        long logButtonTime = System.currentTimeMillis();
         long contextTime = 0;
         long resolveTime = 0;
         long saveTime = 0;
@@ -222,9 +222,11 @@ public class ButtonProcessor {
     }
 
     public static String getButtonProcessingStatistics() {
+        var decimalFormatter = new DecimalFormat("#.##");
         return "Button queue size: " + instance.buttonInteractionQueue.size() + ".\n" +
             "Total button presses: " + instance.runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" +
-            "Average preprocessing time: " + instance.runtimeWarningService.getAveragePreprocessingTime() + "ms.\n" +
-            "Average processing time: " + instance.runtimeWarningService.getAverageProcessingTime() + "ms.";
+            "Total threshold misses: " + instance.runtimeWarningService.getTotalRuntimeThresholdMissCount() + ".\n" +
+            "Average preprocessing time: " + decimalFormatter.format(instance.runtimeWarningService.getAveragePreprocessingTime()) + "ms.\n" +
+            "Average processing time: " + decimalFormatter.format(instance.runtimeWarningService.getAverageProcessingTime()) + "ms.";
     }
 }

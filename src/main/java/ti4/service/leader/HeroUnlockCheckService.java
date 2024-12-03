@@ -16,25 +16,26 @@ import ti4.map.Player;
 public class HeroUnlockCheckService {
     public static void checkIfHeroUnlocked(Game game, Player player) {
         Leader playerLeader = player.getLeader(Constants.HERO).orElse(null);
-        if (playerLeader != null && playerLeader.isLocked()) {
-            int scoredSOCount = player.getSecretsScored().size();
-            int scoredPOCount = 0;
-            Map<String, List<String>> playerScoredPublics = game.getScoredPublicObjectives();
-            for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
-                if (Mapper.getPublicObjectivesStage1().containsKey(scoredPublic.getKey())
-                    || Mapper.getPublicObjectivesStage2().containsKey(scoredPublic.getKey())
-                    || game.getSoToPoList().contains(scoredPublic.getKey())
-                    || game.getSoToPoList().stream().map(Mapper::getSecretObjective).filter(Objects::nonNull).anyMatch(so -> so.getName().equals(scoredPublic.getKey()))
-                    || scoredPublic.getKey().contains("Throne of the False Emperor")) {
-                    if (scoredPublic.getValue().contains(player.getUserID())) {
-                        scoredPOCount++;
-                    }
+        if (playerLeader == null || !playerLeader.isLocked()) {
+            return;
+        }
+        int scoredSOCount = player.getSecretsScored().size();
+        int scoredPOCount = 0;
+        Map<String, List<String>> playerScoredPublics = game.getScoredPublicObjectives();
+        for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
+            if (Mapper.getPublicObjectivesStage1().containsKey(scoredPublic.getKey())
+                || Mapper.getPublicObjectivesStage2().containsKey(scoredPublic.getKey())
+                || game.getSoToPoList().contains(scoredPublic.getKey())
+                || game.getSoToPoList().stream().map(Mapper::getSecretObjective).filter(Objects::nonNull).anyMatch(so -> so.getName().equals(scoredPublic.getKey()))
+                || scoredPublic.getKey().contains("Throne of the False Emperor")) {
+                if (scoredPublic.getValue().contains(player.getUserID())) {
+                    scoredPOCount++;
                 }
             }
-            int scoredObjectiveCount = scoredPOCount + scoredSOCount;
-            if (scoredObjectiveCount >= 3) {
-                UnlockLeaderService.unlockLeader("hero", game, player);
-            }
+        }
+        int scoredObjectiveCount = scoredPOCount + scoredSOCount;
+        if (scoredObjectiveCount >= 3) {
+            UnlockLeaderService.unlockLeader("hero", game, player);
         }
     }
 }
