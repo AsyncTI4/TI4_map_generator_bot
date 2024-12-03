@@ -29,8 +29,9 @@ public class ButtonListener extends ListenerAdapter {
         if (!event.getButton().getId().endsWith("~MDL")) {
             event.deferEdit().queue();
         }
+
         event.getChannel().sendTyping().queue();
 
-        ButtonProcessor.queue(event);
+        ButtonProcessor.process(event);
     }
 }
