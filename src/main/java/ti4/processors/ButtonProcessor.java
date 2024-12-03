@@ -88,7 +88,7 @@ public class ButtonProcessor {
 
     private void process(ButtonInteractionEvent event) {
         long startTime = System.currentTimeMillis();
-        BotLogger.logButton(event);
+        // BotLogger.logButton(event); // TODO: just disabling this temp to see what happens
         long contextTime = 0;
         long resolveTime = 0;
         long saveTime = 0;
@@ -101,6 +101,7 @@ public class ButtonProcessor {
             resolveTime = System.currentTimeMillis();
             context.save(event);
             saveTime = System.currentTimeMillis();
+            // BotLogger.logWithTimestamp("Button Save: " + DateTimeHelper.getTimeRepresentationToMilliseconds(saveTime - resolveTime) + "\nButton Queue Size: " + buttonInteractionQueue.size());
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
