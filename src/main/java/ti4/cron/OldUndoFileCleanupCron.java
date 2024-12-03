@@ -20,7 +20,7 @@ public class OldUndoFileCleanupCron {
         for (Game game : GameManager.getGameNameToGame().values()) {
             GameSaveLoadManager.cleanUpExcessUndoFilesAndReturnLatestIndex(game);
         }
-        BotLogger.logWithTimestamp("Cleaned excess undo files.");
+        BotLogger.logWithTimestamp("Cleaned excess undo files, starting on old undo files...");
 
         GameSaveLoadManager.cleanupOldUndoFiles();
         BotLogger.logWithTimestamp("Cleaned old undo files.");
