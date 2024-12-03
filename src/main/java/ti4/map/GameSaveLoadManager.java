@@ -277,6 +277,7 @@ public class GameSaveLoadManager {
                 .map(undoNumber -> gameName + "_" + undoNumber + Constants.TXT)
                 .forEach(fileName -> {
                     File mapToDelete = Storage.getGameUndoStorage(fileName);
+                    Files.deleteIfExists()
                     if (!mapToDelete.delete()) {
                         BotLogger.log("Failed to delete undo: " + fileName);
                     }
@@ -319,7 +320,14 @@ public class GameSaveLoadManager {
         for (String mapFilePath : mapUndoFiles) {
             File mapToDelete = Storage.getGameUndoStorage(mapFilePath);
             Date lastModified = Date.from(Instant.ofEpochMilli(mapToDelete.lastModified()));
-            if (lastModified.before(tooOld) && mapToDelete.delete()) count++;
+            if (lastModified.before(tooOld)) {
+                try {
+                    Files.delete(mapToDelete.toPath());
+                    count++;
+                } catch (Exception e) {
+                    BotLogger.log("Failed to delete undo file: " + mapToDelete.getName(), e);
+                }
+            }
         }
         BotLogger.log("Cleaned up `" + count + "` undo files that were over `" + daysOld + "` days old (" + tooOld + ")");
     }
