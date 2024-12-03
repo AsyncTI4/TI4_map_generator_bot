@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -215,7 +216,7 @@ public class GameSaveLoadManager {
 
             for (Player p1 : loadedGame.getRealPlayers()) {
                 Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
-                if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
+                if (p2 != null && (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo())) {
                     CardsInfoService.sendCardsInfo(loadedGame, p1);
                 }
             }
@@ -246,40 +247,9 @@ public class GameSaveLoadManager {
     }
 
     private static void saveUndo(Game game, File originalMapFile) {
-        String gameName = game.getName();
-        String gameNameFileNamePrefix = gameName + "_";
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(getMapUndoDirectory().toPath(), path -> path.getFileName().toString().startsWith(gameNameFileNamePrefix))) {
-            List<Integer> undoNumbers = new ArrayList<>();
-            for (Path path : stream) {
-                String fileName = path.getFileName().toString();
-                String undoNumberStr = StringUtils.substringBetween(fileName, gameNameFileNamePrefix, Constants.TXT);
-                if (undoNumberStr != null) {
-                    try {
-                        undoNumbers.add(Integer.parseInt(undoNumberStr));
-                    } catch (NumberFormatException e) {
-                        BotLogger.log("Could not parse undo number '" + undoNumberStr + "' for game " + gameName, e);
-                    }
-                }
-            }
-
-            if (undoNumbers.isEmpty()) {
-                createUndoCopy(originalMapFile, gameName, 1);
-                return;
-            }
-
-            undoNumbers.sort(Integer::compareTo);
-            int maxUndoNumber = undoNumbers.getLast();
-            int maxUndoFilesPerGame = game.isHasEnded() ? 10 : 100;
-            int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;
-
-            undoNumbers.stream()
-                .filter(undoNumber -> undoNumber < oldestUndoNumberThatShouldExist)
-                .map(undoNumber -> gameName + "_" + undoNumber + Constants.TXT)
-                .forEach(fileName -> deleteFile(Storage.getGameUndoStoragePath(fileName)));
-
-            createUndoCopy(originalMapFile, gameName, maxUndoNumber + 1);
-        } catch (Exception e) {
-            BotLogger.log("Error trying to save undo for game: " + gameName, e);
+        int latestIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(game);
+        if (latestIndex > 0) {
+            createUndoCopy(originalMapFile, game.getName(), latestIndex);
         }
     }
 
@@ -309,27 +279,69 @@ public class GameSaveLoadManager {
     }
 
     public static void cleanupOldUndoFiles() {
-        File mapUndoDirectory = getMapUndoDirectory();
-        String[] mapUndoFiles = mapUndoDirectory.list();
-        if (mapUndoFiles == null) {
-            return;
-        }
-        int count = 0;
         long daysOld = 60;
-        Date tooOld = Date.from(Instant.ofEpochMilli(Instant.now().toEpochMilli() - (daysOld * 24 * 60 * 60 * 1000)));
-        for (String mapFilePath : mapUndoFiles) {
-            File mapToDelete = Storage.getGameUndoStorage(mapFilePath);
-            Date lastModified = Date.from(Instant.ofEpochMilli(mapToDelete.lastModified()));
-            if (lastModified.before(tooOld)) {
+        Date tooOld = Date.from(Instant.now().minus(daysOld, ChronoUnit.DAYS));
+
+        int count = 0;
+
+        Path mapUndoDirectory = getMapUndoDirectory().toPath();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(mapUndoDirectory)) {
+            for (Path mapFilePath : stream) {
                 try {
-                    Files.delete(mapToDelete.toPath());
-                    count++;
+                    File mapToDelete = mapFilePath.toFile();
+                    Date lastModified = Date.from(Instant.ofEpochMilli(mapToDelete.lastModified()));
+
+                    if (lastModified.before(tooOld)) {
+                        Files.delete(mapFilePath);
+                        count++;
+                    }
                 } catch (Exception e) {
-                    BotLogger.log("Failed to delete undo file: " + mapToDelete.getName(), e);
+                    BotLogger.log("Failed to delete undo file: " + mapFilePath.getFileName(), e);
                 }
             }
+        } catch (IOException e) {
+            BotLogger.log("Failed to access the undo directory: " + mapUndoDirectory, e);
         }
+
         BotLogger.log("Cleaned up `" + count + "` undo files that were over `" + daysOld + "` days old (" + tooOld + ")");
+    }
+
+    public static int cleanUpExcessUndoFilesAndReturnLatestIndex(Game game) {
+        String gameName = game.getName();
+        String gameNameFileNamePrefix = gameName + "_";
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(getMapUndoDirectory().toPath(), path -> path.getFileName().toString().startsWith(gameNameFileNamePrefix))) {
+            List<Integer> undoNumbers = new ArrayList<>();
+            for (Path path : stream) {
+                String fileName = path.getFileName().toString();
+                String undoNumberStr = StringUtils.substringBetween(fileName, gameNameFileNamePrefix, Constants.TXT);
+                if (undoNumberStr != null) {
+                    try {
+                        undoNumbers.add(Integer.parseInt(undoNumberStr));
+                    } catch (NumberFormatException e) {
+                        BotLogger.log("Could not parse undo number '" + undoNumberStr + "' for game " + gameName, e);
+                    }
+                }
+            }
+
+            if (undoNumbers.isEmpty()) {
+                return 1;
+            }
+
+            undoNumbers.sort(Integer::compareTo);
+            int maxUndoNumber = undoNumbers.getLast();
+            int maxUndoFilesPerGame = game.isHasEnded() ? 10 : 100;
+            int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;
+
+            undoNumbers.stream()
+                .filter(undoNumber -> undoNumber < oldestUndoNumberThatShouldExist)
+                .map(undoNumber -> gameName + "_" + undoNumber + Constants.TXT)
+                .forEach(fileName -> deleteFile(Storage.getGameUndoStoragePath(fileName)));
+
+            return maxUndoNumber + 1;
+        } catch (Exception e) {
+            BotLogger.log("Error trying clean up excess undo files for: " + gameName, e);
+        }
+        return -1;
     }
 
     private static void saveGameInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {
