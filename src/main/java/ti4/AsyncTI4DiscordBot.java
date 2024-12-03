@@ -29,6 +29,7 @@ import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;
 import ti4.cron.GameCreationLockRemovalCron;
 import ti4.cron.LogCacheStatsCron;
+import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.UploadStatsCron;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.FoWHelper;
@@ -218,6 +219,7 @@ public class AsyncTI4DiscordBot {
         LogCacheStatsCron.register();
         UploadStatsCron.register();
         GameCreationLockRemovalCron.register();
+        OldUndoFileCleanupCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
