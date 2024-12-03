@@ -126,6 +126,7 @@ public class GameSaveLoadManager {
     }
 
     public static void saveGame(Game game, boolean keepModifiedDate, String saveReason) {
+        long startSaveTime = System.currentTimeMillis();
         game.setLatestCommand(Objects.requireNonNullElse(saveReason, "Last Command Unknown - No Event Provided"));
         try {
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
@@ -135,6 +136,7 @@ public class GameSaveLoadManager {
         } catch (Exception e) {
             BotLogger.log("Error adding transient attachment tokens for game " + game.getName(), e);
         }
+        long doneTransientAttachmentTokenCheckTime = System.currentTimeMillis();
 
         File mapFile = Storage.getGameFile(game.getName() + TXT);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(mapFile))) {
@@ -154,9 +156,26 @@ public class GameSaveLoadManager {
         } catch (IOException e) {
             BotLogger.log("Could not save map: " + game.getName(), e);
         }
+        long doneWriteTime = System.currentTimeMillis();
+
         mapFile = Storage.getGameFile(game.getName() + TXT);
         if (mapFile.exists()) {
             saveUndo(game, mapFile);
+        }
+        long doneUndoSaveTime = System.currentTimeMillis();
+
+        final int milliThreshold = 200;
+        if (doneUndoSaveTime - startSaveTime > milliThreshold) {
+            String tokenTime = DateTimeHelper.getTimeRepresentationToMilliseconds(doneTransientAttachmentTokenCheckTime - startSaveTime);
+            String writeTime = DateTimeHelper.getTimeRepresentationToMilliseconds(doneWriteTime - doneTransientAttachmentTokenCheckTime);
+            String undoTime = DateTimeHelper.getTimeRepresentationToMilliseconds(doneUndoSaveTime - doneWriteTime);
+            String errorMessage = game.getID() + " took over " + milliThreshold + "ms to save:\n> " +
+                saveReason + "\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(startSaveTime) + " save started\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(doneTransientAttachmentTokenCheckTime) + " `" + tokenTime + "` to handle tokens\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(doneWriteTime) + " `" + writeTime + "` to write to file obj\n> " +
+                DateTimeHelper.getTimestampFromMillesecondsEpoch(doneUndoSaveTime) + " `" + undoTime + "` to create the Undo file ";
+            BotLogger.log(errorMessage);
         }
     }
 
