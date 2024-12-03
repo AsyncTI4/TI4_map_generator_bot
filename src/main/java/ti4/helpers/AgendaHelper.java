@@ -16,13 +16,6 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -36,6 +29,12 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -1957,7 +1956,7 @@ public class AgendaHelper {
     }
 
     public static void eraseVotesOfFaction(Game game, String faction) {
-        if (game.getCurrentAgendaVotes().keySet().isEmpty()) {
+        if (game.getCurrentAgendaVotes().isEmpty()) {
             return;
         }
         Map<String, String> outcomes = new HashMap<>(game.getCurrentAgendaVotes());
@@ -2031,7 +2030,7 @@ public class AgendaHelper {
             agendaName = "Not Currently Tracked";
         }
 
-        if (outcomes.keySet().isEmpty()) {
+        if (outcomes.isEmpty()) {
             summary = "# Agenda Name: " + agendaName + "\nNo current Riders or votes have been cast yet.";
         } else {
             StringBuilder summaryBuilder = new StringBuilder(
@@ -2183,9 +2182,9 @@ public class AgendaHelper {
     public static int getVoteCountFromPlanets(Game game, Player player) {
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         Map<String, Planet> planetsInfo = game.getPlanetsInfo();
-        int baseResourceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(Planet.class::cast)
+        int baseResourceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
             .mapToInt(Planet::getResources).sum();
-        int baseInfluenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(Planet.class::cast)
+        int baseInfluenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
             .mapToInt(Planet::getInfluence).sum();
         int voteCount = baseInfluenceCount; // default
 
@@ -2394,8 +2393,7 @@ public class AgendaHelper {
 
     @ButtonHandler("outcome_")
     public static void outcome(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        if (game.getLaws() != null
-            && (game.getLaws().containsKey("rep_govt") || game.getLaws().containsKey("absol_government"))) {
+        if (game.getLaws() != null && (game.getLaws().containsKey("rep_govt") || game.getLaws().containsKey("absol_government"))) {
             player.resetSpentThings();
             player.addSpentThing("representative_1");
             boolean playerHasMr = CollectionUtils.containsAny(player.getPlanets(), Constants.MECATOLS);

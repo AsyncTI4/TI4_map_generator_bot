@@ -173,7 +173,7 @@ public class GameSaveLoadManager {
         String gameName = game.getName();
         String gameNameForUndoStart = gameName + "_";
         String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
-        if (mapUndoFiles == null || mapUndoFiles.length <= 0) {
+        if (mapUndoFiles == null || mapUndoFiles.length == 0) {
             return;
         }
         try {
@@ -194,8 +194,6 @@ public class GameSaveLoadManager {
                     // to regenerate buttons:");
                     MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(),
                         loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
-                } else {
-                    // System.out.println("Boop" + loadedGame.getSavedButtons().size());
                 }
             } catch (Exception e) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
