@@ -50,6 +50,7 @@ import ti4.listeners.UserJoinServerListener;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.processors.ButtonProcessor;
 import ti4.selections.SelectionManager;
 import ti4.service.statistics.StatisticsPipeline;
 
@@ -232,6 +233,11 @@ public class AsyncTI4DiscordBot {
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS, WAITING 10 SECONDS FOR COMPLETION");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
+                if (ButtonProcessor.shutdown()) { // will wait for up to an additional 20 seconds
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING BUTTONS");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING BUTTONS");
+                }
                 if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.logWithTimestamp("FINISHED RENDERING MAPS");
                 } else {
