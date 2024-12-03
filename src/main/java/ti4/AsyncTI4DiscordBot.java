@@ -244,7 +244,7 @@ public class AsyncTI4DiscordBot {
                     BotLogger.logWithTimestamp("DID NOT FINISH RENDERING MAPS");
                 }
                 if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.logWithTimestamp("DONE PROCESSING STATISTICS");
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING STATISTICS");
                 } else {
                     BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING STATISTICS");
                 }
