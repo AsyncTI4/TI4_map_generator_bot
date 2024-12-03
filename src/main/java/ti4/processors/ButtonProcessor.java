@@ -88,7 +88,7 @@ public class ButtonProcessor {
 
     private void process(ButtonInteractionEvent event) {
         long startTime = System.currentTimeMillis();
-        // BotLogger.logButton(event); // TODO: just disabling this temp to see what happens
+        BotLogger.logButton(event);
         long contextTime = 0;
         long resolveTime = 0;
         long saveTime = 0;
