@@ -273,7 +273,7 @@ public class GameSaveLoadManager {
     private static File getMapUndoDirectory() {
         File mapUndoDirectory = Storage.getGameUndoDirectory();
         if (!mapUndoDirectory.exists()) {
-            mapUndoDirectory.mkdir();afsasf
+            mapUndoDirectory.mkdir();
         }
         return mapUndoDirectory;
     }
