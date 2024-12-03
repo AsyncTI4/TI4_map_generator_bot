@@ -248,7 +248,7 @@ public class GameSaveLoadManager {
     private static void saveUndo(Game game, File originalMapFile) {
         String gameName = game.getName();
         String gameNameFileNamePrefix = gameName + "_";
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(getMapUndoDirectory().toPath(), path -> path.getFileName().startsWith(gameNameFileNamePrefix))) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(getMapUndoDirectory().toPath(), path -> path.getFileName().toString().startsWith(gameNameFileNamePrefix))) {
             List<Integer> undoNumbers = new ArrayList<>();
             for (Path path : stream) {
                 String fileName = path.getFileName().toString();
@@ -275,19 +275,21 @@ public class GameSaveLoadManager {
             undoNumbers.stream()
                 .filter(undoNumber -> undoNumber < oldestUndoNumberThatShouldExist)
                 .map(undoNumber -> gameName + "_" + undoNumber + Constants.TXT)
-                .forEach(fileName -> {
-                    File mapToDelete = Storage.getGameUndoStorage(fileName);
-                    Files.deleteIfExists()
-                    if (!mapToDelete.delete()) {
-                        BotLogger.log("Failed to delete undo: " + fileName);
-                    }
-                });
+                .forEach(fileName -> deleteFile(Storage.getGameUndoStoragePath(fileName)));
 
             createUndoCopy(originalMapFile, gameName, maxUndoNumber + 1);
         } catch (IOException e) {
             BotLogger.log("Error trying to access undo directory for game: " + gameName, e);
         } catch (Exception e) {
             BotLogger.log("Error trying to save undo for game: " + gameName, e);
+        }
+    }
+
+    private static void deleteFile(Path path) {
+        try {
+            Files.deleteIfExists(path);
+        } catch (Exception e) {
+            BotLogger.log("Error trying to delete file: " + path, e);
         }
     }
 
