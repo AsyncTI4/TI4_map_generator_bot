@@ -216,7 +216,7 @@ public class GameSaveLoadManager {
 
             for (Player p1 : loadedGame.getRealPlayers()) {
                 Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
-                if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
+                if (p2 != null && (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo())) {
                     CardsInfoService.sendCardsInfo(loadedGame, p1);
                 }
             }
