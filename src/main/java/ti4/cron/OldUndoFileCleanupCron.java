@@ -12,7 +12,7 @@ import ti4.message.BotLogger;
 public class OldUndoFileCleanupCron {
 
     public static void register() {
-        CronManager.register(UploadStatsCron.class, OldUndoFileCleanupCron::cleanup, 1, 240, TimeUnit.MINUTES);
+        CronManager.register(OldUndoFileCleanupCron.class, OldUndoFileCleanupCron::cleanup, 1, 240, TimeUnit.MINUTES);
     }
 
     private static void cleanup() {
