@@ -19,6 +19,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.SearchGameHelper;
 import ti4.listeners.annotations.AnnotationHandler;
@@ -223,10 +224,11 @@ public class ButtonProcessor {
 
     public static String getButtonProcessingStatistics() {
         var decimalFormatter = new DecimalFormat("#.##");
-        return "Button queue size: " + instance.buttonInteractionQueue.size() + ".\n" +
-            "Total button presses: " + instance.runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" +
-            "Total threshold misses: " + instance.runtimeWarningService.getTotalRuntimeThresholdMissCount() + ".\n" +
-            "Average preprocessing time: " + decimalFormatter.format(instance.runtimeWarningService.getAveragePreprocessingTime()) + "ms.\n" +
-            "Average processing time: " + decimalFormatter.format(instance.runtimeWarningService.getAverageProcessingTime()) + "ms.";
+        return "Button Processor Statistics: " + DateTimeHelper.getCurrentTimestamp() + "\n" +
+            "> Button queue size: " + instance.buttonInteractionQueue.size() + ".\n" +
+            "> Total button presses: " + instance.runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" +
+            "> Total threshold misses: " + instance.runtimeWarningService.getTotalRuntimeThresholdMissCount() + ".\n" +
+            "> Average preprocessing time: " + decimalFormatter.format(instance.runtimeWarningService.getAveragePreprocessingTime()) + "ms.\n" +
+            "> Average processing time: " + decimalFormatter.format(instance.runtimeWarningService.getAverageProcessingTime()) + "ms.";
     }
 }
