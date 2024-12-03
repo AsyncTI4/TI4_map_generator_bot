@@ -12,17 +12,17 @@ import ti4.message.BotLogger;
 public class OldUndoFileCleanupCron {
 
     public static void register() {
-        CronManager.register(UploadStatsCron.class, OldUndoFileCleanupCron::cleanup, 1, 60, TimeUnit.MINUTES);
+        CronManager.register(UploadStatsCron.class, OldUndoFileCleanupCron::cleanup, 1, 240, TimeUnit.MINUTES);
     }
 
     private static void cleanup() {
-        BotLogger.log("Cleaning up excess undo files...");
+        BotLogger.logWithTimestamp("Cleaning up excess undo files...");
         for (Game game : GameManager.getGameNameToGame().values()) {
             GameSaveLoadManager.cleanUpExcessUndoFilesAndReturnLatestIndex(game);
         }
-        BotLogger.log("Cleaned excess undo files.");
+        BotLogger.logWithTimestamp("Cleaned excess undo files.");
 
         GameSaveLoadManager.cleanupOldUndoFiles();
-        BotLogger.log("Cleaned old undo files.");
+        BotLogger.logWithTimestamp("Cleaned old undo files.");
     }
 }
