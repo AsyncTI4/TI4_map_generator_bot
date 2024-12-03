@@ -1,18 +1,7 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static ti4.image.ImageHelper.writeCompressedFormat;
-
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -40,20 +29,17 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import javax.imageio.ImageIO;
-
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands2.CommandHelper;
@@ -102,6 +88,9 @@ import ti4.model.UnitModel;
 import ti4.service.fow.FowConstants;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 import ti4.website.WebsiteOverlay;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static ti4.image.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator implements AutoCloseable {
 
@@ -249,7 +238,7 @@ public class MapGenerator implements AutoCloseable {
             }
         }
 
-        int lawsY = (game.getLaws().keySet().size() / 2 + 1) * 115;
+        int lawsY = (game.getLaws().size() / 2 + 1) * 115;
         return playerY + lawsY + objectivesY + 600;
     }
 
@@ -258,10 +247,7 @@ public class MapGenerator implements AutoCloseable {
             return game.getDisplayTypeForced();
         }
         if (displayType == null) {
-            displayType = game.getDisplayTypeForced();
-            if (displayType == null) {
-                return DisplayType.all;
-            }
+            return DisplayType.all;
         }
         return displayType;
     }
@@ -3395,7 +3381,7 @@ public class MapGenerator implements AutoCloseable {
 
         { // PAINT SO ICONS
             List<String> soToPoList = game.getSoToPoList();
-            int unscoredSOs = player.getSecrets().keySet().size();
+            int unscoredSOs = player.getSecrets().size();
             int scoredSOs = (int) player.getSecretsScored().keySet().stream().filter(so -> !soToPoList.contains(so)).count();
             int secretsEmpty = player.getMaxSOCount() - unscoredSOs - scoredSOs;
             int soOffset = (15 + 35 * player.getMaxSOCount()) / 2 - 50;
@@ -3955,7 +3941,7 @@ public class MapGenerator implements AutoCloseable {
         graphics.drawString("VP: " + vpCount, point.x + deltaX, point.y + deltaY);
 
         // PAINT SO ICONS
-        int totalSecrets = player.getSecrets().keySet().size();
+        int totalSecrets = player.getSecrets().size();
         Set<String> soSet = player.getSecretsScored().keySet();
         int soOffset = 0;
         String soHand = "pa_so-icon_hand.png";
@@ -4359,9 +4345,9 @@ public class MapGenerator implements AutoCloseable {
         graphics.setColor(Color.RED);
         y = displaySecretObjectives(y, scoredSecretObjectives, revealedSecretObjectives, players, secretObjectives, secret, customPublicVP);
         if (player.isSearchWarrant()) {
-            return secretsScored.keySet().size() + player.getSecrets().keySet().size();
+            return secretsScored.size() + player.getSecrets().size();
         }
-        return secretsScored.keySet().size();
+        return secretsScored.size();
     }
 
     private int displaySecretObjectives(
