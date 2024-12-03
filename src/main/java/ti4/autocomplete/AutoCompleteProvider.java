@@ -74,7 +74,7 @@ public class AutoCompleteProvider {
             resolveAutoCompleteEvent(event);
 
             long endTime = System.currentTimeMillis();
-            final int milliThreshold = 2000;
+            int milliThreshold = 2000;
             if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
                 String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
                 String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
