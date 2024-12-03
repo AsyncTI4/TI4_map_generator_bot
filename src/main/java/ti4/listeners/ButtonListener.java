@@ -32,6 +32,6 @@ public class ButtonListener extends ListenerAdapter {
 
         event.getChannel().sendTyping().queue();
 
-        ButtonProcessor.process(event);
+        ButtonProcessor.queue(event);
     }
 }
