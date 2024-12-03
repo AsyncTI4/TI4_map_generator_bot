@@ -35,7 +35,6 @@ public class ButtonProcessor {
     private static final ButtonProcessor instance = new ButtonProcessor();
     private static final Map<String, Consumer<ButtonContext>> knownButtons = AnnotationHandler.findKnownHandlers(ButtonContext.class, ButtonHandler.class);
 
-
     private final BlockingQueue<ButtonInteractionEvent> buttonInteractionQueue = new LinkedBlockingQueue<>();
     private final Set<String> userButtonPressSet = ConcurrentHashMap.newKeySet();
     private final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
@@ -46,7 +45,7 @@ public class ButtonProcessor {
         worker = new Thread(() -> {
             while (running || !buttonInteractionQueue.isEmpty()) {
                 try {
-                    ButtonInteractionEvent buttonInteractionEvent = buttonInteractionQueue.poll(1, TimeUnit.SECONDS);
+                    ButtonInteractionEvent buttonInteractionEvent = buttonInteractionQueue.poll(2, TimeUnit.SECONDS);
                     if (buttonInteractionEvent != null) {
                         process(buttonInteractionEvent);
                     }

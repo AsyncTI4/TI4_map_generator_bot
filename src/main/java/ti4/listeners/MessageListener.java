@@ -41,8 +41,10 @@ public class MessageListener extends ListenerAdapter {
         Message message = event.getMessage();
         if (message.getContentRaw().startsWith("[DELETE]")) {
             message.delete().queue();
+            return;
         }
-        AsyncTI4DiscordBot.runAsync("Message listener task", () -> processMessage(event, message));
+
+        processMessage(event, message);
     }
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {

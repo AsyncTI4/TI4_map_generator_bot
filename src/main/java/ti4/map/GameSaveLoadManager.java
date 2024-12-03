@@ -137,7 +137,7 @@ public class GameSaveLoadManager {
         }
 
         File mapFile = Storage.getGameFile(game.getName() + TXT);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(mapFile.getAbsoluteFile()))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(mapFile))) {
             Map<String, Tile> tileMap = game.getTileMap();
             writer.write(game.getOwnerID());
             writer.write(System.lineSeparator());
