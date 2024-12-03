@@ -275,29 +275,49 @@ public class GameSaveLoadManager {
         }
 
         try {
+            // NEW - Was slow to create file so disabled
+            // List<Integer> numbers = Arrays.stream(mapUndoFiles)
+            //     .map(fileName -> StringUtils.substringBetween(fileName, gameNameForUndoStart, Constants.TXT))
+            //     .map(Integer::parseInt).toList();
+
+            // int maxUndoNumber = numbers.isEmpty() ? 0
+            //     : numbers.stream().mapToInt(value -> value)
+            //         .max().orElseThrow(NoSuchElementException::new);
+
+            // int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;
+
+            // // Delete old undo copies
+            // for (String mapFilePath : mapUndoFiles) {
+            //     int undoNumber = Integer.parseInt(StringUtils.substringBetween(mapFilePath, gameNameForUndoStart, Constants.TXT));
+            //     if (undoNumber >= oldestUndoNumberThatShouldExist) {
+            //         break;
+            //     }
+            //     File mapToDelete = Storage.getGameUndoStorage(gameName + "_" + undoNumber + Constants.TXT);
+            //     mapToDelete.delete();
+            // }
+
+            // // Create new undo copy
+            // int nextNumber = maxUndoNumber + 1;
+            // File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + nextNumber + Constants.TXT);
+            // CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
+            // Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), options);
+
+            // Old
             List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                .map(fileName -> StringUtils.substringBetween(fileName, gameNameForUndoStart, Constants.TXT))
+                .map(fileName -> fileName.replace(gameNameForUndoStart, ""))
+                .map(fileName -> fileName.replace(Constants.TXT, ""))
                 .map(Integer::parseInt).toList();
-
-            int maxUndoNumber = numbers.isEmpty() ? 0
-                : numbers.stream().mapToInt(value -> value)
-                    .max().orElseThrow(NoSuchElementException::new);
-
-            int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;
-
-            // Delete old undo copies
-            for (String mapFilePath : mapUndoFiles) {
-                int undoNumber = Integer.parseInt(StringUtils.substringBetween(mapFilePath, gameNameForUndoStart, Constants.TXT));
-                if (undoNumber >= oldestUndoNumberThatShouldExist) {
-                    break;
-                }
-                File mapToDelete = Storage.getGameUndoStorage(gameName + "_" + undoNumber + Constants.TXT);
+            if (numbers.size() == 50) {
+                int minNumber = numbers.stream().mapToInt(value -> value)
+                    .min().orElseThrow(NoSuchElementException::new);
+                File mapToDelete = Storage.getGameUndoStorage(gameName + "_" + minNumber + Constants.TXT);
                 mapToDelete.delete();
             }
-
-            // Create new undo copy
-            int nextNumber = maxUndoNumber + 1;
-            File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + nextNumber + Constants.TXT);
+            int maxNumber = numbers.isEmpty() ? 0
+                : numbers.stream().mapToInt(value -> value)
+                    .max().orElseThrow(NoSuchElementException::new);
+            maxNumber++;
+            File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + maxNumber + Constants.TXT);
             CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
             Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), options);
         } catch (Exception e) {
