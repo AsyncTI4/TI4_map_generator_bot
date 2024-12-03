@@ -18,9 +18,11 @@ class ButtonRuntimeWarningService {
     @Getter
     private int totalRuntimeSubmissionCount;
     @Getter
-    private long averageProcessingTime;
+    private int totalRuntimeThresholdMissCount;
     @Getter
-    private long averagePreprocessingTime;
+    private double averageProcessingTime;
+    @Getter
+    private double averagePreprocessingTime;
 
     void submitNewRuntime(ButtonInteractionEvent event, long startTime, long endTime, long contextTime, long resolveTime, long saveTime) {
         totalRuntimeSubmissionCount++;
@@ -35,23 +37,25 @@ class ButtonRuntimeWarningService {
         if (now.minusMinutes(1).isAfter(lastWarningTime)) {
             runtimeWarningCount = 0;
         }
-        if (pauseWarningsUntil.isBefore(now) &&
-                (startTime - eventStartTime > warningThresholdMilliseconds || endTime - startTime > warningThresholdMilliseconds)) {
-            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventStartTime);
-            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
-            String message = "[" + event.getChannel().getName() + "](" + event.getMessage().getJumpUrl() + ") " + event.getUser().getEffectiveName() + " pressed button: " + ButtonHelper.getButtonRepresentation(event.getButton()) +
-                "\n> Warning: This button took over " + warningThresholdMilliseconds + "ms to respond or execute\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(eventStartTime) + " button was pressed by user\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventStartTime ? "😲" : "");
-            message += "\nContext time: " + (contextTime - startTime) + "ms\nResolve time: " + (resolveTime - contextTime) + "ms\nSave time: " + (saveTime - resolveTime) + "ms";
-            BotLogger.log(message);
-            if (++runtimeWarningCount > 20) {
-                pauseWarningsUntil = now.plusMinutes(5);
-                BotLogger.log("**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
-                runtimeWarningCount = 0;
+        if (startTime - eventStartTime > warningThresholdMilliseconds || endTime - startTime > warningThresholdMilliseconds) {
+            totalRuntimeThresholdMissCount++;
+            if (pauseWarningsUntil.isBefore(now)) {
+                String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventStartTime);
+                String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+                String message = "[" + event.getChannel().getName() + "](" + event.getMessage().getJumpUrl() + ") " + event.getUser().getEffectiveName() + " pressed button: " + ButtonHelper.getButtonRepresentation(event.getButton()) +
+                    "\n> Warning: This button took over " + warningThresholdMilliseconds + "ms to respond or execute\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(eventStartTime) + " button was pressed by user\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
+                    DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventStartTime ? "😲" : "");
+                message += "\nContext time: " + (contextTime - startTime) + "ms\nResolve time: " + (resolveTime - contextTime) + "ms\nSave time: " + (saveTime - resolveTime) + "ms";
+                BotLogger.log(message);
+                if (++runtimeWarningCount > 20) {
+                    pauseWarningsUntil = now.plusMinutes(5);
+                    BotLogger.log("**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
+                    runtimeWarningCount = 0;
+                }
+                lastWarningTime = now;
             }
-            lastWarningTime = now;
         }
     }
 }
