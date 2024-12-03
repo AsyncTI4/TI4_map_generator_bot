@@ -17,12 +17,16 @@ public class OldUndoFileCleanupCron {
 
     private static void cleanup() {
         BotLogger.logWithTimestamp("Cleaning up excess undo files...");
-        for (Game game : GameManager.getGameNameToGame().values()) {
-            GameSaveLoadManager.cleanUpExcessUndoFilesAndReturnLatestIndex(game);
-        }
-        BotLogger.logWithTimestamp("Cleaned excess undo files, starting on old undo files...");
+        try {
+            for (Game game : GameManager.getGameNameToGame().values()) {
+                GameSaveLoadManager.cleanUpExcessUndoFilesAndReturnLatestIndex(game);
+            }
+            BotLogger.logWithTimestamp("Cleaned excess undo files, starting on old undo files...");
 
-        GameSaveLoadManager.cleanupOldUndoFiles();
+            GameSaveLoadManager.cleanupOldUndoFiles();
+        } catch (Exception e) {
+            BotLogger.log("**Error cleaning up old undo files!**", e);
+        }
         BotLogger.logWithTimestamp("Cleaned old undo files.");
     }
 }
