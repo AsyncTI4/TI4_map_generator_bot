@@ -208,10 +208,11 @@ public class AsyncTI4DiscordBot {
         DataMigrationManager.runMigrations();
         BotLogger.logWithTimestamp(" FINISHED CHECKING FOR DATA MIGRATIONS");
 
-        // START MAP GENERATION
+        // START ASYNC PIPELINES
         ImageIO.setUseCache(false);
         MapRenderPipeline.start();
         StatisticsPipeline.start();
+        ButtonProcessor.start();
 
         // START CRONS
         AutoPingCron.register();
