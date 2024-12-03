@@ -27,7 +27,7 @@ class CreateGameButtonHandler {
 
     @ButtonHandler("createGameChannels")
     public static void createGameChannelsButton(ButtonInteractionEvent event) {
-        AsyncTI4DiscordBot.runAsync("Create game channels button task", () -> createGameChannels(event));
+        createGameChannels(event);
     }
 
     private static void createGameChannels(ButtonInteractionEvent event) {
