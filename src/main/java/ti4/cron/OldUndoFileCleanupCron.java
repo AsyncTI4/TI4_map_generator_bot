@@ -1,6 +1,6 @@
 package ti4.cron;
 
-import java.util.concurrent.TimeUnit;
+import java.time.ZoneId;
 
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
@@ -12,7 +12,7 @@ import ti4.message.BotLogger;
 public class OldUndoFileCleanupCron {
 
     public static void register() {
-        CronManager.register(OldUndoFileCleanupCron.class, OldUndoFileCleanupCron::cleanup, 1, 240, TimeUnit.MINUTES);
+        CronManager.register(OldUndoFileCleanupCron.class, OldUndoFileCleanupCron::cleanup, 3, 0, ZoneId.of("America/New_York"));
     }
 
     private static void cleanup() {
