@@ -549,7 +549,7 @@ public class CreateGameService {
         if (channelCount > (channelMax - channelsCountRequiredForNewCategory)) {
             BotLogger.log("`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
                 + guild.getName() + "** currently has " + channelCount + " channels and a new category requires space for "
-                + channelsCountRequiredForNewCategory + " new channels.");
+                + channelsCountRequiredForNewCategory + " new channels (including 1 for the category itself)");
             return false;
         }
 
