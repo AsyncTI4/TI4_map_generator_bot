@@ -310,7 +310,6 @@ public class GameSaveLoadManager {
 
     public static void cleanupOldUndoFiles() {
         File mapUndoDirectory = getMapUndoDirectory();
-        BotLogger.logWithTimestamp("Checking UNDO Directory (" + mapUndoDirectory.list().length + " files)");
         String[] mapUndoFiles = mapUndoDirectory.list();
         if (mapUndoFiles == null) {
             return;
@@ -330,44 +329,7 @@ public class GameSaveLoadManager {
                 }
             }
         }
-        BotLogger.logWithTimestamp("Cleaned up `" + count + "` undo files that were over `" + daysOld + "` days old (" + tooOld + ")");
-
-        for (Game game : GameManager.getGameNameToGame().values()) {
-            cleanupExtraGameUndoFiles(game);
-        }
-    }
-
-    public static void cleanupExtraGameUndoFiles(Game game) {
-        String gameName = game.getName();
-        String gameNameForUndoStartsWith = gameName + "_";
-        File mapUndoDirectory = getMapUndoDirectory();
-
-        int maxUndoFilesPerGame = game.isHasEnded() ? 10 : 100;
-        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStartsWith));
-        if (mapUndoFiles == null) {
-            return;
-        }
-
-        int maxUndoNumber = Arrays.stream(mapUndoFiles)
-            .map(fileName -> StringUtils.substringBetween(fileName, gameNameForUndoStartsWith, Constants.TXT))
-            .map(Integer::parseInt).mapToInt(value -> value)
-            .max().orElse(0);
-
-        int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;
-
-        // Delete old undo copies
-        for (String mapFilePath : mapUndoFiles) {
-            int undoNumber = Integer.parseInt(StringUtils.substringBetween(mapFilePath, gameNameForUndoStartsWith, Constants.TXT));
-            if (undoNumber >= oldestUndoNumberThatShouldExist) {
-                break;
-            }
-            File mapToDelete = Storage.getGameUndoStorage(gameName + "_" + undoNumber + Constants.TXT);
-            try {
-                Files.delete(mapToDelete.toPath());
-            } catch (Exception e) {
-                BotLogger.log("Failed to delete undo file: " + mapToDelete.getName(), e);
-            }
-        }
+        BotLogger.log("Cleaned up `" + count + "` undo files that were over `" + daysOld + "` days old (" + tooOld + ")");
     }
 
     private static void saveGameInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {
