@@ -4,6 +4,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Path;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -263,6 +264,11 @@ public class Storage {
     @NotNull
     public static File getGameUndoStorage(String gameName) {
         return new File(getStoragePath() + GAMES_UNDO + gameName);
+    }
+
+    @NotNull
+    public static Path getGameUndoStoragePath(String gameName) {
+        return Path.of(getStoragePath() + GAMES_UNDO + gameName);
     }
 
     @NotNull

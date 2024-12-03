@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.CopyOption;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -126,7 +127,6 @@ public class GameSaveLoadManager {
     }
 
     public static void saveGame(Game game, boolean keepModifiedDate, String saveReason) {
-        // long startSaveTime = System.currentTimeMillis();
         game.setLatestCommand(Objects.requireNonNullElse(saveReason, "Last Command Unknown - No Event Provided"));
         try {
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
@@ -136,7 +136,6 @@ public class GameSaveLoadManager {
         } catch (Exception e) {
             BotLogger.log("Error adding transient attachment tokens for game " + game.getName(), e);
         }
-        // long doneTransientAttachmentTokenCheckTime = System.currentTimeMillis();
 
         File mapFile = Storage.getGameFile(game.getName() + TXT);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(mapFile))) {
@@ -156,27 +155,10 @@ public class GameSaveLoadManager {
         } catch (IOException e) {
             BotLogger.log("Could not save map: " + game.getName(), e);
         }
-        // long doneWriteTime = System.currentTimeMillis();
-
         mapFile = Storage.getGameFile(game.getName() + TXT);
         if (mapFile.exists()) {
             saveUndo(game, mapFile);
         }
-        // long doneUndoSaveTime = System.currentTimeMillis();
-
-        // final int milliThreshold = 200;
-        // if (doneUndoSaveTime - startSaveTime > milliThreshold) {
-        //     String tokenTime = DateTimeHelper.getTimeRepresentationToMilliseconds(doneTransientAttachmentTokenCheckTime - startSaveTime);
-        //     String writeTime = DateTimeHelper.getTimeRepresentationToMilliseconds(doneWriteTime - doneTransientAttachmentTokenCheckTime);
-        //     String undoTime = DateTimeHelper.getTimeRepresentationToMilliseconds(doneUndoSaveTime - doneWriteTime);
-        //     String errorMessage = game.getID() + " took over " + milliThreshold + "ms to save:\n> " +
-        //         saveReason + "\n> " +
-        //         DateTimeHelper.getTimestampFromMillesecondsEpoch(startSaveTime) + " save started\n> " +
-        //         DateTimeHelper.getTimestampFromMillesecondsEpoch(doneTransientAttachmentTokenCheckTime) + " `" + tokenTime + "` to handle tokens\n> " +
-        //         DateTimeHelper.getTimestampFromMillesecondsEpoch(doneWriteTime) + " `" + writeTime + "` to write to file obj\n> " +
-        //         DateTimeHelper.getTimestampFromMillesecondsEpoch(doneUndoSaveTime) + " `" + undoTime + "` to create the Undo file ";
-        //     BotLogger.log(errorMessage);
-        // }
     }
 
     public static void undo(Game game, GenericInteractionCreateEvent event) {
@@ -265,71 +247,56 @@ public class GameSaveLoadManager {
 
     private static void saveUndo(Game game, File originalMapFile) {
         String gameName = game.getName();
-        String gameNameForUndoStart = gameName + "_";
+        String gameNameFileNamePrefix = gameName + "_";
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(getMapUndoDirectory().toPath(), path -> path.getFileName().toString().startsWith(gameNameFileNamePrefix))) {
+            List<Integer> undoNumbers = new ArrayList<>();
+            for (Path path : stream) {
+                String fileName = path.getFileName().toString();
+                String undoNumberStr = StringUtils.substringBetween(fileName, gameNameFileNamePrefix, Constants.TXT);
+                if (undoNumberStr != null) {
+                    try {
+                        undoNumbers.add(Integer.parseInt(undoNumberStr));
+                    } catch (NumberFormatException e) {
+                        BotLogger.log("Could not parse undo number '" + undoNumberStr + "' for game " + gameName, e);
+                    }
+                }
+            }
 
-        try {
-            // long startTime = System.currentTimeMillis();
-
-            File mapUndoDirectory = getMapUndoDirectory();
-
-            int maxUndoFilesPerGame = game.isHasEnded() ? 10 : 100;
-            String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
-            if (mapUndoFiles == null) {
+            if (undoNumbers.isEmpty()) {
+                createUndoCopy(originalMapFile, gameName, 1);
                 return;
             }
 
-            // long getFilePathsTime = System.currentTimeMillis();
-
-            List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                .map(fileName -> StringUtils.substringBetween(fileName, gameNameForUndoStart, Constants.TXT))
-                .map(Integer::parseInt).toList();
-
-            int maxUndoNumber = numbers.isEmpty() ? 0
-                : numbers.stream().mapToInt(value -> value)
-                    .max().orElseThrow(NoSuchElementException::new);
-
+            undoNumbers.sort(Integer::compareTo);
+            int maxUndoNumber = undoNumbers.getLast();
+            int maxUndoFilesPerGame = game.isHasEnded() ? 10 : 100;
             int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;
 
-            // long doneDeletePrepTime = System.currentTimeMillis();
-            // int deleteLoopCount = 0;
+            undoNumbers.stream()
+                .filter(undoNumber -> undoNumber < oldestUndoNumberThatShouldExist)
+                .map(undoNumber -> gameName + "_" + undoNumber + Constants.TXT)
+                .forEach(fileName -> deleteFile(Storage.getGameUndoStoragePath(fileName)));
 
-            // Delete old undo copies
-            for (String mapFilePath : mapUndoFiles) {
-                int undoNumber = Integer.parseInt(StringUtils.substringBetween(mapFilePath, gameNameForUndoStart, Constants.TXT));
-                if (undoNumber >= oldestUndoNumberThatShouldExist) {
-                    break;
-                }
-                File mapToDelete = Storage.getGameUndoStorage(gameName + "_" + undoNumber + Constants.TXT);
-                Files.deleteIfExists(mapToDelete.toPath());
-                // deleteLoopCount++;
-            }
-            // long doneDeletingTime = System.currentTimeMillis();
-
-            // Create new undo copy
-            int nextNumber = maxUndoNumber + 1;
-            File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + nextNumber + Constants.TXT);
-            CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
-            Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), options);
-
-            // long doneCopyTime = System.currentTimeMillis();
-
-            // final int milliThreshold = 400;
-            // if (doneCopyTime - startTime > milliThreshold) {
-            //     String filePathsTime = DateTimeHelper.getTimeRepresentationToMilliseconds(getFilePathsTime - startTime);
-            //     String deletePrepTime = DateTimeHelper.getTimeRepresentationToMilliseconds(doneDeletePrepTime - getFilePathsTime);
-            //     String deleteTime = DateTimeHelper.getTimeRepresentationToMilliseconds(doneDeletingTime - doneDeletePrepTime);
-            //     String copyTime = DateTimeHelper.getTimeRepresentationToMilliseconds(doneCopyTime - doneDeletingTime);
-            //     String errorMessage = game.getID() + " took over " + milliThreshold + "ms to save an undo file:\n> " +
-            //         DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " undo save create started\n> " +
-            //         DateTimeHelper.getTimestampFromMillesecondsEpoch(getFilePathsTime) + " `" + filePathsTime + "` to get filepaths\n> " +
-            //         DateTimeHelper.getTimestampFromMillesecondsEpoch(doneDeletePrepTime) + " `" + deletePrepTime + "` to prepare to delete\n> " +
-            //         DateTimeHelper.getTimestampFromMillesecondsEpoch(doneDeletingTime) + " `" + deleteTime + "` to delete " + deleteLoopCount + " old files\n> " +
-            //         DateTimeHelper.getTimestampFromMillesecondsEpoch(doneCopyTime) + " `" + copyTime + "` to copy the file";
-            //     BotLogger.log(errorMessage);
-            // }
-
+            createUndoCopy(originalMapFile, gameName, maxUndoNumber + 1);
         } catch (Exception e) {
-            BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
+            BotLogger.log("Error trying to save undo for game: " + gameName, e);
+        }
+    }
+
+    private static void deleteFile(Path path) {
+        try {
+            Files.deleteIfExists(path);
+        } catch (Exception e) {
+            BotLogger.log("Error trying to delete file: " + path, e);
+        }
+    }
+
+    private static void createUndoCopy(File originalMapFile, String gameName, int undoNumber) {
+        try {
+            File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + undoNumber + Constants.TXT);
+            Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            BotLogger.log("Error copying undo file for " + gameName, e);
         }
     }
 
