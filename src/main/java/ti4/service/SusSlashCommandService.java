@@ -3,7 +3,6 @@ package ti4.service;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -16,7 +15,7 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class SusSlashCommandService {
 
-    public static void checkIfShouldReportSusSlashCommand(SlashCommandInteractionEvent event, String userID, Message m, ManagedGame game) {
+    public static void checkIfShouldReportSusSlashCommand(SlashCommandInteractionEvent event, ManagedGame game) {
         if (game == null) return;
         if (game.isFowMode()) return;
 
@@ -39,15 +38,17 @@ public class SusSlashCommandService {
             && !event.getMessageChannel().getName().contains("bot-map-updates");
 
         if ((isPrivateThread || isNotGameChannel) && !isPublicThread) {
-            reportSusSlashCommand(event, m);
+            reportSusSlashCommand(event);
         }
     }
 
-    private static void reportSusSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
+    private static void reportSusSlashCommand(SlashCommandInteractionEvent event) {
         TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
         if (bothelperLoungeChannel == null) return;
-        ThreadChannel threadChannel = ThreadGetter.getThreadInChannel(bothelperLoungeChannel, "sus-slash-commands", true, true);
-        String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + commandResponseMessage.getJumpUrl();
-        MessageHelper.sendMessageToChannel(threadChannel, sb);
+        ThreadGetter.getThreadInChannel(bothelperLoungeChannel, "sus-slash-commands", true, true,
+            threadChannel -> {
+                String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + threadChannel.getJumpUrl();
+                MessageHelper.sendMessageToChannel(threadChannel, sb);
+            });
     }
 }

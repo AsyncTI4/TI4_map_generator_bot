@@ -1,13 +1,11 @@
 package ti4.commands2;
 
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.service.SusSlashCommandService;
 
 class CommandGameState {
@@ -32,14 +30,7 @@ class CommandGameState {
         game.incrementSpecificSlashCommandCount(event.getFullCommandName());  // TODO: This only works for commands that save...
         this.game.set(game);
 
-        Member member = event.getMember();
-        if (member != null) {
-            String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
-            event.getChannel().sendMessage(commandText).queue(message -> {
-                BotLogger.logSlashCommand(event, message);
-                SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, event.getUser().getId(), message, GameManager.getManagedGame(gameName));
-            }, BotLogger::catchRestError);
-        }
+        SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, GameManager.getManagedGame(gameName));
 
         if (!isPlayerCommand) {
             return;

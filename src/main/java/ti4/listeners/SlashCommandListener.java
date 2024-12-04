@@ -2,6 +2,7 @@ package ti4.listeners;
 
 import javax.annotation.Nonnull;
 
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -27,8 +28,15 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private static void process(SlashCommandInteractionEvent event) {
         long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
-
         long startTime = System.currentTimeMillis();
+
+        Member member = event.getMember();
+        if (member != null) {
+            String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
+            event.getChannel().sendMessage(commandText).queue(message -> {
+                BotLogger.logSlashCommand(event, message);
+            }, BotLogger::catchRestError);
+        }
 
         Command command = CommandManager.getCommand(event.getName());
         if (command.accept(event)) {
