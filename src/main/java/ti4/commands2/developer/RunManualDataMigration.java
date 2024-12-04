@@ -11,6 +11,7 @@ import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -38,9 +39,11 @@ class RunManualDataMigration extends Subcommand {
             method.setAccessible(true);
             Boolean changesMade = (Boolean) method.invoke(null, game);
             if (changesMade) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully run migration " + migrationName + " for map " + game.getName());
+                game.addMigration(migrationName);
+                GameSaveLoadManager.saveGame(game, "Migration ran: " + migrationName);
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully ran migration " + migrationName + " for map " + game.getName());
             } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully run migration " + migrationName + " for map " + game.getName() + " but no changes were required.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully ran migration " + migrationName + " for map " + game.getName() + " but no changes were required.");
             }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             BotLogger.log("failed to run data migration", e);
