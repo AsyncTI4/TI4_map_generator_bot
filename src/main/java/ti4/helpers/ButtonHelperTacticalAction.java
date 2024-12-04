@@ -94,8 +94,7 @@ public class ButtonHelperTacticalAction {
                             if (!player.unitBelongsToPlayer(unitEntry.getKey()))
                                 continue;
                             UnitKey unitKey = unitEntry.getKey();
-                            if ((unitKey.getUnitType() == UnitType.Infantry
-                                || unitKey.getUnitType() == UnitType.Mech)) {
+                            if (unitKey.getUnitType() == UnitType.Infantry || unitKey.getUnitType() == UnitType.Mech) {
                                 String unitName = unitKey.unitName();
                                 int amount = unitEntry.getValue();
                                 int totalUnits = amount;
@@ -262,6 +261,9 @@ public class ButtonHelperTacticalAction {
         } else {
             game.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName, amount);
         }
+        if (currentActivation.get(rest) == 0) {
+            currentActivation.remove(rest);
+        }
         String message = ButtonHelper.buildMessageFromDisplacedUnits(game, false, player, remove, tile);
         List<Button> systemButtons = getButtonsForAllUnitsInSystem(player, game, game.getTileByPosition(pos), remove);
         MessageHelper.editMessageWithButtons(event, message, systemButtons);
@@ -401,7 +403,7 @@ public class ButtonHelperTacticalAction {
             }
             List<Button> empyButtons = new ArrayList<>();
             if (!game.getMovedUnitsFromCurrentActivation().isEmpty()
-                && (tile.getUnitHolders().values().size() == 1) && player.hasUnexhaustedLeader("empyreanagent")) {
+                && (tile.getUnitHolders().size() == 1) && player.hasUnexhaustedLeader("empyreanagent")) {
                 Button empyButton = Buttons.gray("exhaustAgent_empyreanagent",
                     "Use Empyrean Agent", Emojis.Empyrean);
                 empyButtons.add(empyButton);
@@ -412,7 +414,7 @@ public class ButtonHelperTacticalAction {
                     empyButtons);
             }
             if (!game.getMovedUnitsFromCurrentActivation().isEmpty()
-                && (tile.getUnitHolders().values().size() == 1) && player.getPlanets().contains("ghoti")) {
+                && (tile.getUnitHolders().size() == 1) && player.getPlanets().contains("ghoti")) {
                 player.setCommodities(player.getCommodities() + 1);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentation()
@@ -666,16 +668,6 @@ public class ButtonHelperTacticalAction {
             if (!game.isL1Hero()) {
                 ButtonHelper.resolveOnActivationEnemyAbilities(game, game.getTileByPosition(pos), player, false, event);
             }
-            // if (abilities > 0 ) {
-            // List<Button> buttons = new ArrayList<>();
-            // buttons.add(Buttons.green("doActivation_" + pos, "Confirm"));
-            // buttons.add(Buttons.red("deleteButtons", "This activation was a mistake"));
-            // String msg = "# " + player.getFactionEmoji() + " You are about to
-            // automatically trigger some abilities by activating this system. Please hit
-            // confirm before continuing";
-            // MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg,
-            // buttons);
-            // }
         }
         game.setStoredValue("crucibleBoost", "");
         game.setStoredValue("flankspeedBoost", "");
@@ -785,7 +777,7 @@ public class ButtonHelperTacticalAction {
                 buttons.add(validTile2);
             }
         }
-        if (!displacedUnits.keySet().isEmpty()) {
+        if (!displacedUnits.isEmpty()) {
             Button validTile2 = Buttons.green(finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_reverseAll", "Undo all");
             buttons.add(validTile2);
         }
