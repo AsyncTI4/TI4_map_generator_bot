@@ -40,8 +40,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getShortName() {
-        if (!getHomebrewReplacesID().isPresent())
-        {
+        if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shortName).orElse(getName());
         }
         return Optional.ofNullable(shortName).orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShortName());

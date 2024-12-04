@@ -134,7 +134,6 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
         return switch (getType()) {
             case TECHNOLOGY -> Emojis.NonUnitTechSkip;
             case AGENDA -> Emojis.Agenda;
-            case EVENT -> "";
             case ACTION_CARD -> Emojis.ActionCard;
             case PUBLIC_STAGE_1_OBJECTIVE -> Emojis.Public1;
             case PUBLIC_STAGE_2_OBJECTIVE -> Emojis.Public2;
