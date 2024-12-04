@@ -392,10 +392,18 @@ public class ExploreService {
 
         // Specific Explore Handling
         switch (cardID) {
-            case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + Emojis.CFrag);
-            case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + Emojis.HFrag);
-            case "irf1", "irf2", "irf3", "irf4", "irf5" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + Emojis.IFrag);
-            case "urf1", "urf2", "urf3" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + Emojis.UFrag);
+            case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> {
+                MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + Emojis.CFrag);
+            }
+            case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> {
+                MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + Emojis.HFrag);
+            }
+            case "irf1", "irf2", "irf3", "irf4", "irf5" -> {
+                MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + Emojis.IFrag);
+            }
+            case "urf1", "urf2", "urf3" -> {
+                MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + Emojis.UFrag);
+            }
             case "ed1", "ed2" -> {
                 message = "Card has been added to play area.";
                 player.addRelic(Constants.ENIGMATIC_DEVICE);

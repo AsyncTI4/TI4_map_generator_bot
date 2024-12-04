@@ -2,7 +2,9 @@ package ti4.commands2.player;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Queue;
+import java.util.Set;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -74,6 +76,11 @@ class SCUnpick extends GameStateSubcommand {
         //INFORM ALL PLAYER HAVE PICKED
         if (allPicked) {
             msgExtra += "\nAll players picked strategy cards.";
+
+            Set<Integer> scPickedList = new HashSet<>();
+            for (Player player_ : activePlayers) {
+                scPickedList.addAll(player_.getSCs());
+            }
 
             //ADD A TG TO UNPICKED SC
             game.incrementScTradeGoods();

@@ -43,7 +43,7 @@ public class SetDeckService {
                 return true;
             }
             case Constants.RELIC_DECK -> {
-                return game.validateAndSetRelicDeck(deckModel);
+                return game.validateAndSetRelicDeck(event, deckModel);
             }
             case Constants.AGENDA_DECK -> {
                 return game.validateAndSetAgendaDeck(event, deckModel);

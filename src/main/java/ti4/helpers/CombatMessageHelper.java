@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.helpers.DiceHelper.Die;
 import ti4.image.Mapper;
+import ti4.helpers.DiceHelper.Die;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -157,7 +157,7 @@ public class CombatMessageHelper {
                 combatTypeName += " on " + StringUtils.capitalize(holderName);
             }
         } else {
-            int round;
+            int round = 0;
             Game game = player.getGame();
             String combatName = "combatRoundTracker" + player.getFaction() + tile.getPosition() + combatOnHolder.getName();
             if (game.getStoredValue(combatName).isEmpty()) {

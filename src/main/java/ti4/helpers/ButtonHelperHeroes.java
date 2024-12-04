@@ -125,6 +125,8 @@ public class ButtonHelperHeroes {
         List<Button> buttons = getArgentHeroStep3Buttons(game, player, event, buttonID);
         String pos1 = buttonID.split("_")[1];
         Tile destination = game.getTileByPosition(pos1);
+        // String pos2 = buttonID.split("_")[2];
+        // Tile origin = game.getTileByPosition(pos2);
         String msg = player.getRepresentation() + " choose the units you wish to move. These will move stuff to " + destination.getRepresentationForButtons(game, player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
     }
@@ -294,7 +296,6 @@ public class ButtonHelperHeroes {
         buttons = new ArrayList<>(Helper.getTileWithTrapsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 destroyer", buttons);
         buttons = new ArrayList<>(Helper.getTileWithTrapsPlaceUnitButtons(player, game, "carrier", "placeOneNDone_skipbuild"));
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 carrier", buttons);
         buttons = new ArrayList<>(Helper.getTileWithTrapsPlaceUnitButtons(player, game, "ff", "placeOneNDone_skipbuild"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 fighter", buttons);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 fighter", buttons);
@@ -579,6 +580,7 @@ public class ButtonHelperHeroes {
         ButtonInteractionEvent event) {
         String type = buttonID.split("_")[1];
         int counter = 0;
+        boolean foundOne = false;
         StringBuilder sb = new StringBuilder();
         MessageChannel channel = player.getCorrectChannel();
         if (!doesExploreDeckHaveAnAttachmentLeft(type, game)) {
@@ -593,6 +595,7 @@ public class ButtonHelperHeroes {
             ExploreModel explore = Mapper.getExplore(cardID);
             sb.append(explore.textRepresentation()).append(System.lineSeparator());
             if ("attach".equalsIgnoreCase(explore.getResolution())) {
+                foundOne = true;
                 sb.append(player.getRepresentation()).append(" Found attachment ").append(explore.getName());
                 game.purgeExplore(cardID);
                 MessageHelper.sendMessageToChannel(channel, sb.toString());
@@ -933,7 +936,7 @@ public class ButtonHelperHeroes {
                 if (tile.containsPlayersUnits(p2)) {
                     int amountInf = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
                     if (p2.hasInf2Tech()) {
-                        ButtonHelper.resolveInfantryDeath(p2, amountInf);
+                        ButtonHelper.resolveInfantryDeath(player, amountInf);
                     }
                     if (amountInf > 0) {
                         RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountInf + " inf " + name);
@@ -1159,7 +1162,7 @@ public class ButtonHelperHeroes {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> empties = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getUnitHolders().size() > 1 || !FoWHelper.playerHasShipsInSystem(player, tile)) {
+            if (tile.getUnitHolders().values().size() > 1 || !FoWHelper.playerHasShipsInSystem(player, tile)) {
                 continue;
             }
             empties.add(Buttons.blue(finChecker + "exploreFront_" + tile.getPosition(),
@@ -1410,7 +1413,9 @@ public class ButtonHelperHeroes {
     }
 
     @ButtonHandler("olradinHeroFlip_")
-    public static void olradinHeroFlipPolicy(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    public static void olradinHeroFlipPolicy(String buttonID, ButtonInteractionEvent event, Game game,
+        Player player) {
+        int negativePolicies = 0;
         int positivePolicies = 0;
         String policy = buttonID.split("_")[1];
         // go through each option and set the policy accordingly
@@ -1460,14 +1465,20 @@ public class ButtonHelperHeroes {
         player.removeOwnedUnitByID("olradin_mech_positive");
         player.removeOwnedUnitByID("olradin_mech_negative");
         String unitModelID;
-        if (!player.hasAbility("policy_the_economy_exploit")) {
+        if (player.hasAbility("policy_the_economy_exploit")) {
+            negativePolicies++;
+        } else {
             positivePolicies++;
         }
-        if (!player.hasAbility("policy_the_environment_plunder")) {
+        if (player.hasAbility("policy_the_environment_plunder")) {
+            negativePolicies++;
+        } else {
             positivePolicies++;
         }
         if (player.hasAbility("policy_the_people_connect")) {
             positivePolicies++;
+        } else {
+            negativePolicies++;
         }
         if (positivePolicies >= 2) {
             unitModelID = "olradin_mech_positive";
@@ -2067,11 +2078,13 @@ public class ButtonHelperHeroes {
     public static void yinHeroPlanet(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String planet = buttonID.replace("yinHeroPlanet_", "");
         if (planet.equalsIgnoreCase("lockedmallice")) {
+            Tile tile = game.getTileFromPlanet("lockedmallice");
             planet = "mallice";
-            FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet("lockedmallice"), game);
+            tile = FlipTileService.flipTileIfNeeded(event, tile, game);
         } else if (planet.equalsIgnoreCase("hexlockedmallice")) {
+            Tile tile = game.getTileFromPlanet("hexlockedmallice");
             planet = "hexmallice";
-            FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet("hexlockedmallice"), game);
+            tile = FlipTileService.flipTileIfNeeded(event, tile, game);
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged() + " Chose to invade " + Helper.getPlanetRepresentation(planet, game));
         List<Button> buttons = new ArrayList<>();

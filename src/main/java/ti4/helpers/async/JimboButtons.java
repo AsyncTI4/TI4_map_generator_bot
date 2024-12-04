@@ -90,7 +90,7 @@ public class JimboButtons {
     public static <T> boolean jimboPagination(ButtonInteractionEvent event, String msg, List<T> all, Function<T, Button> buttonator, @Nullable Function<List<T>, FileUpload> uploadinator, @Nullable List<Button> bonus, int size, String buttonID) {
         try {
             int pagenum;
-            String prefix;
+            String prefix = "";
             System.out.println("pagination: " + all.size() + " - " + buttonID);
             Matcher page = Pattern.compile(RegexHelper.pageRegex()).matcher(buttonID);
             if (!page.find()) return false; // no pagenum, don't paginate

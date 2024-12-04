@@ -51,7 +51,7 @@ public class TitlesHelper {
             sb.append("\n");
             index++;
         }
-        if (titles.isEmpty()) {
+        if (titles.keySet().isEmpty()) {
             sb = new StringBuilder("No titles yet");
         }
 

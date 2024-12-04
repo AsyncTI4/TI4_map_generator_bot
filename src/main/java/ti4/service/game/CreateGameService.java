@@ -394,7 +394,7 @@ public class CreateGameService {
         gameAndRoleNames.addAll(gameNames);
 
         // CHECK
-        return gameAndRoleNames.contains(name);
+        return gameNames.contains(name);
     }
 
     private static List<Integer> getAllExistingPBDNumbers() {

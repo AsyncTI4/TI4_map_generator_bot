@@ -24,7 +24,7 @@ class UpdateThreadArchiveTime extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.THREAD_SEARCH_STRING, null, OptionMapping::getAsString).toLowerCase();
-        if (searchString.isBlank()) {
+        if (searchString.isEmpty() || searchString.isBlank()) {
             MessageHelper.sendMessageToEventChannel(event, "Please do better with the search string.");
             return;
         }

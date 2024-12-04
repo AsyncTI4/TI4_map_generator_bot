@@ -423,6 +423,8 @@ public class ComponentActionHelper {
                     }
                 } else if ("mantlecracking".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = ButtonHelperAbilities.getMantleCrackingButtons(p1, game);
+                    // MessageHelper.sendMessageToChannel(event.getChannel(),
+                    // p1.getFactionEmoji()+" Chose to use the mantle cracking ability");
                     String message = "Select the planet you would like to mantle crack";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("meditation".equalsIgnoreCase(buttonID)) {
@@ -605,7 +607,9 @@ public class ComponentActionHelper {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
                     ButtonHelper.getButtonsForStellar(player, game));
             }
-            case "passturn" -> MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
+            case "passturn" -> {
+                MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
+            }
             case "titanprototype", "absol_jr" -> {
                 // handled above
             }

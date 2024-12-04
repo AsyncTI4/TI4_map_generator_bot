@@ -135,21 +135,31 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getSCName(dieResult, game) + " has been marked with Speygh, the Kyro hero, and the faction that played the hero as " + player.getFaction());
                 ListTurnOrderService.turnOrder(event, game);
             }
-            case "ghotihero" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Choose the tiles in which you would like to resolve Nmenmede, the Ghoti hero.",
-                ButtonHelperHeroes.getTilesToGhotiHeroIn(player, game, event));
-            case "gledgehero" -> ButtonHelperHeroes.resolveGledgeHero(player, game);
+            case "ghotihero" -> {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Choose the tiles in which you would like to resolve Nmenmede, the Ghoti hero.",
+                    ButtonHelperHeroes.getTilesToGhotiHeroIn(player, game, event));
+            }
+            case "gledgehero" -> {
+                ButtonHelperHeroes.resolveGledgeHero(player, game);
+            }
             case "khraskhero" -> {
                 ButtonHelperHeroes.resolveKhraskHero(player, game);
                 ButtonHelperHeroes.resolveKhraskHero(player, game);
                 ButtonHelperHeroes.resolveKhraskHero(player, game);
                 ButtonHelperHeroes.resolveKhraskHero(player, game);
             }
-            case "mortheushero" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Choose the tiles in which you would like to resolve Bayan, the Mortheus hero.",
-                ButtonHelperHeroes.getTilesToGlimmersHeroIn(player, game, event));
-            case "axishero" -> ButtonHelperHeroes.resolveAxisHeroStep1(player, game);
-            case "lanefirhero" -> ButtonHelperHeroes.resolveLanefirHeroStep1(player, game);
+            case "mortheushero" -> {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Choose the tiles in which you would like to resolve Bayan, the Mortheus hero.",
+                    ButtonHelperHeroes.getTilesToGlimmersHeroIn(player, game, event));
+            }
+            case "axishero" -> {
+                ButtonHelperHeroes.resolveAxisHeroStep1(player, game);
+            }
+            case "lanefirhero" -> {
+                ButtonHelperHeroes.resolveLanefirHeroStep1(player, game);
+            }
             case "cymiaehero" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(
@@ -160,9 +170,11 @@ public class PlayHeroService {
                     player.getRepresentation() + " choose whether to resolve Autonetic Memory or not.", buttons);
 
             }
-            case "lizhohero" -> MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
-                "You may use the buttons in your cards info to set traps, then when you're done with that, press the following button to start distributing 12 fighters.",
-                Buttons.green("lizhoHeroFighterResolution", "Distribute 12 Fighters"));
+            case "lizhohero" -> {
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
+                    "You may use the buttons in your cards info to set traps, then when you're done with that, press the following button to start distributing 12 fighters.",
+                    Buttons.green("lizhoHeroFighterResolution", "Distribute 12 Fighters"));
+            }
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getRepresentationUnfogged() + " removed all of your CCs from the board");
@@ -172,14 +184,18 @@ public class PlayHeroService {
                     }
                 }
             }
-            case "cheiranhero" -> ButtonHelperHeroes.cheiranHeroResolution(player, game, event);
+            case "cheiranhero" -> {
+                ButtonHelperHeroes.cheiranHeroResolution(player, game, event);
+            }
             case "olradinhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getRepresentationUnfogged() + " added 1 infantry to each planet");
                 ActionCardHelper.doRise(player, event, game);
                 ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
             }
-            case "argenthero" -> ButtonHelperHeroes.argentHeroStep1(game, player, event);
+            case "argenthero" -> {
+                ButtonHelperHeroes.argentHeroStep1(game, player, event);
+            }
             case "l1z1xhero" -> {
                 String message = player.getRepresentation()
                     + " Resolving The Helmsman, the L1Z1X Hero. At the moment, this is implemented as a sort of tactical action, relying on the player to follow the rules."
@@ -278,8 +294,12 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
-            case "freesystemshero" -> ButtonHelperHeroes.offerFreeSystemsButtons(player, game, event);
-            case "vadenhero" -> ButtonHelperHeroes.startVadenHero(game, player);
+            case "freesystemshero" -> {
+                ButtonHelperHeroes.offerFreeSystemsButtons(player, game, event);
+            }
+            case "vadenhero" -> {
+                ButtonHelperHeroes.startVadenHero(game, player);
+            }
             case "veldyrhero" -> {
                 game.setComponentAction(true);
                 for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)) {

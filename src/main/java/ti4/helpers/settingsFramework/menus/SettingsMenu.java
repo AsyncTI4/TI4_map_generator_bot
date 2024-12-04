@@ -137,10 +137,11 @@ public abstract class SettingsMenu {
 
     public String shortSummaryString(boolean shortDescrOnly) {
         StringBuilder sb = new StringBuilder("**__" + menuName + ":__**");
-        for (String line : description) {
-            sb.append("\n- *").append(line).append("*");
-            if (shortDescrOnly)
-                break;
+        if (description != null) {
+            for (String line : description) {
+                sb.append("\n- *").append(line).append("*");
+                if (shortDescrOnly) break;
+            }
         }
         if (shortDescrOnly) return sb.toString();
 

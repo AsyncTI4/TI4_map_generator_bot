@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class MapPresetService {
 
-    public static final List<String> templates = List.of(
+    public static List<String> templates = List.of(
         "Solo (1 slice)",
         "Minimal Solo (1 slice)",
         "TspMap (6 slices)",

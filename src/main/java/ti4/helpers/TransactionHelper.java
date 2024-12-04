@@ -163,7 +163,9 @@ public class TransactionHelper {
                     case "starCharts" -> trans.append(Mapper.getRelic(furtherDetail).getName()).append(Emojis.DiscordantStars);
                     case "ACs" -> {
                         switch (furtherDetail) {
-                            case "generic" -> trans.append(amountToTransact).append(" ").append(Emojis.ActionCard).append(" to be specified verbally");
+                            case "generic" -> {
+                                trans.append(amountToTransact).append(" ").append(Emojis.ActionCard).append(" to be specified verbally");
+                            }
                             default -> {
                                 int acNum = Integer.parseInt(furtherDetail);
                                 String acID = null;
@@ -204,6 +206,9 @@ public class TransactionHelper {
                                     }
                                 } catch (NumberFormatException e) {
                                     id = furtherDetail.replace("fin9", "_");
+                                }
+                                if (id == null) {
+                                    // continue;
                                 }
                                 trans.append(Emojis.PN);
                                 if (!hidePrivateCardText) {
@@ -920,6 +925,8 @@ public class TransactionHelper {
                 CommanderUnlockCheckService.checkPlayer(p1, "hacan");
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, oldP1Comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, p1, oldP2Comms);
+                // ButtonHelperAbilities.pillageCheck(p1, game);
+                // ButtonHelperAbilities.pillageCheck(p2, game);
                 String id1 = p1.getFactionEmojiOrColor();
                 String id2 = p2.getFactionEmojiOrColor();
                 message2 = ident + " washed their " + (oldP1Comms - newP1Comms) + " Commodities with " + ident2 + "  ("
@@ -927,7 +934,7 @@ public class TransactionHelper {
                     + " washed their " + (oldP2Comms - newP2Comms) + " Commodities with " + id1 + " (" + id2
                     + " TGs went from (" + oldP2tg + "->" + p2.getTg() + "))";
             }
-            case "shipOrders", "starCharts" -> {
+            case "shipOrders" -> {
                 message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;
                 p1.removeRelic(amountToTrans);
                 p2.addRelic(amountToTrans);
@@ -940,6 +947,11 @@ public class TransactionHelper {
             case "ClearDebt" -> {
                 message2 = ident + " cleared " + amountToTrans + " debt tokens of " + ident2;
                 p1.removeDebtTokens(p2.getColor(), Integer.parseInt(amountToTrans));
+            }
+            case "starCharts" -> {
+                message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;
+                p1.removeRelic(amountToTrans);
+                p2.addRelic(amountToTrans);
             }
             case "ACs" -> {
 
@@ -976,6 +988,9 @@ public class TransactionHelper {
                 try {
                     pnIndex = Integer.parseInt(amountToTrans);
                 } catch (NumberFormatException e) {
+                    if (p1.getPromissoryNotes().containsKey(amountToTrans)) {
+                        id = amountToTrans;
+                    }
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "# " + p1.getRepresentation() + " heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
                     return;
                 }

@@ -2,11 +2,9 @@ package ti4.users;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import lombok.Data;
 
@@ -16,7 +14,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class UserSettings {
 
     private String userId;
-    private Set<String> preferredColors;
+    private List<String> preferredColourList;
     private int personalPingInterval;
     private boolean prefersDistanceBasedTacticalActions;
     private String afkHours;
@@ -28,15 +26,11 @@ public class UserSettings {
         this.userId = userId;
     }
 
-    public Set<String> getPreferredColors() {
-        return Objects.requireNonNullElse(preferredColors, Collections.emptySet());
-    }
-
-    public void addPreferredColor(String color) {
-        if (preferredColors == null) {
-            preferredColors = new HashSet<>();
+    public List<String> getPreferredColourList() {
+        if (preferredColourList == null) {
+            return Collections.emptyList();
         }
-        preferredColors.add(color);
+        return preferredColourList;
     }
 
     public void putStoredValue(String settingKey, String settingValue) {

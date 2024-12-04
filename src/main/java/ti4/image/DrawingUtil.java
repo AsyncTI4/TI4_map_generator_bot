@@ -43,8 +43,8 @@ public class DrawingUtil {
      * @param outlineSize use global variable "strokeX" where X = outline size e.g. stroke1 for 1px outline
      * @param outlineColor
      */
-    public static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, MapGenerator.HorizontalAlign horizontalAlignment, MapGenerator.VerticalAlign verticalAlignment,
-                                        Stroke outlineSize, Color outlineColor) {
+    public static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, MapGenerator.HorizontalAlign horizontalAlignment, MapGenerator.VerticalAlign verticalAlignment, Stroke outlineSize, Color outlineColor) {
+        boolean debugPosition = false;
         if (txt == null) return;
 
         int width = g.getFontMetrics().stringWidth(txt);

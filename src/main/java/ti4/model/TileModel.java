@@ -7,13 +7,14 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
-import ti4.helpers.Emojis;
 import ti4.image.Mapper;
+import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 
 @Data
@@ -74,7 +75,11 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getTilePath() {
         String tileName = Mapper.getTileID(getId());
-        return ResourceHelper.getInstance().getTileFile(tileName);
+        String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+        if (tilePath == null) {
+            //BotLogger.log("Could not find tile image: " + getId());
+        }
+        return tilePath;
     }
 
     @JsonIgnore

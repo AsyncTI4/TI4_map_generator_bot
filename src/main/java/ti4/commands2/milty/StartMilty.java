@@ -72,7 +72,7 @@ class StartMilty extends GameStateSubcommand {
     }
 
     private static MapTemplateModel getMapTemplateFromOption(SlashCommandInteractionEvent event, Game game) {
-        int players = game.getPlayers().size();
+        int players = game.getPlayers().values().size();
         List<MapTemplateModel> allTemplates = Mapper.getMapTemplates();
         List<MapTemplateModel> validTemplates = Mapper.getMapTemplatesForPlayerCount(players);
         MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);

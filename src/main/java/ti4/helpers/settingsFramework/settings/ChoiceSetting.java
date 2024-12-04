@@ -116,7 +116,7 @@ public class ChoiceSetting<T> extends SettingInterface {
             return "Could not complete action";
         } else if (event instanceof StringSelectInteractionEvent selectEvent) {
             List<String> values = selectEvent.getValues();
-            String itemToChoose;
+            String itemToChoose = null;
             if (values.size() == 1) {
                 itemToChoose = values.getFirst();
             } else {

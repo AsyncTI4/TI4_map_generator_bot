@@ -69,9 +69,6 @@ public class UserJoinServerListener extends ListenerAdapter {
     }
 
     private static boolean validateEvent(GenericGuildEvent event) {
-        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
-            return false;
-        }
         String eventGuild = event.getGuild().getId();
         List<String> asyncGuilds = AsyncTI4DiscordBot.guilds.stream().map(Guild::getId).toList();
         // Do not process these events in guilds that we aren't initialized in
