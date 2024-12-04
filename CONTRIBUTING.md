@@ -27,29 +27,49 @@ If you have a different way, please share it here!
 
 ## Run Locally
 
+### Prerequisites
+Download the latest JDK: https://adoptium.net/
+
+Setup vscode with the default extensions for java: https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack
+
+ctrl+shift+p: Java: Configure Java Runtime -> JavaSE-21
+
+Create a discord server for testing
+Create a discord application: https://discord.com/developers/applications
+For the bot settings, go to "Guild Install" scopes -> bot
+For permissions, select "Administrator"
+
+Go to installation -> copy install link and open in your browser
+Add the bot to your server
+
 ### JAVA, IntelliJ, VSCode, or other Java IDE
 
 Ensure your launch.json file includes a configuration like this:
 
 ```json
 {
-    "type": "java",
-    "name": "Launch MapGenerator",
-    "request": "launch",
-    "mainClass": "ti4.AsyncTI4DiscordBot",
-    "projectName": "TI4_map_generator_discord_bot",
-    "args": [
-        "{DISCORD_BOT_TOKEN}", // Discord Developer Portal -> Applications -> Bot -> Token
-        "{DISCORD USER ID}", //Discord User Settings -> Click 3-dot menu next to username -> "Copy USER ID"
-        "{DISCORD SERVER ID}" // Right-Click Discord Server Name -> "Copy Server ID"
-    ]
-    ,
-    "env": {
-        "DB_PATH": "{FULL_PATH_TO_STORAGE_FOLDER}", // Like: "C:/user/repos/TI4_map_generator_bot/storage" - you may need to create this folder
-        "RESOURCE_PATH": "{FULL_PATH_TO_RESOURCE_FOLDER}" // Like: "C:/user/repos/TI4_map_generator_bot/src/main/resources"
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "AsyncTI4DiscordBot",
+            "request": "launch",
+            "mainClass": "ti4.AsyncTI4DiscordBot",
+            "projectName": "TI4_map_generator_discord_bot",
+            "args": [
+              "{DISCORD_BOT_TOKEN}", // Discord Developer Portal -> Applications -> Bot -> Token
+              "{DISCORD USER ID}", //Discord User Settings -> Click 3-dot menu next to username -> "Copy USER ID"
+              "{DISCORD SERVER ID}" // Right-Click Discord Server Name -> "Copy Server ID"
+            ],
+            "env": {
+                "DB_PATH": "${workspaceFolder}/storage", // Like: "C:/user/repos/TI4_map_generator_bot/storage" - you may need to create this folder
+                "RESOURCE_PATH": "${workspaceFolder}/src/main/resources" // Like: "C:/user/repos/TI4_map_generator_bot/src/main/resources"
+            },
         }
+    ]
 }
 ```
+For vscode, this is in `.vscode/launch.json`.
 
 Set the 5 {VARIABLES} to match your bot, user, server, and system.
 
