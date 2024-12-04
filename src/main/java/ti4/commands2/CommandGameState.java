@@ -32,12 +32,12 @@ class CommandGameState {
         if (!isPlayerCommand) {
             return;
         }
-        var gamePlayer = CommandHelper.getPlayerFromEvent(game, event);
-        if (gamePlayer == null) {
+        var player = CommandHelper.getPlayerFromEvent(game, event);
+        if (player == null) {
             throw new IllegalArgumentException("Unable to determine player while attempting to run event " + event.getName() +
                     " in channel " + event.getChannel().getName() + " for game " + gameName);
         }
-        player.set(gamePlayer);
+        this.player.set(player);
     }
 
     public void postExecute(SlashCommandInteractionEvent event) {
