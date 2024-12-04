@@ -385,8 +385,14 @@ public class AsyncTI4DiscordBot {
             return result;
         });
     }
+
     public static void runAsync(String name, Runnable runnable) {
         var timedRunnable = new TimedRunnable(name, runnable);
+        THREAD_POOL.submit(timedRunnable);
+    }
+
+    public static void runAsync(String name, int executionTimeWarningThresholdSeconds, Runnable runnable) {
+        var timedRunnable = new TimedRunnable(name, executionTimeWarningThresholdSeconds, runnable);
         THREAD_POOL.submit(timedRunnable);
     }
 
