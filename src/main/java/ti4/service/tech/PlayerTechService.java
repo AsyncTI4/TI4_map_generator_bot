@@ -156,9 +156,8 @@ public class PlayerTechService {
                     RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
                 }
             }
-            case "td", "absol_td" -> { // Transit Diodes
+            case "td", "absol_td" -> // Transit Diodes
                 ButtonHelper.resolveTransitDiodesStep1(game, player);
-            }
             case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 Button gainCC = Buttons.green(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC");
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -207,9 +206,7 @@ public class PlayerTechService {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
                     List.of(Buttons.REDISTRIBUTE_CCs, deleteButton));
             }
-            case "dsvadeb" -> {
-                ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
-            }
+            case "dsvadeb" -> ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
@@ -338,10 +335,8 @@ public class PlayerTechService {
                     buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
-            default -> {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "> This tech is not automated. Please resolve manually.");
-            }
+            default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "> This tech is not automated. Please resolve manually.");
         }
     }
 

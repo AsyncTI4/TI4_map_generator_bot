@@ -252,7 +252,7 @@ public class ButtonHelperTacticalAction {
         } else {
             game.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
         }
-        if (currentSystem.get(rest) == 0) {
+        if (currentSystem.containsKey(rest) && currentSystem.get(rest) == 0) {
             currentSystem.remove(rest);
         }
         if (currentActivation.containsKey(unitName)) {
@@ -261,7 +261,7 @@ public class ButtonHelperTacticalAction {
         } else {
             game.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName, amount);
         }
-        if (currentActivation.get(rest) == 0) {
+        if (currentActivation.containsKey(rest) && currentActivation.get(rest) == 0) {
             currentActivation.remove(rest);
         }
         String message = ButtonHelper.buildMessageFromDisplacedUnits(game, false, player, remove, tile);

@@ -9,8 +9,8 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
-import ti4.model.Source.ComponentSource;
 import ti4.image.Mapper;
+import ti4.model.Source.ComponentSource;
 
 @Data
 public class AbilityModel implements ModelInterface, EmbeddableModel {
@@ -40,8 +40,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getShortName() {
-        if (!getHomebrewReplacesID().isPresent())
-        {
+        if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shortName).orElse(getName());
         }
         return Optional.ofNullable(shortName).orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShortName());

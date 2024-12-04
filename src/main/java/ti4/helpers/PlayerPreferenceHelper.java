@@ -33,12 +33,8 @@ public class PlayerPreferenceHelper {
     public static void resolvePlayerPref(Player player, ButtonInteractionEvent event, String buttonID, Game game) {
         String thing = buttonID.split("_")[1];
         switch (thing) {
-            case "autoSaboReact" -> {
-                offerSetAutoPassOnSaboButtons(game, player);
-            }
-            case "afkTimes" -> {
-                offerAFKTimeOptions(player);
-            }
+            case "autoSaboReact" -> offerSetAutoPassOnSaboButtons(game, player);
+            case "afkTimes" -> offerAFKTimeOptions(player);
             case "tacticalAction" -> {
                 List<Button> buttons = new ArrayList<>();
                 String msg = player.getRepresentation()
@@ -55,9 +51,7 @@ public class PlayerPreferenceHelper {
                 buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
             }
-            case "directHitManagement" -> {
-                offerDirectHitManagementOptions(game, player);
-            }
+            case "directHitManagement" -> offerDirectHitManagementOptions(game, player);
         }
         ButtonHelper.deleteMessage(event);
     }

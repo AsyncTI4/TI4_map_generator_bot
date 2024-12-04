@@ -2240,7 +2240,6 @@ public class ButtonHelper {
             }
             if (containsRealButton) {
                 String msgText = bevent.getMessage().getContentRaw();
-                if (StringUtils.isBlank(msgText)) msgText = "*edited*";
                 MessageHelper.editMessageWithButtons(bevent, bevent.getMessage().getContentRaw(), newButtons);
             } else {
                 ButtonHelper.deleteMessage(bevent);
@@ -2695,8 +2694,6 @@ public class ButtonHelper {
                 + " capacity, and you are trying to carry "
                 + (numInfNFightersNMechs - numFighter2s) + " things";
         }
-        // System.out.printf("%d %d %d %d%n", fleetCap, numOfCapitalShips, capacity,
-        // numInfNFightersNMechs);
         if (capacityViolated || fleetSupplyViolated) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove",
@@ -4716,10 +4713,6 @@ public class ButtonHelper {
         }
 
         if (playerUnitsByQuantity.isEmpty()) {
-            // String fightingOnUnitHolderName = unitHolderName;
-            // if (!unitHolderName.equalsIgnoreCase(Constants.SPACE)) {
-            //     fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, game);
-            // }
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There were no units selected to reroll");
             return;
         }
@@ -4776,7 +4769,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 List<Button> buttons = new ArrayList<>();
                 if (h > 0) {
-                    int round = 0;
+                    int round;
                     String combatName = "combatRoundTracker" + opponent.getFaction() + tile.getPosition()
                         + combatOnHolder.getName();
                     if (game.getStoredValue(combatName).isEmpty()) {
@@ -4784,7 +4777,7 @@ public class ButtonHelper {
                     } else {
                         round = Integer.parseInt(game.getStoredValue(combatName)) + 1;
                     }
-                    int round2 = 0;
+                    int round2;
                     String combatName2 = "combatRoundTracker" + player.getFaction() + tile.getPosition()
                         + combatOnHolder.getName();
                     if (game.getStoredValue(combatName2).isEmpty()) {
@@ -5013,10 +5006,7 @@ public class ButtonHelper {
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
 
-        //String undoFileToRestorePath = game.getName() + "_" + 1 + ".txt";
-        //File undoFileToRestore = new File(Storage.getMapUndoDirectory(), undoFileToRestorePath);
-
-        File originalMapFile = Storage.getGameFile(game.getName() + Constants.TXT);
+        File originalGameFile = Storage.getGameFile(game.getName() + Constants.TXT);
 
         File mapUndoDirectory = Storage.getGameUndoDirectory();
         if (!mapUndoDirectory.exists()) {
@@ -5038,8 +5028,8 @@ public class ButtonHelper {
 
                 File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + maxNumber + Constants.TXT);
                 CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
-                Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
-                Game gameToRestore = GameSaveLoadManager.loadGame(originalMapFile);
+                Files.copy(mapUndoStorage.toPath(), originalGameFile.toPath(), options);
+                Game gameToRestore = GameSaveLoadManager.loadGame(originalGameFile);
                 gameToRestore.setTableTalkChannelID(chatChannel.getId());
                 gameToRestore.setMainChannelID(actionsChannel.getId());
                 gameToRestore.setName(newName);
@@ -5193,9 +5183,9 @@ public class ButtonHelper {
                 game.setAbsolMode(true);
                 game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
                 if (game.isDiscordantStarsMode() && game.getRelicDeckID().contains("ds")) {
-                    game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol_ds"));
+                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol_ds"));
                 } else {
-                    game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"));
+                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol"));
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Set the relics and agendas to Absol stuff");
@@ -5220,11 +5210,11 @@ public class ButtonHelper {
                         game.setTechnologyDeckID("techs_ds_absol");
                     }
                     if (game.getRelicDeckID().contains("absol")) {
-                        game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol_ds"));
+                        game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol_ds"));
                     }
 
                 } else {
-                    game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_ds"));
+                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_ds"));
                     game.setTechnologyDeckID("techs_ds");
 
                 }
@@ -6433,7 +6423,7 @@ public class ButtonHelper {
     }
 
     public static String resolveACDraw(Player p2, Game game, GenericInteractionCreateEvent event) {
-        String message = "";
+        String message;
         if (p2.hasAbility("scheming")) {
             game.drawActionCard(p2.getUserID());
             game.drawActionCard(p2.getUserID());

@@ -162,7 +162,8 @@ public class AutoPingCron {
             return;
         }
         long milliSinceLastPing = System.currentTimeMillis() - game.getLastActivePlayerPing().getTime();
-        if (milliSinceLastPing <= ONE_HOUR_IN_MILLISECONDS * spacer && (!player.shouldPlayerBeTenMinReminded() || milliSinceLastPing <= TEN_MINUTES_IN_MILLISECONDS)) {
+        if (milliSinceLastPing <= ONE_HOUR_IN_MILLISECONDS * spacer &&
+                (!player.shouldPlayerBeTenMinReminded() || milliSinceLastPing <= TEN_MINUTES_IN_MILLISECONDS)) {
             return;
         }
         String realIdentity = player.getRepresentationUnfogged();
@@ -247,7 +248,6 @@ public class AutoPingCron {
                 }
                 long twelveHoursInMilliseconds = (long) half * ONE_HOUR_IN_MILLISECONDS;
                 long twentyFourHoursInMilliseconds = (long) twenty4 * ONE_HOUR_IN_MILLISECONDS;
-
                 long scPlayTime = Long.parseLong(scTime);
                 long timeDifference = System.currentTimeMillis() - scPlayTime;
                 String timesPinged = game.getStoredValue("scPlayPingCount" + sc + player.getFaction());
@@ -261,7 +261,6 @@ public class AutoPingCron {
                 if (timeDifference > twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("2")) {
                     String sb = player.getRepresentationUnfogged() +
                         Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
-
                     ButtonHelper.sendMessageToRightStratThread(player, game, sb, ButtonHelper.getStratName(sc));
                     player.addFollowedSC(sc);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");

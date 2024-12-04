@@ -52,7 +52,7 @@ public class TitlesHelper {
             sb.append("\n");
             index++;
         }
-        if (titles.keySet().isEmpty()) {
+        if (titles.isEmpty()) {
             sb = new StringBuilder("No titles yet");
         }
 

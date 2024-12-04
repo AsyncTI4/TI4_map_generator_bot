@@ -216,6 +216,24 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.RELIC -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+
+                List<String> tableRelics = new ArrayList<>();
+                if (game != null) {
+                    List<String> relicDeck = Mapper.getDecks().get(game.getRelicDeckID()).getNewShuffledDeck();
+                    tableRelics.addAll(relicDeck);
+                    Collections.shuffle(tableRelics);
+                }
+
+                List<Command.Choice> options = tableRelics.stream()
+                    .filter(value -> value.toLowerCase().contains(enteredValue))
+                    .limit(25)
+                    .map(value -> new Command.Choice(value, value))
+                    .collect(Collectors.toList());
+
+                event.replyChoices(options).queue();
+            }
             case Constants.RELIC_ALL -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Map<String, RelicModel> relics = Mapper.getRelics();
@@ -246,6 +264,30 @@ public class AutoCompleteProvider {
                     .map(value -> new Command.Choice(value.getValue(), value.getKey()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
+            }
+            case Constants.AGENDA_ID -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                if (subCommandName != null) {
+                    switch (subCommandName) {
+                        case Constants.REVEAL_SPECIFIC, Constants.DISCARD_SPECIFIC_AGENDA -> {
+                            List<Command.Choice> options = Mapper.getAgendas().entrySet().stream()
+                                .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue) || value.getValue().getAlias().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
+                                .collect(Collectors.toList());
+                            event.replyChoices(options).queue();
+                        }
+                        default -> {
+                            Map<String, String> agendas = Mapper.getAgendaJustNames(game);
+                            List<Command.Choice> options = agendas.entrySet().stream()
+                                .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                                .collect(Collectors.toList());
+                            event.replyChoices(options).queue();
+                        }
+                    }
+                }
             }
             case Constants.AC_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();

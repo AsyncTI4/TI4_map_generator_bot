@@ -33,9 +33,7 @@ public class SlashCommandListener extends ListenerAdapter {
         Member member = event.getMember();
         if (member != null) {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
-            event.getChannel().sendMessage(commandText).queue(message -> {
-                BotLogger.logSlashCommand(event, message);
-            }, BotLogger::catchRestError);
+            event.getChannel().sendMessage(commandText).queue(m -> BotLogger.logSlashCommand(event, m), BotLogger::catchRestError);
         }
 
         Command command = CommandManager.getCommand(event.getName());
