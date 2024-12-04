@@ -19,6 +19,10 @@ public class SelectionMenuListener extends ListenerAdapter {
 
         event.deferEdit().queue();
 
+        AsyncTI4DiscordBot.runAsync("Selection menu task", () -> handleSelectionEvent(event));
+    }
+
+    private void handleSelectionEvent(StringSelectInteractionEvent event) {
         try {
             SelectionMenuContext context = new SelectionMenuContext(event);
             if (context.isValid()) {

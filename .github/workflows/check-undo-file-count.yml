@@ -20,6 +20,6 @@ jobs:
           script_stop: true
           envs: AWS_KEY, AWS_SECRET
           script: |
-            cd /opt/STORAGE/maps/undo/
+            cd ~/ti4bot/ti4bot_saves/maps/undo
             echo "Number of files in the undo directory:"
             ls -1 | wc -l
