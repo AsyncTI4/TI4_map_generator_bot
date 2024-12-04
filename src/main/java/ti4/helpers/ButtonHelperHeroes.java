@@ -1460,14 +1460,10 @@ public class ButtonHelperHeroes {
         player.removeOwnedUnitByID("olradin_mech_positive");
         player.removeOwnedUnitByID("olradin_mech_negative");
         String unitModelID;
-        if (player.hasAbility("policy_the_economy_exploit")) {
-            negativePolicies++;
-        } else {
+        if (!player.hasAbility("policy_the_economy_exploit")) {
             positivePolicies++;
         }
-        if (player.hasAbility("policy_the_environment_plunder")) {
-            negativePolicies++;
-        } else {
+        if (!player.hasAbility("policy_the_environment_plunder")) {
             positivePolicies++;
         }
         if (player.hasAbility("policy_the_people_connect")) {
