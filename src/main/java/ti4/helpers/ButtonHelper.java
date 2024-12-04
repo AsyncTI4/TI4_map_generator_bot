@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -4926,9 +4925,6 @@ public class ButtonHelper {
                     case 6 -> MiltyService.secondHalfOfPlayerSetup(player, game, "yellow", "franken6", "206", event, false);
                     case 7 -> MiltyService.secondHalfOfPlayerSetup(player, game, "red", "franken7", "207", event, false);
                     case 8 -> MiltyService.secondHalfOfPlayerSetup(player, game, "blue", "franken8", "208", event, false);
-                    default -> {
-
-                    }
                 }
             }
             x++;
@@ -5478,8 +5474,9 @@ public class ButtonHelper {
     public static void resolveSetupColorChecker(Game game) {
         @Data
         class Collision {
-            Player p1, p2;
-            double contrast;
+            final Player p1;
+            final Player p2;
+            final double contrast;
 
             Collision(Player p1, Player p2, double contrast) {
                 this.p1 = p1;
@@ -6078,11 +6075,9 @@ public class ButtonHelper {
             if (game.getStoredValue(messageId) != null) {
                 if (!game.getStoredValue(messageId).contains(player.getFaction())) {
                     game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
-                    GameSaveLoadManager.saveGame(game, "Stored reaction.");
                 }
             } else {
                 game.setStoredValue(messageId, player.getFaction());
-                GameSaveLoadManager.saveGame(game, "Stored reaction.");
             }
 
             UnfiledButtonHandlers.checkForAllReactions(event, game);

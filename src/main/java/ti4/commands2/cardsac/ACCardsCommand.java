@@ -4,8 +4,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands2.CommandHelper;
 import ti4.commands2.ParentCommand;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
@@ -45,12 +43,6 @@ public class ACCardsCommand implements ParentCommand {
     @Override
     public String getDescription() {
         return "Action Cards";
-    }
-
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return ParentCommand.super.accept(event) &&
-            CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
     }
 
     @Override

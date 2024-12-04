@@ -117,11 +117,13 @@ public class PlayerPreferenceHelper {
 
     public static void offerAFKTimeOptions(Player player) {
         List<Button> buttons = getSetAFKButtons();
+
         var userSettings = UserSettingsManager.get(player.getUserID());
         if (isNotBlank(userSettings.getAfkHours())) {
             userSettings.setAfkHours(null);
             UserSettingsManager.save(userSettings);
         }
+
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged()
             + " your afk times (if any) have been reset. Use buttons to select the hours (note they are in UTC) in which you're afk. If you select 8 for example, you will be set as AFK from 8:00 UTC to 8:59 UTC in every game you are in.",
             buttons);

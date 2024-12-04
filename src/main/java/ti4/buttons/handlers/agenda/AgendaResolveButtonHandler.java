@@ -5,13 +5,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
@@ -680,6 +681,41 @@ class AgendaResolveButtonHandler {
                     game.setStoredValue("agendaConstitution", "true");
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                         "# Removed all laws, will exhaust all home planets at the start of next Strategy phase");
+                }
+            }
+            if ("absol_constitution".equalsIgnoreCase(agID)) {
+                if ("for".equalsIgnoreCase(winner)) {
+                    List<String> laws = new ArrayList<>(game.getLaws().keySet());
+                    for (String law : laws) {
+                        game.removeLaw(law);
+                    }
+                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                        "# Removed all laws");
+                    int counter = 40;
+                    boolean lawFound = false;
+                    while (counter > 0 && !lawFound) {
+                        counter--;
+                        String id2 = game.revealAgenda(false);
+                        ArrayList<String> discardedAgendas = new ArrayList<String>();
+                        AgendaModel agendaDetails = Mapper.getAgenda(id2);
+                        if (agendaDetails.getType().equalsIgnoreCase("law")) {
+                            lawFound = true;
+                            game.putAgendaBackIntoDeckOnTop(id2);
+                            AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
+                            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                                "Shuffled the found agendas back in");
+                            for (String id3 : discardedAgendas) {
+                                game.putAgendaBackIntoDeckOnTop(id3);
+                            }
+                            game.shuffleAgendas();
+
+                        } else {
+                            discardedAgendas.add(id2);
+                            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                                "Found the non-law agenda: " + agendaDetails.getName());
+                        }
+                    }
+
                 }
             }
             if ("artifact".equalsIgnoreCase(agID) || "little_omega_artifact".equalsIgnoreCase(agID)) {

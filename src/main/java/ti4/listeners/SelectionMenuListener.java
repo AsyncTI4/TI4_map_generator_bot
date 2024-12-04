@@ -19,18 +19,18 @@ public class SelectionMenuListener extends ListenerAdapter {
 
         event.deferEdit().queue();
 
-        AsyncTI4DiscordBot.runAsync(
-            "Selection menu task",
-            () -> {
-                try {
-                    SelectionMenuContext context = new SelectionMenuContext(event);
-                    if (context.isValid()) {
-                        SelectionMenuProvider.resolveSelectionMenu(context);
-                    }
-                } catch (Exception e) {
-                    String message = "Selection Menu issue in event: " + event.getComponentId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
-                    BotLogger.log(message, e);
-                }
-            });
+        AsyncTI4DiscordBot.runAsync("Selection menu task", () -> handleSelectionEvent(event));
+    }
+
+    private void handleSelectionEvent(StringSelectInteractionEvent event) {
+        try {
+            SelectionMenuContext context = new SelectionMenuContext(event);
+            if (context.isValid()) {
+                SelectionMenuProvider.resolveSelectionMenu(context);
+            }
+        } catch (Exception e) {
+            String message = "Selection Menu issue in event: " + event.getComponentId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
+            BotLogger.log(message, e);
+        }
     }
 }

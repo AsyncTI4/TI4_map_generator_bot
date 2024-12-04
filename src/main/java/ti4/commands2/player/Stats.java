@@ -144,10 +144,10 @@ class Stats extends GameStateSubcommand {
             player.setAutoSaboPassMedian(optionMedian.getAsInt());
         }
 
-        OptionMapping optionPref = event.getOption(Constants.PREFERS_DISTANCE);
-        if (optionPref != null) {
+        OptionMapping prefersDistanceOption = event.getOption(Constants.PREFERS_DISTANCE);
+        if (prefersDistanceOption != null) {
             var userSettings = UserSettingsManager.get(getPlayer().getUserID());
-            userSettings.setPrefersDistanceBasedTacticalActions(optionPref.getAsBoolean());
+            userSettings.setPrefersDistanceBasedTacticalActions(prefersDistanceOption.getAsBoolean());
             UserSettingsManager.save(userSettings);
         }
 

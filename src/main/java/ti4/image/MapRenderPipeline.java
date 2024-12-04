@@ -31,7 +31,7 @@ public class MapRenderPipeline {
                 try {
                     RenderEvent renderEvent = gameRenderQueue.poll(2, TimeUnit.SECONDS);
                     if (renderEvent != null) {
-                        queue(renderEvent);
+                        render(renderEvent);
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -59,7 +59,7 @@ public class MapRenderPipeline {
         }
     }
 
-    private static void queue(RenderEvent renderEvent) {
+    private static void render(RenderEvent renderEvent) {
         var timedRunnable = new TimedRunnable("Render event task for " + renderEvent.game.getName(),
                 EXECUTION_TIME_SECONDS_WARNING_THRESHOLD,
                 () -> {

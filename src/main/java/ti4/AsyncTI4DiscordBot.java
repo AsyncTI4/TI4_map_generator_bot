@@ -33,6 +33,7 @@ import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;
 import ti4.cron.GameCreationLockRemovalCron;
 import ti4.cron.LogCacheStatsCron;
+import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.UploadStatsCron;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.FoWHelper;
@@ -79,6 +80,7 @@ public class AsyncTI4DiscordBot {
     public static Guild guildQuaternary;
     public static Guild guildQuinary;
     public static Guild guildSenary;
+    public static Guild guildSeptenary;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
     public static final Set<Guild> guilds = new HashSet<>();
@@ -183,6 +185,13 @@ public class AsyncTI4DiscordBot {
             serversToCreateNewGamesOn.add(guildSenary);
         }
 
+        // Async: Duder's Domain
+        if (args.length >= 11) {
+            guildSeptenary = jda.getGuildById(args[10]);
+            startBot(guildSeptenary);
+            // serversToCreateNewGamesOn.add(guildsSeptenary); // TODO: enable this server for new games
+        }
+
         // LOAD DATA
         BotLogger.logWithTimestamp(" LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
@@ -200,14 +209,13 @@ public class AsyncTI4DiscordBot {
         // LOAD GAMES NAMES
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
         GameManager.initialize();
-        GameSaveLoadManager.cleanupOldUndoFiles();
 
         // RUN DATA MIGRATIONS
         BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
         DataMigrationManager.runMigrations();
         BotLogger.logWithTimestamp(" FINISHED CHECKING FOR DATA MIGRATIONS");
 
-        // START MAP GENERATION
+        // START ASYNC PIPELINES
         ImageIO.setUseCache(false);
         MapRenderPipeline.start();
         StatisticsPipeline.start();
@@ -218,6 +226,7 @@ public class AsyncTI4DiscordBot {
         LogCacheStatsCron.register();
         UploadStatsCron.register();
         GameCreationLockRemovalCron.register();
+        OldUndoFileCleanupCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
@@ -349,21 +358,6 @@ public class AsyncTI4DiscordBot {
         return GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, false);
     }
 
-    public static <T> CompletableFuture<T> completeAsync(Supplier<T> supplier) {
-        return CompletableFuture.supplyAsync(supplier, THREAD_POOL).handle((result, exception) -> {
-            if (exception != null) {
-                BotLogger.log("Unable to complete async process.", exception);
-                return null;
-            }
-            return result;
-        });
-    }
-
-    public static void runAsync(String name, Runnable runnable) {
-        var timedRunnable = new TimedRunnable(name, runnable);
-        THREAD_POOL.submit(timedRunnable);
-    }
-
     public static List<Category> getAvailablePBDCategories() {
         return guilds.stream()
             .flatMap(guild -> guild.getCategories().stream())
@@ -383,11 +377,26 @@ public class AsyncTI4DiscordBot {
         return classes;
     }
 
-
-    public static Guild getGuild(String guildId) {
-        return guilds.stream().filter(guild -> guild.getId().equals(guildId)).findFirst().orElse(null);
+    public static <T> CompletableFuture<T> completeAsync(Supplier<T> supplier) {
+        return CompletableFuture.supplyAsync(supplier, THREAD_POOL).handle((result, exception) -> {
+            if (exception != null) {
+                BotLogger.log("Unable to complete async process.", exception);
+                return null;
+            }
+            return result;
+        });
     }
-  
+
+    public static void runAsync(String name, Runnable runnable) {
+        var timedRunnable = new TimedRunnable(name, runnable);
+        THREAD_POOL.submit(timedRunnable);
+    }
+
+    public static void runAsync(String name, int executionTimeWarningThresholdSeconds, Runnable runnable) {
+        var timedRunnable = new TimedRunnable(name, executionTimeWarningThresholdSeconds, runnable);
+        THREAD_POOL.submit(timedRunnable);
+    }
+
     public static boolean shutdown() {
         THREAD_POOL.shutdown();
         try {

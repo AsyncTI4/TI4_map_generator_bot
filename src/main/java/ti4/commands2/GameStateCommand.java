@@ -8,9 +8,18 @@ import ti4.map.Player;
 public abstract class GameStateCommand implements ParentCommand {
 
     private final CommandGameState commandGameState;
+    private final boolean saveGame;
+    private final boolean playerCommand;
 
-    public GameStateCommand(boolean saveGame, boolean isPlayerCommand) {
-        commandGameState = new CommandGameState(saveGame, isPlayerCommand);
+    public GameStateCommand(boolean saveGame, boolean playerCommand) {
+        this.saveGame = saveGame;
+        this.playerCommand = playerCommand;
+        commandGameState = new CommandGameState(saveGame, playerCommand);
+    }
+
+    @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return ParentCommand.super.accept(event) && CommandHelper.acceptIfValidGame(event, saveGame, playerCommand);
     }
 
     @Override

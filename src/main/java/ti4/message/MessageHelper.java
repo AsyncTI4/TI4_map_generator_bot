@@ -128,9 +128,9 @@ public class MessageHelper {
 			return buttons;
 		}
 
-		String mapName = game.getName();
-		String mapNameForUndoStart = mapName + "_";
-		String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+		String gameName = game.getName();
+		String gameNameForUndoStart = gameName + "_";
+		String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
 		if (mapUndoFiles == null || mapUndoFiles.length == 0) {
 			return buttons;
 		}
@@ -138,13 +138,13 @@ public class MessageHelper {
 		List<Button> newButtons = new ArrayList<>(buttons);
 		try {
 			List<Integer> numbers = Arrays.stream(mapUndoFiles)
-				.map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+				.map(fileName -> fileName.replace(gameNameForUndoStart, ""))
 				.map(fileName -> fileName.replace(Constants.TXT, ""))
 				.map(Integer::parseInt).toList();
 			int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
 			newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
 		} catch (Exception e) {
-			BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
+			BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
 		}
 
 		return newButtons;
@@ -164,11 +164,12 @@ public class MessageHelper {
 		if (game.getStoredValue(messageId) != null
 			&& !game.getStoredValue(messageId).isEmpty()) {
 			if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-				game.setStoredValue(messageId,
-					game.getStoredValue(messageId) + "_" + player.getFaction());
+				game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
+				//GameSaveLoadManager.saveGame(game, "Stored reaction."); TODO: this should save, I think, but saving is heavy...
 			}
 		} else {
 			game.setStoredValue(messageId, player.getFaction());
+			//GameSaveLoadManager.saveGame(game, "Stored reaction."); TODO: this should save, I think, but saving is heavy...
 		}
 	}
 
@@ -183,9 +184,8 @@ public class MessageHelper {
 			saboable);
 	}
 
-	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText,
-		Game game, Player player, List<MessageEmbed> embeds, List<Button> buttons,
-		boolean saboable) {
+	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game game, Player player,
+																	 List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
 		MessageFunction addFactionReact = (msg) -> {
 			addFactionReactToMessage(game, player, msg);
 			if (saboable) {
@@ -399,9 +399,6 @@ public class MessageHelper {
 							if (game.getLatestUpNextMsg() != null && !"".equalsIgnoreCase(game.getLatestUpNextMsg())) {
 								String id = game.getLatestUpNextMsg().split("_")[0];
 								String msg = game.getLatestUpNextMsg().substring(game.getLatestUpNextMsg().indexOf("_") + 1);
-								// if (message.contains("# ")) {
-								// 	msg = game.getLatestUpNextMsg().substring(game.getLatestUpNextMsg().indexOf("_") + 1).replace("#", "");
-								// }
 								msg = msg.replace("UP NEXT", "started their turn");
 								game.getActionsChannel().editMessageById(id, msg).queue(null,
 									error -> BotLogger.log(getRestActionFailureMessage(channel, "Error editing message", messageCreateData, error)));

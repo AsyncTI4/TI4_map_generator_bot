@@ -110,6 +110,8 @@ public class Game extends GameProperties {
     private Map<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
     private Map<String, String> currentAgendaVotes = new HashMap<>();
 
+    @Setter
+    @Getter
     private DisplayType displayTypeForced;
     private @Getter @Setter List<BorderAnomalyHolder> borderAnomalies = new ArrayList<>();
     private Date lastActivePlayerPing = new Date(0);
@@ -752,14 +754,6 @@ public class Game extends GameProperties {
             .sorted((p1, p2) -> p1.getLeft().hasTheZeroToken() ? -1 : p2.getLeft().hasTheZeroToken() ? 1 : Integer.compare(p1.getRight(), p2.getRight()))
             .map(ImmutablePair::getLeft)
             .toList();
-    }
-
-    public DisplayType getDisplayTypeForced() {
-        return displayTypeForced;
-    }
-
-    public void setDisplayTypeForced(DisplayType displayTypeForced) {
-        this.displayTypeForced = displayTypeForced;
     }
 
     public int getRingCount() {
@@ -2254,7 +2248,7 @@ public class Game extends GameProperties {
                 player.setActionCard(id);
                 return player.getActionCards();
             }
-        } else if (!discardActionCards.keySet().isEmpty()) {
+        } else if (!discardActionCards.isEmpty()) {
             reshuffleActionCardDiscard();
             return drawActionCard(userID);
         }

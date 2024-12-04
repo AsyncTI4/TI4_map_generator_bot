@@ -1,6 +1,6 @@
 package ti4.users;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,11 +14,11 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class UserSettings {
 
     private String userId;
-    private List<String> preferredColourList = new ArrayList<>();
+    private List<String> preferredColourList;
     private int personalPingInterval;
     private boolean prefersDistanceBasedTacticalActions;
     private String afkHours;
-    private Map<String, String> storedValues = new HashMap<>();
+    private Map<String, String> storedValues;
 
     public UserSettings() {} // needed for ObjectMapper
 
@@ -26,15 +26,31 @@ public class UserSettings {
         this.userId = userId;
     }
 
+    public List<String> getPreferredColourList() {
+        if (preferredColourList == null) {
+            return Collections.emptyList();
+        }
+        return preferredColourList;
+    }
+
     public void putStoredValue(String settingKey, String settingValue) {
+        if (storedValues == null) {
+            storedValues = new HashMap<>();
+        }
         storedValues.put(settingKey, settingValue);
     }
 
     public Optional<String> getStoredValue(String settingKey) {
+        if (storedValues == null) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(storedValues.get(settingKey));
     }
 
     public String removeStoredValue(String settingKey) {
+        if (storedValues == null) {
+            return null;
+        }
         return storedValues.remove(settingKey);
     }
 

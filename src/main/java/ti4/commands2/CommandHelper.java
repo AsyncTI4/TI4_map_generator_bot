@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +52,7 @@ public class CommandHelper {
     }
 
     @NotNull
-    public static String getGameNameFromChannel(GenericInteractionCreateEvent event) {
+    private static String getGameNameFromChannel(Interaction event) {
         // try to get game name from channel name
         var channel = event.getChannel();
         String gameName = getGameNameFromChannelName(channel.getName());
@@ -72,21 +73,21 @@ public class CommandHelper {
         gameName = StringUtils.substringBefore(gameName, "-");
         return gameName;
     }
-
-    public static boolean acceptIfPlayerInGameAndGameChannel(SlashCommandInteractionEvent event) {
-        var game = GameManager.getGame(getGameName(event));
+  
+    public static boolean acceptIfValidGame(SlashCommandInteractionEvent event, boolean checkChannel, boolean checkPlayer) {
+        var gameName = getGameName(event);
+        var game = GameManager.getGame(gameName);
         if (game == null) {
-            MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' command canceled. Execute command in correctly named channel that " +
-                "starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`");
+            MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' command canceled. Game name '" + gameName + "' is not valid. " +
+                "Execute command in correctly named channel that starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`");
             return false;
         }
-        var player = getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.replyToMessage(event, "Command must be ran by a player in the game, please use `/join gameName` or `/special2 setup_neutral_player`.");
+        if (checkChannel && !event.getChannel().getName().startsWith(game.getName() + "-")) {
+            MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' can only be executed in a game channel.");
             return false;
         }
-        if (!event.getChannel().getName().startsWith(game.getName() + "-")) {
-            MessageHelper.replyToMessage(event, "Commands can be executed only in game specific channels");
+        if (checkPlayer && getPlayerFromEvent(game, event) == null) {
+            MessageHelper.replyToMessage(event, "Command must be ran by a player in the game, please use `/game join gameName` or `/special2 setup_neutral_player`.");
             return false;
         }
         return true;

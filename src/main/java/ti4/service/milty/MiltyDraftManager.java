@@ -662,6 +662,7 @@ public class MiltyDraftManager {
             List<ActionRow> newRows = partitioned.stream().map(ActionRow::of).toList();
             newComponents.addAll(newRows);
         }
+        if (messageId == null) return;
 
         game.getMainGameChannel().retrieveMessageById(messageId).queue((msg) -> {
             if (newMessage != null && newButtons != null)

@@ -1,5 +1,6 @@
 package ti4.processors;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ public class ButtonProcessor {
 
     private final BlockingQueue<ButtonInteractionEvent> buttonInteractionQueue = new LinkedBlockingQueue<>();
     private final Set<String> userButtonPressSet = ConcurrentHashMap.newKeySet();
+    private final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
     private final Thread worker;
     private boolean running = true;
 
@@ -43,7 +45,7 @@ public class ButtonProcessor {
         worker = new Thread(() -> {
             while (running || !buttonInteractionQueue.isEmpty()) {
                 try {
-                    ButtonInteractionEvent buttonInteractionEvent = buttonInteractionQueue.poll(1, TimeUnit.SECONDS);
+                    ButtonInteractionEvent buttonInteractionEvent = buttonInteractionQueue.poll(2, TimeUnit.SECONDS);
                     if (buttonInteractionEvent != null) {
                         process(buttonInteractionEvent);
                     }
@@ -51,7 +53,7 @@ public class ButtonProcessor {
                     Thread.currentThread().interrupt();
                     break;
                 } catch (Exception e) {
-                    BotLogger.log("MapRenderPipeline worker threw an exception.", e);
+                    BotLogger.log("ButtonProcessor worker threw an exception.", e);
                 }
             }
         });
@@ -76,7 +78,7 @@ public class ButtonProcessor {
     public static void queue(ButtonInteractionEvent event) {
         String key = event.getUser().getId() + event.getButton().getId();
         if (instance.userButtonPressSet.contains(key)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "We ignored your excess button press.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "The bot hasn't processed this button press since you last pressed it. Please wait.");
             return;
         }
         instance.userButtonPressSet.add(key);
@@ -84,31 +86,27 @@ public class ButtonProcessor {
     }
 
     private void process(ButtonInteractionEvent event) {
-        BotLogger.logButton(event);
-        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
         long startTime = System.currentTimeMillis();
+        BotLogger.logButton(event);
+        long contextTime = 0;
+        long resolveTime = 0;
+        long saveTime = 0;
         try {
             ButtonContext context = new ButtonContext(event);
+            contextTime = System.currentTimeMillis();
             if (context.isValid()) {
                 resolveButtonInteractionEvent(context);
             }
+            resolveTime = System.currentTimeMillis();
             context.save(event);
+            saveTime = System.currentTimeMillis();
+            // BotLogger.logWithTimestamp("Button Save: " + DateTimeHelper.getTimeRepresentationToMilliseconds(saveTime - resolveTime) + "\nButton Queue Size: " + buttonInteractionQueue.size());
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
 
-        long endTime = System.currentTimeMillis();
-        final int milliThreshold = 2000;
-        if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
-            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
-            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
-            String message = "[" + event.getChannel().getName() + "](" + event.getMessage().getJumpUrl() + ") " + event.getUser().getEffectiveName() + " pressed button: " + ButtonHelper.getButtonRepresentation(event.getButton()) +
-                "\n> Warning: This button took over " + milliThreshold + "ms to respond or execute\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " button was pressed by user\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
-            BotLogger.log(message);
-        }
+        runtimeWarningService.submitNewRuntime(event, startTime, System.currentTimeMillis(), contextTime, resolveTime, saveTime);
+
         instance.userButtonPressSet.remove(event.getUser().getId() + event.getButton().getId());
     }
 
@@ -222,5 +220,15 @@ public class ButtonProcessor {
                 default -> MessageHelper.sendMessageToEventChannel(event, "Button " + ButtonHelper.getButtonRepresentation(event.getButton()) + " pressed. This button does not do anything.");
             }
         }
+    }
+
+    public static String getButtonProcessingStatistics() {
+        var decimalFormatter = new DecimalFormat("#.##");
+        return "Button Processor Statistics: " + DateTimeHelper.getCurrentTimestamp() + "\n" +
+            "> Button queue size: " + instance.buttonInteractionQueue.size() + ".\n" +
+            "> Total button presses: " + instance.runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" +
+            "> Total threshold misses: " + instance.runtimeWarningService.getTotalRuntimeThresholdMissCount() + ".\n" +
+            "> Average preprocessing time: " + decimalFormatter.format(instance.runtimeWarningService.getAveragePreprocessingTime()) + "ms.\n" +
+            "> Average processing time: " + decimalFormatter.format(instance.runtimeWarningService.getAverageProcessingTime()) + "ms.";
     }
 }

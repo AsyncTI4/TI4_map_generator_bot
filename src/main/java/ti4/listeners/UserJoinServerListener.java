@@ -32,41 +32,41 @@ public class UserJoinServerListener extends ListenerAdapter {
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
         if (!validateEvent(event)) return;
-        AsyncTI4DiscordBot.runAsync(
-            "Guild member join task",
-            () -> {
-                try {
-                    checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
-                } catch (Exception e) {
-                    BotLogger.log("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
-                }
-            });
+        AsyncTI4DiscordBot.runAsync("Guild member join task", () -> handleGuildMemberJoin(event));
+    }
+
+    private void handleGuildMemberJoin(GuildMemberJoinEvent event) {
+        try {
+            checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
+        } catch (Exception e) {
+            BotLogger.log("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
+        }
     }
 
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
         if (!validateEvent(event)) return;
-        AsyncTI4DiscordBot.runAsync(
-            "Guild member remove task",
-            () -> {
-                try {
-                    event.getGuild().retrieveAuditLogs().queueAfter(1, TimeUnit.SECONDS, (logs) -> {
-                        boolean voluntary = true;
-                        for (AuditLogEntry log : logs) {
-                            if (log.getTargetIdLong() == event.getUser().getIdLong()) {
-                                if (log.getType() == ActionType.BAN || log.getType() == ActionType.KICK) {
-                                    voluntary = false;
-                                    break;
-                                }
-                            }
-                        }
+        AsyncTI4DiscordBot.runAsync("Guild member remove task", () -> handleGuildMemberRemove(event));
+    }
 
-                        checkIfUserLeftActiveGames(event.getGuild(), event.getUser(), voluntary);
-                    }, BotLogger::catchRestError);
-                } catch (Exception e) {
-                    BotLogger.log("Error in `UserJoinServerListener.onGuildMemberRemove`", e);
+    private void handleGuildMemberRemove(GuildMemberRemoveEvent event) {
+        try {
+            event.getGuild().retrieveAuditLogs().queueAfter(1, TimeUnit.SECONDS, (logs) -> {
+                boolean voluntary = true;
+                for (AuditLogEntry log : logs) {
+                    if (log.getTargetIdLong() == event.getUser().getIdLong()) {
+                        if (log.getType() == ActionType.BAN || log.getType() == ActionType.KICK) {
+                            voluntary = false;
+                            break;
+                        }
+                    }
                 }
-            });
+
+                checkIfUserLeftActiveGames(event.getGuild(), event.getUser(), voluntary);
+            }, BotLogger::catchRestError);
+        } catch (Exception e) {
+            BotLogger.log("Error in `UserJoinServerListener.onGuildMemberRemove`", e);
+        }
     }
 
     private static boolean validateEvent(GenericGuildEvent event) {
@@ -192,8 +192,7 @@ public class UserJoinServerListener extends ListenerAdapter {
         List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
         if (threadChannels.isEmpty()) return;
         String threadName = "in-progress-games-left";
-        ThreadChannel threadChannel = ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName);
-        MessageHelper.sendMessageToChannel(threadChannel, message);
-
+        ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName,
+            threadChannel -> MessageHelper.sendMessageToChannel(threadChannel, message));
     }
 }

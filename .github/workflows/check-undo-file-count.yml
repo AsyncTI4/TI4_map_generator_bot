@@ -1,0 +1,25 @@
+on: workflow_dispatch
+name: CheckUndoFileCount
+concurrency:
+  group: "CheckUndoFileCount"
+jobs:
+  save:
+    name: CheckUndoFileCount
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        env:
+          AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
+          AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script_stop: true
+          envs: AWS_KEY, AWS_SECRET
+          script: |
+            cd ~/ti4bot/ti4bot_saves/maps/undo
+            echo "Number of files in the undo directory:"
+            ls -1 | wc -l

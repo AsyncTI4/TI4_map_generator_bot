@@ -8,10 +8,12 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.CopyOption;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -133,8 +135,7 @@ public class GameSaveLoadManager {
         }
 
         File mapFile = Storage.getGameFile(game.getName() + TXT);
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(mapFile.getAbsoluteFile()))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(mapFile))) {
             Map<String, Tile> tileMap = game.getTileMap();
             writer.write(game.getOwnerID());
             writer.write(System.lineSeparator());
@@ -164,20 +165,20 @@ public class GameSaveLoadManager {
             return;
         }
 
-        String mapName = game.getName();
-        String mapNameForUndoStart = mapName + "_";
-        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
-        if (mapUndoFiles == null || mapUndoFiles.length <= 0) {
+        String gameName = game.getName();
+        String gameNameForUndoStart = gameName + "_";
+        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
+        if (mapUndoFiles == null || mapUndoFiles.length == 0) {
             return;
         }
         try {
             List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                    .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
-                    .map(fileName -> fileName.replace(Constants.TXT, ""))
-                    .map(Integer::parseInt).toList();
+                .map(fileName -> fileName.replace(gameNameForUndoStart, ""))
+                .map(fileName -> fileName.replace(Constants.TXT, ""))
+                .map(Integer::parseInt).toList();
             int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
-            File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + (maxNumber - 1) + Constants.TXT);
-            File mapUndoStorage2 = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
+            File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + (maxNumber - 1) + Constants.TXT);
+            File mapUndoStorage2 = Storage.getGameUndoStorage(gameName + "_" + maxNumber + Constants.TXT);
             CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
             Files.copy(mapUndoStorage2.toPath(), originalMapFile.toPath(), options);
             Game loadedGame = loadGame(originalMapFile);
@@ -187,9 +188,7 @@ public class GameSaveLoadManager {
                     // MessageHelper.sendMessageToChannel(loadedGame.getSavedChannel(), "Attempting
                     // to regenerate buttons:");
                     MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(),
-                            loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
-                } else {
-                    // System.out.println("Boop" + loadedGame.getSavedButtons().size());
+                        loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                 }
             } catch (Exception e) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -210,7 +209,7 @@ public class GameSaveLoadManager {
 
             for (Player p1 : loadedGame.getRealPlayers()) {
                 Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
-                if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
+                if (p2 != null && (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo())) {
                     CardsInfoService.sendCardsInfo(loadedGame, p1);
                 }
             }
@@ -219,10 +218,10 @@ public class GameSaveLoadManager {
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
             } else {
-                ButtonHelper.findOrCreateThreadWithMessage(game, mapName + "-undo-log", sb.toString());
+                ButtonHelper.findOrCreateThreadWithMessage(game, gameName + "-undo-log", sb.toString());
             }
         } catch (Exception e) {
-            BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
+            BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
         }
     }
 
@@ -231,6 +230,31 @@ public class GameSaveLoadManager {
         if (gameFile.exists()) {
             GameManager.invalidateGame(gameName);
             return loadGame(gameFile);
+        }
+        return null;
+    }
+
+    private static void saveUndo(Game game, File originalMapFile) {
+        int latestIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(game);
+        if (latestIndex > 0) {
+            createUndoCopy(originalMapFile, game.getName(), latestIndex);
+        }
+    }
+
+    private static void deleteFile(Path path) {
+        try {
+            Files.deleteIfExists(path);
+        } catch (Exception e) {
+            BotLogger.log("Error trying to delete file: " + path, e);
+        }
+    }
+
+    private static void createUndoCopy(File originalMapFile, String gameName, int undoNumber) {
+        try {
+            File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + undoNumber + Constants.TXT);
+            Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            BotLogger.log("Error copying undo file for " + gameName, e);
         }
         return null;
     }
@@ -244,20 +268,69 @@ public class GameSaveLoadManager {
     }
 
     public static void cleanupOldUndoFiles() {
-        File mapUndoDirectory = getMapUndoDirectory();
-        String[] mapUndoFiles = mapUndoDirectory.list();
-        if (mapUndoFiles == null) {
-            return;
-        }
-        int count = 0;
         long daysOld = 60;
-        Date tooOld = Date.from(Instant.ofEpochMilli(Instant.now().toEpochMilli() - (daysOld * 24 * 60 * 60 * 1000)));
-        for (String mapFilePath : mapUndoFiles) {
-            File mapToDelete = Storage.getGameUndoStorage(mapFilePath);
-            Date lastModified = Date.from(Instant.ofEpochMilli(mapToDelete.lastModified()));
-            if (lastModified.before(tooOld) && mapToDelete.delete()) count++;
+        Date tooOld = Date.from(Instant.now().minus(daysOld, ChronoUnit.DAYS));
+
+        int count = 0;
+
+        Path mapUndoDirectory = getMapUndoDirectory().toPath();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(mapUndoDirectory)) {
+            for (Path mapFilePath : stream) {
+                try {
+                    File mapToDelete = mapFilePath.toFile();
+                    Date lastModified = Date.from(Instant.ofEpochMilli(mapToDelete.lastModified()));
+
+                    if (lastModified.before(tooOld)) {
+                        Files.delete(mapFilePath);
+                        count++;
+                    }
+                } catch (Exception e) {
+                    BotLogger.log("Failed to delete undo file: " + mapFilePath.getFileName(), e);
+                }
+            }
+        } catch (IOException e) {
+            BotLogger.log("Failed to access the undo directory: " + mapUndoDirectory, e);
         }
+
         BotLogger.log("Cleaned up `" + count + "` undo files that were over `" + daysOld + "` days old (" + tooOld + ")");
+    }
+
+    public static int cleanUpExcessUndoFilesAndReturnLatestIndex(Game game) {
+        String gameName = game.getName();
+        String gameNameFileNamePrefix = gameName + "_";
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(getMapUndoDirectory().toPath(), path -> path.getFileName().toString().startsWith(gameNameFileNamePrefix))) {
+            List<Integer> undoNumbers = new ArrayList<>();
+            for (Path path : stream) {
+                String fileName = path.getFileName().toString();
+                String undoNumberStr = StringUtils.substringBetween(fileName, gameNameFileNamePrefix, Constants.TXT);
+                if (undoNumberStr != null) {
+                    try {
+                        undoNumbers.add(Integer.parseInt(undoNumberStr));
+                    } catch (NumberFormatException e) {
+                        BotLogger.log("Could not parse undo number '" + undoNumberStr + "' for game " + gameName, e);
+                    }
+                }
+            }
+
+            if (undoNumbers.isEmpty()) {
+                return 1;
+            }
+
+            undoNumbers.sort(Integer::compareTo);
+            int maxUndoNumber = undoNumbers.getLast();
+            int maxUndoFilesPerGame = game.isHasEnded() ? 10 : 100;
+            int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;
+
+            undoNumbers.stream()
+                .filter(undoNumber -> undoNumber < oldestUndoNumberThatShouldExist)
+                .map(undoNumber -> gameName + "_" + undoNumber + Constants.TXT)
+                .forEach(fileName -> deleteFile(Storage.getGameUndoStoragePath(fileName)));
+
+            return maxUndoNumber + 1;
+        } catch (Exception e) {
+            BotLogger.log("Error trying clean up excess undo files for: " + gameName, e);
+        }
+        return -1;
     }
 
     private static void saveGameInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {

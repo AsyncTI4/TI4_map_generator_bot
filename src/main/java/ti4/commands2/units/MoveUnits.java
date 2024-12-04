@@ -12,6 +12,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
@@ -30,12 +31,6 @@ public class MoveUnits extends GameStateCommand {
     @Override
     public String getDescription() {
         return "Move units from one system to another system";
-    }
-
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return super.accept(event) &&
-            CommandHelper.acceptIfPlayerInGameAndGameChannel(event);
     }
 
     @Override
@@ -72,7 +67,7 @@ public class MoveUnits extends GameStateCommand {
 
         Tile tileTo = CommandHelper.getTile(event, game, event.getOption(Constants.TILE_NAME_TO).getAsString());
         if (tileTo == null) {
-            BotLogger.log("Could not find the tile you're moving to.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the tile you're moving to.");
             return;
         }
 

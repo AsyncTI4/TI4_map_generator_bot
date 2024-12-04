@@ -28,9 +28,9 @@ class CommandGameState {
             throw new IllegalArgumentException("Invalid game name: " + gameName + " while attempting to run event " + event.getName() +
                     " in channel " + event.getChannel().getName());
         }
-        Game eventGame = GameManager.getGame(gameName);
-        eventGame.incrementSpecificSlashCommandCount(event.getFullCommandName());
-        game.set(eventGame);
+        Game game = GameManager.getGame(gameName);
+        game.incrementSpecificSlashCommandCount(event.getFullCommandName());  // TODO: This only works for commands that save...
+        this.game.set(game);
 
         Member member = event.getMember();
         if (member != null) {
@@ -44,12 +44,12 @@ class CommandGameState {
         if (!isPlayerCommand) {
             return;
         }
-        var gamePlayer = CommandHelper.getPlayerFromEvent(eventGame, event);
-        if (gamePlayer == null) {
+        var player = CommandHelper.getPlayerFromEvent(game, event);
+        if (player == null) {
             throw new IllegalArgumentException("Unable to determine player while attempting to run event " + event.getName() +
                     " in channel " + event.getChannel().getName() + " for game " + gameName);
         }
-        player.set(gamePlayer);
+        this.player.set(player);
     }
 
     public void postExecute(SlashCommandInteractionEvent event) {

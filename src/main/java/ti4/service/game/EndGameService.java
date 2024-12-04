@@ -121,8 +121,7 @@ public class EndGameService {
         }
         if (actionsChannel != null) {
             for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
-                if (threadChannel.getName().contains("Cards Info")) {
-                } else {
+                if (!threadChannel.getName().contains("Cards Info")) {
                     threadChannel.getManager().setArchived(true).queue();
                 }
             }
@@ -134,8 +133,8 @@ public class EndGameService {
         if (bothelperLoungeChannel != null) {
             // POST GAME END TO BOTHELPER LOUNGE GAME STARTS & ENDS THREAD
             String threadName = "game-starts-and-ends";
-            ThreadChannel threadChannel = ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName);
-            MessageHelper.sendMessageToChannel(threadChannel, "Game: **" + gameName + "** on server **" + game.getGuild().getName() + "** has concluded.");     
+            ThreadGetter.getThreadInChannel(bothelperLoungeChannel, threadName,
+                threadChannel -> MessageHelper.sendMessageToChannel(threadChannel, "Game: **" + gameName + "** on server **" + game.getGuild().getName() + "** has concluded."));
         }
 
         // Archive Game Channels
@@ -167,53 +166,54 @@ public class EndGameService {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
-        AsyncTI4DiscordBot.runAsync("Async game chronicle task",
-            () -> {
-                String gameEndText = getGameEndText(game, event);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
-                TextChannel summaryChannel = getGameSummaryChannel(game);
-                if (!game.isFowMode()) {
-                    MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
-                        MessageHelper.replyToMessage(event, fileUpload);
-                        // CREATE POST
-                        if (publish) {
-                            if (summaryChannel == null) {
-                                BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
-                                return;
-                            }
+        AsyncTI4DiscordBot.runAsync("EndGaveService writeChronicle task", () -> writeChronicle(game, event, publish));
+    }
 
-                            // INFORM PLAYERS
-                            summaryChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
-                                m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
-                                m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS, t -> {
-                                    sendFeedbackMessage(t, game);
-                                    sendRoundSummariesToThread(t, game);
-                                });
-                                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                                    "Game summary has been posted in the " + summaryChannel.getAsMention() + " channel: " + m.getJumpUrl());
-                            });
-                        }
-
-                        // TIGL Extras
-                        if (game.isCompetitiveTIGLGame() && game.getWinner().isPresent()) {
-                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
-                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.BLT + Constants.bltPing());
-                            TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
-                        }
-                    });
-                } else if (publish) { //FOW SUMMARY
+    private static void writeChronicle(Game game, GenericInteractionCreateEvent event, boolean publish) {
+        String gameEndText = getGameEndText(game, event);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
+        TextChannel summaryChannel = getGameSummaryChannel(game);
+        if (!game.isFowMode()) {
+            MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
+                MessageHelper.replyToMessage(event, fileUpload);
+                // CREATE POST
+                if (publish) {
                     if (summaryChannel == null) {
-                        BotLogger.log(event, "`#fow-war-stories` channel not found - `/game end` cannot post summary");
+                        BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
                         return;
                     }
-                    MessageHelper.sendMessageToChannel(summaryChannel, gameEndText);
-                    summaryChannel.createThreadChannel(gameName, true).queue(t -> {
-                        MessageHelper.sendMessageToChannel(t, gameEndText);
-                        sendFeedbackMessage(t, game);
-                        sendRoundSummariesToThread(t, game);
+
+                    // INFORM PLAYERS
+                    summaryChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
+                        m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
+                        m.createThreadChannel(game.getName()).queueAfter(2, TimeUnit.SECONDS, t -> {
+                            sendFeedbackMessage(t, game);
+                            sendRoundSummariesToThread(t, game);
+                        });
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                            "Game summary has been posted in the " + summaryChannel.getAsMention() + " channel: " + m.getJumpUrl());
                     });
                 }
+
+                // TIGL Extras
+                if (game.isCompetitiveTIGLGame() && game.getWinner().isPresent()) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.BLT + Constants.bltPing());
+                    TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
+                }
             });
+        } else if (publish) { //FOW SUMMARY
+            if (summaryChannel == null) {
+                BotLogger.log(event, "`#fow-war-stories` channel not found - `/game end` cannot post summary");
+                return;
+            }
+            MessageHelper.sendMessageToChannel(summaryChannel, gameEndText);
+            summaryChannel.createThreadChannel(game.getName(), true).queue(t -> {
+                MessageHelper.sendMessageToChannel(t, gameEndText);
+                sendFeedbackMessage(t, game);
+                sendRoundSummariesToThread(t, game);
+            });
+        }
     }
 
     private static void sendRoundSummariesToThread(ThreadChannel t, Game game) {
