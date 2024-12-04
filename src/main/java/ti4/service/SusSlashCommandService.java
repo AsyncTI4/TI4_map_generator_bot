@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.ThreadGetter;
+import ti4.map.ManagedGame;
+import ti4.message.MessageHelper;
 
 @UtilityClass
 public class SusSlashCommandService {

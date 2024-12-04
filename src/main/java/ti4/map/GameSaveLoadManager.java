@@ -91,8 +91,6 @@ public class GameSaveLoadManager {
     public static final String ENDPLAYER = "-endplayer-";
     private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
 
-    private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
-
     public static void saveGame(Game game, String reason) {
         saveGame(game, false, reason);
     }
@@ -243,7 +241,7 @@ public class GameSaveLoadManager {
     }
 
     private static void saveUndo(Game game, File originalGameFile) {
-        int latestIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(game);
+        int latestIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(GameManager.getManagedGame(game.getName()));
         if (latestIndex > 0) {
             createUndoCopy(originalGameFile, game.getName(), latestIndex);
         }
@@ -1226,6 +1224,7 @@ public class GameSaveLoadManager {
         return game;
     }
 
+    @Nullable
     private static Game readGame(File gameFile) {
         if (gameFile == null || !gameFile.exists()) {
             BotLogger.log("Could not load map, map file does not exist: " + (gameFile == null ? "null file" : gameFile.getAbsolutePath()));
@@ -1258,8 +1257,8 @@ public class GameSaveLoadManager {
                     try {
                         readGameInfo(game, data);
                     } catch (Exception e) {
-                        BotLogger.log("Data is bad: " + game.getName(), e);
-                        fatalError = true;
+                        BotLogger.log("Data is bad for " + game.getName() + ". Load aborted.", e);
+                        return null;
                     }
                 }
 
@@ -1287,7 +1286,7 @@ public class GameSaveLoadManager {
                 }
             }
             Map<String, Tile> tileMap = getTileMap(gameFileLines, game, gameFile);
-            if (tileMap == null || fatalError) {
+            if (tileMap == null) {
                 BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
                 return null;
             }

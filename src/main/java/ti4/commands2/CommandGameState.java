@@ -32,8 +32,6 @@ class CommandGameState {
 
         SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, GameManager.getManagedGame(gameName));
 
-        SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, game);
-
         if (!isPlayerCommand) {
             return;
         }
