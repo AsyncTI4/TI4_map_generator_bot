@@ -27,8 +27,8 @@ class CommandGameState {
                     " in channel " + event.getChannel().getName());
         }
         Game game = GameManager.getGame(gameName);
-        game.incrementSpecificSlashCommandCount(event.getFullCommandName());  // TODO: This only works for commands that save...
         this.game.set(game);
+        game.incrementSpecificSlashCommandCount(event.getFullCommandName());  // TODO: This only works for commands that save...
 
         SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, GameManager.getManagedGame(gameName));
 
