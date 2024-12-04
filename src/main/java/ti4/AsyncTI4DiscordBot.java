@@ -324,6 +324,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1250131684393881616")); // Async Senary (Tommer Hawk)
         adminRoles.add(jda.getRoleById("1312882116597518422")); // Async Septenary (Duder's Domain)
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
+        adminRoles.add(jda.getRoleById("951230650680225863")); // Community Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
         adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
         adminRoles.add(jda.getRoleById("1109657180170371182")); // Jazz's Server
@@ -338,7 +339,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1226068025464197160")); // Rintsi's Server
         adminRoles.add(jda.getRoleById("1226805374007640095")); // Solax's Server
         adminRoles.add(jda.getRoleById("1313965793532186725")); // ppups's Server
-        adminRoles.add(jda.getRoleById("951230650680225863")); // Community Server
+        adminRoles.add(jda.getRoleById("1311111853912358922")); // TSI's Server
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
@@ -357,6 +358,7 @@ public class AsyncTI4DiscordBot {
         developerRoles.add(jda.getRoleById("1226068105071956058")); // Rintsi's Server
         developerRoles.add(jda.getRoleById("1226805601422676069")); // Solax's Server
         developerRoles.add(jda.getRoleById("1313966002551128166")); // ppups's Server
+        developerRoles.add(jda.getRoleById("1311111944832553090")); // TSI's Server
         developerRoles.removeIf(Objects::isNull);
 
         //BOTHELPER ROLES
@@ -371,13 +373,14 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1312882116597518419")); // Async Septenary (Duder's Domain)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
+        bothelperRoles.add(jda.getRoleById("1248693989193023519")); // Community Server
         bothelperRoles.add(jda.getRoleById("1225597399385374781")); // ForlornGeas's Server
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); // Jonjo's Server
         bothelperRoles.add(jda.getRoleById("1215450829096624129")); // Sigma's Server
         bothelperRoles.add(jda.getRoleById("1226068245010710558")); // Rintsi's Server
         bothelperRoles.add(jda.getRoleById("1226805674046914560")); // Solax's Server 
         bothelperRoles.add(jda.getRoleById("1313965956338417784")); // ppups's Server
-        bothelperRoles.add(jda.getRoleById("1248693989193023519")); // Community Server
+        bothelperRoles.add(jda.getRoleById("1311112004089548860")); // TSI's Server
         bothelperRoles.removeIf(Objects::isNull);
     }
 
