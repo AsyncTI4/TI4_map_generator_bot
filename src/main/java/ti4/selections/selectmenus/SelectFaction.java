@@ -33,7 +33,8 @@ public class SelectFaction implements Selection {
 
     @Override
     public void execute(StringSelectInteractionEvent event) {
-        Game game = GameManager.getUserActiveGame(event.getUser().getId());
+        String gameName = CommandHelper.getGameNameFromChannel(event);
+        Game game = GameManager.getGame(gameName);
         if (game == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game could not be found");
             return;

@@ -31,7 +31,6 @@ import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.listeners.SlashCommandListener;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -96,8 +95,11 @@ public class AutoCompleteProvider {
         String optionName = event.getFocusedOption().getName();
 
         String userId = event.getUser().getId();
-        SlashCommandListener.setActiveGame(event.getMessageChannel(), userId, event.getName(), event.getSubcommandName());
-        Game game = GameManager.getUserActiveGame(userId);
+        String gameName = CommandHelper.getGameNameFromChannel(event);
+        if (!GameManager.isValidGame(gameName)) {
+            return;
+        }
+        Game game = GameManager.getGame(gameName);
         Player player = null;
         if (game != null) {
             player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
@@ -413,7 +415,6 @@ public class AutoCompleteProvider {
                 event.replyChoices(options).queue();
             }
             case Constants.PLANET, Constants.PLANET2, Constants.PLANET3, Constants.PLANET4, Constants.PLANET5, Constants.PLANET6 -> {
-                SlashCommandListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName(), event.getSubcommandName());
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Set<String> planetIDs;
                 Map<String, String> planets = Mapper.getPlanetRepresentations();
