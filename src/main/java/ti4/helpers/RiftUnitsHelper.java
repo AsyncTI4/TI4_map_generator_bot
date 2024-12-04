@@ -67,6 +67,8 @@ public class RiftUnitsHelper {
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             String name = entry.getKey();
             String representation = planetRepresentations.get(name);
+            if (representation == null) {
+            }
             UnitHolder unitHolder = entry.getValue();
             Map<UnitKey, Integer> units = unitHolder.getUnits();
             if (!(unitHolder instanceof Planet)) {
@@ -169,7 +171,8 @@ public class RiftUnitsHelper {
             UnitHolder unitHolder = entry.getValue();
             Map<UnitKey, Integer> units = unitHolder.getUnits();
 
-            if (!(unitHolder instanceof Planet)) {
+            if (unitHolder instanceof Planet) {
+            } else {
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     UnitKey key = unitEntry.getKey();
                     if (!player.unitBelongsToPlayer(key))
@@ -186,7 +189,8 @@ public class RiftUnitsHelper {
                         continue;
                     }
 
-                    String asyncID = key.unitName();
+                    String asyncID = key.asyncID();
+                    asyncID = key.unitName();
 
                     int totalUnits = unitEntry.getValue();
 

@@ -384,7 +384,7 @@ public class ButtonHelperAgents {
         ExhaustLeaderService.exhaustLeader(game, player, playerLeader);
 
         MessageChannel channel = player.getCorrectChannel();
-        String message;
+        String message = "";
 
         // Clever Clever Ssruu
         String ssruuClever = "";
@@ -875,6 +875,9 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             resolveCeldauriAgentStep2(player, game, event, rest);
         }
+        // if ("celdauriagent".equalsIgnoreCase(agent)) {
+        // resolveCeldauriAgentStep2(player, game, event, rest);
+        // }
         if ("zealotsagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Priestess Tuh, the Rhodun" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);

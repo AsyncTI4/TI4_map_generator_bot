@@ -117,7 +117,10 @@ public class CommanderUnlockCheckService {
                     shouldBeUnlocked = true;
                 }
             }
-            case "kolume" -> shouldBeUnlocked = true;
+            case "kolume" -> {
+                shouldBeUnlocked = true;
+
+            }
             case "veldyr" -> {
                 if (ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player).size() > 1) {
                     shouldBeUnlocked = true;
@@ -153,7 +156,12 @@ public class CommanderUnlockCheckService {
                     shouldBeUnlocked = true;
                 }
             }
-            case "zealots", "keleres", "winnu", "muaat", "augers", "kortali", "letnev", "florzen", "yin" -> shouldBeUnlocked = true;
+            case "zealots" -> shouldBeUnlocked = true;
+            case "yin" -> shouldBeUnlocked = true;
+            case "florzen" -> shouldBeUnlocked = true;
+            case "letnev" -> shouldBeUnlocked = true;
+            case "kortali" -> shouldBeUnlocked = true;
+            case "augers" -> shouldBeUnlocked = true;
             case "hacan" -> {
                 if (player.getTg() > 9) {
                     shouldBeUnlocked = true;
@@ -288,6 +296,8 @@ public class CommanderUnlockCheckService {
                     shouldBeUnlocked = true;
                 }
             }
+            case "muaat" -> shouldBeUnlocked = true;
+            case "winnu" -> shouldBeUnlocked = true;
             case "naalu" -> {
                 Tile rex = game.getMecatolTile();
                 if (rex != null) {
@@ -302,6 +312,7 @@ public class CommanderUnlockCheckService {
                     }
                 }
             }
+            case "keleres" -> shouldBeUnlocked = true;
             case "arborec" -> {
                 int num = ButtonHelper.getAmountOfSpecificUnitsOnPlanets(player, game, "infantry");
                 num += ButtonHelper.getAmountOfSpecificUnitsOnPlanets(player, game, "mech");

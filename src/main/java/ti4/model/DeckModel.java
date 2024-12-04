@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 
@@ -132,6 +134,7 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
         return switch (getType()) {
             case TECHNOLOGY -> Emojis.NonUnitTechSkip;
             case AGENDA -> Emojis.Agenda;
+            case EVENT -> "";
             case ACTION_CARD -> Emojis.ActionCard;
             case PUBLIC_STAGE_1_OBJECTIVE -> Emojis.Public1;
             case PUBLIC_STAGE_2_OBJECTIVE -> Emojis.Public2;

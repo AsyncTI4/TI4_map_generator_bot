@@ -1,7 +1,6 @@
 package ti4.commands2.user;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -23,23 +22,20 @@ class SetPreferredColourList extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        List<String> colors = Helper.getListFromCSV(event.getOption("colour_list", null, OptionMapping::getAsString).toLowerCase());
-        colors = new ArrayList<>(colors.stream().map(AliasHandler::resolveColor).toList());
-
+        List<String> colourList = Helper.getListFromCSV(event.getOption("colour_list", null, OptionMapping::getAsString).toLowerCase());
+        colourList = new ArrayList<>(colourList.stream().map(AliasHandler::resolveColor).toList());
         List<String> badColours = new ArrayList<>();
-        for (String colour : colors) {
+        for (String colour : colourList) {
             if (!Mapper.isValidColor(colour)) {
                 badColours.add(colour);
             }
         }
-        colors.removeAll(badColours);
-
+        colourList.removeAll(badColours);
         var userSettings = UserSettingsManager.get(event.getUser().getId());
-        userSettings.setPreferredColors(new HashSet<>(colors));
+        userSettings.setPreferredColourList(colourList);
         UserSettingsManager.save(userSettings);
-
         StringBuilder sb = new StringBuilder();
-        sb.append("Preferred Colour List updated to: `").append(colors).append("`");
+        sb.append("Preferred Colour List updated to: `").append(colourList).append("`");
         if (!badColours.isEmpty()) {
             sb.append("\nThe following colours were invalid and were not added: `").append(badColours).append("`");
         }

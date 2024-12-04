@@ -1,6 +1,12 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -19,11 +25,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.ButtonHelper;
@@ -34,6 +41,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -757,8 +765,8 @@ public class TileGenerator {
                         }
                     };
 
-                    x += (int) ((345 - 73 * scale) / 2);
-                    y += (int) ((300 - pdsDice.size() * 48 * scale) / 2);
+                    x += (345 - 73 * scale) / 2;
+                    y += (300 - pdsDice.size() * 48 * scale) / 2;
                     for (Player player : pdsDice.keySet()) {
                         int numberOfDice = pdsDice.get(player).size();
                         boolean rerolls = game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander");
@@ -803,7 +811,7 @@ public class TileGenerator {
                                 new Rectangle(Math.round(x + 73 * scale / 2), y, Math.round(73 * scale / 2), Math.round(48 * scale)),
                                 smallFont);
                         }
-                        y += (int) (48 * scale);
+                        y += 48 * scale;
                     }
                 }
             }
@@ -1585,6 +1593,26 @@ public class TileGenerator {
                 }
             }
         }
+    }
+
+    private String getUnitPath(UnitKey unit) {
+        return allEyesOnMe ? ResourceHelper.getInstance().getUnitFile(unit, allEyesOnMe) : ResourceHelper.getInstance().getUnitFile(unit);
+    }
+
+    private static Point getUnitTagLocation(String unitID) {
+        return switch (unitID) {
+            case "ws" -> new Point(-10, 45); // War Sun
+            case "fs", "lord", "lady", "tyrantslament", "cavalry" -> new Point(10, 55); // Flagship
+            case "dn" -> new Point(10, 50); // Dreadnought
+            case "ca" -> new Point(0, 40); // Cruiser
+            case "cv" -> new Point(0, 40); // Carrier
+            case "gf", "ff" -> new Point(-15, 12); // Infantry/Fighter
+            case "dd" -> new Point(-10, 30); // Destroyer
+            case "mf" -> new Point(-10, 20); // Mech
+            case "pd" -> new Point(-10, 20); // PDS
+            case "sd", "csd", "plenaryorbital" -> new Point(-10, 20); // Space Dock
+            default -> new Point(0, 0);
+        };
     }
 
     private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset) {

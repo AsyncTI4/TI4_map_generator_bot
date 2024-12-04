@@ -66,6 +66,7 @@ public class Source {
 
         public String emoji() {
             return switch (this) {
+                case base, pok, codex1, codex2, codex3 -> "";
                 case absol -> Emojis.Absol;
                 case ds -> Emojis.DiscordantStars;
                 case uncharted_space -> Emojis.UnchartedSpace;

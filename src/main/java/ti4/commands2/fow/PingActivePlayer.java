@@ -47,7 +47,6 @@ class PingActivePlayer extends GameStateSubcommand {
             }
             game.setLastActivePlayerPing(new Date());
         }
-
         var referenceGame = GameManager.getGame("finreference");
         if (referenceGame != null) {
             ButtonHelper.increasePingCounter(referenceGame, player.getUserID());

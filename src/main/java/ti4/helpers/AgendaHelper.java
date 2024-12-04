@@ -408,7 +408,7 @@ public class AgendaHelper {
         boolean resolveTime = false;
         String winner = "";
         String votes = buttonID.substring(buttonID.lastIndexOf("_") + 1);
-        MessageChannel channel;
+        MessageChannel channel = game.getMainGameChannel();
 
         boolean prevoting = !game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
         if (prevoting) {
@@ -442,16 +442,21 @@ public class AgendaHelper {
                 if (numV > numVOrig) {
                     player.addSpentThing("specialVotes_" + (numV - numVOrig));
                 }
-                if ((game.getLaws() == null || (!game.getLaws().containsKey("rep_govt") && !game.getLaws().containsKey("absol_government"))) &&
-                        (player.ownsPromissoryNote("blood_pact") || player.getPromissoryNotesInPlayArea().contains("blood_pact"))) {
-                    for (Player p2 : getWinningVoters(outcome, game)) {
-                        if (p2 == player) {
-                            continue;
-                        }
-                        if (p2.ownsPromissoryNote("blood_pact") || p2.getPromissoryNotesInPlayArea().contains("blood_pact")) {
-                            player.addSpentThing("bloodPact_" + 4);
-                            votes = (Integer.parseInt(votes) + 4) + "";
-                            break;
+                if (game.getLaws() != null && (game.getLaws().containsKey("rep_govt")
+                    || game.getLaws().containsKey("absol_government"))) {
+                } else {
+                    if (player.ownsPromissoryNote("blood_pact")
+                        || player.getPromissoryNotesInPlayArea().contains("blood_pact")) {
+                        for (Player p2 : getWinningVoters(outcome, game)) {
+                            if (p2 == player) {
+                                continue;
+                            }
+                            if (p2.ownsPromissoryNote("blood_pact")
+                                || p2.getPromissoryNotesInPlayArea().contains("blood_pact")) {
+                                player.addSpentThing("bloodPact_" + 4);
+                                votes = (Integer.parseInt(votes) + 4) + "";
+                                break;
+                            }
                         }
                     }
                 }
@@ -665,7 +670,8 @@ public class AgendaHelper {
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
         for (String outcome : outcomes.keySet()) {
             String existingData = outcomes.getOrDefault(outcome, "empty");
-            if (existingData != null && !"empty".equalsIgnoreCase(existingData) && !"".equalsIgnoreCase(existingData)) {
+            if (existingData == null || "empty".equalsIgnoreCase(existingData) || "".equalsIgnoreCase(existingData)) {
+            } else {
                 String[] votingInfo = existingData.split(";");
                 StringBuilder totalBuilder = new StringBuilder();
                 for (String onePiece : votingInfo) {
@@ -688,7 +694,8 @@ public class AgendaHelper {
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
         for (String outcome : outcomes.keySet()) {
             String existingData = outcomes.getOrDefault(outcome, "empty");
-            if (existingData != null && !"empty".equalsIgnoreCase(existingData) && !"".equalsIgnoreCase(existingData)) {
+            if (existingData == null || "empty".equalsIgnoreCase(existingData) || "".equalsIgnoreCase(existingData)) {
+            } else {
                 String[] votingInfo = existingData.split(";");
                 StringBuilder totalBuilder = new StringBuilder();
                 for (String onePiece : votingInfo) {

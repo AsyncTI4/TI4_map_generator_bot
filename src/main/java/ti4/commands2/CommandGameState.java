@@ -6,7 +6,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
-import ti4.service.SusSlashCommandService;
 
 class CommandGameState {
 
@@ -30,17 +29,15 @@ class CommandGameState {
         this.game.set(game);
         game.incrementSpecificSlashCommandCount(event.getFullCommandName()); // TODO: This only works for commands that save...
 
-        SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, game);
-
         if (!isPlayerCommand) {
             return;
         }
-        var player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
+        var gamePlayer = CommandHelper.getPlayerFromEvent(game, event);
+        if (gamePlayer == null) {
             throw new IllegalArgumentException("Unable to determine player while attempting to run event " + event.getName() +
                     " in channel " + event.getChannel().getName() + " for game " + gameName);
         }
-        this.player.set(player);
+        player.set(gamePlayer);
     }
 
     public void postExecute(SlashCommandInteractionEvent event) {

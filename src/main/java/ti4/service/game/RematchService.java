@@ -39,7 +39,7 @@ public class RematchService {
         int charValue = name.charAt(name.length() - 1);
         String present = name.substring(name.length() - 1);
         String next = String.valueOf((char) (charValue + 1));
-        String newName;
+        String newName = "";
         if (ButtonHelper.isNumeric(present)) {
             newName = name + "b";
         } else {
@@ -104,8 +104,8 @@ public class RematchService {
             if (!player.getFaction().equals("neutral"))
                 newGame.addPlayer(player.getUserID(), player.getUserName());
         }
-        newGame.setPlayerCountForMap(newGame.getPlayers().size());
-        newGame.setStrategyCardsPerPlayer(newGame.getSCList().size() / newGame.getPlayers().size());
+        newGame.setPlayerCountForMap(newGame.getPlayers().values().size());
+        newGame.setStrategyCardsPerPlayer(newGame.getSCList().size() / newGame.getPlayers().values().size());
 
         // CREATE CHANNELS
         String newGameName = game.getCustomName();

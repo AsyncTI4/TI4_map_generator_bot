@@ -582,7 +582,7 @@ public class Player {
         // ATTEMPT TO FIND BY ID
         try {
             String cardsInfoThreadID = getCardsInfoThreadID();
-            boolean hasCardsInfoThreadId = cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !"null".equals(cardsInfoThreadID);
+            boolean hasCardsInfoThreadId = cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID);
             if (cardsInfoThreadID != null && hasCardsInfoThreadId) {
                 ThreadChannel threadChannel = actionsChannel.getGuild().getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null)
@@ -1539,7 +1539,7 @@ public class Player {
     private void initAbilities() {
         Set<String> abilities = new HashSet<>();
         for (String ability : getFactionStartingAbilities()) {
-            if (!ability.isBlank()) {
+            if (!ability.isEmpty() && !ability.isBlank()) {
                 abilities.add(ability);
             }
         }
@@ -2349,6 +2349,10 @@ public class Player {
 
             // Find another unit model to replace this lost model
             String replacementUnit = unitModel.getBaseType(); // default
+            // if (unitModel.getUpgradesFromUnitId().isPresent() && !unitModel.getUpgradesFromUnitId().isEmpty()) {
+            //     addOwnedUnitByID(unitModel.getUpgradesFromUnitId().orElse(replacementUnit));
+            //     return;
+            // }
             if (relevantTechs.isEmpty() && unitModel.getBaseType() != null) {
                 // No other relevant unit upgrades
                 FactionModel factionSetup = getFactionSetupInfo();
@@ -2595,7 +2599,7 @@ public class Player {
                 color = "No Color";
 
             String userName = getUserName();
-            if (userName == null || userName.isBlank()) {
+            if (userName == null || userName.isEmpty() || userName.isBlank()) {
                 userName = "No User";
             }
 
@@ -2881,7 +2885,7 @@ public class Player {
     @JsonIgnore
     public String getNextAvailableColorIgnoreCurrent() {
         Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
-        String color = UserSettingsManager.get(getUserID()).getPreferredColors().stream()
+        String color = UserSettingsManager.get(getUserID()).getPreferredColourList().stream()
             .filter(c -> getGame().getUnusedColorsPreferringBase().stream().anyMatch(col -> col.getName().equals(c)))
             .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
             .findFirst()

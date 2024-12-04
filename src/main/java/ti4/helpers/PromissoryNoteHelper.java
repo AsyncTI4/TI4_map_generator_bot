@@ -178,6 +178,7 @@ public class PromissoryNoteHelper {
     }
 
     public static void resolvePNPlay(String id, Player player, Game game, GenericInteractionCreateEvent event) {
+        boolean longPNDisplay = false;
         boolean fromHand = true;
         if ("bmfNotHand".equals(id)) {
             fromHand = false;
@@ -217,7 +218,7 @@ public class PromissoryNoteHelper {
             pnText = "Political Secret" + Emojis.Absol
                 + ":  *When you cast votes:* You may exhaust up to 3 of the {color} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {color} player.";
         } else {
-            pnText = Mapper.getPromissoryNote(id).getName();
+            pnText = longPNDisplay ? Mapper.getPromissoryNote(id).getText() : Mapper.getPromissoryNote(id).getName();
         }
         sb.append(pnText).append("\n");
 
