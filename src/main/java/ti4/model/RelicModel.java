@@ -46,7 +46,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getShortName() {
-        if (!getHomebrewReplacesID().isPresent())
+        if (getHomebrewReplacesID().isEmpty())
         {
             return Optional.ofNullable(shortName).orElse(getName());
         }
@@ -54,7 +54,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean getShrinkName() {
-        if (!getHomebrewReplacesID().isPresent())
+        if (getHomebrewReplacesID().isEmpty())
         {
             return Optional.ofNullable(shrinkName).orElse(false);
         }

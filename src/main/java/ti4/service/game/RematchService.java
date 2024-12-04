@@ -39,7 +39,7 @@ public class RematchService {
         int charValue = name.charAt(name.length() - 1);
         String present = name.substring(name.length() - 1);
         String next = String.valueOf((char) (charValue + 1));
-        String newName = "";
+        String newName;
         if (ButtonHelper.isNumeric(present)) {
             newName = name + "b";
         } else {

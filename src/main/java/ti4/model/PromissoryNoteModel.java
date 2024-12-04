@@ -68,7 +68,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     }
 
     public String getShortName() {
-        if (!getHomebrewReplacesID().isPresent())
+        if (getHomebrewReplacesID().isEmpty())
         {
             return Optional.ofNullable(shortName).orElse(getName());
         }
@@ -76,7 +76,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     }
 
     public boolean getShrinkName() {
-        if (!getHomebrewReplacesID().isPresent())
+        if (getHomebrewReplacesID().isEmpty())
         {
             return Optional.ofNullable(shrinkName).orElse(false);
         }

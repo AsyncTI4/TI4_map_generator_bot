@@ -481,11 +481,4 @@ public class CombatModHelper {
         return (int) value;
     }
 
-    // public static List<NamedCombatModifierModel>
-    // FilterRelevantMods(List<NamedCombatModifierModel> mods,
-    // List<UnitModel> units, CombatRollType rollType) {
-    // return mods.stream()
-    // .filter(model -> IsModInScopeForUnits(units, model.getModifier(), rollType))
-    // .toList();
-    // }
 }

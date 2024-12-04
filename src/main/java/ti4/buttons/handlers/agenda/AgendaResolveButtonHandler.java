@@ -5,14 +5,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
@@ -399,7 +398,6 @@ class AgendaResolveButtonHandler {
                 for (Player player : game.getRealPlayers()) {
                     if (player.getPlanets().contains(winner.toLowerCase())) {
                         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(winner, game);
-                        int count = 0;
                         Player cabalMechOwner = Helper.getPlayerFromUnit(game, "cabal_mech");
                         boolean cabalMech = cabalMechOwner != null
                             && uH.getUnitCount(Units.UnitType.Mech, cabalMechOwner.getColor()) > 0
@@ -425,7 +423,6 @@ class AgendaResolveButtonHandler {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabalFSOwner,
                                     uH.getUnitCount(Units.UnitType.Mech, player.getColor()), "mech", event);
                             }
-                            count = count + uH.getUnitCount(Units.UnitType.Mech, player.getColor());
                             uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()),
                                 uH.getUnitCount(Units.UnitType.Mech, player.getColor()));
                         }
@@ -440,7 +437,6 @@ class AgendaResolveButtonHandler {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabalFSOwner,
                                     uH.getUnitCount(Units.UnitType.Infantry, player.getColor()), "infantry", event);
                             }
-                            count = count + uH.getUnitCount(Units.UnitType.Infantry, player.getColor());
                             uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), player.getColorID()),
                                 uH.getUnitCount(Units.UnitType.Infantry, player.getColor()));
                         }
@@ -693,10 +689,10 @@ class AgendaResolveButtonHandler {
                         "# Removed all laws");
                     int counter = 40;
                     boolean lawFound = false;
+                    ArrayList<String> discardedAgendas = new ArrayList<>();
                     while (counter > 0 && !lawFound) {
                         counter--;
                         String id2 = game.revealAgenda(false);
-                        ArrayList<String> discardedAgendas = new ArrayList<String>();
                         AgendaModel agendaDetails = Mapper.getAgenda(id2);
                         if (agendaDetails.getType().equalsIgnoreCase("law")) {
                             lawFound = true;
@@ -708,7 +704,6 @@ class AgendaResolveButtonHandler {
                                 game.putAgendaBackIntoDeckOnTop(id3);
                             }
                             game.shuffleAgendas();
-
                         } else {
                             discardedAgendas.add(id2);
                             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -881,8 +876,6 @@ class AgendaResolveButtonHandler {
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                         "Drew 2 ACs for each of the players who voted for and gave 1 strat CC to those who voted against");
-                } else {
-
                 }
             }
             if ("economic_equality".equalsIgnoreCase(agID)) {
@@ -919,29 +912,16 @@ class AgendaResolveButtonHandler {
                 if (!game.isHomebrewSCMode()) {
                     List<Button> scButtons = new ArrayList<>();
                     switch (winner) {
-                        case "1" -> {
-                            scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain CCs"));
-                            //scButtons.add(Buttons.red("leadershipExhaust", "Exhaust Planets"));
-                        }
-                        case "2" -> {
-                            scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
-                        }
-                        case "3" -> {
-                            scButtons.add(Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", Emojis.ActionCard));
-                        }
+                        case "1" -> scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain CCs"));
+                        case "2" -> scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
+                        case "3" -> scButtons.add(Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", Emojis.ActionCard));
                         case "4" -> {
                             scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", Emojis.spacedock));
                             scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", Emojis.pds));
                         }
-                        case "5" -> {
-                            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", Emojis.comm));
-                        }
-                        case "6" -> {
-                            scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
-                        }
-                        case "7" -> {
-                            scButtons.add(Buttons.GET_A_TECH);
-                        }
+                        case "5" -> scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", Emojis.comm));
+                        case "6" -> scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
+                        case "7" -> scButtons.add(Buttons.GET_A_TECH);
                         case "8" -> {
                             PlayStrategyCardService.handleSOQueueing(game, false);
                             scButtons.add(Buttons.gray("sc_draw_so", "Draw Secret Objective", Emojis.SecretObjective));
@@ -950,10 +930,6 @@ class AgendaResolveButtonHandler {
                     MessageHelper.sendMessageToChannel(actionsChannel,
                         "You may use this button to resolve the secondary.", scButtons);
                 }
-            }
-
-            if (game.getCurrentAgendaInfo().contains("Law")) {
-                // Figure out law
             }
         }
         List<Player> riders = AgendaHelper.getWinningRiders(winner, game, event);

@@ -14,7 +14,7 @@ public class GameStatisticsService {
         String statisticToShow = event.getOption(Constants.GAME_STATISTIC, null, OptionMapping::getAsString);
         GameStatTypes statType = GameStatTypes.fromString(statisticToShow);
         if (statType == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statType);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not determine stat type.");
             return;
         }
         StatisticsPipeline.queue(

@@ -47,7 +47,6 @@ class RunManualDataMigration extends Subcommand {
             }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             BotLogger.log("failed to run data migration", e);
-            e.printStackTrace();
         }
     }
 }
