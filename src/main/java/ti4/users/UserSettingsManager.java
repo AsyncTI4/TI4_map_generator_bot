@@ -23,7 +23,7 @@ public class UserSettingsManager {
         mapper.writer(new DefaultPrettyPrinter());
         userIdToSettingsCache = Caffeine.newBuilder()
                 .maximumSize(200)
-                .expireAfterAccess(2, TimeUnit.HOURS)
+                .expireAfterAccess(4, TimeUnit.HOURS)
                 .build(UserSettingsManager::load);
         LogCacheStatsCron.registerCache("userIdToSettingsCache", userIdToSettingsCache);
     }
@@ -43,6 +43,7 @@ public class UserSettingsManager {
     }
 
     public static void save(UserSettings userSettings) {
+        userIdToSettingsCache.put(userSettings.getUserId(), userSettings);
         persistFile(userSettings);
     }
 

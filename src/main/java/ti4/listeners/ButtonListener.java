@@ -30,8 +30,6 @@ public class ButtonListener extends ListenerAdapter {
             event.deferEdit().queue();
         }
 
-        event.getChannel().sendTyping().queue();
-
         ButtonProcessor.queue(event);
     }
 }

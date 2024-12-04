@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +52,7 @@ public class CommandHelper {
     }
 
     @NotNull
-    private static String getGameNameFromChannel(GenericInteractionCreateEvent event) {
+    private static String getGameNameFromChannel(Interaction event) {
         // try to get game name from channel name
         var channel = event.getChannel();
         String gameName = getGameNameFromChannelName(channel.getName());
