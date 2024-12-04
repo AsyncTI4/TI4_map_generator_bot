@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -1598,7 +1597,7 @@ public class ButtonHelperActionCards {
             amountToKill = 3;
         }
         if (p2.hasInf2Tech()) {
-            ButtonHelper.resolveInfantryDeath(player, amountToKill);
+            ButtonHelper.resolveInfantryDeath(p2, amountToKill);
             boolean cabalMech = false;
             Tile tile = game.getTileFromPlanet(planet);
             if (p2.hasAbility("amalgamation")

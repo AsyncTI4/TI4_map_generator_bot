@@ -936,7 +936,7 @@ public class ButtonHelperHeroes {
                 if (tile.containsPlayersUnits(p2)) {
                     int amountInf = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
                     if (p2.hasInf2Tech()) {
-                        ButtonHelper.resolveInfantryDeath(player, amountInf);
+                        ButtonHelper.resolveInfantryDeath(p2, amountInf);
                     }
                     if (amountInf > 0) {
                         RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountInf + " inf " + name);
@@ -1162,7 +1162,7 @@ public class ButtonHelperHeroes {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> empties = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getUnitHolders().values().size() > 1 || !FoWHelper.playerHasShipsInSystem(player, tile)) {
+            if (tile.getUnitHolders().size() > 1 || !FoWHelper.playerHasShipsInSystem(player, tile)) {
                 continue;
             }
             empties.add(Buttons.blue(finChecker + "exploreFront_" + tile.getPosition(),
