@@ -23,6 +23,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArborec_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArborec_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheArborec",
         "source": "base"
     },
     {
@@ -50,6 +54,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGhostsOfCreuss_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGhostsOfCreuss_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheGhostsOfCreuss",
         "source": "base"
     },
     {
@@ -76,6 +84,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmiratesOfHacan_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmiratesOfHacan_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheEmiratesOfHacan",
         "source": "base"
     },
     {
@@ -103,6 +115,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheUniversitiesOfJolNar_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheUniversitiesOfJolNar_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheUniversitiesOfJolNar",
         "source": "base"
     },
     {
@@ -130,6 +146,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheL1z1xMindnet_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheL1z1xMindnet_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheL1z1xMindnet",
         "source": "base"
     },
     {
@@ -156,6 +176,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheBaronyOfLetnev_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheBaronyOfLetnev_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheBaronyOfLetnev",
         "source": "base"
     },
     {
@@ -183,6 +207,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMentakCoalition_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMentakCoalition_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheMentakCoalition",
         "source": "base"
     },
     {
@@ -210,6 +238,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmbersOfMuaat_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmbersOfMuaat_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheEmbersOfMuaat",
         "source": "base"
     },
     {
@@ -236,6 +268,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaaluCollective_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaaluCollective_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheNaaluCollective",
         "source": "base"
     },
     {
@@ -267,6 +303,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNekroVirus_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNekroVirus_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheNekroVirus",
         "source": "base"
     },
     {
@@ -293,6 +333,10 @@
             "pds",
             "saar_spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheClanOfSaar_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheClanOfSaar_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheClanOfSaar",
         "source": "base"
     },
     {
@@ -320,6 +364,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/SardakkNorr_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/SardakkNorr_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=SardakkNorr",
         "source": "base"
     },
     {
@@ -346,6 +394,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheFederationOfSol_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheFederationOfSol_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheFederationOfSol",
         "source": "base"
     },
     {
@@ -382,6 +434,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheWinnu_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheWinnu_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheWinnu",
         "source": "base"
     },
     {
@@ -408,6 +464,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheXxchaKingdom_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheXxchaKingdom_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheXxchaKingdom",
         "source": "base"
     },
     {
@@ -434,7 +494,9 @@
             "pds",
             "spacedock"
         ],
-        "factionSheetFrontImageURL": "https://static.wikia.nocookie.net/twilight-imperium-4/images/1/14/Yin1.jpg",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYinBrotherhood_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYinBrotherhood_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheYinBrotherhood",
         "source": "base"
     },
     {
@@ -461,6 +523,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYssarilTribes_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYssarilTribes_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheYssarilTribes",
         "source": "base"
     }
 ]
