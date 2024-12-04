@@ -104,8 +104,8 @@ public class RematchService {
             if (!player.getFaction().equals("neutral"))
                 newGame.addPlayer(player.getUserID(), player.getUserName());
         }
-        newGame.setPlayerCountForMap(newGame.getPlayers().values().size());
-        newGame.setStrategyCardsPerPlayer(newGame.getSCList().size() / newGame.getPlayers().values().size());
+        newGame.setPlayerCountForMap(newGame.getPlayers().size());
+        newGame.setStrategyCardsPerPlayer(newGame.getSCList().size() / newGame.getPlayers().size());
 
         // CREATE CHANNELS
         String newGameName = game.getCustomName();
