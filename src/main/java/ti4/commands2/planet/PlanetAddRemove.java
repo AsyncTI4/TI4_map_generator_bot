@@ -92,14 +92,14 @@ abstract class PlanetAddRemove extends GameStateSubcommand {
     public abstract void doAction(GenericInteractionCreateEvent event, Player player, String techID, Game game);
 
     private String getActionHeaderMessage(Player player) {
-        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" ");
+        String message = player.getRepresentation() + " ";
         return switch (getName()) {
-            case Constants.PLANET_ADD -> message.append(" added planet(s):").toString();
-            case Constants.PLANET_REMOVE -> message.append(" removed planet(s):").toString();
-            case Constants.PLANET_EXHAUST -> message.append(" exhausted planet(s):").toString();
-            case Constants.PLANET_REFRESH -> message.append(" readied planet(s):").toString();
-            case Constants.PLANET_EXHAUST_ABILITY -> message.append(" exhausted the legendary ability").toString();
-            case Constants.PLANET_REFRESH_ABILITY -> message.append(" readied the legendary ability:").toString();
+            case Constants.PLANET_ADD -> message + " added planet(s):";
+            case Constants.PLANET_REMOVE -> message + " removed planet(s):";
+            case Constants.PLANET_EXHAUST -> message + " exhausted planet(s):";
+            case Constants.PLANET_REFRESH -> message + " readied planet(s):";
+            case Constants.PLANET_EXHAUST_ABILITY -> message + " exhausted the legendary ability";
+            case Constants.PLANET_REFRESH_ABILITY -> message + " readied the legendary ability:";
             default -> "";
         };
     }

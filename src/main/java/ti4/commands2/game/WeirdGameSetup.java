@@ -102,7 +102,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_miltymod"))) return false;
             if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_miltymod"))) return false;
             if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_miltymod"))) return false;
-            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_base"))) return false;
+            if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_base"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_base"))) return false;
 
             for (Player player : game.getPlayers().values()) {
@@ -126,7 +126,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_base"))) return false;
             if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_base"))) return false;
             if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_basegame_and_codex1"))) return false;
-            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_base"))) return false;
+            if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_base"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_base"))) return false;
 
             for (Player player : game.getPlayers().values()) {
@@ -153,7 +153,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
             if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
             if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
-            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol_ds"))) return false;
+            if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol_ds"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"))) return false;
             game.setTechnologyDeckID("techs_ds_absol");
             game.setAbsolMode(true);
@@ -172,7 +172,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
             if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
             if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
-            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_ds"))) return false;
+            if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_ds"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"))) return false;
             game.setTechnologyDeckID("techs_ds");
             game.setAbsolMode(false);
@@ -187,7 +187,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
             if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
             if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
-            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"))) return false;
+            if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
             game.setTechnologyDeckID("techs_absol");
             game.setDiscordantStarsMode(false);
@@ -203,7 +203,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
             if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
             if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
-            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_pok"))) return false;
+            if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
             game.setTechnologyDeckID("techs_pok");
             game.setBaseGameMode(false);
@@ -219,7 +219,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
             if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
             if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
-            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_pok"))) return false;
+            if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
             game.setTechnologyDeckID("techs_pok");
             game.setBaseGameMode(false);
