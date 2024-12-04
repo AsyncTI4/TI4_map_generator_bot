@@ -20,13 +20,13 @@ class CombatButtonHandler {
         String faction2 = buttonID.split("_")[2];
         Player p1 = game.getPlayerFromColorOrFaction(faction1);
         Player p2 = game.getPlayerFromColorOrFaction(faction2);
-        Player opponent = null;
         String planet = buttonID.split("_")[3];
         String confirmed = buttonID.split("_")[4];
         if (player != p1 && player != p2) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This button is only for combat participants");
             return;
         }
+        Player opponent;
         if (player == p2) {
             opponent = p1;
         } else {

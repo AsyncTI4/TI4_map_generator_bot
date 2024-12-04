@@ -2903,9 +2903,9 @@ public class Game extends GameProperties {
 
         if (isAbsolMode() && !deckSettings.getRelics().getChosenKey().contains("absol")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using absol mode, so the relic deck you chose will be overridden.");
-            success &= validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"));
+            success &= validateAndSetRelicDeck(Mapper.getDeck("relics_absol"));
         } else {
-            success &= validateAndSetRelicDeck(event, deckSettings.getRelics().getValue());
+            success &= validateAndSetRelicDeck(deckSettings.getRelics().getValue());
         }
 
         return success;
@@ -2982,14 +2982,7 @@ public class Game extends GameProperties {
         return true;
     }
 
-    public boolean validateAndSetRelicDeck(GenericInteractionCreateEvent event, DeckModel deck) {
-        // for (Player player : getPlayers().values()) {
-        //     if (!player.getRelics().isEmpty()) {
-        //         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change relic deck to **"
-        //             + deck.getName() + "** while there are relics in player hands.");
-        //         return false;
-        //     }
-        // }
+    public boolean validateAndSetRelicDeck(DeckModel deck) {
         setRelicDeckID(deck.getAlias());
         setRelics(deck.getNewShuffledDeck());
         return true;

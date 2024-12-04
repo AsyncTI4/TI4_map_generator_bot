@@ -30,25 +30,19 @@ public class ListPlayerInfoService {
         return switch (objID) {
             // stage 1's
             case "push_boundaries" -> 2;
-            case "outer_rim" -> 3;
+            case "outer_rim", "ancient_monuments", "revolutionize", "deep_space", "lead", "research_outposts", "infrastructure" -> 3;
             case "make_history" -> 2;
-            case "infrastructure" -> 3;
-            case "corner" -> 4;
+            case "corner", "become_legend", "master_science", "build_defenses" -> 4;
             case "develop" -> 2;
             case "diversify" -> 2;
-            case "monument" -> 8;
+            case "monument", "command_armada", "sway_council" -> 8;
             case "expand_borders" -> 6;
-            case "research_outposts" -> 3;
             case "intimidate" -> 2;
-            case "lead" -> 3;
             case "trade_routes" -> 5;
             case "amass_wealth" -> 9;
-            case "build_defenses" -> 4;
             case "lost_outposts" -> 2;
             case "engineer_marvel" -> 1;
-            case "deep_space" -> 3;
             case "raise_fleet" -> 5;
-            case "sway_council" -> 8;
             // stage 2's
             case "centralize_trade" -> 10;
             case "conquer" -> 1;
@@ -56,19 +50,14 @@ public class ListPlayerInfoService {
             case "golden_age" -> 16;
             case "galvanize" -> 6;
             case "manipulate_law" -> 16;
-            case "master_science" -> 4;
-            case "revolutionize" -> 3;
             case "subdue" -> 11;
             case "unify_colonies" -> 6;
             case "supremacy" -> 1;
-            case "become_legend" -> 4;
-            case "command_armada" -> 8;
             case "massive_cities" -> 7;
             case "control_borderlands" -> 5;
             case "vast_reserves" -> 18;
             case "vast_territories" -> 5;
             case "protect_border" -> 5;
-            case "ancient_monuments" -> 3;
             case "distant_lands" -> 2;
 
             //status phase secrets

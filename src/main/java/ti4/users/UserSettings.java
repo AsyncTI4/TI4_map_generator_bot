@@ -2,19 +2,23 @@ package ti4.users;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserSettings {
 
     private String userId;
-    private List<String> preferredColourList;
+    private Set<String> preferredColors;
     private int personalPingInterval;
     private boolean prefersDistanceBasedTacticalActions;
     private String afkHours;
@@ -26,11 +30,15 @@ public class UserSettings {
         this.userId = userId;
     }
 
-    public List<String> getPreferredColourList() {
-        if (preferredColourList == null) {
-            return Collections.emptyList();
+    public Set<String> getPreferredColors() {
+        return Objects.requireNonNullElse(preferredColors, Collections.emptySet());
+    }
+
+    public void addPreferredColor(String color) {
+        if (preferredColors == null) {
+            preferredColors = new HashSet<>();
         }
-        return preferredColourList;
+        preferredColors.add(color);
     }
 
     public void putStoredValue(String settingKey, String settingValue) {

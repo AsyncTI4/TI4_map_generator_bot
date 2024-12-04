@@ -14,9 +14,8 @@ public class BorderAnomalyHolder {
 
     public boolean blocksAdjacency() {
         return switch (type) {
-            case null -> false;
             case SPATIAL_TEAR -> true;
-            default -> false;
+            case null, default -> false;
         };
     }
 }

@@ -369,7 +369,6 @@ public class CombatRollService {
         int totalHits = 0;
         StringBuilder resultBuilder = new StringBuilder(result);
         List<UnitModel> playerUnitsList = new ArrayList<>(playerUnits.keySet());
-        List<UnitModel> opponentUnitsList = new ArrayList<>(opponentUnits.keySet());
         int totalMisses = 0;
         UnitHolder space = activeSystem.getUnitHolders().get("space");
         StringBuilder extra = new StringBuilder();

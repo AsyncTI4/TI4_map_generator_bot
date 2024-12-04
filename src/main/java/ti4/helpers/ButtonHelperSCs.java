@@ -442,7 +442,6 @@ public class ButtonHelperSCs {
 
     @ButtonHandler("leadershipGenerateCCButtons")
     public static void leadershipGenerateCCButtons(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        int leadershipInitiative = 1;
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
             if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok1leadership")) {
@@ -452,7 +451,7 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("leadership").orElse(null);
         }
-        leadershipInitiative = scModel.getInitiative();
+        int leadershipInitiative = scModel.getInitiative();
 
         if (!player.getFollowedSCs().contains(leadershipInitiative)) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, leadershipInitiative, game, event);
@@ -479,8 +478,6 @@ public class ButtonHelperSCs {
         Button getTactic = Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_tactic_cc", "Gain 1 Tactic CC");
         Button getFleet = Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_fleet_cc", "Gain 1 Fleet CC");
         Button getStrat = Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_strategy_cc", "Gain 1 Strategy CC");
-        // Button exhaust = Buttons.red(finsFactionCheckerPrefix +
-        // "leadershipExhaust", "Exhaust Planets");
         Button doneGainingCC = Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons_leadership", "Done Gaining CCs");
         Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset CCs");
         List<Button> buttons2 = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);

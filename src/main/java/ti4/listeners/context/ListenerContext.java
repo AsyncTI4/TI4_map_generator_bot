@@ -131,17 +131,18 @@ public abstract class ListenerContext {
 
     public boolean checkFinsFactionChecker() {
         GenericInteractionCreateEvent event = getEvent();
-        if (!factionChecked && componentID != null && componentID.startsWith("FFCC_")) {
-            componentID = componentID.replace("FFCC_", "");
-            String factionWhoPressedButton = player == null ? "nullPlayer" : player.getFaction();
-            if (player != null && !componentID.startsWith(factionWhoPressedButton + "_")) {
-                String message = "To " + player.getFactionEmoji() + ": these buttons are for someone else";
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-                return false;
-            }
-            componentID = componentID.replaceFirst(factionWhoPressedButton + "_", "");
-            factionChecked = true;
+        if (factionChecked || componentID == null || !componentID.startsWith("FFCC_")) {
+            return true;
         }
+        componentID = componentID.replace("FFCC_", "");
+        String factionWhoPressedButton = player == null ? "nullPlayer" : player.getFaction();
+        if (player != null && !componentID.startsWith(factionWhoPressedButton + "_")) {
+            String message = "To " + player.getFactionEmoji() + ": these buttons are for someone else";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            return false;
+        }
+        componentID = componentID.replaceFirst(factionWhoPressedButton + "_", "");
+        factionChecked = true;
         return true;
     }
 }

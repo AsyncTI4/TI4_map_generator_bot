@@ -1331,15 +1331,15 @@ public class MapGenerator implements AutoCloseable {
             }
 
             if (relicID.equals("emelpar") || relicModel.getHomebrewReplacesID().orElse("").equals("emelpar")) {
-                String empelar = "";
+                StringBuilder empelar = new StringBuilder();
                 List<Character> letters = Arrays.asList('m', 'e', 'l', 'p', 'a');
                 Collections.shuffle(letters);
                 for (Character c : letters) {
-                    empelar += c;
+                    empelar.append(c);
                 }
-                empelar = "Scepter of\nE" + empelar + "r";
+                empelar = new StringBuilder("Scepter of\nE" + empelar + "r");
                 graphics.setFont(Storage.getFont18());
-                drawOneOrTwoLinesOfTextVertically(g2, empelar, x + deltaX + 7, y + 30, 120, true);
+                drawOneOrTwoLinesOfTextVertically(g2, empelar.toString(), x + deltaX + 7, y + 30, 120, true);
             } else if (relicModel.getShrinkName()) {
                 graphics.setFont(Storage.getFont16());
                 drawOneOrTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 9, y + 30, 120, true);
@@ -1460,7 +1460,7 @@ public class MapGenerator implements AutoCloseable {
             if (leader.getTgCount() != 0) {
                 graphics.setColor(TradeGoodColor);
                 graphics.setFont(Storage.getFont32());
-                Integer offset = 20 - graphics.getFontMetrics().stringWidth("" + leader.getTgCount()) / 2;
+                int offset = 20 - graphics.getFontMetrics().stringWidth("" + leader.getTgCount()) / 2;
                 graphics.drawString(Integer.toString(leader.getTgCount()), x + deltaX + offset, y + 25);
             } else {
                 String pipID;
@@ -1669,7 +1669,7 @@ public class MapGenerator implements AutoCloseable {
             } else {
                 drawPAImageScaled(x + deltaX + 1, y + 1, "pa_promissory_light.png", 38, 28);
             }
-            if (game.isFrankenGame() && !promissoryNote.getFaction().isEmpty()) {
+            if (game.isFrankenGame() && promissoryNote.getFaction().isPresent()) {
                 drawFactionIconImage(graphics, promissoryNote.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
             }
             boolean greyed = false;
@@ -2779,7 +2779,7 @@ public class MapGenerator implements AutoCloseable {
         }
         // Add faction icons on top of upgraded or upgradable units
         for (UnitModel unit : playerUnitModels) {
-            boolean isPurged = unit.getRequiredTechId().isPresent() && player.getPurgedTechs().contains(unit.getRequiredTechId());
+            boolean isPurged = unit.getRequiredTechId().isPresent() && player.getPurgedTechs().contains(unit.getRequiredTechId().get());
             Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
             if (unit.getFaction().isPresent()) {
                 boolean unitHasUpgrade = unit.getUpgradesFromUnitId().isPresent() || unit.getUpgradesToUnitId().isPresent();
@@ -2889,7 +2889,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private String getUnitPath(UnitKey unit) {
-        return allEyesOnMe ? ResourceHelper.getInstance().getUnitFile(unit, allEyesOnMe) : ResourceHelper.getInstance().getUnitFile(unit);
+        return allEyesOnMe ? ResourceHelper.getInstance().getUnitFile(unit, true) : ResourceHelper.getInstance().getUnitFile(unit);
     }
 
     private void drawPAUnitUpgrade(int x, int y, UnitKey unitKey) {
@@ -3759,35 +3759,33 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
             if (offBoardHighlighting >= 2) {
-                int i = 0;
                 for (String planet : attachFiles.keySet()) {
                     BufferedImage bufferedImage = ImageHelper.read(attachFiles.get(planet));
                     bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / offBoardHighlighting / bufferedImage.getWidth() / bufferedImage.getHeight()));
                     graphics.drawImage(bufferedImage,
-                        miscTile.x + (345 - bufferedImage.getWidth()) / 2 - 30 + i * 60 / (offBoardHighlighting - 1),
-                        miscTile.y + (300 - bufferedImage.getHeight()) / 2 - 30 + i * 60 / (offBoardHighlighting - 1) + (player.isSpeaker() ? 30 : 0),
+                        miscTile.x + (345 - bufferedImage.getWidth()) / 2 - 30,
+                        miscTile.y + (300 - bufferedImage.getHeight()) / 2 - 30 + (player.isSpeaker() ? 30 : 0),
                         null);
                     if (attachCount.get(planet) > 1) {
                         graphics.setColor(Color.WHITE);
                         graphics.fillOval(
-                            miscTile.x + (345 - 80) / 2 - 30 + i * 60 / (offBoardHighlighting - 1),
-                            miscTile.y + (300 - 16) / 2 - 30 + i * 60 / (offBoardHighlighting - 1) + (player.isSpeaker() ? 30 : 0),
+                            miscTile.x + (345 - 80) / 2 - 30,
+                            miscTile.y + (300 - 16) / 2 - 30 + (player.isSpeaker() ? 30 : 0),
                             80, 80);
                         graphics.setColor(Color.BLACK);
                         graphics.fillOval(
-                            miscTile.x + (345 - 72) / 2 - 30 + i * 60 / (offBoardHighlighting - 1),
-                            miscTile.y + (300 - 16) / 2 - 30 + i * 60 / (offBoardHighlighting - 1) + (player.isSpeaker() ? 30 : 0) + 4,
+                            miscTile.x + (345 - 72) / 2 - 30,
+                            miscTile.y + (300 - 16) / 2 - 30 + (player.isSpeaker() ? 30 : 0) + 4,
                             72, 72);
                         graphics.setColor(Color.WHITE);
                         DrawingUtil.drawCenteredString(graphics, "" + attachCount.get(planet),
                             new Rectangle(
-                                miscTile.x + (345 - 80) / 2 - 30 + i * 60 / (offBoardHighlighting - 1),
-                                miscTile.y + (300 - 16) / 2 - 30 + i * 60 / (offBoardHighlighting - 1) + (player.isSpeaker() ? 30 : 0),
+                                miscTile.x + (345 - 80) / 2 - 30,
+                                miscTile.y + (300 - 16) / 2 - 30 + (player.isSpeaker() ? 30 : 0),
                                 80, 80),
                             Storage.getFont48());
                     }
                 }
-                i++;
             } else if (offBoardHighlighting == 1) {
                 String planet = attachFiles.keySet().iterator().next();
 
@@ -4373,12 +4371,6 @@ public class MapGenerator implements AutoCloseable {
                 continue;
             }
             keysToRemove.add(key);
-            if (customPublicVP != null) {
-                Integer objectiveWorth = customPublicVP.get(key);
-                if (objectiveWorth == null) {
-                    objectiveWorth = 1;
-                }
-            }
 
             graphics.drawString("(" + index + ") " + name, x, y + 23);
 
@@ -4712,7 +4704,7 @@ public class MapGenerator implements AutoCloseable {
 
     private static int getMapWidth(Game game) {
         float ringCount = getRingCount(game);
-        ringCount += ringCount == RING_MIN_COUNT ? 1.5 : 1;
+        ringCount += ringCount == RING_MIN_COUNT ? 1.5f : 1;
         int mapWidth = (int) (ringCount * 520 + EXTRA_X * 2);
         mapWidth += hasExtraRow(game) ? EXTRA_X : 0;
         return mapWidth;
