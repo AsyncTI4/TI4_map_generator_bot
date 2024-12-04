@@ -14,7 +14,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 class RestoreGame extends Subcommand {
@@ -43,7 +42,7 @@ class RestoreGame extends Subcommand {
         try {
             gameFile = attachment.getProxy().downloadToFile(gameFile).get();
         } catch (InterruptedException | ExecutionException e) {
-            BotLogger.log("Failed to download game", e);
+            e.printStackTrace();
         }
 
         Game game = GameSaveLoadManager.loadGame(gameFile);

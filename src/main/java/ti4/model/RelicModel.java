@@ -9,8 +9,8 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
-import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.image.Mapper;
 
 @Data
 public class RelicModel implements ModelInterface, EmbeddableModel {
@@ -46,7 +46,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getShortName() {
-        if (getHomebrewReplacesID().isEmpty())
+        if (!getHomebrewReplacesID().isPresent())
         {
             return Optional.ofNullable(shortName).orElse(getName());
         }
@@ -54,7 +54,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean getShrinkName() {
-        if (getHomebrewReplacesID().isEmpty())
+        if (!getHomebrewReplacesID().isPresent())
         {
             return Optional.ofNullable(shrinkName).orElse(false);
         }

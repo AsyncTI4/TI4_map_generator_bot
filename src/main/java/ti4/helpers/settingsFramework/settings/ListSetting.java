@@ -37,8 +37,8 @@ public class ListSetting<T> extends SettingInterface {
     private Map<String, T> allValues = new HashMap<>();
     private Function<T, String> show;
     private Function<T, String> getEmoji;
-    private String includeLang;
-    private String removeLang;
+    private String includeLang = "include";
+    private String removeLang = "remove";
 
     public ListSetting(String id, String name, String include, String remove, Set<Entry<String, T>> allVals, Set<String> values, Set<String> defaults) {
         super(id, name);

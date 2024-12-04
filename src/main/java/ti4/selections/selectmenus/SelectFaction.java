@@ -46,7 +46,7 @@ public class SelectFaction implements Selection {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You selected: " + event.getSelectedOptions().getFirst().getLabel());
         String fakeButtonID = selectionID + "_" + event.getUser().getId() + "_" + event.getValues().getFirst();
-        ButtonHelper.resolveSetupStep2(game, event, fakeButtonID);
+        ButtonHelper.resolveSetupStep2(player, game, event, fakeButtonID);
     }
 
     public static void offerFactionSelectionMenu(GenericInteractionCreateEvent event) {

@@ -110,6 +110,7 @@ public class JimboConst {
 
             String rotationStr = hl.getId().replace(baseTile, "");
             int rotation = switch (rotationStr) {
+                case "", "0" -> 0;
                 case "1", "60" -> 1;
                 case "2", "120" -> 2;
                 case "3", "180" -> 3;
@@ -155,7 +156,7 @@ public class JimboConst {
         for (TileModel tile : draftTiles) {
             String color = tile.getId().replaceAll("(blank|\\d+)$", "");
             String indexStr = tile.getId().replace(color, "");
-            int index;
+            int index = 0;
             switch (indexStr) {
                 case "blank" -> index = -1;
                 default -> {

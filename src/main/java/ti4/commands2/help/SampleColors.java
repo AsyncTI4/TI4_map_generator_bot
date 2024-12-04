@@ -14,12 +14,12 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands2.Subcommand;
-import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
-import ti4.image.ImageHelper;
 import ti4.image.MapGenerator;
 import ti4.image.Mapper;
+import ti4.helpers.Constants;
+import ti4.image.ImageHelper;
+import ti4.helpers.Storage;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
 
@@ -63,7 +63,7 @@ class SampleColors extends Subcommand {
         int top = ThreadLocalRandom.current().nextInt(PAGEHIGHT - 2 * hues.size() * DREADTEXHIGHT);
         int right = left;
         int bottom = top + 2 * hues.size() * DREADTEXHIGHT;
-        int x;
+        int x = left;
         int y = top;
 
         BufferedImage coloursImage = new BufferedImage(PAGEWIDTH, PAGEHIGHT, BufferedImage.TYPE_INT_ARGB);

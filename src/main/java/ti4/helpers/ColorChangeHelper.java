@@ -29,6 +29,9 @@ public class ColorChangeHelper {
     }
 
     public static void changePlayerColor(Game game, Player player, String oldColor, String newColor) {
+        StringBuilder sb = new StringBuilder(player.getRepresentation(false, false));
+        sb.append(" changed their color to ").append(Emojis.getColorEmojiWithName(newColor));
+
         String oldColorKey = Mapper.getColorName(oldColor) + "_";
         String newColorKey = Mapper.getColorName(newColor) + "_";
         player.setColor(newColor);

@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -32,15 +34,13 @@ import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 public class ButtonHelperCommanders {
 
     @ButtonHandler("cheiranCommanderBlock_")
     public static void cheiranCommanderBlock(Player player, Game game, ButtonInteractionEvent event) {
-        String msg2;
-        int oldThing;
-        int newThing;
+        String msg2 = "";
+        int oldThing = 0;
+        int newThing = 0;
         if (player.getCommodities() > 0) {
             oldThing = player.getCommodities();
             player.setCommodities(oldThing - 1);
@@ -530,7 +530,8 @@ public class ButtonHelperCommanders {
             + planetRepresentation + " using G'hom Sek'kus, the N'orr Commander.";
         RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet2), game, player.getColor(), "1 " + mechorInf + " " + planet2);
 
-        FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet(planet1), game);
+        Tile tile = game.getTileFromPlanet(planet1);
+        tile = FlipTileService.flipTileIfNeeded(event, tile, game);
         planet1 = planet1.replace("lockedm", "m");
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet1), game, player.getColor(), "1 " + mechorInf + " " + planet1);
 
