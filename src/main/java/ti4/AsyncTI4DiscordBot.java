@@ -7,7 +7,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -37,6 +41,7 @@ import ti4.helpers.GlobalSettings;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
+import ti4.helpers.TimedRunnable;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -63,6 +68,7 @@ public class AsyncTI4DiscordBot {
     public static final List<Role> adminRoles = new ArrayList<>();
     public static final List<Role> developerRoles = new ArrayList<>();
     public static final List<Role> bothelperRoles = new ArrayList<>();
+    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
 
     public static JDA jda;
     public static String userID;
@@ -235,6 +241,11 @@ public class AsyncTI4DiscordBot {
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS, WAITING 10 SECONDS FOR COMPLETION");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
+                if (shutdown()) { // will wait for up to an additional 20 seconds
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING ASYNC THREADPOOL");
+                } else {
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
+                }
                 if (ButtonProcessor.shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.logWithTimestamp("FINISHED PROCESSING BUTTONS");
                 } else {
@@ -363,5 +374,34 @@ public class AsyncTI4DiscordBot {
                 .forEach(classes::add);
         }
         return classes;
+    }
+
+    public static <T> CompletableFuture<T> completeAsync(Supplier<T> supplier) {
+        return CompletableFuture.supplyAsync(supplier, THREAD_POOL).handle((result, exception) -> {
+            if (exception != null) {
+                BotLogger.log("Unable to complete async process.", exception);
+                return null;
+            }
+            return result;
+        });
+    }
+    public static void runAsync(String name, Runnable runnable) {
+        var timedRunnable = new TimedRunnable(name, runnable);
+        THREAD_POOL.submit(timedRunnable);
+    }
+
+    public static boolean shutdown() {
+        THREAD_POOL.shutdown();
+        try {
+            if (!THREAD_POOL.awaitTermination(20, TimeUnit.SECONDS)) {
+                THREAD_POOL.shutdownNow();
+                return false;
+            }
+        } catch (InterruptedException e) {
+            THREAD_POOL.shutdownNow();
+            Thread.currentThread().interrupt();
+            return false;
+        }
+        return true;
     }
 }

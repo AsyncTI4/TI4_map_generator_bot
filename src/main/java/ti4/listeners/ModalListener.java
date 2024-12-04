@@ -40,6 +40,10 @@ public class ModalListener extends ListenerAdapter {
 
         event.deferEdit().queue();
 
+        AsyncTI4DiscordBot.runAsync("Modal listener task", () -> handleModal(event));
+    }
+
+    private void handleModal(@Nonnull ModalInteractionEvent event) {
         long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
         long startTime = System.currentTimeMillis();
         try {

@@ -31,6 +31,10 @@ public class UserJoinServerListener extends ListenerAdapter {
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
         if (!validateEvent(event)) return;
+        AsyncTI4DiscordBot.runAsync("Guild member join task", () -> handleGuildMemberJoin(event));
+    }
+
+    private void handleGuildMemberJoin(GuildMemberJoinEvent event) {
         try {
             checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
         } catch (Exception e) {
@@ -41,6 +45,10 @@ public class UserJoinServerListener extends ListenerAdapter {
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
         if (!validateEvent(event)) return;
+        AsyncTI4DiscordBot.runAsync("Guild member remove task", () -> handleGuildMemberRemove(event));
+    }
+
+    private void handleGuildMemberRemove(GuildMemberRemoveEvent event) {
         try {
             event.getGuild().retrieveAuditLogs().queueAfter(1, TimeUnit.SECONDS, (logs) -> {
                 boolean voluntary = true;

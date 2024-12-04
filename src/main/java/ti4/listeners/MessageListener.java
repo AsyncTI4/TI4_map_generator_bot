@@ -44,7 +44,7 @@ public class MessageListener extends ListenerAdapter {
             return;
         }
 
-        processMessage(event, message);
+        AsyncTI4DiscordBot.runAsync("Message listener task", () -> processMessage(event, message));
     }
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
