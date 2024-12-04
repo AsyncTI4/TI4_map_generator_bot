@@ -73,7 +73,7 @@ public class CommandHelper {
         gameName = StringUtils.substringBefore(gameName, "-");
         return gameName;
     }
-  
+
     public static boolean acceptIfValidGame(SlashCommandInteractionEvent event, boolean checkChannel, boolean checkPlayer) {
         var gameName = getGameName(event);
         var game = GameManager.getGame(gameName);
