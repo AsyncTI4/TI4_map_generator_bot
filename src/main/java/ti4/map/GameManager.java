@@ -9,10 +9,12 @@ import java.util.concurrent.TimeUnit;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Nullable;
 import ti4.cron.LogCacheStatsCron;
 import ti4.message.BotLogger;
 
+@UtilityClass
 public class GameManager {
 
     private static final CopyOnWriteArrayList<String> allGameNames = new CopyOnWriteArrayList<>();
