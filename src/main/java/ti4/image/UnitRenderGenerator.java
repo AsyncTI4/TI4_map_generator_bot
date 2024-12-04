@@ -1,9 +1,6 @@
 package ti4.image;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -272,8 +269,8 @@ public class UnitRenderGenerator {
             (isJail && FoWHelper.canSeeStatsOfFaction(game, jailFaction, frogPlayer));
 
         float mirageDragRatio = 2.0f / 3;
-        int mirageDragX = Math.round((345 / 8 + TILE_PADDING) * (1 - mirageDragRatio));
-        int mirageDragY = Math.round((3 * 300 / 4 + TILE_PADDING) * (1 - mirageDragRatio));
+        int mirageDragX = Math.round(((float) 345 / 8 + TILE_PADDING) * (1 - mirageDragRatio));
+        int mirageDragY = Math.round(((float) (3 * 300) / 4 + TILE_PADDING) * (1 - mirageDragRatio));
 
         Point unitOffset = game.isAllianceMode() ? PositionMapper.getAllianceUnitOffset()
             : PositionMapper.getUnitOffset();
@@ -542,13 +539,9 @@ public class UnitRenderGenerator {
         int xOriginal = posCtx.centerPosition.x + position.x;
         int yOriginal = posCtx.centerPosition.y + position.y;
 
-        // Calculate base position
-        int imageX = position != null ? position.x : xOriginal - (posCtx.unitImage.getWidth() / 2);
-        int imageY = position != null ? position.y : yOriginal - (posCtx.unitImage.getHeight() / 2);
-
         // Add padding
-        imageX += TILE_PADDING;
-        imageY += TILE_PADDING;
+        int imageX = position.x + TILE_PADDING;
+        int imageY = position.y + TILE_PADDING;
 
         // Handle mirage positions
         if (ctx.isMirage) {
