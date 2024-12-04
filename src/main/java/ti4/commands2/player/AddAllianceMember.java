@@ -27,7 +27,7 @@ class AddAllianceMember extends GameStateSubcommand {
             return;
         }
         Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (otherPlayer == null || !otherPlayer.isRealPlayer()) {
+        if (otherPlayer == null) {
             MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
