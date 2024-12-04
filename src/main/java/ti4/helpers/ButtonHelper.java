@@ -5018,7 +5018,7 @@ public class ButtonHelper {
         //String undoFileToRestorePath = game.getName() + "_" + 1 + ".txt";
         //File undoFileToRestore = new File(Storage.getMapUndoDirectory(), undoFileToRestorePath);
 
-        File originalMapFile = Storage.getGameFile(game.getName() + Constants.TXT);
+        File originalGameFile = Storage.getGameFile(game.getName() + Constants.TXT);
 
         File mapUndoDirectory = Storage.getGameUndoDirectory();
         if (!mapUndoDirectory.exists()) {
@@ -5040,8 +5040,8 @@ public class ButtonHelper {
 
                 File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + maxNumber + Constants.TXT);
                 CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
-                Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
-                Game gameToRestore = GameSaveLoadManager.loadGame(originalMapFile);
+                Files.copy(mapUndoStorage.toPath(), originalGameFile.toPath(), options);
+                Game gameToRestore = GameSaveLoadManager.loadGame(originalGameFile);
                 gameToRestore.setTableTalkChannelID(chatChannel.getId());
                 gameToRestore.setMainChannelID(actionsChannel.getId());
                 gameToRestore.setName(newName);
