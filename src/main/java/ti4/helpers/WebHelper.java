@@ -105,7 +105,7 @@ public class WebHelper {
         int count = 0;
 
         for (ManagedGame managedGame : GameManager.getManagedGames()) {
-            if (managedGame.isHasEnded() && managedGame.isHasWinner()) {
+            if (managedGame.getRound() > 2 || managedGame.isHasEnded() && managedGame.isHasWinner()) {
                 count++;
                 try {
                     var game = GameManager.getGame(managedGame.getName());
