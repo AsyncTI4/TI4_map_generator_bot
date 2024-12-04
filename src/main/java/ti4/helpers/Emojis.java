@@ -1385,8 +1385,7 @@ public class Emojis {
             case "adrian" -> Adrian;
             case "akhassi" -> Akhassi;
             case "ako" -> Ako;
-            case "aranndan" -> Aranndan;
-            case "aranndanb" -> Aranndan;
+            case "aranndan", "aranndanb" -> Aranndan;
             case "argenum" -> Argenum;
             case "behjan" -> Behjan;
             case "breakpoint" -> Breakpoint;
@@ -1410,13 +1409,11 @@ public class Emojis {
             case "ghanis" -> Ghanis;
             case "grishinu" -> Grishinu;
             case "gryenorn" -> Gryenorn;
-            case "grywon" -> Grywon;
-            case "grywonb" -> Grywon;
+            case "grywon", "grywonb" -> Grywon;
             case "hellsmaw" -> HellsMaw;
             case "hersey" -> Hersey;
             case "heska" -> Heska;
-            case "hevahold" -> Hevahold;
-            case "hevaholdb" -> Hevahold;
+            case "hevahold", "hevaholdb" -> Hevahold;
             case "hrancus" -> HranCus;
             case "hurigati" -> Hurigati;
             case "ikrusiii" -> IkrusIII;
@@ -1478,8 +1475,7 @@ public class Emojis {
             case "uhott" -> Uhott;
             case "ulongamma" -> UlonGamma;
             case "ulonrho" -> UlonRho;
-            case "ultimur" -> Ultimur;
-            case "ultimurb" -> Ultimur;
+            case "ultimur", "ultimurb" -> Ultimur;
             case "venhalo" -> Venhalo;
             case "vent" -> Vent;
             case "verdis" -> Verdis;
@@ -1828,7 +1824,7 @@ public class Emojis {
             case "l1z1xagent" -> L1Z1XAgent;
             case "letnevagent" -> LetnevAgent;
             case "mahactagent" -> MahactAgent;
-            case "mentakagent" -> MentakAgent;
+            case "mentakagent", "kelerescommander" -> MentakAgent;
             case "muaatagent" -> MuaatAgent;
             case "naaluagent" -> NaaluAgent;
             case "naazagent" -> NaazAgent;
@@ -1853,7 +1849,6 @@ public class Emojis {
             case "empyreancommander" -> EmpyreanCommander;
             case "hacancommander" -> HacanCommander;
             case "jolnarcommander" -> JolNarCommander;
-            case "kelerescommander" -> MentakAgent;
             case "l1z1xcommander" -> L1Z1XCommander;
             case "letnevcommander" -> LetnevCommander;
             case "mahactcommander" -> MahactCommander;
