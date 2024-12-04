@@ -4,9 +4,12 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -32,9 +35,29 @@ import ti4.service.game.CreateGameService;
 
 public class MessageListener extends ListenerAdapter {
 
+    private static final Set<String> CHANNELS_TO_IGNORE = Set.of("bot-log");
+    private static final Set<String> CATEGORIES_TO_IGNORE = Set.of("TI DISCUSSIONS");
+    private static final int EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 1;
+    
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() || !isAsyncServer(event.getGuild().getId())) {
+            return;
+        }
+
+        TextChannel channel = switch (event.getChannel()) {
+            case TextChannel textChannel -> textChannel;
+            case ThreadChannel threadChannel -> (TextChannel) threadChannel.getParentChannel();
+            case ForumChannel forumChannel ->
+            default -> null;
+        };
+
+        if (channel == null || CHANNELS_TO_IGNORE.contains(channel.getName())) {
+            return;
+        }
+
+        Category category = channel.getParentCategory();
+        if (category == null || CATEGORIES_TO_IGNORE.contains(category.getName())) {
             return;
         }
 
