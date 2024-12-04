@@ -1,6 +1,5 @@
 package ti4.helpers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -34,12 +33,9 @@ public class MapTemplateHelper {
             .toList();
 
         Map<String, String> positionMap = new HashMap<>();
-        List<MapTemplateTile> badTemplateTiles = new ArrayList<>();
         for (MapTemplateTile templateTile : template.getTemplateTiles()) {
             Entry<String, String> tileEntry = inferTileFromTemplateAndDraft(templateTile, speakerOrdered);
-            if (tileEntry == null) {
-                badTemplateTiles.add(templateTile);
-            } else {
+            if (tileEntry != null) {
                 positionMap.put(tileEntry.getKey(), tileEntry.getValue());
             }
         }

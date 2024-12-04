@@ -1,18 +1,11 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -28,6 +21,9 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
 import ti4.commands2.planet.PlanetExhaust;
 import ti4.commands2.planet.PlanetExhaustAbility;
 import ti4.helpers.ActionCardHelper;
@@ -35,7 +31,6 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -51,7 +46,6 @@ import ti4.helpers.Emojis;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerPreferenceHelper;
-import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.SecretObjectiveHelper;
@@ -69,7 +63,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.AgendaModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
 import ti4.model.RelicModel;
@@ -91,6 +84,8 @@ import ti4.service.turn.EndTurnService;
 import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
@@ -1095,12 +1090,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     public static void poScoring(ButtonInteractionEvent event, Player player, String buttonID, Game game, MessageChannel privateChannel) {
-        // key2
         if ("true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
             String key2 = "queueToScorePOs";
             String key3 = "potentialScorePOBlockers";
             String key3b = "potentialScoreSOBlockers";
-            String message = "Drew A Secret Objective";
+            String message;
             for (Player player2 : Helper.getInitativeOrder(game)) {
                 if (player2 == player) {
                     if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
@@ -1117,7 +1111,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                             .replace(player.getFaction() + "*", ""));
                         if (!game.getStoredValue(key3b).contains(player.getFaction() + "*")) {
                             Helper.resolvePOScoringQueue(game, event);
-                            // Helper.resolveSOScoringQueue(game, event);
                         }
                     }
                     break;
@@ -1703,13 +1696,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void clearAllReactions(@NotNull ButtonInteractionEvent event) {
         Message mainMessage = event.getInteraction().getMessage();
         mainMessage.clearReactions().queue();
-        // String messageId = mainMessage.getId();
-        // RestAction<Message> messageRestAction =
-        // event.getChannel().retrieveMessageById(messageId);
-        // messageRestAction.queue(m -> {
-        // RestAction<Void> voidRestAction = m.clearReactions();
-        // voidRestAction.queue();
-        // });
     }
 
     public static void checkForAllReactions(@NotNull ButtonInteractionEvent event, Game game) {
@@ -1835,10 +1821,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     guildMessageChannel.sendMessage(message).queueAfter(10, TimeUnit.SECONDS);
                 }
             }
-            case "no_when", "no_when_persistent" -> {
-                event.getInteraction().getMessage().reply("All players have indicated 'No Whens'").queueAfter(1,
-                    TimeUnit.SECONDS);
-            }
+            case "no_when", "no_when_persistent" -> event.getInteraction().getMessage().reply("All players have indicated 'No Whens'").queueAfter(1,
+                TimeUnit.SECONDS);
             case "no_after", "no_after_persistent" -> {
                 event.getInteraction().getMessage().reply("All players have indicated 'No Afters'").queue();
                 AgendaHelper.startTheVoting(game);
@@ -2238,7 +2222,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("draw_2_ACDelete")
     public static void draw2ACDelete(ButtonInteractionEvent event, Player player, Game game) {
-        String message = "";
+        String message;
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, 2);
             message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
@@ -2260,7 +2244,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("draw_1_ACDelete")
     public static void draw1ACDelete(ButtonInteractionEvent event, Player player, Game game) {
-        String message = "";
+        String message;
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
             message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
@@ -2277,7 +2261,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("draw_1_AC")
     public static void draw1AC(ButtonInteractionEvent event, Player player, Game game) {
-        String message = "";
+        String message;
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
             message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";

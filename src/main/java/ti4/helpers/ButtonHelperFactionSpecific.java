@@ -709,7 +709,7 @@ public class ButtonHelperFactionSpecific {
             CombatRollType.combatround, game);
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();
-            int numOfUnit = entry.getValue();
+            int numOfUnit;
             if ("cruiser".equalsIgnoreCase(unit.getBaseType()) || "destroyer".equalsIgnoreCase(unit.getBaseType())) {
                 if ("cruiser".equalsIgnoreCase(unit.getBaseType())) {
                     numOfUnit = numCruisers;
@@ -1026,13 +1026,14 @@ public class ButtonHelperFactionSpecific {
 
             RemoveUnitService.removeUnits(event, game.getTileFromPlanet(origPlanet), game, hacan.getColor(), amount + " " + unitName + " " + origPlanet);
             AddUnitService.addUnits(event, game.getTileFromPlanet(newPlanet), game, hacan.getColor(), amount + " " + unitName + " " + newPlanet);
-            if (unitGroupRef.equalsIgnoreCase("units")) {
-            } else if (!unitName.equalsIgnoreCase("mech")) {
-                unitGroupRef = "units";
-            } else if (unitGroupRef.equalsIgnoreCase("mech")) {
-                unitGroupRef = "mechs";
-            } else {
-                unitGroupRef = "mech";
+            if (!unitGroupRef.equalsIgnoreCase("units")) {
+                if (!unitName.equalsIgnoreCase("mech")) {
+                    unitGroupRef = "units";
+                } else if (unitGroupRef.equalsIgnoreCase("mech")) {
+                    unitGroupRef = "mechs";
+                } else {
+                    unitGroupRef = "mech";
+                }
             }
         }
         AddPlanetService.addPlanet(p2, origPlanet, game, event, false);
@@ -2117,10 +2118,6 @@ public class ButtonHelperFactionSpecific {
 
             if (count > 0 && !removed) {
                 removed = true;
-                String name = uH.getName();
-                if ("space".equals(name)) {
-                    name = "";
-                }
                 uH.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), 1);
                 sb.append("\n ").append(player.getFactionEmoji()).append(" damaged 1 mech on ")
                     .append(tile.getRepresentation()).append("(").append(uH.getName()).append(")");
@@ -2523,7 +2520,7 @@ public class ButtonHelperFactionSpecific {
             "Quashed agenda. Strategic CCs went from " + stratCC + " -> " + (stratCC - 1));
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Quash");
         String agendaCount = game.getStoredValue("agendaCount");
-        int aCount = 0;
+        int aCount;
         if (agendaCount.isEmpty()) {
             aCount = 0;
         } else {

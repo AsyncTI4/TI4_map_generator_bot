@@ -42,9 +42,10 @@ public class RepositoryDispatchEvent {
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Authorization", "Bearer " + REPO_DISPATCH_TOKEN)
                 .build();
-            Response response = client.newCall(request).execute();
-            if (!response.isSuccessful()) {
-                BotLogger.log("RespositoryDisptachEvent error: " + response.body().string());
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    BotLogger.log("RespositoryDisptachEvent error: " + response.body().string());
+                }
             }
         } catch (Exception e) {
             BotLogger.log("RespositoryDisptachEvent error", e);

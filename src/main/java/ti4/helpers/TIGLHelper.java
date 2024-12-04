@@ -95,8 +95,7 @@ public class TIGLHelper {
                 case MINISTER -> TIGLRank.AGENT;
                 case AGENT -> TIGLRank.COMMANDER;
                 case COMMANDER -> TIGLRank.HERO;
-                case HERO -> TIGLRank.EMPEROR;
-                case EMPEROR -> TIGLRank.EMPEROR;
+                case HERO, EMPEROR -> TIGLRank.EMPEROR;
                 default -> null;
             };
         }

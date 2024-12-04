@@ -8,13 +8,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
-import ti4.model.Source.ComponentSource;
 import ti4.image.Mapper;
+import ti4.model.Source.ComponentSource;
 
 @Data
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
@@ -205,7 +206,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getShortName() {
-        if (!getHomebrewReplacesID().isPresent())
+        if (getHomebrewReplacesID().isEmpty())
         {
             return Optional.ofNullable(shortName).orElse(getName());
         }
@@ -213,7 +214,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean getShrinkName() {
-        if (!getHomebrewReplacesID().isPresent())
+        if (getHomebrewReplacesID().isEmpty())
         {
             return Optional.ofNullable(shrinkName).orElse(false);
         }
@@ -221,7 +222,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getInitials() {
-        if (!getHomebrewReplacesID().isPresent())
+        if (getHomebrewReplacesID().isEmpty())
         {
             return Optional.ofNullable(initials).orElse(getName().substring(0,1));
         }
@@ -349,7 +350,6 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                         case "cv2" -> output.append(Emojis.carrier);
                         case "dn2" -> output.append(Emojis.dreadnought);
                         case "ws" -> output.append(Emojis.warsun);
-                        case "fs" -> output.append(Emojis.flagship);
                         default -> output.append(Emojis.flagship);
                     }
                 }

@@ -52,7 +52,7 @@ public class CommandHelper {
     }
 
     @NotNull
-    private static String getGameNameFromChannel(Interaction event) {
+    public static String getGameNameFromChannel(Interaction event) {
         // try to get game name from channel name
         var channel = event.getChannel();
         String gameName = getGameNameFromChannelName(channel.getName());
