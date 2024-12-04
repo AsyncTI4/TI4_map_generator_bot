@@ -252,7 +252,7 @@ public class ButtonHelperTacticalAction {
         } else {
             game.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
         }
-        if (currentSystem.get(rest) == 0) {
+        if (currentSystem.containsKey(rest) && currentSystem.get(rest) == 0) {
             currentSystem.remove(rest);
         }
         if (currentActivation.containsKey(unitName)) {
