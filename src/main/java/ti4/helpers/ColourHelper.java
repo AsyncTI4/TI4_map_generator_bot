@@ -84,13 +84,13 @@ public class ColourHelper {
                     case "ptr":
                     case "eth":
                     case "blu":
-                    case "nvy":
+                    case "nvy", "rbw", "rse", "pnk":
                         return 21;
                     case "splittea":
                     case "splitptr":
                     case "spliteth":
                     case "splitblu":
-                    case "splitnvy":
+                    case "splitnvy", "splitrbw", "splitrse", "splitpnk":
                         return 1;
                     case "lvn":
                     case "ppl":
@@ -100,16 +100,6 @@ public class ColourHelper {
                     case "splitppl":
                     case "splitsns":
                         return 0;
-                    case "rse":
-                    case "pnk":
-                        return 21;
-                    case "splitrse":
-                    case "splitpnk":
-                        return 1;
-                    case "rbw":
-                        return 21;
-                    case "splitrbw":
-                        return 1;
                 }
             case "ghost":
             case "pi_ghost":
@@ -117,12 +107,12 @@ public class ColourHelper {
                 switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
-                    case "blk":
+                    case "blk", "lvn", "ppl", "sns":
                         return 27;
                     case "splitlgy":
                     case "splitgry":
                     case "splitblk":
-                    case "orca":
+                    case "orca", "splitlvn", "splitppl", "splitsns":
                         return 7;
                     case "red":
                     case "bld":
@@ -130,39 +120,17 @@ public class ColourHelper {
                     case "splitred":
                     case "splitbld":
                         return 2;
-                    case "org":
+                    case "org", "splittea", "splitptr", "spliteth", "splitblu", "splitnvy":
                         return 20;
                     case "splitorg":
                         return 0;
                     case "tan":
                     case "bwn":
-                    case "chk":
+                    case "chk", "lme", "grn", "tqs", "frs", "eme", "spr", "ylw", "gld", "crm":
                         return 21;
                     case "splittan":
                     case "splitbwn":
-                    case "splitchk":
-                        return 1;
-                    case "spr":
-                    case "ylw":
-                    case "gld":
-                    case "crm":
-                        return 21;
-                    case "splitspr":
-                    case "splitylw":
-                    case "splitgld":
-                    case "splitcrm":
-                        return 1;
-                    case "lme":
-                    case "grn":
-                    case "tqs":
-                    case "frs":
-                    case "eme":
-                        return 21;
-                    case "splitlme":
-                    case "splitgrn":
-                    case "splittqs":
-                    case "splitfrs":
-                    case "spliteme":
+                    case "splitchk", "splitlme", "splitgrn", "splittqs", "splitfrs", "spliteme", "splitspr", "splitylw", "splitgld", "splitcrm":
                         return 1;
                     case "tea":
                     case "ptr":
@@ -170,20 +138,6 @@ public class ColourHelper {
                     case "blu":
                     case "nvy":
                         return 40;
-                    case "splittea":
-                    case "splitptr":
-                    case "spliteth":
-                    case "splitblu":
-                    case "splitnvy":
-                        return 20;
-                    case "lvn":
-                    case "ppl":
-                    case "sns":
-                        return 27;
-                    case "splitlvn":
-                    case "splitppl":
-                    case "splitsns":
-                        return 7;
                     case "rse":
                     case "pnk":
                         return 24;
@@ -240,13 +194,13 @@ public class ColourHelper {
                     case "grn":
                     case "tqs":
                     case "frs":
-                    case "eme":
+                    case "eme", "lvn", "ppl", "sns":
                         return 23;
                     case "splitlme":
                     case "splitgrn":
                     case "splittqs":
                     case "splitfrs":
-                    case "spliteme":
+                    case "spliteme", "splitlvn", "splitppl", "splitsns":
                         return 3;
                     case "tea":
                     case "ptr":
@@ -260,14 +214,6 @@ public class ColourHelper {
                     case "splitblu":
                     case "splitnvy":
                         return 4;
-                    case "lvn":
-                    case "ppl":
-                    case "sns":
-                        return 23;
-                    case "splitlvn":
-                    case "splitppl":
-                    case "splitsns":
-                        return 3;
                     case "rse":
                     case "pnk":
                         return 22;
@@ -285,18 +231,12 @@ public class ColourHelper {
                 switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
-                    case "blk":
+                    case "blk", "red", "bld":
                         return 23;
                     case "splitlgy":
                     case "splitgry":
                     case "splitblk":
-                    case "orca":
-                        return 3;
-                    case "red":
-                    case "bld":
-                        return 23;
-                    case "splitred":
-                    case "splitbld":
+                    case "orca", "splitred", "splitbld":
                         return 3;
                     case "org":
                         return 22;
@@ -324,13 +264,13 @@ public class ColourHelper {
                     case "grn":
                     case "tqs":
                     case "frs":
-                    case "eme":
+                    case "eme", "rse", "pnk":
                         return 27;
                     case "splitlme":
                     case "splitgrn":
                     case "splittqs":
                     case "splitfrs":
-                    case "spliteme":
+                    case "spliteme", "splitrse", "splitpnk":
                         return 7;
                     case "tea":
                     case "ptr":
@@ -352,12 +292,6 @@ public class ColourHelper {
                     case "splitppl":
                     case "splitsns":
                         return 14;
-                    case "rse":
-                    case "pnk":
-                        return 27;
-                    case "splitrse":
-                    case "splitpnk":
-                        return 7;
                     case "rbw":
                         return 25;
                     case "splitrbw":
@@ -370,18 +304,12 @@ public class ColourHelper {
                 switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
-                    case "blk":
+                    case "blk", "red", "bld":
                         return 34;
                     case "splitlgy":
                     case "splitgry":
                     case "splitblk":
-                    case "orca":
-                        return 14;
-                    case "red":
-                    case "bld":
-                        return 34;
-                    case "splitred":
-                    case "splitbld":
+                    case "orca", "splitred", "splitbld":
                         return 14;
                     case "org":
                         return 23;
@@ -473,21 +401,21 @@ public class ColourHelper {
                         return 4;
                     case "tan":
                     case "bwn":
-                    case "chk":
+                    case "chk", "tea", "ptr", "eth", "blu", "nvy":
                         return 27;
                     case "splittan":
                     case "splitbwn":
-                    case "splitchk":
+                    case "splitchk", "splittea", "splitptr", "spliteth", "splitblu", "splitnvy":
                         return 7;
                     case "spr":
                     case "ylw":
                     case "gld":
-                    case "crm":
+                    case "crm", "lvn", "ppl", "sns":
                         return 23;
                     case "splitspr":
                     case "splitylw":
                     case "splitgld":
-                    case "splitcrm":
+                    case "splitcrm", "splitlvn", "splitppl", "splitsns":
                         return 3;
                     case "lme":
                     case "grn":
@@ -501,35 +429,11 @@ public class ColourHelper {
                     case "splitfrs":
                     case "spliteme":
                         return 0;
-                    case "tea":
-                    case "ptr":
-                    case "eth":
-                    case "blu":
-                    case "nvy":
-                        return 27;
-                    case "splittea":
-                    case "splitptr":
-                    case "spliteth":
-                    case "splitblu":
-                    case "splitnvy":
-                        return 7;
-                    case "lvn":
-                    case "ppl":
-                    case "sns":
-                        return 23;
-                    case "splitlvn":
-                    case "splitppl":
-                    case "splitsns":
-                        return 3;
                     case "rse":
-                    case "pnk":
+                    case "pnk", "rbw":
                         return 21;
                     case "splitrse":
-                    case "splitpnk":
-                        return 1;
-                    case "rbw":
-                        return 21;
-                    case "splitrbw":
+                    case "splitpnk", "splitrbw":
                         return 1;
                 }
             case "mentak":
@@ -546,10 +450,10 @@ public class ColourHelper {
                     case "orca":
                         return 8;
                     case "red":
-                    case "bld":
+                    case "bld", "lvn", "ppl", "sns":
                         return 24;
                     case "splitred":
-                    case "splitbld":
+                    case "splitbld", "splitlvn", "splitppl", "splitsns":
                         return 4;
                     case "org":
                         return 36;
@@ -577,34 +481,14 @@ public class ColourHelper {
                     case "grn":
                     case "tqs":
                     case "frs":
-                    case "eme":
+                    case "eme", "tea", "ptr", "eth", "blu", "nvy":
                         return 21;
                     case "splitlme":
                     case "splitgrn":
                     case "splittqs":
                     case "splitfrs":
-                    case "spliteme":
+                    case "spliteme", "splittea", "splitptr", "spliteth", "splitblu", "splitnvy":
                         return 1;
-                    case "tea":
-                    case "ptr":
-                    case "eth":
-                    case "blu":
-                    case "nvy":
-                        return 21;
-                    case "splittea":
-                    case "splitptr":
-                    case "spliteth":
-                    case "splitblu":
-                    case "splitnvy":
-                        return 1;
-                    case "lvn":
-                    case "ppl":
-                    case "sns":
-                        return 24;
-                    case "splitlvn":
-                    case "splitppl":
-                    case "splitsns":
-                        return 4;
                     case "rse":
                     case "pnk":
                         return 23;
@@ -661,25 +545,13 @@ public class ColourHelper {
                     case "grn":
                     case "tqs":
                     case "frs":
-                    case "eme":
+                    case "eme", "tea", "ptr", "eth", "blu", "nvy":
                         return 20;
                     case "splitlme":
                     case "splitgrn":
                     case "splittqs":
                     case "splitfrs":
-                    case "spliteme":
-                        return 0;
-                    case "tea":
-                    case "ptr":
-                    case "eth":
-                    case "blu":
-                    case "nvy":
-                        return 20;
-                    case "splittea":
-                    case "splitptr":
-                    case "spliteth":
-                    case "splitblu":
-                    case "splitnvy":
+                    case "spliteme", "splittea", "splitptr", "spliteth", "splitblu", "splitnvy":
                         return 0;
                     case "lvn":
                     case "ppl":
@@ -706,18 +578,18 @@ public class ColourHelper {
                 switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
-                    case "blk":
+                    case "blk", "tea", "ptr", "eth", "blu", "nvy":
                         return 25;
                     case "splitlgy":
                     case "splitgry":
                     case "splitblk":
-                    case "orca":
+                    case "orca", "splittea", "splitptr", "spliteth", "splitblu", "splitnvy":
                         return 5;
                     case "red":
-                    case "bld":
+                    case "bld", "lvn", "ppl", "sns":
                         return 22;
                     case "splitred":
-                    case "splitbld":
+                    case "splitbld", "splitlvn", "splitppl", "splitsns":
                         return 2;
                     case "org":
                         return 26;
@@ -734,12 +606,12 @@ public class ColourHelper {
                     case "spr":
                     case "ylw":
                     case "gld":
-                    case "crm":
+                    case "crm", "rbw":
                         return 29;
                     case "splitspr":
                     case "splitylw":
                     case "splitgld":
-                    case "splitcrm":
+                    case "splitcrm", "splitrbw":
                         return 9;
                     case "lme":
                     case "grn":
@@ -753,36 +625,12 @@ public class ColourHelper {
                     case "splitfrs":
                     case "spliteme":
                         return 17;
-                    case "tea":
-                    case "ptr":
-                    case "eth":
-                    case "blu":
-                    case "nvy":
-                        return 25;
-                    case "splittea":
-                    case "splitptr":
-                    case "spliteth":
-                    case "splitblu":
-                    case "splitnvy":
-                        return 5;
-                    case "lvn":
-                    case "ppl":
-                    case "sns":
-                        return 22;
-                    case "splitlvn":
-                    case "splitppl":
-                    case "splitsns":
-                        return 2;
                     case "rse":
                     case "pnk":
                         return 21;
                     case "splitrse":
                     case "splitpnk":
                         return 1;
-                    case "rbw":
-                        return 29;
-                    case "splitrbw":
-                        return 9;
                 }
             case "nekro":
             case "pi_nekro":
@@ -801,11 +649,11 @@ public class ColourHelper {
                     case "bld":
                         return 40;
                     case "splitred":
-                    case "splitbld":
+                    case "splitbld", "tea", "ptr", "eth", "blu", "nvy", "lme", "grn", "tqs", "frs", "eme":
                         return 20;
-                    case "org":
+                    case "org", "rse", "pnk", "lvn", "ppl", "sns":
                         return 22;
-                    case "splitorg":
+                    case "splitorg", "splitrse", "splitpnk", "splitlvn", "splitppl", "splitsns":
                         return 2;
                     case "tan":
                     case "bwn":
@@ -818,55 +666,19 @@ public class ColourHelper {
                     case "spr":
                     case "ylw":
                     case "gld":
-                    case "crm":
+                    case "crm", "rbw":
                         return 21;
                     case "splitspr":
                     case "splitylw":
                     case "splitgld":
-                    case "splitcrm":
+                    case "splitcrm", "splitrbw":
                         return 1;
-                    case "lme":
-                    case "grn":
-                    case "tqs":
-                    case "frs":
-                    case "eme":
-                        return 20;
                     case "splitlme":
                     case "splitgrn":
                     case "splittqs":
                     case "splitfrs":
-                    case "spliteme":
+                    case "spliteme", "splittea", "splitptr", "spliteth", "splitblu", "splitnvy":
                         return 0;
-                    case "tea":
-                    case "ptr":
-                    case "eth":
-                    case "blu":
-                    case "nvy":
-                        return 20;
-                    case "splittea":
-                    case "splitptr":
-                    case "spliteth":
-                    case "splitblu":
-                    case "splitnvy":
-                        return 0;
-                    case "lvn":
-                    case "ppl":
-                    case "sns":
-                        return 22;
-                    case "splitlvn":
-                    case "splitppl":
-                    case "splitsns":
-                        return 2;
-                    case "rse":
-                    case "pnk":
-                        return 22;
-                    case "splitrse":
-                    case "splitpnk":
-                        return 2;
-                    case "rbw":
-                        return 21;
-                    case "splitrbw":
-                        return 1;
                 }
             case "saar":
             case "pi_saar":
@@ -874,12 +686,12 @@ public class ColourHelper {
                 switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
-                    case "blk":
+                    case "blk", "tea", "ptr", "eth", "blu", "nvy":
                         return 27;
                     case "splitlgy":
                     case "splitgry":
                     case "splitblk":
-                    case "orca":
+                    case "orca", "splittea", "splitptr", "spliteth", "splitblu", "splitnvy":
                         return 7;
                     case "red":
                     case "bld":
@@ -921,18 +733,6 @@ public class ColourHelper {
                     case "splitfrs":
                     case "spliteme":
                         return 9;
-                    case "tea":
-                    case "ptr":
-                    case "eth":
-                    case "blu":
-                    case "nvy":
-                        return 27;
-                    case "splittea":
-                    case "splitptr":
-                    case "spliteth":
-                    case "splitblu":
-                    case "splitnvy":
-                        return 7;
                     case "lvn":
                     case "ppl":
                     case "sns":
@@ -1019,21 +819,11 @@ public class ColourHelper {
                         return 0;
                     case "lvn":
                     case "ppl":
-                    case "sns":
+                    case "sns", "rbw", "rse", "pnk":
                         return 21;
                     case "splitlvn":
                     case "splitppl":
-                    case "splitsns":
-                        return 1;
-                    case "rse":
-                    case "pnk":
-                        return 21;
-                    case "splitrse":
-                    case "splitpnk":
-                        return 1;
-                    case "rbw":
-                        return 21;
-                    case "splitrbw":
+                    case "splitsns", "splitrbw", "splitrse", "splitpnk":
                         return 1;
                 }
             case "sol":
@@ -1042,22 +832,12 @@ public class ColourHelper {
                 switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
-                    case "blk":
+                    case "blk", "rse", "pnk", "org", "red", "bld":
                         return 21;
                     case "splitlgy":
                     case "splitgry":
                     case "splitblk":
-                    case "orca":
-                        return 1;
-                    case "red":
-                    case "bld":
-                        return 21;
-                    case "splitred":
-                    case "splitbld":
-                        return 1;
-                    case "org":
-                        return 21;
-                    case "splitorg":
+                    case "orca", "splitrse", "splitpnk", "splitorg", "splitred", "splitbld":
                         return 1;
                     case "tan":
                     case "bwn":
@@ -1081,13 +861,13 @@ public class ColourHelper {
                     case "grn":
                     case "tqs":
                     case "frs":
-                    case "eme":
+                    case "eme", "rbw":
                         return 29;
                     case "splitlme":
                     case "splitgrn":
                     case "splittqs":
                     case "splitfrs":
-                    case "spliteme":
+                    case "spliteme", "splitrbw":
                         return 9;
                     case "tea":
                     case "ptr":
@@ -1109,16 +889,6 @@ public class ColourHelper {
                     case "splitppl":
                     case "splitsns":
                         return 2;
-                    case "rse":
-                    case "pnk":
-                        return 21;
-                    case "splitrse":
-                    case "splitpnk":
-                        return 1;
-                    case "rbw":
-                        return 29;
-                    case "splitrbw":
-                        return 9;
                 }
             case "winnu":
             case "pi_winnu":
@@ -1126,12 +896,12 @@ public class ColourHelper {
                 switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
-                    case "blk":
+                    case "blk", "lme", "grn", "tqs", "frs", "eme":
                         return 21;
                     case "splitlgy":
                     case "splitgry":
                     case "splitblk":
-                    case "orca":
+                    case "orca", "splitlme", "splitgrn", "splittqs", "splitfrs", "spliteme":
                         return 1;
                     case "red":
                     case "bld":
@@ -1161,18 +931,6 @@ public class ColourHelper {
                     case "splitgld":
                     case "splitcrm":
                         return 14;
-                    case "lme":
-                    case "grn":
-                    case "tqs":
-                    case "frs":
-                    case "eme":
-                        return 21;
-                    case "splitlme":
-                    case "splitgrn":
-                    case "splittqs":
-                    case "splitfrs":
-                    case "spliteme":
-                        return 1;
                     case "tea":
                     case "ptr":
                     case "eth":
@@ -1210,12 +968,12 @@ public class ColourHelper {
                 switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
-                    case "blk":
+                    case "blk", "rse", "pnk", "lvn", "ppl", "sns", "org":
                         return 21;
                     case "splitlgy":
                     case "splitgry":
                     case "splitblk":
-                    case "orca":
+                    case "orca", "splitrse", "splitpnk", "splitlvn", "splitppl", "splitsns", "splitorg":
                         return 1;
                     case "red":
                     case "bld":
@@ -1223,27 +981,13 @@ public class ColourHelper {
                     case "splitred":
                     case "splitbld":
                         return 0;
-                    case "org":
-                        return 21;
-                    case "splitorg":
-                        return 1;
                     case "tan":
                     case "bwn":
-                    case "chk":
+                    case "chk", "spr", "ylw", "gld", "crm":
                         return 27;
                     case "splittan":
                     case "splitbwn":
-                    case "splitchk":
-                        return 7;
-                    case "spr":
-                    case "ylw":
-                    case "gld":
-                    case "crm":
-                        return 27;
-                    case "splitspr":
-                    case "splitylw":
-                    case "splitgld":
-                    case "splitcrm":
+                    case "splitchk", "splitspr", "splitylw", "splitgld", "splitcrm":
                         return 7;
                     case "lme":
                     case "grn":
@@ -1269,20 +1013,6 @@ public class ColourHelper {
                     case "splitblu":
                     case "splitnvy":
                         return 10;
-                    case "lvn":
-                    case "ppl":
-                    case "sns":
-                        return 21;
-                    case "splitlvn":
-                    case "splitppl":
-                    case "splitsns":
-                        return 1;
-                    case "rse":
-                    case "pnk":
-                        return 21;
-                    case "splitrse":
-                    case "splitpnk":
-                        return 1;
                     case "rbw":
                         return 29;
                     case "splitrbw":
@@ -1307,9 +1037,9 @@ public class ColourHelper {
                     case "splitred":
                     case "splitbld":
                         return 3;
-                    case "org":
+                    case "org", "tea", "ptr", "eth", "blu", "nvy":
                         return 21;
-                    case "splitorg":
+                    case "splitorg", "splittea", "splitptr", "spliteth", "splitblu", "splitnvy":
                         return 1;
                     case "tan":
                     case "bwn":
@@ -1322,37 +1052,25 @@ public class ColourHelper {
                     case "spr":
                     case "ylw":
                     case "gld":
-                    case "crm":
+                    case "crm", "rse", "pnk":
                         return 28;
                     case "splitspr":
                     case "splitylw":
                     case "splitgld":
-                    case "splitcrm":
+                    case "splitcrm", "splitrse", "splitpnk":
                         return 8;
                     case "lme":
                     case "grn":
                     case "tqs":
                     case "frs":
-                    case "eme":
+                    case "eme", "rbw":
                         return 25;
                     case "splitlme":
                     case "splitgrn":
                     case "splittqs":
                     case "splitfrs":
-                    case "spliteme":
+                    case "spliteme", "splitrbw":
                         return 5;
-                    case "tea":
-                    case "ptr":
-                    case "eth":
-                    case "blu":
-                    case "nvy":
-                        return 21;
-                    case "splittea":
-                    case "splitptr":
-                    case "spliteth":
-                    case "splitblu":
-                    case "splitnvy":
-                        return 1;
                     case "lvn":
                     case "ppl":
                     case "sns":
@@ -1361,16 +1079,6 @@ public class ColourHelper {
                     case "splitppl":
                     case "splitsns":
                         return 15;
-                    case "rse":
-                    case "pnk":
-                        return 28;
-                    case "splitrse":
-                    case "splitpnk":
-                        return 8;
-                    case "rbw":
-                        return 25;
-                    case "splitrbw":
-                        return 5;
                 }
             case "yssaril":
             case "pi_yssaril":
@@ -1391,9 +1099,9 @@ public class ColourHelper {
                     case "splitred":
                     case "splitbld":
                         return 4;
-                    case "org":
+                    case "org", "lvn", "ppl", "sns":
                         return 23;
-                    case "splitorg":
+                    case "splitorg", "splitlvn", "splitppl", "splitsns":
                         return 3;
                     case "tan":
                     case "bwn":
@@ -1437,14 +1145,6 @@ public class ColourHelper {
                     case "splitblu":
                     case "splitnvy":
                         return 2;
-                    case "lvn":
-                    case "ppl":
-                    case "sns":
-                        return 23;
-                    case "splitlvn":
-                    case "splitppl":
-                    case "splitsns":
-                        return 3;
                     case "rse":
                     case "pnk":
                         return 20;
@@ -1500,44 +1200,26 @@ public class ColourHelper {
                     case "grn":
                     case "tqs":
                     case "frs":
-                    case "eme":
+                    case "eme", "rbw":
                         return 25;
                     case "splitlme":
                     case "splitgrn":
                     case "splittqs":
                     case "splitfrs":
-                    case "spliteme":
+                    case "spliteme", "splitrbw":
                         return 5;
                     case "tea":
                     case "ptr":
                     case "eth":
                     case "blu":
-                    case "nvy":
+                    case "nvy", "rse", "pnk", "lvn", "ppl", "sns":
                         return 21;
                     case "splittea":
                     case "splitptr":
                     case "spliteth":
                     case "splitblu":
-                    case "splitnvy":
+                    case "splitnvy", "splitrse", "splitpnk", "splitlvn", "splitppl", "splitsns":
                         return 1;
-                    case "lvn":
-                    case "ppl":
-                    case "sns":
-                        return 21;
-                    case "splitlvn":
-                    case "splitppl":
-                    case "splitsns":
-                        return 1;
-                    case "rse":
-                    case "pnk":
-                        return 21;
-                    case "splitrse":
-                    case "splitpnk":
-                        return 1;
-                    case "rbw":
-                        return 25;
-                    case "splitrbw":
-                        return 5;
                 }
             case "cabal":
             case "pi_cabal":
@@ -1555,11 +1237,11 @@ public class ColourHelper {
                     case "bld":
                         return 40;
                     case "splitred":
-                    case "splitbld":
+                    case "splitbld", "lme", "grn", "tqs", "frs", "eme":
                         return 20;
-                    case "org":
+                    case "org", "rbw":
                         return 25;
-                    case "splitorg":
+                    case "splitorg", "splitrbw":
                         return 5;
                     case "tan":
                     case "bwn":
@@ -1579,12 +1261,6 @@ public class ColourHelper {
                     case "splitgld":
                     case "splitcrm":
                         return 1;
-                    case "lme":
-                    case "grn":
-                    case "tqs":
-                    case "frs":
-                    case "eme":
-                        return 20;
                     case "splitlme":
                     case "splitgrn":
                     case "splittqs":
@@ -1595,21 +1271,13 @@ public class ColourHelper {
                     case "ptr":
                     case "eth":
                     case "blu":
-                    case "nvy":
+                    case "nvy", "lvn", "ppl", "sns":
                         return 24;
                     case "splittea":
                     case "splitptr":
                     case "spliteth":
                     case "splitblu":
-                    case "splitnvy":
-                        return 4;
-                    case "lvn":
-                    case "ppl":
-                    case "sns":
-                        return 24;
-                    case "splitlvn":
-                    case "splitppl":
-                    case "splitsns":
+                    case "splitnvy", "splitlvn", "splitppl", "splitsns":
                         return 4;
                     case "rse":
                     case "pnk":
@@ -1617,22 +1285,18 @@ public class ColourHelper {
                     case "splitrse":
                     case "splitpnk":
                         return 6;
-                    case "rbw":
-                        return 25;
-                    case "splitrbw":
-                        return 5;
                 }
             case "empyrean":
             case "pi_empyrean":
                 switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
-                    case "blk":
+                    case "blk", "tea", "ptr", "eth", "blu", "nvy":
                         return 29;
                     case "splitlgy":
                     case "splitgry":
                     case "splitblk":
-                    case "orca":
+                    case "orca", "splittea", "splitptr", "spliteth", "splitblu", "splitnvy":
                         return 9;
                     case "red":
                     case "bld":
@@ -1640,60 +1304,24 @@ public class ColourHelper {
                     case "splitred":
                     case "splitbld":
                         return 6;
-                    case "org":
+                    case "org", "lme", "grn", "tqs", "frs", "eme", "tan", "bwn", "chk":
                         return 21;
-                    case "splitorg":
-                        return 1;
-                    case "tan":
-                    case "bwn":
-                    case "chk":
-                        return 21;
-                    case "splittan":
-                    case "splitbwn":
-                    case "splitchk":
+                    case "splitorg", "splitlme", "splitgrn", "splittqs", "splitfrs", "spliteme", "splittan", "splitbwn", "splitchk":
                         return 1;
                     case "spr":
                     case "ylw":
                     case "gld":
-                    case "crm":
+                    case "crm", "splitlvn", "splitppl", "splitsns":
                         return 20;
                     case "splitspr":
                     case "splitylw":
                     case "splitgld":
                     case "splitcrm":
                         return 0;
-                    case "lme":
-                    case "grn":
-                    case "tqs":
-                    case "frs":
-                    case "eme":
-                        return 21;
-                    case "splitlme":
-                    case "splitgrn":
-                    case "splittqs":
-                    case "splitfrs":
-                    case "spliteme":
-                        return 1;
-                    case "tea":
-                    case "ptr":
-                    case "eth":
-                    case "blu":
-                    case "nvy":
-                        return 29;
-                    case "splittea":
-                    case "splitptr":
-                    case "spliteth":
-                    case "splitblu":
-                    case "splitnvy":
-                        return 9;
                     case "lvn":
                     case "ppl":
                     case "sns":
                         return 40;
-                    case "splitlvn":
-                    case "splitppl":
-                    case "splitsns":
-                        return 20;
                     case "rse":
                     case "pnk":
                         return 28;
@@ -1718,22 +1346,18 @@ public class ColourHelper {
                     case "orca":
                         return 8;
                     case "red":
-                    case "bld":
+                    case "bld", "org":
                         return 26;
                     case "splitred":
-                    case "splitbld":
-                        return 6;
-                    case "org":
-                        return 26;
-                    case "splitorg":
+                    case "splitbld", "splitorg":
                         return 6;
                     case "tan":
                     case "bwn":
-                    case "chk":
+                    case "chk", "rse", "pnk", "lme", "grn", "tqs", "frs", "eme":
                         return 24;
                     case "splittan":
                     case "splitbwn":
-                    case "splitchk":
+                    case "splitchk", "splitrse", "splitpnk", "splitlme", "splitgrn", "splittqs", "splitfrs", "spliteme":
                         return 4;
                     case "spr":
                     case "ylw":
@@ -1745,18 +1369,6 @@ public class ColourHelper {
                     case "splitgld":
                     case "splitcrm":
                         return 19;
-                    case "lme":
-                    case "grn":
-                    case "tqs":
-                    case "frs":
-                    case "eme":
-                        return 24;
-                    case "splitlme":
-                    case "splitgrn":
-                    case "splittqs":
-                    case "splitfrs":
-                    case "spliteme":
-                        return 4;
                     case "tea":
                     case "ptr":
                     case "eth":
@@ -1777,12 +1389,6 @@ public class ColourHelper {
                     case "splitppl":
                     case "splitsns":
                         return 12;
-                    case "rse":
-                    case "pnk":
-                        return 24;
-                    case "splitrse":
-                    case "splitpnk":
-                        return 4;
                     case "rbw":
                         return 33;
                     case "splitrbw":
@@ -1806,17 +1412,9 @@ public class ColourHelper {
                     case "splitred":
                     case "splitbld":
                         return 2;
-                    case "org":
+                    case "org", "tan", "bwn", "chk":
                         return 21;
-                    case "splitorg":
-                        return 1;
-                    case "tan":
-                    case "bwn":
-                    case "chk":
-                        return 21;
-                    case "splittan":
-                    case "splitbwn":
-                    case "splitchk":
+                    case "splitorg", "splittan", "splitbwn", "splitchk":
                         return 1;
                     case "spr":
                     case "ylw":
@@ -1854,11 +1452,11 @@ public class ColourHelper {
                         return 16;
                     case "lvn":
                     case "ppl":
-                    case "sns":
+                    case "sns", "rbw":
                         return 33;
                     case "splitlvn":
                     case "splitppl":
-                    case "splitsns":
+                    case "splitsns", "splitrbw":
                         return 13;
                     case "rse":
                     case "pnk":
@@ -1866,32 +1464,24 @@ public class ColourHelper {
                     case "splitrse":
                     case "splitpnk":
                         return 7;
-                    case "rbw":
-                        return 33;
-                    case "splitrbw":
-                        return 13;
                 }
             case "naaz":
             case "pi_naaz":
                 switch (colour.getAlias()) {
                     case "lgy":
                     case "gry":
-                    case "blk":
+                    case "blk", "lvn", "ppl", "sns":
                         return 24;
                     case "splitlgy":
                     case "splitgry":
                     case "splitblk":
-                    case "orca":
+                    case "orca", "splitlvn", "splitppl", "splitsns":
                         return 4;
                     case "red":
-                    case "bld":
+                    case "bld", "org":
                         return 23;
                     case "splitred":
-                    case "splitbld":
-                        return 3;
-                    case "org":
-                        return 23;
-                    case "splitorg":
+                    case "splitbld", "splitorg":
                         return 3;
                     case "tan":
                     case "bwn":
@@ -1927,27 +1517,13 @@ public class ColourHelper {
                     case "ptr":
                     case "eth":
                     case "blu":
-                    case "nvy":
+                    case "nvy", "rse", "pnk":
                         return 21;
                     case "splittea":
                     case "splitptr":
                     case "spliteth":
                     case "splitblu":
-                    case "splitnvy":
-                        return 1;
-                    case "lvn":
-                    case "ppl":
-                    case "sns":
-                        return 24;
-                    case "splitlvn":
-                    case "splitppl":
-                    case "splitsns":
-                        return 4;
-                    case "rse":
-                    case "pnk":
-                        return 21;
-                    case "splitrse":
-                    case "splitpnk":
+                    case "splitnvy", "splitrse", "splitpnk":
                         return 1;
                     case "rbw":
                         return 29;
@@ -1967,14 +1543,14 @@ public class ColourHelper {
                     case "orca":
                         return 2;
                     case "red":
-                    case "bld":
+                    case "bld", "rbw", "spr", "ylw", "gld", "crm":
                         return 25;
                     case "splitred":
-                    case "splitbld":
+                    case "splitbld", "splitrbw", "splitspr", "splitylw", "splitgld", "splitcrm":
                         return 5;
-                    case "org":
+                    case "org", "lme", "grn", "tqs", "frs", "eme":
                         return 24;
-                    case "splitorg":
+                    case "splitorg", "splitlme", "splitgrn", "splittqs", "splitfrs", "spliteme":
                         return 4;
                     case "tan":
                     case "bwn":
@@ -1984,28 +1560,6 @@ public class ColourHelper {
                     case "splitbwn":
                     case "splitchk":
                         return 7;
-                    case "spr":
-                    case "ylw":
-                    case "gld":
-                    case "crm":
-                        return 25;
-                    case "splitspr":
-                    case "splitylw":
-                    case "splitgld":
-                    case "splitcrm":
-                        return 5;
-                    case "lme":
-                    case "grn":
-                    case "tqs":
-                    case "frs":
-                    case "eme":
-                        return 24;
-                    case "splitlme":
-                    case "splitgrn":
-                    case "splittqs":
-                    case "splitfrs":
-                    case "spliteme":
-                        return 4;
                     case "tea":
                     case "ptr":
                     case "eth":
@@ -2032,10 +1586,6 @@ public class ColourHelper {
                     case "splitrse":
                     case "splitpnk":
                         return 20;
-                    case "rbw":
-                        return 25;
-                    case "splitrbw":
-                        return 5;
                 }
             case "keleresa":
             case "keleresm":
@@ -2080,7 +1630,7 @@ public class ColourHelper {
                     case "splitspr":
                     case "splitylw":
                     case "splitgld":
-                    case "splitcrm":
+                    case "splitcrm", "splitrbw":
                         return 7;
                     case "lme":
                     case "grn":
@@ -2122,8 +1672,6 @@ public class ColourHelper {
                         return 4;
                     case "rbw":
                         return 37;
-                    case "splitrbw":
-                        return 7;
                 }
                 // Discordant Stars
             case "augers":
@@ -2349,7 +1897,7 @@ public class ColourHelper {
                     case "splitgrn":
                     case "splittqs":
                     case "splitfrs":
-                    case "spliteme":
+                    case "spliteme", "splittea", "splitptr", "spliteth", "splitblu", "splitnvy":
                         return 15;
                     case "tea":
                     case "ptr":
@@ -2357,12 +1905,6 @@ public class ColourHelper {
                     case "blu":
                     case "nvy":
                         return 35;
-                    case "splittea":
-                    case "splitptr":
-                    case "spliteth":
-                    case "splitblu":
-                    case "splitnvy":
-                        return 15;
                 }
             case "gledge":
                 switch (colour.getAlias()) {
@@ -2554,19 +2096,13 @@ public class ColourHelper {
                     case "ptr":
                     case "eth":
                     case "blu":
-                    case "nvy":
+                    case "nvy", "rse", "pnk":
                         return 30;
                     case "splittea":
                     case "splitptr":
                     case "spliteth":
                     case "splitblu":
-                    case "splitnvy":
-                        return 10;
-                    case "rse":
-                    case "pnk":
-                        return 30;
-                    case "splitrse":
-                    case "splitpnk":
+                    case "splitnvy", "splitrse", "splitpnk":
                         return 10;
                     case "rbw":
                         return 35;
@@ -2579,19 +2115,13 @@ public class ColourHelper {
                     case "grn":
                     case "tqs":
                     case "frs":
-                    case "eme":
+                    case "eme", "rse", "pnk":
                         return 30;
                     case "splitlme":
                     case "splitgrn":
                     case "splittqs":
                     case "splitfrs":
-                    case "spliteme":
-                        return 10;
-                    case "rse":
-                    case "pnk":
-                        return 30;
-                    case "splitrse":
-                    case "splitpnk":
+                    case "spliteme", "splitrse", "splitpnk":
                         return 10;
                     case "rbw":
                         return 35;

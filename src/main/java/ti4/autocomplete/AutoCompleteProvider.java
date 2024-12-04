@@ -268,10 +268,6 @@ public class AutoCompleteProvider {
 
                 List<String> tableRelics = new ArrayList<>();
                 if (game != null) {
-                    // for (Player player_ : game.getPlayers().values()) {
-                    //     List<String> playerRelics = player_.getRelics();
-                    //     tableRelics.addAll(playerRelics);
-                    // }
                     List<String> relicDeck = Mapper.getDecks().get(game.getRelicDeckID()).getNewShuffledDeck();
                     tableRelics.addAll(relicDeck);
                     Collections.shuffle(tableRelics);
@@ -320,15 +316,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 if (subCommandName != null) {
                     switch (subCommandName) {
-                        case Constants.REVEAL_SPECIFIC -> {
-                            List<Command.Choice> options = Mapper.getAgendas().entrySet().stream()
-                                .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue) || value.getValue().getAlias().toLowerCase().contains(enteredValue))
-                                .limit(25)
-                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
-                                .collect(Collectors.toList());
-                            event.replyChoices(options).queue();
-                        }
-                        case Constants.DISCARD_SPECIFIC_AGENDA -> {
+                        case Constants.REVEAL_SPECIFIC, Constants.DISCARD_SPECIFIC_AGENDA -> {
                             List<Command.Choice> options = Mapper.getAgendas().entrySet().stream()
                                 .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue) || value.getValue().getAlias().toLowerCase().contains(enteredValue))
                                 .limit(25)

@@ -264,12 +264,12 @@ public class CombatModHelper {
             case "next_to_structure" -> meetsCondition = (!ButtonHelperAgents.getAdjacentTilesWithStructuresInThem(player, game, tile).isEmpty() || ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile));
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
                 meetsCondition = false;
-                if (unitsByQuantity.entrySet().size() == 1) {
+                if (unitsByQuantity.size() == 1) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).getFirst();
                     meetsCondition = unitByQuantity.getValue() == 2
                         && !"ff".equals(unitByQuantity.getKey().getAsyncId());
                 }
-                if (unitsByQuantity.entrySet().size() == 2) {
+                if (unitsByQuantity.size() == 2) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).get(0);
                     Entry<UnitModel, Integer> unitByQuantity2 = new ArrayList<>(unitsByQuantity.entrySet()).get(1);
                     String baseType1 = unitByQuantity.getKey().getBaseType();
@@ -284,7 +284,7 @@ public class CombatModHelper {
                         meetsCondition = true;
                     }
                 }
-                if (unitsByQuantity.entrySet().size() == 3) {
+                if (unitsByQuantity.size() == 3) {
                     List<Entry<UnitModel, Integer>> entries = new ArrayList<>(unitsByQuantity.entrySet());
                     meetsCondition = entries.stream()
                         .limit(3)
@@ -481,11 +481,4 @@ public class CombatModHelper {
         return (int) value;
     }
 
-    // public static List<NamedCombatModifierModel>
-    // FilterRelevantMods(List<NamedCombatModifierModel> mods,
-    // List<UnitModel> units, CombatRollType rollType) {
-    // return mods.stream()
-    // .filter(model -> IsModInScopeForUnits(units, model.getModifier(), rollType))
-    // .toList();
-    // }
 }

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -1598,7 +1597,7 @@ public class ButtonHelperActionCards {
             amountToKill = 3;
         }
         if (p2.hasInf2Tech()) {
-            ButtonHelper.resolveInfantryDeath(player, amountToKill);
+            ButtonHelper.resolveInfantryDeath(p2, amountToKill);
             boolean cabalMech = false;
             Tile tile = game.getTileFromPlanet(planet);
             if (p2.hasAbility("amalgamation")
@@ -1704,15 +1703,16 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " you Plague'd " + planetRep + " and got " + hits + " hit" + (hits == 1 ? "" : "s"));
         String adjective = "";
-        if (amount <= 3) {
-        } else if (hits == 0) {
-            adjective = "n inconsequential";
-        } else if (hits == amount) {
-            adjective = " catastrophic";
-        } else if (hits <= amount / 3) {
-            adjective = " minor";
-        } else if (hits <= 2 * amount / 3) {
-            adjective = " major";
+        if (amount > 3) {
+            if (hits == 0) {
+                adjective = "n inconsequential";
+            } else if (hits == amount) {
+                adjective = " catastrophic";
+            } else if (hits <= amount / 3) {
+                adjective = " minor";
+            } else if (hits <= 2 * amount / 3) {
+                adjective = " major";
+            }
         }
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
             p2.getRepresentationUnfogged() + " your planet " + planetRep + " suffered a"

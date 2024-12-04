@@ -40,7 +40,7 @@ public class JimboHandlers {
     @ButtonHandler(JimboConst.metaAction)
     private static void menu(GenericInteractionCreateEvent event, MessageChannel channel, Game game, String buttonID) {
         String message = "__Welcome to **\"JIMBO\"**, Jazz's Interactive Map Building " + JimboConst.o() + "!!!__";
-        String menu = null;
+        String menu;
         if (buttonID == null) buttonID = JimboConst.mainPage;
         if (buttonID.startsWith(JimboConst.tileAction)) {
             menu = JimboConst.tileAction;
@@ -163,7 +163,7 @@ public class JimboHandlers {
         String regexPt4 = regexPt3 + "_ring" + RegexHelper.oneOf(List.of(RegexHelper.intRegex("ring"), "corners"));
         String regexPt5 = regexPt3 + "_tile" + RegexHelper.posRegex("posTo");
 
-        if ((matcher = Pattern.compile(regexPt1).matcher(buttonID)).matches()) {
+        if (Pattern.compile(regexPt1).matcher(buttonID).matches()) {
             String msg = "Choose a ring to move a tile from:";
             List<Button> goBack = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE));
             pickRing(event, game, msg, buttonID, goBack);
@@ -220,7 +220,7 @@ public class JimboHandlers {
         String regexPt2 = regexPt1 + "_ring" + RegexHelper.oneOf(List.of(RegexHelper.intRegex("ring"), "corners"));
         String regexPt3 = regexPt1 + "_tile" + RegexHelper.posRegex("pos");
 
-        if ((matcher = Pattern.compile(regexPt1).matcher(buttonID)).matches()) {
+        if (Pattern.compile(regexPt1).matcher(buttonID).matches()) {
             String msg = "Choose a ring to remove a tile from:";
             List<Button> goBack = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE));
             pickRing(event, game, msg, JimboConst.tileRemove, goBack);

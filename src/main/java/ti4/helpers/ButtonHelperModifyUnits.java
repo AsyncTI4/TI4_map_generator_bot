@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -803,13 +802,6 @@ public class ButtonHelperModifyUnits {
         String skilledS = "";
         if (skilled) {
             skilledS = "_skilled";
-        }
-        HashSet<String> adjTiles = new HashSet<>(FoWHelper.getAdjacentTilesAndNotThisTile(game, pos1, player, false));
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander")) {
-            Tile hs = player.getHomeSystemTile();
-            if (hs != null) {
-                adjTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(game, hs.getPosition(), player, false));
-            }
         }
         for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, player, false)) {
             Tile tile = game.getTileByPosition(pos2);
