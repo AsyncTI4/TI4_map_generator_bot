@@ -50,7 +50,7 @@ public abstract class ListenerContext {
         privateChannel = event.getMessageChannel();
         mainGameChannel = event.getMessageChannel();
 
-        if (GameManager.isValidGame(gameName)) {
+        if (game != null) {
             String userID = event.getUser().getId();
             player = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
 
