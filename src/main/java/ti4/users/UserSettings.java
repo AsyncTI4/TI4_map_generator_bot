@@ -8,11 +8,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserSettings {
 
     private String userId;
