@@ -43,6 +43,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
 import ti4.draft.BagDraft;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -234,10 +235,10 @@ public class GameSaveLoadManager {
         return null;
     }
 
-    private static void saveUndo(Game game, File originalMapFile) {
-        int latestIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(game);
+    private static void saveUndo(String gameName, File originalMapFile) {
+        int latestIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(GameManager.getManagedGame(gameName));
         if (latestIndex > 0) {
-            createUndoCopy(originalMapFile, game.getName(), latestIndex);
+            createUndoCopy(originalMapFile, gameName, latestIndex);
         }
     }
 
@@ -256,7 +257,6 @@ public class GameSaveLoadManager {
         } catch (Exception e) {
             BotLogger.log("Error copying undo file for " + gameName, e);
         }
-        return null;
     }
 
     private static File getMapUndoDirectory() {
@@ -295,7 +295,7 @@ public class GameSaveLoadManager {
         BotLogger.log("Cleaned up `" + count + "` undo files that were over `" + daysOld + "` days old (" + tooOld + ")");
     }
 
-    public static int cleanUpExcessUndoFilesAndReturnLatestIndex(Game game) {
+    public static int cleanUpExcessUndoFilesAndReturnLatestIndex(ManagedGame game) {
         String gameName = game.getName();
         String gameNameFileNamePrefix = gameName + "_";
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(getMapUndoDirectory().toPath(), path -> path.getFileName().toString().startsWith(gameNameFileNamePrefix))) {

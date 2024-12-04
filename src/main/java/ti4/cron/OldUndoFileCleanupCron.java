@@ -3,7 +3,6 @@ package ti4.cron;
 import java.time.ZoneId;
 
 import lombok.experimental.UtilityClass;
-import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
@@ -18,7 +17,7 @@ public class OldUndoFileCleanupCron {
     private static void cleanup() {
         BotLogger.logWithTimestamp("Cleaning up excess undo files...");
         try {
-            for (Game game : GameManager.getGameNameToGame().values()) {
+            for (var game : GameManager.getManagedGames()) {
                 GameSaveLoadManager.cleanUpExcessUndoFilesAndReturnLatestIndex(game);
             }
             BotLogger.logWithTimestamp("Cleaned excess undo files, starting on old undo files...");
