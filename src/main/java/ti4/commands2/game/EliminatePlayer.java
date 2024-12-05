@@ -85,11 +85,11 @@ class EliminatePlayer extends GameStateSubcommand {
                 if (pn != null && !pn.getOwner().equalsIgnoreCase(player.getColor()) && !pn.getOwner().equalsIgnoreCase(player.getFaction())) {
                     Player p2 = game.getPlayerFromColorOrFaction(pn.getOwner());
                     player.removePromissoryNote(pnID);
-                    if (p2 != null) {
+                    if (p2 == null) {
+                        BotLogger.log("Could not find player when removing eliminated player's PN: " + pn.getOwner());
+                    } else {
                         p2.setPromissoryNote(pnID);
                         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
-                    } else {
-                        BotLogger.log("Could not find player when removing eliminated player's PN: " + pn.getOwner());
                     }
                 }
             }
