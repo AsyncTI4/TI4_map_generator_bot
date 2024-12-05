@@ -2138,8 +2138,7 @@ public class Helper {
             addPlayerPermissionsToGameChannel(guild, actionsChannel, players);
         }
         String gameName = game.getName();
-        List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
-            .toList();
+        List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
         for (GuildChannel channel : channels) {
             addPlayerPermissionsToGameChannel(guild, channel, players);
         }
@@ -2167,8 +2166,7 @@ public class Helper {
                     }
                 }
                 String gameName = game.getName();
-                List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
-                    .toList();
+                List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
                 for (GuildChannel channel : channels) {
                     addRolePermissionsToGameChannel(guild, channel, role);
                 }
