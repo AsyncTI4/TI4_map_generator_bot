@@ -24,10 +24,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import ti4.commands2.CommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;
@@ -60,8 +56,6 @@ import ti4.processors.ButtonProcessor;
 import ti4.selections.SelectionManager;
 import ti4.service.statistics.StatisticsPipeline;
 
-import static org.reflections.scanners.Scanners.SubTypes;
-
 public class AsyncTI4DiscordBot {
 
     public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
@@ -84,8 +78,6 @@ public class AsyncTI4DiscordBot {
     public static Guild guildCommunityPlays;
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
-
-    private static final List<Class<?>> classes = new ArrayList<>();
 
     public static void main(String[] args) {
         GlobalSettings.loadSettings();
@@ -203,11 +195,12 @@ public class AsyncTI4DiscordBot {
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
 
-        // LOAD GAMES
-        BotLogger.logWithTimestamp(" LOADING GAMES");
-        // LOAD GAMES NAMES
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
+
+        // LOAD GAMES NAMES
+        BotLogger.logWithTimestamp(" LOADING GAMES");
         GameSaveLoadManager.loadGame();
+        BotLogger.logWithTimestamp(" FINISHED LOADING GAMES");
 
         // RUN DATA MIGRATIONS
         BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
@@ -361,18 +354,6 @@ public class AsyncTI4DiscordBot {
             .flatMap(guild -> guild.getCategories().stream())
             .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
             .toList();
-    }
-
-    public static List<Class<?>> getAllClasses() {
-        if (classes.isEmpty()) {
-            Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .setUrls(ClasspathHelper.forJavaClassPath())
-                .setScanners(new SubTypesScanner(false)));
-            reflections.get(SubTypes.of(Object.class).asClass()).stream()
-                .filter(c -> c.getPackageName().startsWith("ti4"))
-                .forEach(classes::add);
-        }
-        return classes;
     }
 
     public static <T> CompletableFuture<T> completeAsync(Supplier<T> supplier) {
