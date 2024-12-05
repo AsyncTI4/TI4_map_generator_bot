@@ -252,16 +252,19 @@ public class AutoPingCron {
                 long timeDifference = System.currentTimeMillis() - scPlayTime;
                 String timesPinged = game.getStoredValue("scPlayPingCount" + sc + player.getFaction());
                 if (timeDifference > twelveHoursInMilliseconds && timeDifference < twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("1")) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(player.getRepresentationUnfogged());
-                    sb.append(" You are getting this ping because ").append(Helper.getSCName(sc, game)).append(" has been played and now it has been half the alloted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
+                    StringBuilder sb = new StringBuilder()
+                        .append(player.getRepresentationUnfogged())
+                        .append(" You are getting this ping because ").append(Helper.getSCName(sc, game))
+                        .append(" has been played and now it has been half the allotted time and you haven't reacted. Please do so, or after another ")
+                        .append("half you will be marked as not following.");
                     appendScMessages(game, player, sc, sb);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
                 }
                 if (timeDifference > twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("2")) {
-                    String sb = player.getRepresentationUnfogged() +
-                        Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
-                    ButtonHelper.sendMessageToRightStratThread(player, game, sb, ButtonHelper.getStratName(sc));
+                    String message = player.getRepresentationUnfogged() + Helper.getSCName(sc, game) +
+                        " has been played and now it has been the allotted time and they haven't reacted, so they have " +
+                        "been marked as not following.\n";
+                    ButtonHelper.sendMessageToRightStratThread(player, game, message, ButtonHelper.getStratName(sc));
                     player.addFollowedSC(sc);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
                     String messageID = game.getStoredValue("scPlayMsgID" + sc);
