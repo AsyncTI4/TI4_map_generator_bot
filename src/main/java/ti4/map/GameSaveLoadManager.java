@@ -153,7 +153,7 @@ public class GameSaveLoadManager {
             BotLogger.log("Could not save map: " + game.getName(), e);
         }
 
-        GameManager.addOrReplaceGame(game);
+        GameManager.onSave(game);
 
         gameFile = Storage.getGameFile(game.getName() + TXT);
         if (gameFile.exists()) {
@@ -233,7 +233,6 @@ public class GameSaveLoadManager {
     public static Game reload(String gameName) {
         File gameFile = Storage.getGameFile(gameName + Constants.TXT);
         if (gameFile.exists()) {
-            GameManager.invalidateGame(gameName);
             return loadGame(gameFile);
         }
         return null;
@@ -1174,7 +1173,7 @@ public class GameSaveLoadManager {
     }
 
     public static boolean deleteGame(String gameName) {
-        GameManager.invalidateGame(gameName);
+        GameManager.onDelete(gameName);
         File mapStorage = Storage.getGameFile(gameName + TXT);
         if (!mapStorage.exists()) {
             return false;
@@ -1209,6 +1208,7 @@ public class GameSaveLoadManager {
         return Collections.emptyList();
     }
 
+    @Nullable
     public static Game loadGame(String gameName) {
         File originalGameFile = Storage.getGameFile(gameName + Constants.TXT);
         return loadGame(originalGameFile);
@@ -1219,7 +1219,7 @@ public class GameSaveLoadManager {
     public static Game loadGame(File gameFile) {
         Game game = readGame(gameFile);
         if (game != null) {
-            GameManager.addOrReplaceGame(game);
+            GameManager.onLoad(game);
         }
         return game;
     }

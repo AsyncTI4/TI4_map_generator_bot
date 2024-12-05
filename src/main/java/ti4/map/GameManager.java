@@ -52,17 +52,31 @@ public class GameManager {
         return activeGameCache.get(gameName);
     }
 
-    static void addOrReplaceGame(Game game) {
+    static void onLoad(Game game) {
         allGameNames.addIfAbsent(game.getName());
-        gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
-        activeGameCache.put(game.getName(), game);
+        if (!hasMatchingManagedGame(game)) {
+            gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
+        }
     }
 
-    static void invalidateGame(String gameName) {
+    static void onSave(Game game) {
+        allGameNames.addIfAbsent(game.getName());
+        gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
+        if (!game.isHasEnded()) {
+            activeGameCache.put(game.getName(), game);
+        }
+    }
+
+    static void onDelete(String gameName) {
         allGameNames.remove(gameName);
         var managedGame = gameNameToManagedGame.remove(gameName);
         managedGame.getPlayers().forEach(player -> player.getGames().remove(managedGame));
         activeGameCache.invalidate(gameName);
+    }
+
+    private static boolean hasMatchingManagedGame(Game game) {
+        var managedGame = gameNameToManagedGame.get(game.getName());
+        return managedGame != null && managedGame.matches(game);
     }
 
     public static boolean isValidGame(String gameName) {

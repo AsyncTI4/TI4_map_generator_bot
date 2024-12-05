@@ -24,6 +24,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final boolean vpGoalReached;
     private final boolean fowMode;
     private final String creationDate;
+    private final long lastModifiedDate;
     private final String activePlayerId;
     private final long lastActivePlayerChange;
     private final long endedDate;
@@ -46,6 +47,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         vpGoalReached = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
         fowMode = game.isFowMode();
         creationDate = game.getCreationDate();
+        lastModifiedDate = game.getLastModifiedDate();
         activePlayerId = sanitizeToNull(game.getActivePlayerID());
         lastActivePlayerChange = game.getLastActivePlayerChange() == null ? 0 : game.getLastActivePlayerChange().getTime();
         endedDate = game.getEndedDate();
@@ -105,6 +107,10 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
             if (user != null) sb.append(user.getAsMention()).append(" ");
         }
         return sb.toString();
+    }
+
+    public boolean matches(Game game) {
+        return name.equals(game.getName()) && lastModifiedDate == game.getLastModifiedDate();
     }
 
     @Override
