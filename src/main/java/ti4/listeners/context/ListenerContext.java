@@ -43,9 +43,6 @@ public abstract class ListenerContext {
         this.event = event;
         this.componentID = this.origComponentID = compID;
 
-        String userID = event.getUser().getId();
-
-        // Find game
         String gameName = CommandHelper.getGameNameFromChannel(event);
         game = GameManager.getGame(gameName);
 
@@ -54,6 +51,7 @@ public abstract class ListenerContext {
         mainGameChannel = event.getMessageChannel();
 
         if (game != null) {
+            String userID = event.getUser().getId();
             player = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
 
             if (player == null && !"showGameAgain".equalsIgnoreCase(componentID)) {
@@ -100,7 +98,6 @@ public abstract class ListenerContext {
             }
         }
 
-        // newstuff
         if (componentID.startsWith("anonDeclare_")) {
             String declaration = componentID.split("_")[1];
             String old = game.getStoredValue(player.getUserID() + "anonDeclare");
