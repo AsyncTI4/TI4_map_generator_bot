@@ -83,6 +83,8 @@ public class AsyncTI4DiscordBot {
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
 
+    private static final List<Class<?>> classes = new ArrayList<>();
+
     public static void main(String[] args) {
         GlobalSettings.loadSettings();
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
