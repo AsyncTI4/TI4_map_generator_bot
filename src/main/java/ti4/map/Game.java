@@ -44,7 +44,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.planet.PlanetRemove;
@@ -305,7 +304,6 @@ public class Game extends GameProperties {
         return returnValue;
     }
 
-    @NotNull
     @JsonIgnore
     public MiltyDraftManager getMiltyDraftManager() {
         if (miltyDraftManager == null) {
@@ -3071,6 +3069,20 @@ public class Game extends GameProperties {
             discardActionCards.put(card, identifier);
         }
         this.discardActionCards = discardActionCards;
+    }
+
+    @JsonIgnore
+    public void setPurgedActionCards(List<String> purgedActionCardList) {
+        Map<String, Integer> purgedActionCards = new LinkedHashMap<>();
+        for (String card : purgedActionCardList) {
+            Collection<Integer> values = purgedActionCards.values();
+            int identifier = ThreadLocalRandom.current().nextInt(1000);
+            while (values.contains(identifier)) {
+                identifier = ThreadLocalRandom.current().nextInt(1000);
+            }
+            purgedActionCards.put(card, identifier);
+        }
+        this.purgedActionCards = purgedActionCards;
     }
 
     public String getGameNameForSorting() {
