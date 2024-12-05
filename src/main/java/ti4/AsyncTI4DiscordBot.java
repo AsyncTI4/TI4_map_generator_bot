@@ -203,11 +203,12 @@ public class AsyncTI4DiscordBot {
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
 
-        // LOAD GAMES
-        BotLogger.logWithTimestamp(" LOADING GAMES");
-        // LOAD GAMES NAMES
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
+
+        // LOAD GAMES NAMES
+        BotLogger.logWithTimestamp(" LOADING GAMES");
         GameSaveLoadManager.loadGame();
+        BotLogger.logWithTimestamp(" FINISHED LOADING GAMES");
 
         // RUN DATA MIGRATIONS
         BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
@@ -363,18 +364,6 @@ public class AsyncTI4DiscordBot {
             .toList();
     }
 
-    public static List<Class<?>> getAllClasses() {
-        if (classes.isEmpty()) {
-            Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .setUrls(ClasspathHelper.forJavaClassPath())
-                .setScanners(new SubTypesScanner(false)));
-            reflections.get(SubTypes.of(Object.class).asClass()).stream()
-                .filter(c -> c.getPackageName().startsWith("ti4"))
-                .forEach(classes::add);
-        }
-        return classes;
-    }
-
     public static <T> CompletableFuture<T> completeAsync(Supplier<T> supplier) {
         return CompletableFuture.supplyAsync(supplier, THREAD_POOL).handle((result, exception) -> {
             if (exception != null) {
@@ -408,5 +397,17 @@ public class AsyncTI4DiscordBot {
             return false;
         }
         return true;
+    }
+
+    public static List<Class<?>> getAllClasses() {
+        if (classes.isEmpty()) {
+            Reflections reflections = new Reflections(new ConfigurationBuilder()
+                .setUrls(ClasspathHelper.forJavaClassPath())
+                .setScanners(new SubTypesScanner(false)));
+            reflections.get(SubTypes.of(Object.class).asClass()).stream()
+                .filter(c -> c.getPackageName().startsWith("ti4"))
+                .forEach(classes::add);
+        }
+        return classes;
     }
 }

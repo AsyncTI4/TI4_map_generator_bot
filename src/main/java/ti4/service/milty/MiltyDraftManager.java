@@ -696,7 +696,7 @@ public class MiltyDraftManager {
         return String.join(",", msgs.stream().map(m -> m == null ? "null" : m).toList());
     }
 
-    public void loadSuperSaveString(Game game, String saveString) throws Exception {
+    public void loadSuperSaveString(String saveString) throws Exception {
         StringTokenizer bigTokenizer = new StringTokenizer(saveString, "|");
         if (bigTokenizer.countTokens() != 6) {
             throw new Exception("Bad milty draft save string: " + saveString);
