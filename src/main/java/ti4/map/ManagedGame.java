@@ -93,7 +93,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         return getName();
     }
 
-    public String getPing() {
+    public String getPingAllPlayers() {
         Role role = guild == null ? null :
                 guild.getRoles().stream().filter(r -> getName().equals(r.getName().toLowerCase())).findFirst().orElse(null);
         if (role != null) {

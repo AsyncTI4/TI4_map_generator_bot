@@ -3072,30 +3072,6 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
-    public void setPurgedActionCards(List<String> purgedActionCardList) {
-        Map<String, Integer> purgedActionCards = new LinkedHashMap<>();
-        for (String card : purgedActionCardList) {
-            Collection<Integer> values = purgedActionCards.values();
-            int identifier = ThreadLocalRandom.current().nextInt(1000);
-            while (values.contains(identifier)) {
-                identifier = ThreadLocalRandom.current().nextInt(1000);
-            }
-            purgedActionCards.put(card, identifier);
-        }
-        this.purgedActionCards = purgedActionCards;
-    }
-
-    public String getGameNameForSorting() {
-        if (getName().startsWith("pbd")) {
-            return StringUtils.leftPad(getName(), 10, "0");
-        }
-        if (getName().startsWith("fow")) {
-            return StringUtils.leftPad(getName(), 10, "1");
-        }
-        return getName();
-    }
-
-    @JsonIgnore
     public String getPing() {
         Role role = getGameRole();
         if (role != null) {

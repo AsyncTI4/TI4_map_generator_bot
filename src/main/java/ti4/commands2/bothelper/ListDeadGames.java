@@ -16,6 +16,9 @@ import ti4.message.MessageHelper;
 
 class ListDeadGames extends Subcommand {
 
+    private static final String WARNING_MESSAGE = " this is a warning that this game will be cleaned up tomorrow, " +
+        "unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done.";
+
     public ListDeadGames() {
         super(Constants.LIST_DEAD_GAMES, "List games that haven't moved in 2+ months but still have channels");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Delete with with DELETE, otherwise warning").setRequired(true));
@@ -85,7 +88,7 @@ class ListDeadGames extends Subcommand {
                 actionsChannel.delete().queue();
             } else {
                 warned = true;
-                MessageHelper.sendMessageToChannel(actionsChannel, game.getPing() + " this is a warning that this game will be cleaned up tomorrow, unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done. ");
+                MessageHelper.sendMessageToChannel(actionsChannel, game.getPingAllPlayers() + WARNING_MESSAGE);
             }
         }
 
@@ -98,7 +101,7 @@ class ListDeadGames extends Subcommand {
                 if (delete) {
                     tableTalkChannel.delete().queue();
                 } else if (!warned) {
-                    MessageHelper.sendMessageToChannel(actionsChannel, game.getPing() + " this is a warning that this game will be cleaned up tomorrow, unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done. ");
+                    MessageHelper.sendMessageToChannel(actionsChannel, game.getPingAllPlayers() + WARNING_MESSAGE);
                 }
             }
         }
