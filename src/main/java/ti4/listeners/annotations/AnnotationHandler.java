@@ -30,10 +30,6 @@ import ti4.message.BotLogger;
 
 public class AnnotationHandler {
 
-    private static List<Class<?>> classesToCheck() {
-        return AsyncTI4DiscordBot.getAllClasses();
-    }
-
     private static <C extends ListenerContext> boolean validateParams(Method method, Class<C> contextClass) {
         boolean hasComponentID = false;
         List<Parameter> badParams = new ArrayList<>();
@@ -209,7 +205,7 @@ public class AnnotationHandler {
                 return consumers;
             }
 
-            for (Class<?> klass : classesToCheck()) {
+            for (Class<?> klass : AsyncTI4DiscordBot.getAllClasses()) {
                 for (Method method : klass.getDeclaredMethods()) {
                     method.setAccessible(true);
                     List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));

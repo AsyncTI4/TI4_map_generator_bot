@@ -2509,10 +2509,11 @@ public class ButtonHelper {
     }
 
     public static int checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
-        if (tile.getRepresentation() == null || "null".equalsIgnoreCase(tile.getRepresentation())) {
+        String tileRepresentation = tile.getRepresentation();
+        if (tileRepresentation == null || "null".equalsIgnoreCase(tileRepresentation)) {
             return 0;
         }
-        if (tile.getRepresentation().toLowerCase().contains("nombox")) {
+        if (tileRepresentation.toLowerCase().contains("nombox")) {
             return 0;
         }
         if (!game.isCcNPlasticLimit()) {
