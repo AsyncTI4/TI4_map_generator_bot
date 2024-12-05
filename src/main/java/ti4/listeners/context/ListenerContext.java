@@ -22,7 +22,7 @@ public abstract class ListenerContext {
     protected boolean contextIsValid = true;
     protected final String origComponentID;
     protected String componentID;
-    protected boolean factionChecked = false;
+    protected boolean factionChecked;
     protected final Game game;
     protected Player player;
     protected MessageChannel privateChannel, mainGameChannel, actionsChannel;
@@ -31,10 +31,6 @@ public abstract class ListenerContext {
     public abstract GenericInteractionCreateEvent getEvent();
 
     public abstract String getContextType();
-
-    public String getSubCommand() {
-        return "no sub command";
-    }
 
     public boolean isValid() {
         return contextIsValid;
