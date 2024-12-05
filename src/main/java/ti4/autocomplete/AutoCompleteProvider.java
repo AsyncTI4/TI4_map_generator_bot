@@ -24,7 +24,6 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.uncategorized.ServerPromoteCommand;
 import ti4.helpers.Constants;
-import ti4.helpers.DateTimeHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
@@ -65,23 +64,7 @@ public class AutoCompleteProvider {
 
     public static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         try {
-            long startTime = System.currentTimeMillis();
-
             resolveAutoCompleteEvent(event);
-
-            long endTime = System.currentTimeMillis();
-            final int milliThreshold = 1000;
-            if (endTime - startTime > milliThreshold) {
-                long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
-                String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
-                String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
-                String message = event.getChannel().getAsMention() + " " + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: " +
-                    "This AutoComplete event took over " + milliThreshold + "ms to respond or execute\n> " +
-                    DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " event received\n> " +
-                    DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
-                    DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
-                BotLogger.log(message);
-            }
         } catch (Exception e) {
             BotLogger.log("Error in handleAutoCompleteEvent", e);
         }
