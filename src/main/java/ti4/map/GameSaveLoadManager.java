@@ -1227,9 +1227,9 @@ public class GameSaveLoadManager {
             BotLogger.log("Could not load map, map file does not exist: " + (gameFile == null ? "null file" : gameFile.getAbsolutePath()));
             return null;
         }
-        Game game = new Game();
-        boolean fatalError = false;
         try {
+            Game game = new Game();
+            boolean fatalError = false;
             Iterator<String> gameFileLines = Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()).listIterator();
             game.setOwnerID(gameFileLines.next());
             game.setOwnerName(gameFileLines.next());
