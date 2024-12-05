@@ -157,7 +157,7 @@ public class GameSaveLoadManager {
 
         gameFile = Storage.getGameFile(game.getName() + TXT);
         if (gameFile.exists()) {
-            saveUndo(game, gameFile);
+            saveUndo(game.getName(), gameFile);
         }
     }
 
@@ -240,10 +240,10 @@ public class GameSaveLoadManager {
         return null;
     }
 
-    private static void saveUndo(Game game, File originalGameFile) {
-        int latestIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(GameManager.getManagedGame(game.getName()));
+    private static void saveUndo(String gameName, File originalGameFile) {
+        int latestIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(GameManager.getManagedGame(gameName));
         if (latestIndex > 0) {
-            createUndoCopy(originalGameFile, game.getName(), latestIndex);
+            createUndoCopy(originalGameFile, gameName, latestIndex);
         }
     }
 
@@ -1215,6 +1215,7 @@ public class GameSaveLoadManager {
         return loadGame(originalGameFile);
     }
 
+    // TODO: sanitize so that "null" string literal isn't used
     @Nullable
     public static Game loadGame(File gameFile) {
         Game game = readGame(gameFile);
