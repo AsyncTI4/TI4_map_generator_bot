@@ -96,7 +96,7 @@ public class AutoPingCron {
     }
 
     private static boolean canPlayerConceivablySabo(Player player, Game game) {
-        return player.hasTechReady("it") && player.getStrategicCC() > 0 ||
+        return player.getStrategicCC() > 0 && player.hasTechReady("it")  ||
             player.hasUnit("empyrean_mech") && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Mech).isEmpty() ||
             player.getAc() > 0;
     }
