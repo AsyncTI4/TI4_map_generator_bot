@@ -284,7 +284,6 @@ public class MiltyDraftHelper {
             if (!sourceAllowed) continue;
 
             Tile tile = new Tile(tileID, "none");
-
             if (tile.isHomeSystem() || tile.getTileModel().isHyperlane()) {
                 continue;
             }

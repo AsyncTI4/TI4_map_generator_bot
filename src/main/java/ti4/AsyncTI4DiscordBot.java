@@ -24,6 +24,10 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import ti4.commands2.CommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;
@@ -388,5 +392,17 @@ public class AsyncTI4DiscordBot {
             return false;
         }
         return true;
+    }
+
+    public static List<Class<?>> getAllClasses() {
+        if (classes.isEmpty()) {
+            Reflections reflections = new Reflections(new ConfigurationBuilder()
+                .setUrls(ClasspathHelper.forJavaClassPath())
+                .setScanners(new SubTypesScanner(false)));
+            reflections.get(SubTypes.of(Object.class).asClass()).stream()
+                .filter(c -> c.getPackageName().startsWith("ti4"))
+                .forEach(classes::add);
+        }
+        return classes;
     }
 }
