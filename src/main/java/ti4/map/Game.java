@@ -3871,35 +3871,31 @@ public class Game extends GameProperties {
 
     @Nullable
     public Player getPlayerFromColorOrFaction(String factionOrColor) {
-        Player player = null;
-        if (factionOrColor != null) {
-            String factionColor = AliasHandler.resolveColor(factionOrColor.toLowerCase());
-            factionColor = StringUtils.substringBefore(factionColor, " "); // TO HANDLE UNRESOLVED AUTOCOMPLETE
-            factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : getPlayers().values()) {
-                if ("keleres".equalsIgnoreCase(factionColor)) {
-                    if (Objects.equals(factionColor + "a", player_.getFaction())) {
-                        player = player_;
-                        break;
-                    }
-                    if (Objects.equals(factionColor + "x", player_.getFaction())) {
-                        player = player_;
-                        break;
-                    }
-                    if (Objects.equals(factionColor + "m", player_.getFaction())) {
-                        player = player_;
-                        break;
-                    }
+        if (factionOrColor == null) {
+            return null;
+        }
+        String factionColor = AliasHandler.resolveColor(factionOrColor.toLowerCase());
+        factionColor = StringUtils.substringBefore(factionColor, " "); // TO HANDLE UNRESOLVED AUTOCOMPLETE
+        factionColor = AliasHandler.resolveFaction(factionColor);
+        for (Player player : getPlayers().values()) {
+            if ("keleres".equalsIgnoreCase(factionColor)) {
+                if (Objects.equals(factionColor + "a", player.getFaction())) {
+                    return player;
                 }
-                if (Objects.equals(factionColor, player_.getFaction()) ||
-                    Objects.equals(factionColor, player_.getColor()) ||
-                    Objects.equals(factionColor, player_.getColorID())) {
-                    player = player_;
-                    break;
+                if (Objects.equals(factionColor + "x", player.getFaction())) {
+                    return player;
+                }
+                if (Objects.equals(factionColor + "m", player.getFaction())) {
+                    return player;
                 }
             }
+            if (Objects.equals(factionColor, player.getFaction()) ||
+                Objects.equals(factionColor, player.getColor()) ||
+                Objects.equals(factionColor, player.getColorID())) {
+                return player;
+            }
         }
-        return player;
+        return null;
     }
 
     @Nullable

@@ -96,11 +96,10 @@ public class ButtonProcessor {
             contextTime = System.currentTimeMillis();
             if (context.isValid()) {
                 resolveButtonInteractionEvent(context);
+                resolveTime = System.currentTimeMillis();
+                context.save(event);
+                saveTime = System.currentTimeMillis();
             }
-            resolveTime = System.currentTimeMillis();
-            context.save(event);
-            saveTime = System.currentTimeMillis();
-            // BotLogger.logWithTimestamp("Button Save: " + DateTimeHelper.getTimeRepresentationToMilliseconds(saveTime - resolveTime) + "\nButton Queue Size: " + buttonInteractionQueue.size());
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
