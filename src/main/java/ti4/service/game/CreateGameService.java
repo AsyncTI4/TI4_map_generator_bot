@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -385,8 +383,7 @@ public class CreateGameService {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        Set<String> gameNames = new HashSet<>(GameManager.getGameNames());
-        gameAndRoleNames.addAll(gameNames);
+        gameAndRoleNames.addAll(GameManager.getGameNames());
 
         // CHECK
         return gameAndRoleNames.contains(name);

@@ -2,7 +2,9 @@ package ti4.map;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -69,8 +71,8 @@ public class GameManager {
         return gameName != null && allGameNames.contains(gameName);
     }
 
-    public static List<String> getGameNames() {
-        return new ArrayList<>(allGameNames);
+    public static Set<String> getGameNames() {
+        return new HashSet<>(allGameNames);
     }
 
     public static int getNumberOfGames() {

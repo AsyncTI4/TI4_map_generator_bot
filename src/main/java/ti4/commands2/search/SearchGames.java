@@ -123,7 +123,7 @@ class SearchGames extends Subcommand {
         if (filteredGameNames.isEmpty()) {
             sb.append("No games match the selected filters.");
         } else {
-            int totalGames = GameManager.getGameNames().size();
+            int totalGames = GameManager.getNumberOfGames();
 
             Map<Predicate<Game>, Integer> predicatesToIntegerCounts = predicatesToCounts.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()));
 
