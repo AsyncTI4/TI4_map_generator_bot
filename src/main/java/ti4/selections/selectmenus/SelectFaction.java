@@ -17,7 +17,6 @@ import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.selections.Selection;
@@ -39,12 +38,6 @@ public class SelectFaction implements Selection {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game could not be found");
             return;
         }
-        Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
-            return;
-        }
-
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You selected: " + event.getSelectedOptions().getFirst().getLabel());
         String fakeButtonID = selectionID + "_" + event.getUser().getId() + "_" + event.getValues().getFirst();
         ButtonHelper.resolveSetupStep2(game, event, fakeButtonID);

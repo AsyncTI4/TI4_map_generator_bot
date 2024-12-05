@@ -8,7 +8,8 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 
 @Getter
 public class SelectionMenuContext extends ListenerContext {
-    private String menuID, messageID;
+    private String menuID;
+    private String messageID;
     private List<String> values;
 
     public StringSelectInteractionEvent getEvent() {

@@ -6,11 +6,12 @@ import java.util.Map;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
-import ti4.map.GameSaveLoadManager;
 
 @Getter
 public class ModalContext extends ListenerContext {
-    private String modalID, messageID;
+
+    private String modalID;
+    private String messageID;
     private Map<String, String> values;
 
     public ModalInteractionEvent getEvent() {
@@ -33,10 +34,6 @@ public class ModalContext extends ListenerContext {
         this.values = new HashMap<>();
         for (ModalMapping mapping : event.getValues()) {
             values.put(mapping.getId(), mapping.getAsString());
-        }
-
-        if (game != null) {
-            GameSaveLoadManager.saveGame(game, event);
         }
     }
 }
