@@ -219,7 +219,6 @@ public class GameSaveLoadManager {
                     CardsInfoService.sendCardsInfo(loadedGame, p1);
                 }
             }
-            GameManager.invalidateGame(game.getName());
 
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());

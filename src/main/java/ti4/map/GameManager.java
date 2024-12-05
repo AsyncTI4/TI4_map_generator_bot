@@ -54,12 +54,8 @@ public class GameManager {
 
     static void addOrReplaceGame(Game game) {
         allGameNames.addIfAbsent(game.getName());
-        if (!hasMatchingManagedGame(game)) {
-            gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
-        }
-        if (activeGameCache.getIfPresent(game.getName()) != null) {
-            activeGameCache.put(game.getName(), game);
-        }
+        gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
+        activeGameCache.put(game.getName(), game);
     }
 
     static void invalidateGame(String gameName) {
@@ -92,11 +88,6 @@ public class GameManager {
                     ". Something is very off...");
         }
         return new ArrayList<>(gameNameToManagedGame.values());
-    }
-
-    private static boolean hasMatchingManagedGame(Game game) {
-        var managedGame = gameNameToManagedGame.get(game.getName());
-        return managedGame != null && managedGame.matches(game);
     }
 
     public static ManagedPlayer getManagedPlayer(String playerId) {
