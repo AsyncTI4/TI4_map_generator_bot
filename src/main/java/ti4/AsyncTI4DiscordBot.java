@@ -54,7 +54,6 @@ import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
 import ti4.listeners.UserJoinServerListener;
 import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.processors.ButtonProcessor;
@@ -204,11 +203,12 @@ public class AsyncTI4DiscordBot {
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
 
+        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
+
         // LOAD GAMES NAMES
         BotLogger.logWithTimestamp(" LOADING GAMES");
-        // LOAD GAMES NAMES
-        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
         GameManager.initialize();
+        BotLogger.logWithTimestamp(" FINISHED LOADING GAMES");
 
         // RUN DATA MIGRATIONS
         BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
@@ -231,7 +231,6 @@ public class AsyncTI4DiscordBot {
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
         jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
-        BotLogger.log("# `" + new Timestamp(System.currentTimeMillis()) + "`  FINISHED LOADING GAMES");
 
         // Register Shutdown Hook to run when SIGTERM is received from docker stop
         Thread mainThread = Thread.currentThread();
