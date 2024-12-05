@@ -1,21 +1,15 @@
 package ti4.listeners;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Command;
-import ti4.commands2.CommandHelper;
 import ti4.commands2.CommandManager;
-import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
-import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.message.BotLogger;
 
 public class SlashCommandListener extends ListenerAdapter {
@@ -29,7 +23,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
         event.getInteraction().deferReply().queue();
 
-        AsyncTI4DiscordBot.runAsync("Slash command task", () -> process(event));
+        AsyncTI4DiscordBot.runAsync("Slash command task: " + event.getFullCommandName(), () -> process(event));
     }
 
     private static void process(SlashCommandInteractionEvent event) {
