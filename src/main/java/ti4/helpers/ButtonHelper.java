@@ -6036,7 +6036,8 @@ public class ButtonHelper {
             return;
 
         String userID = event.getUser().getId();
-        Game game = GameManager.getUserActiveGame(userID);
+        String gameName = CommandHelper.getGameNameFromChannel(event);
+        Game game = GameManager.getGame(gameName);
         if (game == null) {
             event.getChannel().sendMessage("Unable to determine active game.").queue();
             return;
@@ -6046,7 +6047,7 @@ public class ButtonHelper {
             event.getChannel().sendMessage("You're not an active player of the game").queue();
             return;
         }
-        // String playerFaction = player.getFaction();
+
         Guild guild = event.getGuild();
         if (guild == null) {
             event.getChannel().sendMessage("Could not find server Emojis").queue();

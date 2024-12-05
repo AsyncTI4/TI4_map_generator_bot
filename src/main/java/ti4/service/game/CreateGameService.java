@@ -62,11 +62,7 @@ public class CreateGameService {
         newGame.setAutoPing(true);
         newGame.setAutoPingSpacer(24);
         GameManager.addGame(newGame);
-        boolean setMapSuccessful = GameManager.setGameForUser(ownerID, gameName);
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
-        if (!setMapSuccessful) {
-            MessageHelper.replyToMessage(event, "Could not assign active Game " + gameName);
-        }
         GameSaveLoadManager.saveGame(newGame, event);
         return newGame;
     }
