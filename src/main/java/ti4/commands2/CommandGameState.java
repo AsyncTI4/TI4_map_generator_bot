@@ -28,7 +28,7 @@ class CommandGameState {
         }
         Game game = GameManager.getGame(gameName);
         this.game.set(game);
-        game.incrementSpecificSlashCommandCount(event.getFullCommandName());  // TODO: This only works for commands that save...
+        game.incrementSpecificSlashCommandCount(event.getFullCommandName()); // TODO: This only works for commands that save...
 
         SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, GameManager.getManagedGame(gameName));
 
