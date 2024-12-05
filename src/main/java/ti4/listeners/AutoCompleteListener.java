@@ -15,6 +15,6 @@ public class AutoCompleteListener extends ListenerAdapter {
             event.replyChoice("Please try again in a moment. The bot is not ready to serve AutoComplete.", 0).queue();
             return;
         }
-        AsyncTI4DiscordBot.runAsync("AutoComplete task", () -> AutoCompleteProvider.handleAutoCompleteEvent(event));
+        AsyncTI4DiscordBot.runAsync("AutoComplete task", 1, () -> AutoCompleteProvider.handleAutoCompleteEvent(event));
     }
 }

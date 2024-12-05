@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
-import ti4.listeners.SlashCommandListener;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -45,13 +44,9 @@ public abstract class ListenerContext {
         this.componentID = this.origComponentID = compID;
 
         String userID = event.getUser().getId();
-        SlashCommandListener.setActiveGame(event.getMessageChannel(), userID, getContextType(), getSubCommand());
 
         // Find game
-        String gameName = event.getChannel().getName();
-        gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
-        gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
-        gameName = StringUtils.substringBefore(gameName, "-");
+        String gameName = CommandHelper.getGameNameFromChannel(event);
         game = GameManager.getGame(gameName);
 
         player = null;

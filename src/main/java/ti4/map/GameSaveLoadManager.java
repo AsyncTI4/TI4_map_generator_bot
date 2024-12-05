@@ -1227,9 +1227,8 @@ public class GameSaveLoadManager {
             BotLogger.log("Could not load map, map file does not exist: " + (gameFile == null ? "null file" : gameFile.getAbsolutePath()));
             return null;
         }
-        Game game = new Game();
-        boolean fatalError = false;
         try {
+            Game game = new Game();
             Iterator<String> gameFileLines = Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()).listIterator();
             game.setOwnerID(gameFileLines.next());
             game.setOwnerName(gameFileLines.next());
@@ -1254,8 +1253,8 @@ public class GameSaveLoadManager {
                     try {
                         readGameInfo(game, data);
                     } catch (Exception e) {
-                        BotLogger.log("Data is bad: " + game.getName(), e);
-                        fatalError = true;
+                        BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
+                        return null;
                     }
                 }
 
@@ -1283,7 +1282,7 @@ public class GameSaveLoadManager {
                 }
             }
             Map<String, Tile> tileMap = getTileMap(gameFileLines, game, gameFile);
-            if (tileMap == null || fatalError) {
+            if (tileMap == null) {
                 BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
                 return null;
             }
