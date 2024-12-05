@@ -20,3 +20,4 @@ TI4_map_generator_discord_bot.iml
 /runbot.sh
 .DS_Store
 *.swp
+.prettierrc
