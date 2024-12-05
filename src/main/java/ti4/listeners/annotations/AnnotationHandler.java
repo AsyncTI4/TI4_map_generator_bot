@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -31,17 +32,18 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
 public class AnnotationHandler {
 
-    private static final List<Class<?>> classes;
+    private static final Set<Class<?>> classes;
     static {
         Reflections reflections = new Reflections(
             new ConfigurationBuilder()
                 .setUrls(ClasspathHelper.forPackage("ti4"))
-                .setScanners(Scanners.SubTypes)
+                .setScanners(Scanners.SubTypes.filterResultsBy(s -> true))
                 .setExpandSuperTypes(false));
-
-        classes = reflections.get(Scanners.SubTypes.of(Object.class).asClass()).stream().toList();
+        classes = reflections.get(SubTypes.of(Object.class).asClass());
     }
 
     private static <C extends ListenerContext> boolean validateParams(Method method, Class<C> contextClass) {
