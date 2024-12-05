@@ -44,6 +44,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.planet.PlanetRemove;
@@ -304,6 +305,7 @@ public class Game extends GameProperties {
         return returnValue;
     }
 
+    @NotNull
     @JsonIgnore
     public MiltyDraftManager getMiltyDraftManager() {
         if (miltyDraftManager == null) {

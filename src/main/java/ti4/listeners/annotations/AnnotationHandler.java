@@ -18,7 +18,10 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import ti4.AsyncTI4DiscordBot;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import ti4.helpers.Constants;
 import ti4.listeners.context.ButtonContext;
 import ti4.listeners.context.ListenerContext;
@@ -30,8 +33,15 @@ import ti4.message.BotLogger;
 
 public class AnnotationHandler {
 
-    private static List<Class<?>> classesToCheck() {
-        return AsyncTI4DiscordBot.getAllClasses();
+    private static final List<Class<?>> classes;
+    static {
+        Reflections reflections = new Reflections(
+            new ConfigurationBuilder()
+                .setUrls(ClasspathHelper.forPackage("ti4"))
+                .setScanners(Scanners.SubTypes)
+                .setExpandSuperTypes(false));
+
+        classes = reflections.get(Scanners.SubTypes.of(Object.class).asClass()).stream().toList();
     }
 
     private static <C extends ListenerContext> boolean validateParams(Method method, Class<C> contextClass) {
@@ -209,7 +219,7 @@ public class AnnotationHandler {
                 return consumers;
             }
 
-            for (Class<?> klass : classesToCheck()) {
+            for (Class<?> klass : classes) {
                 for (Method method : klass.getDeclaredMethods()) {
                     method.setAccessible(true);
                     List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));
