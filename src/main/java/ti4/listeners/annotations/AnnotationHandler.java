@@ -36,14 +36,20 @@ import static org.reflections.scanners.Scanners.SubTypes;
 
 public class AnnotationHandler {
 
-    private static final Set<Class<?>> classes;
-    static {
+    private static Set<Class<?>> classes;
+
+    private static Set<Class<?>> getAllClasses() {
+        if (classes != null) {
+            return classes;
+        }
         Reflections reflections = new Reflections(
             new ConfigurationBuilder()
                 .setUrls(ClasspathHelper.forPackage("ti4"))
                 .setScanners(Scanners.SubTypes.filterResultsBy(s -> true))
                 .setExpandSuperTypes(false));
         classes = reflections.get(SubTypes.of(Object.class).asClass());
+        BotLogger.log("Found " + classes.size() + " TI4 classes.");
+        return classes;
     }
 
     private static <C extends ListenerContext> boolean validateParams(Method method, Class<C> contextClass) {
@@ -221,7 +227,7 @@ public class AnnotationHandler {
                 return consumers;
             }
 
-            for (Class<?> klass : classes) {
+            for (Class<?> klass : getAllClasses()) {
                 for (Method method : klass.getDeclaredMethods()) {
                     method.setAccessible(true);
                     List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));
