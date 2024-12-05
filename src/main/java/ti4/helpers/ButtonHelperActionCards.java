@@ -1537,7 +1537,7 @@ public class ButtonHelperActionCards {
     }
 
     @ButtonHandler("resolveTacticalBombardmentStep1")
-    public static void resolveTacticalBombardmentStep1(Player player, Game game, ButtonInteractionEvent event) {
+    public static void resolveTacticalBombardmentStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = getTacticalBombardmentButtons(game, player);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
