@@ -743,7 +743,8 @@ public class GameSaveLoadManager {
 
         if (game.getRound() == 1 && !game.isHasEnded()) {
             MiltyDraftManager manager = game.getMiltyDraftManager();
-            if (!manager.isFinished()) {
+            boolean miltyDraftFinished = manager == null || manager.isFinished();
+            if (!miltyDraftFinished) {
                 writer.write(Constants.MILTY_DRAFT_MANAGER + " " + manager.superSaveMessage());
                 writer.write(System.lineSeparator());
 
@@ -2199,7 +2200,12 @@ public class GameSaveLoadManager {
                         if (game.getRound() == 1 && !game.isHasEnded()) {
                             MiltyDraftManager manager = game.getMiltyDraftManager();
                             manager.init(game);
-                            manager.loadSuperSaveString(info);
+                            manager.loadSuperSaveString(game, info);
+                            if (manager.isFinished()) {
+                                game.setMiltyJson(null);
+                                game.setMiltySettings(null);
+                                game.setMiltyDraftManager(null);
+                            }
                         }
                     } catch (Exception e) {
                         // Do nothing
