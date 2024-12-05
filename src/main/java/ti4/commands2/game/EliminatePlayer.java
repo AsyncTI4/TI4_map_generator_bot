@@ -26,6 +26,7 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
@@ -68,9 +69,10 @@ class EliminatePlayer extends GameStateSubcommand {
         User extraUser = option.getAsUser();
         Player player = game.getPlayer(extraUser.getId());
         Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
-        if (player != null && player.getColor() != null && player.getFaction() != null &&
-                !"null".equalsIgnoreCase(player.getFaction()) && player.isRealPlayer() &&
-                !"".equalsIgnoreCase(player.getFaction())) {
+        if (player == null || player.getColor() == null || player.getFaction() == null || "null".equalsIgnoreCase(player.getFaction()) ||
+                !player.isRealPlayer() || "".equalsIgnoreCase(player.getFaction())) {
+            game.removePlayer(player.getUserID());
+        } else {
             if (!player.getPlanetsAllianceMode().isEmpty()) {
                 String msg = "This person doesn't meet the elimination conditions. If you want to replace a player, run /game replace. Ping a Bothelper for assistance if you need it.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
@@ -79,13 +81,16 @@ class EliminatePlayer extends GameStateSubcommand {
             // send back all the PNs of others that the player was holding
             Set<String> pns = new HashSet<>(player.getPromissoryNotes().keySet());
             for (String pnID : pns) {
-
                 PromissoryNoteModel pn = promissoryNotes.get(pnID);
                 if (pn != null && !pn.getOwner().equalsIgnoreCase(player.getColor()) && !pn.getOwner().equalsIgnoreCase(player.getFaction())) {
                     Player p2 = game.getPlayerFromColorOrFaction(pn.getOwner());
                     player.removePromissoryNote(pnID);
-                    p2.setPromissoryNote(pnID);
-                    PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
+                    if (p2 == null) {
+                        BotLogger.log("Could not find player when removing eliminated player's PN: " + pn.getOwner());
+                    } else {
+                        p2.setPromissoryNote(pnID);
+                        PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
+                    }
                 }
             }
 
@@ -100,7 +105,7 @@ class EliminatePlayer extends GameStateSubcommand {
                     }
                 }
             }
-            //Remove all of the players units and ccs from the board
+            //Remove all the players units and ccs from the board
             for (Tile tile : game.getTileMap().values()) {
                 tile.removeAllUnits(player.getColor());
                 if (!"null".equalsIgnoreCase(player.getColor()) && CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
@@ -137,8 +142,6 @@ class EliminatePlayer extends GameStateSubcommand {
             if (!game.isFowMode()) {
                 Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game);
             }
-        } else {
-            game.removePlayer(player.getUserID());
         }
 
         Guild guild = event.getGuild();
