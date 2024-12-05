@@ -439,7 +439,7 @@ public class TileGenerator {
                 if (game.isFowMode()) {
                     break;
                 }
-                if (tile.getRepresentation().contains("Hyperlane")) {
+                if (tile.getTileModel().isHyperlane()) {
                     break;
                 }
 
@@ -478,7 +478,7 @@ public class TileGenerator {
                 if (game.isFowMode()) {
                     break;
                 }
-                if (tile.getRepresentation().contains("Hyperlane")) {
+                if (tile.getTileModel().isHyperlane()) {
                     break;
                 }
 
@@ -507,7 +507,7 @@ public class TileGenerator {
                 if (game.isFowMode()) {
                     break;
                 }
-                if (tile.getRepresentation().contains("Hyperlane")) {
+                if (tile.getTileModel().isHyperlane()) {
                     break;
                 }
 
@@ -537,7 +537,7 @@ public class TileGenerator {
                 if (game.isFowMode()) {
                     break;
                 }
-                if (tile.getRepresentation().contains("Hyperlane")) {
+                if (tile.getTileModel().isHyperlane()) {
                     break;
                 }
 
@@ -610,7 +610,7 @@ public class TileGenerator {
                 if (game.isFowMode()) {
                     break;
                 }
-                if (tile.getRepresentation().contains("Hyperlane")) {
+                if (tile.getTileModel().isHyperlane()) {
                     break;
                 }
 
@@ -641,7 +641,7 @@ public class TileGenerator {
                 if (game.isFowMode()) {
                     break;
                 }
-                if (tile.getRepresentation().contains("Hyperlane")) {
+                if (tile.getTileModel().isHyperlane()) {
                     break;
                 }
 
@@ -811,7 +811,7 @@ public class TileGenerator {
                 if (game.isFowMode()) {
                     break;
                 }
-                if (tile.getRepresentation().contains("Hyperlane")) {
+                if (tile.getTileModel().isHyperlane()) {
                     break;
                 }
 
@@ -897,7 +897,7 @@ public class TileGenerator {
                 if (game.isFowMode()) {
                     break;
                 }
-                if (tile.getRepresentation().contains("Hyperlane")) {
+                if (tile.getTileModel().isHyperlane()) {
                     break;
                 }
 
@@ -993,7 +993,7 @@ public class TileGenerator {
                 if (game.isFowMode()) {
                     break;
                 }
-                if (tile.getRepresentation().contains("Hyperlane")) {
+                if (tile.getTileModel().isHyperlane()) {
                     break;
                 }
 
