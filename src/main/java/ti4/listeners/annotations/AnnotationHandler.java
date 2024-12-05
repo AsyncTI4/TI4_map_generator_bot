@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -19,10 +18,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.listeners.context.ButtonContext;
 import ti4.listeners.context.ListenerContext;
@@ -32,26 +28,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 
-import static org.reflections.scanners.Scanners.SubTypes;
-
 public class AnnotationHandler {
-
-    private static Set<Class<?>> classes;
-
-    private static Set<Class<?>> getAllClasses() {
-        if (classes != null) {
-            return classes;
-        }
-        BotLogger.log("Searching for TI4 classes...");
-        Reflections reflections = new Reflections(
-            new ConfigurationBuilder()
-                .setUrls(ClasspathHelper.forPackage("ti4"))
-                .setScanners(Scanners.SubTypes.filterResultsBy(s -> true))
-                .setExpandSuperTypes(false));
-        classes = reflections.get(SubTypes.of(Object.class).asClass());
-        BotLogger.log("Found " + classes.size() + " TI4 classes.");
-        return classes;
-    }
 
     private static <C extends ListenerContext> boolean validateParams(Method method, Class<C> contextClass) {
         boolean hasComponentID = false;
@@ -228,7 +205,7 @@ public class AnnotationHandler {
                 return consumers;
             }
 
-            for (Class<?> klass : getAllClasses()) {
+            for (Class<?> klass : AsyncTI4DiscordBot.getAllClasses()) {
                 for (Method method : klass.getDeclaredMethods()) {
                     method.setAccessible(true);
                     List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));
