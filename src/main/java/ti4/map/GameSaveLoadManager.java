@@ -1230,7 +1230,6 @@ public class GameSaveLoadManager {
             BotLogger.log("Could not load map, map file does not exist: " + (gameFile == null ? "null file" : gameFile.getAbsolutePath()));
             return null;
         }
-
         try {
             Game game = new Game();
             Iterator<String> gameFileLines = Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()).listIterator();
@@ -1257,7 +1256,7 @@ public class GameSaveLoadManager {
                     try {
                         readGameInfo(game, data);
                     } catch (Exception e) {
-                        BotLogger.log("Data is bad for " + game.getName() + ". Load aborted.", e);
+                        BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
                         return null;
                     }
                 }
