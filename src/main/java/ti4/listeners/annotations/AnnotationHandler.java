@@ -42,6 +42,7 @@ public class AnnotationHandler {
         if (classes != null) {
             return classes;
         }
+        BotLogger.log("Searching for TI4 classes...");
         Reflections reflections = new Reflections(
             new ConfigurationBuilder()
                 .setUrls(ClasspathHelper.forPackage("ti4"))
