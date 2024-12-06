@@ -598,7 +598,7 @@ public class Player {
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
                 if (useComplete) {
-                    hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                    hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().queue();
                     for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                         if (threadChannel_.getId().equals(cardsInfoThreadID)) {
                             setCardsInfoThreadID(threadChannel_.getId());
@@ -623,7 +623,7 @@ public class Player {
 
             // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
             if (useComplete) {
-                if (hiddenThreadChannels.isEmpty()) hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                if (hiddenThreadChannels.isEmpty()) hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().queue();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         setCardsInfoThreadID(threadChannel_.getId());
@@ -656,7 +656,7 @@ public class Player {
         }
         ThreadChannel threadChannel = null;
         if (useComplete) {
-            threadChannel = threadAction.complete();
+            threadChannel = threadAction.queue();
             setCardsInfoThreadID(threadChannel.getId());
         }
         return threadChannel;

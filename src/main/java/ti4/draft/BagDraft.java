@@ -150,7 +150,7 @@ public abstract class BagDraft {
         if (isPrivateChannel) {
             threadAction.setInvitable(false);
         }
-        ThreadChannel threadChannel = threadAction.complete();
+        ThreadChannel threadChannel = threadAction.queue();
         player.setBagInfoThreadID(threadChannel.getId());
         return threadChannel;
     }
@@ -183,7 +183,7 @@ public abstract class BagDraft {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().queue();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getId().equals(bagInfoThread)) {
                         player.setBagInfoThreadID(threadChannel_.getId());
@@ -212,7 +212,7 @@ public abstract class BagDraft {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().queue();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         player.setBagInfoThreadID(threadChannel_.getId());

@@ -309,7 +309,7 @@ public class FrankenDraftBagService {
     public static void updateDraftStatusMessage(Game game) {
         String statusMessage = game.getActiveBagDraft().getDraftStatusMessage();
         if (game.getBagDraftStatusMessageID() == null || "null".equals(game.getBagDraftStatusMessageID())) {
-            String messageID = game.getActionsChannel().sendMessage(statusMessage).complete().getId();
+            String messageID = game.getActionsChannel().sendMessage(statusMessage).queue().getId();
             game.setBagDraftStatusMessageID(messageID);
             return;
         }

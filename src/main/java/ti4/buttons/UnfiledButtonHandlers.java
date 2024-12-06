@@ -1494,7 +1494,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
                 MessageHistory mHistory = event.getChannel().getHistory();
                 RestAction<List<Message>> lis = mHistory.retrievePast(3);
-                Message previousM = lis.complete().get(1);
+                Message previousM = lis.queue().get(1);
                 System.out.println(previousM.getContentRaw());
                 if (previousM.getContentRaw().contains("You have available to you")) {
                     previousM.delete().queue();

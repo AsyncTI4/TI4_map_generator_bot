@@ -313,9 +313,9 @@ public class TIGLHelper {
         if (thread != null) {
             return thread;
         }
-        for (ThreadChannel archivedThread : getTIGLChannel().retrieveArchivedPrivateThreadChannels().complete()) {
+        for (ThreadChannel archivedThread : getTIGLChannel().retrieveArchivedPrivateThreadChannels().queue()) {
             if (TIGL_ADMIN_THREAD.equals(archivedThread.getName())) {
-                archivedThread.getManager().setArchived(false).complete();
+                archivedThread.getManager().setArchived(false).queue();
                 thread = archivedThread;
             }
         }

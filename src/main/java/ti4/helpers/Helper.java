@@ -2556,7 +2556,7 @@ public class Helper {
             return tc.createInvite()
                 .setMaxUses(uses)
                 .setMaxAge((long) (forever ? 0 : 4), TimeUnit.DAYS)
-                .complete()
+                .queue()
                 .getUrl();
         }
         return "Whoops invalid url. Have one of the players on the server generate an invite";

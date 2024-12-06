@@ -148,7 +148,7 @@ public class AgendaHelper {
         String activeGamePing = game.getPing();
         TextChannel watchParty = watchPartyChannel(game);
         String watchPartyPing = watchPartyPing(game);
-        Message watchPartyMsg = publish && watchParty != null ? watchParty.sendMessage(drumroll(watchPartyPing, 0)).complete() : null;
+        Message watchPartyMsg = publish && watchParty != null ? watchParty.sendMessage(drumroll(watchPartyPing, 0)).queue() : null;
 
         MessageHelper.MessageFunction resolveIxthian = (msg) -> {
             int rand = 4 + ThreadLocalRandom.current().nextInt(4);

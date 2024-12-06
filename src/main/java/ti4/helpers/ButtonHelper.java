@@ -2323,7 +2323,7 @@ public class ButtonHelper {
                 return;
             }
         }
-        List<ThreadChannel> hiddenThreadChannels = channel.retrieveArchivedPublicThreadChannels().complete();
+        List<ThreadChannel> hiddenThreadChannels = channel.retrieveArchivedPublicThreadChannels().queue();
         for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
                 MessageHelper.sendMessageToChannel(threadChannel_, message);
@@ -4986,11 +4986,11 @@ public class ButtonHelper {
         Role gameRole = guild.createRole()
             .setName(newName)
             .setMentionable(true)
-            .complete();
+            .queue();
         for (Player player : game.getRealPlayers()) {
             Member member = guild.getMemberById(player.getUserID());
             if (member != null) {
-                guild.addRoleToMember(member, gameRole).complete();
+                guild.addRoleToMember(member, gameRole).queue();
             }
         }
         Category category = game.getMainGameChannel().getParentCategory();
@@ -4999,13 +4999,13 @@ public class ButtonHelper {
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, category)
             .syncPermissionOverrides()
             .addRolePermissionOverride(gameRoleID, permission, 0)
-            .complete();
+            .queue();
 
         // CREATE ACTIONS CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
             .syncPermissionOverrides()
             .addRolePermissionOverride(gameRoleID, permission, 0)
-            .complete();
+            .queue();
 
         File originalGameFile = Storage.getGameFile(game.getName() + Constants.TXT);
 
@@ -5038,7 +5038,7 @@ public class ButtonHelper {
                 GameManager.addGame(gameToRestore);
                 // CREATE BOT/MAP THREAD
                 ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
-                    .complete();
+                    .queue();
                 gameToRestore.setBotMapUpdatesThreadID(botThread.getId());
                 for (Player player : gameToRestore.getRealPlayers()) {
                     player.setCardsInfoThreadID(null);

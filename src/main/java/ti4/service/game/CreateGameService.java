@@ -118,13 +118,13 @@ public class CreateGameService {
         Role role = guild.createRole()
             .setName(gameName)
             .setMentionable(true)
-            .complete();
+            .queue();
 
         // ADD PLAYERS TO ROLE
         for (Member member : members) {
             if (missingMembers.contains(member))
                 continue; // skip members who aren't on the new server yet
-            guild.addRoleToMember(member, role).complete();
+            guild.addRoleToMember(member, role).queue();
         }
 
         // CREATE GAME
@@ -152,14 +152,14 @@ public class CreateGameService {
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, categoryChannel)
             .syncPermissionOverrides()
             .addRolePermissionOverride(gameRoleID, permission, 0)
-            .complete();
+            .queue();
         newGame.setTableTalkChannelID(chatChannel.getId());
 
         // CREATE ACTIONS CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, categoryChannel)
             .syncPermissionOverrides()
             .addRolePermissionOverride(gameRoleID, permission, 0)
-            .complete();
+            .queue();
         newGame.setMainChannelID(actionsChannel.getId());
 
         // CREATE BOT/MAP THREAD
@@ -626,7 +626,7 @@ public class CreateGameService {
             createCategoryAction.addRolePermissionOverride(spectatorRole.getIdLong(), allow, null);
         if (everyoneRole != null)
             createCategoryAction.addRolePermissionOverride(everyoneRole.getIdLong(), null, deny);
-        return createCategoryAction.complete();
+        return createCategoryAction.queue();
     }
 
     //TODO: Can this just be guild.getRolesByName?

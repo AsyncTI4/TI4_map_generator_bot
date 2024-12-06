@@ -241,7 +241,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (ident == -1) {
             return getEmojiURL();
         }
-        return AsyncTI4DiscordBot.jda.retrieveSticker(Sticker.fromId(ident)).complete().getIconUrl();
+        return AsyncTI4DiscordBot.jda.retrieveSticker(Sticker.fromId(ident)).queue().getIconUrl();
     }
 
     public boolean search(String searchString) {

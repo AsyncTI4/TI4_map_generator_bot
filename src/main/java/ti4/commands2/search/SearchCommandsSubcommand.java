@@ -26,7 +26,7 @@ class SearchCommandsSubcommand extends Subcommand {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
 
         StringBuilder sb = new StringBuilder("__**Command List**__");
-        List<Command> commands = event.getGuild().retrieveCommands().complete();
+        List<Command> commands = event.getGuild().retrieveCommands().queue();
         int commandCount = commands.size();
         sb.append(" (").append(commandCount).append("/100)\n");
 
