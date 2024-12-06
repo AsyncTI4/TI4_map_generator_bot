@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.apache.commons.collections4.ListUtils;
-import ti4.commands2.CommandHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Emojis;
 import ti4.image.Mapper;
@@ -20,6 +19,7 @@ import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.selections.Selection;
+import ti4.service.game.GameNameService;
 
 public class SelectFaction implements Selection {
 
@@ -32,7 +32,7 @@ public class SelectFaction implements Selection {
 
     @Override
     public void execute(StringSelectInteractionEvent event) {
-        String gameName = CommandHelper.getGameNameFromChannel(event);
+        String gameName = GameNameService.getGameNameFromChannel(event);
         Game game = GameManager.getGame(gameName);
         if (game == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game could not be found");

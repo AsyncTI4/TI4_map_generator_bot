@@ -26,6 +26,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
+import ti4.service.game.GameNameService;
 
 @UtilityClass
 public class CommandHelper {
@@ -39,13 +40,14 @@ public class CommandHelper {
     }
 
     public static boolean acceptIfValidGame(SlashCommandInteractionEvent event, boolean checkChannel, boolean checkPlayer) {
-        var gameName = getGameName(event);
-        var game = GameManager.getGame(gameName);
-        if (game == null) {
+        var gameName = GameNameService.getGameName(event);
+        var managedGame = GameManager.getManagedGame(gameName);
+        if (managedGame == null) {
             MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' command canceled. Game name '" + gameName + "' is not valid. " +
                 "Execute command in correctly named channel that starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`");
             return false;
         }
+        var game = managedGame.getGame();
         if (checkChannel && !event.getChannel().getName().startsWith(game.getName() + "-")) {
             MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' can only be executed in a game channel.");
             return false;

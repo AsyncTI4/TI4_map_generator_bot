@@ -1,16 +1,11 @@
 package ti4.helpers;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +65,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.map.manage.GameManager;
-import ti4.map.manage.GameSaveService;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
@@ -91,6 +85,7 @@ import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.decks.ShowActionCardsService;
 import ti4.service.explore.ExploreService;
+import ti4.service.game.GameNameService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
@@ -4971,19 +4966,18 @@ public class ButtonHelper {
     }
 
     public static void cloneGame(GenericInteractionCreateEvent event, Game game) {
-        String name = game.getName();
-        GameManager.save(game, event);
-        String newName = name + "clone";
+        String gameName = game.getName();
+        String cloneName = gameName + "clone";
         Guild guild = game.getGuild();
         String gameFunName = game.getCustomName();
-        String newChatChannelName = newName + "-" + gameFunName;
-        String newActionsChannelName = newName + Constants.ACTIONS_CHANNEL_SUFFIX;
-        String newBotThreadName = newName + Constants.BOT_CHANNEL_SUFFIX;
+        String newChatChannelName = cloneName + "-" + gameFunName;
+        String newActionsChannelName = cloneName + Constants.ACTIONS_CHANNEL_SUFFIX;
+        String newBotThreadName = cloneName + Constants.BOT_CHANNEL_SUFFIX;
 
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
         Role gameRole = guild.createRole()
-            .setName(newName)
+            .setName(cloneName)
             .setMentionable(true)
             .complete();
         for (Player player : game.getRealPlayers()) {
@@ -5006,47 +5000,20 @@ public class ButtonHelper {
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
 
-        File originalGameFile = Storage.getGameFile(game.getName() + Constants.TXT);
-
-        File mapUndoDirectory = Storage.getGameUndoDirectory();
-        if (!mapUndoDirectory.exists()) {
-            return;
+        game.setTableTalkChannelID(chatChannel.getId());
+        game.setMainChannelID(actionsChannel.getId());
+        game.setName(cloneName);
+        game.shuffleDecks();
+        // CREATE BOT/MAP THREAD
+        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
+            .complete();
+        game.setBotMapUpdatesThreadID(botThread.getId());
+        for (Player player : game.getRealPlayers()) {
+            player.setCardsInfoThreadID(null);
         }
+        GameManager.save(game, "Cloned");
 
-        String gameName = game.getName();
-        String gameNameForUndoStart = gameName + "_";
-        String[] mapUndoFiles = mapUndoDirectory.list((dir, name2) -> name2.startsWith(gameNameForUndoStart));
-        if (mapUndoFiles != null && mapUndoFiles.length > 0) {
-            try {
-                List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                    .map(fileName -> fileName.replace(gameNameForUndoStart, ""))
-                    .map(fileName -> fileName.replace(Constants.TXT, ""))
-                    .map(Integer::parseInt).toList();
-                int maxNumber = numbers.isEmpty() ? 0
-                    : numbers.stream().mapToInt(value -> value)
-                        .max().orElseThrow(NoSuchElementException::new);
-
-                File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + maxNumber + Constants.TXT);
-                Files.copy(mapUndoStorage.toPath(), originalGameFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                Game gameToRestore = GameSaveService.loadGame(originalGameFile);
-                gameToRestore.setTableTalkChannelID(chatChannel.getId());
-                gameToRestore.setMainChannelID(actionsChannel.getId());
-                gameToRestore.setName(newName);
-                gameToRestore.shuffleDecks();
-                // CREATE BOT/MAP THREAD
-                ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
-                    .complete();
-                gameToRestore.setBotMapUpdatesThreadID(botThread.getId());
-                for (Player player : gameToRestore.getRealPlayers()) {
-                    player.setCardsInfoThreadID(null);
-                }
-                GameManager.save(gameToRestore, event);
-            } catch (Exception ignored) {
-
-            }
-
-        }
-
+        GameManager.reload(gameName);
     }
 
     public static List<Button> getColorSetupButtons(Game game, String buttonID) {
@@ -6019,12 +5986,11 @@ public class ButtonHelper {
     }
 
     public static void addReaction(ButtonInteractionEvent event, boolean skipReaction, boolean sendPublic, String message, String additionalMessage) {
-        if (event == null)
-            return;
+        if (event == null) return;
 
         String userID = event.getUser().getId();
-        String gameName = CommandHelper.getGameNameFromChannel(event);
-        Game game = GameManager.getGame(gameName);
+        String gameName = GameNameService.getGameNameFromChannel(event);
+        Game game = GameManager.getManagedGame(gameName).getGame();
         if (game == null) {
             event.getChannel().sendMessage("Unable to determine active game.").queue();
             return;

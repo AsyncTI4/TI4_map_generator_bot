@@ -20,7 +20,7 @@ class SetThreadName extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String gameName = CommandHelper.getGameName(event);
+        String gameName = GameNameService.getGameName(event);
         String name = event.getOption(Constants.THREAD_NAME).getAsString();
         if (event.getMessageChannel() instanceof ThreadChannel channel) {
             ThreadChannelManager manager = channel.getManager();
