@@ -39,7 +39,7 @@ public class GameManager {
     }
 
     private static Game load(String gameName) {
-        Game game = GameLoadService.loadGame(gameName);
+        Game game = GameLoadService.load(gameName);
         if (game == null) {
             return null;
         }
@@ -55,23 +55,23 @@ public class GameManager {
     }
 
     @Nullable
-    static Game getGame(String gameName) {
-        if (!isValidGame(gameName)) {
+    static Game get(String gameName) {
+        if (!isValid(gameName)) {
             return null;
         }
         if (gameNameToManagedGame.get(gameName).isHasEnded()) {
             activeGameCache.invalidate(gameName);
-            return GameLoadService.loadGame(gameName);
+            return GameLoadService.load(gameName);
         }
         return activeGameCache.get(gameName);
     }
 
-    public static boolean isValidGame(String gameName) {
+    public static boolean isValid(String gameName) {
         return gameName != null && allGameNames.contains(gameName);
     }
 
     public static boolean save(Game game, String reason) {
-        if (!GameSaveService.saveGame(game, reason)) {
+        if (!GameSaveService.save(game, reason)) {
             return false;
         }
         allGameNames.addIfAbsent(game.getName());
@@ -83,7 +83,7 @@ public class GameManager {
     }
 
     public static boolean delete(String gameName) {
-        if (!GameSaveService.deleteGame(gameName)) {
+        if (!GameSaveService.delete(gameName)) {
             return false;
         }
         allGameNames.remove(gameName);
@@ -118,11 +118,16 @@ public class GameManager {
         return handleUndo(undo);
     }
 
+    public static Game reload(String gameName) {
+        activeGameCache.invalidate(gameName);
+        return get(gameName);
+    }
+
     public static List<String> getGameNames() {
         return new ArrayList<>(allGameNames);
     }
 
-    public static int getNumberOfGames() {
+    public static int getGameCount() {
         return allGameNames.size();
     }
 
@@ -143,7 +148,7 @@ public class GameManager {
         return playerNameToManagedPlayer.get(playerId);
     }
 
-    public static ManagedPlayer addOrMergePlayer(ManagedGame game, Player player) {
+    static ManagedPlayer addOrMergePlayer(ManagedGame game, Player player) {
         var managedPlayer = playerNameToManagedPlayer.computeIfAbsent(player.getUserID(), k -> new ManagedPlayer(game, player));
         if (!managedPlayer.getGames().contains(game)) {
             managedPlayer.merge(game, player);

@@ -7,7 +7,6 @@ import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.manage.GameManager;
-import ti4.map.manage.GameSaveService;
 import ti4.message.MessageHelper;
 
 class ControlGameCreation extends Subcommand {
@@ -30,6 +29,6 @@ class ControlGameCreation extends Subcommand {
             mapReference.setStoredValue("allowedButtonPress", "true");
             MessageHelper.sendMessageToChannel(event.getChannel(), "Set game creation button presses as allowed");
         }
-        GameSaveService.saveGame(mapReference, "Updated Setting");
+        GameManager.save(mapReference, "Updated Setting");
     }
 }

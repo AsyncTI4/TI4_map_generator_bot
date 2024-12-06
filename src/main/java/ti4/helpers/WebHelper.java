@@ -27,10 +27,10 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.ResourceHelper;
 import ti4.image.ImageHelper;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
 import ti4.map.GameStatsDashboardPayload;
-import ti4.map.manage.ManagedGame;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.website.WebsiteOverlay;
 
@@ -108,7 +108,7 @@ public class WebHelper {
             if (managedGame.getRound() > 2 || managedGame.isHasEnded() && managedGame.isHasWinner()) {
                 count++;
                 try {
-                    var game = GameManager.getGame(managedGame.getName());
+                    var game = GameManager.getManagedGame(managedGame.getName()).getGame();
                     GameStatsDashboardPayload payload = new GameStatsDashboardPayload(game);
                     objectMapper.writeValueAsString(payload);
                     payloads.add(new GameStatsDashboardPayload(game));

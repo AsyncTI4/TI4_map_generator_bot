@@ -101,7 +101,7 @@ class GameUndoService {
             }
 
             replaceGameFileWithUndo(gameName, undoIndex, currentGameFile.toPath());
-            Game loadedGame = GameLoadService.loadGame(gameName);
+            Game loadedGame = GameLoadService.load(gameName);
             if (loadedGame == null) { // rollback if we failed to load the undo
                 replaceGameFileWithUndo(gameName, latestUndoIndex, currentGameFile.toPath());
                 return null;

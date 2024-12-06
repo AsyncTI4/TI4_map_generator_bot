@@ -65,13 +65,13 @@ import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.GameSaveService;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.GameSaveService;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
@@ -4973,7 +4973,7 @@ public class ButtonHelper {
 
     public static void cloneGame(GenericInteractionCreateEvent event, Game game) {
         String name = game.getName();
-        GameSaveService.saveGame(game, event);
+        GameManager.save(game, event);
         String newName = name + "clone";
         Guild guild = game.getGuild();
         String gameFunName = game.getCustomName();
@@ -5042,7 +5042,7 @@ public class ButtonHelper {
                 for (Player player : gameToRestore.getRealPlayers()) {
                     player.setCardsInfoThreadID(null);
                 }
-                GameSaveService.saveGame(gameToRestore, event);
+                GameManager.save(gameToRestore, event);
             } catch (Exception ignored) {
 
             }

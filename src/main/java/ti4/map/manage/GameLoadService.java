@@ -102,7 +102,7 @@ class GameLoadService {
     }
 
     @Nullable
-    public static Game loadGame(String gameName) {
+    public static Game load(String gameName) {
         File gameFile = Storage.getGameFile(gameName + Constants.TXT);
         if (!gameFile.exists()) {
             return null;

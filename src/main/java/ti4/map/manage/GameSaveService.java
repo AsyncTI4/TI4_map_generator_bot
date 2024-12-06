@@ -55,15 +55,15 @@ import static ti4.map.manage.GamePersistenceKeys.UNITS;
 @UtilityClass
 class GameSaveService {
 
-    public static boolean saveGame(Game game, String reason) {
-        if (saveGame(game)) {
+    public static boolean save(Game game, String reason) {
+        if (save(game)) {
             game.setLatestCommand(Objects.requireNonNullElse(reason, "Last Command Unknown - No Event Provided"));
             return true;
         }
         return false;
     }
 
-    public static boolean saveGame(Game game) {
+    public static boolean save(Game game) {
         try {
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
             DiscordantStarsHelper.checkGardenWorlds(game);
@@ -949,7 +949,7 @@ class GameSaveService {
         }
     }
 
-    public static boolean deleteGame(String gameName) {
+    public static boolean delete(String gameName) {
         File mapStorage = Storage.getGameFile(gameName + Constants.TXT);
         if (!mapStorage.exists()) {
             return false;

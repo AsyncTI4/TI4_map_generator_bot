@@ -11,7 +11,6 @@ import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.manage.GameManager;
-import ti4.map.manage.GameSaveService;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -40,7 +39,7 @@ class RunManualDataMigration extends Subcommand {
             Boolean changesMade = (Boolean) method.invoke(null, game);
             if (changesMade) {
                 game.addMigration(migrationName);
-                GameSaveService.saveGame(game, "Migration ran: " + migrationName);
+                GameManager.save(game, "Migration ran: " + migrationName);
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully ran migration " + migrationName + " for map " + game.getName());
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully ran migration " + migrationName + " for map " + game.getName() + " but no changes were required.");

@@ -20,7 +20,7 @@ class ReloadMap extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String gameName = event.getOption(Constants.GAME_NAME).getAsString();
-        if (!GameManager.isValidGame(gameName)) {
+        if (!GameManager.isValid(gameName)) {
             MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exists, use /list_games");
             return;
         }

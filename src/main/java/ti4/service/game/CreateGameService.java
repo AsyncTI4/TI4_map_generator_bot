@@ -41,9 +41,8 @@ import ti4.helpers.ThreadHelper;
 import ti4.image.ImageHelper;
 import ti4.image.MapGenerator;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -60,7 +59,7 @@ public class CreateGameService {
         newGame.setAutoPing(true);
         newGame.setAutoPingSpacer(24);
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
-        GameSaveService.saveGame(newGame, event);
+        GameManager.save(newGame, event);
         return newGame;
     }
 
@@ -184,7 +183,7 @@ public class CreateGameService {
             actionsChannel.getAsMention();
         MessageHelper.sendMessageToEventChannel(event, message);
 
-        GameSaveService.saveGame(newGame, event);
+        GameManager.save(newGame, event);
         reportNewGameCreated(newGame);
 
         presentSetupToPlayers(newGame);

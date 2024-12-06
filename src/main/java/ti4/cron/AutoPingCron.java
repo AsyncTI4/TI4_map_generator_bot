@@ -18,7 +18,6 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
-import ti4.map.manage.GameSaveService;
 import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -229,7 +228,7 @@ class AutoPingCron {
         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS * game.getAutoPingSpacer())) {
             AgendaHelper.pingMissingPlayers(game);
             game.setLastActivePlayerPing(new Date());
-            GameSaveService.saveGame(game, "Auto Ping");
+            GameManager.save(game, "Auto Ping");
         }
     }
 

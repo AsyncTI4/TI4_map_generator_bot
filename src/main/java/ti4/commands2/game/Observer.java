@@ -34,7 +34,7 @@ class Observer extends Subcommand {
         String gameName = event.getOption("game_name", null, OptionMapping::getAsString);
         String addOrRemove = event.getOption("add_remove", "", OptionMapping::getAsString).toLowerCase();
 
-        if (!GameManager.isValidGame(gameName)) {
+        if (!GameManager.isValid(gameName)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game not found: " + gameName);
             return;
         }

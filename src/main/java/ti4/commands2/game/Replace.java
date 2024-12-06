@@ -20,7 +20,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -136,9 +135,6 @@ class Replace extends GameStateSubcommand {
 
         game.getMiltyDraftManager().replacePlayer(oldPlayerUserId, replacedPlayer.getUserID());
 
-        GameSaveService.saveGame(game, event);
-        // Load the new game instance so that we can repost the milty draft
-        game = GameSaveService.reload(game.getName());
         if (game.getMiltyDraftManager().getDraftIndex() < game.getMiltyDraftManager().getDraftOrder().size()) {
             game.getMiltyDraftManager().repostDraftInformation(game);
         }

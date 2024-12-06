@@ -28,7 +28,6 @@ import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.listeners.UserJoinServerListener;
 import ti4.map.Game;
-import ti4.map.manage.GameSaveService;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -87,7 +86,6 @@ public class StartPhaseService {
             case "agendaResolve" -> AgendaHelper.resolveTime(game, null);
             case "pbd1000decks" -> {
                 game.pbd1000decks();
-                GameSaveService.saveGame(game, event);
             }
             case "action" -> startActionPhase(event, game);
             case "playerSetup" -> ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel(), game);

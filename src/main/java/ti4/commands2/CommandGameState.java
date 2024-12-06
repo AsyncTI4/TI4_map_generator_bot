@@ -3,9 +3,8 @@ package ti4.commands2;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 
 class CommandGameState {
 
@@ -21,7 +20,7 @@ class CommandGameState {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         String gameName = CommandHelper.getGameName(event);
-        if (!GameManager.isValidGame(gameName)) {
+        if (!GameManager.isValid(gameName)) {
             throw new IllegalArgumentException("Invalid game name: " + gameName + " while attempting to run event " + event.getName() +
                     " in channel " + event.getChannel().getName());
         }
@@ -42,7 +41,7 @@ class CommandGameState {
 
     public void postExecute(SlashCommandInteractionEvent event) {
         if (saveGame) {
-            GameSaveService.saveGame(game.get(), event);
+            GameManager.save(game.get(), event);
         }
         game.remove();
         player.remove();

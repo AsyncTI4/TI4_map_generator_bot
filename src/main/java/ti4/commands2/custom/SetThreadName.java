@@ -24,7 +24,7 @@ class SetThreadName extends Subcommand {
         String name = event.getOption(Constants.THREAD_NAME).getAsString();
         if (event.getMessageChannel() instanceof ThreadChannel channel) {
             ThreadChannelManager manager = channel.getManager();
-            if (GameManager.isValidGame(gameName)) {
+            if (GameManager.isValid(gameName)) {
                 manager.setName(gameName + "-" + name).queue();
             } else {
                 manager.setName(name).queue();

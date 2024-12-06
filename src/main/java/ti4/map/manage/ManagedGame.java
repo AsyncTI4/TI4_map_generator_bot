@@ -1,7 +1,6 @@
 package ti4.map.manage;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -11,9 +10,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.map.Game;
-import ti4.map.Player;
 
-import static java.util.stream.Collectors.toUnmodifiableMap;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
 @Getter
@@ -24,7 +21,6 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final boolean hasWinner;
     private final boolean vpGoalReached;
     private final boolean fowMode;
-    private final boolean communityMode;
     private final boolean factionReactMode;
     private final String creationDate;
     private final long lastModifiedDate;
@@ -37,13 +33,6 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final TextChannel actionsChannel;
     private final TextChannel tableTalkChannel;
     private final Set<ManagedPlayer> players;
-    private final Map<ManagedPlayer, Boolean> playerToIsReal; // TODO: keep all these in an object rather than a bunch of maps
-    private final Map<ManagedPlayer, Integer> playerToTotalTurns; // TODO unsure if keeping
-    private final Map<ManagedPlayer, Long> playerToTurnTime; // TODO unsure if keeping
-    private final Map<ManagedPlayer, Integer> playerToExpectedHitsTimes10; // TODO unsure if keeping
-    private final Map<ManagedPlayer, Integer> playerToActualHits; // TODO unsure if keeping
-    //private final Map<ManagedPlayer, Role> playerToCommunityRole;
-    //private final Map<ManagedPlayer, List<String>> playerToTeammates;
 
     public ManagedGame(Game game) {
         name = game.getName();
@@ -51,7 +40,6 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         hasWinner = game.hasWinner();
         vpGoalReached = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
         fowMode = game.isFowMode();
-        communityMode = game.isCommunityMode();
         factionReactMode = game.isBotFactionReacts();
         creationDate = game.getCreationDate();
         lastModifiedDate = game.getLastModifiedDate();
@@ -65,19 +53,6 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         tableTalkChannel = game.getTableTalkChannel();
 
         players = game.getPlayers().values().stream().map(p -> GameManager.addOrMergePlayer(this, p)).collect(toUnmodifiableSet());
-        playerToIsReal = game.getPlayers().values().stream().collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::isRealPlayer));
-        playerToTotalTurns = game.getRealPlayers().stream().collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getNumberTurns));
-        playerToTurnTime = game.getRealPlayers().stream().collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getTotalTurnTime));
-        playerToExpectedHitsTimes10 = game.getRealPlayers().stream().collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getExpectedHitsTimes10));
-        playerToActualHits = game.getRealPlayers().stream().collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getActualHits));
-//        playerToCommunityRole = !communityMode ? null :
-//            game.getRealPlayers().stream()
-//                .filter(p -> p.getRoleForCommunity() != null)
-//                .collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getRoleForCommunity));
-//        Map<ManagedPlayer, List<String>> playerToTeammates = game.getPlayers().values().stream()
-//            .filter(p -> isNotEmpty(p.getTeamMateIDs()))
-//            .collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getTeamMateIDs));
-//        this.playerToTeammates = playerToTeammates.isEmpty() ? null : playerToTeammates;
     }
 
     private static String sanitizeToNull(String str) {
@@ -96,10 +71,6 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         return players.stream().anyMatch(p -> p.getId().equals(playerId));
     }
 
-    public List<ManagedPlayer> getRealPlayers() {
-        return playerToIsReal.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).toList();
-    }
-
     public List<String> getPlayerIds() {
         return players.stream().map(ManagedPlayer::getId).toList();
     }
@@ -109,7 +80,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     }
 
     public Game getGame() {
-        return GameManager.getGame(name);
+        return GameManager.get(name);
     }
 
     @Override

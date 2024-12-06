@@ -17,9 +17,9 @@ import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
 import ti4.map.GamesPage;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 
 class SearchGames extends Subcommand {
@@ -123,7 +123,7 @@ class SearchGames extends Subcommand {
         if (filteredGameNames.isEmpty()) {
             sb.append("No games match the selected filters.");
         } else {
-            int totalGames = GameManager.getNumberOfGames();
+            int totalGames = GameManager.getGameCount();
 
             Map<Predicate<Game>, Integer> predicatesToIntegerCounts = predicatesToCounts.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()));
 

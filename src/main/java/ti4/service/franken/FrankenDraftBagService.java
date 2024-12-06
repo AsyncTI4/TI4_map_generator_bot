@@ -21,8 +21,8 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
-import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 import ti4.service.game.SetOrderService;
 import ti4.service.milty.MiltyService;
@@ -275,7 +275,7 @@ public class FrankenDraftBagService {
             "> Once you have made your " + next + " pick" + (next == 1 ? "" : "s") + " (" + first + " in the first bag), the bags will automatically be passed once everyone is ready.";
 
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
-        GameSaveService.saveGame(game, "Franken draft was started");
+        GameManager.save(game, "Franken draft was started");
     }
 
     public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event, boolean force) {

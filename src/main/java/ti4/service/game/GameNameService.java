@@ -31,7 +31,7 @@ public class GameNameService {
     @NotNull
     public static String getGameNameFromChannel(Channel channel) {
         String gameName = getGameNameFromChannelName(channel.getName());
-        if (GameManager.isValidGame(gameName)) {
+        if (GameManager.isValid(gameName)) {
             return gameName;
         }
         if (channel instanceof ThreadChannel) {
