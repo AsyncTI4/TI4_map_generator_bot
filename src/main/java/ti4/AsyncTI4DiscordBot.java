@@ -397,4 +397,8 @@ public class AsyncTI4DiscordBot {
         }
         return classes;
     }
+
+    public static boolean isValidGuild(String guildId) {
+        return AsyncTI4DiscordBot.guilds.stream().anyMatch(g -> g.getId().equals(guildId));
+    }
 }

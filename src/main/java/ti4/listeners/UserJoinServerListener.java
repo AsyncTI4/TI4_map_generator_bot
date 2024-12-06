@@ -74,9 +74,7 @@ public class UserJoinServerListener extends ListenerAdapter {
             return false;
         }
         String eventGuild = event.getGuild().getId();
-        List<String> asyncGuilds = AsyncTI4DiscordBot.guilds.stream().map(Guild::getId).toList();
-        // Do not process these events in guilds that we aren't initialized in
-        return asyncGuilds.contains(eventGuild);
+        return AsyncTI4DiscordBot.isValidGuild(eventGuild);
     }
 
     private void checkIfNewUserIsInExistingGamesAndAutoAddRole(Guild guild, User user) {

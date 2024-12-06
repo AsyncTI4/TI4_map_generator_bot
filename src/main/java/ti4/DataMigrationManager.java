@@ -28,13 +28,12 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.GameSaveService;
-import ti4.map.manage.ManagedGame;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -146,15 +145,14 @@ public class DataMigrationManager {
                 continue;
             }
 
-            var game = GameManager.getGame(managedGame.getName());
-
-            if (game == null || game.hasRunMigration(migrationName)) {
+            var game = managedGame.getGame();
+            if (game.hasRunMigration(migrationName)) {
                 continue;
             }
 
             var changesMade = migrationMethod.apply(game);
             game.addMigration(migrationName);
-            GameSaveService.saveGame(game, "Data Migration - " + migrationName);
+            GameManager.save(game, "Data Migration - " + migrationName);
             if (changesMade) {
                 migrationsApplied.add(game.getName());
             }

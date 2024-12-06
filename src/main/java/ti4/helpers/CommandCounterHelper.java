@@ -6,10 +6,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import org.jetbrains.annotations.Nullable;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
+import ti4.service.game.GameNameService;
 
 public class CommandCounterHelper {
 
@@ -22,9 +23,7 @@ public class CommandCounterHelper {
     }
 
     public static void addCC(GenericInteractionCreateEvent event, String color, Tile tile, boolean ping) {
-        String gameName = event.getChannel().getName();
-        gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
-        gameName = gameName.substring(0, gameName.indexOf("-"));
+        String gameName = GameNameService.getGameNameFromChannel(event);
         Game game = GameManager.getGame(gameName);
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);

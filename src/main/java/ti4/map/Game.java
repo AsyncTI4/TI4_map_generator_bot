@@ -2,9 +2,6 @@ package ti4.map;
 
 import java.awt.*;
 import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,7 +66,6 @@ import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
-import ti4.map.manage.GameSaveService;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
@@ -3341,23 +3337,6 @@ public class Game extends GameProperties {
             }
         }
         return planets.keySet();
-    }
-
-    public void endGameIfOld() {
-        if (isHasEnded())
-            return;
-
-        LocalDate currentDate = LocalDate.now();
-        LocalDate lastModifiedDate = (new Date(getLastModifiedDate())).toInstant().atZone(ZoneId.systemDefault())
-            .toLocalDate();
-        Period period = Period.ofMonths(2); // TODO: CANDIDATE FOR GLOBAL VARIABLE
-        LocalDate oldestLastModifiedDateBeforeEnding = currentDate.minus(period);
-
-        if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
-            BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate + " - the game flag `hasEnded` has been set to true");
-            setHasEnded(true);
-            GameSaveService.saveGame(this, "Game ended");
-        }
     }
 
     public void rebuildTilePositionAutoCompleteList() {

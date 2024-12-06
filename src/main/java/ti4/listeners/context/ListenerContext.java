@@ -11,9 +11,8 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 
 @Getter
@@ -41,7 +40,7 @@ public abstract class ListenerContext {
         this.componentID = this.origComponentID = compID;
 
         String gameName = CommandHelper.getGameNameFromChannel(event);
-        game = GameManager.getGame(gameName);
+        game = GameManager.getManagedGame(gameName).getGame();
         player = null;
         privateChannel = event.getMessageChannel();
         mainGameChannel = event.getMessageChannel();
@@ -94,6 +93,7 @@ public abstract class ListenerContext {
             }
         }
 
+        // TODO Why is this here...?
         if (componentID.startsWith("anonDeclare_")) {
             String declaration = componentID.split("_")[1];
             String old = game.getStoredValue(player.getUserID() + "anonDeclare");
@@ -107,7 +107,7 @@ public abstract class ListenerContext {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Someone has changed their preference from \"" + old + "\" to  \"" + declaration + "\" ");
             }
             game.setStoredValue(player.getUserID() + "anonDeclare", declaration);
-            GameSaveService.saveGame(game, event);
+            GameManager.save(game, "Updated game environment preference.");
             contextIsValid = false;
             return;
         }

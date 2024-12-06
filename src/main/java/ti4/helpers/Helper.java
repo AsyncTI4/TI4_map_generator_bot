@@ -51,13 +51,13 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
 import ti4.map.Leader;
-import ti4.map.manage.ManagedGame;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -2122,14 +2122,15 @@ public class Helper {
         }
 
         if (role == null) { // make sure players have access to the game channels
-            addMapPlayerPermissionsToGameChannels(guild, game);
+            addMapPlayerPermissionsToGameChannels(guild, game.getName());
         } else { // make sure players have the role
             addGameRoleToMapPlayers(guild, role, game);
         }
     }
 
-    public static void addMapPlayerPermissionsToGameChannels(Guild guild, Game game) {
-        var players = game.getPlayerIDs();
+    public static void addMapPlayerPermissionsToGameChannels(Guild guild, String gameName) {
+        ManagedGame game = GameManager.getManagedGame(gameName);
+        var players = game.getPlayerIds();
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null) {
             addPlayerPermissionsToGameChannel(guild, tableTalkChannel, players);
@@ -2138,7 +2139,6 @@ public class Helper {
         if (actionsChannel != null) {
             addPlayerPermissionsToGameChannel(guild, actionsChannel, players);
         }
-        String gameName = game.getName();
         List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
         for (GuildChannel channel : channels) {
             addPlayerPermissionsToGameChannel(guild, channel, players);

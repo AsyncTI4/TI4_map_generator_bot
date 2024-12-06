@@ -4,18 +4,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
 import ti4.map.Player;
+
+import static java.util.stream.Collectors.toUnmodifiableMap;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 
 @Getter
 public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN EASILY BALLOON THE DATA ON THE HEAP BY MEGABYTES PER FIELD
@@ -25,6 +24,8 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final boolean hasWinner;
     private final boolean vpGoalReached;
     private final boolean fowMode;
+    private final boolean communityMode;
+    private final boolean factionReactMode;
     private final String creationDate;
     private final long lastModifiedDate;
     private final String activePlayerId;
@@ -36,11 +37,13 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final TextChannel actionsChannel;
     private final TextChannel tableTalkChannel;
     private final Set<ManagedPlayer> players;
-    private final Map<ManagedPlayer, Boolean> playerToIsReal;
+    private final Map<ManagedPlayer, Boolean> playerToIsReal; // TODO: keep all these in an object rather than a bunch of maps
     private final Map<ManagedPlayer, Integer> playerToTotalTurns; // TODO unsure if keeping
     private final Map<ManagedPlayer, Long> playerToTurnTime; // TODO unsure if keeping
     private final Map<ManagedPlayer, Integer> playerToExpectedHitsTimes10; // TODO unsure if keeping
     private final Map<ManagedPlayer, Integer> playerToActualHits; // TODO unsure if keeping
+    //private final Map<ManagedPlayer, Role> playerToCommunityRole;
+    //private final Map<ManagedPlayer, List<String>> playerToTeammates;
 
     public ManagedGame(Game game) {
         name = game.getName();
@@ -48,6 +51,8 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         hasWinner = game.hasWinner();
         vpGoalReached = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
         fowMode = game.isFowMode();
+        communityMode = game.isCommunityMode();
+        factionReactMode = game.isBotFactionReacts();
         creationDate = game.getCreationDate();
         lastModifiedDate = game.getLastModifiedDate();
         activePlayerId = sanitizeToNull(game.getActivePlayerID());
@@ -59,12 +64,20 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         actionsChannel = game.getActionsChannel();
         tableTalkChannel = game.getTableTalkChannel();
 
-        players = game.getPlayers().values().stream().map(player -> GameManager.addOrMergePlayer(this, player)).collect(Collectors.toUnmodifiableSet());
-        playerToIsReal = game.getPlayers().values().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::isRealPlayer));
-        playerToTotalTurns = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getNumberTurns));
-        playerToTurnTime = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getTotalTurnTime));
-        playerToExpectedHitsTimes10 = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getExpectedHitsTimes10));
-        playerToActualHits = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getActualHits));
+        players = game.getPlayers().values().stream().map(p -> GameManager.addOrMergePlayer(this, p)).collect(toUnmodifiableSet());
+        playerToIsReal = game.getPlayers().values().stream().collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::isRealPlayer));
+        playerToTotalTurns = game.getRealPlayers().stream().collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getNumberTurns));
+        playerToTurnTime = game.getRealPlayers().stream().collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getTotalTurnTime));
+        playerToExpectedHitsTimes10 = game.getRealPlayers().stream().collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getExpectedHitsTimes10));
+        playerToActualHits = game.getRealPlayers().stream().collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getActualHits));
+//        playerToCommunityRole = !communityMode ? null :
+//            game.getRealPlayers().stream()
+//                .filter(p -> p.getRoleForCommunity() != null)
+//                .collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getRoleForCommunity));
+//        Map<ManagedPlayer, List<String>> playerToTeammates = game.getPlayers().values().stream()
+//            .filter(p -> isNotEmpty(p.getTeamMateIDs()))
+//            .collect(toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getTeamMateIDs));
+//        this.playerToTeammates = playerToTeammates.isEmpty() ? null : playerToTeammates;
     }
 
     private static String sanitizeToNull(String str) {
@@ -87,28 +100,8 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         return playerToIsReal.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).toList();
     }
 
-    public String getGameNameForSorting() {
-        if (getName().startsWith("pbd")) {
-            return StringUtils.leftPad(getName(), 10, "0");
-        }
-        if (getName().startsWith("fow")) {
-            return StringUtils.leftPad(getName(), 10, "1");
-        }
-        return getName();
-    }
-
-    public String getPingAllPlayers() {
-        Role role = guild == null ? null :
-                guild.getRoles().stream().filter(r -> getName().equals(r.getName().toLowerCase())).findFirst().orElse(null);
-        if (role != null) {
-            return role.getAsMention();
-        }
-        StringBuilder sb = new StringBuilder(getName()).append(" ");
-        for (var player : players) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(player.getId());
-            if (user != null) sb.append(user.getAsMention()).append(" ");
-        }
-        return sb.toString();
+    public List<String> getPlayerIds() {
+        return players.stream().map(ManagedPlayer::getId).toList();
     }
 
     public boolean matches(Game game) {

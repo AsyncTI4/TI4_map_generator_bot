@@ -25,15 +25,16 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
 import ti4.service.combat.StartCombatService;
+import ti4.service.game.GameNameService;
 
 public class FoWHelper {
 
@@ -56,17 +57,14 @@ public class FoWHelper {
 		return isPrivateGame(game, null, null);
 	}
 
-	public static boolean isPrivateGame(Game game, @Nullable GenericInteractionCreateEvent event,
-		@Nullable Channel channel_) {
+	public static boolean isPrivateGame(Game game, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
 		Channel eventChannel = event == null ? null : event.getChannel();
 		Channel channel = channel_ != null ? channel_ : eventChannel;
 		if (channel == null) {
 			return game.isFowMode();
 		}
 		if (game == null) {
-			String gameName = channel.getName();
-			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
-			gameName = gameName.substring(0, gameName.indexOf("-"));
+			String gameName = GameNameService.getGameNameFromChannel(channel);
 			game = GameManager.getGame(gameName);
 			if (game == null) {
 				return false;
