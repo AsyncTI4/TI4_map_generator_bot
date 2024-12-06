@@ -56,7 +56,9 @@ public class StartCombatService {
         if (playersWithShipsInSystem.size() <= 1) {
             return;
         }
-        Player player = playersWithShipsInSystem.getFirst();
+        Player player = playersWithShipsInSystem.contains(game.getActivePlayer())
+            ? game.getActivePlayer()
+            : playersWithShipsInSystem.getFirst();
         playersWithShipsInSystem.stream()
             .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
             .findFirst()
@@ -68,7 +70,9 @@ public class StartCombatService {
         if (playersWithUnitsOnPlanet.size() <= 1) {
             return false;
         }
-        Player player = playersWithUnitsOnPlanet.getFirst();
+        Player player = playersWithUnitsOnPlanet.contains(game.getActivePlayer())
+            ? game.getActivePlayer()
+            : playersWithUnitsOnPlanet.getFirst();
         Optional<Player> enemyPlayer = playersWithUnitsOnPlanet.stream()
             .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
             .findFirst();
