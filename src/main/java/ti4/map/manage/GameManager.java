@@ -118,6 +118,7 @@ public class GameManager {
         return handleUndo(undo);
     }
 
+    @Nullable
     public static Game reload(String gameName) {
         activeGameCache.invalidate(gameName);
         return get(gameName);

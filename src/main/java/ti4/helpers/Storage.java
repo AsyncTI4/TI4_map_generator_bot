@@ -286,6 +286,11 @@ public class Storage {
     }
 
     @NotNull
+    public static Path getGamePath(String gameName) {
+        return Path.of(getStoragePath() + GAMES_PATH + gameName);
+    }
+
+    @NotNull
     public static File getGamesDirectory() {
         var file = new File(getStoragePath() + GAMES_PATH);
         if (!file.exists()) {

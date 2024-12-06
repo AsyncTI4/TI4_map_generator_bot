@@ -1,7 +1,6 @@
 package ti4.helpers;
 
 import java.io.File;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -5028,8 +5027,7 @@ public class ButtonHelper {
                         .max().orElseThrow(NoSuchElementException::new);
 
                 File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + maxNumber + Constants.TXT);
-                CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
-                Files.copy(mapUndoStorage.toPath(), originalGameFile.toPath(), options);
+                Files.copy(mapUndoStorage.toPath(), originalGameFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 Game gameToRestore = GameSaveService.loadGame(originalGameFile);
                 gameToRestore.setTableTalkChannelID(chatChannel.getId());
                 gameToRestore.setMainChannelID(actionsChannel.getId());
