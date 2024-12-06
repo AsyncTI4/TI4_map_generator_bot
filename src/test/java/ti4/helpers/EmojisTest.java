@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections4.SetUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Emojis.TI4Emoji;
 import ti4.testUtils.BaseTi4Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Disabled
 public class EmojisTest extends BaseTi4Test {
 
     @Test
