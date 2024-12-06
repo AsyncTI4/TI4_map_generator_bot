@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.GameSaveService;
 import ti4.message.MessageHelper;
 import ti4.service.game.EndGameService;
 
@@ -28,7 +28,7 @@ class DeleteGame extends Subcommand {
             return;
         }
 
-        if (GameSaveLoadManager.deleteGame(gameName)) {
+        if (GameSaveService.deleteGame(gameName)) {
             EndGameService.secondHalfOfGameEnd(event, gameToDelete, false, true, false);
             MessageHelper.replyToMessage(event, "Map: " + gameName + " deleted.");
         } else {

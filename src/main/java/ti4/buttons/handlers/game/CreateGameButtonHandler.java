@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.GameManager;
+import ti4.map.manage.GameManager;
 import ti4.map.PersistenceManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;

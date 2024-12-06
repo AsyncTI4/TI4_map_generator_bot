@@ -28,9 +28,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
-import ti4.map.ManagedGame;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.GameSaveService;
+import ti4.map.manage.ManagedGame;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -154,7 +154,7 @@ public class DataMigrationManager {
 
             var changesMade = migrationMethod.apply(game);
             game.addMigration(migrationName);
-            GameSaveLoadManager.saveGame(game, "Data Migration - " + migrationName);
+            GameSaveService.saveGame(game, "Data Migration - " + migrationName);
             if (changesMade) {
                 migrationsApplied.add(game.getName());
             }

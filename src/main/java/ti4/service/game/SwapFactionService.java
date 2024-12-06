@@ -8,7 +8,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -45,8 +45,8 @@ public class SwapFactionService {
             MessageHelper.replyToMessage(event, "Specify player that is in game to be swapped");
             return;
         }
-        GameSaveLoadManager.saveGame(game, event);
-        GameSaveLoadManager.reload(game.getName());
+        GameSaveService.saveGame(game, event);
+        GameSaveService.reload(game.getName());
         message.append("> **After:** ").append(swapperPlayer.getRepresentation()).append(" & ").append(removedPlayer.getRepresentation()).append("\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
     }

@@ -16,10 +16,10 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
-import ti4.map.ManagedGame;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.GameSaveService;
+import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.StrategyCardModel;
@@ -30,20 +30,21 @@ import ti4.users.UserSettingsManager;
 import static java.util.function.Predicate.not;
 
 @UtilityClass
-public class AutoPingCron {
+class AutoPingCron {
 
     private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
     private static final long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
 
-    public static void register() {
+    static {
         CronManager.register(AutoPingCron.class, AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
     }
 
     private static void autoPingGames() {
-        GameManager.getManagedGames().stream().filter(not(ManagedGame::isHasEnded))
-            .forEach(managedGame -> {
-                var game = GameManager.getGame(managedGame.getName());
+        GameManager.getManagedGames().stream()
+            .filter(not(ManagedGame::isHasEnded))
+            .map(ManagedGame::getGame)
+            .forEach(game -> {
                 handleTechSummary(game); // TODO, move this?
                 checkAllSaboWindows(game);
                 if (game.isFastSCFollowMode()) {
@@ -185,14 +186,14 @@ public class AutoPingCron {
 
         pingPlayer(game, player, milliSinceLastTurnChange, spacer, pingMessage, pingNumber, realIdentity);
 
-        Game mapReference = GameManager.getGame("finreference");
+        Game mapReference = GameManager.getManagedGame("finreference").getGame();
         if (mapReference != null) {
             ButtonHelper.increasePingCounter(mapReference, player.getUserID());
-            GameSaveLoadManager.saveGame(mapReference, "Auto Ping");
+            GameManager.save(mapReference, "Auto Ping");
         }
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         game.setLastActivePlayerPing(new Date());
-        GameSaveLoadManager.saveGame(game, "Auto Ping");
+        GameManager.save(game, "Auto Ping");
     }
 
     private static void pingPlayer(Game game, Player player, long milliSinceLastTurnChange, int spacer, String pingMessage, int pingNumber, String realIdentity) {
@@ -228,7 +229,7 @@ public class AutoPingCron {
         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS * game.getAutoPingSpacer())) {
             AgendaHelper.pingMissingPlayers(game);
             game.setLastActivePlayerPing(new Date());
-            GameSaveLoadManager.saveGame(game, "Auto Ping");
+            GameSaveService.saveGame(game, "Auto Ping");
         }
     }
 

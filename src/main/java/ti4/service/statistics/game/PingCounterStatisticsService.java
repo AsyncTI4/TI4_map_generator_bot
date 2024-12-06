@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameManager;
+import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 
 @UtilityClass

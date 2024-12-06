@@ -10,9 +10,9 @@ import ti4.message.BotLogger;
 import ti4.model.metadata.GameCreationLocks;
 
 @UtilityClass
-public class GameCreationLockRemovalCron {
+class GameCreationLockRemovalCron {
 
-    public static void register() {
+    static  {
         CronManager.register(GameCreationLockRemovalCron.class, GameCreationLockRemovalCron::removeGameCreationLocks, 1, 10, TimeUnit.MINUTES);
     }
 

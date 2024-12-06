@@ -13,8 +13,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.ManagedGame;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 

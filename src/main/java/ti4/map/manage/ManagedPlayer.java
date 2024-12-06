@@ -1,10 +1,11 @@
-package ti4.map;
+package ti4.map.manage;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 import lombok.Getter;
+import ti4.map.Player;
 
 @Getter
 public class ManagedPlayer {

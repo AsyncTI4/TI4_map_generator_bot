@@ -1,21 +1,14 @@
 package ti4.commands2.game;
 
-import java.io.File;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameSaveService;
 import ti4.message.MessageHelper;
-import ti4.service.game.UndoService;
 
 class Undo extends GameStateSubcommand {
 
@@ -28,7 +21,8 @@ class Undo extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        if (!event.getChannel().getName().startsWith(game.getName() + "-")) {
+        String gameName = game.getName();
+        if (!event.getChannel().getName().startsWith(gameName + "-")) {
             MessageHelper.replyToMessage(event, "Undo must be executed in game channel only!");
             return;
         }
@@ -44,53 +38,18 @@ class Undo extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Must specify command to undo back to");
             return;
         }
+
         if (gameToUndoBackTo.toLowerCase().contains("fog of war")) {
             MessageHelper.replyToMessage(event, "Game is Fog of War - limited to a single undo at a time.");
-            GameSaveLoadManager.undo(game, event);
+            GameSaveService.undo(game, event);
             return;
         }
-        if (!gameToUndoBackTo.contains(game.getName())) {
+
+        if (!gameToUndoBackTo.contains(gameName)) {
             MessageHelper.replyToMessage(event, "Undo failed - Parameter doesn't look right: " + gameToUndoBackTo);
             return;
         }
-        String intToUndoBackTo = gameToUndoBackTo.replace(game.getName() + "_", "").replace(".txt", "");
 
-        int gameToUndoBackToNumber = Integer.parseInt(intToUndoBackTo);
 
-        Map<String, String> undoFiles = UndoService.getAllUndoSavedGames(game);
-        int maxSaveNumber = undoFiles.keySet().stream().map(s -> s.replace(game.getName() + "_", "").replace(".txt", ""))
-            .mapToInt(Integer::parseInt).max().orElseThrow(NoSuchElementException::new);
-
-        String undoFileToRestorePath = game.getName() + "_" + gameToUndoBackToNumber + ".txt";
-        File undoFileToRestore = new File(Storage.getGameUndoDirectory(), undoFileToRestorePath);
-        if (!undoFileToRestore.exists()) {
-            MessageHelper.replyToMessage(event, "Undo failed - Couldn't find game to undo back to: " + undoFileToRestorePath);
-            return;
-        }
-        Game gameToRestore = GameSaveLoadManager.loadGame(undoFileToRestore);
-        if (gameToRestore == null) {
-            MessageHelper.replyToMessage(event,
-                "Undo failed - Couldn't load game to undo back to: " + undoFileToRestorePath);
-            return;
-        }
-
-        StringBuilder sb = new StringBuilder(
-            "Undoing Save #" + maxSaveNumber + " back to before Save #" + gameToUndoBackToNumber + ":\n");
-        for (int i = maxSaveNumber; i > gameToUndoBackToNumber; i--) {
-            String undoFile = game.getName() + "_" + i + ".txt";
-            File undoFileToBeDeleted = new File(Storage.getGameUndoDirectory(), undoFile);
-            if (undoFileToBeDeleted.exists()) {
-                sb.append("> `").append(i).append("` ")
-                    .append(undoFiles.get(undoFileToBeDeleted.getName())).append("\n");
-                undoFileToBeDeleted.delete();
-            }
-        }
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
-        } else {
-            ButtonHelper.findOrCreateThreadWithMessage(game, game.getName() + "-undo-log", sb.toString());
-        }
-
-        GameSaveLoadManager.undo(gameToRestore, event);
     }
 }

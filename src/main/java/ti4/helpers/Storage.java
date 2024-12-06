@@ -267,13 +267,17 @@ public class Storage {
     }
 
     @NotNull
-    public static Path getGameUndoStoragePath(String gameName) {
-        return Path.of(getStoragePath() + GAMES_UNDO + gameName);
+    public static Path getGameUndoStoragePath(String fileName) {
+        return Path.of(getStoragePath() + GAMES_UNDO + fileName);
     }
 
     @NotNull
     public static File getGameUndoDirectory() {
-        return new File(getStoragePath() + GAMES_UNDO);
+        File directory = new File(getStoragePath() + GAMES_UNDO);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        return directory;
     }
 
     @NotNull

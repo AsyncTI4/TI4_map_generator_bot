@@ -30,7 +30,7 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
-import ti4.map.GameManager;
+import ti4.map.manage.GameManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.model.AbilityModel;
@@ -575,7 +575,7 @@ public class AutoCompleteProvider {
                     return;
                 }
 
-                List<Command.Choice> options = UndoService.getAllUndoSavedGames(game).entrySet().stream()
+                List<Command.Choice> options = UndoService.get25UndoNamesToCommandText(game).entrySet().stream()
                     .sorted(Map.Entry.<String, String>comparingByValue().reversed())
                     .limit(25)
                     .map(entry -> new Command.Choice(StringUtils.left(entry.getValue(), 100), entry.getKey()))

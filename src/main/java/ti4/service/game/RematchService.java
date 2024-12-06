@@ -21,7 +21,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.RegexHelper;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -168,7 +168,7 @@ public class RematchService {
         buttons2.add(Buttons.green("getHomebrewButtons", "Yes, have homebrew"));
         buttons2.add(Buttons.red("deleteButtons", "No Homebrew"));
         MessageHelper.sendMessageToChannel(actionsChannel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons", buttons2);
-        GameSaveLoadManager.saveGame(newGame, event);
+        GameSaveService.saveGame(newGame, event);
         if (event instanceof ButtonInteractionEvent event2) {
             event2.getMessage().delete().queue();
         }

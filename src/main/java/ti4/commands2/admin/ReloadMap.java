@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.GameSaveService;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 
@@ -25,7 +25,7 @@ class ReloadMap extends Subcommand {
             return;
         }
 
-        var game = GameSaveLoadManager.reload(gameName);
+        var game = GameSaveService.reload(gameName);
         ShowGameService.simpleShowGame(game, event);
     }
 }

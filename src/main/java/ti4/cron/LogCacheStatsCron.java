@@ -21,12 +21,12 @@ public class LogCacheStatsCron {
     private static final int LOG_CACHE_STATS_INTERVAL_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.LOG_CACHE_STATS_INTERVAL_MINUTES.toString(), Integer.class, 30);
     private static final ThreadLocal<DecimalFormat> percentFormatter = ThreadLocal.withInitial(() -> new DecimalFormat("##.##%"));
 
-    public static void registerCache(String name, Cache<?, ?> cache) {
-        cacheNameToCache.put(name, cache);
+    static {
+        CronManager.register(LogCacheStatsCron.class, LogCacheStatsCron::logCacheStats, LOG_CACHE_STATS_INTERVAL_MINUTES, LOG_CACHE_STATS_INTERVAL_MINUTES, TimeUnit.MINUTES);
     }
 
-    public static void register() {
-        CronManager.register(LogCacheStatsCron.class, LogCacheStatsCron::logCacheStats, LOG_CACHE_STATS_INTERVAL_MINUTES, LOG_CACHE_STATS_INTERVAL_MINUTES, TimeUnit.MINUTES);
+    public static void registerCache(String name, Cache<?, ?> cache) {
+        cacheNameToCache.put(name, cache);
     }
 
     private static void logCacheStats() {

@@ -65,8 +65,8 @@ import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.GameSaveService;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -4973,7 +4973,7 @@ public class ButtonHelper {
 
     public static void cloneGame(GenericInteractionCreateEvent event, Game game) {
         String name = game.getName();
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveService.saveGame(game, event);
         String newName = name + "clone";
         Guild guild = game.getGuild();
         String gameFunName = game.getCustomName();
@@ -5030,7 +5030,7 @@ public class ButtonHelper {
                 File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + maxNumber + Constants.TXT);
                 CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
                 Files.copy(mapUndoStorage.toPath(), originalGameFile.toPath(), options);
-                Game gameToRestore = GameSaveLoadManager.loadGame(originalGameFile);
+                Game gameToRestore = GameSaveService.loadGame(originalGameFile);
                 gameToRestore.setTableTalkChannelID(chatChannel.getId());
                 gameToRestore.setMainChannelID(actionsChannel.getId());
                 gameToRestore.setName(newName);
@@ -5042,7 +5042,7 @@ public class ButtonHelper {
                 for (Player player : gameToRestore.getRealPlayers()) {
                     player.setCardsInfoThreadID(null);
                 }
-                GameSaveLoadManager.saveGame(gameToRestore, event);
+                GameSaveService.saveGame(gameToRestore, event);
             } catch (Exception ignored) {
 
             }

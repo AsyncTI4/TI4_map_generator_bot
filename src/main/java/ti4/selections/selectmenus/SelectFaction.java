@@ -16,7 +16,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GameManager;
+import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.selections.Selection;

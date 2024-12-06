@@ -11,8 +11,8 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -107,7 +107,7 @@ public abstract class ListenerContext {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Someone has changed their preference from \"" + old + "\" to  \"" + declaration + "\" ");
             }
             game.setStoredValue(player.getUserID() + "anonDeclare", declaration);
-            GameSaveLoadManager.saveGame(game, event);
+            GameSaveService.saveGame(game, event);
             contextIsValid = false;
             return;
         }

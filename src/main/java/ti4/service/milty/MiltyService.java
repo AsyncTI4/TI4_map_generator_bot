@@ -38,7 +38,7 @@ import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
@@ -163,7 +163,7 @@ public class MiltyService {
             specs.presetSlices.forEach(draftManager::addSlice);
             // Kick it off with a bang!
             draftManager.repostDraftInformation(game);
-            GameSaveLoadManager.saveGame(game, event);
+            GameSaveService.saveGame(game, event);
         } else {
             event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
                 boolean slicesCreated = generateSlices(event, draftManager, specs);
@@ -176,7 +176,7 @@ public class MiltyService {
                 } else {
                     // Kick it off with a bang!
                     draftManager.repostDraftInformation(game);
-                    GameSaveLoadManager.saveGame(game, event);
+                    GameSaveService.saveGame(game, event);
                     game.setPhaseOfGame("miltydraft");
                 }
             });

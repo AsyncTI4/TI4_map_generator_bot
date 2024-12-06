@@ -1,4 +1,4 @@
-package ti4.map;
+package ti4.map.manage;
 
 import java.util.List;
 import java.util.Map;
@@ -14,6 +14,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
+import ti4.map.Game;
+import ti4.map.Player;
 
 @Getter
 public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN EASILY BALLOON THE DATA ON THE HEAP BY MEGABYTES PER FIELD
@@ -111,6 +113,10 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
 
     public boolean matches(Game game) {
         return name.equals(game.getName()) && lastModifiedDate == game.getLastModifiedDate();
+    }
+
+    public Game getGame() {
+        return GameManager.getGame(name);
     }
 
     @Override

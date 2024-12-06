@@ -21,9 +21,9 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.ThreadGetter;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.ManagedGame;
-import ti4.map.ManagedPlayer;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
+import ti4.map.manage.ManagedPlayer;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 

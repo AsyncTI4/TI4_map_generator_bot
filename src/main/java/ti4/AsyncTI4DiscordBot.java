@@ -29,12 +29,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import ti4.commands2.CommandManager;
-import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;
-import ti4.cron.GameCreationLockRemovalCron;
-import ti4.cron.LogCacheStatsCron;
-import ti4.cron.OldUndoFileCleanupCron;
-import ti4.cron.UploadStatsCron;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
@@ -53,7 +48,7 @@ import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
 import ti4.listeners.UserJoinServerListener;
-import ti4.map.GameManager;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.processors.ButtonProcessor;
@@ -219,13 +214,6 @@ public class AsyncTI4DiscordBot {
         MapRenderPipeline.start();
         StatisticsPipeline.start();
         ButtonProcessor.start();
-
-        // START CRONS
-        AutoPingCron.register();
-        LogCacheStatsCron.register();
-        UploadStatsCron.register();
-        GameCreationLockRemovalCron.register();
-        OldUndoFileCleanupCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);

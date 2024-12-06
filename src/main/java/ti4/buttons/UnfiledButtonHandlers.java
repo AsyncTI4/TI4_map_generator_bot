@@ -57,7 +57,7 @@ import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameSaveService;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -1775,7 +1775,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (game.getLatestAfterMsg().equalsIgnoreCase(messageId)) {
                     msg.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
                     AgendaHelper.startTheVoting(game);
-                    GameSaveLoadManager.saveGame(game, "Started Voting");
+                    GameSaveService.saveGame(game, "Started Voting");
                 } else if (game.getLatestWhenMsg().equalsIgnoreCase(messageId)) {
                     msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
 
@@ -1795,7 +1795,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
             if (game.getMessageIDsForSabo().contains(messageId)) {
                 game.removeMessageIDForSabo(messageId);
-                GameSaveLoadManager.saveGame(game, "No Sabo");
+                GameSaveService.saveGame(game, "No Sabo");
             }
         }
     }

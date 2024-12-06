@@ -20,8 +20,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
@@ -117,7 +117,7 @@ public class MessageListener extends ListenerAdapter {
             mapReference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
             MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players " +
                 "and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
-            GameSaveLoadManager.saveGame(mapReference, "newChannel");
+            GameSaveService.saveGame(mapReference, "newChannel");
         }
         return true;
     }
@@ -137,7 +137,7 @@ public class MessageListener extends ListenerAdapter {
         if (game != null) {
             Player player = getPlayer(event, game);
             RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true, event.getChannel());
-            GameSaveLoadManager.saveGame(game, "End of round summary.");
+            GameSaveService.saveGame(game, "End of round summary.");
         }
         return true;
     }
@@ -239,7 +239,7 @@ public class MessageListener extends ListenerAdapter {
             previousThoughts = game.getStoredValue("futureMessageFor" + player.getFaction()) + "\n\n";
         }
         game.setStoredValue("futureMessageFor" + player.getFaction(), previousThoughts + messageContent);
-        GameSaveLoadManager.saveGame(game, "Whisper to future.");
+        GameSaveService.saveGame(game, "Whisper to future.");
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
         event.getMessage().delete().queue();
     }

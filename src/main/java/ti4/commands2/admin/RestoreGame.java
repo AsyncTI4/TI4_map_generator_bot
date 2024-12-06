@@ -13,7 +13,7 @@ import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameSaveService;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -46,7 +46,7 @@ class RestoreGame extends Subcommand {
             BotLogger.log("Failed to download game", e);
         }
 
-        Game game = GameSaveLoadManager.loadGame(gameFile);
+        Game game = GameSaveService.loadGame(gameFile);
         if (game == null) {
             MessageHelper.sendMessageToEventChannel(event, "Failed to load game.");
             return;

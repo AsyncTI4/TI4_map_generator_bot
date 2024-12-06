@@ -13,7 +13,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -54,7 +54,7 @@ class UndoButtonHandler {
             }
         }
 
-        GameSaveLoadManager.undo(game, event);
+        GameSaveService.undo(game, event);
 
         StringBuilder msg = new StringBuilder("You undid something, the details of which can be found in the undo-log thread");
         List<ThreadChannel> threadChannels = game.getMainGameChannel().getThreadChannels();

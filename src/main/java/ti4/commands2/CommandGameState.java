@@ -3,8 +3,8 @@ package ti4.commands2;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
 
 class CommandGameState {
@@ -42,7 +42,7 @@ class CommandGameState {
 
     public void postExecute(SlashCommandInteractionEvent event) {
         if (saveGame) {
-            GameSaveLoadManager.saveGame(game.get(), event);
+            GameSaveService.saveGame(game.get(), event);
         }
         game.remove();
         player.remove();

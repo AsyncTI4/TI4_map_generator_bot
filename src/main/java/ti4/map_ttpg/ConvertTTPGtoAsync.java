@@ -29,7 +29,7 @@ import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -146,7 +146,7 @@ public class ConvertTTPGtoAsync {
                 return false;
             }
             Game game = ConvertTTPGMaptoAsyncMap(ttpgMap, gamename);
-            GameSaveLoadManager.saveGame(game, "Imported from TTPG");
+            GameSaveService.saveGame(game, "Imported from TTPG");
             //GameSaveLoadManager.loadGame();
         } catch (Exception e) {
             BotLogger.log("TTPG Import Failed: " + gamename + "    filename: " + filename, e);

@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -26,7 +27,21 @@ public class UndoService {
     private static final Pattern lastestCommandPattern = Pattern.compile("^(?>latest_command ).*$");
     private static final Pattern lastModifiedPattern = Pattern.compile("^(?>last_modified_date ).*$");
 
-    public static Map<String, String> getAllUndoSavedGames(Game game) {
+    public static Set<String> getUndoGameNames(Game game) {
+        Path undoPath = Storage.getGameUndoDirectory().toPath();
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(undoPath, game.getName() + "_*")) {
+            return StreamSupport.stream(directoryStream.spliterator(), false)
+                .map(Path::toFile)
+                .sorted(Comparator.comparing(File::getName).reversed())
+                .map(File::getName)
+                .collect(Collectors.toSet());
+        } catch (IOException e) {
+            BotLogger.log("Error listing files in directory: " + undoPath, e);
+            return Collections.emptySet();
+        }
+    }
+
+    public static Map<String, String> get25UndoNamesToCommandText(Game game) {
         Path undoPath = Storage.getGameUndoDirectory().toPath();
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(undoPath, game.getName() + "_*")) {
             return StreamSupport.stream(directoryStream.spliterator(), false)
@@ -43,7 +58,7 @@ public class UndoService {
         }
     }
 
-    public static String getLastModifiedDateAndLastCommandTextFromFile(File file) {
+    private static String getLastModifiedDateAndLastCommandTextFromFile(File file) {
         long dateTime = System.currentTimeMillis();
         long fileLastModifiedDate = file.lastModified();
 

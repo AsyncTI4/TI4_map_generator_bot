@@ -10,8 +10,8 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.GameManager;
-import ti4.map.ManagedGame;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
 
 class ListDeadGames extends Subcommand {

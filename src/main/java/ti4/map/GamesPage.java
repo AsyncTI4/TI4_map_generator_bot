@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import lombok.Getter;
+import ti4.map.manage.GameManager;
 
 public class GamesPage {
 
