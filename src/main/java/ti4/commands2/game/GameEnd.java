@@ -14,7 +14,7 @@ import ti4.service.game.EndGameService;
 class GameEnd extends GameStateSubcommand {
 
     public GameEnd() {
-        super(Constants.GAME_END, "Declare the game has ended", true, false);
+        super(Constants.END, "Declare the game has ended", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.PUBLISH, "True to publish results to #pbd-chronicles. (Default: True)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ARCHIVE_CHANNELS, "True to archive the channels and delete the game role (Default: True)"));
