@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import com.google.gwt.thirdparty.guava.common.base.Joiner;
 
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -25,23 +26,52 @@ import ti4.model.Source.ComponentSource;
  */
 
 class SearchSources extends Subcommand {
+
+    private static final String CHECK_SOURCES = "sources_check";
+    private static final String CANAL = "canal_official";
     
     public SearchSources() {
         super(Constants.SEARCH_SOURCES, "List all sources the bot has");
-        addOptions(new OptionData(OptionType.STRING, Constants.SOURCE, "Limit results to a specific source.").setAutoComplete(true));
+        addOptions(
+            new OptionData(OptionType.STRING, Constants.SOURCE, "Limit results to a specific source.").setAutoComplete(true),
+            new OptionData(OptionType.BOOLEAN, CHECK_SOURCES, "True: Cancel search, counts elements in json files per source, and compare to sources file"),
+            new OptionData(OptionType.BOOLEAN, CANAL, "unspecified for all sources, True for 'official' only, False for 'community' only")
+        );
     }
 
+    /*  If CheckSources = True Then get all sources from data jsons & all sources from sources.json
+            Show (Total nb sources) & (Total nb elements), show list of each (source) with (nb of elements) & (if is only in 1 of the 2 source types)
+        Else Then
+            Show embeds of each (source) with (data from sources.json) & (component types which have this source)
+            Use Source & Canal as filters  */
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         
-        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
-        
-        if (false) {
-            // IF source is valid
-            // THEN get number of elements per type for this source + data links
+        String sourceString = event.getOption(Constants.SOURCE, null, OptionMapping::getAsString);
+        ComponentSource source = ComponentSource.fromString(sourceString);
+        boolean sourcesCheck = event.getOption(CHECK_SOURCES, false, OptionMapping::getAsBoolean);
+        Boolean canalBool = event.getOption(CANAL, null, OptionMapping::getAsBoolean);
+
+        if (sourcesCheck) {
+            checkSources(event);
             return;
         }
 
+        if (Mapper.isValidSource(sourceString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getSource(sourceString).getRepresentationEmbed()).queue();
+            return;
+        }
+        
+        // TO DO: add filter for canal
+        List<MessageEmbed> messageEmbeds = Mapper.getSources().values().stream()
+            .filter(model -> model.search(sourceString, source))
+            .filter(model -> canalBool == null || canalBool == model.isCanalOfficial())
+            .map(model -> model.getRepresentationEmbed())
+            .toList();
+        SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
+    }
+
+    private void checkSources(SlashCommandInteractionEvent event) {
         Stream<String> abilitySources = Mapper.getAbilities().values() // Collection<AbilityModel>
             .stream().map(model -> model.getSource().toString());
         Stream<String> actioncardSources = Mapper.getActionCards().values() // Collection<ActionCardModel>
@@ -102,10 +132,8 @@ class SearchSources extends Subcommand {
         String uniqueComponentSourcesTextList = uniqueComponentSources.size() + " sources: "+ uniqueComponentSources.values().stream().mapToLong(d -> d).sum() +" elements\r\n"
             + "- " + Joiner.on("\r\n- ").withKeyValueSeparator(": ").join(uniqueComponentSources); // added guava class for "Joiner"
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), uniqueComponentSourcesTextList);
-        MessageHelper.sendMessageToThread(event.getChannel(), "Sources", uniqueComponentSourcesTextList);
-
-        String end = "end";
+        //MessageHelper.sendMessageToChannel(event.getChannel(), uniqueComponentSourcesTextList);
+        MessageHelper.sendMessageToThread(event.getChannel(), "Sources check", uniqueComponentSourcesTextList);
     }
 
 }

@@ -1,8 +1,9 @@
 [
     {
         "source":"base",
-        "name":"Base game",
+        "name":"Twilight Imperium 4th Edition (Base Game)",
         "canal":"official",
+        "credits":"Dane Beltrami",
         "data": [
             "https://twilight-imperium.fandom.com/wiki/Official_Rules",
             "https://www.tirules.com/",
@@ -12,8 +13,9 @@
     },
     {
         "source":"pok",
-        "name":"Prophecy of Kings",
+        "name":"Prophecy of Kings [Expansion]",
         "canal":"official",
+        "credits":"Dane Beltrami",
         "data": [
             "https://twilight-imperium.fandom.com/wiki/Prophecy_of_Kings"
         ]
@@ -22,6 +24,7 @@
         "source":"codex1",
         "name":"Codex I",
         "canal":"official",
+        "credits":"Dane Beltrami",
         "data": [
             "https://twilight-imperium.fandom.com/wiki/Codex#Volume_I_(Ordinian)",
             "https://images-cdn.fantasyflightgames.com/filer_public/94/c5/94c59830-533e-47aa-a708-25634575161b/twilight_codex_v1-compressed.pdf",
@@ -32,6 +35,7 @@
         "source":"codex2",
         "name":"Codex II",
         "canal":"official",
+        "credits":"Dane Beltrami",
         "data": [
             "https://twilight-imperium.fandom.com/wiki/Codex#Volume_II_(Affinity)",
             "https://images-cdn.fantasyflightgames.com/filer_public/ff/fe/fffe5e9d-33fb-4149-a3a2-cd6dfadb4de3/ti_codex_ii_rules_web.pdf",
@@ -43,6 +47,7 @@
         "source":"codex3",
         "name":"Codex III",
         "canal":"official",
+        "credits":"Dane Beltrami",
         "data": [
             "https://twilight-imperium.fandom.com/wiki/Codex#Volume_III_(Vigil)",
             "https://images-cdn.fantasyflightgames.com/filer_public/35/e1/35e10f37-4b6d-4479-a117-4e2c571ddfa7/ti_codex_volume_3_vigil_v2_1-compressed.pdf",
@@ -54,6 +59,8 @@
         "source":"ds",
         "name":"Discordant Stars / Uncharted Space",
         "canal":"community",
+        "subcanal":"big homebrew",
+        "credits":"andcat",
         "data": [
             "https://twilight-imperium.fandom.com/wiki/Discordant_Stars_Expansion_(UNOFFICIAL)",
             "https://drive.google.com/file/d/11stOJknvmhmPeNDuhEkkykQypUi8stVY/view",
@@ -65,8 +72,29 @@
         "source":"absol",
         "name":"Absol",
         "canal":"community",
+        "subcanal":"big homebrew",
+        "credits":"Absol197",
         "data": [
             "https://discord.com/channels/743629929484386395/1215827226302349393"
+        ]
+    },
+    {
+        "source":"franken",
+        "name":"Franken",
+        "canal":"community",
+        "subcanal":"big homebrew",
+        "credits":"",
+        "data": [
+        ]
+    },
+    {
+        "source":"monuments",
+        "name":"Monuments+",
+        "canal":"community",
+        "subcanal":"big homebrew",
+        "credits":"Blarknob",
+        "data": [
+            "https://discord.com/channels/743629929484386395/1205395696950321172"
         ]
     }
 ]
