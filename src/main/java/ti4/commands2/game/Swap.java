@@ -15,7 +15,6 @@ import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.manage.GameSaveService;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.game.SwapFactionService;
@@ -68,8 +67,6 @@ class Swap extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Specify player to swap");
             return;
         }
-        GameSaveService.saveGame(game, event);
-        GameSaveService.reload(game.getName());
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 }

@@ -43,15 +43,15 @@ public class GameManager {
         if (game == null) {
             return null;
         }
-        if (!hasMatchingManagedGame(game)) {
+        if (doesNotHaveMatchingManagedGame(game)) {
             gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
         }
         return game;
     }
 
-    private static boolean hasMatchingManagedGame(Game game) {
+    private static boolean doesNotHaveMatchingManagedGame(Game game) {
         var managedGame = gameNameToManagedGame.get(game.getName());
-        return managedGame != null && managedGame.matches(game);
+        return managedGame == null || !managedGame.matches(game);
     }
 
     @Nullable
@@ -95,26 +95,28 @@ public class GameManager {
         return true;
     }
 
-    public static Game undo(String gameName, int undoIndex) {
-        if (!isValidGame(gameName)) {
-            return null;
-        }
-        Game undo = GameUndoService.undo(gameName, undoIndex);
+    @Nullable
+    public static Game undo(Game game) {
+        Game undo = GameUndoService.undo(game);
+        return handleUndo(undo);
+    }
+
+    private static Game handleUndo(Game undo) {
         if (undo == null) {
             return null;
         }
-        activeGameCache.invalidate(gameName);
-        if (!hasMatchingManagedGame(undo)) {
+        activeGameCache.invalidate(undo.getName());
+        if (doesNotHaveMatchingManagedGame(undo)) {
             gameNameToManagedGame.put(undo.getName(), new ManagedGame(undo));
         }
         return undo;
     }
 
-//    @Nullable
-//    static Game reload(String gameName) {
-//        activeGameCache.invalidate(gameName);
-//        return getGame(gameName);
-//    }
+    @Nullable
+    public static Game undo(Game game, int undoIndex) {
+        Game undo = GameUndoService.undo(game, undoIndex);
+        return handleUndo(undo);
+    }
 
     public static List<String> getGameNames() {
         return new ArrayList<>(allGameNames);

@@ -93,7 +93,7 @@ class GameSaveService {
             return false;
         }
 
-        GameUndoService.saveUndo(game.getName());
+        GameUndoService.createUndoCopy(game.getName());
         return true;
     }
 

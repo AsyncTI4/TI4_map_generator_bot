@@ -17,6 +17,7 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class LogCacheStatsCron {
 
+    // TODO: maybe separate this out into a CacheManager class so this can be made package private
     private static final Map<String, Cache<?, ?>> cacheNameToCache = new ConcurrentHashMap<>();
     private static final int LOG_CACHE_STATS_INTERVAL_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.LOG_CACHE_STATS_INTERVAL_MINUTES.toString(), Integer.class, 30);
     private static final ThreadLocal<DecimalFormat> percentFormatter = ThreadLocal.withInitial(() -> new DecimalFormat("##.##%"));

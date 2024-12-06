@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -22,35 +21,21 @@ import ti4.map.Game;
 import ti4.message.BotLogger;
 
 @UtilityClass
-public class UndoService {
+public class GameUndoNameService {
 
     private static final Pattern lastestCommandPattern = Pattern.compile("^(?>latest_command ).*$");
     private static final Pattern lastModifiedPattern = Pattern.compile("^(?>last_modified_date ).*$");
 
-    public static Set<String> getUndoGameNames(Game game) {
+    public static Map<String, String> getUndoNamesToCommandText(Game game, int limit) {
         Path undoPath = Storage.getGameUndoDirectory().toPath();
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(undoPath, game.getName() + "_*")) {
             return StreamSupport.stream(directoryStream.spliterator(), false)
                 .map(Path::toFile)
                 .sorted(Comparator.comparing(File::getName).reversed())
-                .map(File::getName)
-                .collect(Collectors.toSet());
-        } catch (IOException e) {
-            BotLogger.log("Error listing files in directory: " + undoPath, e);
-            return Collections.emptySet();
-        }
-    }
-
-    public static Map<String, String> get25UndoNamesToCommandText(Game game) {
-        Path undoPath = Storage.getGameUndoDirectory().toPath();
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(undoPath, game.getName() + "_*")) {
-            return StreamSupport.stream(directoryStream.spliterator(), false)
-                .map(Path::toFile)
-                .sorted(Comparator.comparing(File::getName).reversed())
-                .limit(25)
+                .limit(limit)
                 .collect(Collectors.toMap(
                     File::getName,
-                    UndoService::getLastModifiedDateAndLastCommandTextFromFile
+                    GameUndoNameService::getLastModifiedDateAndLastCommandTextFromFile
                 ));
         } catch (IOException e) {
             BotLogger.log("Error listing files in directory: " + undoPath, e);

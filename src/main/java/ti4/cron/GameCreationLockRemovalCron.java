@@ -29,7 +29,7 @@ class GameCreationLockRemovalCron {
                 PersistenceManager.writeObjectToJsonFile(GameCreationLocks.JSON_DATA_FILE_NAME, gameCreationLocks);
             }
         } catch (Exception e) {
-            BotLogger.log("Failed to remove game creation locks.", e);
+            BotLogger.log("**Failed to remove game creation locks.**", e);
         }
     }
 }

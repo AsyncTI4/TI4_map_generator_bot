@@ -176,7 +176,6 @@ class GameLoadService {
                 return null;
             }
             game.setTileMap(tileMap);
-            game.endGameIfOld();
             return game;
         } catch (Exception e) {
             BotLogger.log("Data read error: " + gameFile.getName(), e);

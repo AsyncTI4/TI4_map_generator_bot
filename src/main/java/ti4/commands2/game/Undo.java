@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.manage.GameSaveService;
+import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 
 class Undo extends GameStateSubcommand {
@@ -40,8 +40,12 @@ class Undo extends GameStateSubcommand {
         }
 
         if (gameToUndoBackTo.toLowerCase().contains("fog of war")) {
-            MessageHelper.replyToMessage(event, "Game is Fog of War - limited to a single undo at a time.");
-            GameSaveService.undo(game, event);
+            Game undo = GameManager.undo(game);
+            if (undo == null) {
+                MessageHelper.replyToMessage(event, "Failed to undo.");
+            } else {
+                MessageHelper.replyToMessage(event, "Game is Fog of War - limited to a single undo at a time.");
+            }
             return;
         }
 
@@ -50,6 +54,8 @@ class Undo extends GameStateSubcommand {
             return;
         }
 
-
+        String targetUndoIndexStr = gameToUndoBackTo.replace(gameName + "_", "").replace(".txt", "");
+        int targetUndoIndex = Integer.parseInt(targetUndoIndexStr);
+        GameManager.undo(game, targetUndoIndex);
     }
 }

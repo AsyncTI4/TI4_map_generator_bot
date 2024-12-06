@@ -30,8 +30,8 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyModel;
@@ -55,7 +55,7 @@ import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.UnitDecalService;
 import ti4.service.franken.FrankenDraftMode;
-import ti4.service.game.UndoService;
+import ti4.service.game.GameUndoNameService;
 import ti4.service.map.MapPresetService;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
@@ -85,7 +85,7 @@ public class AutoCompleteProvider {
         }
 
         String gameName = CommandHelper.getGameNameFromChannel(event);
-        Game game = GameManager.getGame(gameName);
+        Game game = GameManager.getManagedGame(gameName).getGame();
         if (game != null && subCommandName != null) {
             switch (commandName) {
                 case Constants.MAP -> resolveMapAutoComplete(event, subCommandName, optionName, game);
@@ -575,7 +575,7 @@ public class AutoCompleteProvider {
                     return;
                 }
 
-                List<Command.Choice> options = UndoService.get25UndoNamesToCommandText(game).entrySet().stream()
+                List<Command.Choice> options = GameUndoNameService.getUndoNamesToCommandText(game, 25).entrySet().stream()
                     .sorted(Map.Entry.<String, String>comparingByValue().reversed())
                     .limit(25)
                     .map(entry -> new Command.Choice(StringUtils.left(entry.getValue(), 100), entry.getKey()))
