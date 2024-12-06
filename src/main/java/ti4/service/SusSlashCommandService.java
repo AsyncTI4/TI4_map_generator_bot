@@ -25,7 +25,8 @@ public class SusSlashCommandService {
     private static final List<String> HARMLESS_SUBCOMMANDS = List.of(
         Constants.INFO, Constants.CREATE_GAME_BUTTON, "po_info", Constants.DICE_LUCK, Constants.SHOW_AC_DISCARD_LIST, "show_deck",
         Constants.TURN_STATS, Constants.SHOW_AC_REMAINING_CARD_COUNT, Constants.SHOW_HAND, Constants.SHOW_BAG, Constants.UNIT_INFO,
-        Constants.TURN_END, Constants.PING_ACTIVE_PLAYER, Constants.SHOW_ALL_SO_TO_ALL, Constants.END, Constants.REMATCH, Constants.ABILITY_INFO
+        Constants.TURN_END, Constants.PING_ACTIVE_PLAYER, Constants.SHOW_ALL_SO_TO_ALL, Constants.END, Constants.REMATCH, Constants.ABILITY_INFO,
+        Constants.SPENDS
     );
 
     private static final List<String> EXCLUDED_GAMES = List.of("pbd1000", "pbd100two");
