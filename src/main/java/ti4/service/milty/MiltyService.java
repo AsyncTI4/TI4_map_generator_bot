@@ -154,7 +154,7 @@ public class MiltyService {
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
         } catch (Exception e) {
-            //asdf
+            // Ignore
         }
 
         if (specs.presetSlices != null) {
