@@ -27,7 +27,7 @@ public class LifeTimeRecordService {
             User member = event.getOption("player" + i).getAsUser();
             members.add(member);
         }
-        String records = DiceLuckService.getDiceLuck(members) + TurnTimeService.getSelectUsersTurnTime(members);
+        String records = DiceLuckService.getDiceLuck(members) + TurnTimeService.getAverageTurnTime(members);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), records);
     }
 }

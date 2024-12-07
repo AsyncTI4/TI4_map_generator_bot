@@ -20,7 +20,7 @@ class ControlGameCreation extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         // GAME NAME
-        Game mapReference = GameManager.getGame("finreference");
+        Game mapReference = GameManager.getManagedGame("finreference").getGame();
         boolean allowGameCreation = event.getOption(Constants.ALLOW_GAME_CREATION).getAsBoolean();
         if (!allowGameCreation) {
             mapReference.setStoredValue("allowedButtonPress", "false");

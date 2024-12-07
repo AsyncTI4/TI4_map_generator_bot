@@ -25,7 +25,7 @@ class CommandGameState {
             throw new IllegalArgumentException("Invalid game name: " + gameName + " while attempting to run event " + event.getName() +
                     " in channel " + event.getChannel().getName());
         }
-        Game game = GameManager.getGame(gameName);
+        Game game = GameManager.getManagedGame(gameName).getGame();
         this.game.set(game);
         game.incrementSpecificSlashCommandCount(event.getFullCommandName()); // TODO: This only works for commands that save...
 
@@ -42,7 +42,7 @@ class CommandGameState {
 
     public void postExecute(SlashCommandInteractionEvent event) {
         if (saveGame) {
-            GameManager.save(game.get(), event);
+            GameManager.save(game.get(), event.getFullCommandName());
         }
         game.remove();
         player.remove();

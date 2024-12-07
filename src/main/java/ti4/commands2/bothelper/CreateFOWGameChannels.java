@@ -166,7 +166,7 @@ class CreateFOWGameChannels extends Subcommand {
             "> " + actionsChannel.getAsMention() + "\n";
         MessageHelper.sendMessageToEventChannel(event, message);
 
-        GameManager.save(newGame, event);
+        GameManager.save(newGame, "Create FOW Game Channels");
     }
 
     private static String getNextFOWGameName() {

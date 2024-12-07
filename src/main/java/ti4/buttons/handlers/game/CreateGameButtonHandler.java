@@ -15,8 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
 import ti4.map.PersistenceManager;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.GameCreationLocks;
@@ -32,16 +32,18 @@ class CreateGameButtonHandler {
 
     private static void createGameChannels(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " pressed the [Create Game] button");
-        Game mapreference = GameManager.getGame("finreference");
 
-        if (mapreference != null && mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
+        Game mapreference = GameManager.getManagedGame("finreference").getGame();
+        if (mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Admins have temporarily turned off game creation, most " +
+                "likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
             return;
         }
 
         if (isLockedFromCreatingGames(event)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "You created a game within the last 10 minutes and thus are being stopped from creating more until some time has passed. You can have someone else in the game press the button instead. ");
+                "You created a game within the last 10 minutes and thus are being stopped from creating more until some time " +
+                    "has passed. You can have someone else in the game press the button instead. ");
             return;
         }
 
@@ -49,10 +51,11 @@ class CreateGameButtonHandler {
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         String gameName = CreateGameService.getNextGameName();
         String lastGame = CreateGameService.getLastGameName();
-        Game game = GameManager.getGame(lastGame);
+        Game game = GameManager.getManagedGame(lastGame).getGame();
         if (game != null && game.getCustomName().equalsIgnoreCase(gameSillyName)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "The custom name of the last game is the same as the one for this game, so the bot suspects a double press occurred and is cancelling the creation of another game. ");
+                "The custom name of the last game is the same as the one for this game, so the bot suspects a double press " +
+                    "occurred and is cancelling the creation of another game. ");
             return;
         }
         List<Member> members = new ArrayList<>();

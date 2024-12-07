@@ -7,11 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -349,16 +347,6 @@ public class AsyncTI4DiscordBot {
             .flatMap(guild -> guild.getCategories().stream())
             .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
             .toList();
-    }
-
-    public static <T> CompletableFuture<T> completeAsync(Supplier<T> supplier) {
-        return CompletableFuture.supplyAsync(supplier, THREAD_POOL).handle((result, exception) -> {
-            if (exception != null) {
-                BotLogger.log("Unable to complete async process.", exception);
-                return null;
-            }
-            return result;
-        });
     }
 
     public static void runAsync(String name, Runnable runnable) {
