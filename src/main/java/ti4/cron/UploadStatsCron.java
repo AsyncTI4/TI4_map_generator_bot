@@ -12,12 +12,12 @@ import ti4.map.PersistenceManager;
 import ti4.message.BotLogger;
 
 @UtilityClass
-class UploadStatsCron {
+public class UploadStatsCron {
 
     private static final String JSON_DATA_FILE_NAME = "UploadStatsCronData.json";
     private static final int UPLOAD_STATS_INTERVAL_DAYS = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_STATS_INTERVAL_DAYS.toString(), Integer.class, 7);
 
-    static {
+    public static void register() {
         CronManager.register(UploadStatsCron.class, UploadStatsCron::uploadStats, 0, 0, ZoneId.of("America/New_York"));
     }
 
