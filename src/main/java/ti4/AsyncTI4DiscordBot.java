@@ -7,11 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -29,12 +27,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import ti4.commands2.CommandManager;
-import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;
-import ti4.cron.GameCreationLockRemovalCron;
-import ti4.cron.LogCacheStatsCron;
-import ti4.cron.OldUndoFileCleanupCron;
-import ti4.cron.UploadStatsCron;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
@@ -221,13 +214,6 @@ public class AsyncTI4DiscordBot {
         StatisticsPipeline.start();
         ButtonProcessor.start();
 
-        // START CRONS
-        AutoPingCron.register();
-        LogCacheStatsCron.register();
-        UploadStatsCron.register();
-        GameCreationLockRemovalCron.register();
-        OldUndoFileCleanupCron.register();
-
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
         jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
@@ -364,16 +350,6 @@ public class AsyncTI4DiscordBot {
             .toList();
     }
 
-    public static <T> CompletableFuture<T> completeAsync(Supplier<T> supplier) {
-        return CompletableFuture.supplyAsync(supplier, THREAD_POOL).handle((result, exception) -> {
-            if (exception != null) {
-                BotLogger.log("Unable to complete async process.", exception);
-                return null;
-            }
-            return result;
-        });
-    }
-
     public static void runAsync(String name, Runnable runnable) {
         var timedRunnable = new TimedRunnable(name, runnable);
         THREAD_POOL.submit(timedRunnable);
@@ -409,5 +385,9 @@ public class AsyncTI4DiscordBot {
                 .forEach(classes::add);
         }
         return classes;
+    }
+
+    public static boolean isValidGuild(String guildId) {
+        return AsyncTI4DiscordBot.guilds.stream().anyMatch(g -> g.getId().equals(guildId));
     }
 }
