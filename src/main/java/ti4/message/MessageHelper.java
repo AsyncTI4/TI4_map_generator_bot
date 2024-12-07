@@ -3,14 +3,11 @@ package ti4.message;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringTokenizer;
@@ -29,7 +26,6 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
-import net.dv8tion.jda.api.entities.messages.MessagePoll.LayoutType;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -38,7 +34,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import net.dv8tion.jda.api.utils.messages.MessagePollBuilder;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -55,6 +50,7 @@ import ti4.helpers.ThreadHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
+import ti4.service.game.GameNameService;
 
 public class MessageHelper {
 
@@ -106,7 +102,8 @@ public class MessageHelper {
 		}
 
 		// Add UNDO button
-		Game game = getGameFromChannelName(channel.getName());
+		String gameName = GameNameService.getGameNameFromChannel(channel);
+		Game game = GameManager.getGame(gameName);
 		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")
 			&& messageText != null && !messageText.contains("end of turn ability") && game != null && game.isUndoButtonOffered()) {
 			buttons = addUndoButtonToList(buttons, game);
@@ -375,7 +372,8 @@ public class MessageHelper {
 
 		buttons = sanitizeButtons(buttons, channel);
 
-		Game game = getGameFromChannelName(channel.getName());
+		String gameName = GameNameService.getGameNameFromChannel(channel);
+		Game game = GameManager.getGame(gameName);
 		if (game != null && game.isInjectRulesLinks() && !game.isFowMode()) {
 			messageText = injectRules(messageText);
 		}
@@ -847,32 +845,5 @@ public class MessageHelper {
 			BotLogger.log("Issue injecting Rules into message: " + message, e);
 			return message;
 		}
-	}
-
-	private static Game getGameFromChannelName(String channelName) {
-		String gameName = channelName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
-		gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
-		gameName = StringUtils.substringBefore(gameName, "-");
-		return GameManager.getGame(gameName);
-	}
-
-	/**
-	 * @param channel
-	 * @param messageText message above the poll
-	 * @param pollTitle title of the poll
-	 * @param duration 1h to 168h (7d)
-	 * @param multiAnswer allow multiple answers
-	 * @param answerAndEmojiPair Map of answer and emoji, use LinkedHashMap to control order
-	 */
-	public static void sendPollToChannel(MessageChannel channel, String messageText, String pollTitle, int durationHours, boolean multiAnswer, Map<String, Emoji> answerAndEmojiPair) {
-		MessagePollBuilder poll = new MessagePollBuilder(pollTitle);
-		poll.setDuration(Duration.ofHours(durationHours));
-		poll.setLayout(LayoutType.DEFAULT);
-		poll.setMultiAnswer(multiAnswer);
-		for (Entry<String, Emoji> pair : answerAndEmojiPair.entrySet()) {
-			poll.addAnswer(pair.getKey(), pair.getValue());
-		}
-		channel.sendMessage(messageText).setPoll(poll.build()).queue(null,
-			error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send Poll to Channel", null, error)));
 	}
 }

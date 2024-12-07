@@ -6,6 +6,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.service.game.GameNameService;
 
 class CommandGameState {
 
@@ -20,7 +21,7 @@ class CommandGameState {
     }
 
     public void preExecute(SlashCommandInteractionEvent event) {
-        String gameName = CommandHelper.getGameName(event);
+        String gameName = GameNameService.getGameName(event);
         if (!GameManager.isValidGame(gameName)) {
             throw new IllegalArgumentException("Invalid game name: " + gameName + " while attempting to run event " + event.getName() +
                     " in channel " + event.getChannel().getName());
