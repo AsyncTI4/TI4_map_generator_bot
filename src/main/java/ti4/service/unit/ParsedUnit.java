@@ -1,6 +1,7 @@
 package ti4.service.unit;
 
 import lombok.Getter;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 
@@ -20,6 +21,7 @@ public class ParsedUnit {
     public ParsedUnit(Units.UnitKey unitKey, int count, String location) {
         this.unitKey = unitKey;
         this.count = count;
-        this.location = location;
+        this.location = Constants.SPACE.equalsIgnoreCase(location) ? Constants.SPACE :
+            AliasHandler.resolvePlanet(location.toLowerCase());
     }
 }
