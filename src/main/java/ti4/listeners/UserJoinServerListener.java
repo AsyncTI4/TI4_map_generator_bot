@@ -26,6 +26,7 @@ import ti4.map.manage.ManagedGame;
 import ti4.map.manage.ManagedPlayer;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.game.ManagedGameService;
 
 public class UserJoinServerListener extends ListenerAdapter {
 
@@ -91,7 +92,7 @@ public class UserJoinServerListener extends ListenerAdapter {
         for (ManagedGame managedGame : mapsJoined) {
             String gameMessage = user.getAsMention() + " has joined the server!";
             MessageHelper.sendMessageToChannel(managedGame.getTableTalkChannel(), gameMessage);
-            Game game = GameManager.getGame(managedGame.getName());
+            Game game = managedGame.getGame();
             checkIfCanCloseGameLaunchThread(game, true);
         }
     }
@@ -101,7 +102,7 @@ public class UserJoinServerListener extends ListenerAdapter {
         if (gameGuild == null || !gameGuild.equals(guild) || !managedGame.hasPlayer(user.getId())) {
             return false;
         }
-        Game game = GameManager.getGame(managedGame.getName());
+        Game game = managedGame.getGame();
         Helper.fixGameChannelPermissions(guild, game);
         ThreadChannel mapThread = game.getBotMapUpdatesThread();
         if (mapThread != null && !mapThread.isLocked()) {
@@ -161,13 +162,13 @@ public class UserJoinServerListener extends ListenerAdapter {
 
         if (!gamesQuit.isEmpty()) {
             StringBuilder msg = new StringBuilder("User " + user.getName() + " has left the server " + guild.getName() + " with the following in-progress games:");
-            for (ManagedGame g : gamesQuit) {
-                String gameMessage = "Attention " + g.getPingAllPlayers() + ": " + user.getName();
+            for (ManagedGame game : gamesQuit) {
+                String gameMessage = "Attention " + ManagedGameService.getPingAllPlayers(game) + ": " + user.getName();
                 if (voluntary) gameMessage += " has left the server.\n> If this was not a mistake, you may make ";
                 if (!voluntary) gameMessage += " was removed from the server.\n> Make ";
                 gameMessage += "a post in https://discord.com/channels/943410040369479690/1176191865188536500 to get a replacement player";
-                MessageHelper.sendMessageToChannel(g.getTableTalkChannel(), gameMessage);
-                msg.append("\n> ").append(g.getName()).append(" -> Link:").append(g.getTableTalkChannel().getJumpUrl());
+                MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), gameMessage);
+                msg.append("\n> ").append(game.getName()).append(" -> Link:").append(game.getTableTalkChannel().getJumpUrl());
             }
             reportUserLeftServer(msg.toString());
 

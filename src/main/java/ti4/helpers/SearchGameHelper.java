@@ -13,10 +13,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.game.ManagedGameService;
 
 @UtilityClass
 public class SearchGameHelper {
@@ -42,7 +43,7 @@ public class SearchGameHelper {
 
         var filteredManagedGames = GameManager.getManagedGames().stream()
             .filter(allFilterPredicates)
-            .sorted(Comparator.comparing(ManagedGame::getGameNameForSorting))
+            .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
             .toList();
 
         int index = 1;
@@ -52,7 +53,7 @@ public class SearchGameHelper {
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
         for (var managedGame : filteredManagedGames) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
-            var game = GameManager.getGame(managedGame.getName());
+            var game = managedGame.getGame();
             sb.append(getPlayerMapListRepresentation(game, userID, showAverageTurnTime, showSecondaries, showGameModes));
             sb.append("\n");
             index++;

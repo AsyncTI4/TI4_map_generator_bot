@@ -10,7 +10,8 @@ import ti4.map.manage.ManagedGame;
 @UtilityClass
 public class ManagedGameService {
 
-    public String getGameNameForSorting(String gameName) {
+    public String getGameNameForSorting(ManagedGame game) {
+        String gameName = game.getName();
         if (gameName.startsWith("pbd")) {
             return StringUtils.leftPad(gameName, 10, "0");
         }

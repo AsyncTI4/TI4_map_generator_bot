@@ -13,6 +13,7 @@ import ti4.helpers.Helper;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
+import ti4.service.game.ManagedGameService;
 
 class ListDeadGames extends Subcommand {
 
@@ -88,7 +89,7 @@ class ListDeadGames extends Subcommand {
                 actionsChannel.delete().queue();
             } else {
                 warned = true;
-                MessageHelper.sendMessageToChannel(actionsChannel, game.getPingAllPlayers() + WARNING_MESSAGE);
+                MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
             }
         }
 
@@ -101,7 +102,7 @@ class ListDeadGames extends Subcommand {
                 if (delete) {
                     tableTalkChannel.delete().queue();
                 } else if (!warned) {
-                    MessageHelper.sendMessageToChannel(actionsChannel, game.getPingAllPlayers() + WARNING_MESSAGE);
+                    MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
                 }
             }
         }

@@ -13,6 +13,7 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
+import ti4.service.game.ManagedGameService;
 
 @UtilityClass
 public class TitlesHelper {
@@ -24,11 +25,11 @@ public class TitlesHelper {
         Predicate<ManagedGame> thisPlayerIsInGame = game -> game.getPlayer(userId) != null;
         List<ManagedGame> games = GameManager.getManagedGames().stream()
             .filter(thisPlayerIsInGame.and(ManagedGame::isHasEnded))
-            .sorted(Comparator.comparing(ManagedGame::getGameNameForSorting))
+            .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
             .toList();
 
         for (var managedGame : games) {
-            var game = GameManager.getGame(managedGame.getName());
+            var game = managedGame.getGame();
             String titlesForPlayer = game.getStoredValue("TitlesFor" + userId);
             if (titlesForPlayer.isEmpty()) {
                 continue;

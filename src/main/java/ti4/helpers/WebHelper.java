@@ -108,7 +108,7 @@ public class WebHelper {
             if (managedGame.getRound() > 2 || managedGame.isHasEnded() && managedGame.isHasWinner()) {
                 count++;
                 try {
-                    var game = GameManager.getManagedGame(managedGame.getName()).getGame();
+                    var game = managedGame.getGame();
                     GameStatsDashboardPayload payload = new GameStatsDashboardPayload(game);
                     objectMapper.writeValueAsString(payload);
                     payloads.add(new GameStatsDashboardPayload(game));
