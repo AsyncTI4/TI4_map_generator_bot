@@ -49,7 +49,7 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class CreateGameService {
 
-    public static Game createNewGame(GenericInteractionCreateEvent event, String gameName, Member gameOwner) {
+    public static Game createNewGame(String gameName, Member gameOwner) {
         Game newGame = new Game();
         newGame.newGameSetup();
         String ownerID = gameOwner.getId();
@@ -59,7 +59,7 @@ public class CreateGameService {
         newGame.setAutoPing(true);
         newGame.setAutoPingSpacer(24);
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
-        GameManager.save(newGame, event);
+        GameManager.save(newGame, "Game created");
         return newGame;
     }
 
@@ -124,7 +124,7 @@ public class CreateGameService {
         }
 
         // CREATE GAME
-        Game newGame = createNewGame(event, gameName, gameOwner);
+        Game newGame = createNewGame(gameName, gameOwner);
 
         // ADD PLAYERS
         for (Member member : members) {
@@ -183,7 +183,7 @@ public class CreateGameService {
             actionsChannel.getAsMention();
         MessageHelper.sendMessageToEventChannel(event, message);
 
-        GameManager.save(newGame, event);
+        GameManager.save(newGame, "Created game channels");
         reportNewGameCreated(newGame);
 
         presentSetupToPlayers(newGame);

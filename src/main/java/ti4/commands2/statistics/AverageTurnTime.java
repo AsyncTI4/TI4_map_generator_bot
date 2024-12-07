@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.service.statistics.TurnTimeService;
+import ti4.service.statistics.AverageTurnTimeService;
 
 class AverageTurnTime extends Subcommand {
 
@@ -19,6 +19,6 @@ class AverageTurnTime extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        TurnTimeService.queueReply(event);
+        AverageTurnTimeService.queueReply(event);
     }
 }

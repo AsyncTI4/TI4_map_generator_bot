@@ -65,10 +65,10 @@ public class FoWHelper {
 		}
 		if (game == null) {
 			String gameName = GameNameService.getGameNameFromChannel(channel);
-			game = GameManager.getGame(gameName);
-			if (game == null) {
+			if (!GameManager.isValid(gameName)) {
 				return false;
 			}
+			game = GameManager.getManagedGame(gameName).getGame();
 		}
 		if (game.isFowMode() && channel_ != null || event != null) {
 			return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
@@ -76,10 +76,6 @@ public class FoWHelper {
 		return false;
 	}
 
-	/**
-	 * Method to determine of a viewing player should be able to see the stats of a
-	 * particular faction
-	 */
 	public static boolean canSeeStatsOfFaction(Game game, String faction, Player viewingPlayer) {
 		for (Player player : game.getPlayers().values()) {
 			if (faction.equals(player.getFaction())) {
@@ -89,10 +85,6 @@ public class FoWHelper {
 		return false;
 	}
 
-	/**
-	 * Method to determine of a viewing player should be able to see the stats of a
-	 * particular player
-	 */
 	public static boolean canSeeStatsOfPlayer(Game game, Player player, Player viewingPlayer) {
 		if (!player.isRealPlayer() || !viewingPlayer.isRealPlayer()) {
 			return false;

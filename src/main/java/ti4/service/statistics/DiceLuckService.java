@@ -13,11 +13,12 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GamesPage;
-import ti4.map.manage.GameManager;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -44,11 +45,11 @@ public class DiceLuckService {
             .sorted(comparator)
             .limit(topLimit)
             .forEach(entry  -> {
-                var managedPlayer = GameManager.getManagedPlayer(entry.getKey());
+                var user = AsyncTI4DiscordBot.jda.getUserById(entry.getKey());
                 double expectedHits = entry.getValue().getKey();
                 int actualHits = entry.getValue().getValue();
                 if (expectedHits > 0 && actualHits > 0) {
-                    appendDiceLuck(sb, index, managedPlayer.getName(), expectedHits, actualHits);
+                    appendDiceLuck(sb, index, user.getName(), expectedHits, actualHits);
                 }
             });
 
@@ -79,28 +80,28 @@ public class DiceLuckService {
 
         GamesPage.consumeAllGames(
             endedGamesFilter,
-            game -> getScPick(game, round, faction, gamesThatHadThem, scsPicked, custodians)
+            game -> getDiceLuckForGame(game, playerDiceLucks, playerAverageDiceLucks)
         );
 
         return playerDiceLucks;
     }
 
-    private void handleGame(Game game) {
-        Map.Entry<Double, Integer> playerDiceLuck = Map.entry(
-            game.getPlayerToExpectedHitsTimes10().get(player) / 10.0,
-            game.getPlayerToActualHits().get(player));
-        playerDiceLucks.merge(player.getId(), playerDiceLuck,
-            (oldEntry, newEntry) -> Map.entry(
-                oldEntry.getKey() + playerDiceLuck.getKey(),
-                oldEntry.getValue() + playerDiceLuck.getValue()));
+    private void getDiceLuckForGame(Game game, Map<String, Map.Entry<Double, Integer>> playerDiceLucks,
+                            Map<String, Set<Double>> playerAverageDiceLucks) {
+        for (Player player : game.getRealPlayers()) {
+            Map.Entry<Double, Integer> playerDiceLuck = Map.entry(player.getExpectedHitsTimes10() / 10.0, player.getActualHits());
+            playerDiceLucks.merge(player.getUserID(), playerDiceLuck,
+                (oldEntry, newEntry) ->
+                    Map.entry(oldEntry.getKey() + playerDiceLuck.getKey(), oldEntry.getValue() + playerDiceLuck.getValue()));
 
-        if (playerDiceLuck.getKey() == 0) continue;
-        Double averageDiceLuck = playerDiceLuck.getValue() / playerDiceLuck.getKey();
-        playerAverageDiceLucks.compute(player.getId(), (key, value) -> {
-            if (value == null) value = new HashSet<>();
-            value.add(averageDiceLuck);
-            return value;
-        });
+            if (playerDiceLuck.getKey() == 0) continue;
+            Double averageDiceLuck = playerDiceLuck.getValue() / playerDiceLuck.getKey();
+            playerAverageDiceLucks.compute(player.getUserID(), (key, value) -> {
+                if (value == null) value = new HashSet<>();
+                value.add(averageDiceLuck);
+                return value;
+            });
+        }
     }
 
     private void appendDiceLuck(StringBuilder sb, AtomicInteger index, String playerName, double expectedHits, int actualHits) {

@@ -19,7 +19,7 @@ import ti4.message.MessageHelper;
 class PingCounterStatisticsService {
 
     static void listPingCounterList(SlashCommandInteractionEvent event) {
-        Game reference = GameManager.getGame("finreference");
+        Game reference = GameManager.getManagedGame("finreference").getGame();
         if (reference == null) {
             return;
         }

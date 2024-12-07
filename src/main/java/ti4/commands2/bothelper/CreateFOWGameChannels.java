@@ -110,7 +110,7 @@ class CreateFOWGameChannels extends Subcommand {
         }
 
         // CREATE GAME
-        Game newGame = CreateGameService.createNewGame(event, gameName, gameOwner);
+        Game newGame = CreateGameService.createNewGame(gameName, gameOwner);
         newGame.setFowMode(true);
 
         //ADD PLAYERS
