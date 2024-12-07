@@ -2,6 +2,7 @@ package ti4.service.statistics;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -43,17 +44,20 @@ public class MedianTurnTimeService {
         Map<String, Long> playerMedianTurnTimes = playerAverageTurnTimes.entrySet().stream()
             .map(e -> Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList())))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
-        StringBuilder sb = new StringBuilder();
 
-        sb.append("## __**Median Turn Time:**__\n");
+        StringBuilder sb = new StringBuilder("## __**Median Turn Time:**__\n");
 
         int index = 1;
         int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
 
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
-        for (Map.Entry<String, Long> userMedianTurnTime : playerMedianTurnTimes.entrySet().stream()
+        List<Map.Entry<String, Long>> medianTurnTimes = playerMedianTurnTimes.entrySet().stream()
             .filter(o -> o.getValue() != 0 && playerTurnCount.get(o.getKey()) >= minimumTurnsToShow)
-            .sorted(Map.Entry.comparingByValue()).limit(topLimit).toList()) {
+            .sorted(Map.Entry.comparingByValue())
+            .limit(topLimit)
+            .toList();
+
+        for (Map.Entry<String, Long> userMedianTurnTime : medianTurnTimes) {
             User user = AsyncTI4DiscordBot.jda.getUserById(userMedianTurnTime.getKey());
             long totalMillis = userMedianTurnTime.getValue();
             int turnCount = playerTurnCount.get(userMedianTurnTime.getKey());
@@ -74,10 +78,11 @@ public class MedianTurnTimeService {
     private static void getMedianTurnTimeForGame(Game game, Map<String, Integer> playerTurnCount,
                                                     Map<String, Set<Long>> playerAverageTurnTimes) {
         for (Player player : game.getRealPlayers()) {
-            Integer totalTurns = player.getNumberTurns();
-            Long totalTurnTime = player.getTotalTurnTime();
+            int totalTurns = player.getNumberTurns();
+            long totalTurnTime = player.getTotalTurnTime();
+            if (totalTurns == 0 || totalTurnTime == 0) continue;
+
             Map.Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
-            if (playerTurnTime.getKey() == 0) continue;
             Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
             playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
                 if (value == null) value = new HashSet<>();

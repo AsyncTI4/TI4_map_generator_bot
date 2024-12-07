@@ -84,9 +84,7 @@ public class StartPhaseService {
             }
             case "statusHomework" -> startStatusHomework(event, game);
             case "agendaResolve" -> AgendaHelper.resolveTime(game, null);
-            case "pbd1000decks" -> {
-                game.pbd1000decks();
-            }
+            case "pbd1000decks" -> game.pbd1000decks();
             case "action" -> startActionPhase(event, game);
             case "playerSetup" -> ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel(), game);
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find phase: `" + phase + "`");

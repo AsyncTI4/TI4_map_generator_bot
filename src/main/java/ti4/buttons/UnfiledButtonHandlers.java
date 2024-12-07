@@ -1780,15 +1780,14 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
 
                 } else {
-                    String msg2 = "All players have indicated 'No Sabotage'";
-                    // if (game.getMessageIDsForSabo().contains(messageId)) {
+                    Matcher acToReact = Pattern.compile("Card\\s(.*?):").matcher(msg.getContentRaw());
+                    String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
                     String faction = "bob_" + game.getStoredValue(messageId) + "_";
                     faction = faction.split("_")[1];
                     Player p2 = game.getPlayerFromColorOrFaction(faction);
                     if (p2 != null && !game.isFowMode()) {
                         msg2 = p2.getRepresentation() + " " + msg2;
                     }
-                    // }
                     msg.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
                 }
             });

@@ -64,7 +64,13 @@ public class AverageTurnTimeService {
 
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
         int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
-        for (Map.Entry<String, Map.Entry<Integer, Long>> userTurnCountTotalTime : playerTurnTimes.entrySet().stream().filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow).sorted(comparator).limit(topLimit).toList()) {
+        List<Map.Entry<String, Map.Entry<Integer, Long>>> turnTimes =  playerTurnTimes.entrySet().stream()
+            .filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow)
+            .sorted(comparator)
+            .limit(topLimit)
+            .toList();
+
+        for (var userTurnCountTotalTime : turnTimes) {
             User user = AsyncTI4DiscordBot.jda.getUserById(userTurnCountTotalTime.getKey());
             int turnCount = userTurnCountTotalTime.getValue().getKey();
             long totalMillis = userTurnCountTotalTime.getValue().getValue();

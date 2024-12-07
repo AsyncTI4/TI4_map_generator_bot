@@ -172,7 +172,6 @@ public class MiltyService {
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 } else {
-                    // Kick it off with a bang!
                     draftManager.repostDraftInformation(game);
                     game.setPhaseOfGame("miltydraft");
                     GameManager.save(game, "Milty draft phase");

@@ -513,7 +513,6 @@ public class MiltyDraftManager {
         } catch (Exception e) {
             BotLogger.log("Unable to clear out old buttons and messages.", e);
         }
-        // And then null them out so we don't mess with 'em again
         prevPingMessage = null;
     }
 
@@ -542,8 +541,10 @@ public class MiltyDraftManager {
             BotLogger.log("Unable to clear out old buttons and messages.", e);
         }
 
-        // And then null them out so we don't mess with 'em again
-        prevSliceMessage = prevFactionMessage = prevOrderMessage = prevSummaryMessage;
+        prevSliceMessage = null;
+        prevFactionMessage = null;
+        prevOrderMessage = null;
+        prevSummaryMessage = null;
     }
 
     private List<Button> getSliceButtons() {
