@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.map.Game;
@@ -75,8 +76,9 @@ public class RemoveUnitService {
 
     private static List<UnitHolder> getUnitHoldersToRemoveFrom(Tile tile, ParsedUnit parsedUnit) {
         if (!parsedUnit.getLocation().equals(Constants.SPACE)) { // We are removing from a specific planet.
-            var specificUnitHolder = tile.getUnitHolders().get(parsedUnit.getLocation());
-            return specificUnitHolder == null ? Collections.emptyList() : List.of(specificUnitHolder);
+            String planetName = AliasHandler.resolvePlanet(parsedUnit.getLocation().toLowerCase());
+            var planet = tile.getUnitHolders().get(planetName);
+            return planet == null ? Collections.emptyList() : List.of(planet);
         }
         // Otherwise, the location was not specified, so we check everywhere
         return tile.getUnitHolders().values().stream()
