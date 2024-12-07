@@ -154,14 +154,12 @@ public class MiltyService {
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
         } catch (Exception e) {
-            //asdf
+            // Ignore
         }
 
         if (specs.presetSlices != null) {
-            startMsg = "### You are using preset slices!!";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
             specs.presetSlices.forEach(draftManager::addSlice);
-            // Kick it off with a bang!
             draftManager.repostDraftInformation(game);
             GameSaveLoadManager.saveGame(game, event);
         } else {
