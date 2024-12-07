@@ -50,6 +50,7 @@ import ti4.helpers.ThreadHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 import ti4.service.game.GameNameService;
 
 public class MessageHelper {
@@ -373,10 +374,13 @@ public class MessageHelper {
 		buttons = sanitizeButtons(buttons, channel);
 
 		String gameName = GameNameService.getGameNameFromChannel(channel);
-		Game game = GameManager.getManagedGame(gameName).getGame();
-		if (game != null && game.isInjectRulesLinks() && !game.isFowMode()) {
-			messageText = injectRules(messageText);
+		if (GameManager.isValid(gameName)) {
+			Game game = GameManager.getManagedGame(gameName).getGame();
+			if (game.isInjectRulesLinks() && !game.isFowMode()) {
+				messageText = injectRules(messageText);
+			}
 		}
+
 		final String message = messageText;
 		List<MessageCreateData> objects = getMessageCreateDataObjects(message, sanitizedEmbeds, buttons);
 		Iterator<MessageCreateData> iterator = objects.iterator();
@@ -387,7 +391,9 @@ public class MessageHelper {
 					error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send intermediate message", messageCreateData, error)));
 			} else { // last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
-					if (message != null && game != null && !game.isFowMode()) {
+					ManagedGame managedGame = GameManager.getManagedGame(gameName);
+					if (message != null && managedGame != null && !managedGame.isFowMode()) {
+						Game game = managedGame.getGame();
 						if (message.contains("Use buttons to do your turn") || message.contains("Use buttons to end turn")) {
 							game.setLatestTransactionMsg(complete.getId());
 						}
