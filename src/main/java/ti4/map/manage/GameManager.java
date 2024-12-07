@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import lombok.experimental.UtilityClass;
-import ti4.cron.LogCacheStatsCron;
+import ti4.cache.CacheManager;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -29,7 +29,7 @@ public class GameManager {
                 .maximumSize(500)
                 .expireAfterAccess(2, TimeUnit.HOURS)
                 .build(GameManager::load);
-        LogCacheStatsCron.registerCache("gameCache", activeGameCache);
+        CacheManager.registerCache("gameCache", activeGameCache);
     }
 
     public static void initialize() {
