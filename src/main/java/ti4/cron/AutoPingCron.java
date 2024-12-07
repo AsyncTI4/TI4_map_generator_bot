@@ -29,13 +29,13 @@ import ti4.users.UserSettingsManager;
 import static java.util.function.Predicate.not;
 
 @UtilityClass
-class AutoPingCron {
+public class AutoPingCron {
 
     private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
     private static final long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
 
-    static {
+    public static void register() {
         CronManager.register(AutoPingCron.class, AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
     }
 

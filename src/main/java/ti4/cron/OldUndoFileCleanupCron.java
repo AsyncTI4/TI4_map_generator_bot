@@ -14,9 +14,9 @@ import ti4.helpers.Storage;
 import ti4.message.BotLogger;
 
 @UtilityClass
-class OldUndoFileCleanupCron {
+public class OldUndoFileCleanupCron {
 
-    static {
+    public static void register() {
         CronManager.register(OldUndoFileCleanupCron.class, OldUndoFileCleanupCron::cleanup, 3, 0, ZoneId.of("America/New_York"));
     }
 
