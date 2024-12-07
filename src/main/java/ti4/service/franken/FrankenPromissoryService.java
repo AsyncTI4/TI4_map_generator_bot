@@ -31,6 +31,7 @@ public class FrankenPromissoryService {
             sb.append(PromissoryNoteHelper.getPromissoryNoteRepresentation(game, pnID));
             sb.append("\n");
             player.addOwnedPromissoryNoteByID(pnID);
+            player.setPromissoryNote(pnID);
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
@@ -45,6 +46,7 @@ public class FrankenPromissoryService {
             }
             sb.append("\n");
             player.removeOwnedPromissoryNoteByID(pnID);
+            player.removePromissoryNote(pnID);
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
