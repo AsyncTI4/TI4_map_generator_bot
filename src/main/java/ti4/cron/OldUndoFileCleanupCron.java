@@ -9,9 +9,9 @@ import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 
 @UtilityClass
-public class OldUndoFileCleanupCron {
+class OldUndoFileCleanupCron {
 
-    public static void register() {
+    static {
         CronManager.register(OldUndoFileCleanupCron.class, OldUndoFileCleanupCron::cleanup, 3, 0, ZoneId.of("America/New_York"));
     }
 

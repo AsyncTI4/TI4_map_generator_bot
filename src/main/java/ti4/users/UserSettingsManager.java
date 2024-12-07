@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import ti4.cron.LogCacheStatsCron;
+import ti4.cache.CacheManager;
 import ti4.helpers.Storage;
 import ti4.map.PersistenceManager;
 import ti4.message.BotLogger;
@@ -25,7 +25,7 @@ public class UserSettingsManager {
                 .maximumSize(200)
                 .expireAfterAccess(4, TimeUnit.HOURS)
                 .build(UserSettingsManager::load);
-        LogCacheStatsCron.registerCache("userIdToSettingsCache", userIdToSettingsCache);
+        CacheManager.registerCache("userIdToSettingsCache", userIdToSettingsCache);
     }
 
     private static UserSettings load(String userId) {

@@ -35,7 +35,7 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() || !isAsyncServer(event.getGuild().getId())) {
+        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() || !AsyncTI4DiscordBot.isValidGuild(event.getGuild().getId())) {
             return;
         }
 
@@ -64,10 +64,6 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    private static boolean isAsyncServer(String guildID) {
-        return AsyncTI4DiscordBot.guilds.stream().anyMatch(g -> g.getId().equals(guildID));
-    }
-
     private static Player getPlayer(MessageReceivedEvent event, Game game) {
         Player player = game.getPlayer(event.getAuthor().getId());
         if (!game.isCommunityMode()) {
@@ -76,10 +72,10 @@ public class MessageListener extends ListenerAdapter {
         List<Role> roles = event.getMember().getRoles();
         for (Player player2 : game.getRealPlayers()) {
             if (roles.contains(player2.getRoleForCommunity())) {
-                player = player2;
+                return player2;
             }
             if (player2.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
-                player = player2;
+                return player2;
             }
         }
         return player;

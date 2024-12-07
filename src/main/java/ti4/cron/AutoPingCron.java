@@ -29,13 +29,13 @@ import ti4.users.UserSettingsManager;
 import static java.util.function.Predicate.not;
 
 @UtilityClass
-public class AutoPingCron {
+class AutoPingCron {
 
     private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
     private static final long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
 
-    public static void register() {
+    static {
         CronManager.register(AutoPingCron.class, AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
     }
 
@@ -259,10 +259,10 @@ public class AutoPingCron {
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
                 }
                 if (timeDifference > twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("2")) {
-                    String sb = player.getRepresentationUnfogged() + Helper.getSCName(sc, game) +
-                        " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
-
-                    ButtonHelper.sendMessageToRightStratThread(player, game, sb, ButtonHelper.getStratName(sc));
+                    String message = player.getRepresentationUnfogged() + Helper.getSCName(sc, game) +
+                        " has been played and now it has been the allotted time and they haven't reacted, so they have " +
+                        "been marked as not following.\n";
+                    ButtonHelper.sendMessageToRightStratThread(player, game, message, ButtonHelper.getStratName(sc));
                     player.addFollowedSC(sc);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
                     String messageID = game.getStoredValue("scPlayMsgID" + sc);

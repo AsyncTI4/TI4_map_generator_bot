@@ -7,12 +7,12 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.ThreadGetter;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
+import ti4.service.game.GameNameService;
 
 @UtilityClass
 public class SusSlashCommandService {
@@ -25,13 +25,14 @@ public class SusSlashCommandService {
     private static final List<String> HARMLESS_SUBCOMMANDS = List.of(
         Constants.INFO, Constants.CREATE_GAME_BUTTON, "po_info", Constants.DICE_LUCK, Constants.SHOW_AC_DISCARD_LIST, "show_deck",
         Constants.TURN_STATS, Constants.SHOW_AC_REMAINING_CARD_COUNT, Constants.SHOW_HAND, Constants.SHOW_BAG, Constants.UNIT_INFO,
-        Constants.TURN_END, Constants.PING_ACTIVE_PLAYER, Constants.SHOW_ALL_SO_TO_ALL, Constants.END, Constants.REMATCH
+        Constants.TURN_END, Constants.PING_ACTIVE_PLAYER, Constants.SHOW_ALL_SO_TO_ALL, Constants.END, Constants.REMATCH, Constants.ABILITY_INFO,
+        Constants.SPENDS, Constants.CHANGE_COLOR
     );
 
     private static final List<String> EXCLUDED_GAMES = List.of("pbd1000", "pbd100two");
 
     public static void checkIfShouldReportSusSlashCommand(SlashCommandInteractionEvent event, String jumpUrl) {
-        String gameName = CommandHelper.getGameName(event);
+        String gameName = GameNameService.getGameName(event);
         Game game = GameManager.getGame(gameName);
         if (game == null) return;
         if (game.isFowMode()) return;

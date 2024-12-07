@@ -15,6 +15,7 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.game.GameNameService;
 
 @Getter
 public abstract class ListenerContext {
@@ -40,7 +41,7 @@ public abstract class ListenerContext {
         this.event = event;
         this.componentID = this.origComponentID = compID;
 
-        String gameName = CommandHelper.getGameNameFromChannel(event);
+        String gameName = GameNameService.getGameNameFromChannel(event);
         game = GameManager.getGame(gameName);
 
         player = null;

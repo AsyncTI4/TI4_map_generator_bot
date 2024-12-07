@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import ti4.cron.LogCacheStatsCron;
+import ti4.cache.CacheManager;
 import ti4.helpers.GlobalSettings;
 import ti4.message.BotLogger;
 
@@ -33,8 +33,8 @@ public class ImageCache {
                 .expireAfterWrite(URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES)
                 .recordStats()
                 .build();
-        LogCacheStatsCron.registerCache("fileImageCache", fileImageCache);
-        LogCacheStatsCron.registerCache("urlImageCache", urlImageCache);
+        CacheManager.registerCache("fileImageCache", fileImageCache);
+        CacheManager.registerCache("urlImageCache", urlImageCache);
     }
 
     public static ImageCache getInstance() {

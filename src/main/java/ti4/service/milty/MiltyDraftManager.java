@@ -51,18 +51,18 @@ public class MiltyDraftManager {
     private final List<MiltyDraftSlice> slices = new ArrayList<>();
     private final Map<String, PlayerDraft> draft = new HashMap<>(); //userID
 
-    private int draftIndex = 0;
+    private int draftIndex;
     private List<String> draftOrder = new ArrayList<>(); // userID
     private List<String> players = new ArrayList<>(); // userID
     private List<String> factionDraft = new ArrayList<>();
 
-    private String prevSummaryMessage = null;
-    private String prevSliceMessage = null;
-    private String prevFactionMessage = null;
-    private String prevOrderMessage = null;
-    private String prevPingMessage = null;
+    private String prevSummaryMessage;
+    private String prevSliceMessage;
+    private String prevFactionMessage;
+    private String prevOrderMessage;
+    private String prevPingMessage;
 
-    private String mapTemplate = null;
+    private String mapTemplate;
 
     private boolean finished;
 
@@ -543,7 +543,10 @@ public class MiltyDraftManager {
         }
 
         // And then null them out so we don't mess with 'em again
-        prevSliceMessage = prevFactionMessage = prevOrderMessage = prevSummaryMessage = null;
+        prevSliceMessage = null;
+        prevFactionMessage = null;
+        prevOrderMessage = null;
+        prevSummaryMessage = null;
     }
 
     private List<Button> getSliceButtons() {

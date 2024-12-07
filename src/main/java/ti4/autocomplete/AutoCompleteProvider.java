@@ -55,6 +55,7 @@ import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.UnitDecalService;
 import ti4.service.franken.FrankenDraftMode;
+import ti4.service.game.GameNameService;
 import ti4.service.game.UndoService;
 import ti4.service.map.MapPresetService;
 import ti4.service.statistics.PlayerStatTypes;
@@ -84,7 +85,7 @@ public class AutoCompleteProvider {
             if (event.isAcknowledged()) return;
         }
 
-        String gameName = CommandHelper.getGameNameFromChannel(event);
+        String gameName = GameNameService.getGameNameFromChannel(event);
         Game game = GameManager.getGame(gameName);
         if (game != null && subCommandName != null) {
             switch (commandName) {

@@ -5,11 +5,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
-import ti4.commands2.CommandHelper;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
+import ti4.service.game.GameNameService;
 
 class SetThreadName extends Subcommand {
 
@@ -20,7 +20,7 @@ class SetThreadName extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String gameName = CommandHelper.getGameName(event);
+        String gameName = GameNameService.getGameName(event);
         String name = event.getOption(Constants.THREAD_NAME).getAsString();
         if (event.getMessageChannel() instanceof ThreadChannel channel) {
             ThreadChannelManager manager = channel.getManager();

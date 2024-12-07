@@ -92,6 +92,7 @@ import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.decks.ShowActionCardsService;
 import ti4.service.explore.ExploreService;
+import ti4.service.game.GameNameService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
@@ -6037,7 +6038,7 @@ public class ButtonHelper {
             return;
 
         String userID = event.getUser().getId();
-        String gameName = CommandHelper.getGameNameFromChannel(event);
+        String gameName = GameNameService.getGameNameFromChannel(event);
         Game game = GameManager.getGame(gameName);
         if (game == null) {
             event.getChannel().sendMessage("Unable to determine active game.").queue();
