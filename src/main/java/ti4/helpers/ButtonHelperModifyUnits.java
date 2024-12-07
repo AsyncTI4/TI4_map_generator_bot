@@ -1131,15 +1131,14 @@ public class ButtonHelperModifyUnits {
         }
 
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unitType), player.getColor());
-        if (buttonLabel.toLowerCase().contains("damaged")) {
-            AddUnitService.addUnits(event, game.getTileByPosition(pos2), game, player.getColor(), amount + " " + unitType);
+        AddUnitService.addUnits(event, game.getTileByPosition(pos2), game, player.getColor(), amount + " " + unitType);
+        boolean damaged = buttonLabel.toLowerCase().contains("damaged");
+        if (damaged) {
             game.getTileByPosition(pos2).addUnitDamage("space", unitKey, amount);
-        } else {
-            AddUnitService.addUnits(event, game.getTileByPosition(pos2), game, player.getColor(), amount + " " + unitType);
         }
 
         var unit = new ParsedUnit(unitKey, amount, planet);
-        RemoveUnitService.removeUnit(event, game.getTileByPosition(pos1), game, unit);
+        RemoveUnitService.removeUnit(event, game.getTileByPosition(pos1), game, unit, damaged);
 
         List<Button> systemButtons = getRetreatingGroundTroopsButtons(player, game, event, pos1, pos2);
         String retreatMessage = player.getFactionEmojiOrColor() + " Retreated " + amount + " " + unitType + " on " + planet + " to "

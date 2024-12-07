@@ -75,8 +75,8 @@ public class RemoveUnitService {
 
     private static List<UnitHolder> getUnitHoldersToRemoveFrom(Tile tile, ParsedUnit parsedUnit) {
         if (!parsedUnit.getLocation().equals(Constants.SPACE)) { // We are removing from a specific planet.
-            var specificUnitHolder = tile.getUnitHolders().get(parsedUnit.getLocation());
-            return specificUnitHolder == null ? Collections.emptyList() : List.of(specificUnitHolder);
+            var planet = tile.getUnitHolders().get(parsedUnit.getLocation());
+            return planet == null ? Collections.emptyList() : List.of(planet);
         }
         // Otherwise, the location was not specified, so we check everywhere
         return tile.getUnitHolders().values().stream()
