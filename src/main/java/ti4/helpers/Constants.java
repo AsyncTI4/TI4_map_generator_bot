@@ -646,7 +646,7 @@ public class Constants {
     public static final String AGENDAS = "agendas";
     public static final String AGENDA_DECK = "agenda_deck";
     public static final String AGENDA = "agenda";
-    public static final String RELIC_SHOW_REMAINING = "show_remaining";
+    public static final String SHOW_REMAINING = "show_remaining";
     public static final String RELIC_DRAW_SPECIFIC = "draw_specific";
     public static final String DRAW = "draw";
     public static final String RELIC_DRAW = "draw";

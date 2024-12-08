@@ -98,6 +98,7 @@ class GameUndoService {
             if (!currentGameFile.exists()) {
                 BotLogger.log("Game file for " + gameName + " doesn't exist!");
                 return null;
+
             }
 
             replaceGameFileWithUndo(gameName, undoIndex, currentGameFile.toPath());
@@ -116,21 +117,26 @@ class GameUndoService {
                 }
             }
 
-            for (int currentUndoIndex = undoIndex + 1; currentUndoIndex <= latestUndoIndex; currentUndoIndex++) {
-                File currentUndo = Storage.getGameUndoStorage(getUndoFileName(gameName, currentUndoIndex));
+            Map<String, String> undoNamesToCommandText = GameUndoNameService.getUndoNamesToCommandText(game, latestUndoIndex - undoIndex);
+            List<String> undoCommands = new ArrayList<>();
+            for (int i = latestUndoIndex; i > undoIndex; i--) {
+                String fileName = getUndoFileName(gameName, i);
+                File currentUndo = Storage.getGameUndoStorage(fileName);
                 if (!currentUndo.delete()) {
                     BotLogger.log("Failed to delete undo file: " + currentUndo.getAbsolutePath());
+                } else {
+                    undoCommands.add(undoNamesToCommandText.get(fileName));
                 }
             }
 
             if (!game.isFowMode()) {
-                sendUndoConfirmationMessage(game, latestUndoIndex, undoIndex);
+                sendUndoConfirmationMessage(game, undoIndex, latestUndoIndex, undoCommands);
             }
             return loadedGame;
         } catch (Exception e) {
             BotLogger.log("Error trying to undo: " + gameName, e);
+            return null;
         }
-        return null;
     }
 
     private static void replaceGameFileWithUndo(String gameName, int undoIndex, Path gameFilePath) throws IOException {
@@ -142,14 +148,12 @@ class GameUndoService {
         return gameName + "_" + undoIndex + Constants.TXT;
     }
 
-    private static void sendUndoConfirmationMessage(Game game, int undoIndex, int latestUndoIndex) {
+    private static void sendUndoConfirmationMessage(Game game, int undoIndex, int latestUndoIndex, List<String> undoCommands) {
         StringBuilder sb = new StringBuilder("Rolled back to save `").append(undoIndex).append("` from `").append(latestUndoIndex).append("`:\n");
 
         String gameName = game.getName();
-        Map<String, String> undoNamesToCommandText = GameUndoNameService.getUndoNamesToCommandText(game, latestUndoIndex - undoIndex);
-        for (int i = latestUndoIndex; i > undoIndex; i--) {
-            String undoFileName = getUndoFileName(gameName, i);
-            sb.append("> `").append(i).append("` ").append(undoNamesToCommandText.get(undoFileName)).append("\n");
+        for (int i = 0; i < undoCommands.size(); i++) {
+            sb.append("> `").append(latestUndoIndex - i).append("` ").append(undoCommands.get(i)).append("\n");
         }
         ButtonHelper.findOrCreateThreadWithMessage(game, gameName + "-undo-log", sb.toString());
     }

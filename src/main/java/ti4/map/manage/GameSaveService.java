@@ -56,11 +56,8 @@ import static ti4.map.manage.GamePersistenceKeys.UNITS;
 class GameSaveService {
 
     public static boolean save(Game game, String reason) {
-        if (save(game)) {
-            game.setLatestCommand(Objects.requireNonNullElse(reason, "Last Command Unknown - No Event Provided"));
-            return true;
-        }
-        return false;
+        game.setLatestCommand(Objects.requireNonNullElse(reason, "Command Unknown"));
+        return save(game);
     }
 
     public static boolean save(Game game) {

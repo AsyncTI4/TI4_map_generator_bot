@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -111,9 +112,9 @@ class GameLoadService {
     }
 
     @Nullable
-    private static Game readGame(File gameFile) {
-        if (gameFile == null || !gameFile.exists()) {
-            BotLogger.log("Could not load map, map file does not exist: " + (gameFile == null ? "null file" : gameFile.getAbsolutePath()));
+    private static Game readGame(@NotNull File gameFile) {
+        if (!gameFile.exists()) {
+            BotLogger.log("Could not load map, map file does not exist: " + gameFile.getAbsolutePath());
             return null;
         }
         try {
@@ -179,8 +180,8 @@ class GameLoadService {
             return game;
         } catch (Exception e) {
             BotLogger.log("Data read error: " + gameFile.getName(), e);
+            return null;
         }
-        return null;
     }
 
     private static Map<String, Tile> getTileMap(Iterator<String> gameFileLines, Game game, File gameFile) {
