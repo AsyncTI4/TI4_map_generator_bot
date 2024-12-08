@@ -47,8 +47,8 @@ public class DataMigrationManager {
         //migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
-    public static void runMigrations() {
-        if (migrations.isEmpty()) return;
+    public static boolean runMigrations() {
+        if (migrations.isEmpty()) return false;
         Map<String, List<String>> migrationNamesToAppliedGameNames = new HashMap<>();
 
         try {
@@ -74,6 +74,7 @@ public class DataMigrationManager {
                 BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", entry.getKey(), gameNames));
             }
         }
+        return true;
     }
 
     private static Optional<LocalDate> getMigrationForGamesBeforeDate(String migrationName) {

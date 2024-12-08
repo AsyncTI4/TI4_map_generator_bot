@@ -209,9 +209,9 @@ public class AsyncTI4DiscordBot {
         GameManager.initialize();
 
         // RUN DATA MIGRATIONS
-        BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
-        DataMigrationManager.runMigrations();
-        BotLogger.logWithTimestamp(" FINISHED CHECKING FOR DATA MIGRATIONS");
+        if (DataMigrationManager.runMigrations()) {
+            BotLogger.logWithTimestamp(" RAN MIGRATIONS");
+        }
 
         // START ASYNC PIPELINES
         ImageIO.setUseCache(false);
