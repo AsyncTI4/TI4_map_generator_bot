@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
@@ -39,9 +40,11 @@ public class UserSettings {
         }
     }
 
+    @JsonGetter("myDateTime")
     public LocalDateTime getLockedFromCreatingGamesUntil() {
-        if (lockedFromCreatingGamesUntil == null) return null;
-        if (lockedFromCreatingGamesUntil.isBefore(LocalDateTime.now())) return null;
+        if (lockedFromCreatingGamesUntil == null || lockedFromCreatingGamesUntil.isBefore(LocalDateTime.now())) {
+            return null;
+        }
         return lockedFromCreatingGamesUntil;
     }
 
