@@ -26,13 +26,9 @@ public class GlobalSettings {
         FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES, //
         URL_IMAGE_CACHE_MAX_SIZE, //
         URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES, //
-        CALCULATED_IMAGE_CACHE_SIZE,
-        CALCULATED_IMAGE_CACHE_EXPIRE_TIME_MINUTES,
-        LOG_CACHE_STATS_INTERVAL_MINUTES, //
-        UPLOAD_STATS_INTERVAL_DAYS,
         GUILD_ID_FOR_NEW_GAME_CATEGORIES, //Which guild to create new game categories in (DEPRECATED)
         MAX_GAMES_PER_CATEGORY, //Max # of games when creating a category
-        UNDO_COPIES, //Max # of undo copies saved per map
+        ALLOW_GAME_CREATION,
         READY_TO_RECEIVE_COMMANDS; //Whether the bot is ready to receive commands
 
         @Override

@@ -24,7 +24,6 @@ public class GameStatisticsService {
     private void getGameStatistics(SlashCommandInteractionEvent event, GameStatTypes statType) {
         switch (statType) {
             case UNLEASH_THE_NAMES -> AllNamesStatisticsService.sendAllNames(event);
-            case PING_LIST -> PingCounterStatisticsService.listPingCounterList(event);
             case HIGHEST_SPENDERS -> SpendToWinCorrelationStatisticsService.calculateSpendToWinCorrelation(event);
             case GAME_LENGTH -> GameLengthStatisticsService.showGameLengths(event, 3650);
             case GAME_LENGTH_4MO -> GameLengthStatisticsService.showGameLengths(event, 120);
