@@ -103,9 +103,6 @@ public class AutoCompleteProvider {
 
         // GENERIC HANDLING OF OPTIONS
         handleOptions(event, optionName, subCommandName, gameName);
-        if (!event.isAcknowledged()) {
-            event.replyChoiceStrings("Unable to determine AutoComplete. Should you be in a game channel?").queue();
-        }
     }
 
     private static void handleOptions(@NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName, String subcommandName, String gameName) {
