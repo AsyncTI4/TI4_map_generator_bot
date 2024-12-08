@@ -77,4 +77,8 @@ public class DraftErrataModel implements ModelInterface {
     public ComponentSource getSource() {
         return source;
     }
+
+    public boolean searchSource(ComponentSource searchSource) {
+        return (searchSource == null || (getSource() != null && getSource().equals(searchSource)));
+    }
 }

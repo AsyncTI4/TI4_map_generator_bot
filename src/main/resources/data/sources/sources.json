@@ -3,7 +3,7 @@
         "source":"base",
         "name":"Twilight Imperium 4th Edition (Base Game)",
         "canal":"official",
-        "credits":"Dane Beltrami",
+        "credits":"Dane Beltrami, Flight Fantasy Games",
         "data": [
             "https://twilight-imperium.fandom.com/wiki/Official_Rules",
             "https://www.tirules.com/",
@@ -15,7 +15,8 @@
         "source":"pok",
         "name":"Prophecy of Kings [Expansion]",
         "canal":"official",
-        "credits":"Dane Beltrami",
+        "credits":"Dane Beltrami, Flight Fantasy Games",
+        "description":"new Factions, Leaders, Exploration, Relics, Mechs, new Techs, new Tiles, PN Alliance, new Objectives & ACs, modified Agendas, updated SC2 & SC4",
         "data": [
             "https://twilight-imperium.fandom.com/wiki/Prophecy_of_Kings"
         ]
@@ -24,7 +25,8 @@
         "source":"codex1",
         "name":"Codex I",
         "canal":"official",
-        "credits":"Dane Beltrami",
+        "credits":"Dane Beltrami, Flight Fantasy Games",
+        "description":"omega Techs & PNs, new ACs, updated Rules, new Map & Scenario",
         "data": [
             "https://twilight-imperium.fandom.com/wiki/Codex#Volume_I_(Ordinian)",
             "https://images-cdn.fantasyflightgames.com/filer_public/94/c5/94c59830-533e-47aa-a708-25634575161b/twilight_codex_v1-compressed.pdf",
@@ -35,7 +37,8 @@
         "source":"codex2",
         "name":"Codex II",
         "canal":"official",
-        "credits":"Dane Beltrami",
+        "credits":"Dane Beltrami, Flight Fantasy Games",
+        "description":"Faction Ref Cards & Alliance Ref Cards, Alliance Game mode, new Relics, new Maps",
         "data": [
             "https://twilight-imperium.fandom.com/wiki/Codex#Volume_II_(Affinity)",
             "https://images-cdn.fantasyflightgames.com/filer_public/ff/fe/fffe5e9d-33fb-4149-a3a2-cd6dfadb4de3/ti_codex_ii_rules_web.pdf",
@@ -47,7 +50,8 @@
         "source":"codex3",
         "name":"Codex III",
         "canal":"official",
-        "credits":"Dane Beltrami",
+        "credits":"Dane Beltrami, Flight Fantasy Games",
+        "description":"omega Leaders & Mech & Objectives (Naalu, Yin, Xxcha), new Faction (Keleres), new Frontier",
         "data": [
             "https://twilight-imperium.fandom.com/wiki/Codex#Volume_III_(Vigil)",
             "https://images-cdn.fantasyflightgames.com/filer_public/35/e1/35e10f37-4b6d-4479-a117-4e2c571ddfa7/ti_codex_volume_3_vigil_v2_1-compressed.pdf",
@@ -90,6 +94,16 @@
     {
         "source":"monuments",
         "name":"Monuments+",
+        "canal":"community",
+        "subcanal":"big homebrew",
+        "credits":"Blarknob",
+        "data": [
+            "https://discord.com/channels/743629929484386395/1205395696950321172"
+        ]
+    },
+    {
+        "source":"luminous",
+        "name":"Luminous",
         "canal":"community",
         "subcanal":"big homebrew",
         "credits":"Blarknob",
