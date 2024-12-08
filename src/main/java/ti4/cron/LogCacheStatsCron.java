@@ -31,7 +31,6 @@ public class LogCacheStatsCron {
         } catch (Exception e) {
             BotLogger.log("**LogCacheStatsCron failed.**", e);
         }
-        BotLogger.log("Ran LogCacheStatsCron.");
     }
 
     private static String cacheStatsToString(String name, Cache<?, ?> cache) {

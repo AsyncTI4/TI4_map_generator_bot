@@ -49,7 +49,6 @@ public class AutoPingCron {
         } catch (Exception e) {
             BotLogger.log("**AutoPingCron failed.**", e);
         }
-        BotLogger.log("Ran AutoPingCron.");
     }
 
     private static void autoPingGame(Game game) {
