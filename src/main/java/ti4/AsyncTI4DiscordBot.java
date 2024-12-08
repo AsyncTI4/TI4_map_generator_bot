@@ -29,14 +29,11 @@ import org.reflections.util.ConfigurationBuilder;
 import ti4.commands2.CommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;
-import ti4.cron.GameCreationLockRemovalCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.UploadStatsCron;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.GlobalSettings;
-import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TimedRunnable;
@@ -58,6 +55,8 @@ import ti4.migration.DataMigrationManager;
 import ti4.processors.ButtonProcessor;
 import ti4.selections.SelectionManager;
 import ti4.service.statistics.StatisticsPipeline;
+import ti4.settings.GlobalSettings;
+import ti4.settings.GlobalSettings.ImplementedSettings;
 
 import static org.reflections.scanners.Scanners.SubTypes;
 
@@ -223,7 +222,6 @@ public class AsyncTI4DiscordBot {
         AutoPingCron.register();
         LogCacheStatsCron.register();
         UploadStatsCron.register();
-        GameCreationLockRemovalCron.register();
         OldUndoFileCleanupCron.register();
 
         // BOT IS READY

@@ -25,7 +25,6 @@ import ti4.commands2.CommandHelper;
 import ti4.commands2.uncategorized.ServerPromoteCommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -61,6 +60,7 @@ import ti4.service.game.GameUndoNameService;
 import ti4.service.map.MapPresetService;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
+import ti4.settings.GlobalSettings;
 
 public class AutoCompleteProvider {
 
