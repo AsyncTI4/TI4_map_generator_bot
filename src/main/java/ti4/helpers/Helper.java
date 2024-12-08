@@ -602,14 +602,14 @@ public class Helper {
             return getSCName(sc, game);
         }
         return switch (sc) {
-            case 1 -> Emojis.SC1Mention();
-            case 2 -> Emojis.SC2Mention();
-            case 3 -> Emojis.SC3Mention();
-            case 4 -> Emojis.SC4Mention();
-            case 5 -> Emojis.SC5Mention();
-            case 6 -> Emojis.SC6Mention();
-            case 7 -> Emojis.SC7Mention();
-            case 8 -> Emojis.SC8Mention();
+            case 1 -> Emojis.SC1Mention;
+            case 2 -> Emojis.SC2Mention;
+            case 3 -> Emojis.SC3Mention;
+            case 4 -> Emojis.SC4Mention;
+            case 5 -> Emojis.SC5Mention;
+            case 6 -> Emojis.SC6Mention;
+            case 7 -> Emojis.SC7Mention;
+            case 8 -> Emojis.SC8Mention;
             default -> "**SC" + sc + "**";
         };
     }
@@ -2064,8 +2064,7 @@ public class Helper {
      * @return left padded string
      */
     public static String leftpad(String text, int length) {
-        if (text.length() > length)
-        {
+        if (text.length() > length) {
             return text;
         }
         return String.format("%" + length + "." + length + "s", text);
