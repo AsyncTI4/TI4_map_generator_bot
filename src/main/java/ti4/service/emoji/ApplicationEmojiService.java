@@ -31,7 +31,7 @@ public class ApplicationEmojiService {
     private static boolean cacheInitialized = false;
     private static boolean filesInitialized = false;
 
-    public static void initAll() {
+    private static void initAll() {
         initFromCache();
         initFileData();
     }
@@ -41,26 +41,29 @@ public class ApplicationEmojiService {
         List<EmojiFileData> newEmojis = emojiFiles.values().stream()
             .filter(data -> !emojis.containsKey(data.getName()))
             .toList();
+        BotLogger.logWithTimestamp("Uploading " + newEmojis.size() + " new emojis...");
         boolean success = createAppEmojis(newEmojis);
         pushEmojiListToCache(success);
     }
 
-    public static void reuploadChangedEmojis() {
+    public static void reuploadStaleEmojis() {
         initAll(); // Redundant, probably. Short circuits anyway.
-        List<EmojiFileData> changedEmojis = emojiFiles.values().stream()
+        List<EmojiFileData> staleEmojis = emojiFiles.values().stream()
             .filter(data -> emojis.containsKey(data.getName()))
             .filter(data -> emojis.get(data.getName()).getTimeCreated() < data.getFile().lastModified())
             .toList();
-        boolean success = reuploadAppEmojis(changedEmojis);
+        BotLogger.logWithTimestamp("Re-uploading " + staleEmojis.size() + " stale emojis...");
+        boolean success = reuploadAppEmojis(staleEmojis);
         pushEmojiListToCache(success);
     }
 
     public static void deleteHangingEmojis() {
         initAll(); // Redundant, probably. Short circuits anyway.
-        List<CachedEmoji> deletedEmojis = emojis.values().stream()
+        List<CachedEmoji> hangingEmojis = emojis.values().stream()
             .filter(emoji -> !emojiFiles.containsKey(emoji.getName()))
             .toList();
-        boolean success = deleteAppEmojis(deletedEmojis);
+        BotLogger.logWithTimestamp("Deleting " + hangingEmojis.size() + " hanging emojis...");
+        boolean success = deleteAppEmojis(hangingEmojis);
         pushEmojiListToCache(success);
     }
 
