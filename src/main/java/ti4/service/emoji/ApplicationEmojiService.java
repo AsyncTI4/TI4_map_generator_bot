@@ -104,14 +104,12 @@ public class ApplicationEmojiService {
 
     private static boolean createAppEmojis(List<EmojiFileData> toUpload) {
         if (toUpload.isEmpty()) return true;
-        BotLogger.logWithTimestamp("Uploading `" + toUpload.size() + "` emojis.");
         Map<String, CachedEmoji> uploaded = toUpload.parallelStream()
             .map(ApplicationEmojiService::createAppEmoji)
             .filter(Objects::nonNull)
             .map(CachedEmoji::new)
             .collect(Collectors.toConcurrentMap(CachedEmoji::getName, e -> e));
         emojis.putAll(uploaded);
-        BotLogger.logWithTimestamp("Uploaded `" + uploaded.size() + "` emojis.");
         return uploaded.size() == toUpload.size();
     }
 
@@ -129,7 +127,6 @@ public class ApplicationEmojiService {
     private static boolean deleteAppEmojis(List<CachedEmoji> toDelete) {
         if (toDelete.isEmpty()) return true;
         boolean success = true;
-        BotLogger.logWithTimestamp("Deleting `" + toDelete.size() + "` emojis.");
         Map<String, Boolean> deleted = toDelete.parallelStream()
             .collect(Collectors.toConcurrentMap(CachedEmoji::getName, ApplicationEmojiService::deleteAppEmoji));
         for (Entry<String, Boolean> deleted2 : deleted.entrySet()) {
@@ -139,7 +136,6 @@ public class ApplicationEmojiService {
                 success = false;
             }
         }
-        BotLogger.logWithTimestamp("Deleted `" + deleted.size() + "` emojis.");
         return success;
     }
 
@@ -164,7 +160,6 @@ public class ApplicationEmojiService {
 
     private static boolean reuploadAppEmojis(List<EmojiFileData> toReupload) {
         if (toReupload.isEmpty()) return true;
-        BotLogger.logWithTimestamp("Reuploading `" + toReupload.size() + "` emojis.");
         try {
             for (EmojiFileData f : toReupload) {
                 ApplicationEmoji emoji = reuploadAppEmoji(f);
@@ -177,7 +172,6 @@ public class ApplicationEmojiService {
             BotLogger.log(Constants.jazzPing() + " Failed to upload emoji files: ", e);
             return false;
         }
-        BotLogger.logWithTimestamp("Reuploaded `" + toReupload.size() + "` emojis.");
         return true;
     }
 
