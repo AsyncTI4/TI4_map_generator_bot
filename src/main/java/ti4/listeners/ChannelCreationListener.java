@@ -4,9 +4,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 public class ChannelCreationListener extends ListenerAdapter {
@@ -20,13 +17,8 @@ public class ChannelCreationListener extends ListenerAdapter {
         if (!(event.getChannel() instanceof ThreadChannel channel) || !channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
             return;
         }
-        Game mapReference = GameManager.getGame("finreference");
-        if (mapReference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
-            mapReference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
-            MessageHelper.sendMessageToChannel(channel, "To launch a new game, please run the command `/game create_game_button`, " +
-                "filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members " +
-                "are correct.");
-            GameSaveLoadManager.saveGame(mapReference, "newChannel");
-        }
+        MessageHelper.sendMessageToChannel(channel, "To launch a new game, please run the command `/game create_game_button`, " +
+            "filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members " +
+            "are correct.");
     }
 }
