@@ -24,7 +24,6 @@ import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Emojis;
-import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.TIGLHelper;
@@ -55,6 +54,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.info.TechInfoService;
 import ti4.service.info.UnitInfoService;
 import ti4.service.planet.AddPlanetService;
+import ti4.settings.GlobalSettings;
 
 @UtilityClass
 public class MiltyService {

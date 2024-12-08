@@ -9,9 +9,9 @@ import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import lombok.experimental.UtilityClass;
 import ti4.AsyncTI4DiscordBot;
 import ti4.cache.CacheManager;
-import ti4.helpers.GlobalSettings;
 import ti4.helpers.ToStringHelper;
 import ti4.message.MessageHelper;
+import ti4.settings.GlobalSettings;
 
 @UtilityClass
 public class LogCacheStatsCron {

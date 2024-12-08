@@ -15,10 +15,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
-import ti4.helpers.GlobalSettings;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.ThreadHelper;
 import ti4.selections.SelectionMenuProvider;
+import ti4.settings.GlobalSettings;
 
 public class BotLogger {
     /**

@@ -13,8 +13,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands2.Subcommand;
 import ti4.message.MessageHelper;
-import ti4.users.UserSettings;
-import ti4.users.UserSettingsManager;
+import ti4.settings.users.UserSettings;
+import ti4.settings.users.UserSettingsManager;
 
 class ShowUserSettings extends Subcommand {
 

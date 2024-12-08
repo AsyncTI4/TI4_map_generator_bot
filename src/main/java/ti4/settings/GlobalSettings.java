@@ -1,4 +1,4 @@
-package ti4.helpers;
+package ti4.settings;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import ti4.helpers.Storage;
 import ti4.message.BotLogger;
 
 public class GlobalSettings {

@@ -3,6 +3,7 @@ package ti4.helpers;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import ti4.message.BotLogger;
+import ti4.settings.GlobalSettings;
 
 @UtilityClass
 public class ThreadHelper {

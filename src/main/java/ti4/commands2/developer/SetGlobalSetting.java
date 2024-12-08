@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.GlobalSettings;
 import ti4.message.MessageHelper;
+import ti4.settings.GlobalSettings;
 
 class SetGlobalSetting extends Subcommand {
 

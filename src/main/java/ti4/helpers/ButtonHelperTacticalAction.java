@@ -28,7 +28,7 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
-import ti4.users.UserSettingsManager;
+import ti4.settings.users.UserSettingsManager;
 
 public class ButtonHelperTacticalAction {
 
