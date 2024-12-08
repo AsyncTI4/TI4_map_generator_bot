@@ -17,8 +17,11 @@ public class ChannelCreationListener extends ListenerAdapter {
         if (!(event.getChannel() instanceof ThreadChannel channel) || !channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
             return;
         }
-        MessageHelper.sendMessageToChannel(channel, "To launch a new game, please run the command `/game create_game_button`, " +
-            "filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members " +
-            "are correct.");
+        MessageHelper.sendMessageToChannel(channel,
+            """
+            To launch a new game, please run the command `/game create_game_button`, \
+            filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members \
+            are correct.
+            """);
     }
 }
