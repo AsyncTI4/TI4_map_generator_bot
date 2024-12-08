@@ -19,6 +19,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.StrategyCardModel;
@@ -42,6 +43,12 @@ public class AutoPingCron {
     private static void autoPingGames() {
         var games = GameManager.getGameNameToGame().values().stream().filter(not(Game::isHasEnded)).toList();
         for (Game game : games) {
+            autoPingGame(game);
+        }
+    }
+
+    private static void autoPingGame(Game game) {
+        try {
             handleTechSummary(game); // TODO, move this?
             checkAllSaboWindows(game);
             if (game.isFastSCFollowMode()) {
@@ -51,6 +58,8 @@ public class AutoPingCron {
             if (game.getAutoPingStatus() && !game.isTemporaryPingDisable()) {
                 handleAutoPing(game, player);
             }
+        } catch (Exception e) {
+            BotLogger.log("AutoPing failed for game: " + game.getName(), e);
         }
     }
 
@@ -182,12 +191,6 @@ public class AutoPingCron {
         pingMessage = getPingMessage(milliSinceLastTurnChange, spacer, pingMessage, realIdentity, pingNumber);
 
         pingPlayer(game, player, milliSinceLastTurnChange, spacer, pingMessage, pingNumber, realIdentity);
-
-        Game mapReference = GameManager.getGame("finreference");
-        if (mapReference != null) {
-            ButtonHelper.increasePingCounter(mapReference, player.getUserID());
-            GameSaveLoadManager.saveGame(mapReference, "Auto Ping");
-        }
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         game.setLastActivePlayerPing(new Date());
         GameSaveLoadManager.saveGame(game, "Auto Ping");

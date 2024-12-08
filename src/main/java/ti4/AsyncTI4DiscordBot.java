@@ -43,6 +43,7 @@ import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
 import ti4.listeners.AutoCompleteListener;
 import ti4.listeners.ButtonListener;
+import ti4.listeners.ChannelCreationListener;
 import ti4.listeners.MessageListener;
 import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
@@ -107,6 +108,7 @@ public class AsyncTI4DiscordBot {
 
         jda.addEventListener(
             new MessageListener(),
+            new ChannelCreationListener(),
             new SlashCommandListener(),
             ButtonListener.getInstance(),
             ModalListener.getInstance(),

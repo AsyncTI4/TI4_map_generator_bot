@@ -924,7 +924,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.SCORE_SO, Constants.DISCARD_SO, Constants.SHOW_SO, Constants.SHOW_SO_TO_ALL -> { // In hand, not safe to show Name/ID
+            case Constants.SCORE_SO, Constants.DISCARD_SO, Constants.SHOW_SO, Constants.SHOW_TO_ALL -> { // In hand, not safe to show Name/ID
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<Command.Choice> options = player.getSecretsUnscored().entrySet().stream()
                     .filter(entry -> (entry.getValue() + entry.getKey()).toLowerCase().contains(enteredValue))

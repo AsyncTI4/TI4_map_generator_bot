@@ -18,6 +18,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
+import ti4.settings.GlobalSettings;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -31,15 +32,17 @@ class CreateGameButtonHandler {
     private static void createGameChannels(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " pressed the [Create Game] button");
 
-        Game mapreference = GameManager.getGame("finreference");
-        if (mapreference != null && mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
+        boolean gameCreationAllowed = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, true);
+        if (!gameCreationAllowed) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Admins have temporarily turned off game creation, " +
+                "most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
             return;
         }
 
         if (isLockedFromCreatingGames(event)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "You created a game within the last 10 minutes and thus are being stopped from creating more until some time has passed. You can have someone else in the game press the button instead. ");
+                "You created a game within the last 10 minutes and thus are being stopped from creating more until some time " +
+                    "has passed. You can have someone else in the game press the button instead.");
             return;
         }
 
@@ -50,7 +53,8 @@ class CreateGameButtonHandler {
         Game game = GameManager.getGame(lastGame);
         if (game != null && game.getCustomName().equalsIgnoreCase(gameSillyName)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "The custom name of the last game is the same as the one for this game, so the bot suspects a double press occurred and is cancelling the creation of another game. ");
+                "The custom name of the last game is the same as the one for this game, so the bot suspects a double press " +
+                    "occurred and is cancelling the creation of another game.");
             return;
         }
         List<Member> members = new ArrayList<>();
@@ -81,8 +85,8 @@ class CreateGameButtonHandler {
         if (categoryChannel == null)
             categoryChannel = CreateGameService.createNewCategory(categoryChannelName);
         if (categoryChannel == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not automatically find a category that begins with **" + categoryChannelName
-                + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
+            MessageHelper.sendMessageToEventChannel(event, "Could not automatically find a category that begins with **" +
+                categoryChannelName + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
             return;
         }
         event.getMessage().delete().queue();
