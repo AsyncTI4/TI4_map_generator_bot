@@ -33,7 +33,7 @@ class CreateGameButtonHandler {
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " pressed the [Create Game] button");
 
         boolean gameCreationAllowed = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, true);
-        if (gameCreationAllowed) {
+        if (!gameCreationAllowed) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Admins have temporarily turned off game creation, " +
                 "most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
             return;
