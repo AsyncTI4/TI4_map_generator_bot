@@ -195,8 +195,7 @@ public class AsyncTI4DiscordBot {
         // LOAD DATA
         BotLogger.logWithTimestamp(" LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
-        // TODO: Jazz reenable this
-        // ApplicationEmojiService.uploadNewEmojis();
+        ApplicationEmojiService.uploadNewEmojis();
         TileHelper.init();
         PositionMapper.init();
         Mapper.init();
