@@ -19,6 +19,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.StrategyCardModel;
@@ -40,17 +41,26 @@ public class AutoPingCron {
     }
 
     private static void autoPingGames() {
-        var games = GameManager.getGameNameToGame().values().stream().filter(not(Game::isHasEnded)).toList();
-        for (Game game : games) {
-            handleTechSummary(game); // TODO, move this?
-            checkAllSaboWindows(game);
-            if (game.isFastSCFollowMode()) {
-                handleFastScFollowMode(game);
+        try {
+            var games = GameManager.getGameNameToGame().values().stream().filter(not(Game::isHasEnded)).toList();
+            for (Game game : games) {
+                autoPingGame(game);
             }
-            Player player = game.getActivePlayer();
-            if (game.getAutoPingStatus() && !game.isTemporaryPingDisable()) {
-                handleAutoPing(game, player);
-            }
+        } catch (Exception e) {
+            BotLogger.log("**AutoPingCron failed.**", e);
+        }
+        BotLogger.log("Ran AutoPingCron.");
+    }
+
+    private static void autoPingGame(Game game) {
+        handleTechSummary(game); // TODO, move this?
+        checkAllSaboWindows(game);
+        if (game.isFastSCFollowMode()) {
+            handleFastScFollowMode(game);
+        }
+        Player player = game.getActivePlayer();
+        if (game.getAutoPingStatus() && !game.isTemporaryPingDisable()) {
+            handleAutoPing(game, player);
         }
     }
 

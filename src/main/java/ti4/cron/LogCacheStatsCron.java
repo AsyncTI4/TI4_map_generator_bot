@@ -10,6 +10,7 @@ import lombok.experimental.UtilityClass;
 import ti4.AsyncTI4DiscordBot;
 import ti4.cache.CacheManager;
 import ti4.helpers.ToStringHelper;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.settings.GlobalSettings;
 
@@ -24,10 +25,15 @@ public class LogCacheStatsCron {
     }
 
     private static void logCacheStats() {
-        var cacheStats = CacheManager.getNamesToCaches().stream()
+        try {
+            var cacheStats = CacheManager.getNamesToCaches().stream()
                 .map(entry -> cacheStatsToString(entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining("\n\n"));
-        MessageHelper.sendMessageToPrimaryBotLogChannel("```\n" + cacheStats + "\n```");
+            MessageHelper.sendMessageToPrimaryBotLogChannel("```\n" + cacheStats + "\n```");
+        } catch (Exception e) {
+            BotLogger.log("**LogCacheStatsCron failed.**", e);
+        }
+        BotLogger.log("Ran LogCacheStatsCron.");
     }
 
     private static String cacheStatsToString(String name, Cache<?, ?> cache) {
