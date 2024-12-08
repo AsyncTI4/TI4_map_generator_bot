@@ -33,7 +33,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
-import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -106,8 +105,6 @@ import ti4.service.unit.RemoveUnitService;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelper {
-
-    public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
 
     public static String getButtonRepresentation(Button button) {
         String id = button.getId();
@@ -6050,23 +6047,6 @@ public class ButtonHelper {
             return;
         }
 
-        Guild guild = event.getGuild();
-        if (guild == null) {
-            event.getChannel().sendMessage("Could not find server Emojis").queue();
-            return;
-        }
-        Map<String, Emoji> emojiMap = emoteMap.get(guild);
-        List<RichCustomEmoji> emojis = guild.getEmojis();
-        if (emojiMap != null && emojiMap.size() != emojis.size()) {
-            emojiMap.clear();
-        }
-        if (emojiMap == null || emojiMap.isEmpty()) {
-            emojiMap = new HashMap<>();
-            for (Emoji emoji : emojis) {
-                emojiMap.put(emoji.getName().toLowerCase(), emoji);
-            }
-        }
-
         Message mainMessage = event.getInteraction().getMessage();
         Emoji emojiToUse = Helper.getPlayerEmoji(game, player, mainMessage);
         String messageId = mainMessage.getId();
@@ -6114,22 +6094,6 @@ public class ButtonHelper {
     }
 
     public static void addReaction(Player player, boolean skipReaction, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
-        Guild guild = game.getGuild();
-        if (guild == null)
-            return;
-
-        Map<String, Emoji> emojiMap = emoteMap.get(guild);
-        List<RichCustomEmoji> emojis = guild.getEmojis();
-        if (emojiMap != null && emojiMap.size() != emojis.size()) {
-            emojiMap.clear();
-        }
-        if (emojiMap == null || emojiMap.isEmpty()) {
-            emojiMap = new HashMap<>();
-            for (Emoji emoji : emojis) {
-                emojiMap.put(emoji.getName().toLowerCase(), emoji);
-            }
-        }
-
         try {
             game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
                 Emoji emojiToUse = Helper.getPlayerEmoji(game, player, mainMessage);
