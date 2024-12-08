@@ -103,6 +103,9 @@ public class AutoCompleteProvider {
 
         // GENERIC HANDLING OF OPTIONS
         handleOptions(event, optionName, subCommandName, gameName);
+        if (!event.isAcknowledged()) {
+            event.replyChoices(Collections.emptyList()).queue();
+        }
     }
 
     private static void handleOptions(@NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName, String subcommandName, String gameName) {
