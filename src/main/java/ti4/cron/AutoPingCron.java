@@ -57,7 +57,7 @@ public class AutoPingCron {
     private static void autoPingGame(Game game) {
         try {
             handleTechSummary(game); // TODO, move this?
-            checkAllSaboWindows(game);
+            checkAllSaboWindows(game); // TODO, move this?
             if (game.isFastSCFollowMode()) {
                 handleFastScFollowMode(game);
             }
@@ -83,7 +83,7 @@ public class AutoPingCron {
                 for (String messageID : messageIDs) {
                     if (shouldPlayerLeaveAReact(player, game, messageID)) {
                         String message = game.isFowMode() ? "No Sabotage" : null;
-                        addReaction(player, false, false, message, null, messageID, game);
+                        addReaction(player, false, message, null, messageID, game);
                     }
                 }
             }
@@ -96,13 +96,13 @@ public class AutoPingCron {
                     if (!doesPlayerHaveAnyWhensOrAfters(player)
                         && !PlayerReactService.checkForASpecificPlayerReact(whensID, player, game)) {
                         String message = game.isFowMode() ? "No whens" : null;
-                        addReaction(player, false, false, message, null, whensID, game);
+                        addReaction(player, false, message, null, whensID, game);
                     }
                     String aftersID = game.getLatestAfterMsg();
                     if (!doesPlayerHaveAnyWhensOrAfters(player)
                         && !PlayerReactService.checkForASpecificPlayerReact(aftersID, player, game)) {
                         String message = game.isFowMode() ? "No afters" : null;
-                        addReaction(player, false, false, message, null, aftersID, game);
+                        addReaction(player, false, message, null, aftersID, game);
                     }
                 }
             }
@@ -275,7 +275,7 @@ public class AutoPingCron {
                     player.addFollowedSC(sc);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
                     String messageID = game.getStoredValue("scPlayMsgID" + sc);
-                    addReaction(player, false, true, "Not following", "", messageID, game);
+                    addReaction(player, true, "Not following", "", messageID, game);
 
                     StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
                     if (scModel != null && scModel.usesAutomationForSCID("pok8imperial")) {
@@ -546,7 +546,7 @@ public class AutoPingCron {
         return false;
     }
 
-    private static void addReaction(Player player, boolean skipReaction, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
+    private static void addReaction(Player player, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
         Guild guild = game.getGuild();
         if (guild == null)
             return;
@@ -568,20 +568,18 @@ public class AutoPingCron {
                 Emoji emojiToUse = Helper.getPlayerEmoji(game, player, mainMessage);
                 String messageId = mainMessage.getId();
 
-                if (!skipReaction) {
-                    game.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
-                    if (game.getStoredValue(messageId) != null) {
-                        if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-                            game.setStoredValue(messageId,
-                                game.getStoredValue(messageId) + "_" + player.getFaction());
-                        }
-                    } else {
-                        game.setStoredValue(messageId, player.getFaction());
+                game.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
+                if (game.getStoredValue(messageId) != null) {
+                    if (!game.getStoredValue(messageId).contains(player.getFaction())) {
+                        game.setStoredValue(messageId,
+                            game.getStoredValue(messageId) + "_" + player.getFaction());
                     }
-                    checkForAllReactions(messageId, game);
-                    if (message == null || message.isEmpty()) {
-                        return;
-                    }
+                } else {
+                    game.setStoredValue(messageId, player.getFaction());
+                }
+                checkForAllReactions(messageId, game);
+                if (message == null || message.isEmpty()) {
+                    return;
                 }
 
                 String text = player.getRepresentation() + " " + message;
