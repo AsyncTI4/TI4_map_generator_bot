@@ -45,8 +45,7 @@ public class MedianTurnTimeService {
             .map(e -> Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList())))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("## __**Median Turn Time:**__\n");
+        StringBuilder sb = new StringBuilder("## __**Median Turn Time:**__\n");
 
         int index = 1;
         int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
@@ -80,8 +79,9 @@ public class MedianTurnTimeService {
                                                     Map<String, Set<Long>> playerAverageTurnTimes) {
         for (Player player : game.getRealPlayers()) {
             int totalTurns = player.getNumberTurns();
-            if (totalTurns == 0) continue;
             long totalTurnTime = player.getTotalTurnTime();
+            if (totalTurns == 0 || totalTurnTime == 0) continue;
+
             Map.Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
             Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
             playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {

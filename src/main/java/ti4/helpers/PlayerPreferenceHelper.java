@@ -26,7 +26,7 @@ public class PlayerPreferenceHelper {
         buttons.add(Buttons.gray("playerPref_autoNoWhensAfters", "Change Auto No Whens/Afters React", Emojis.Agenda));
         buttons.add(Buttons.OFFER_PING_OPTIONS_BUTTON);
         buttons.add(Buttons.gray("playerPref_directHitManagement", "Tell The Bot What Units Not To Risk Direct Hit On"));
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " Choose the thing you wish to change", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " Choose the thing you wish to change", buttons);
     }
 
     @ButtonHandler("playerPref_")
@@ -41,7 +41,7 @@ public class PlayerPreferenceHelper {
                     + " Choose whether you want your tactical action buttons to be distance based (offer you 0 tiles away initially, then 1, 2, 3 tiles away upon more button presses) or ring based (choose what ring the active system is in). Default is ring based. This will apply to all your games";
                 buttons.add(Buttons.green("playerPrefDecision_true_distance", "Make it distance based"));
                 buttons.add(Buttons.green("playerPrefDecision_false_distance", "Make it ring based"));
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
             case "autoNoWhensAfters" -> {
                 List<Button> buttons = new ArrayList<>();
@@ -49,7 +49,7 @@ public class PlayerPreferenceHelper {
                     + " Choose whether you want the game to auto react no whens/afters after a random amount of time for you when you have no whens/afters. Default is off. This will only apply to this game. If you have any whens or afters or related when/after abilities, it will not do anything. ";
                 buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
                 buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
             case "directHitManagement" -> offerDirectHitManagementOptions(game, player);
         }

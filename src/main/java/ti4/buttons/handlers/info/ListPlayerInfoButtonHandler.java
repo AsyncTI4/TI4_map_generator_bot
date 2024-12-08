@@ -41,7 +41,7 @@ class ListPlayerInfoButtonHandler {
         buttons.add(Buttons.green("offerInfoButtonStep2_ftech", "Faction Tech"));
         buttons.add(Buttons.REFRESH_INFO);
         String msg = "Select the category you'd like more info on. You will then be able to select either a specific faction's info you want, or every factions";
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
 
     @ButtonHandler("offerInfoButtonStep2_")
@@ -62,7 +62,7 @@ class ListPlayerInfoButtonHandler {
             }
             buttons.add(Buttons.green("offerInfoButtonStep3_" + category + "_all", "All Factions"));
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
 
     @ButtonHandler("offerInfoButtonStep3_")

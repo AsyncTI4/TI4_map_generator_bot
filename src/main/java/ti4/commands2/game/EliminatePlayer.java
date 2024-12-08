@@ -140,7 +140,7 @@ class EliminatePlayer extends GameStateSubcommand {
             player.setEliminated(true);
             player.setDummy(true);
             if (!game.isFowMode()) {
-                Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game);
+                Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game.getName());
             }
         }
 

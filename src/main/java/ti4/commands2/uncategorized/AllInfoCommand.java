@@ -42,7 +42,7 @@ public class AllInfoCommand extends GameStateCommand {
         AbilityInfoService.sendAbilityInfo(game, player);
         UnitInfoService.sendUnitInfo(player, false);
         LeaderInfoService.sendLeadersInfo(game, player);
-        TechInfoService.sendTechInfo(game, player);
+        TechInfoService.sendTechInfo(player);
         RelicInfoService.sendRelicInfo(player);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         ActionCardHelper.sendActionCardInfo(game, player);

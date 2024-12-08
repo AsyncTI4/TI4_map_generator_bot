@@ -37,7 +37,7 @@ public class DiscardSecretService {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.gray("drawSpecificSO_" + soIDString, "Retrieve " + Mapper.getSecretObjective(soIDString).getName()));
             buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
 
         handleSecretObjectiveDrawOrder(game, player);
