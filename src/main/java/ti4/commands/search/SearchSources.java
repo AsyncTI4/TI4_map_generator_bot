@@ -1,6 +1,8 @@
 package ti4.commands2.search;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +21,12 @@ import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
+import ti4.model.AbilityModel;
+import ti4.model.ActionCardModel;
+import ti4.model.EmbeddableModel;
+import ti4.model.ModelInterface;
 import ti4.model.Source.ComponentSource;
+import ti4.model.SourceModel;
 
 /* When no arguments list all sources appearing in all of data (related to game only))
  * First argument is Source, and if completed, lists all component types with the number for this source
@@ -39,11 +46,14 @@ class SearchSources extends Subcommand {
         );
     }
 
-    /*  If CheckSources = True Then get all sources from data jsons & all sources from sources.json
+    /*
+        Needs (all sources from data jsons) & (all sources from sources.json)
+        If CheckSources = True Then
             Show (Total nb sources) & (Total nb elements), show list of each (source) with (nb of elements) & (if is only in 1 of the 2 source types)
         Else Then
             Show embeds of each (source) with (data from sources.json) & (component types which have this source)
-            Use Source & Canal as filters  */
+            Use Source & Canal as filters
+    */
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         
@@ -58,82 +68,228 @@ class SearchSources extends Subcommand {
         }
 
         if (Mapper.isValidSource(sourceString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getSource(sourceString).getRepresentationEmbed()).queue();
+            SourceModel model = Mapper.getSource(sourceString);
+            event.getChannel().sendMessageEmbeds(model.getRepresentationEmbed(getOccurrencesByCompType(model.getSource()))).queue(); // change getRepEmbed function here as well
             return;
         }
-        
-        // TO DO: add filter for canal
-        List<MessageEmbed> messageEmbeds = Mapper.getSources().values().stream()
+
+        List<MessageEmbed> messageEmbeds2 = Mapper.getSources().values().stream()
             .filter(model -> model.search(sourceString, source))
             .filter(model -> canalBool == null || canalBool == model.isCanalOfficial())
-            .map(model -> model.getRepresentationEmbed())
+            .map(model -> model.getRepresentationEmbed(getOccurrencesByCompType(model.getSource())))
             .toList();
-        SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
+        SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds2);
     }
 
+
+    private HashMap<String, Integer> getOccurrencesByCompType(ComponentSource compSource) {
+        HashMap<String, Integer> occurrences = new HashMap<>();
+        occurrences.put("Abilities", getAbilitiesSources(compSource).size());
+        occurrences.put("Action Cards", getActionCardsSources(compSource).size());
+        occurrences.put("Agendas", getAgendasSources(compSource).size());
+        occurrences.put("Attachments", getAttachmentsSources(compSource).size());
+        //occurrences.put("Colors", get...(compSource).size());
+        //occurrences.put("Combat Modifiers", get...(compSource).size());
+        occurrences.put("Decks", getDecksSources(compSource).size());
+        occurrences.put("Events", getEventsSources(compSource).size());
+        occurrences.put("Explores", getExploresSources(compSource).size());
+        occurrences.put("Factions", getFactionsSources(compSource).size());
+        occurrences.put("Draft Errata", getDraftErratasSources(compSource).size());
+        occurrences.put("Generic Cards", getGenericCardsSources(compSource).size());
+        occurrences.put("Leaders", getLeadersSources(compSource).size());
+        //occurrences.put("Map Templates", get...(compSource).size());
+        occurrences.put("Promissory Notes", getPromissoryNotesSources(compSource).size());
+        occurrences.put("Public Objectives", getPublicObjectivesSources(compSource).size());
+        occurrences.put("Relics", getRelicsSources(compSource).size());
+        occurrences.put("Secret Objectives", getSecretObjectivesSources(compSource).size());
+        occurrences.put("Strategy Card Sets", getStrategyCardSetsSources(compSource).size());
+        occurrences.put("Strategy Cards", getStrategyCardsSources(compSource).size());
+        occurrences.put("Technologies", getTechnologiesSources(compSource).size());
+        occurrences.put("Tokens", getTokensSources(compSource).size());
+        occurrences.put("Units", getUnitsSources(compSource).size());
+        occurrences.put("Planets", getPlanetsSources(compSource).size());
+        occurrences.put("Tiles", getTilesSources(compSource).size());
+        return occurrences;
+    }
+
+    // ##################################################
+    // Transfer all this section to Mapper.java?
+    private List<String> getAbilitiesSources(ComponentSource CompSource) {
+        return Mapper.getAbilities().values().stream() // Collection<AbilityModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getActionCardsSources(ComponentSource CompSource) {
+        return Mapper.getActionCards().values().stream() // Collection<ActionCardModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getAgendasSources(ComponentSource CompSource) {
+        return Mapper.getAgendas().values().stream() // Collection<AgendaModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getAttachmentsSources(ComponentSource CompSource) {
+        return Mapper.getAttachments().stream() // List<AttachmentModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    // colors not sourced
+    // combat_modifiers not sourced
+    private List<String> getDecksSources(ComponentSource CompSource) {
+        return Mapper.getDecks().values().stream() // Collection<DeckModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getEventsSources(ComponentSource CompSource) {
+        return Mapper.getEvents().values().stream() // Collection<EventModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getExploresSources(ComponentSource CompSource) {
+        return Mapper.getExplores().values().stream() // Collection<ExploreModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getFactionsSources(ComponentSource CompSource) {
+        return Mapper.getFactions().stream() // List<FactionModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getDraftErratasSources(ComponentSource CompSource) {
+        return Mapper.getFrankenErrata().values().stream() // Collection<DraftErrataModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource)) // searchSource not implemented
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getGenericCardsSources(ComponentSource CompSource) {
+        return Mapper.getGenericCards().values().stream() // Collection<GenericCardModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getLeadersSources(ComponentSource CompSource) {
+        return Mapper.getLeaders().values().stream() // Collection<LeaderModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    // map_templates not sourced
+    private List<String> getPromissoryNotesSources(ComponentSource CompSource) {
+        return Mapper.getPromissoryNotes().values().stream() // Collection<PromissoryNoteModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getPublicObjectivesSources(ComponentSource CompSource) {
+        return Mapper.getPublicObjectives().values().stream() // Collection<PublicObjectiveModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getRelicsSources(ComponentSource CompSource) {
+        return Mapper.getRelics().values().stream() // Collection<RelicModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getSecretObjectivesSources(ComponentSource CompSource) {
+        return Mapper.getSecretObjectives().values().stream() // Collection<SecretObjectiveModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getStrategyCardSetsSources(ComponentSource CompSource) {
+        return Mapper.getStrategyCardSets().values().stream() // Collection<StrategyCardSetModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource)) // searchSource not implemented
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getStrategyCardsSources(ComponentSource CompSource) {
+        return Mapper.getStrategyCards().values().stream() // Collection<StrategyCardModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getTechnologiesSources(ComponentSource CompSource) {
+        return Mapper.getTechs().values().stream() // Collection<TechnologyModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getTokensSources(ComponentSource CompSource) {
+        return Mapper.getTokens2().stream() // List<TokenModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource)) // searchSource not implemented
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getUnitsSources(ComponentSource CompSource) {
+        return Mapper.getUnits().values().stream() // Collection<UnitModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getPlanetsSources(ComponentSource CompSource) {
+        return TileHelper.getAllPlanetModels().stream() // Collection<PlanetModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    private List<String> getTilesSources(ComponentSource CompSource) {
+        return TileHelper.getAllTileModels().stream() // Collection<TileModel> -> Stream<>
+            .filter(model -> model.searchSource(CompSource))
+            .map(model -> model.getSource().toString()).toList();
+    }
+    // ##################################################
+
     private void checkSources(SlashCommandInteractionEvent event) {
-        Stream<String> abilitySources = Mapper.getAbilities().values() // Collection<AbilityModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> actioncardSources = Mapper.getActionCards().values() // Collection<ActionCardModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> agendaSources = Mapper.getAgendas().values() // Collection<AgendaModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> attachmentSources = Mapper.getAttachments() // List<AttachmentModel>
-            .stream().map(model -> model.getSource().toString());
+        List<String> abilitySources = getAbilitiesSources(null);
+        List<String> actioncardSources = getActionCardsSources(null);
+        List<String> agendaSources = getAgendasSources(null);
+        List<String> attachmentSources = getAttachmentsSources(null);
         // colors not sourced
         // combat_modifiers not sourced
-        Stream<String> deckSources = Mapper.getDecks().values() // Collection<DeckModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> eventSources = Mapper.getEvents().values() // Collection<DeckModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> exploreSources = Mapper.getExplores().values() // Collection<ExploreModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> factionSources = Mapper.getFactions() // List<FactionModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> frankenerrataSources = Mapper.getFrankenErrata().values() // Collection<DraftErrataModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> genericcardSources = Mapper.getGenericCards().values() // Collection<GenericCardModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> leaderSources = Mapper.getLeaders().values() // Collection<LeaderModel>
-            .stream().map(model -> model.getSource().toString());
+        List<String> deckSources = getDecksSources(null);
+        List<String> eventSources = getEventsSources(null);
+        List<String> exploreSources = getExploresSources(null);
+        List<String> factionSources = getFactionsSources(null);
+        List<String> drafterrataSources = getDraftErratasSources(null);
+        List<String> genericcardSources = getGenericCardsSources(null);
+        List<String> leaderSources = getLeadersSources(null);
         // map_templates not sourced
-        Stream<String> promissorynoteSources = Mapper.getPromissoryNotes().values() // Collection<PromissoryNoteModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> publicobjectiveSources = Mapper.getPublicObjectives().values() // Collection<PublicObjectiveModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> relicSources = Mapper.getRelics().values() // Collection<RelicModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> secretobjectiveSources = Mapper.getSecretObjectives().values() // Collection<SecretObjectiveModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> strategycardsetSources = Mapper.getStrategyCardSets().values() // Collection<StrategyCardSetModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> strategycardSources = Mapper.getStrategyCards().values() // Collection<StrategyCardModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> technologySources = Mapper.getTechs().values() // Collection<TechnologyModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> tokenSources = Mapper.getTokens2() // List<TokenModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> unitSources = Mapper.getUnits().values() // Collection<UnitModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> planetSources = TileHelper.getAllPlanetModels() // Collection<PlanetModel>
-            .stream().map(model -> model.getSource().toString());
-        Stream<String> tileSources = TileHelper.getAllTileModels() // Collection<TileModel>
-            .stream().map(model -> model.getSource().toString());
+        List<String> promissorynoteSources = getPromissoryNotesSources(null);
+        List<String> publicobjectiveSources = getPublicObjectivesSources(null);
+        List<String> relicSources = getRelicsSources(null);
+        List<String> secretobjectiveSources = getSecretObjectivesSources(null);
+        List<String> strategycardsetSources = getStrategyCardSetsSources(null);
+        List<String> strategycardSources = getStrategyCardsSources(null);
+        List<String> technologySources = getTechnologiesSources(null);
+        List<String> tokenSources = getTokensSources(null);
+        List<String> unitSources = getUnitsSources(null);
+        List<String> planetSources = getPlanetsSources(null);
+        List<String> tileSources = getTilesSources(null);
+
+        List<String> sources = Mapper.getSources().values().stream()
+            .map(model -> model.getSource().toString()).toList();
 
         List<String> componentSources = Stream.of(abilitySources, actioncardSources, agendaSources, attachmentSources,
-                deckSources, eventSources, exploreSources, factionSources, frankenerrataSources, genericcardSources,
+                deckSources, eventSources, exploreSources, factionSources, drafterrataSources, genericcardSources,
                 leaderSources, promissorynoteSources, publicobjectiveSources, relicSources, secretobjectiveSources,
                 strategycardsetSources, strategycardSources, technologySources, tokenSources, unitSources,
                 planetSources, tileSources)
-            .flatMap(i -> i).toList();
+            .flatMap(i -> i.stream()).toList();
+
         Map<String, Long> uniqueComponentSources = componentSources.stream().collect(Collectors.groupingBy(e -> e, Collectors.counting())) // Removes duplicates and counts occurrences
             .entrySet().stream().sorted(Map.Entry.comparingByKey()).sorted(Collections.reverseOrder(Map.Entry.comparingByValue())) // Sorts by values DESC then untie with key ASC
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new)); // Converts back to Map
-        String uniqueComponentSourcesTextList = uniqueComponentSources.size() + " sources: "+ uniqueComponentSources.values().stream().mapToLong(d -> d).sum() +" elements\r\n"
-            + "- " + Joiner.on("\r\n- ").withKeyValueSeparator(": ").join(uniqueComponentSources); // added guava class for "Joiner"
+        
+        StringBuilder uniqueComponentSourcesTextList = new StringBuilder();
+
+        uniqueComponentSourcesTextList.append("**/resources/ JSONs content:**\n");
+        uniqueComponentSourcesTextList.append(uniqueComponentSources.size()).append(" sources: ").append(uniqueComponentSources.values().stream().mapToLong(d -> d).sum()).append(" elements\r\n");
+        uniqueComponentSourcesTextList.append("- ").append(Joiner.on("\r\n- ").withKeyValueSeparator(": ").join(uniqueComponentSources)); // added guava class for "Joiner"
+        
+        uniqueComponentSourcesTextList.append("\n\n");
+        uniqueComponentSourcesTextList.append("**Entries missing from sources.json:**");
+        for (int i = 0; i < sources.size(); i++) {
+            if (!uniqueComponentSources.containsKey(sources.get(i))) uniqueComponentSourcesTextList.append("\n- ").append(sources.get(i));
+        }
+
+        uniqueComponentSourcesTextList.append("\n\n");
+        uniqueComponentSourcesTextList.append("**Implentation missing from /resources/ JSONs content:**");
+        for (Map.Entry<String, Long> entry : uniqueComponentSources.entrySet()) {
+            if (!sources.contains(entry.getKey())) uniqueComponentSourcesTextList.append("\n- ").append(entry.getKey());
+        }
 
         //MessageHelper.sendMessageToChannel(event.getChannel(), uniqueComponentSourcesTextList);
-        MessageHelper.sendMessageToThread(event.getChannel(), "Sources check", uniqueComponentSourcesTextList);
+        MessageHelper.sendMessageToThread(event.getChannel(), "Sources check", uniqueComponentSourcesTextList.toString());
     }
 
 }
