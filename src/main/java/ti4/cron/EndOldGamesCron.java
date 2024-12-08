@@ -34,12 +34,11 @@ public class EndOldGamesCron {
     }
 
     private void endIfOld(Game game) {
-        LocalDate currentDate = LocalDate.now();
         LocalDate lastModifiedDate = Instant.ofEpochMilli(game.getLastModifiedDate())
             .atZone(ZoneId.systemDefault())
             .toLocalDate();
 
-        LocalDate oldestLastModifiedDateBeforeEnding = currentDate.minus(AUTOMATIC_GAME_END_INACTIVITY_THRESHOLD);
+        LocalDate oldestLastModifiedDateBeforeEnding = LocalDate.now().minus(AUTOMATIC_GAME_END_INACTIVITY_THRESHOLD);
 
         if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
             BotLogger.log("Game: " + game.getName() + " has not been modified since ~" + lastModifiedDate +
