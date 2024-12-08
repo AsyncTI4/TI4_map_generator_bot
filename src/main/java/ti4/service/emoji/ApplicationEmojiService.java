@@ -27,6 +27,7 @@ public class ApplicationEmojiService {
     private static final Map<String, CachedEmoji> emojis = new HashMap<>();
     private static final Map<String, EmojiFileData> emojiFiles = new HashMap<>();
 
+    private static boolean spoofing = false;
     private static boolean cacheInitialized = false;
     private static boolean filesInitialized = false;
 
@@ -68,6 +69,7 @@ public class ApplicationEmojiService {
         for (TI4Emoji e : ti4Emojis) {
             emojis.put(e.name(), new CachedEmoji(e.name(), "<id>", fallbackEmoji, 0));
         }
+        spoofing = true;
         cacheInitialized = true;
         initAll();
     }
@@ -234,6 +236,7 @@ public class ApplicationEmojiService {
     }
 
     private static void pushEmojiListToCache(boolean isHealthy) {
+        if (spoofing) return;
         if (!isHealthy) {
             BotLogger.log(Constants.jazzPing() + " - Uploading failed, reinitializing cache from Discord.");
             resetCacheFromDiscord();
@@ -243,6 +246,7 @@ public class ApplicationEmojiService {
     }
 
     private static void pushEmojiListToCache() {
+        if (spoofing) return;
         List<CachedEmoji> allCached = new ArrayList<>(emojis.values());
         ApplicationEmojiCacheService.saveCachedEmojis(allCached);
     }
