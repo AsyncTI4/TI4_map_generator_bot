@@ -1,28 +1,28 @@
 package ti4.service.unit;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import ti4.helpers.Units;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Space;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.testUtils.BaseTi4Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class RemoveUnitServiceTest {
+class RemoveUnitServiceTest extends BaseTi4Test {
 
     @Test
     void removeUnits() {
-        GenericInteractionCreateEvent event = Mockito.mock(GenericInteractionCreateEvent.class);
+        beforeAll();
+
         var unitKey = new Units.UnitKey(Units.UnitType.Mech, "black");
         Tile tile = createTile("ixth", unitKey, 4);
         Game game = createGame(tile);
         ParsedUnit parsedUnit = createParsedUnit("ixth", unitKey, 4);
 
-        RemoveUnitService.removeUnit(event, tile, game, parsedUnit);
+        RemoveUnitService.removeUnit(null, tile, game, parsedUnit);
 
         assertThat(tile.getPlanetUnitHolders().getFirst().getUnits().get(unitKey)).isNull();
     }

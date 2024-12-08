@@ -31,6 +31,7 @@ import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.OldUndoFileCleanupCron;
+import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.UploadStatsCron;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.FoWHelper;
@@ -54,6 +55,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.processors.ButtonProcessor;
 import ti4.selections.SelectionManager;
+import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
@@ -193,6 +195,8 @@ public class AsyncTI4DiscordBot {
         // LOAD DATA
         BotLogger.logWithTimestamp(" LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
+        // TODO: Jazz reenable this
+        // ApplicationEmojiService.uploadNewEmojis();
         TileHelper.init();
         PositionMapper.init();
         Mapper.init();
@@ -222,6 +226,7 @@ public class AsyncTI4DiscordBot {
 
         // START CRONS
         AutoPingCron.register();
+        ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
         UploadStatsCron.register();
         OldUndoFileCleanupCron.register();

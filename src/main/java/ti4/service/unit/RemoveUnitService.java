@@ -59,9 +59,7 @@ public class RemoveUnitService {
             MessageHelper.replyToMessage(event, "Did not find enough units to remove, " + toRemoveCount + " missing.");
         }
 
-        tile.getUnitHolders().values().forEach(unitHolder ->
-            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, unitHolder.getName(), game)
-        );
+        tile.getUnitHolders().values().forEach(unitHolder -> AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, unitHolder.getName(), game));
     }
 
     private static int getNumberOfDamagedUnitsToRemove(UnitHolder unitHolder, Units.UnitKey unitKey, boolean prioritizeDamagedUnits, int oldUnitCount, int unitsRemoved) {
@@ -91,7 +89,7 @@ public class RemoveUnitService {
     }
 
     private static void handleEmptyUnitHolders(GenericInteractionCreateEvent event, Tile tile, ParsedUnit parsedUnit) {
-        if (event instanceof ButtonInteractionEvent) {
+        if (event != null && event instanceof ButtonInteractionEvent) {
             BotLogger.log(event.getId() + " found a null UnitHolder with the following info: " + tile.getRepresentation() + " " + parsedUnit.getLocation());
         } else {
             MessageHelper.replyToMessage(event, "Unable to determine where the units are being removed from.");

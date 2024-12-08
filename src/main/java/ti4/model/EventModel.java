@@ -125,7 +125,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
 
         StringBuilder sb = new StringBuilder();
         if (numericalID != null) sb.append("(").append(numericalID).append(") ");
-        sb.append(Emojis.EventCard).append("__**").append(getName()).append("**__").append(getSource().emoji());
+        sb.append("__**").append(getName()).append("**__").append(getSource().emoji());
         eb.setTitle(sb.toString());
 
         eb.setColor(Color.black);

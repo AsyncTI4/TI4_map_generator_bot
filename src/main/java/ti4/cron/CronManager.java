@@ -16,7 +16,9 @@ public class CronManager {
 
     public static void register(Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
         TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
-        SCHEDULER.scheduleAtFixedRate(timedRunnable, initialDelay, period, unit);
+        if (period > 0) {
+            SCHEDULER.scheduleAtFixedRate(timedRunnable, initialDelay, period, unit);
+        }
     }
 
     public static void register(Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId) {
