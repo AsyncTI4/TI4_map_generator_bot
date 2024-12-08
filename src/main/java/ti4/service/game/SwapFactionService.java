@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -42,7 +41,6 @@ public class SwapFactionService {
         swapperPlayer.setUserID(removedPlayer.getUserID());
         player.setUserName(addedUser.getName());
         player.setUserID(addedUser.getId());
-        GameManager.save(game, "Swap faction");
 
         String message = "Users have swapped factions:\n" + "> **Before:** " + swapperPlayer.getRepresentation() + " & " +
             removedPlayer.getRepresentation() + "\n" + "> **After:** " + swapperPlayer.getRepresentation() + " & " +

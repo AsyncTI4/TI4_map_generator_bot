@@ -643,7 +643,7 @@ public class CreateGameService {
         List<Button> homebrewButtons = new ArrayList<>();
         homebrewButtons.add(Buttons.green("getHomebrewButtons", "Yes, use Homebrew"));
         homebrewButtons.add(Buttons.red("deleteButtons", "No Homebrew"));
-        MessageHelper.sendMessageToChannelWithButtons(channel, "If you plan to have a supported homebrew mode in this game, please indicate " +
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, "If you plan to have a supported homebrew mode in this game, please indicate " +
             "so with these buttons. 4/4/4 is a type of homebrew btw", homebrewButtons);
     }
 }

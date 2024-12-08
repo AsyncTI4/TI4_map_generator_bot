@@ -4967,7 +4967,7 @@ public class ButtonHelper {
         }
     }
 
-    public static void cloneGame(GenericInteractionCreateEvent event, Game game) {
+    public static void cloneGame(Game game) {
         String gameName = game.getName();
         String cloneName = gameName + "clone";
         Guild guild = game.getGuild();
@@ -6064,64 +6064,6 @@ public class ButtonHelper {
         }
 
         MessageHelper.sendMessageToChannel(Helper.getThreadChannelIfExists(event), text);
-    }
-
-    public static void addReaction(Player player, boolean skipReaction, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
-        Guild guild = game.getGuild();
-        if (guild == null)
-            return;
-
-        Map<String, Emoji> emojiMap = emoteMap.get(guild);
-        List<RichCustomEmoji> emojis = guild.getEmojis();
-        if (emojiMap != null && emojiMap.size() != emojis.size()) {
-            emojiMap.clear();
-        }
-        if (emojiMap == null || emojiMap.isEmpty()) {
-            emojiMap = new HashMap<>();
-            for (Emoji emoji : emojis) {
-                emojiMap.put(emoji.getName().toLowerCase(), emoji);
-            }
-        }
-
-        try {
-            game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
-                Emoji emojiToUse = Helper.getPlayerEmoji(game, player, mainMessage);
-                String messageId = mainMessage.getId();
-
-                if (!skipReaction) {
-                    game.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
-                    if (game.getStoredValue(messageId) != null) {
-                        if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-                            game.setStoredValue(messageId,
-                                game.getStoredValue(messageId) + "_" + player.getFaction());
-                        }
-                    } else {
-                        game.setStoredValue(messageId, player.getFaction());
-                    }
-                    UnfiledButtonHandlers.checkForAllReactions(messageId, game);
-                    if (message == null || message.isEmpty()) {
-                        return;
-                    }
-                }
-
-                String text = player.getRepresentation() + " " + message;
-                if (game.isFowMode() && sendPublic) {
-                    text = message;
-                } else if (game.isFowMode()) {
-                    text = "(You) " + emojiToUse.getFormatted() + " " + message;
-                }
-
-                if (additionalMessage != null && !additionalMessage.isEmpty()) {
-                    text += game.getPing() + " " + additionalMessage;
-                }
-
-                if (game.isFowMode() && !sendPublic) {
-                    MessageHelper.sendPrivateMessageToPlayer(player, game, text);
-                }
-            }, BotLogger::catchRestError);
-        } catch (Throwable e) {
-            game.removeMessageIDForSabo(messageID);
-        }
     }
 
     public static Tile getTileOfPlanetWithNoTrait(Player player, Game game) {

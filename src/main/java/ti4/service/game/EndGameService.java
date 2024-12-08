@@ -32,7 +32,6 @@ import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.game.GameStatisticsService;
@@ -157,7 +156,6 @@ public class EndGameService {
         game.setEndedDate(System.currentTimeMillis());
         game.setAutoPing(false);
         game.setAutoPingSpacer(0);
-        GameManager.save(game, "End game");
 
         if (!game.isFowMode()) {
             PlayerTitleHelper.offerEveryoneTitlePossibilities(game);

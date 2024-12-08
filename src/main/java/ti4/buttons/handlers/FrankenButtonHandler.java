@@ -15,7 +15,6 @@ import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -142,14 +141,12 @@ class FrankenButtonHandler {
                     player.getCurrentDraftBag().Contents.addAll(player.getDraftQueue().Contents);
                     player.resetDraftQueue();
                     FrankenDraftBagService.showPlayerBag(game, player);
-                    GameManager.save(game, player.getUserName() + " reset their draft queue");
                     return;
                 }
                 case "confirm_draft" -> {
                     player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
                     player.resetDraftQueue();
                     draft.setPlayerReadyToPass(player, true);
-                    GameManager.save(game, player.getUserName() + " confirmed their draft picks");
 
                     // Clear out all existing messages
                     draft.findExistingBagChannel(player).getHistory().retrievePast(100).queue(m -> {
@@ -197,8 +194,6 @@ class FrankenButtonHandler {
         }
 
         FrankenDraftBagService.showPlayerBag(game, player);
-
-        GameManager.save(game, player.getUserName() + " did something related to Franken");
         event.getMessage().delete().queue();
     }
 }

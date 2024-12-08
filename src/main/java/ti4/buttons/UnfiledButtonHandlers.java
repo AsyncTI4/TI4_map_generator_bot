@@ -62,7 +62,6 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
@@ -1754,46 +1753,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (matchingFactionReactions >= numberOfPlayers) {
             respondAllPlayersReacted(event, game);
             game.removeStoredValue(messageId);
-
-        }
-    }
-
-    public static void checkForAllReactions(String messageId, Game game) {
-        int matchingFactionReactions = 0;
-        for (Player player : game.getRealPlayers()) {
-
-            if ((game.getStoredValue(messageId) != null
-                && game.getStoredValue(messageId).contains(player.getFaction()))) {
-                matchingFactionReactions++;
-            }
-        }
-        int numberOfPlayers = game.getRealPlayers().size();
-        if (matchingFactionReactions >= numberOfPlayers) {
-            game.getMainGameChannel().retrieveMessageById(messageId).queue(msg -> {
-                if (game.getLatestAfterMsg().equalsIgnoreCase(messageId)) {
-                    msg.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
-                    AgendaHelper.startTheVoting(game);
-                    GameManager.save(game, "Started Voting");
-                } else if (game.getLatestWhenMsg().equalsIgnoreCase(messageId)) {
-                    msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
-
-                } else {
-                    Matcher acToReact = Pattern.compile("Card\\s(.*?):").matcher(msg.getContentRaw());
-                    String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
-                    String faction = "bob_" + game.getStoredValue(messageId) + "_";
-                    faction = faction.split("_")[1];
-                    Player p2 = game.getPlayerFromColorOrFaction(faction);
-                    if (p2 != null && !game.isFowMode()) {
-                        msg2 = p2.getRepresentation() + " " + msg2;
-                    }
-                    msg.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
-                }
-            });
-
-            if (game.getMessageIDsForSabo().contains(messageId)) {
-                game.removeMessageIDForSabo(messageId);
-                GameManager.save(game, "No Sabo");
-            }
         }
     }
 

@@ -20,7 +20,7 @@ class CloneGame extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         if ("YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
-            ButtonHelper.cloneGame(event, game);
+            ButtonHelper.cloneGame(game);
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Please type YES.");
         }
