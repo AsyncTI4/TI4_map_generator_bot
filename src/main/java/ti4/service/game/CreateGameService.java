@@ -258,9 +258,7 @@ public class CreateGameService {
         buttons.add(Buttons.green("anonDeclare_Friendly", "Friendly"));
         buttons.add(Buttons.blue("anonDeclare_No Strong Preference", "No Strong Preference"));
         buttons.add(Buttons.red("anonDeclare_Aggressive", "Aggressive"));
-        game.setUndoButtonOffered(false);
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), aggressionMsg, buttons);
-        game.setUndoButtonOffered(true);
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(game.getActionsChannel(), aggressionMsg, buttons);
     }
 
     private static void introductionToActionsChannel(Game game) {
@@ -645,6 +643,7 @@ public class CreateGameService {
         List<Button> homebrewButtons = new ArrayList<>();
         homebrewButtons.add(Buttons.green("getHomebrewButtons", "Yes, use Homebrew"));
         homebrewButtons.add(Buttons.red("deleteButtons", "No Homebrew"));
-        MessageHelper.sendMessageToChannel(channel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons. 4/4/4 is a type of homebrew btw", homebrewButtons);
+        MessageHelper.sendMessageToChannelWithButtons(channel, "If you plan to have a supported homebrew mode in this game, please indicate " +
+            "so with these buttons. 4/4/4 is a type of homebrew btw", homebrewButtons);
     }
 }

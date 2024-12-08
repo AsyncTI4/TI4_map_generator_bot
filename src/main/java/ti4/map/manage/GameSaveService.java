@@ -378,8 +378,6 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.NOMAD_COIN + " " + game.isNomadCoin());
         writer.write(System.lineSeparator());
-        writer.write(Constants.UNDO_BUTTON + " " + game.isUndoButtonOffered());
-        writer.write(System.lineSeparator());
         writer.write(Constants.FAST_SC_FOLLOW + " " + game.isFastSCFollowMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.QUEUE_SO + " " + game.isQueueSO());

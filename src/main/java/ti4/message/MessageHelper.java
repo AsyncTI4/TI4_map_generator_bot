@@ -87,27 +87,21 @@ public class MessageHelper {
 		splitAndSent(messageText, channel, null, Collections.singletonList(button));
 	}
 
-	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons, boolean includeUndo) {
-		sendMessageToChannelWithEmbedsAndButtons(channel, messageText, null, buttons, includeUndo);
+	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
+		String gameName = GameNameService.getGameNameFromChannel(channel);
+		if (GameManager.isValid(gameName) && buttons instanceof ArrayList
+				&& !(channel instanceof ThreadChannel) && channel.getName().contains("actions")) {
+			buttons = addUndoButtonToList(buttons, gameName);
+		}
+		sendMessageToChannelWithEmbedsAndButtons(channel, messageText, null, buttons);
+	}
+
+	public static void sendMessageToChannelWithButtonsAndNoUndo(MessageChannel channel, String messageText, List<Button> buttons) {
+		sendMessageToChannelWithEmbedsAndButtons(channel, messageText, null, buttons);
 	}
 
 	public static void sendMessageToChannelWithEmbedsAndButtons(@Nonnull MessageChannel channel, @Nullable String messageText,
-																@Nullable List<MessageEmbed> embeds, @Nullable List<Button> buttons,
-																boolean includeUndo) {
-		if (messageText != null && messageText.contains("NO_UNDO")) {
-			messageText = messageText.replaceFirst("NO_UNDO", "");
-			splitAndSent(messageText, channel, embeds, buttons);
-			return;
-		}
-		// !messageText.contains("end of turn ability")
-		if (includeUndo) {
-			String gameName = GameNameService.getGameNameFromChannel(channel);
-			if (GameManager.isValid(gameName) && buttons instanceof ArrayList
-					&& !(channel instanceof ThreadChannel) && channel.getName().contains("actions")) {
-				buttons = addUndoButtonToList(buttons, gameName);
-			}
-		}
-
+																@Nullable List<MessageEmbed> embeds, @Nullable List<Button> buttons) {
 		splitAndSent(messageText, channel, embeds, buttons);
 	}
 

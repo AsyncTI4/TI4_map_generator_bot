@@ -1044,7 +1044,7 @@ public class Game extends GameProperties {
             if (player != null) {
                 player.setTg(player.getTg() + tradeGoodCount);
                 ButtonHelperAbilities.pillageCheck(player, this);
-                ButtonHelperAgents.resolveArtunoCheck(player, this, tradeGoodCount);
+                ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
                 tradeGoodCount = 0;
                 MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + tradeGoodCount + "TGs"
                     + " that would be placed on the SC " + sc + " have instead been given to the Kyro Hero player, as per Kyro Hero text");

@@ -698,12 +698,6 @@ class GameLoadService {
                         game.setNomadCoin(value);
                     } catch (Exception e) {}
                 }
-                case Constants.UNDO_BUTTON -> {
-                    try {
-                        boolean value = Boolean.parseBoolean(info);
-                        game.setUndoButtonOffered(value);
-                    } catch (Exception e) {}
-                }
                 case Constants.FAST_SC_FOLLOW -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);

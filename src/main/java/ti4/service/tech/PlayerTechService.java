@@ -130,7 +130,7 @@ public class PlayerTechService {
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "absol_dxa" -> { // Dacxive
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     "Use buttons to drop 2 infantry on a planet",
                     Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
                 deleteTheOneButtonIfButtonEvent(event);

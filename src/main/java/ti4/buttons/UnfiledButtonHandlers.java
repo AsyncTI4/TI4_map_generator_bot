@@ -113,7 +113,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (msg.contains("Ghemina")) {
             msg = msg + " to gain 1TG after winning the space combat";
             player.setTg(player.getTg() + 1);
-            ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+            ButtonHelperAgents.resolveArtunoCheck(player, 1);
             ButtonHelperAbilities.pillageCheck(player, game);
         }
         if (msg.contains("Lightning")) {
@@ -324,7 +324,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " TGs increased by 1 " + player.gainTG(1));
             ButtonHelperAbilities.pillageCheck(player, game);
-            ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+            ButtonHelperAgents.resolveArtunoCheck(player, 1);
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -365,7 +365,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     + " The bot may also auto react for you when you have no whens/afters, using the same interval. Default for this is off. This will only apply to this game. If you have any whens or afters or related when/after abilities, it will not do anything. ";
                 buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
                 buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
         }
         ButtonHelper.deleteMessage(event);
@@ -389,7 +389,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("shroudOfLithStart")
     public static void shroudOfLithStart(ButtonInteractionEvent event, Player player, Game game) {
         ButtonHelper.deleteTheOneButton(event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
             "Select up to 2 ships and 2 ground forces to place in the space area",
             ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, game));
     }
@@ -582,7 +582,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         boolean sendReact = true;
         if ("empy".equalsIgnoreCase(type)) {
             message += "a Watcher mech! The Watcher should be removed now by the owner.";
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 "Remove the watcher",
                 ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech"));
             ButtonHelper.deleteMessage(event);
@@ -662,8 +662,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getFactionEmoji()
                         + " may have the opportunity to gain a comm from their ancient knowledge ability due to exhausting a tech skip planet");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg,
-                    buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
         }
         List<ActionRow> actionRow2 = new ArrayList<>();
@@ -732,7 +731,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         buttons = new ArrayList<>();
         buttons.add(
             Buttons.green("cymiaeHeroStep1_" + (game.getRealPlayers().size()), "Resolve Cymiae Hero"));
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation() + " resolve hero after doing Autonetic Memory steps", buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -1596,8 +1595,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green("startRallyToTheCause", "Rally To The Cause"));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg,
-                        buttons2);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
 
                 }
             }
@@ -1657,7 +1655,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                         + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                         + "T'ro, the N'orr" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                         + " agent.";
-                    systemButtons2.addAll(ButtonHelperAgents.getSardakkAgentButtons(game, player));
+                    systemButtons2.addAll(ButtonHelperAgents.getSardakkAgentButtons(game));
                     systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                 }
@@ -2030,7 +2028,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 buttons.add(Buttons.green("pay1tgToAnnounceARetreat", "Pay 1TG"));
                 buttons.add(Buttons.red("deleteButtons", "I don't have to pay"));
                 String raiders = player.getRepresentation() + " reminder that your opponent has the cargo raiders ability, which means you might have to pay 1TG to announce a retreat if they choose.";
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), raiders, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), raiders, buttons);
             }
         }
     }
@@ -2218,7 +2216,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String message = player.getRepresentation() + " Click the names of up to 2 planets you wish to ready ";
         List<Button> buttons = Helper.getPlanetRefreshButtons(event, player, game);
         buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         AgendaHelper.revealAgenda(event, false, game, actionsChannel);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to ready 2 planets to the person who pressed the button");
     }
@@ -2330,7 +2328,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String playerRep = player.getFactionEmoji();
         String message = playerRep + " exhausted Mallice ability and gained 2TGs " + player.gainTG(2) + ".";
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 2);
+        ButtonHelperAgents.resolveArtunoCheck(player, 2);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         if (!game.isFowMode() && event.getMessageChannel() != game.getMainGameChannel()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
@@ -2343,7 +2341,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void gain1tgFromCommander(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
         String message = player.getRepresentation() + " Gained 1TG " + player.gainTG(1) + " from their commander";
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+        ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(mainGameChannel, message);
         ButtonHelper.deleteMessage(event);
     }
@@ -2351,7 +2349,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void gain1tgFromMuaatCommander(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
         String message = player.getRepresentation() + " Gained 1TG " + player.gainTG(1) + " from Magmus, the Muaat commander.";
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+        ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(mainGameChannel, message);
         ButtonHelper.deleteMessage(event);
     }
@@ -2359,7 +2357,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void gain1tgFromLetnevCommander(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
         String message = player.getRepresentation() + " Gained 1TG " + player.gainTG(1) + " from Rear Admiral Farran, the Letnev commander.";
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+        ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(mainGameChannel, message);
         ButtonHelper.deleteMessage(event);
     }
@@ -2375,7 +2373,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         if (!failed) {
             message += "Gained 1TG " + player.gainTG(1, true) + ".";
-            ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+            ButtonHelperAgents.resolveArtunoCheck(player, 1);
         }
         ButtonHelper.addReaction(event, false, false, message, "");
         if (!failed) {
@@ -2646,7 +2644,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void endOfTurnAbilities(ButtonInteractionEvent event, Player player, Game game) {
         String msg = "Use buttons to do an end of turn ability";
         List<Button> buttons = ButtonHelper.getEndOfTurnAbilities(player, game);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);
     }
 
     @ButtonHandler("startStrategyPhase")
@@ -2658,7 +2656,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("deployTyrant")
     public static void deployTyrant(ButtonInteractionEvent event, Player player, Game game) {
         String message = "Use buttons to place the **Tyrant's Lament** with your ships";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, Helper.getTileWithShipsPlaceUnitButtons(player, game, "tyrantslament", "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
+            Helper.getTileWithShipsPlaceUnitButtons(player, game, "tyrantslament", "placeOneNDone_skipbuild"));
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is deploying the **Tyrant's Lament**");
         player.addOwnedUnitByID("tyrantslament");

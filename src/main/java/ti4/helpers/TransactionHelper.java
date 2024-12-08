@@ -640,7 +640,7 @@ public class TransactionHelper {
                 + "\n## Click something else that YOU want to offer";
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
     }
 
     @ButtonHandler("getNewTransaction_")
@@ -660,7 +660,7 @@ public class TransactionHelper {
                 + "\n## Click something that YOU want to offer";
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
     }
 
     @ButtonHandler("sendOffer_")
