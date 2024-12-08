@@ -2,7 +2,9 @@ package ti4.json;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.experimental.UtilityClass;
@@ -36,11 +38,25 @@ public class PersistenceManager {
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, object);
     }
 
+    public static <T> List<T> readListFromJsonFile(String fileName, Class<T> clazz) throws IOException {
+        return readListFromJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, clazz);
+    }
+
+    public static <T> List<T> readListFromJsonFile(String directory, String fileName, Class<T> clazz) throws IOException {
+        JavaType ref = objectMapper.getTypeFactory().constructParametricType(List.class, clazz);
+        return readObjectFromJsonFile(directory, fileName, ref);
+    }
+
     public static <T> T readObjectFromJsonFile(String fileName, Class<T> clazz) throws IOException {
         return readObjectFromJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, clazz);
     }
 
     public static <T> T readObjectFromJsonFile(String directory, String fileName, Class<T> clazz) throws IOException {
+        JavaType ref = objectMapper.getTypeFactory().constructType(clazz);
+        return readObjectFromJsonFile(directory, fileName, ref);
+    }
+
+    private static <T> T readObjectFromJsonFile(String directory, String fileName, JavaType clazz) throws IOException {
         if (fileName == null || fileName.isEmpty()) {
             throw new IllegalArgumentException("The file path cannot be null or empty.");
         }
