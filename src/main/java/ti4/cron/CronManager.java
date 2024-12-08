@@ -18,6 +18,8 @@ public class CronManager {
         TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
         if (period > 0) {
             SCHEDULER.scheduleAtFixedRate(timedRunnable, initialDelay, period, unit);
+        } else {
+            SCHEDULER.schedule(timedRunnable, initialDelay, unit);
         }
     }
 
