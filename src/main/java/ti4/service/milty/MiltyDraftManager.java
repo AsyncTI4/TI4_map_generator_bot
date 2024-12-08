@@ -639,7 +639,7 @@ public class MiltyDraftManager {
         buttons.add(Buttons.blue("miltyFactionInfo_remaining", "Remaining faction info"));
         buttons.add(Buttons.blue("miltyFactionInfo_picked", "Picked faction info"));
         buttons.add(Buttons.blue("miltyFactionInfo_all", "All faction info"));
-        buttons = MessageHelper.addUndoButtonToList(buttons, game);
+        buttons = MessageHelper.addUndoButtonToList(buttons, game.getName());
         MessageHelper.splitAndSentWithAction(ping, game.getMainGameChannel(), buttons, m -> prevPingMessage = m.getId());
     }
 

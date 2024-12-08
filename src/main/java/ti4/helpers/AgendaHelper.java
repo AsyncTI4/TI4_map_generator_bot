@@ -2691,7 +2691,7 @@ public class AgendaHelper {
                         String sb = speaker.getRepresentationUnfogged() +
                             " this is the top agenda for Covert Legislation:";
                         List<MessageEmbed> embeds = List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
-                        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, speaker, sb, embeds);
+                        MessageHelper.sendMessageEmbedsToCardsInfoThread(speaker, sb, embeds);
                         game.drawAgenda();
 
                     }
