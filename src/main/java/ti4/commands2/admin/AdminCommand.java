@@ -17,7 +17,7 @@ public class AdminCommand implements ParentCommand {
                     new DeleteGame(),
                     new ResetEmojiCache(),
                     new DisableBot(),
-                    new ReloadMap(),
+                    new ReloadGame(),
                     new ReloadMapperObjects(),
                     new RestoreGame(),
                     new CardsInfoForPlayer(),

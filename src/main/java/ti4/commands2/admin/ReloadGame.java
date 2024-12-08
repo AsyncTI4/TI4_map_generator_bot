@@ -9,9 +9,9 @@ import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 
-class ReloadMap extends Subcommand {
+class ReloadGame extends Subcommand {
 
-    public ReloadMap() {
+    public ReloadGame() {
         super(Constants.RELOAD_GAME, "Reload game from save file");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "GameName to reload").setRequired(true).setAutoComplete(true));
     }
