@@ -14,11 +14,11 @@ import ti4.message.BotLogger;
 import static java.util.function.Predicate.not;
 
 @UtilityClass
-class EndOldGamesCron {
+public class EndOldGamesCron {
 
     private static final Period AUTOMATIC_GAME_END_INACTIVITY_THRESHOLD = Period.ofMonths(2);
 
-    static {
+    public static void register() {
         CronManager.register(EndOldGamesCron.class, EndOldGamesCron::endOldGames, 2, 0, ZoneId.of("America/New_York"));
     }
 
