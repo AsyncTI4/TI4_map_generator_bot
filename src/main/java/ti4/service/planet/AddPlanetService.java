@@ -2,8 +2,6 @@ package ti4.service.planet;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -26,6 +24,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 
@@ -59,20 +58,13 @@ public class AddPlanetService {
             unitHolder.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
         }
         String color = player.getColor();
-        boolean moveTitanPN = false;
-        Set<String> moveBranchOffices = null;
         if (color != null && !"null".equals(color)) {
             String ccID = Mapper.getControlID(color);
             String ccPath = Mapper.getCCPath(ccID);
             if (ccPath != null) {
                 unitHolder.addControl(ccID);
             }
-            moveBranchOffices = unitHolder.getTokenList().stream()
-                .filter(s -> s.startsWith("attachment_veldyr"))
-                .collect(Collectors.toSet());
-            if (unitHolder.getTokenList().contains(Constants.ATTACHMENT_TITANSPN_PNG)) {
-                moveTitanPN = true;
-            } else if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
+            if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
                 unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
                 game.scorePublicObjective(player.getUserID(), 0);
                 MessageChannel channel = game.getMainGameChannel();
@@ -125,6 +117,16 @@ public class AddPlanetService {
                             Helper.checkEndGame(game, player);
                         }
                     }
+                    List<String> currentPns = new ArrayList<>(player_.getPromissoryNotesInPlayArea());
+                    for (String pn : currentPns) {
+                        PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn);
+                        if (pnModel.getAttachment().isPresent() 
+                            && unitHolder.getTokenList().stream().anyMatch(s -> s.contains(pnModel.getAttachment().get()))) {
+                            player_.removePromissoryNote(pn);
+                            player.setPromissoryNote(pn);
+                            player.setPromissoryNotesInPlayArea(pn);
+                        }
+                    }
                     if (Mapper.getPlanet(planet) != null &&
                             !"action_deck_2".equals(game.getAcDeckID()) &&
                             !game.isACInDiscard("Reparations")) {
@@ -132,19 +134,6 @@ public class AddPlanetService {
                                 + " has a window to play Reparations for the taking of "
                                 + Mapper.getPlanet(planet).getName();
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                    }
-                    if (moveTitanPN) {
-                        movePN(player_, player, Constants.TERRAFORM);
-                    }
-                    if (moveBranchOffices != null && !moveBranchOffices.isEmpty()) {
-                        for (String branchOffice : moveBranchOffices) {
-                            switch (branchOffice) {
-                                case "attachment_veldyrtaxhaven.png" -> movePN(player_, player, "dspnveld1");
-                                case "attachment_veldyrbroadcasthub.png" -> movePN(player_, player, "dspnveld2");
-                                case "attachment_veldyrreservebank.png" -> movePN(player_, player, "dspnveld3");
-                                case "attachment_veldyrorbitalshipyard.png" -> movePN(player_, player, "dspnveld4");
-                            }
-                        }
                     }
                 }
             }
@@ -339,14 +328,6 @@ public class AddPlanetService {
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
         if (Constants.MECATOLS.contains(planet.toLowerCase()) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");
-        }
-    }
-
-    private static void movePN(Player from, Player to, String pn) {
-        if (from.getPromissoryNotesInPlayArea().contains(pn)) {
-            from.removePromissoryNote(pn);
-            to.setPromissoryNote(pn);
-            to.setPromissoryNotesInPlayArea(pn);
         }
     }
 }
