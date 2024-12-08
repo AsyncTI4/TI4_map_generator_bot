@@ -3,8 +3,8 @@ package ti4.service.player;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.message.MessageHelper;
-import ti4.users.UserSettings;
-import ti4.users.UserSettingsManager;
+import ti4.settings.users.UserSettings;
+import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class PingIntervalService {

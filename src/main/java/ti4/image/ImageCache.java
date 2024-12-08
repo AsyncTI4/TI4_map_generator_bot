@@ -7,8 +7,8 @@ import java.util.function.Function;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import ti4.cache.CacheManager;
-import ti4.helpers.GlobalSettings;
 import ti4.message.BotLogger;
+import ti4.settings.GlobalSettings;
 
 public class ImageCache {
 

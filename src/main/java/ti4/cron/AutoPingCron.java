@@ -24,7 +24,7 @@ import ti4.model.ActionCardModel;
 import ti4.model.StrategyCardModel;
 import ti4.service.player.PlayerReactService;
 import ti4.service.tech.PlayerTechService;
-import ti4.users.UserSettingsManager;
+import ti4.settings.users.UserSettingsManager;
 
 import static java.util.function.Predicate.not;
 

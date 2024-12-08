@@ -31,6 +31,7 @@ import ti4.map.GameManager;
 import ti4.map.GameStatsDashboardPayload;
 import ti4.map.Player;
 import ti4.message.BotLogger;
+import ti4.settings.GlobalSettings;
 import ti4.website.WebsiteOverlay;
 
 public class WebHelper {

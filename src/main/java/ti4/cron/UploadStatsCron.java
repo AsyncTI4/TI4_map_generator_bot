@@ -6,10 +6,10 @@ import java.time.ZoneId;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.experimental.UtilityClass;
-import ti4.helpers.GlobalSettings;
 import ti4.helpers.WebHelper;
-import ti4.map.PersistenceManager;
+import ti4.json.PersistenceManager;
 import ti4.message.BotLogger;
+import ti4.settings.GlobalSettings;
 
 @UtilityClass
 public class UploadStatsCron {
