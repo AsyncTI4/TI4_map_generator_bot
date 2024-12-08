@@ -6,13 +6,13 @@ import java.lang.reflect.Method;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.DataMigrationManager;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.migration.DataMigrationManager;
 
 class RunManualDataMigration extends Subcommand {
 
