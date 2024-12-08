@@ -573,7 +573,7 @@ public class AutoCompleteProvider {
                 }
                 event.replyChoice(latestCommand, Constants.LATEST_COMMAND).queue();
             }
-            case Constants.UNDO_TO_BEFORE_COMMAND -> {
+            case Constants.UNDO_TO_COMMAND -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 if (game.isFowMode() && !game.getFogOfWarGMIDs().contains(event.getUser().getId())) {
