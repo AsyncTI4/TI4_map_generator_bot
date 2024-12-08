@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
@@ -100,8 +99,7 @@ public class AsyncTI4DiscordBot {
             // It *appears* we need to pull all members or else the bot has trouble pinging players
             // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
             // and avoid loading every user at startup
-            .setMemberCachePolicy(MemberCachePolicy.ALL)
-            .setChunkingFilter(ChunkingFilter.ALL)
+            .setMemberCachePolicy(MemberCachePolicy.ALL.and(MemberCachePolicy.lru(1000)))
             // This allows us to use our own ShutdownHook, created below
             .setEnableShutdownHook(false)
             .build();
