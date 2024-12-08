@@ -1,4 +1,4 @@
-package ti4.map;
+package ti4.json;
 
 import java.io.File;
 import java.io.IOException;

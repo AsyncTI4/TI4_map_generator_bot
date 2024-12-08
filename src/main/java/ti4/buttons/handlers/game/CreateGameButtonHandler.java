@@ -1,6 +1,6 @@
 package ti4.buttons.handlers.game;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,11 +16,9 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.PersistenceManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.metadata.GameCreationLocks;
 import ti4.service.game.CreateGameService;
+import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 class CreateGameButtonHandler {
@@ -32,8 +30,8 @@ class CreateGameButtonHandler {
 
     private static void createGameChannels(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " pressed the [Create Game] button");
-        Game mapreference = GameManager.getGame("finreference");
 
+        Game mapreference = GameManager.getGame("finreference");
         if (mapreference != null && mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
             return;
@@ -102,21 +100,12 @@ class CreateGameButtonHandler {
             }
         }
 
-        try {
-            GameCreationLocks gameCreationLocks = PersistenceManager.readObjectFromJsonFile(GameCreationLocks.JSON_DATA_FILE_NAME, GameCreationLocks.class);
-            if (gameCreationLocks == null) {
-                gameCreationLocks = new GameCreationLocks();
-            }
-            String userId = event.getUser().getId();
-            boolean isGameCreationLocked = gameCreationLocks.getUsernameToLastGameCreation().containsKey(userId);
-            if (isGameCreationLocked) {
-                return true;
-            }
-            gameCreationLocks.getUsernameToLastGameCreation().put(userId, Instant.now());
-            PersistenceManager.writeObjectToJsonFile(GameCreationLocks.JSON_DATA_FILE_NAME, gameCreationLocks);
-        } catch (Exception e) {
-            BotLogger.log("Unable to handle game creation locks.", e);
+        var userSettings = UserSettingsManager.get(event.getUser().getId());
+        if (userSettings.isLockedFromCreatingGames()) {
+            return true;
         }
+        userSettings.setLockedFromCreatingGamesUntil(LocalDateTime.now().plusMinutes(10));
+        UserSettingsManager.save(userSettings);
         return false;
     }
 
