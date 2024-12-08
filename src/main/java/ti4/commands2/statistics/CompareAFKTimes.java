@@ -12,7 +12,7 @@ import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
-import ti4.users.UserSettingsManager;
+import ti4.settings.users.UserSettingsManager;
 
 class CompareAFKTimes extends Subcommand {
 
