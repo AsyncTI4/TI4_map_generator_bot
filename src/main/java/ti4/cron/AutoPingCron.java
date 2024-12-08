@@ -41,25 +41,25 @@ public class AutoPingCron {
     }
 
     private static void autoPingGames() {
-        try {
-            var games = GameManager.getGameNameToGame().values().stream().filter(not(Game::isHasEnded)).toList();
-            for (Game game : games) {
-                autoPingGame(game);
-            }
-        } catch (Exception e) {
-            BotLogger.log("**AutoPingCron failed.**", e);
+        var games = GameManager.getGameNameToGame().values().stream().filter(not(Game::isHasEnded)).toList();
+        for (Game game : games) {
+            autoPingGame(game);
         }
     }
 
     private static void autoPingGame(Game game) {
-        handleTechSummary(game); // TODO, move this?
-        checkAllSaboWindows(game);
-        if (game.isFastSCFollowMode()) {
-            handleFastScFollowMode(game);
-        }
-        Player player = game.getActivePlayer();
-        if (game.getAutoPingStatus() && !game.isTemporaryPingDisable()) {
-            handleAutoPing(game, player);
+        try {
+            handleTechSummary(game); // TODO, move this?
+            checkAllSaboWindows(game);
+            if (game.isFastSCFollowMode()) {
+                handleFastScFollowMode(game);
+            }
+            Player player = game.getActivePlayer();
+            if (game.getAutoPingStatus() && !game.isTemporaryPingDisable()) {
+                handleAutoPing(game, player);
+            }
+        } catch (Exception e) {
+            BotLogger.log("AutoPing failed for game: " + game.getName(), e);
         }
     }
 
