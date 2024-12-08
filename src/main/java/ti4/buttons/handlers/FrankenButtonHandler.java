@@ -198,7 +198,7 @@ class FrankenButtonHandler {
 
         FrankenDraftBagService.showPlayerBag(game, player);
 
-        GameManager.save(game, player.getUserName() + " did something");
+        GameManager.save(game, player.getUserName() + " did something related to Franken");
         event.getMessage().delete().queue();
     }
 }
