@@ -19,6 +19,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.StrategyCardModel;
@@ -43,17 +44,23 @@ public class AutoPingCron {
         GameManager.getManagedGames().stream()
             .filter(not(ManagedGame::isHasEnded))
             .map(ManagedGame::getGame)
-            .forEach(game -> {
-                handleTechSummary(game); // TODO, move this?
-                checkAllSaboWindows(game);
-                if (game.isFastSCFollowMode()) {
-                    handleFastScFollowMode(game);
-                }
-                Player player = game.getActivePlayer();
-                if (game.getAutoPingStatus() && !game.isTemporaryPingDisable()) {
-                    handleAutoPing(game, player);
-                }
-            });
+            .forEach(AutoPingCron::autoPingGame);
+}
+
+    private static void autoPingGame(Game game) {
+        try {
+            handleTechSummary(game); // TODO, move this?
+            checkAllSaboWindows(game);
+            if (game.isFastSCFollowMode()) {
+                handleFastScFollowMode(game);
+            }
+            Player player = game.getActivePlayer();
+            if (game.getAutoPingStatus() && !game.isTemporaryPingDisable()) {
+                handleAutoPing(game, player);
+            }
+        } catch (Exception e) {
+            BotLogger.log("AutoPing failed for game: " + game.getName(), e);
+        }
     }
 
     private static void checkAllSaboWindows(Game game) {
@@ -182,14 +189,7 @@ public class AutoPingCron {
         long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange().getTime();
         int pingNumber = (int) (milliSinceLastTurnChange / (ONE_HOUR_IN_MILLISECONDS * spacer));
         pingMessage = getPingMessage(milliSinceLastTurnChange, spacer, pingMessage, realIdentity, pingNumber);
-
         pingPlayer(game, player, milliSinceLastTurnChange, spacer, pingMessage, pingNumber, realIdentity);
-
-        Game mapReference = GameManager.getManagedGame("finreference").getGame();
-        if (mapReference != null) {
-            ButtonHelper.increasePingCounter(mapReference, player.getUserID());
-            GameManager.save(mapReference, "Auto Ping");
-        }
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         game.setLastActivePlayerPing(new Date());
         GameManager.save(game, "Auto Ping");

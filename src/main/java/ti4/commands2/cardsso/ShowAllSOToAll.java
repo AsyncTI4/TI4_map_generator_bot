@@ -16,7 +16,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 class ShowAllSOToAll extends GameStateSubcommand {
 
     public ShowAllSOToAll() {
-        super(Constants.SHOW_ALL_SO_TO_ALL, "Show all Secret Objectives to all players", true, true);
+        super(Constants.SHOW_ALL_TO_ALL, "Show all Secret Objectives to all players", true, true);
     }
 
     @Override

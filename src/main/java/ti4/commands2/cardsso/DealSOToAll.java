@@ -11,7 +11,7 @@ import ti4.service.objectives.DrawSecretService;
 class DealSOToAll extends GameStateSubcommand {
 
     public DealSOToAll() {
-        super(Constants.DEAL_SO_TO_ALL, "Deal Secret Objective (count) to all game players", true, true);
+        super(Constants.DEAL_TO_ALL, "Deal Secret Objective (count) to all game players", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
     }
 

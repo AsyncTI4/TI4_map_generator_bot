@@ -59,10 +59,10 @@ public class MessageListener extends ListenerAdapter {
                 if (copyLFGPingsToLFGPingsChannel(event, message)) return;
                 if (endOfRoundSummary(event, message)) return;
             }
-            if (checkIfNewMakingGamesPostAndPostIntroduction(event)) return;
             handleFogOfWarCombatThreadMirroring(event);
         } catch (Exception e) {
-            BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
+            BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " +
+                event.getMessage().getJumpUrl(), e);
         }
     }
 
@@ -103,20 +103,6 @@ public class MessageListener extends ListenerAdapter {
         String msg2 = lfgRole.getAsMention() + " this game is looking for more members (it's old if it has -launched [FULL] in its title) " + message.getJumpUrl();
         TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
         MessageHelper.sendMessageToChannel(lfgPings, msg2);
-        return true;
-    }
-
-    private static boolean checkIfNewMakingGamesPostAndPostIntroduction(MessageReceivedEvent event) {
-        if (!(event.getChannel() instanceof ThreadChannel channel) || !channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
-            return false;
-        }
-        Game mapReference = GameManager.getManagedGame("finreference").getGame();
-        if (mapReference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
-            mapReference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
-            MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players " +
-                "and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
-            GameManager.save(mapReference, "newChannel");
-        }
         return true;
     }
 

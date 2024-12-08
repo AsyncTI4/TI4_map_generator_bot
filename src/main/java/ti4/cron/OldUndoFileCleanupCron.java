@@ -24,7 +24,7 @@ public class OldUndoFileCleanupCron {
         try {
             cleanupOldUndoFiles();
         } catch (Exception e) {
-            BotLogger.log("**Error cleaning up old undo files!**", e);
+            BotLogger.log("**OldUndoFileCleanupCron failed.**", e);
         }
     }
 
@@ -48,6 +48,6 @@ public class OldUndoFileCleanupCron {
         } catch (IOException e) {
             BotLogger.log("Failed to access the undo directory: " + mapUndoDirectory, e);
         }
-        BotLogger.log(String.format("Cleaned up `%d` undo files that were over `%d` days old (%s)", count, daysOld, cutoff));
+        BotLogger.log(String.format("OldUndoFileCleanupCron: Cleaned up `%d` undo files that were over `%d` days old (%s)", count, daysOld, cutoff));
     }
 }

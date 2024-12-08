@@ -15,7 +15,6 @@ public class BothelperCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
                     new CreateGameChannels(),
-                    new ControlGameCreation(),
                     new CreateFOWGameChannels(),
                     new ServerLimitStats(),
                     new ArchiveOldThreads(),
