@@ -192,12 +192,6 @@ public class AutoPingCron {
         pingMessage = getPingMessage(milliSinceLastTurnChange, spacer, pingMessage, realIdentity, pingNumber);
 
         pingPlayer(game, player, milliSinceLastTurnChange, spacer, pingMessage, pingNumber, realIdentity);
-
-        Game mapReference = GameManager.getGame("finreference");
-        if (mapReference != null) {
-            ButtonHelper.increasePingCounter(mapReference, player.getUserID());
-            GameSaveLoadManager.saveGame(mapReference, "Auto Ping");
-        }
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         game.setLastActivePlayerPing(new Date());
         GameSaveLoadManager.saveGame(game, "Auto Ping");

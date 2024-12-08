@@ -28,6 +28,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.CreateGameService;
+import ti4.service.game.GameNameService;
 
 public class MessageListener extends ListenerAdapter {
 
@@ -60,7 +61,8 @@ public class MessageListener extends ListenerAdapter {
             if (checkIfNewMakingGamesPostAndPostIntroduction(event)) return;
             handleFogOfWarCombatThreadMirroring(event);
         } catch (Exception e) {
-            BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
+            BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " +
+                event.getMessage().getJumpUrl(), e);
         }
     }
 
@@ -111,8 +113,9 @@ public class MessageListener extends ListenerAdapter {
         Game mapReference = GameManager.getGame("finreference");
         if (mapReference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
             mapReference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
-            MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players " +
-                "and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, " +
+                "filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members " +
+                "are correct.");
             GameSaveLoadManager.saveGame(mapReference, "newChannel");
         }
         return true;
@@ -223,9 +226,7 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private static void whisperToFutureMe(MessageReceivedEvent event) {
-        String gameName = event.getChannel().getName();
-        gameName = gameName.replace("Cards Info-", "");
-        gameName = gameName.substring(0, gameName.indexOf("-"));
+        String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
         Game game = GameManager.getGame(gameName);
         String messageContent = StringUtils.substringAfter(event.getMessage().getContentRaw(), " ");
         Player player = getPlayer(event, game);
