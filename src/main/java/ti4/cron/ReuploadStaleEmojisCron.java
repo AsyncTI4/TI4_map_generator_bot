@@ -10,7 +10,7 @@ import ti4.service.emoji.ApplicationEmojiService;
 public class ReuploadStaleEmojisCron {
 
     public static void register() {
-        CronManager.register(ReuploadStaleEmojisCron.class, ReuploadStaleEmojisCron::reuploadEmojisAndDeleteHanging, 30, -1, TimeUnit.SECONDS);
+        CronManager.scheduleOnce(ReuploadStaleEmojisCron.class, ReuploadStaleEmojisCron::reuploadEmojisAndDeleteHanging, 30, TimeUnit.SECONDS);
     }
 
     private static void reuploadEmojisAndDeleteHanging() {

@@ -10,7 +10,7 @@ import ti4.message.BotLogger;
 public class UploadStatsCron {
 
     public static void register() {
-        CronManager.register(UploadStatsCron.class, UploadStatsCron::uploadStats, 0, 0, ZoneId.of("America/New_York"));
+        CronManager.schedulePeriodicallyAtTime(UploadStatsCron.class, UploadStatsCron::uploadStats, 0, 0, ZoneId.of("America/New_York"));
     }
 
     private static void uploadStats() {
