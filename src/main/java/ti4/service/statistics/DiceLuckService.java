@@ -45,7 +45,7 @@ public class DiceLuckService {
             .sorted(comparator)
             .limit(topLimit)
             .forEach(entry  -> {
-                var user = GameManager.getManagedGame(entry.getKey());
+                var user = GameManager.getManagedPlayer(entry.getKey());
                 double expectedHits = entry.getValue().getKey();
                 int actualHits = entry.getValue().getValue();
                 if (expectedHits > 0 && actualHits > 0) {

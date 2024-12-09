@@ -57,7 +57,7 @@ public class MedianTurnTimeService {
             .toList();
 
         for (var userMedianTurnTime : medianTurnTimes) {
-            var user = GameManager.getManagedGame(userMedianTurnTime.getKey());
+            var user = GameManager.getManagedPlayer(userMedianTurnTime.getKey());
             long totalMillis = userMedianTurnTime.getValue();
             int turnCount = playerTurnCount.get(userMedianTurnTime.getKey());
 

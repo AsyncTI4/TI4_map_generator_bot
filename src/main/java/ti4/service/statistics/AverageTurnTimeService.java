@@ -71,7 +71,7 @@ public class AverageTurnTimeService {
             .toList();
 
         for (var userTurnCountTotalTime : turnTimes) {
-            var user = GameManager.getManagedGame(userTurnCountTotalTime.getKey());
+            var user = GameManager.getManagedPlayer(userTurnCountTotalTime.getKey());
             int turnCount = userTurnCountTotalTime.getValue().getKey();
             long totalMillis = userTurnCountTotalTime.getValue().getValue();
 
