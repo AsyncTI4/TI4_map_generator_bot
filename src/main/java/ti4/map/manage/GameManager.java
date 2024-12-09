@@ -1,11 +1,12 @@
 package ti4.map.manage;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.annotation.Nullable;
 
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
@@ -18,21 +19,27 @@ public class GameManager {
     private static final CopyOnWriteArrayList<String> allGameNames = new CopyOnWriteArrayList<>();
     private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>(); // TODO: We can evaluate dropping the managed objects entirely
     private static final ConcurrentMap<String, ManagedPlayer> playerNameToManagedPlayer = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Game> currentlyExecutingGames = new ConcurrentHashMap<>();
 
     public static void initialize() {
         GameLoadService.loadManagedGames()
-                .forEach(managedGame -> gameNameToManagedGame.put(managedGame.getName(), managedGame));
+            .forEach(managedGame -> gameNameToManagedGame.put(managedGame.getName(), managedGame));
         allGameNames.addAll(gameNameToManagedGame.keySet());
     }
 
     private static Game load(String gameName) {
+        if (currentlyExecutingGames.get(gameName) != null) {
+            return currentlyExecutingGames.get(gameName);
+        }
         Game game = GameLoadService.load(gameName);
         if (game == null) {
             return null;
         }
+        currentlyExecutingGames.put(game.getName(), game);
         if (doesNotHaveMatchingManagedGame(game)) {
             gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
         }
+
         return game;
     }
 
@@ -59,6 +66,9 @@ public class GameManager {
         }
         allGameNames.addIfAbsent(game.getName());
         gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
+        if (currentlyExecutingGames.get(game.getName()) != null) {
+            currentlyExecutingGames.remove(game.getName());
+        }
         return true;
     }
 
