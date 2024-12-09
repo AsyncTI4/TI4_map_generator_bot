@@ -18,9 +18,10 @@ public class UserSettingsManager {
 
     static {
         userIdToSettingsCache = Caffeine.newBuilder()
-                .maximumSize(200)
-                .expireAfterAccess(4, TimeUnit.HOURS)
-                .build(UserSettingsManager::load);
+            .maximumSize(200)
+            .expireAfterAccess(4, TimeUnit.HOURS)
+            .recordStats()
+            .build(UserSettingsManager::load);
         CacheManager.registerCache("userIdToSettingsCache", userIdToSettingsCache);
     }
 
