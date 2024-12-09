@@ -56,7 +56,10 @@ public class ButtonContext extends ListenerContext {
             componentID.contains("searchMyGames") ||
             componentID.contains("decline_explore") ||
             componentID.contains("offerDeckButtons");
-        if (game != null && !skippableButton) {
+        if (skippableButton) {
+            return;
+        }
+        if (game != null) {
             ButtonHelper.saveButtons(getEvent(), game, player);
         }
         super.save();
