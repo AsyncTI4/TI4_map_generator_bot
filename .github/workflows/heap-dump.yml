@@ -24,5 +24,5 @@ jobs:
             echo "Deleting old heap dumps..."
             rm -f "$HEAP_DUMP_DIR"/*.hprof
             echo "Creating new heap dump..."
-            jmap -dump:live,file=$HEAP_DUMP_DIR/heapdump_$(date +%Y%m%d%H%M%S).hprof <PID>
+            /usr/bin/jmap -dump:live,file=$HEAP_DUMP_DIR/heapdump_$(date +%Y%m%d%H%M%S).hprof <PID>
             echo "Heap dump process completed."
