@@ -7,12 +7,11 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import ti4.map.Game;
 
 @UtilityClass
 public class EventAuditService {
 
-    public static String getReason(Game game, GenericInteractionCreateEvent event) {
+    public static String getReason(GenericInteractionCreateEvent event, boolean isFow) {
         if (event == null) {
             return null;
         }
@@ -23,14 +22,14 @@ public class EventAuditService {
                 boolean thread = button.getMessageChannel() instanceof ThreadChannel;
                 boolean cardThread = thread && button.getMessageChannel().getName().contains("Cards Info-");
                 boolean draftThread = thread && button.getMessageChannel().getName().contains("Draft Bag-");
-                if (cardThread || draftThread || game.isFowMode() || button.getButton().getId().contains("anonDeclare") || button.getButton().getId().contains("requestAllFollow")) {
+                if (cardThread || draftThread || isFow || button.getButton().getId().contains("anonDeclare") || button.getButton().getId().contains("requestAllFollow")) {
                     yield username + " pressed button: [CLASSIFIED]";
                 }
                 yield username + " pressed button: " + button.getButton().getId() + " -- " + button.getButton().getLabel();
             }
             case StringSelectInteractionEvent selectMenu -> username + " used string selection: " + selectMenu.getComponentId();
             case ModalInteractionEvent modal -> username + " used modal: " + modal.getModalId();
-            default -> "Last Command Unknown - No Event Provided";
+            default -> "Last Command Unknown";
         };
     }
 }

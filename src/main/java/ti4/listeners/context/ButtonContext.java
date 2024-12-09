@@ -5,6 +5,7 @@ import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.map.manage.GameManager;
+import ti4.service.event.EventAuditService;
 
 @Getter
 public class ButtonContext extends ListenerContext {
@@ -58,7 +59,7 @@ public class ButtonContext extends ListenerContext {
             componentID.contains("offerDeckButtons");
         if (game != null && !skippableButton) {
             ButtonHelper.saveButtons(event, game, player);
-            GameManager.save(game, componentID);
+            GameManager.save(game, EventAuditService.getReason(event, game.isFowMode()));
         }
     }
 }

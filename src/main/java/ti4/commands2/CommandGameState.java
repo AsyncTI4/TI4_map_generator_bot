@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
+import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
 
 class CommandGameState {
@@ -42,7 +43,8 @@ class CommandGameState {
 
     public void postExecute(SlashCommandInteractionEvent event) {
         if (saveGame) {
-            GameManager.save(game.get(), event.getFullCommandName());
+            Game game = this.game.get();
+            GameManager.save(game, EventAuditService.getReason(event, game.isFowMode()));
         }
         game.remove();
         player.remove();
