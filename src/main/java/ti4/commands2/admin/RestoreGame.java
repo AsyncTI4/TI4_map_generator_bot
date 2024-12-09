@@ -38,14 +38,10 @@ class RestoreGame extends Subcommand {
             MessageHelper.sendMessageToEventChannel(event, "Save file name must be the same as the game name.");
             return;
         }
-        if (!GameManager.isValid(gameName)) {
-            MessageHelper.sendMessageToEventChannel(event, "Invalid game name.");
-            return;
-        }
 
         try {
             File gameFile = Storage.getGameFile(attachment.getFileName());
-             attachment.getProxy().downloadToFile(gameFile).get();
+            attachment.getProxy().downloadToFile(gameFile).get();
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "Failed to download game attachment.");
             return;

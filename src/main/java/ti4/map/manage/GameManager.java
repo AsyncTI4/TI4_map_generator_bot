@@ -59,9 +59,10 @@ public class GameManager {
         if (!isValid(gameName)) {
             return null;
         }
-        if (gameNameToManagedGame.get(gameName).isHasEnded()) {
+        var managedGame = gameNameToManagedGame.get(gameName);
+        if (managedGame == null || managedGame.isHasEnded()) {
             activeGameCache.invalidate(gameName);
-            return GameLoadService.load(gameName);
+            return load(gameName);
         }
         return activeGameCache.get(gameName);
     }
@@ -121,6 +122,7 @@ public class GameManager {
     @Nullable
     public static Game reload(String gameName) {
         activeGameCache.invalidate(gameName);
+        allGameNames.addIfAbsent(gameName);
         return get(gameName);
     }
 
