@@ -1,7 +1,5 @@
 package ti4.commands2.bothelper;
 
-import java.util.Collection;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -12,11 +10,15 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.GameManager;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
+import ti4.service.game.ManagedGameService;
 
 class ListDeadGames extends Subcommand {
+
+    private static final String WARNING_MESSAGE = " this is a warning that this game will be cleaned up tomorrow, " +
+        "unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done.";
 
     public ListDeadGames() {
         super(Constants.LIST_DEAD_GAMES, "List games that haven't moved in 2+ months but still have channels");
@@ -24,27 +26,23 @@ class ListDeadGames extends Subcommand {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        execute(event, GameManager.getGameNameToGame().values());
-    }
-
-    private void execute(SlashCommandInteractionEvent event, Collection<Game> games) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         boolean delete = "DELETE".equals(option.getAsString());
         StringBuilder sb = new StringBuilder("Dead Channels\n");
         StringBuilder sb2 = new StringBuilder("Dead Roles\n");
         int channelCount = 0;
         int roleCount = 0;
-        for (var game : games) {
+        for (ManagedGame game : GameManager.getManagedGames()) {
             if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
                 continue;
             }
             if (game.getName().contains("pbd1000") || game.getName().contains("pbd2863") || game.getName().contains("pbd3000") || game.getName().equalsIgnoreCase("pbd104") || game.getName().equalsIgnoreCase("pbd100") || game.getName().equalsIgnoreCase("pbd100two")) {
                 continue;
             }
-            long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange().getTime();
+            long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange();
 
             // TODO: we really shouldn't use these magical numbers.
-            if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange().getTime() && milliSinceLastTurnChange < 1259600000L) {
+            if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange() && milliSinceLastTurnChange < 1259600000L) {
                 continue;
             }
             if (game.isHasEnded() || milliSinceLastTurnChange > 5259600000L) {
@@ -74,7 +72,7 @@ class ListDeadGames extends Subcommand {
         MessageHelper.sendMessageToChannel(event.getChannel(), sb2 + "Role Count =" + roleCount);
     }
 
-    private static int sendMessageToChannel(Game game, StringBuilder sb, boolean delete) {
+    private static int sendMessageToChannel(ManagedGame game, StringBuilder sb, boolean delete) {
         var actionsChannel = game.getActionsChannel();
         if (actionsChannel == null || !actionsChannel.getName().equalsIgnoreCase(game.getName() + "-actions")) {
             return 0;
@@ -91,7 +89,7 @@ class ListDeadGames extends Subcommand {
                 actionsChannel.delete().queue();
             } else {
                 warned = true;
-                MessageHelper.sendMessageToChannel(actionsChannel, game.getPing() + " this is a warning that this game will be cleaned up tomorrow, unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done. ");
+                MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
             }
         }
 
@@ -104,12 +102,11 @@ class ListDeadGames extends Subcommand {
                 if (delete) {
                     tableTalkChannel.delete().queue();
                 } else if (!warned) {
-                    MessageHelper.sendMessageToChannel(actionsChannel, game.getPing() + " this is a warning that this game will be cleaned up tomorrow, unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done. ");
+                    MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
                 }
             }
         }
 
         return channelCount;
     }
-
 }

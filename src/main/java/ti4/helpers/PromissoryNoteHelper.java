@@ -86,14 +86,10 @@ public class PromissoryNoteHelper {
     }
 
     public static String getPromissoryNoteRepresentation(Game game, String pnID) {
-        return getPromissoryNoteRepresentation(game, pnID, null, true);
+        return getPromissoryNoteRepresentation(game, pnID, true);
     }
 
     public static String getPromissoryNoteRepresentation(Game game, String pnID, boolean longFormat) {
-        return getPromissoryNoteRepresentation(game, pnID, null, longFormat);
-    }
-
-    public static String getPromissoryNoteRepresentation(Game game, String pnID, Integer pnUniqueID, boolean longFormat) {
         PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pnID);
         if (pnModel == null) {
             String error = "Could not find representation for PN ID: " + pnID;
@@ -276,7 +272,7 @@ public class PromissoryNoteHelper {
         }
         if ("ragh".equalsIgnoreCase(id)) {
             String message = player.getRepresentationUnfogged() + " select planet to Ragh's Call on";
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message,
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
                 ButtonHelperFactionSpecific.getRaghsCallButtons(player, game,
                     game.getTileByPosition(game.getActiveSystem())));
         }

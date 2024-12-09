@@ -20,9 +20,8 @@ import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
@@ -111,7 +110,7 @@ class CreateFOWGameChannels extends Subcommand {
         }
 
         // CREATE GAME
-        Game newGame = CreateGameService.createNewGame(event, gameName, gameOwner);
+        Game newGame = CreateGameService.createNewGame(gameName, gameOwner);
         newGame.setFowMode(true);
 
         //ADD PLAYERS
@@ -167,7 +166,7 @@ class CreateFOWGameChannels extends Subcommand {
             "> " + actionsChannel.getAsMention() + "\n";
         MessageHelper.sendMessageToEventChannel(event, message);
 
-        GameSaveLoadManager.saveGame(newGame, event);
+        GameManager.save(newGame, "Create FOW Game Channels");
     }
 
     private static String getNextFOWGameName() {

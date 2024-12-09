@@ -123,7 +123,7 @@ public class ButtonHelperStats {
 
         // After gain tg checks
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, amt);
+        ButtonHelperAgents.resolveArtunoCheck(player, amt);
     }
 
     public static void afterGainCommsChecks(Game game, Player player, int realGain) {

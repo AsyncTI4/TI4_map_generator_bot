@@ -7,8 +7,8 @@ import java.util.Map.Entry;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -33,7 +33,7 @@ class EventInfo extends GameStateSubcommand {
     }
 
     public static void sendEventInfo(Game game, Player player) {
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, player, "_ _\n__**Events in Hand:**__", getEventMessageEmbeds(player));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "_ _\n__**Events in Hand:**__", getEventMessageEmbeds(player));
     }
 
     private static List<MessageEmbed> getEventMessageEmbeds(Player player) {

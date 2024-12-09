@@ -3,9 +3,9 @@ package ti4.commands2;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
+import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
 
 class CommandGameState {
@@ -22,11 +22,11 @@ class CommandGameState {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         String gameName = GameNameService.getGameName(event);
-        if (!GameManager.isValidGame(gameName)) {
+        if (!GameManager.isValid(gameName)) {
             throw new IllegalArgumentException("Invalid game name: " + gameName + " while attempting to run event " + event.getName() +
                     " in channel " + event.getChannel().getName());
         }
-        Game game = GameManager.getGame(gameName);
+        Game game = GameManager.getManagedGame(gameName).getGame();
         this.game.set(game);
         game.incrementSpecificSlashCommandCount(event.getFullCommandName()); // TODO: This only works for commands that save...
 
@@ -43,7 +43,8 @@ class CommandGameState {
 
     public void postExecute(SlashCommandInteractionEvent event) {
         if (saveGame) {
-            GameSaveLoadManager.saveGame(game.get(), event);
+            Game game = this.game.get();
+            GameManager.save(game, EventAuditService.getReason(event, game.isFowMode()));
         }
         game.remove();
         player.remove();

@@ -174,7 +174,7 @@ class AgendaResolveButtonHandler {
                     if (!"for".equalsIgnoreCase(winner)) {
                         for (Player player : game.getRealPlayers()) {
                             if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Pds).isEmpty()) {
-                                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                                     player.getRepresentation() + " remove 1 PDS", ButtonHelperModifyUnits
                                         .getRemoveThisTypeOfUnitButton(player, game, "pds"));
                             }
@@ -267,7 +267,7 @@ class AgendaResolveButtonHandler {
                         for (Player playerWL : winOrLose) {
                             playerWL.setTg(playerWL.getTg() + 3);
                             ButtonHelperAbilities.pillageCheck(playerWL, game);
-                            ButtonHelperAgents.resolveArtunoCheck(playerWL, game, 3);
+                            ButtonHelperAgents.resolveArtunoCheck(playerWL, 3);
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                             "Added 3TGs to those who voted for");
@@ -417,7 +417,7 @@ class AgendaResolveButtonHandler {
                                             + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
-                                ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+                                ButtonHelperAgents.resolveArtunoCheck(player, 1);
                             }
                             if (cabalFS) {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabalFSOwner,
@@ -451,7 +451,7 @@ class AgendaResolveButtonHandler {
                                     player2.getFaction()));
                             }
                         }
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                             player.getRepresentationUnfogged() + " choose who you want to get the planet",
                             buttons);
 
@@ -486,7 +486,7 @@ class AgendaResolveButtonHandler {
                                             + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
-                                ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+                                ButtonHelperAgents.resolveArtunoCheck(player, 1);
                             }
                             if (cabalFS) {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabalFSOwner,
@@ -520,7 +520,7 @@ class AgendaResolveButtonHandler {
                         }
                         if (count > 0) {
                             player.setTg(player.getTg() + count);
-                            ButtonHelperAgents.resolveArtunoCheck(player, game, count);
+                            ButtonHelperAgents.resolveArtunoCheck(player, count);
                             ButtonHelperAbilities.pillageCheck(player, game);
                         }
                         MessageHelper.sendMessageToChannel(actionsChannel,
@@ -549,8 +549,7 @@ class AgendaResolveButtonHandler {
                         List<Button> buttons = List.of(loseTactic, loseFleet, loseStrat, DoneGainingCC);
                         String message2 = player.getRepresentationUnfogged() + "! Your current CCs are "
                             + player.getCCRepresentation() + ". Use buttons to lose CCs";
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2,
-                            buttons);
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
                         game.setStoredValue("originalCCsFor" + player.getFaction(),
                             player.getCCRepresentation());
                     }
@@ -567,12 +566,12 @@ class AgendaResolveButtonHandler {
                 if ("for".equalsIgnoreCase(winner)) {
                     for (Player player : game.getRealPlayers()) {
                         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false) > 4) {
-                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                                 player.getRepresentation() + " remove excess cruisers", ButtonHelperModifyUnits
                                     .getRemoveThisTypeOfUnitButton(player, game, "cruiser"));
                         }
                         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false) > 2) {
-                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                                 player.getRepresentation() + " remove excess dreadnoughts", ButtonHelperModifyUnits
                                     .getRemoveThisTypeOfUnitButton(player, game, "dreadnought"));
                         }
@@ -591,7 +590,7 @@ class AgendaResolveButtonHandler {
                     for (Player player : game.getRealPlayers()) {
                         String message = player.getRepresentation()
                             + " Use buttons to drop 1 mech on a Home System Planet";
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message,
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
                             Helper.getHSPlanetPlaceUnitButtons(player, game, "mech",
                                 "placeOneNDone_skipbuild"));
                     }
@@ -632,8 +631,7 @@ class AgendaResolveButtonHandler {
                         List<Button> buttons = List.of(loseTactic, loseFleet, loseStrat, DoneGainingCC);
                         String message2 = player.getRepresentationUnfogged() + "! Your current CCs are "
                             + player.getCCRepresentation() + ". Use buttons to lose CCs";
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2,
-                            buttons);
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
                         game.setStoredValue("originalCCsFor" + player.getFaction(),
                             player.getCCRepresentation());
                     }
@@ -780,7 +778,8 @@ class AgendaResolveButtonHandler {
                         message.append(playerWL.getRepresentation()).append(" was made speaker and owes everyone who voted for them a PN\n");
                         for (Player p2 : AgendaHelper.getWinningVoters(winner, game)) {
                             if (p2 != playerWL) {
-                                MessageHelper.sendMessageToChannel(playerWL.getCardsInfoThread(), "You owe " + p2.getRepresentation() + "a PN", ButtonHelper.getForcedPNSendButtons(game, p2, playerWL));
+                                MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(), "You owe " + p2.getRepresentation() +
+                                    "a PN", ButtonHelper.getForcedPNSendButtons(game, p2, playerWL));
                             }
                         }
                     } else {
@@ -892,7 +891,7 @@ class AgendaResolveButtonHandler {
                     }
                     playerB.setTg(finalTG);
                     if (finalTG > 0) {
-                        ButtonHelperAgents.resolveArtunoCheck(playerB, game, finalTG);
+                        ButtonHelperAgents.resolveArtunoCheck(playerB, finalTG);
                         ButtonHelperAbilities.pillageCheck(playerB, game);
                     }
                 }
@@ -927,7 +926,7 @@ class AgendaResolveButtonHandler {
                             scButtons.add(Buttons.gray("sc_draw_so", "Draw Secret Objective", Emojis.SecretObjective));
                         }
                     }
-                    MessageHelper.sendMessageToChannel(actionsChannel,
+                    MessageHelper.sendMessageToChannelWithButtons(actionsChannel,
                         "You may use this button to resolve the secondary.", scButtons);
                 }
             }
@@ -938,7 +937,7 @@ class AgendaResolveButtonHandler {
             if (voter.hasTech("dskyrog")) {
                 MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), voter.getFactionEmoji() + " gets to drop 2 infantry on a planet due to Kyro green tech");
                 List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(voter, game, "2gf", "placeOneNDone_skipbuild"));
-                MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), "Use buttons to drop 2 infantry on a planet", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), "Use buttons to drop 2 infantry on a planet", buttons);
             }
         }
         voters.addAll(riders);
@@ -953,7 +952,7 @@ class AgendaResolveButtonHandler {
                 message = rep
                     + " you have a Rider to resolve or you voted for the correct outcome. Either way a " + Emojis.tg + " has been added to your total due to your **Future Sight** ability. "
                     + rid.gainTG(1, true);
-                ButtonHelperAgents.resolveArtunoCheck(rid, game, 1);
+                ButtonHelperAgents.resolveArtunoCheck(rid, 1);
             } else {
                 message = rep + " you have a Rider to resolve.";
             }

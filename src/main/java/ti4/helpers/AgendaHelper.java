@@ -222,7 +222,7 @@ public class AgendaHelper {
                 }
                 buttons.add(Buttons.blue("sendTGTo_" + p2.getFaction() + "_debt", "Erase 1 debt"));
                 buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
         }
     }
@@ -416,7 +416,7 @@ public class AgendaHelper {
             game.setStoredValue("preVoting" + player.getFaction(), votes);
             List<Button> buttonsPV = new ArrayList<>();
             buttonsPV.add(Buttons.red("erasePreVote", "Erase Pre-Vote"));
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Successfully stored a pre-vote. You can erase it with this button", buttonsPV);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Successfully stored a pre-vote. You can erase it with this button", buttonsPV);
             return;
         }
         if (!buttonID.contains("outcomeTie*")) {
@@ -851,7 +851,7 @@ public class AgendaHelper {
                 + "since you have Minister of Industry, you may build in tile "
                 + tile.getRepresentationForButtons(game, player) + ". You have "
                 + Helper.getProductionValue(player, game, tile, false) + " PRODUCTION Value in the system.";
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg,
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg,
                 Helper.getPlaceUnitButtons(event, player, game, tile, "ministerBuild", "place"));
         }
     }
@@ -1156,7 +1156,7 @@ public class AgendaHelper {
                         String msg2 = "Gained 3" + Emojis.getTGorNomadCoinEmoji(game) + " (" + (keleres.getTg() - size)
                             + " -> **" + keleres.getTg() + "**) ";
                         ButtonHelperAbilities.pillageCheck(keleres, game);
-                        ButtonHelperAgents.resolveArtunoCheck(keleres, game, size);
+                        ButtonHelperAgents.resolveArtunoCheck(keleres, size);
                         MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), msg2);
                         List<Button> buttons = ButtonHelper.getGainCCButtons(keleres);
                         String trueIdentity = keleres.getRepresentationUnfogged();
@@ -1188,7 +1188,7 @@ public class AgendaHelper {
                         List<Player> loseFleetPlayers = getWinningVoters(winner, game);
                         for (Player p2 : loseFleetPlayers) {
                             p2.setTg(p2.getTg() + 2);
-                            ButtonHelperAgents.resolveArtunoCheck(p2, game, 2);
+                            ButtonHelperAgents.resolveArtunoCheck(p2, 2);
                             ButtonHelperAbilities.pillageCheck(p2, game);
                             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                                 p2.getRepresentation()
@@ -1264,7 +1264,7 @@ public class AgendaHelper {
                             sb.append(" trade goods ").append(winningR.gainTG(2));
                             MessageHelper.sendMessageToChannel(channel, sb.toString());
                             ButtonHelperAbilities.pillageCheck(winningR, game);
-                            ButtonHelperAgents.resolveArtunoCheck(winningR, game, 2);
+                            ButtonHelperAgents.resolveArtunoCheck(winningR, 2);
                         }
                         if (specificVote.contains("Politics Rider")) {
                             int amount = 3;
@@ -1320,7 +1320,7 @@ public class AgendaHelper {
                         if (specificVote.contains("Trade Rider")) {
                             MessageHelper.sendMessageToChannel(channel, identity + " due to having a winning **Trade Rider**, you have been given five " + Emojis.tg(5) + " Trade Goods " + winningR.gainTG(5));
                             ButtonHelperAbilities.pillageCheck(winningR, game);
-                            ButtonHelperAgents.resolveArtunoCheck(winningR, game, 5);
+                            ButtonHelperAgents.resolveArtunoCheck(winningR, 5);
                         }
                         if (specificVote.contains("Relic Rider")) {
                             MessageHelper.sendMessageToChannel(channel, identity + " due to having a winning **Relic Rider**, you have gained a " + Emojis.Relic + " Relic");
@@ -1700,7 +1700,7 @@ public class AgendaHelper {
             if (thing.contains("kyro")) {
                 player.increaseInfantrySpentThisWindow(1);
                 if (!prevoting) {
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentation() + " please remove 1 infantry to pay for Silas Deriga, the Kyro commander.",
                         ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "infantry"));
                 }
@@ -1903,7 +1903,7 @@ public class AgendaHelper {
         buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAgendaVote_" + votes,
             "Vote " + votes + " vote" + (votes.equals("1") ? "" : "s")));
         buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "distinguished_" + votes, "Modify Votes"));
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
 
     public static void resolveAbsolAgainstChecksNBalances(Game game) {
@@ -2691,7 +2691,7 @@ public class AgendaHelper {
                         String sb = speaker.getRepresentationUnfogged() +
                             " this is the top agenda for Covert Legislation:";
                         List<MessageEmbed> embeds = List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
-                        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, speaker, sb, embeds);
+                        MessageHelper.sendMessageEmbedsToCardsInfoThread(speaker, sb, embeds);
                         game.drawAgenda();
 
                     }
@@ -2945,7 +2945,7 @@ public class AgendaHelper {
         }
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
-        ButtonHelperAgents.resolveArtunoCheck(player, game, player.getTg() - oldTg);
+        ButtonHelperAgents.resolveArtunoCheck(player, player.getTg() - oldTg);
         ButtonHelperAbilities.pillageCheck(player, game);
     }
 
