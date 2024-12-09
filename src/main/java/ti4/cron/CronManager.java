@@ -14,19 +14,22 @@ public class CronManager {
 
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
-    public static void register(Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
-        Runnable wrappedRunnable = () -> AsyncTI4DiscordBot.runAsync(clazz.getSimpleName(), runnable);
-        if (period > 0) {
-            SCHEDULER.scheduleAtFixedRate(wrappedRunnable, initialDelay, period, unit);
-        } else {
-            SCHEDULER.schedule(wrappedRunnable, initialDelay, unit);
-        }
+    public static void schedulePeriodically(Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
+        SCHEDULER.scheduleAtFixedRate(runWithPrimaryThreadPool(clazz, runnable), initialDelay, period, unit);
     }
 
-    public static void register(Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId) {
+    private static Runnable runWithPrimaryThreadPool(Class<?> clazz, Runnable runnable) {
+        return () -> AsyncTI4DiscordBot.runAsync(clazz.getSimpleName(), runnable);
+    }
+
+    public static void scheduleOnce(Class<?> clazz, Runnable runnable, long initialDelay, TimeUnit unit) {
+        SCHEDULER.schedule(runWithPrimaryThreadPool(clazz, runnable), initialDelay, unit);
+    }
+
+    public static void schedulePeriodicallyAtTime(Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId) {
         long initialDelaySeconds = calculateInitialDelaySeconds(hour, minute, zoneId);
         long periodSeconds = TimeUnit.DAYS.toSeconds(1);
-        register(clazz, runnable, initialDelaySeconds, periodSeconds, TimeUnit.SECONDS);
+        schedulePeriodically(clazz, runnable, initialDelaySeconds, periodSeconds, TimeUnit.SECONDS);
     }
 
     private static long calculateInitialDelaySeconds(int hour, int minute, ZoneId zoneId) {
