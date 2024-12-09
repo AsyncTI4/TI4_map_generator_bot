@@ -7,15 +7,15 @@ import java.util.List;
 import java.util.function.Function;
 
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
-import ti4.image.MapGenerator;
+import ti4.image.ImageHelper;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.MapGenerator.VerticalAlign;
 import ti4.image.Mapper;
-import ti4.image.ImageHelper;
-import ti4.helpers.Storage;
 import ti4.model.BorderAnomalyModel.BorderAnomalyType;
 import ti4.model.TileModel;
+import ti4.service.image.FileUploadService;
 
 // Jazz's Interactive Map Builder
 public class JimboImageHelper {
@@ -66,6 +66,6 @@ public class JimboImageHelper {
             g2.drawImage(img, x * size + xoff, y * size, null);
             i++;
         }
-        return MapGenerator.createFileUpload(newImage, 1.0f, "jimboStuff");
+        return FileUploadService.createFileUpload(newImage, 1.0f, "jimboStuff");
     }
 }

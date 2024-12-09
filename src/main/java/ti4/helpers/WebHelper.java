@@ -163,9 +163,7 @@ public class WebHelper {
             String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                // TODO: Use webp one day, ImageHelper.writeWebpOrDefaultTo
-                String format = "png";
-                ImageHelper.writeCompressedFormat(img, out, format, 0.1f);
+                String format = ImageHelper.writeWebpOrDefaultTo(img, out, "png");
                 mapPath += format;
                 PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(webProperties.getProperty("bucket"))

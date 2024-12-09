@@ -23,7 +23,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.image.MapGenerator;
+import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.listeners.UserJoinServerListener;
@@ -114,7 +114,7 @@ public class StartPhaseService {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
         if (game.isShowBanners()) {
-            MapGenerator.drawPhaseBanner("strategy", round, game.getActionsChannel());
+            BannerGenerator.drawPhaseBanner("strategy", round, game.getActionsChannel());
         }
         if (game.getRealPlayers().size() == 6) {
             game.setStrategyCardsPerPlayer(1);
@@ -514,7 +514,7 @@ public class StartPhaseService {
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have picked a strategy card.");
             if (game.isShowBanners()) {
-                MapGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
+                BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
             }
             ListTurnOrderService.turnOrder(event, game);
             if (!msgExtra.isEmpty()) {

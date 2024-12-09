@@ -42,7 +42,7 @@ import ti4.commands2.planet.PlanetExhaust;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.MapGenerator;
+import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -2593,7 +2593,7 @@ public class AgendaHelper {
         }
         game.setStoredValue("agendaCount", aCount + "");
         if (aCount == 1 && game.isShowBanners()) {
-            MapGenerator.drawPhaseBanner("agenda", game.getRound(), game.getActionsChannel());
+            BannerGenerator.drawPhaseBanner("agenda", game.getRound(), game.getActionsChannel());
         }
 
         CryypterHelper.checkEnvoyUnlocks(game);
@@ -2722,9 +2722,7 @@ public class AgendaHelper {
         String revealMessage = game.getPing() + "\nAn agenda has been revealed";
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
         if (!action) {
-            MapGenerator.drawAgendaBanner(aCount, game);
-            // MessageHelper.sendMessageToChannel(channel,"The game believes this is agenda #" + aCount + " of this agenda phase");
-
+            BannerGenerator.drawAgendaBanner(aCount, game);
         }
         StringBuilder whensAftersMessage = new StringBuilder(
             "Please indicate whether you abstain from playing whens/afters below.\nIf you have an action card with those windows, you may simply play it.");

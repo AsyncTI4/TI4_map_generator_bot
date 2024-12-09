@@ -27,7 +27,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.Units;
 import ti4.helpers.async.RoundSummaryHelper;
-import ti4.image.MapGenerator;
+import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -210,7 +210,7 @@ public class EndTurnService {
     public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
         if (game.isShowBanners()) {
-            MapGenerator.drawPhaseBanner("status", game.getRound(), game.getActionsChannel());
+            BannerGenerator.drawPhaseBanner("status", game.getRound(), game.getActionsChannel());
         }
         String message = "Please score objectives, " + game.getPing() + ".";
 

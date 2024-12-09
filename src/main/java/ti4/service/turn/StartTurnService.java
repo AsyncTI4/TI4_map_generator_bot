@@ -20,7 +20,7 @@ import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.image.MapGenerator;
+import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -117,7 +117,7 @@ public class StartTurnService {
         } else {
             //checkhere
             if (game.isShowBanners()) {
-                MapGenerator.drawBanner(player);
+                BannerGenerator.drawFactionBanner(player);
             }
             MessageHelper.sendMessageToChannel(gameChannel, text);
             if (!goingToPass) {
