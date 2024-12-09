@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,9 +10,9 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
+import ti4.image.TileHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.message.BotLogger;
@@ -33,17 +34,12 @@ public class RegexHelper {
         }
     }
 
-    private static String regexBuilder(String groupname, Set<String> options) {
-        String sb = "(?<" + groupname + ">(" +
-                String.join("|", options) +
-                "))";
-        return sb;
+    private static String regexBuilder(String groupname, Collection<String> options) {
+        return "(?<" + groupname + ">(" + String.join("|", options) + "))";
     }
 
     private static String regexBuilder(String groupname, String pattern) {
-        String sb = "(?<" + groupname + ">" +
-                pattern + ")";
-        return sb;
+        return "(?<" + groupname + ">" + pattern + ")";
     }
 
     private static Set<String> legalColors(Game game) {
@@ -72,9 +68,8 @@ public class RegexHelper {
     }
 
     public static String oneOf(List<String> regex) {
-        String sb = "(" + "(" + String.join(")|(", regex) + ")" +
+        return "(" + "(" + String.join(")|(", regex) + ")" +
                 ")";
-        return sb;
     }
 
     /**
@@ -152,7 +147,7 @@ public class RegexHelper {
 
     /** @return group "tileID" matching any legal tile ID in the bot */
     public static String tileIDRegex() {
-        return regexBuilder("tileID", TileHelper.getAllTiles().keySet());
+        return regexBuilder("tileID", TileHelper.getAllTileIds());
     }
 
     /** @return group matching any planet on the map, and also "space" */

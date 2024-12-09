@@ -10,12 +10,12 @@ import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.MapTemplateModel;
 
@@ -83,7 +83,7 @@ public class GameSettings extends SettingsMenu {
             mapTemplate.initialize(json.get("mapTemplate"));
         }
 
-        decks = new DeckSettings(game, json, this);
+        decks = new DeckSettings(json, this);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -134,8 +134,11 @@ public class GameSettings extends SettingsMenu {
             int players = m.getPlayerSettings().getGamePlayers().getKeys().size();
             Map<String, MapTemplateModel> allowed = Mapper.getMapTemplatesForPlayerCount(players).stream()
                 .collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x));
-            String defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players).getAlias();
-            mapTemplate.setAllValues(allowed, defaultTemplate);
+            var defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
+            if (defaultTemplate == null) {
+                return;
+            }
+            mapTemplate.setAllValues(allowed, defaultTemplate.getAlias());
         }
     }
 

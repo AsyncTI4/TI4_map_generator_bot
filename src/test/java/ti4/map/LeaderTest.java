@@ -1,17 +1,15 @@
 package ti4.map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-
+import org.junit.jupiter.api.Test;
 import ti4.testUtils.BaseTi4Test;
 import ti4.testUtils.JsonValidator;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LeaderTest extends BaseTi4Test {
     private final String expectedId = "testId";

@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -31,7 +31,7 @@ public class HomeSystemDraftItem extends DraftItem {
             return "Delta Wormhole / Delta Wormhole, Creuss (4/2)";
         }
         FactionModel faction = Mapper.getFaction(ItemId);
-        TileModel tile = TileHelper.getTile(faction.getHomeSystem());
+        TileModel tile = TileHelper.getTileById(faction.getHomeSystem());
         StringBuilder sb = new StringBuilder();
         List<String> planetIds = tile.getPlanets();
         for (int i = 0; i < planetIds.size() - 1; i++) {
@@ -66,7 +66,7 @@ public class HomeSystemDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(DraftItem.Generate(Category.HOMESYSTEM, faction.getAlias()));
+            allItems.add(DraftItem.generate(Category.HOMESYSTEM, faction.getAlias()));
         }
         return allItems;
     }

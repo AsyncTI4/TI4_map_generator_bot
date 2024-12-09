@@ -1,27 +1,24 @@
 package ti4.message;
 
-import java.sql.Timestamp;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.helpers.GlobalSettings;
-import ti4.helpers.Helper;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.DateTimeHelper;
+import ti4.helpers.ThreadGetter;
+import ti4.helpers.ThreadHelper;
 import ti4.selections.SelectionMenuProvider;
+import ti4.settings.GlobalSettings;
 
 public class BotLogger {
     /**
@@ -34,7 +31,7 @@ public class BotLogger {
     }
 
     public static void logWithTimestamp(String msg) {
-        String timeStampedMessage = "`" + StringUtils.rightPad(new Timestamp(System.currentTimeMillis()).toString(), 23) + "`  " + msg;
+        String timeStampedMessage = DateTimeHelper.getCurrentTimestamp() + "  " + msg;
         log(null, timeStampedMessage, null);
     }
 
@@ -84,8 +81,6 @@ public class BotLogger {
         TextChannel botLogChannel = getBotLogChannel(event);
         if (msg == null) msg = "";
 
-        // Logger logger = LoggerFactory.getLogger(BotLogger.class);
-        // logger.info(msg);
         System.out.println("[BOT-LOG] " + msg);
 
         //Adding so we don't cause an exception by attempting to log
@@ -119,12 +114,13 @@ public class BotLogger {
             case SlashCommandInteractionEvent slashCommandInteractionEvent -> { //SLASH COMMAND EVENT LOGS
                 String channelName = event.getChannel().getName();
                 String channelMention = event.getChannel().getAsMention();
-                String commandString = ((CommandInteractionPayload) event).getCommandString();
+                String commandString = slashCommandInteractionEvent.getCommandString();
+                String message = "[" + channelName + "](" + channelMention + ") " + event.getUser().getEffectiveName() + " used: `" + commandString + "`\n> Error: " + msg;
                 if (e == null) {
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [command: `" + commandString + "`]\n" + msg).queue();
+                    botLogChannel.sendMessage(message).queue();
                 } else {
-                    Helper.checkThreadLimitAndArchive(event.getGuild());
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [command: `" + commandString + "`]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
+                    ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
+                    botLogChannel.sendMessage(message).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
                     }));
@@ -132,13 +128,14 @@ public class BotLogger {
             }
             case ButtonInteractionEvent buttonInteractionEvent -> { //BUTTON EVENT LOGS
                 String channelName = event.getChannel().getName();
-                String channelMention = event.getChannel().getAsMention();
-                Button button = ((ButtonInteraction) event).getButton();
+                Button button = buttonInteractionEvent.getButton();
+                String message = "[" + channelName + "](" + buttonInteractionEvent.getMessage().getJumpUrl() + ") " + event.getUser().getEffectiveName() + " pressed button: " + ButtonHelper.getButtonRepresentation(button) +
+                    "\n> Error: " + msg;
                 if (e == null) {
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue();
+                    botLogChannel.sendMessage(message).queue();
                 } else {
-                    Helper.checkThreadLimitAndArchive(event.getGuild());
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
+                    ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
+                    botLogChannel.sendMessage(message).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
                     }));
@@ -153,7 +150,7 @@ public class BotLogger {
                 if (e == null) {
                     botLogChannel.sendMessage(logMsg).queue();
                 } else {
-                    Helper.checkThreadLimitAndArchive(event.getGuild());
+                    ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
                     botLogChannel.sendMessage(logMsg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
@@ -164,7 +161,7 @@ public class BotLogger {
                 if (e == null) {
                     botLogChannel.sendMessage("[unknown event]\n" + msg).queue();
                 } else {
-                    Helper.checkThreadLimitAndArchive(event.getGuild());
+                    ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
                     botLogChannel.sendMessage("[unknown event]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
@@ -178,35 +175,12 @@ public class BotLogger {
         TextChannel primaryBotLogChannel = getPrimaryBotLogChannel();
         if (primaryBotLogChannel == null) return;
         try {
-            List<ThreadChannel> threadChannels = primaryBotLogChannel.getThreadChannels();
             String threadName = "button-log";
-            ThreadChannel buttonLogThread = null;
-            // SEARCH FOR EXISTING OPEN THREAD
-            for (ThreadChannel threadChannel : threadChannels) {
-                if (threadChannel.getName().equals(threadName)) {
-                    buttonLogThread = threadChannel;
-                }
-            }
-
-            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-            if (buttonLogThread == null) {
-                List<ThreadChannel> hiddenThreadChannels = primaryBotLogChannel.retrieveArchivedPrivateThreadChannels().complete();
-                for (ThreadChannel threadChannel : hiddenThreadChannels) {
-                    if (threadChannel.getName().equals(threadName)) {
-                        buttonLogThread = threadChannel;
-                    }
-                }
-            }
-            if (buttonLogThread == null) return;
-
-            StringBuilder sb = new StringBuilder();
-            sb.append(event.getUser().getEffectiveName()).append(" ");
-            sb.append("[");
-            if (event.getButton().getEmoji() != null) sb.append(event.getButton().getEmoji().getFormatted());
-            sb.append(event.getButton().getLabel()).append("]");
-            sb.append(" `").append(event.getButton().getId()).append("` ");
-            sb.append(event.getMessage().getJumpUrl());
-            MessageHelper.sendMessageToChannel(buttonLogThread, sb.toString());
+            ThreadGetter.getThreadInChannel(primaryBotLogChannel, threadName,
+                threadChannel -> {
+                    String sb = event.getUser().getEffectiveName() + " " + ButtonHelper.getButtonRepresentation(event.getButton()) + event.getMessage().getJumpUrl();
+                    MessageHelper.sendMessageToChannel(threadChannel, sb);
+                });
         } catch (Exception e) {
             // Do nothing
         }
@@ -216,31 +190,12 @@ public class BotLogger {
         TextChannel primaryBotLogChannel = getPrimaryBotLogChannel();
         if (primaryBotLogChannel == null) return;
         try {
-            List<ThreadChannel> threadChannels = primaryBotLogChannel.getThreadChannels();
             String threadName = "slash-command-log";
-            ThreadChannel slashCommandLogThread = null;
-            // SEARCH FOR EXISTING OPEN THREAD
-            for (ThreadChannel threadChannel : threadChannels) {
-                if (threadChannel.getName().equals(threadName)) {
-                    slashCommandLogThread = threadChannel;
-                }
-            }
-
-            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-            if (slashCommandLogThread == null) {
-                List<ThreadChannel> hiddenThreadChannels = primaryBotLogChannel.retrieveArchivedPrivateThreadChannels().complete();
-                for (ThreadChannel threadChannel : hiddenThreadChannels) {
-                    if (threadChannel.getName().equals(threadName)) {
-                        slashCommandLogThread = threadChannel;
-                    }
-                }
-            }
-            if (slashCommandLogThread == null) return;
-
-            String sb = event.getUser().getEffectiveName() + " " +
-                    "`" + event.getCommandString() + "` " +
-                    commandResponseMessage.getJumpUrl();
-            MessageHelper.sendMessageToChannel(slashCommandLogThread, sb);
+            ThreadGetter.getThreadInChannel(primaryBotLogChannel, threadName,
+                threadChannel -> {
+                    String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + commandResponseMessage.getJumpUrl();
+                    MessageHelper.sendMessageToChannel(threadChannel, sb);
+                });
         } catch (Exception e) {
             // Do nothing
         }

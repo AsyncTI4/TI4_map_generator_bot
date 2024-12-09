@@ -13,14 +13,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.apache.commons.lang3.StringUtils;
-import ti4.generator.Mapper;
+import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.model.AttachmentModel;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel;
 import ti4.model.TechSpecialtyModel;
 import ti4.model.UnitModel;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @JsonTypeName("planet")
 public class Planet extends UnitHolder {
@@ -29,14 +32,14 @@ public class Planet extends UnitHolder {
     private int influenceOriginal;
     private int resourcesModifier;
     private int influenceModifier;
-    private String originalPlanetType = "";
-    private String originalTechSpeciality = "";
+    private String originalPlanetType;
+    private String originalTechSpeciality;
     private final List<String> planetType = new ArrayList<>();
     private final List<String> techSpeciality = new ArrayList<>();
     private boolean hasAbility;
     private int spaceCannonHitsOn;
     private int spaceCannonDieCount;
-    private String contrastColor = "";
+    private String contrastColor;
 
     @JsonCreator
     public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
@@ -119,7 +122,6 @@ public class Planet extends UnitHolder {
     public boolean hasGroundForces(Game game) {
         return getUnits().keySet().stream()
             .flatMap(uk -> game.getPriorityUnitByUnitKey(uk, this).stream())
-            .filter(Objects::nonNull)
             .anyMatch(UnitModel::getIsGroundForce);
     }
 
@@ -235,10 +237,12 @@ public class Planet extends UnitHolder {
         return getResources() + getInfluence();
     }
 
+    @Nullable
     public String getOriginalPlanetType() {
         return originalPlanetType;
     }
 
+    @Nullable
     public String getOriginalTechSpeciality() {
         return originalTechSpeciality;
     }
@@ -259,7 +263,7 @@ public class Planet extends UnitHolder {
         for (String type : planetType) {
             if (three.contains(type)) types.add(type);
         }
-        if (three.contains(originalPlanetType)) types.add(originalPlanetType);
+        if (isNotBlank(originalPlanetType) && three.contains(originalPlanetType)) types.add(originalPlanetType);
         return types;
     }
 
@@ -270,7 +274,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public Set<String> getTechSpecialities() {
         Set<String> specialties = new HashSet<>();
-        if (originalTechSpeciality != null && !originalTechSpeciality.isEmpty()) {
+        if (isNotBlank(originalTechSpeciality)) {
             specialties.add(originalTechSpeciality);
         }
         specialties.addAll(techSpeciality);

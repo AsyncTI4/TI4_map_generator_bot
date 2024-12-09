@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -21,6 +21,7 @@ import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollType;
 
 public class CombatMessageHelper {
     public static void displayDuplicateUnits(GenericInteractionCreateEvent event, List<String> dupes) {
@@ -84,8 +85,13 @@ public class CombatMessageHelper {
             .collect(Collectors.joining(" "));
 
         String unitEmoji = unitModel.getUnitEmoji();
-
+        
         String resultRollsString = "[" + resultRolls.stream().map(Die::getRedDieIfSuccessOrGrayDieIfFailure).collect(Collectors.joining("")) + "]";
+        if ("jolnar_flagship".equals(unitModel.getId()))
+        {
+            resultRollsString = resultRollsString.replace(Emojis.d10red_9, Emojis.d10blue_9).replace(Emojis.d10red_0, Emojis.d10blue_0);
+        }
+        
         return String.format("> `%sx`%s %s %s - %s hit%s\n", unitQuantity, unitEmoji, optionalText, resultRollsString, numHit, hitsSuffix);
     }
 
@@ -151,7 +157,7 @@ public class CombatMessageHelper {
                 combatTypeName += " on " + StringUtils.capitalize(holderName);
             }
         } else {
-            int round = 0;
+            int round;
             Game game = player.getGame();
             String combatName = "combatRoundTracker" + player.getFaction() + tile.getPosition() + combatOnHolder.getName();
             if (game.getStoredValue(combatName).isEmpty()) {

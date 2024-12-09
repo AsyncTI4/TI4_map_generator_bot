@@ -1,6 +1,6 @@
 package ti4.map;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,26 +9,25 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import org.apache.commons.collections4.CollectionUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.TileHelper;
+import ti4.helpers.AliasHandler;
+import ti4.helpers.CalendarHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
+import ti4.image.TileHelper;
 import ti4.message.BotLogger;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
@@ -72,27 +71,9 @@ public class Tile {
         unitHolders.put(Constants.SPACE, space);
         Map<String, Point> tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
 
-        if (Optional.ofNullable(tilePlanetPositions).isPresent())
+        if (tilePlanetPositions != null)
             tilePlanetPositions
                 .forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
-    }
-
-    public void inheritFogData(Tile t) {
-        fog.putAll(t.getFog());
-        fogLabel.putAll(t.getFogLabel());
-    }
-
-    @Nullable
-    public static String getUnitPath(UnitKey unitID) {
-        if (unitID == null)
-            return null;
-
-        String unitPath = ResourceHelper.getInstance().getUnitFile(unitID);
-        if (unitPath == null) {
-            BotLogger.log("Could not find unit: " + unitID);
-            return null;
-        }
-        return unitPath;
     }
 
     @Nullable
@@ -123,16 +104,18 @@ public class Tile {
 
     public void addUnitDamage(String spaceHolder, UnitKey unitID, @Nullable Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
-        if (unitHolder != null && count != null) {
-            Map<UnitKey, Integer> units = unitHolder.getUnits();
-            Integer unitCount = units.get(unitID);
-            if (unitCount != null) {
-                if (unitCount < count) {
-                    count = unitCount;
-                }
-                unitHolder.addUnitDamage(unitID, count);
-            }
+        if (unitHolder == null || count == null) {
+            return;
         }
+        Map<UnitKey, Integer> units = unitHolder.getUnits();
+        Integer unitCount = units.get(unitID);
+        if (unitCount == null) {
+            return;
+        }
+        if (unitCount < count) {
+            count = unitCount;
+        }
+        unitHolder.addDamagedUnit(unitID, count);
     }
 
     public void addCC(String ccID) {
@@ -210,7 +193,7 @@ public class Tile {
     public void removeUnitDamage(String spaceHolder, UnitKey unitID, @Nullable Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null && count != null) {
-            unitHolder.removeUnitDamage(unitID, count);
+            unitHolder.removeDamagedUnit(unitID, count);
         }
     }
 
@@ -272,8 +255,14 @@ public class Tile {
     public String getTilePath() {
         String tileName = Mapper.getTileID(tileID);
         if (("44".equals(tileID) || ("45".equals(tileID)))
-            && (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0)) {
+            && (RandomHelper.isOneInX(Constants.EYE_CHANCE))) {
             tileName = "S15_Cucumber.png";
+        }
+        if (("43".equals(tileID) || "80".equals(tileID))) {
+            int baubleChance = CalendarHelper.isNearChristmas() ? 5 : 10000;
+            if (RandomHelper.isOneInX(baubleChance)) {
+                tileName = tileName.replace(".png", "_xmas.png");
+            }
         }
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
@@ -362,8 +351,6 @@ public class Tile {
 
     @JsonIgnore
     public UnitHolder getSpaceUnitHolder() {
-        if (unitHolders.get("space") == null)
-            return null;
         return unitHolders.get("space");
     }
 
@@ -431,7 +418,7 @@ public class Tile {
 
     @JsonIgnore
     public TileModel getTileModel() {
-        return TileHelper.getTile(getTileID());
+        return TileHelper.getTileById(getTileID());
     }
 
     @JsonIgnore
@@ -628,27 +615,12 @@ public class Tile {
         if ("0g".equalsIgnoreCase(tileID)) {
             return true;
         }
-
-        //TileModel model = getTileModel();
-        // if (model != null) {
-        //     if (StringUtils.isNotBlank(model.getTileBack())) {
-        //         // if the tile back is defined, that is the source of truth
-        //         return "green".equals(model.getTileBack());
-        //     }
-        //     for (String p : model.getPlanets()) {
-        //         PlanetModel planet = Mapper.getPlanet(p);
-        //         if (StringUtils.isNotBlank(planet.getFactionHomeworld())) {
-        //             return true;
-        //         }
-        //     }
-        //     return false;
-        // }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planetHolder) {
-                boolean oneOfThree = (unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_threetraits.png")) || (planetHolder.getOriginalPlanetType() != null
-                    && ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
+                boolean oneOfThree = (unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_threetraits.png")) ||
+                    ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
                         || "cultural".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
-                        || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType())));
+                        || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType()));
 
                 if (!Constants.MECATOLS.contains(planetHolder.getName()) && !oneOfThree) {
                     return true;
@@ -676,5 +648,10 @@ public class Tile {
 
     public static Predicate<Tile> tileHasPlayerUnits(Player player) {
         return tile -> tile.containsPlayersUnits(player);
+    }
+
+    public String getHexTileSummary() {
+        // TILE +-X +-Y SPACE ; PLANET1 ; PLANET2 ;
+        return getTileID() + AliasHandler.resolveTTPGPosition(getPosition());
     }
 }

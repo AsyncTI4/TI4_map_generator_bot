@@ -13,12 +13,9 @@ public class BorderAnomalyHolder {
     private BorderAnomalyModel.BorderAnomalyType type;
 
     public boolean blocksAdjacency() {
-        if (type == null) {
-            return false;
-        }
         return switch (type) {
             case SPATIAL_TEAR -> true;
-            default -> false;
+            case null, default -> false;
         };
     }
 }

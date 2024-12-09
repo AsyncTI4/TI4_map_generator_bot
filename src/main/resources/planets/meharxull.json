@@ -2,7 +2,7 @@
     "id": "meharxull",
     "tileId": "24",
     "name": "Mehar Xull",
-    "shortName": null,
+    "shrinkNamePNAttach": true,
     "aliases": [
         "meharxull",
         "mx",

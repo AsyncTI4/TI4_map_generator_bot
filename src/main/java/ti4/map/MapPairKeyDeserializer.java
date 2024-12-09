@@ -4,7 +4,6 @@ import java.util.StringTokenizer;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
-
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 
 public class MapPairKeyDeserializer extends KeyDeserializer {

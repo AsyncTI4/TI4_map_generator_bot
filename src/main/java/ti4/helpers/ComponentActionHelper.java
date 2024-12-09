@@ -10,16 +10,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardspn.PlayPN;
-import ti4.commands.ds.DrawBlueBackTile;
-import ti4.commands.leaders.ExhaustLeader;
-import ti4.commands.leaders.HeroPlay;
-import ti4.commands.player.TurnStart;
-import ti4.commands.units.AddUnits;
-import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -30,6 +22,10 @@ import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
+import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.PlayHeroService;
+import ti4.service.turn.StartTurnService;
+import ti4.service.unit.AddUnitService;
 
 public class ComponentActionHelper {
 
@@ -197,7 +193,7 @@ public class ComponentActionHelper {
             if (prom == null) {
                 MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentationUnfogged()
                     + " you have a null PN. Please use /pn purge after reporting it " + pn);
-                PNInfo.sendPromissoryNoteInfo(game, p1, false);
+                PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
             }
         }
 
@@ -296,18 +292,18 @@ public class ComponentActionHelper {
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
                         if ("fogallianceagent".equalsIgnoreCase(buttonID)) {
-                            ExhaustLeader.exhaustLeader(event, game, p1, p1.getLeader(buttonID).orElse(null));
+                            ExhaustLeaderService.exhaustLeader(game, p1, p1.getLeader(buttonID).orElse(null));
                             ButtonHelperAgents.exhaustAgent("fogallianceagent", event, game, p1);
                         } else {
                             ButtonHelperAgents.exhaustAgent(buttonID, event, game, p1);
                         }
                     }
                 } else if (buttonID.contains("hero")) {
-                    HeroPlay.playHero(event, game, p1, p1.getLeader(buttonID).orElse(null));
+                    PlayHeroService.playHero(event, game, p1, p1.getLeader(buttonID).orElse(null));
                 }
             }
             case "relic" -> resolveRelicComponentAction(game, p1, event, buttonID);
-            case "pn" -> PlayPN.resolvePNPlay(buttonID, p1, game, event);
+            case "pn" -> PromissoryNoteHelper.resolvePNPlay(buttonID, p1, game, event);
             case "ability" -> {
                 if ("starForge".equalsIgnoreCase(buttonID)) {
 
@@ -341,8 +337,8 @@ public class ComponentActionHelper {
                         Emojis.Muaat + Emojis.flagship + "The Inferno");
                     List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship);
                     Tile tile = tiles.getFirst();
-                    List<Button> buttons = TurnStart.getStartOfTurnButtons(p1, game, true, event);
-                    new AddUnits().unitParsing(event, p1.getColor(), tile, "1 cruiser", game);
+                    List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
+                    AddUnitService.addUnits(event, tile, game, p1.getColor(), "cruiser");
                     successMessage = successMessage + "Produced 1 " + Emojis.cruiser + " in tile "
                         + tile.getRepresentationForButtons(game, p1) + ".";
                     MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
@@ -380,7 +376,7 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2,
                         purgeFragButtons);
                     String message = "Use buttons to end turn or do an action";
-                    List<Button> systemButtons = TurnStart.getStartOfTurnButtons(p1, game, true, event);
+                    List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, systemButtons);
 
                 } else if ("fabrication".equalsIgnoreCase(buttonID)) {
@@ -414,7 +410,7 @@ public class ComponentActionHelper {
                 } else if ("stallTactics".equalsIgnoreCase(buttonID)) {
                     String secretScoreMsg = "_ _\n" + p1.getRepresentationUnfogged()
                         + " Click a button below to discard an Action Card";
-                    List<Button> acButtons = ACInfo.getDiscardActionCardButtons(p1, true);
+                    List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
                         p1.getRepresentation() + " is resolving their Stall Tactics ability");
                     if (!acButtons.isEmpty()) {
@@ -427,8 +423,6 @@ public class ComponentActionHelper {
                     }
                 } else if ("mantlecracking".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = ButtonHelperAbilities.getMantleCrackingButtons(p1, game);
-                    // MessageHelper.sendMessageToChannel(event.getChannel(),
-                    // p1.getFactionEmoji()+" Chose to use the mantle cracking ability");
                     String message = "Select the planet you would like to mantle crack";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("meditation".equalsIgnoreCase(buttonID)) {
@@ -444,8 +438,8 @@ public class ComponentActionHelper {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     }
                     String message = "Select the tech you would like to ready";
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message, ButtonHelper.getAllTechsToReady(game, p1));
-                    List<Button> buttons = TurnStart.getStartOfTurnButtons(p1, game, true, event);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelper.getAllTechsToReady(p1));
+                    List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
                     String message2 = "Use buttons to end turn or do another action";
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 }
@@ -517,7 +511,7 @@ public class ComponentActionHelper {
             }
             case "actionCards" -> {
                 String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
-                List<Button> acButtons = ACInfo.getActionPlayActionCardButtons(p1);
+                List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
                 if (!acButtons.isEmpty()) {
                     List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
                     ThreadChannel cardsInfoThreadChannel = p1.getCardsInfoThread();
@@ -529,7 +523,7 @@ public class ComponentActionHelper {
             }
             case "doStarCharts" -> {
                 ButtonHelper.purge2StarCharters(p1);
-                DrawBlueBackTile.drawBlueBackTiles(event, game, p1, 1);
+                DiscordantStarsHelper.drawBlueBackTiles(event, game, p1, 1);
             }
         }
 
@@ -539,8 +533,7 @@ public class ComponentActionHelper {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void resolveRelicComponentAction(Game game, Player player, ButtonInteractionEvent event,
-        String relicID) {
+    private static void resolveRelicComponentAction(Game game, Player player, ButtonInteractionEvent event, String relicID) {
         if (!Mapper.isValidRelic(relicID) || !player.hasRelic(relicID)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Invalid relic or player does not have specified relic: `" + relicID + "`");
@@ -580,9 +573,9 @@ public class ComponentActionHelper {
         // SPECIFIC HANDLING //TODO: Move this shite to RelicPurge
         switch (relicID) {
             case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, event);
-            case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(player, game, event);
-            case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> ButtonHelper.offerNanoforgeButtons(player, game, event);
-            case "decrypted_cartoglyph" -> DrawBlueBackTile.drawBlueBackTiles(event, game, player, 3);
+            case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(event);
+            case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> ButtonHelperRelics.offerNanoforgeButtons(player, game, event);
+            case "decrypted_cartoglyph" -> DiscordantStarsHelper.drawBlueBackTiles(event, game, player, 3);
             case "throne_of_the_false_emperor" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("drawRelic", "Draw a relic"));
@@ -591,7 +584,7 @@ public class ComponentActionHelper {
                 message = player.getRepresentation()
                     + " choose one of the options. Reminder than you can't score more secrets than normal with this relic (even if they're someone else's), and you can't score the same secret twice."
                     + " If scoring one of your unscored secrets, just score it via the normal process after pressing the button.";
-                MessageHelper.sendMessageToChannel(event.getChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
             case "dynamiscore", "absol_dynamiscore" -> {
                 int oldTg = player.getTg();
@@ -605,16 +598,14 @@ public class ComponentActionHelper {
                     + player.getTg();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);
-                ButtonHelperAgents.resolveArtunoCheck(player, game, player.getTg() - oldTg);
+                ButtonHelperAgents.resolveArtunoCheck(player, player.getTg() - oldTg);
             }
             case "stellarconverter" -> {
                 message = player.getRepresentationUnfogged() + " Select the planet you want to destroy";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
                     ButtonHelper.getButtonsForStellar(player, game));
             }
-            case "passturn" -> {
-                MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
-            }
+            case "passturn" -> MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
             case "titanprototype", "absol_jr" -> {
                 // handled above
             }
@@ -625,7 +616,7 @@ public class ComponentActionHelper {
 
     public static void serveNextComponentActionButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         String message = "Use buttons to end turn or do another action.";
-        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+        List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, systemButtons);
     }
 }

@@ -1,14 +1,13 @@
 package ti4.helpers;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Units {
 
@@ -51,7 +50,7 @@ public class Units {
 
         @JsonIgnore
         public String getFileName() {
-            return getFileName(ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0);
+            return getFileName(RandomHelper.isOneInX(Constants.EYE_CHANCE));
         }
 
         public String getFileName(boolean eyes) {
@@ -68,7 +67,7 @@ public class Units {
                 return "PlenaryOrbital.png";
             }
             if (UnitType.Monument == unitType) {
-                return "monument.png"; // TODO: Colours
+                return getColor() + "_monument.png";
             }
 
             return String.format("%s_%s.png", colorID, asyncID());

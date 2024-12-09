@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import ti4.generator.TileHelper;
+import ti4.image.TileHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 
@@ -76,7 +76,7 @@ public class JimboConst {
         Function<TileModel, Integer> sourceOrder = t -> t.getSource().ordinal();
         Comparator<TileModel> comp = Comparator.comparing(sourceOrder).thenComparing(TileModel::getAlias);
         // sort by source, then by alias
-        List<TileModel> allTilesSorted = TileHelper.getAllTiles().values().stream().sorted(comp).toList();
+        List<TileModel> allTilesSorted = TileHelper.getAllTileModels().stream().sorted(comp).toList();
 
         blueTiles = allTilesSorted.stream().filter(t -> "0b".equals(t.getAlias()) || "blue".equals(t.getTileBack())).toList();
         redTiles = allTilesSorted.stream().filter(t -> "0r".equals(t.getAlias()) || "red".equals(t.getTileBack())).toList();
@@ -110,7 +110,6 @@ public class JimboConst {
 
             String rotationStr = hl.getId().replace(baseTile, "");
             int rotation = switch (rotationStr) {
-                case "", "0" -> 0;
                 case "1", "60" -> 1;
                 case "2", "120" -> 2;
                 case "3", "180" -> 3;
@@ -156,7 +155,7 @@ public class JimboConst {
         for (TileModel tile : draftTiles) {
             String color = tile.getId().replaceAll("(blank|\\d+)$", "");
             String indexStr = tile.getId().replace(color, "");
-            int index = 0;
+            int index;
             switch (indexStr) {
                 case "blank" -> index = -1;
                 default -> {

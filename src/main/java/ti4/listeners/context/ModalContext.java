@@ -5,12 +5,17 @@ import java.util.Map;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
-import ti4.map.GameSaveLoadManager;
+import ti4.helpers.ButtonHelper;
+import ti4.map.manage.GameManager;
+import ti4.service.event.EventAuditService;
 
 @Getter
 public class ModalContext extends ListenerContext {
-    private String modalID, messageID;
+
+    private String modalID;
+    private String messageID;
     private Map<String, String> values;
 
     public ModalInteractionEvent getEvent() {
@@ -34,9 +39,20 @@ public class ModalContext extends ListenerContext {
         for (ModalMapping mapping : event.getValues()) {
             values.put(mapping.getId(), mapping.getAsString());
         }
+    }
 
-        if (game != null) {
-            GameSaveLoadManager.saveGame(game, event);
+    public void save(ButtonInteractionEvent event) {
+        boolean skippableButton = componentID.contains("ultimateUndo") ||
+            "showGameAgain".equalsIgnoreCase(componentID) ||
+            "cardsInfo".equalsIgnoreCase(componentID) ||
+            componentID.contains("showDeck") ||
+            componentID.contains("FactionInfo") ||
+            componentID.contains("searchMyGames") ||
+            componentID.contains("decline_explore") ||
+            componentID.contains("offerDeckButtons");
+        if (game != null && !skippableButton) {
+            ButtonHelper.saveButtons(event, game, player);
+            GameManager.save(game, EventAuditService.getReason(event, game.isFowMode()));
         }
     }
 }

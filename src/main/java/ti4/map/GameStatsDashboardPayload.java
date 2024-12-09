@@ -1,6 +1,5 @@
 package ti4.map;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -19,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awssdk.utils.StringUtils;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.message.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
@@ -76,14 +75,7 @@ public class GameStatsDashboardPayload {
     }
 
     public String getHexSummary() {
-        // 18+0+0*b;Bio,71+0+2Rct;Ro;Ri,36+1+1Kcf;Km*I;Ki,76+1-1;;;,72+0-2; ......
-        // CSV of {tileID}{+x+yCoords}??{list;of;tokens} ?? 
-        // See ConvertTTPGtoAsync.ConvertTTPGHexToAsyncTile() and reverse it!
-        return null;
-    }
-
-    public Map<Timestamp, GameStatsDashboardPayload> getHistory() {
-        return game.getHistoricalGameStatsDashboardPayloads();
+        return game.getHexSummary();
     }
 
     @JsonProperty("isPoK")
@@ -113,36 +105,39 @@ public class GameStatsDashboardPayload {
         // Relics
         var relics = new ArrayList<String>();
         game.getRealAndEliminatedPlayers().stream()
-                .map(Player::getRelics)
-                .flatMap(Collection::stream)
-                .forEach(customPublicVp -> {
-                    if (customPublicVp.startsWith("absol_shardofthethrone")) {
-                        var shardNumber = customPublicVp.charAt(customPublicVp.length() - 1);
-                        relics.add("Shard of the Throne " + shardNumber + " (Absol)");
-                    } else if (customPublicVp.toLowerCase().contains("shard")) {
-                        relics.add("Shard of the Throne");
-                    }});
+            .map(Player::getRelics)
+            .flatMap(Collection::stream)
+            .forEach(customPublicVp -> {
+                if (customPublicVp.startsWith("absol_shardofthethrone")) {
+                    var shardNumber = customPublicVp.charAt(customPublicVp.length() - 1);
+                    relics.add("Shard of the Throne " + shardNumber + " (Absol)");
+                } else if (customPublicVp.toLowerCase().contains("shard")) {
+                    relics.add("Shard of the Throne");
+                }
+            });
         // some older games may have added these custom
         game.getCustomPublicVP().keySet()
-                .forEach(customPublicVp -> {
-                    if (customPublicVp.toLowerCase().contains("shard") && !relics.contains("Shard of the Throne")) {
-                        relics.add("Shard of the Throne");
-                    } else if (customPublicVp.toLowerCase().contains("emphidia")) {
-                        relics.add("The Crown of Emphidia");
-                    }});
+            .forEach(customPublicVp -> {
+                if (customPublicVp.toLowerCase().contains("shard") && !relics.contains("Shard of the Throne")) {
+                    relics.add("Shard of the Throne");
+                } else if (customPublicVp.toLowerCase().contains("emphidia")) {
+                    relics.add("The Crown of Emphidia");
+                }
+            });
         objectives.put("Relics", relics);
 
         // Agenda
         var agendas = new ArrayList<String>();
         game.getCustomPublicVP().keySet()
-                .forEach(customPublicVp -> {
-                    if (customPublicVp.toLowerCase().contains("censure")) {
-                        agendas.add("Political Censure");
-                    } else if (customPublicVp.toLowerCase().contains("mutiny")) {
-                        agendas.add("Mutiny");
-                    } else if (customPublicVp.toLowerCase().contains("seed")) {
-                        agendas.add("Seed of an Empire");
-                    }});
+            .forEach(customPublicVp -> {
+                if (customPublicVp.toLowerCase().contains("censure")) {
+                    agendas.add("Political Censure");
+                } else if (customPublicVp.toLowerCase().contains("mutiny")) {
+                    agendas.add("Mutiny");
+                } else if (customPublicVp.toLowerCase().contains("seed")) {
+                    agendas.add("Seed of an Empire");
+                }
+            });
         objectives.put("Agenda", agendas);
 
         // Custom
@@ -151,37 +146,38 @@ public class GameStatsDashboardPayload {
         // Other (Supports + Imperial Rider)
         var otherObjectives = new ArrayList<String>();
         game.getPlayers().values().stream()
-                        .map(Player::getPromissoryNotesOwned)
-                        .flatMap(Collection::stream)
-                        .map(Mapper::getPromissoryNote)
-                        .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
-                        .map(pn -> "Support for the Throne (" + pn.getColor() + ")")
-                        .forEach(otherObjectives::add);
+            .map(Player::getPromissoryNotesOwned)
+            .flatMap(Collection::stream)
+            .map(Mapper::getPromissoryNote)
+            .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
+            .map(pn -> "Support for the Throne (" + pn.getColor().get() + ")")
+            .forEach(otherObjectives::add);
         game.getCustomPublicVP().keySet()
-                .forEach(customPublicVp -> {
-                    if (customPublicVp.toLowerCase().contains("rider")) {
-                        otherObjectives.add("Imperial Rider");
-                    }});
+            .forEach(customPublicVp -> {
+                if (customPublicVp.toLowerCase().contains("rider")) {
+                    otherObjectives.add("Imperial Rider");
+                }
+            });
         objectives.put("Other", otherObjectives);
 
         var revealedPublics = game.getRevealedPublicObjectives().keySet().stream()
-                .map(Mapper::getPublicObjective)
-                .filter(Objects::nonNull)
-                .toList();
+            .map(Mapper::getPublicObjective)
+            .filter(Objects::nonNull)
+            .toList();
 
         //Public I
         objectives.put("Public Objectives I",
-                revealedPublics.stream()
-                        .filter(publicObjective -> publicObjective.getPoints() == 1)
-                        .map(PublicObjectiveModel::getName)
-                        .toList());
+            revealedPublics.stream()
+                .filter(publicObjective -> publicObjective.getPoints() == 1)
+                .map(PublicObjectiveModel::getName)
+                .toList());
 
         //Public II
         objectives.put("Public Objectives II",
-                revealedPublics.stream()
-                        .filter(publicObjective -> publicObjective.getPoints() == 2)
-                        .map(PublicObjectiveModel::getName)
-                        .toList());
+            revealedPublics.stream()
+                .filter(publicObjective -> publicObjective.getPoints() == 2)
+                .map(PublicObjectiveModel::getName)
+                .toList());
 
         // Secrets
         List<String> secrets = new ArrayList<>();
@@ -242,6 +238,13 @@ public class GameStatsDashboardPayload {
         }
     }
 
+    public Long getEndedTimestamp() {
+        if (!game.isHasEnded()) {
+            return null;
+        }
+        return Instant.ofEpochMilli(game.getEndedDate()).getEpochSecond();
+    }
+
     public String getTurn() {
         Player activePlayer = game.getActivePlayer();
         if (activePlayer == null) return null;
@@ -261,8 +264,31 @@ public class GameStatsDashboardPayload {
         return game.getWinner().isPresent() ? game.getWinner().get().getUserID() : null;
     }
 
+    public boolean hasCompleted() {
+        return game.getWinner().isPresent() && game.isHasEnded();
+    }
+
     public boolean isHomebrew() {
         return game.hasHomebrew();
     }
 
+    public boolean isDiscordantStarsMode() {
+        return game.isDiscordantStarsMode();
+    }
+
+    public boolean isAbsolMode() {
+        return game.isAbsolMode();
+    }
+
+    public boolean isFrankenGame() {
+        return game.isFrankenGame();
+    }
+
+    public boolean isAllianceMode() {
+        return game.isAllianceMode();
+    }
+
+    public boolean isTIGLGame() {
+        return game.isCompetitiveTIGLGame();
+    }
 }

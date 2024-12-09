@@ -13,8 +13,8 @@ public class RepositoryDispatchEvent {
 
     private static final String GITHUB_API_URL = "https://api.github.com/repos/AsyncTI4/TI4_map_generator_bot/dispatches";
     private static final String REPO_DISPATCH_TOKEN = System.getenv("REPO_DISPATCH_TOKEN");
-    private String eventType;
-    private RespositoryDispatchClientPayload payload;
+    private final String eventType;
+    private final RespositoryDispatchClientPayload payload;
 
     /**
      * https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event
@@ -31,7 +31,7 @@ public class RepositoryDispatchEvent {
             OkHttpClient client = new OkHttpClient().newBuilder().build();
             MediaType mediaType = MediaType.parse("application/json");
             StringBuilder bodyJson = new StringBuilder("{\"event_type\":\"" + eventType + "\"");
-            if (payload != null && payload.isValid()) {
+            if (payload.isValid()) {
                 bodyJson.append(",").append(payload.toJson());
             }
             bodyJson.append("}");
@@ -42,9 +42,10 @@ public class RepositoryDispatchEvent {
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Authorization", "Bearer " + REPO_DISPATCH_TOKEN)
                 .build();
-            Response response = client.newCall(request).execute();
-            if (!response.isSuccessful()) {
-                BotLogger.log("RespositoryDisptachEvent error: " + response.body().string());
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    BotLogger.log("RespositoryDisptachEvent error: " + response.body().string());
+                }
             }
         } catch (Exception e) {
             BotLogger.log("RespositoryDisptachEvent error", e);

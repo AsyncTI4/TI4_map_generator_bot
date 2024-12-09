@@ -2,7 +2,6 @@
     "id": "zarr",
     "tileId": "d04",
     "name": "Zarr",
-    "shortName": null,
     "aliases": [
         "zarr",
         "zar"

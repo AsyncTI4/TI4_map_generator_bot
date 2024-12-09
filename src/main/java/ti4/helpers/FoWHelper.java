@@ -20,20 +20,21 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.combat.StartCombat;
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
+import ti4.service.combat.StartCombatService;
+import ti4.service.game.GameNameService;
 
 public class FoWHelper {
 
@@ -56,21 +57,18 @@ public class FoWHelper {
 		return isPrivateGame(game, null, null);
 	}
 
-	public static boolean isPrivateGame(Game game, @Nullable GenericInteractionCreateEvent event,
-		@Nullable Channel channel_) {
+	public static boolean isPrivateGame(Game game, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
 		Channel eventChannel = event == null ? null : event.getChannel();
 		Channel channel = channel_ != null ? channel_ : eventChannel;
 		if (channel == null) {
 			return game.isFowMode();
 		}
 		if (game == null) {
-			String gameName = channel.getName();
-			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
-			gameName = gameName.substring(0, gameName.indexOf("-"));
-			game = GameManager.getInstance().getGame(gameName);
-			if (game == null) {
+			String gameName = GameNameService.getGameNameFromChannel(channel);
+			if (!GameManager.isValid(gameName)) {
 				return false;
 			}
+			game = GameManager.getManagedGame(gameName).getGame();
 		}
 		if (game.isFowMode() && channel_ != null || event != null) {
 			return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
@@ -78,10 +76,6 @@ public class FoWHelper {
 		return false;
 	}
 
-	/**
-	 * Method to determine of a viewing player should be able to see the stats of a
-	 * particular faction
-	 */
 	public static boolean canSeeStatsOfFaction(Game game, String faction, Player viewingPlayer) {
 		for (Player player : game.getPlayers().values()) {
 			if (faction.equals(player.getFaction())) {
@@ -91,10 +85,6 @@ public class FoWHelper {
 		return false;
 	}
 
-	/**
-	 * Method to determine of a viewing player should be able to see the stats of a
-	 * particular player
-	 */
 	public static boolean canSeeStatsOfPlayer(Game game, Player player, Player viewingPlayer) {
 		if (!player.isRealPlayer() || !viewingPlayer.isRealPlayer()) {
 			return false;
@@ -103,10 +93,7 @@ public class FoWHelper {
 			return true;
 		}
 
-		return viewingPlayer != null && player != null && game != null &&
-			(hasHomeSystemInView(game, player, viewingPlayer)
-				|| hasPlayersPromInPlayArea(player, viewingPlayer)
-				|| hasMahactCCInFleet(player, viewingPlayer) || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
+		return game != null && (hasHomeSystemInView(game, player, viewingPlayer) || hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer) || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
 	}
 
 	/**
@@ -531,11 +518,8 @@ public class FoWHelper {
 				}
 				for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
 					if (tokenName.contains(wh.getWhString())) {
-						wormholeIDs.add(wh.getWhString());
-						if (!wh.toString().contains("eta") || wh.toString().contains("beta")) {
 							wormholeIDs.add(wh.toString());
-						}
-						break;
+  						break;
 					}
 				}
 			}
@@ -572,7 +556,8 @@ public class FoWHelper {
 				Set<String> tokenList = unitHolder.getTokenList();
 				for (String token : tokenList) {
 					for (String wormholeID : wormholeIDs) {
-						if (token.contains(wormholeID) && !(wormholeID.equals("eta") && token.contains("beta"))) {
+						if (token.contains(wormholeID) && !(wormholeID.equals("eta") 
+              && (token.contains("beta") || token.contains("theta") || token.contains("zeta") ))) {
 							adjacentPositions.add(position_);
 						}
 					}
@@ -750,11 +735,14 @@ public class FoWHelper {
 	}
 
 	public static boolean playerHasUnitsOnPlanet(Player player, Tile tile, String planet) {
+		return playerHasUnitsOnPlanet(player, tile.getUnitHolders().get(planet));
+	}
+
+	public static boolean playerHasUnitsOnPlanet(Player player, UnitHolder unitHolder) {
 		String colorID = Mapper.getColorID(player.getColor());
 		if (colorID == null)
 			return false; // player doesn't have a color
 
-		UnitHolder unitHolder = tile.getUnitHolders().get(planet);
 		Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
 		for (UnitKey unitKey : units.keySet()) {
@@ -797,7 +785,7 @@ public class FoWHelper {
 				success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
 				MessageChannel channel = player_.getPrivateChannel();
 				MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
-					StartCombat.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
+					StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
 			}
 			successfulCount += success ? 1 : 0;
 		}
@@ -885,10 +873,7 @@ public class FoWHelper {
 				sb.append("???");
 			}
 			sb.append(" sent ").append(transactedObject).append(" to ");
-			if (receivingPlayer == null) {
-				BotLogger.log(event, "`FoWHelper.pingPlayersTransaction` Warning, receivingPlayer is null");
-			}
-			if (receiverVisible && receivingPlayer != null) {
+            if (receiverVisible) {
 				sb.append(receivingPlayer.getRepresentation());
 			} else {
 				sb.append("???");

@@ -28,6 +28,7 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.blue("bestowTitleStep1_Lightning Fast", "Lightning Fast"));
             buttons.add(Buttons.blue("bestowTitleStep1_Fortune Favored", "Fortune Favored"));
             buttons.add(Buttons.blue("bestowTitleStep1_Possesses Cursed Dice", "Possesses Cursed Dice"));
+            buttons.add(Buttons.blue("bestowTitleStep1_A Great Hollywooder", "A Great Hollywooder"));
             buttons.add(Buttons.blue("bestowTitleStep1_A Worthy Opponent", "A Worthy Opponent"));
             buttons.add(Buttons.blue("bestowTitleStep1_A Brilliant Tactician", "A Brilliant Tactician"));
             buttons.add(Buttons.blue("bestowTitleStep1_A Master Diplomat", "A Master Diplomat"));
@@ -44,7 +45,7 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.red("bestowTitleStep1_Saltshaker", "Saltshaker"));
 
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Tiles here", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Tiles here", buttons);
         }
     }
 
@@ -59,7 +60,7 @@ public class PlayerTitleHelper {
             }
             buttons.add(Buttons.green("bestowTitleStep2_" + title + "_" + player2.getFaction(), player2.getFactionModel().getFactionName() + " (" + player2.getUserName() + ")"));
         }
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
 

@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +18,10 @@ public class Constants {
     public static final String bltId = "757405214398480486";
     public static final String gedsDeadId = "586504147746947090";
     public static final String sigmaId = "214326507458396161";
-    public static List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
+    public static final List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
+
+    // Server IDs
+    public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
 
     public static String jazzPing() {
         User jazz = AsyncTI4DiscordBot.jda.getUserById(jazzId);
@@ -32,7 +35,7 @@ public class Constants {
 
     // Tourney Winners
     public static final String cal1nos = "740848810749722646";
-    public static List<String> tourneyWinners = List.of(cal1nos);
+    public static final List<String> tourneyWinners = List.of(cal1nos);
 
     // Other People IDs
     public static final String cagesId = "203608548440014848";
@@ -251,7 +254,7 @@ public class Constants {
     public static final String START_PHASE = "start_phase";
     public static final String SPECIFIC_PHASE = "specific_phase";
     public static final String REMOVE_CODEX_AC = "remove_codex_ac";
-    public static final String PRIORITY_NO_DAMAGE = "priority_no_damage";
+    public static final String PRIORITIZE_DAMAGED = "prioritize_damaged";
     public static final String UNIT_NAMES_TO = "unit_names_to";
     public static final String UNIT_NAMES_FROM = "unit_names_from";
     public static final String UNIT_NAMES_FROM_2 = "unit_names_from_2";
@@ -421,6 +424,11 @@ public class Constants {
     public static final String REMOVE_PO_FROM_GAME = "remove_po_from_game";
     public static final String REMOVE_SC_FROM_GAME = "remove_sc_from_game";
 
+    public static final String SET_PO_DECK = "set_po_deck";
+    public static final String SET_PO_DECK_STAGE1_LIST = "stage1_ids";
+    public static final String SET_PO_DECK_STAGE2_LIST = "stage2_ids";
+    public static final String SET_PO_DECK_SHUFFLE = "shuffle";
+
     public static final String SO_ID = "so_id";
     public static final String AGENDA_ID = "agenda_id";
     public static final String CURRENT_AGENDA_INFO = "current_agenda_info";
@@ -538,9 +546,9 @@ public class Constants {
     public static final String PO_NO_SCORING = "po_no_scoring";
     public static final String SO_NO_SCORING = "so_no_scoring";
     public static final String FACTION_COLOR = "faction_or_color";
+    public static final String TARGET_FACTION_OR_COLOR = "target_faction_or_color";
+    public static final String TARGET_PLAYER = "target_player";
     public static final String TECH_TYPE = "tech_type";
-    public static final String FACTION_COLOR_1 = "faction_or_color_1";
-    public static final String FACTION_COLOR_2 = "faction_or_color_2";
     public static final String STATS = "stats";
     public static final String SEND_TG = "send_tg";
     public static final String SEND_COMMODITIES = "send_commodities";
@@ -596,8 +604,6 @@ public class Constants {
     public static final String ACTION_CARD = "action_card";
     public static final String AC_DECK = "ac_deck";
     public static final String STAGE_1_PUBLIC_DECK = "s1_public_deck";
-    public static final String STAGE_1_PUBLIC = "public_stage_1_objective";
-    public static final String STAGE_2_PUBLIC = "public_stage_2_objective";
     public static final String STAGE_2_PUBLIC_DECK = "s2_public_deck";
     public static final String EXPLORATION_DECKS = "exploration_decks";
     public static final String AC_DISCARDED = "action_cards_discarded";
@@ -640,7 +646,7 @@ public class Constants {
     public static final String AGENDAS = "agendas";
     public static final String AGENDA_DECK = "agenda_deck";
     public static final String AGENDA = "agenda";
-    public static final String RELIC_SHOW_REMAINING = "show_remaining";
+    public static final String SHOW_REMAINING = "show_remaining";
     public static final String RELIC_DRAW_SPECIFIC = "draw_specific";
     public static final String DRAW = "draw";
     public static final String RELIC_DRAW = "draw";
@@ -653,12 +659,15 @@ public class Constants {
     public static final String RELIC_INFO = "info";
     public static final String PUT_TOP = "put_top";
     public static final String PUT_BOTTOM = "put_bottom";
+    public static final String PUT_IN_DECK = "put_in_deck";
+    public static final String PUT_ON_BOTTOM = "put_on_bottom";
     public static final String SHUFFLE_AGENDAS = "shuffle_deck";
     public static final String RESET_AGENDAS = "reset_deck";
     public static final String RESET_DRAW_STATE_FOR_AGENDAS = "reset_draw_state_for_deck";
     public static final String PUT_DISCARD_BACK_INTO_DECK = "put_discard_back_into_deck";
     public static final String LOOK_AT_TOP = "look_at_top";
     public static final String LOOK_AT_BOTTOM = "look_at_bottom";
+    public static final String LOOK = "look";
     public static final String REVEAL = "reveal";
     public static final String REVEAL_FROM_BOTTOM = "reveal_from_bottom";
     public static final String ADD_LAW = "add_law";
@@ -734,11 +743,11 @@ public class Constants {
     public static final String DRAW_SO = "draw";
     public static final String ONLY_PHASE = "only_phase";
     public static final String DEAL_SO = "deal";
-    public static final String DEAL_SO_TO_ALL = "deal_to_all";
+    public static final String DEAL_TO_ALL = "deal_to_all";
     public static final String SHOW_SO = "show";
-    public static final String SHOW_ALL_SO = "show_all";
-    public static final String SHOW_ALL_SO_TO_ALL = "show_all_to_all";
-    public static final String SHOW_SO_TO_ALL = "show_to_all";
+    public static final String SHOW_ALL = "show_all";
+    public static final String SHOW_ALL_TO_ALL = "show_all_to_all";
+    public static final String SHOW_TO_ALL = "show_to_all";
     public static final String CARDS_AC = "ac";
     public static final String CARDS_SO = "so";
     public static final String CARDS_PN = "pn";
@@ -756,8 +765,6 @@ public class Constants {
     public static final String MAKE_AC_COPIES = "make_ac_copies";
     public static final String SHUFFLE_AC_DECK = "shuffle_deck";
     public static final String SHOW_AC = "show";
-    public static final String SHOW_ALL_AC = "show_all";
-    public static final String SHOW_AC_TO_ALL = "show_to_all";
     public static final String DISCARD_AC = "discard";
     public static final String PURGE_AC = "purge";
     public static final String DISCARD_AC_RANDOM = "discard_random";
@@ -777,16 +784,14 @@ public class Constants {
     public static final String PROMISSORY_NOTES_OWNED = "promissory_notes_owned";
     public static final String PROMISSORY_NOTES_PLAY_AREA = "promissory_notes_play_area";
     public static final String SHOW_PN = "show";
-    public static final String SHOW_ALL_PN = "show_all";
-    public static final String SHOW_PN_TO_ALL = "show_to_all";
     public static final String PLAY_PN = "play";
-    public static final String PLAY_PN_INTO_PLAY_AREA = "play_into_play_area";
     public static final String SEND_PN = "send";
     public static final String PURGE_PN = "purge";
     public static final String PURGED_PN = "purged_pn";
 
     public static final String TECH_ADD = "add";
     public static final String TECH_REMOVE = "remove";
+    public static final String TECH_PURGE = "purge";
     public static final String TECH_EXHAUST = "exhaust";
     public static final String TECH_REFRESH = "ready";
 
@@ -871,7 +876,7 @@ public class Constants {
     public static final String CATEGORY = "category";
     public static final String SEND_JSON_TO_S3 = "send_games_to_s3";
     public static final String SERVER_LIMIT_STATS = "server_limit_stats";
-    public static final String GAME_END = "end";
+    public static final String END = "end";
     public static final String GAME_HAS_ENDED = "game_has_ended";
     public static final String ARCHIVE_OLD_THREADS = "archive_old_threads";
     public static final String CREATE_TILE = "create_tile";
@@ -1145,7 +1150,7 @@ public class Constants {
     public static final String GAMES_WITH_FACTIONS = "games_with_factions";
     public static final String GAME_STATISTIC = "game_statistic";
     public static final String PLAYER_STATISTIC = "player_statistic";
-    public static final String UNDO_TO_BEFORE_COMMAND = "undo_to_before_command";
+    public static final String UNDO_TO_COMMAND = "undo_to_command";
     public static final String SHOW_GAME_MODES = "show_game_modes";
     public static final String MAX_SO_COUNT = "max_so_count";
     public static final String REFRESH_RELIC_INFO = "refreshRelicInfo";
@@ -1184,4 +1189,6 @@ public class Constants {
     public static final String FOW_GM_IDS = "fogOfWarGMIDs";
     public static final String STARTED_DATE = "started_date";
     public static final String MODIFY_UNITS = "modify_units";
+    public static final String SHOW_OWNED_PNS_IN_PLAYER_AREA = "show_owned_pns_in_player_area";
+    public static final String SECONDS = "seconds";
 }

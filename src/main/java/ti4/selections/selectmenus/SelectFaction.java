@@ -11,16 +11,15 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.apache.commons.collections4.ListUtils;
-import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.Player;
+import ti4.image.Mapper;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.selections.Selection;
+import ti4.service.game.GameNameService;
 
 public class SelectFaction implements Selection {
 
@@ -33,21 +32,15 @@ public class SelectFaction implements Selection {
 
     @Override
     public void execute(StringSelectInteractionEvent event) {
-        Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
-        if (game == null) {
+        String gameName = GameNameService.getGameNameFromChannel(event);
+        ManagedGame managedGame = GameManager.getManagedGame(gameName);
+        if (managedGame == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game could not be found");
             return;
         }
-        Player player = game.getPlayer(event.getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
-            return;
-        }
-
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You selected: " + event.getSelectedOptions().getFirst().getLabel());
         String fakeButtonID = selectionID + "_" + event.getUser().getId() + "_" + event.getValues().getFirst();
-        ButtonHelper.resolveSetupStep2(player, game, event, fakeButtonID);
+        ButtonHelper.resolveSetupStep2(managedGame.getGame(), event, fakeButtonID);
     }
 
     public static void offerFactionSelectionMenu(GenericInteractionCreateEvent event) {

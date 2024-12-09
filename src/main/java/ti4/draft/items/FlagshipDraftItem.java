@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -83,7 +83,7 @@ public class FlagshipDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             var units = faction.getUnits();
             units.removeIf((String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(DraftItem.Generate(Category.FLAGSHIP, units.getFirst()));
+            allItems.add(DraftItem.generate(Category.FLAGSHIP, units.getFirst()));
         }
         return allItems;
     }

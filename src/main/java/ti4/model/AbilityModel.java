@@ -1,13 +1,15 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
+import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @Data
@@ -22,6 +24,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     private String windowEffect;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
+    private String homebrewReplacesID;
 
     @Override
     public boolean isValid() {
@@ -37,7 +40,10 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getShortName() {
-        return Optional.ofNullable(shortName).orElse(getName());
+        if (getHomebrewReplacesID().isEmpty()) {
+            return Optional.ofNullable(shortName).orElse(getName());
+        }
+        return Optional.ofNullable(shortName).orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShortName());
     }
 
     public Optional<String> getPermanentEffect() {
@@ -50,6 +56,10 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getWindowEffect() {
         return Optional.ofNullable(windowEffect);
+    }
+
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
     }
 
     public MessageEmbed getRepresentationEmbed() {

@@ -1,10 +1,10 @@
 package ti4.testUtils;
 
 import org.junit.jupiter.api.BeforeAll;
-
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
+import ti4.image.TileHelper;
+import ti4.service.emoji.ApplicationEmojiService;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
 
@@ -30,6 +30,7 @@ public class BaseTi4Test {
         Mapper.init();
         AliasHandler.init();
         Storage.init();
+        ApplicationEmojiService.spoofEmojis();
     }
 
     /**

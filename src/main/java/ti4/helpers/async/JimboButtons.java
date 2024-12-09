@@ -7,13 +7,12 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections4.ListUtils;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.ListUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
 import ti4.helpers.RegexHelper;
 import ti4.map.Game;
@@ -90,16 +89,15 @@ public class JimboButtons {
 
     public static <T> boolean jimboPagination(ButtonInteractionEvent event, String msg, List<T> all, Function<T, Button> buttonator, @Nullable Function<List<T>, FileUpload> uploadinator, @Nullable List<Button> bonus, int size, String buttonID) {
         try {
-            int pagenum = 0;
-            int pagesize = size;
-            String prefix = "";
+            int pagenum;
+            String prefix;
             System.out.println("pagination: " + all.size() + " - " + buttonID);
             Matcher page = Pattern.compile(RegexHelper.pageRegex()).matcher(buttonID);
             if (!page.find()) return false; // no pagenum, don't paginate
             pagenum = Integer.parseInt(page.group("page"));
             prefix = buttonID.replace("_page" + pagenum, "");
 
-            List<List<T>> pages = ListUtils.partition(all, pagesize);
+            List<List<T>> pages = ListUtils.partition(all, size);
             if (pagenum >= pages.size()) pagenum = pages.size() - 1;
             if (pagenum < 0) pagenum = 0;
             List<T> pageToSend = pages.get(pagenum);

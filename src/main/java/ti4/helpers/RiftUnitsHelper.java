@@ -14,11 +14,10 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.units.RemoveUnits;
-import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -27,6 +26,8 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.unit.ParsedUnit;
+import ti4.service.unit.RemoveUnitService;
 
 public class RiftUnitsHelper {
 
@@ -66,8 +67,6 @@ public class RiftUnitsHelper {
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             String name = entry.getKey();
             String representation = planetRepresentations.get(name);
-            if (representation == null) {
-            }
             UnitHolder unitHolder = entry.getValue();
             Map<UnitKey, Integer> units = unitHolder.getUnits();
             if (!(unitHolder instanceof Planet)) {
@@ -150,7 +149,8 @@ public class RiftUnitsHelper {
             msg = msg + " and survived. May you always be so lucky.";
         } else {
             UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
-            new RemoveUnits().removeStuff(event, tile, 1, "space", key, player.getColor(), damaged, game);
+            var parsedUnit = new ParsedUnit(key);
+            RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
             msg = msg + " and failed. Condolences for your loss.";
             if (cabal != null && cabal != player
                 && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)) {
@@ -169,8 +169,7 @@ public class RiftUnitsHelper {
             UnitHolder unitHolder = entry.getValue();
             Map<UnitKey, Integer> units = unitHolder.getUnits();
 
-            if (unitHolder instanceof Planet) {
-            } else {
+            if (!(unitHolder instanceof Planet)) {
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     UnitKey key = unitEntry.getKey();
                     if (!player.unitBelongsToPlayer(key))
@@ -187,8 +186,7 @@ public class RiftUnitsHelper {
                         continue;
                     }
 
-                    String asyncID = key.asyncID();
-                    asyncID = key.unitName();
+                    String asyncID = key.unitName();
 
                     int totalUnits = unitEntry.getValue();
 
@@ -239,7 +237,7 @@ public class RiftUnitsHelper {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("unflipMallice", "Unflip Mallice"));
             buttons.add(Buttons.red("deleteButtons", "Leave it alone"));
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
     }
 

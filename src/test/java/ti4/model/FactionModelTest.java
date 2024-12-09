@@ -1,13 +1,14 @@
 package ti4.model;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.testUtils.BaseTi4Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FactionModelTest extends BaseTi4Test {
     @Test
@@ -67,17 +68,17 @@ class FactionModelTest extends BaseTi4Test {
     }
 
     private static boolean validateHomePlanets(FactionModel faction) {
-        if (TileHelper.getAllPlanets().keySet().containsAll(faction.getHomePlanets())) return true;
+        if (faction.getHomePlanets().stream().allMatch(TileHelper::isValidPlanet)) return true;
         List<String> invalidPlanetIDs = new ArrayList<>();
         for (String planetID : faction.getHomePlanets()) {
-            if (!TileHelper.getAllPlanets().containsKey(planetID)) invalidPlanetIDs.add(planetID);
+            if (!TileHelper.isValidPlanet(planetID)) invalidPlanetIDs.add(planetID);
         }
         System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid home planet IDs: `" + invalidPlanetIDs + "`");
         return false;
     }
 
     private static boolean validateHomeSystem(FactionModel faction) {
-        if (TileHelper.getAllTiles().containsKey(faction.getHomeSystem()) || faction.getHomeSystem().isEmpty()) {
+        if (TileHelper.isValidTile(faction.getHomeSystem()) || faction.getHomeSystem().isEmpty()) {
             return true;
         }
         System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid home system IDs: `" + faction.getHomeSystem() + "`");

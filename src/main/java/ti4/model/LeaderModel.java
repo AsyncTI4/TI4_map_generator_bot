@@ -1,18 +1,17 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import ti4.generator.Mapper;
+import org.apache.commons.lang3.StringUtils;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
@@ -24,6 +23,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String faction;
     private String name;
     private String shortName;
+    private Boolean shrinkName;
     private String title;
     private String abilityName;
     private String abilityWindow;
@@ -56,6 +56,10 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     public String getShortName() {
         return Optional.ofNullable(shortName).orElse(getName());
+    }
+
+    public boolean getShrinkName() {
+        return Optional.ofNullable(shrinkName).orElse(false);
     }
 
     public String getLeaderEmoji() {

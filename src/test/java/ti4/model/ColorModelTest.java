@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.Emojis;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -65,7 +65,7 @@ public class ColorModelTest extends BaseTi4Test {
 
     private static String unitPath(UnitKey uk, boolean eyes) {
         String fileName = uk.getFileName(eyes);
-        String path = ResourceHelper.getInstance().getResourceFromFolder("units/", fileName, "");
+        String path = ResourceHelper.getResourceFromFolder("units/", fileName);
         assertNotNull(path, "Could not find unit file: " + fileName);
         return path;
     }

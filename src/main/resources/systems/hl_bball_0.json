@@ -1,6 +1,7 @@
 {
     "id": "hl_bball_0",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "bball_0"
     ],

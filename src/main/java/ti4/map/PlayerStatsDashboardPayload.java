@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
@@ -48,6 +48,14 @@ public class PlayerStatsDashboardPayload {
     @JsonIgnore
     public boolean isActive() {
         return player.getUserID().equals(game.getActivePlayerID()); // UNUSED, IGNORE
+    }
+
+    public String getDiscordUserID() {
+        return player.getUserID();
+    }
+
+    public String getDiscordUsername() {
+        return player.getUserName();
     }
 
     public List<String> getAlliances() {
@@ -284,6 +292,30 @@ public class PlayerStatsDashboardPayload {
             .filter(u -> u.getRequiredTechId().isPresent()) // is a unit that requires a tech upgrade
             .map(UnitModel::getBaseType)
             .toList();
+    }
+
+    public int getTotalNumberOfTurns() {
+        return player.getNumberTurns();
+    }
+
+    public long getTotalTurnTime() {
+        return player.getTotalTurnTime();
+    }
+
+    public double getExpectedHits() {
+        return player.getExpectedHits();
+    }
+
+    public int getActualHits() {
+        return player.getActualHits();
+    }
+
+    public boolean isEliminated() {
+        return player.isEliminated();
+    }
+
+    public List<String> getTeammateIDs() {
+        return player.getTeamMateIDs();
     }
 
     @Data

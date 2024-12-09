@@ -2,7 +2,6 @@
     "id": "bion",
     "tileId": "m09",
     "name": "Bion",
-    "shortName": null,
     "aliases": ["bi", "bion"],
     "positionInTile": {
         "x": 140.0,

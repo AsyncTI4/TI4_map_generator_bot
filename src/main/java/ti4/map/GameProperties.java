@@ -1,14 +1,11 @@
 package ti4.map;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.Constants;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -69,7 +66,6 @@ public class GameProperties {
     private @ExportableField int mapImageGenerationCount;
     private @ExportableField int numberOfPurgedFragments;
     private @ExportableField int pingSystemCounter;
-    private Map<Timestamp, GameStatsDashboardPayload> historicalGameStatsDashboardPayloads = new LinkedHashMap<>();
 
     // Customization Flags/Settings
     private boolean botFactionReacts;
@@ -87,11 +83,11 @@ public class GameProperties {
     private boolean showUnitTags;
     private boolean stratPings = true;
     private boolean testBetaFeaturesMode;
-    private boolean undoButtonOffered = true;
+    private boolean showOwnedPNsInPlayerArea = false;
     private String hexBorderStyle = "off";
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
-    private long autoPingSpacer;
+    private int autoPingSpacer;
     private List<String> tags = new ArrayList<>();
 
     // Game modes / homebrew flags

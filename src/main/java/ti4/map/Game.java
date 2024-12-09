@@ -2,11 +2,6 @@ package ti4.map;
 
 import java.awt.*;
 import java.lang.reflect.Field;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +19,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -47,23 +41,22 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.cardsso.SOInfo;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.planet.PlanetRemove;
+import ti4.commands2.planet.PlanetRemove;
 import ti4.draft.BagDraft;
-import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
@@ -71,6 +64,7 @@ import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
+import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -86,16 +80,19 @@ import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.milty.MiltyDraftManager;
 
+import static java.util.function.Predicate.not;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public class Game extends GameProperties {
+
     // TODO (Jazz): Sort through these and add to GameProperties
     private Map<String, Tile> tileMap = new HashMap<>(); // Position, Tile
     private Map<String, Player> players = new LinkedHashMap<>();
 
     private final @JsonIgnore Map<String, Planet> planets = new HashMap<>();
-    private final MiltyDraftManager miltyDraftManager;
     private final Map<String, String> fowOptions = new HashMap<>();
     private final Map<Integer, Boolean> scPlayed = new HashMap<>();
     private final Map<String, String> checkingForAllReacts = new HashMap<>();
@@ -111,6 +108,8 @@ public class Game extends GameProperties {
     private Map<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
     private Map<String, String> currentAgendaVotes = new HashMap<>();
 
+    @Setter
+    @Getter
     private DisplayType displayTypeForced;
     private @Getter @Setter List<BorderAnomalyHolder> borderAnomalies = new ArrayList<>();
     private Date lastActivePlayerPing = new Date(0);
@@ -158,17 +157,18 @@ public class Game extends GameProperties {
     private List<String> relics;
     @JsonIgnore
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
-    private final List<String> runDataMigrations = new ArrayList<>();
+    private final Set<String> runDataMigrations = new HashSet<>();
     private BagDraft activeDraft;
     @JsonIgnore
     @Getter
     @Setter
     private Map<String, Integer> tileDistances = new HashMap<>();
+    private MiltyDraftManager miltyDraftManager;
     @Setter
-    private MiltySettings miltySettings = null;
+    private MiltySettings miltySettings;
     @Getter
     @Setter
-    private String miltyJson = null;
+    private String miltyJson;
     @Getter
     @Setter
     private TIGLRank minimumTIGLRankAtGameStart;
@@ -176,8 +176,6 @@ public class Game extends GameProperties {
     public Game() {
         setCreationDate(Helper.getDateRepresentation(System.currentTimeMillis()));
         setLastModifiedDate(System.currentTimeMillis());
-
-        miltyDraftManager = new MiltyDraftManager();
     }
 
     public void newGameSetup() {
@@ -230,10 +228,13 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Player setupNeutralPlayer(String color) {
-        if (players.get(Constants.dicecordId) != null)
+        Player neutral = players.get(Constants.dicecordId);
+        if (neutral != null) {
+            ColorChangeHelper.changePlayerColor(this, neutral, neutral.getColor(), color);
             return players.get(Constants.dicecordId);
+        }
         addPlayer(Constants.dicecordId, "Dicecord"); //Dicecord
-        Player neutral = getPlayer(Constants.dicecordId);
+        neutral = getPlayer(Constants.dicecordId);
         neutral.setColor(color);
         neutral.setFaction("neutral");
         neutral.setDummy(true);
@@ -241,39 +242,6 @@ public class Game extends GameProperties {
         Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         neutral.setUnitsOwned(playerOwnedUnits);
         return neutral;
-    }
-
-    @JsonIgnore
-    public Player getNeutralPlayer(String fallbackColor) {
-        if (players.get(Constants.dicecordId) != null)
-            return players.get(Constants.dicecordId);
-        return setupNeutralPlayer(fallbackColor);
-    }
-
-    @JsonIgnore
-    public Player getNeutralPlayer() {
-        if (players.get(Constants.dicecordId) != null)
-            return players.get(Constants.dicecordId);
-        return null;
-    }
-
-    public String pickNeutralColorID(List<String> exclusions) {
-        // Start with the preferred colors, but then add all the colors to the list anyway
-        List<String> colorPriority = new ArrayList<>(List.of("gray", "red", "blue", "green", "orange", "yellow", "black", "pink", "purple", "rose", "lime", "brown", "teal", "spring", "petrol", "lightgray"));
-        colorPriority.addAll(Mapper.getColorNames());
-        List<String> preferredNeutralColors = new ArrayList<>(colorPriority.stream().map(Mapper::getColorID).toList());
-
-        // Build the full set of exclusions based on the argument plus the list of players
-        Set<String> excludedColorIDs = new HashSet<>();
-        if (exclusions != null) excludedColorIDs.addAll(exclusions);
-        excludedColorIDs.addAll(getPlayers().values().stream().map(Player::getColorID).toList());
-
-        // Finally, pick a color
-        String neutralColorID = preferredNeutralColors.stream().filter(colorID -> !excludedColorIDs.contains(colorID)).findFirst().orElse(null);
-        if (neutralColorID == null) {
-            MessageHelper.sendMessageToChannel(getActionsChannel(), "Could not determine a good neutral unit color " + Constants.jazzPing());
-        }
-        return neutralColorID;
     }
 
     public int getNumberOfSOsInTheDeck() {
@@ -334,12 +302,21 @@ public class Game extends GameProperties {
         return returnValue;
     }
 
+    @NotNull
     @JsonIgnore
     public MiltyDraftManager getMiltyDraftManager() {
+        if (miltyDraftManager == null) {
+            miltyDraftManager = new MiltyDraftManager();
+        }
         return miltyDraftManager;
     }
 
+    public void setMiltyDraftManager(MiltyDraftManager miltyDraftManager) {
+        this.miltyDraftManager = miltyDraftManager;
+    }
+
     @JsonProperty("miltySettings")
+    @Nullable
     public MiltySettings getMiltySettingsUnsafe() {
         return miltySettings;
     }
@@ -447,7 +424,6 @@ public class Game extends GameProperties {
         listOfTilePinged[count] = tileName;
     }
 
-    // Overrides
     @Override
     public void setRound(int round) {
         super.setRound(Math.max(1, round));
@@ -498,9 +474,10 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public String getGameModesText() {
+        boolean isNormalGame = isNormalGame();
         Map<String, Boolean> gameModes = new HashMap<>() {
             {
-                put(Emojis.TI4PoK + "Normal", isNormalGame());
+                put(Emojis.TI4PoK + "Normal", isNormalGame);
                 put(Emojis.TI4BaseGame + "Base Game", isBaseGameMode());
                 put(Emojis.MiltyMod + "MiltyMod", isMiltyModMode());
                 put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
@@ -516,7 +493,7 @@ public class Game extends GameProperties {
                 put("HomebrewSC", isHomebrewSCMode());
                 put("Little Omega", isLittleOmega());
                 put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
-                put("Homebrew", hasHomebrew());
+                put("Homebrew", !isNormalGame);
             }
         };
         for (String tag : getTags()) {
@@ -543,7 +520,7 @@ public class Game extends GameProperties {
             TextChannel tableTalkChannel;
             List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda.getTextChannels().stream()
                 .filter(c -> c.getName().startsWith(getName()))
-                .filter(Predicate.not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
+                .filter(not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
                 .toList();
             if (gameChannels.size() == 1) {
                 tableTalkChannel = gameChannels.getFirst();
@@ -611,7 +588,6 @@ public class Game extends GameProperties {
 
         // CHECK IF ARCHIVED
         if (getActionsChannel() == null) {
-            BotLogger.log(getName() + " does not have an actions channel and therefore can't find the bot-map-updates channel");
             return null;
         }
         for (ThreadChannel archivedChannel : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
@@ -626,8 +602,7 @@ public class Game extends GameProperties {
 
     public ThreadChannel getLaunchPostThread() {
         if (StringUtils.isNumeric(getLaunchPostThreadID())) {
-            ThreadChannel threadChannel = AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(getLaunchPostThreadID());
-            return threadChannel;
+            return AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(getLaunchPostThreadID());
         }
         return null;
     }
@@ -674,9 +649,8 @@ public class Game extends GameProperties {
     public String getFactionsThatReactedToThis(String messageID) {
         if (checkingForAllReacts.get(messageID) != null) {
             return checkingForAllReacts.get(messageID);
-        } else {
-            return "";
         }
+        return "";
     }
 
     public void clearAllEmptyStoredValues() {
@@ -779,14 +753,6 @@ public class Game extends GameProperties {
             .sorted((p1, p2) -> p1.getLeft().hasTheZeroToken() ? -1 : p2.getLeft().hasTheZeroToken() ? 1 : Integer.compare(p1.getRight(), p2.getRight()))
             .map(ImmutablePair::getLeft)
             .toList();
-    }
-
-    public DisplayType getDisplayTypeForced() {
-        return displayTypeForced;
-    }
-
-    public void setDisplayTypeForced(DisplayType displayTypeForced) {
-        this.displayTypeForced = displayTypeForced;
     }
 
     public int getRingCount() {
@@ -1078,7 +1044,7 @@ public class Game extends GameProperties {
             if (player != null) {
                 player.setTg(player.getTg() + tradeGoodCount);
                 ButtonHelperAbilities.pillageCheck(player, this);
-                ButtonHelperAgents.resolveArtunoCheck(player, this, tradeGoodCount);
+                ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
                 tradeGoodCount = 0;
                 MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + tradeGoodCount + "TGs"
                     + " that would be placed on the SC " + sc + " have instead been given to the Kyro Hero player, as per Kyro Hero text");
@@ -1650,6 +1616,9 @@ public class Game extends GameProperties {
         return soToPoList;
     }
 
+    /**
+     * @param soToPoList - a list of Secret Objective IDs that have been turned into Public Objectives (typically via Classified Document Leaks)
+     */
     public void setSoToPoList(List<String> soToPoList) {
         this.soToPoList = soToPoList;
     }
@@ -2009,30 +1978,28 @@ public class Game extends GameProperties {
                 break;
             }
         }
-        if (!id.isEmpty()) {
-            if ("warrant".equalsIgnoreCase(id)) {
-                for (Player p2 : getRealPlayers()) {
-                    if (ButtonHelper.isPlayerElected(this, p2, id)) {
-                        p2.setSearchWarrant(false);
-                    }
-                }
-            }
-            if ("censure".equalsIgnoreCase(id)) {
-
-                Map<String, Integer> customPOs = new HashMap<>(getRevealedPublicObjectives());
-                for (String customPO : customPOs.keySet()) {
-                    if (customPO.toLowerCase().contains("political censure")) {
-                        removeCustomPO(customPOs.get(customPO));
-                    }
-                }
-
-            }
-            laws.remove(id);
-            lawsInfo.remove(id);
-            addDiscardAgenda(id);
-            return true;
+        if (id.isEmpty()) {
+            return false;
         }
-        return false;
+        if ("warrant".equalsIgnoreCase(id)) {
+            for (Player p2 : getRealPlayers()) {
+                if (ButtonHelper.isPlayerElected(this, p2, id)) {
+                    p2.setSearchWarrant(false);
+                }
+            }
+        }
+        if ("censure".equalsIgnoreCase(id)) {
+            Map<String, Integer> customPOs = new HashMap<>(getRevealedPublicObjectives());
+            for (String customPO : customPOs.keySet()) {
+                if (customPO.toLowerCase().contains("political censure")) {
+                    removeCustomPO(customPOs.get(customPO));
+                }
+            }
+        }
+        laws.remove(id);
+        lawsInfo.remove(id);
+        addDiscardAgenda(id);
+        return true;
     }
 
     public boolean removeLaw(String id) {
@@ -2243,12 +2210,6 @@ public class Game extends GameProperties {
         return succeeded;
     }
 
-    public boolean putSpecificAgendaOnTop(String agendaID) {
-        boolean succeeded = getAgendas().remove(agendaID);
-        addDiscardAgenda(agendaID);
-        return succeeded;
-    }
-
     public String getNextAgenda(boolean revealFromBottom) {
         int index = revealFromBottom ? getAgendas().size() - 1 : 0;
         return getAgendas().get(index);
@@ -2280,7 +2241,7 @@ public class Game extends GameProperties {
                 player.setActionCard(id);
                 return player.getActionCards();
             }
-        } else if (!discardActionCards.keySet().isEmpty()) {
+        } else if (!discardActionCards.isEmpty()) {
             reshuffleActionCardDiscard();
             return drawActionCard(userID);
         }
@@ -2561,7 +2522,7 @@ public class Game extends GameProperties {
                 + ") and should discard one. If your game is playing with a higher SO limit, you may change that in /game setup.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
             String secretScoreMsg = "Click a button below to discard your Secret Objective";
-            List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(this, player);
+            List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
             if (!soButtons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), secretScoreMsg,
                     soButtons);
@@ -2935,9 +2896,9 @@ public class Game extends GameProperties {
 
         if (isAbsolMode() && !deckSettings.getRelics().getChosenKey().contains("absol")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using absol mode, so the relic deck you chose will be overridden.");
-            success &= validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"));
+            success &= validateAndSetRelicDeck(Mapper.getDeck("relics_absol"));
         } else {
-            success &= validateAndSetRelicDeck(event, deckSettings.getRelics().getValue());
+            success &= validateAndSetRelicDeck(deckSettings.getRelics().getValue());
         }
 
         return success;
@@ -3014,14 +2975,7 @@ public class Game extends GameProperties {
         return true;
     }
 
-    public boolean validateAndSetRelicDeck(GenericInteractionCreateEvent event, DeckModel deck) {
-        // for (Player player : getPlayers().values()) {
-        //     if (!player.getRelics().isEmpty()) {
-        //         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change relic deck to **"
-        //             + deck.getName() + "** while there are relics in player hands.");
-        //         return false;
-        //     }
-        // }
+    public boolean validateAndSetRelicDeck(DeckModel deck) {
         setRelicDeckID(deck.getAlias());
         setRelics(deck.getNewShuffledDeck());
         return true;
@@ -3111,30 +3065,6 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
-    public void setPurgedActionCards(List<String> purgedActionCardList) {
-        Map<String, Integer> purgedActionCards = new LinkedHashMap<>();
-        for (String card : purgedActionCardList) {
-            Collection<Integer> values = purgedActionCards.values();
-            int identifier = ThreadLocalRandom.current().nextInt(1000);
-            while (values.contains(identifier)) {
-                identifier = ThreadLocalRandom.current().nextInt(1000);
-            }
-            purgedActionCards.put(card, identifier);
-        }
-        this.purgedActionCards = purgedActionCards;
-    }
-
-    public String getGameNameForSorting() {
-        if (getName().startsWith("pbd")) {
-            return StringUtils.leftPad(getName(), 10, "0");
-        }
-        if (getName().startsWith("fow")) {
-            return StringUtils.leftPad(getName(), 10, "1");
-        }
-        return getName();
-    }
-
-    @JsonIgnore
     public String getPing() {
         Role role = getGameRole();
         if (role != null) {
@@ -3194,33 +3124,24 @@ public class Game extends GameProperties {
             .count() > 1;
     }
 
-    @JsonIgnore
-    public Map<String, Player> getPlayerControlMap() {
-        Map<String, Player> controlMap = new HashMap<>();
-        for (Tile tile : getTileMap().values()) {
-            Player controllingPlayer = null;
-            for (Player p : getRealPlayers()) {
-                if (FoWHelper.playerHasActualShipsInSystem(p, tile)) {
-                    if (controllingPlayer == null) {
-                        controllingPlayer = p;
-                    } else {
-                        controllingPlayer = null;
-                        break;
-                    }
-                }
-            }
-            controlMap.put(tile.getPosition(), controllingPlayer);
+    public Player getPlayerThatControlsTile(String tileId) {
+        return getPlayerThatControlsTile(tileMap.get(tileId));
+    }
+
+    public Player getPlayerThatControlsTile(Tile tile) {
+        if (tile == null) {
+            return null;
         }
-        return controlMap;
+        for (Player player : getRealPlayers()) {
+            if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                return player;
+            }
+        }
+        return null;
     }
 
-    public void addPlayer(String id, String name) {
-        Player player = new Player(id, name, getName());
-        players.put(id, player);
-    }
-
-    public Player addPlayerLoad(String id, String name) {
-        Player player = new Player(id, name, getName());
+    public Player addPlayer(String id, String name) {
+        Player player = new Player(id, name, this);
         players.put(id, player);
         return player;
     }
@@ -3267,7 +3188,7 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public List<Player> getNotRealPlayers() {
-        return getPlayers().values().stream().filter(Player::isNotRealPlayer).collect(Collectors.toList());
+        return getPlayers().values().stream().filter(not(Player::isRealPlayer)).collect(Collectors.toList());
     }
 
     @JsonIgnore
@@ -3410,23 +3331,6 @@ public class Game extends GameProperties {
             }
         }
         return planets.keySet();
-    }
-
-    public void endGameIfOld() {
-        if (isHasEnded())
-            return;
-
-        LocalDate currentDate = LocalDate.now();
-        LocalDate lastModifiedDate = (new Date(getLastModifiedDate())).toInstant().atZone(ZoneId.systemDefault())
-            .toLocalDate();
-        Period period = Period.ofMonths(2); // TODO: CANDIDATE FOR GLOBAL VARIABLE
-        LocalDate oldestLastModifiedDateBeforeEnding = currentDate.minus(period);
-
-        if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
-            BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate + " - the game flag `hasEnded` has been set to true");
-            setHasEnded(true);
-            GameSaveLoadManager.saveGame(this, "Game ended");
-        }
     }
 
     public void rebuildTilePositionAutoCompleteList() {
@@ -3644,7 +3548,7 @@ public class Game extends GameProperties {
         runDataMigrations.add(string);
     }
 
-    public List<String> getRunMigrations() {
+    public Set<String> getRunMigrations() {
         return runDataMigrations;
     }
 
@@ -3788,6 +3692,11 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
+    public int getHazardousExploreDiscardSize() {
+        return getExploreDiscard(Constants.HAZARDOUS).size();
+    }
+
+    @JsonIgnore
     public int getHazardousExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.HAZARDOUS);
     }
@@ -3795,6 +3704,11 @@ public class Game extends GameProperties {
     @JsonIgnore
     public int getCulturalExploreDeckSize() {
         return getExploreDeckSize(Constants.CULTURAL);
+    }
+
+    @JsonIgnore
+    public int getCulturalExploreDiscardSize() {
+        return getExploreDiscard(Constants.CULTURAL).size();
     }
 
     @JsonIgnore
@@ -3808,6 +3722,11 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
+    public int getIndustrialExploreDiscardSize() {
+        return getExploreDiscard(Constants.INDUSTRIAL).size();
+    }
+
+    @JsonIgnore
     public int getIndustrialExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.INDUSTRIAL);
     }
@@ -3815,6 +3734,11 @@ public class Game extends GameProperties {
     @JsonIgnore
     public int getFrontierExploreDeckSize() {
         return getExploreDeckSize(Constants.FRONTIER);
+    }
+
+    @JsonIgnore
+    public int getFrontierExploreDiscardSize() {
+        return getExploreDiscard(Constants.FRONTIER).size();
     }
 
     @JsonIgnore
@@ -3899,35 +3823,31 @@ public class Game extends GameProperties {
 
     @Nullable
     public Player getPlayerFromColorOrFaction(String factionOrColor) {
-        Player player = null;
-        if (factionOrColor != null) {
-            String factionColor = AliasHandler.resolveColor(factionOrColor.toLowerCase());
-            factionColor = StringUtils.substringBefore(factionColor, " "); // TO HANDLE UNRESOLVED AUTOCOMPLETE
-            factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : getPlayers().values()) {
-                if ("keleres".equalsIgnoreCase(factionColor)) {
-                    if (Objects.equals(factionColor + "a", player_.getFaction())) {
-                        player = player_;
-                        break;
-                    }
-                    if (Objects.equals(factionColor + "x", player_.getFaction())) {
-                        player = player_;
-                        break;
-                    }
-                    if (Objects.equals(factionColor + "m", player_.getFaction())) {
-                        player = player_;
-                        break;
-                    }
+        if (factionOrColor == null) {
+            return null;
+        }
+        String factionColor = AliasHandler.resolveColor(factionOrColor.toLowerCase());
+        factionColor = StringUtils.substringBefore(factionColor, " "); // TO HANDLE UNRESOLVED AUTOCOMPLETE
+        factionColor = AliasHandler.resolveFaction(factionColor);
+        for (Player player : getPlayers().values()) {
+            if ("keleres".equalsIgnoreCase(factionColor)) {
+                if (Objects.equals(factionColor + "a", player.getFaction())) {
+                    return player;
                 }
-                if (Objects.equals(factionColor, player_.getFaction()) ||
-                    Objects.equals(factionColor, player_.getColor()) ||
-                    Objects.equals(factionColor, player_.getColorID())) {
-                    player = player_;
-                    break;
+                if (Objects.equals(factionColor + "x", player.getFaction())) {
+                    return player;
+                }
+                if (Objects.equals(factionColor + "m", player.getFaction())) {
+                    return player;
                 }
             }
+            if (Objects.equals(factionColor, player.getFaction()) ||
+                Objects.equals(factionColor, player.getColor()) ||
+                Objects.equals(factionColor, player.getColorID())) {
+                return player;
+            }
         }
-        return player;
+        return null;
     }
 
     @Nullable
@@ -4091,9 +4011,12 @@ public class Game extends GameProperties {
                 .map(Mapper::getFaction)
                 .filter(Objects::nonNull)
                 .anyMatch(faction -> !faction.getSource().isOfficial())
-            || Mapper.getLeaders().values().stream()
-                .filter(leader -> !leader.getSource().isOfficial())
-                .anyMatch(leader -> isLeaderInGame(leader.getID()))
+            || getRealAndEliminatedAndDummyPlayers().stream()
+                .map(Player::getLeaderIDs)
+                .flatMap(Collection::stream)
+                .map(Mapper::getLeader)
+                .filter(Objects::nonNull)
+                .anyMatch(leader -> !leader.getSource().isOfficial())
             || (publicObjectives1 != null && publicObjectives1.size() < 5 && getRound() >= 4)
             || (publicObjectives2 != null && publicObjectives2.size() < (getRound() - 4))
             || getRealPlayers().stream()
@@ -4156,7 +4079,7 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
-    public List<ColorModel> getUnusedColors() {
+    public List<ColorModel> getUnusedColorsPreferringBase() {
         List<String> priorityColourIDs = List.of("red", "blue", "yellow", "purple", "green", "orange", "pink", "black");
         List<ColorModel> priorityColours = priorityColourIDs.stream()
             .map(Mapper::getColor)
@@ -4165,6 +4088,10 @@ public class Game extends GameProperties {
         if (!priorityColours.isEmpty()) {
             return priorityColours;
         }
+        return getUnusedColors();
+    }
+
+    public List<ColorModel> getUnusedColors() {
         return Mapper.getColors().stream()
             .filter(color -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(color.getName())))
             .toList();
@@ -4179,7 +4106,7 @@ public class Game extends GameProperties {
     }
 
     public void checkCommanderUnlocks(String factionToCheck) {
-        CommanderUnlockCheck.checkAllPlayersInGame(this, factionToCheck);
+        CommanderUnlockCheckService.checkAllPlayersInGame(this, factionToCheck);
     }
 
     /**
@@ -4237,6 +4164,15 @@ public class Game extends GameProperties {
         return sb.toString().trim();
     }
 
+    public String getHexSummary() {
+        // 18+0+0*b;Bio,71+0+2Rct;Ro;Ri,36+1+1Kcf;Km*I;Ki,76+1-1;;;,72+0-2; ......
+        // CSV of {tileID}{+x+yCoords}??{list;of;tokens} ?? 
+        // See ConvertTTPGtoAsync.ConvertTTPGHexToAsyncTile() and reverse it!
+        return getTileMap().values().stream()
+            .map(Tile::getHexTileSummary)
+            .collect(Collectors.joining(","));
+    }
+
     public boolean hasUser(User user) {
         if (user == null) return false;
         String id = user.getId();
@@ -4249,15 +4185,5 @@ public class Game extends GameProperties {
             }
         }
         return false;
-    }
-
-    @JsonIgnore
-    public String getGameStatsDashboardJSON() {
-        return new GameStatsDashboardPayload(this).getJson();
-    }
-
-    public void addHistoricalGameStatsDashboardPayload() {
-        GameStatsDashboardPayload payload = new GameStatsDashboardPayload(this);
-        getHistoricalGameStatsDashboardPayloads().put(Timestamp.from(Instant.now()), payload);
     }
 }
