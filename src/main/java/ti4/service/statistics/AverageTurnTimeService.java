@@ -82,7 +82,7 @@ public class AverageTurnTimeService {
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
             sb.append(DateTimeHelper.getTimeRepresentationToSeconds(averageTurnTime));
             if (showMedian) sb.append(" (median: ").append(DateTimeHelper.getTimeRepresentationToSeconds(playerMedianTurnTimes.get(userTurnCountTotalTime.getKey()))).append(")");
-            sb.append("` ").append(user.getEffectiveName());
+            sb.append("` ").append(user.getName());
             sb.append("   [").append(turnCount).append(" total turns]");
             sb.append("\n");
             index++;
