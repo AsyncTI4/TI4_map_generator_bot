@@ -17,10 +17,10 @@ public class StatisticsPipeline {
     private boolean running = true;
 
     private StatisticsPipeline() {
-        worker = Thread.startVirtualThread(() -> {
+        worker = new Thread(() -> {
             while (running || !statisticsQueue.isEmpty()) {
                 try {
-                    StatisticsPipeline.StatisticsEvent statisticsEvent = statisticsQueue.poll(1, TimeUnit.SECONDS);
+                    StatisticsPipeline.StatisticsEvent statisticsEvent = statisticsQueue.poll(2, TimeUnit.SECONDS);
                     if (statisticsEvent != null) {
                         run(statisticsEvent);
                     }
@@ -32,6 +32,10 @@ public class StatisticsPipeline {
                 }
             }
         });
+    }
+
+    public static void start() {
+        instance.worker.start();
     }
 
     public static boolean shutdown() {
