@@ -2,19 +2,15 @@ package ti4.cron;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
@@ -547,22 +543,6 @@ public class AutoPingCron {
     }
 
     private static void addReaction(Player player, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
-        Guild guild = game.getGuild();
-        if (guild == null)
-            return;
-
-        Map<String, Emoji> emojiMap = ButtonHelper.emoteMap.get(guild);
-        List<RichCustomEmoji> emojis = guild.getEmojis();
-        if (emojiMap != null && emojiMap.size() != emojis.size()) {
-            emojiMap.clear();
-        }
-        if (emojiMap == null || emojiMap.isEmpty()) {
-            emojiMap = new HashMap<>();
-            for (Emoji emoji : emojis) {
-                emojiMap.put(emoji.getName().toLowerCase(), emoji);
-            }
-        }
-
         try {
             game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
                 Emoji emojiToUse = Helper.getPlayerEmoji(game, player, mainMessage);
