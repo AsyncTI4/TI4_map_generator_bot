@@ -152,13 +152,14 @@ public class AutoPingCron {
 
     private static void handleTechSummary(Game game) {
         String key2 = "TechForRound" + game.getRound() + "Counter";
-        if (!game.getStoredValue(key2).isEmpty() && !game.getStoredValue(key2).equalsIgnoreCase("0")) {
-            game.setStoredValue(key2, (Integer.parseInt(game.getStoredValue(key2)) - 1) + "");
-            if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
-                PlayerTechService.postTechSummary(game);
-            }
-            GameManager.save(game, "Tech summary.");
+        if (game.getStoredValue(key2).isEmpty() || game.getStoredValue(key2).equalsIgnoreCase("0")) {
+            return;
         }
+        game.setStoredValue(key2, (Integer.parseInt(game.getStoredValue(key2)) - 1) + "");
+        if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
+            PlayerTechService.postTechSummary(game);
+        }
+        GameManager.save(game, "Tech summary.");
     }
 
     private static void handleAutoPing(Game game, Player player) {
