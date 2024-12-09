@@ -150,7 +150,6 @@ public class EndGameService {
 
     public static void gameEndStuff(Game game, GenericInteractionCreateEvent event, boolean publish) {
         String gameName = game.getName();
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
         game.setHasEnded(true);
         game.setEndedDate(System.currentTimeMillis());

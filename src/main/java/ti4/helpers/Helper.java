@@ -2129,6 +2129,9 @@ public class Helper {
     }
 
     public static void addMapPlayerPermissionsToGameChannels(Guild guild, String gameName) {
+        if (!GameManager.isValid(gameName)) {
+            return;
+        }
         ManagedGame game = GameManager.getManagedGame(gameName);
         var players = game.getPlayerIds();
         TextChannel tableTalkChannel = game.getTableTalkChannel();

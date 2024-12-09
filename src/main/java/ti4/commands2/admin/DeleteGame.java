@@ -14,7 +14,7 @@ class DeleteGame extends Subcommand {
 
     DeleteGame() {
         super(Constants.DELETE_GAME, "Delete a game.");
-        addOption(OptionType.STRING, Constants.GAME_NAME, "Game to delete", true);
+        addOption(OptionType.STRING, Constants.GAME_NAME, "Game to delete", true, true);
     }
 
     @Override
@@ -22,6 +22,10 @@ class DeleteGame extends Subcommand {
         String gameName = event.getOption(Constants.GAME_NAME, OptionMapping::getAsString);
         if (gameName == null) return;
 
+        if (!GameManager.isValid(gameName)) {
+            MessageHelper.replyToMessage(event, "Invalid game name.");
+            return;
+        }
         Game game = GameManager.getManagedGame(gameName).getGame();
         if (!GameManager.delete(gameName)) {
             MessageHelper.replyToMessage(event, "Game failed to delete.");
