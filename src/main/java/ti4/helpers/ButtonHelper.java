@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +15,11 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
@@ -33,10 +40,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -89,8 +92,6 @@ import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelper {
 
@@ -3254,7 +3255,7 @@ public class ButtonHelper {
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 if (Constants.MECATOLS.contains(uH.getName())
                     && game.getStoredValue("planetsTakenThisRound").contains(uH.getName())) {
-                    AddUnitService.addUnits(event, tile, game, player.getColor(),  "sd mr, pds mr");
+                    AddUnitService.addUnits(event, tile, game, player.getColor(), "sd mr, pds mr");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
                             + " Due to the reclamation ability, 1 PDS and 1 space dock have been added to Mecatol Rex. This is optional though.");
@@ -3280,9 +3281,9 @@ public class ButtonHelper {
                 Planet planetReal = (Planet) planetUnit;
                 String planet = planetReal.getName();
                 if (isNotBlank(planetReal.getOriginalPlanetType())
-                        && player.getPlanetsAllianceMode().contains(planet)
-                        && Helper.getProductionValueOfUnitHolder(player, game, tile, planetUnit) > 0
-                        && !game.getStoredValue(player.getFaction() + "planetsExplored").contains(planetUnit.getName() + "*")) {
+                    && player.getPlanetsAllianceMode().contains(planet)
+                    && Helper.getProductionValueOfUnitHolder(player, game, tile, planetUnit) > 0
+                    && !game.getStoredValue(player.getFaction() + "planetsExplored").contains(planetUnit.getName() + "*")) {
                     List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
                     buttons.addAll(planetButtons);
                 }
@@ -3545,7 +3546,7 @@ public class ButtonHelper {
     public static void addAbsolOrbital(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         UnitHolder uH = tile.getUnitHolders().get(buttonID.split("_")[2]);
-        AddUnitService.addUnits(event, tile, game, player.getColor(),  "plenaryorbital " + uH.getName());
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "plenaryorbital " + uH.getName());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()
             + " added an Plenary Orbital to " + Mapper.getPlanet(uH.getName()).getName());
         player.addOwnedUnitByID("plenaryorbital");
@@ -4152,7 +4153,7 @@ public class ButtonHelper {
                         if (!"space".equalsIgnoreCase(unitHolder.getName())) {
                             planetName = " " + unitHolder.getName();
                         }
-                        AddUnitService.addUnits(event, tile, game, player.getColor(),  numMechs + " infantry" + planetName);
+                        AddUnitService.addUnits(event, tile, game, player.getColor(), numMechs + " infantry" + planetName);
 
                         successMessageBuilder.append("\n").append(player.getFactionEmoji()).append(" placed ").append(numMechs)
                             .append(" ").append(Emojis.infantry)
@@ -5953,7 +5954,6 @@ public class ButtonHelper {
             if (event.getMessageChannel() instanceof ThreadChannel) {
                 game.getActionsChannel().addReactionById(event.getChannel().getId(), emojiToUse).queue();
             }
-
             event.getChannel().addReactionById(messageId, emojiToUse).queue(Consumers.nop(), BotLogger::catchRestError);
             if (game.getStoredValue(messageId) != null) {
                 if (!game.getStoredValue(messageId).contains(player.getFaction())) {
@@ -6252,7 +6252,7 @@ public class ButtonHelper {
             + Helper.getPlanetRepresentation(planet, game);
         player.exhaustTech("sar");
         Tile tile = game.getTileFromPlanet(planet);
-        AddUnitService.addUnits(event, tile, game, player.getColor(),  "mech " + planet);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "mech " + planet);
         deleteMessage(event);
         sendMessageToRightStratThread(player, game, msg1, warfareOrNot);
     }
@@ -6322,8 +6322,8 @@ public class ButtonHelper {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().flatMap(
-                entry -> player.getUnitsByAsyncID(entry.getKey()).stream()
-                    .map(x -> new ImmutablePair<>(x, entry.getValue())))
+            entry -> player.getUnitsByAsyncID(entry.getKey()).stream()
+                .map(x -> new ImmutablePair<>(x, entry.getValue())))
             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         HashMap<UnitModel, Integer> output;
