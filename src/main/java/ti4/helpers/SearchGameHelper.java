@@ -26,7 +26,7 @@ public class SearchGameHelper {
         String userID = user.getId();
 
         Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate ?
-            game -> game.getPlayers().stream().anyMatch(player -> player.getId().equals(user.getId())) :
+            game -> game.getRealPlayers().stream().anyMatch(player -> player.getId().equals(user.getId())) :
             game -> game.getPlayers().stream().anyMatch(player -> player.getId().equals(user.getId()));
         Predicate<ManagedGame> onlyMyTurnFilter = onlyMyTurn ?
             game -> Objects.equals(game.getActivePlayerId(), user.getId()) :
