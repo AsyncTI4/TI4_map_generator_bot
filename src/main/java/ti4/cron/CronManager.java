@@ -7,7 +7,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import lombok.experimental.UtilityClass;
-import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.TimedRunnable;
 
 @UtilityClass
 public class CronManager {
@@ -15,15 +15,13 @@ public class CronManager {
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
     public static void schedulePeriodically(Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
-        SCHEDULER.scheduleAtFixedRate(runWithPrimaryThreadPool(clazz, runnable), initialDelay, period, unit);
-    }
-
-    private static Runnable runWithPrimaryThreadPool(Class<?> clazz, Runnable runnable) {
-        return () -> AsyncTI4DiscordBot.runAsync(clazz.getSimpleName(), runnable);
+        TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
+        SCHEDULER.scheduleAtFixedRate(timedRunnable, initialDelay, period, unit);
     }
 
     public static void scheduleOnce(Class<?> clazz, Runnable runnable, long initialDelay, TimeUnit unit) {
-        SCHEDULER.schedule(runWithPrimaryThreadPool(clazz, runnable), initialDelay, unit);
+        TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
+        SCHEDULER.schedule(timedRunnable, initialDelay, unit);
     }
 
     public static void schedulePeriodicallyAtTime(Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId) {

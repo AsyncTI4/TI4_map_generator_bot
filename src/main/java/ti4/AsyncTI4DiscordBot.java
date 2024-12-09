@@ -71,7 +71,7 @@ public class AsyncTI4DiscordBot {
     public static final List<Role> adminRoles = new ArrayList<>();
     public static final List<Role> developerRoles = new ArrayList<>();
     public static final List<Role> bothelperRoles = new ArrayList<>();
-    private static final ExecutorService THREAD_POOL = Executors.newVirtualThreadPerTaskExecutor();
+    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
 
     public static JDA jda;
     public static String userID;
@@ -221,6 +221,9 @@ public class AsyncTI4DiscordBot {
 
         // START ASYNC PIPELINES
         ImageIO.setUseCache(false);
+        MapRenderPipeline.start();
+        StatisticsPipeline.start();
+        ButtonProcessor.start();
 
         // START CRONS
         AutoPingCron.register();
