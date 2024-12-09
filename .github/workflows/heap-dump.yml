@@ -1,0 +1,28 @@
+on: workflow_dispatch
+name: HeapDump
+concurrency:
+  group: "HeapDump"
+jobs:
+  save:
+    name: HeapDump
+    runs-on: ubuntu-latest
+    steps:
+      - name: Executing remote SSH commands to manage heap dump
+        uses: appleboy/ssh-action@master
+        env:
+          AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
+          AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script_stop: true
+          envs: AWS_KEY, AWS_SECRET
+          script: |
+            HEAP_DUMP_DIR="~/ti4bot/heap_dump"
+            echo "Deleting old heap dumps..."
+            rm -f "$HEAP_DUMP_DIR"/*.hprof
+            echo "Creating new heap dump..."
+            jmap -dump:live,file=$HEAP_DUMP_DIR/heapdump_$(date +%Y%m%d%H%M%S).hprof <PID>
+            echo "Heap dump process completed."
