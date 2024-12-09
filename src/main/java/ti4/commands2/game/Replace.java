@@ -139,7 +139,7 @@ class Replace extends GameStateSubcommand {
             game.getMiltyDraftManager().repostDraftInformation(game);
         }
 
-        String message = "Game: " + game.getName() + "  Player: " + replacedPlayer.getUserName() + " replaced by player: " + replacementUser.getName();
+        String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: " + replacementUser.getName();
         if (FoWHelper.isPrivateGame(game)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
