@@ -23,12 +23,11 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.image.MapGenerator;
+import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.listeners.UserJoinServerListener;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -85,10 +84,7 @@ public class StartPhaseService {
             }
             case "statusHomework" -> startStatusHomework(event, game);
             case "agendaResolve" -> AgendaHelper.resolveTime(game, null);
-            case "pbd1000decks" -> {
-                game.pbd1000decks();
-                GameSaveLoadManager.saveGame(game, event);
-            }
+            case "pbd1000decks" -> game.pbd1000decks();
             case "action" -> startActionPhase(event, game);
             case "playerSetup" -> ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel(), game);
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find phase: `" + phase + "`");
@@ -118,7 +114,7 @@ public class StartPhaseService {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
         if (game.isShowBanners()) {
-            MapGenerator.drawPhaseBanner("strategy", round, game.getActionsChannel());
+            BannerGenerator.drawPhaseBanner("strategy", round, game.getActionsChannel());
         }
         if (game.getRealPlayers().size() == 6) {
             game.setStrategyCardsPerPlayer(1);
@@ -197,7 +193,7 @@ public class StartPhaseService {
                 String message = p2.getRepresentation() + " Click the names of up to 3 planets you wish to ready after Checks and Balances resolved against.";
                 List<Button> buttons = Helper.getPlanetRefreshButtons(event, p2, game);
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
-                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, buttons);
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 "# Sent buttons to refresh 3 planets due to Checks and Balances.");
@@ -209,7 +205,7 @@ public class StartPhaseService {
 
                 List<Button> buttons = Helper.getPlanetExhaustButtons(p2, game);
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting")); // spitItOut
-                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, buttons);
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Sent buttons to exhaust 1 planet for each tech due to Anti-Intellectual Revolution resolving against.");
         }
@@ -518,7 +514,7 @@ public class StartPhaseService {
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have picked a strategy card.");
             if (game.isShowBanners()) {
-                MapGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
+                BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
             }
             ListTurnOrderService.turnOrder(event, game);
             if (!msgExtra.isEmpty()) {

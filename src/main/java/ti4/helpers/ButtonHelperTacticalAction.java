@@ -28,7 +28,7 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
-import ti4.users.UserSettingsManager;
+import ti4.settings.users.UserSettingsManager;
 
 public class ButtonHelperTacticalAction {
 
@@ -603,7 +603,7 @@ public class ButtonHelperTacticalAction {
             buttons.add(getCommButton);
             String msg = player.getRepresentation()
                 + " you have Henry Storcher, the Celdauri Commander, and activated a system with your space dock. Please use the button to get a commodity.";
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
 
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, pos);

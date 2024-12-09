@@ -14,7 +14,7 @@ import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.users.UserSettingsManager;
+import ti4.settings.users.UserSettingsManager;
 
 class Info extends GameStateSubcommand {
 

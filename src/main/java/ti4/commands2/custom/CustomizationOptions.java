@@ -39,7 +39,6 @@ class CustomizationOptions extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.SHOW_HEX_BORDERS, "Show borders around systems with player ships").addChoices(hexBorderChoices));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INJECT_RULES_LINKS, "Have the bot inject helpful links to rules within it's output"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO_BUTTON, "Offer Undo Button"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.FAST_SC_FOLLOW, "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off"));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE, "Swap player's owned units to units from another source").setAutoComplete(true));
     }
@@ -155,10 +154,6 @@ class CustomizationOptions extends GameStateSubcommand {
                 game.setStoredValue(key3, "");
             }
         }
-
-        Boolean undo = event.getOption(Constants.UNDO_BUTTON, null, OptionMapping::getAsBoolean);
-        if (undo != null)
-            game.setUndoButtonOffered(undo);
 
         Integer fast = event.getOption(Constants.FAST_SC_FOLLOW, null, OptionMapping::getAsInt);
         if (fast != null) {

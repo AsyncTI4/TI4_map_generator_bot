@@ -30,7 +30,7 @@ class NekroAgentButtonHandler {
             + ". Use buttons in your cards info thread to discard 1 AC, or lose 1 CC";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message);
         ButtonHelperAbilities.pillageCheck(p2, game);
-        ButtonHelperAgents.resolveArtunoCheck(p2, game, 2);
+        ButtonHelperAgents.resolveArtunoCheck(p2, 2);
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
             p2.getRepresentationUnfogged() + " use buttons to discard",
             ActionCardHelper.getDiscardActionCardButtons(p2, false));
@@ -46,8 +46,7 @@ class NekroAgentButtonHandler {
         List<Button> buttons = List.of(loseTactic, loseFleet, loseStrat, DoneGainingCC);
         String message2 = p2.getRepresentationUnfogged() + "! Your current CCs are "
             + p2.getCCRepresentation() + ". Use buttons to lose CCs";
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2,
-            buttons);
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);
         game.setStoredValue("originalCCsFor" + p2.getFaction(),
             p2.getCCRepresentation());
         ButtonHelper.deleteMessage(event);

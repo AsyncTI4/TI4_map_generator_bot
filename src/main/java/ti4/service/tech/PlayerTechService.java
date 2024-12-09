@@ -130,7 +130,7 @@ public class PlayerTechService {
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "absol_dxa" -> { // Dacxive
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     "Use buttons to drop 2 infantry on a planet",
                     Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
                 deleteTheOneButtonIfButtonEvent(event);
@@ -510,8 +510,8 @@ public class PlayerTechService {
     }
 
     public static void postTechSummary(Game game) {
-        if (game.isFowMode() || game.getTableTalkChannel() == null
-            || !game.getStoredValue("TechSummaryRound" + game.getRound()).isEmpty() || game.isHomebrewSCMode()) {
+        if (game.isFowMode() || game.getTableTalkChannel() == null || !game.getStoredValue("TechSummaryRound" + game.getRound()).isEmpty()
+                || game.isHomebrewSCMode()) {
             return;
         }
         StringBuilder msg = new StringBuilder("**__Tech Summary For Round " + game.getRound() + "__**\n");
@@ -555,10 +555,8 @@ public class PlayerTechService {
         if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg.toString());
             game.setStoredValue("TechSummaryRound" + game.getRound(), "yes");
-        } else {
-            if (game.getStoredValue(key2).isEmpty()) {
-                game.setStoredValue(key2, "6");
-            }
+        } else if (game.getStoredValue(key2).isEmpty()) {
+            game.setStoredValue(key2, "6");
         }
     }
 

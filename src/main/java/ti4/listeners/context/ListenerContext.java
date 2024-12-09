@@ -11,10 +11,11 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
+import ti4.service.event.EventAuditService;
+import ti4.service.game.GameNameService;
 
 @Getter
 public abstract class ListenerContext {
@@ -40,9 +41,8 @@ public abstract class ListenerContext {
         this.event = event;
         this.componentID = this.origComponentID = compID;
 
-        String gameName = CommandHelper.getGameNameFromChannel(event);
-        game = GameManager.getGame(gameName);
-
+        String gameName = GameNameService.getGameNameFromChannel(event);
+        game = GameManager.isValid(gameName) ? GameManager.getManagedGame(gameName).getGame() : null;
         player = null;
         privateChannel = event.getMessageChannel();
         mainGameChannel = event.getMessageChannel();
@@ -70,16 +70,20 @@ public abstract class ListenerContext {
                     privateChannel = player.getPrivateChannel();
                 }
             }
-        }
 
-        if (game != null && game.getMainGameChannel() != null) {
-            mainGameChannel = game.getMainGameChannel();
-        }
+            if (game.getMainGameChannel() != null) {
+                mainGameChannel = game.getMainGameChannel();
+            }
 
-        if (componentID.contains("dummyPlayerSpoof")) {
-            String identity = StringUtils.substringBefore(componentID, "_").replace("dummyPlayerSpoof", "");
-            player = game.getPlayerFromColorOrFaction(identity);
-            componentID = componentID.replace("dummyPlayerSpoof" + identity + "_", "");
+            if (componentID.contains("dummyPlayerSpoof")) {
+                String identity = StringUtils.substringBefore(componentID, "_").replace("dummyPlayerSpoof", "");
+                player = game.getPlayerFromColorOrFaction(identity);
+                componentID = componentID.replace("dummyPlayerSpoof" + identity + "_", "");
+            }
+
+            if (player != null && game.getActivePlayerID() != null && player.getUserID().equalsIgnoreCase(game.getActivePlayerID())) {
+                game.setLastActivePlayerPing(new Date());
+            }
         }
 
         if (!checkFinsFactionChecker()) {
@@ -93,28 +97,6 @@ public abstract class ListenerContext {
                 actionsChannel = textChannel_;
                 break;
             }
-        }
-
-        if (componentID.startsWith("anonDeclare_")) {
-            String declaration = componentID.split("_")[1];
-            String old = game.getStoredValue(player.getUserID() + "anonDeclare");
-            if (old.isEmpty()) {
-                if (declaration.toLowerCase().contains("strong")) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Someone has said that they have \"" + declaration + "\"");
-                } else {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Someone has said that they prefer a \"" + declaration + "\" environment.");
-                }
-            } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Someone has changed their preference from \"" + old + "\" to  \"" + declaration + "\" ");
-            }
-            game.setStoredValue(player.getUserID() + "anonDeclare", declaration);
-            GameSaveLoadManager.saveGame(game, event);
-            contextIsValid = false;
-            return;
-        }
-
-        if (player != null && game != null && game.getActivePlayerID() != null && player.getUserID().equalsIgnoreCase(game.getActivePlayerID())) {
-            game.setLastActivePlayerPing(new Date());
         }
     }
 
@@ -133,5 +115,11 @@ public abstract class ListenerContext {
         componentID = componentID.replaceFirst(factionWhoPressedButton + "_", "");
         factionChecked = true;
         return true;
+    }
+
+    public void save() {
+        if (game != null) {
+            GameManager.save(game, EventAuditService.getReason(getEvent(), game.isFowMode()));
+        }
     }
 }

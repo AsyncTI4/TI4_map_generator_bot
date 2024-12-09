@@ -27,7 +27,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.Units;
 import ti4.helpers.async.RoundSummaryHelper;
-import ti4.image.MapGenerator;
+import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -210,7 +210,7 @@ public class EndTurnService {
     public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
         if (game.isShowBanners()) {
-            MapGenerator.drawPhaseBanner("status", game.getRound(), game.getActionsChannel());
+            BannerGenerator.drawPhaseBanner("status", game.getRound(), game.getActionsChannel());
         }
         String message = "Please score objectives, " + game.getPing() + ".";
 
@@ -233,7 +233,7 @@ public class EndTurnService {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("bindingDebtsRes_" + vaden.getFaction(), "Pay 1TG"));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
         }
@@ -272,7 +272,7 @@ public class EndTurnService {
                 player.setTg(player.getTg() + numScoredSOs);
                 if (numScoredSOs > 0) {
                     ButtonHelperAbilities.pillageCheck(player, game);
-                    ButtonHelperAgents.resolveArtunoCheck(player, game, numScoredSOs);
+                    ButtonHelperAgents.resolveArtunoCheck(player, numScoredSOs);
                 }
                 player.setCommodities(player.getCommodities() + numScoredPos);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -394,7 +394,7 @@ public class EndTurnService {
             game.setStoredValue("forcedScoringOrder", "true");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.red("turnOffForcedScoring", "Turn off forced scoring order"));
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), game.getPing() +
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), game.getPing() +
                 "Players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
             for (Player player : Helper.getInitativeOrder(game)) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");

@@ -51,26 +51,26 @@ public class MiltyDraftManager {
     private final List<MiltyDraftSlice> slices = new ArrayList<>();
     private final Map<String, PlayerDraft> draft = new HashMap<>(); //userID
 
-    private int draftIndex = 0;
+    private int draftIndex;
     private List<String> draftOrder = new ArrayList<>(); // userID
     private List<String> players = new ArrayList<>(); // userID
     private List<String> factionDraft = new ArrayList<>();
 
-    private String prevSummaryMessage = null;
-    private String prevSliceMessage = null;
-    private String prevFactionMessage = null;
-    private String prevOrderMessage = null;
-    private String prevPingMessage = null;
+    private String prevSummaryMessage;
+    private String prevSliceMessage;
+    private String prevFactionMessage;
+    private String prevOrderMessage;
+    private String prevPingMessage;
 
-    private String mapTemplate = null;
+    private String mapTemplate;
 
     private boolean finished;
 
     @Data
     public static class PlayerDraft {
-        private String faction = null;
-        private MiltyDraftSlice slice = null;
-        private Integer position = null;
+        private String faction;
+        private MiltyDraftSlice slice;
+        private Integer position;
 
         public String summary(String doggy) {
             return String.join(" ", factionEmoji(doggy), sliceEmoji(), positionEmoji());
@@ -513,7 +513,6 @@ public class MiltyDraftManager {
         } catch (Exception e) {
             BotLogger.log("Unable to clear out old buttons and messages.", e);
         }
-        // And then null them out so we don't mess with 'em again
         prevPingMessage = null;
     }
 
@@ -542,8 +541,10 @@ public class MiltyDraftManager {
             BotLogger.log("Unable to clear out old buttons and messages.", e);
         }
 
-        // And then null them out so we don't mess with 'em again
-        prevSliceMessage = prevFactionMessage = prevOrderMessage = prevSummaryMessage = null;
+        prevSliceMessage = null;
+        prevFactionMessage = null;
+        prevOrderMessage = null;
+        prevSummaryMessage = null;
     }
 
     private List<Button> getSliceButtons() {
@@ -638,7 +639,7 @@ public class MiltyDraftManager {
         buttons.add(Buttons.blue("miltyFactionInfo_remaining", "Remaining faction info"));
         buttons.add(Buttons.blue("miltyFactionInfo_picked", "Picked faction info"));
         buttons.add(Buttons.blue("miltyFactionInfo_all", "All faction info"));
-        buttons = MessageHelper.addUndoButtonToList(buttons, game);
+        buttons = MessageHelper.addUndoButtonToList(buttons, game.getName());
         MessageHelper.splitAndSentWithAction(ping, game.getMainGameChannel(), buttons, m -> prevPingMessage = m.getId());
     }
 

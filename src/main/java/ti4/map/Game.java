@@ -1,10 +1,10 @@
 package ti4.map;
 
-import java.awt.*;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
+
+import java.awt.Point;
 import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +24,10 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -31,6 +35,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -43,9 +48,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.planet.PlanetRemove;
 import ti4.draft.BagDraft;
@@ -85,9 +87,6 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
-
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public class Game extends GameProperties {
 
@@ -664,6 +663,7 @@ public class Game extends GameProperties {
     public void setStoredValue(String key, String value) {
         value = StringHelper.escape(value);
         checkingForAllReacts.put(key, value);
+        System.out.println(key);
     }
 
     public String getStoredValue(String key) {
@@ -1047,7 +1047,7 @@ public class Game extends GameProperties {
             if (player != null) {
                 player.setTg(player.getTg() + tradeGoodCount);
                 ButtonHelperAbilities.pillageCheck(player, this);
-                ButtonHelperAgents.resolveArtunoCheck(player, this, tradeGoodCount);
+                ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
                 tradeGoodCount = 0;
                 MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + tradeGoodCount + "TGs"
                     + " that would be placed on the SC " + sc + " have instead been given to the Kyro Hero player, as per Kyro Hero text");
@@ -2213,12 +2213,6 @@ public class Game extends GameProperties {
         return succeeded;
     }
 
-    public boolean putSpecificAgendaOnTop(String agendaID) {
-        boolean succeeded = getAgendas().remove(agendaID);
-        addDiscardAgenda(agendaID);
-        return succeeded;
-    }
-
     public String getNextAgenda(boolean revealFromBottom) {
         int index = revealFromBottom ? getAgendas().size() - 1 : 0;
         return getAgendas().get(index);
@@ -3073,16 +3067,6 @@ public class Game extends GameProperties {
         this.discardActionCards = discardActionCards;
     }
 
-    public String getGameNameForSorting() {
-        if (getName().startsWith("pbd")) {
-            return StringUtils.leftPad(getName(), 10, "0");
-        }
-        if (getName().startsWith("fow")) {
-            return StringUtils.leftPad(getName(), 10, "1");
-        }
-        return getName();
-    }
-
     @JsonIgnore
     public String getPing() {
         Role role = getGameRole();
@@ -3350,23 +3334,6 @@ public class Game extends GameProperties {
             }
         }
         return planets.keySet();
-    }
-
-    public void endGameIfOld() {
-        if (isHasEnded())
-            return;
-
-        LocalDate currentDate = LocalDate.now();
-        LocalDate lastModifiedDate = (new Date(getLastModifiedDate())).toInstant().atZone(ZoneId.systemDefault())
-            .toLocalDate();
-        Period period = Period.ofMonths(2); // TODO: CANDIDATE FOR GLOBAL VARIABLE
-        LocalDate oldestLastModifiedDateBeforeEnding = currentDate.minus(period);
-
-        if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
-            BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate + " - the game flag `hasEnded` has been set to true");
-            setHasEnded(true);
-            GameSaveLoadManager.saveGame(this, "Game ended");
-        }
     }
 
     public void rebuildTilePositionAutoCompleteList() {

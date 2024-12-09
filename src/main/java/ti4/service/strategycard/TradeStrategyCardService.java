@@ -23,7 +23,7 @@ public class TradeStrategyCardService {
             ButtonHelper.addReaction(e, false, false, msg, "");
         }
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
+        ButtonHelperAgents.resolveArtunoCheck(player, 3);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperStats.replenishComms(event, game, player, reacted);
     }

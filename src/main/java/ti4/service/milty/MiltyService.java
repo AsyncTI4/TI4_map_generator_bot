@@ -24,7 +24,6 @@ import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Emojis;
-import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.TIGLHelper;
@@ -38,7 +37,6 @@ import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
@@ -55,6 +53,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.info.TechInfoService;
 import ti4.service.info.UnitInfoService;
 import ti4.service.planet.AddPlanetService;
+import ti4.settings.GlobalSettings;
 
 @UtilityClass
 public class MiltyService {
@@ -154,16 +153,13 @@ public class MiltyService {
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
         } catch (Exception e) {
-            //asdf
+            // Ignore
         }
 
         if (specs.presetSlices != null) {
-            startMsg = "### You are using preset slices!!";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
             specs.presetSlices.forEach(draftManager::addSlice);
-            // Kick it off with a bang!
             draftManager.repostDraftInformation(game);
-            GameSaveLoadManager.saveGame(game, event);
         } else {
             event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
                 boolean slicesCreated = generateSlices(event, draftManager, specs);
@@ -174,9 +170,7 @@ public class MiltyService {
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 } else {
-                    // Kick it off with a bang!
                     draftManager.repostDraftInformation(game);
-                    GameSaveLoadManager.saveGame(game, event);
                     game.setPhaseOfGame("miltydraft");
                 }
             });

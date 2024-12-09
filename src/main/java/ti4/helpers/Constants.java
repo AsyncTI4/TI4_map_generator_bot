@@ -646,7 +646,7 @@ public class Constants {
     public static final String AGENDAS = "agendas";
     public static final String AGENDA_DECK = "agenda_deck";
     public static final String AGENDA = "agenda";
-    public static final String RELIC_SHOW_REMAINING = "show_remaining";
+    public static final String SHOW_REMAINING = "show_remaining";
     public static final String RELIC_DRAW_SPECIFIC = "draw_specific";
     public static final String DRAW = "draw";
     public static final String RELIC_DRAW = "draw";
@@ -743,11 +743,11 @@ public class Constants {
     public static final String DRAW_SO = "draw";
     public static final String ONLY_PHASE = "only_phase";
     public static final String DEAL_SO = "deal";
-    public static final String DEAL_SO_TO_ALL = "deal_to_all";
+    public static final String DEAL_TO_ALL = "deal_to_all";
     public static final String SHOW_SO = "show";
-    public static final String SHOW_ALL_SO = "show_all";
-    public static final String SHOW_ALL_SO_TO_ALL = "show_all_to_all";
-    public static final String SHOW_SO_TO_ALL = "show_to_all";
+    public static final String SHOW_ALL = "show_all";
+    public static final String SHOW_ALL_TO_ALL = "show_all_to_all";
+    public static final String SHOW_TO_ALL = "show_to_all";
     public static final String CARDS_AC = "ac";
     public static final String CARDS_SO = "so";
     public static final String CARDS_PN = "pn";
@@ -765,8 +765,6 @@ public class Constants {
     public static final String MAKE_AC_COPIES = "make_ac_copies";
     public static final String SHUFFLE_AC_DECK = "shuffle_deck";
     public static final String SHOW_AC = "show";
-    public static final String SHOW_ALL_AC = "show_all";
-    public static final String SHOW_AC_TO_ALL = "show_to_all";
     public static final String DISCARD_AC = "discard";
     public static final String PURGE_AC = "purge";
     public static final String DISCARD_AC_RANDOM = "discard_random";
@@ -786,10 +784,7 @@ public class Constants {
     public static final String PROMISSORY_NOTES_OWNED = "promissory_notes_owned";
     public static final String PROMISSORY_NOTES_PLAY_AREA = "promissory_notes_play_area";
     public static final String SHOW_PN = "show";
-    public static final String SHOW_ALL_PN = "show_all";
-    public static final String SHOW_PN_TO_ALL = "show_to_all";
     public static final String PLAY_PN = "play";
-    public static final String PLAY_PN_INTO_PLAY_AREA = "play_into_play_area";
     public static final String SEND_PN = "send";
     public static final String PURGE_PN = "purge";
     public static final String PURGED_PN = "purged_pn";
@@ -1155,7 +1150,7 @@ public class Constants {
     public static final String GAMES_WITH_FACTIONS = "games_with_factions";
     public static final String GAME_STATISTIC = "game_statistic";
     public static final String PLAYER_STATISTIC = "player_statistic";
-    public static final String UNDO_TO_BEFORE_COMMAND = "undo_to_before_command";
+    public static final String UNDO_TO_COMMAND = "undo_to_command";
     public static final String SHOW_GAME_MODES = "show_game_modes";
     public static final String MAX_SO_COUNT = "max_so_count";
     public static final String REFRESH_RELIC_INFO = "refreshRelicInfo";

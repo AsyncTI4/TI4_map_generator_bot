@@ -14,15 +14,20 @@ public class CronManager {
 
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
-    public static void register(Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
+    public static void schedulePeriodically(Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
         TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
         SCHEDULER.scheduleAtFixedRate(timedRunnable, initialDelay, period, unit);
     }
 
-    public static void register(Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId) {
+    public static void scheduleOnce(Class<?> clazz, Runnable runnable, long initialDelay, TimeUnit unit) {
+        TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
+        SCHEDULER.schedule(timedRunnable, initialDelay, unit);
+    }
+
+    public static void schedulePeriodicallyAtTime(Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId) {
         long initialDelaySeconds = calculateInitialDelaySeconds(hour, minute, zoneId);
         long periodSeconds = TimeUnit.DAYS.toSeconds(1);
-        register(clazz, runnable, initialDelaySeconds, periodSeconds, TimeUnit.SECONDS);
+        schedulePeriodically(clazz, runnable, initialDelaySeconds, periodSeconds, TimeUnit.SECONDS);
     }
 
     private static long calculateInitialDelaySeconds(int hour, int minute, ZoneId zoneId) {

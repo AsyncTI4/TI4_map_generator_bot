@@ -19,7 +19,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.player.PlayerStatsService;
-import ti4.users.UserSettingsManager;
+import ti4.settings.users.UserSettingsManager;
 
 class Stats extends GameStateSubcommand {
 

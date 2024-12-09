@@ -427,7 +427,7 @@ public class ActionCardHelper {
                 if (acbuttons.isEmpty()) {
                     msg = player.getRepresentation() + " there were no attachments found in the applicable exploration decks.";
                 }
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, acbuttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, acbuttons);
             }
 
             String codedMessage = player.getRepresentation() + " After checking for Sabos, use buttons to resolve. Reminder that all card targets (besides tech RESEARCH) should be declared now, before people decide on sabos. Resolve ";
@@ -1039,6 +1039,7 @@ public class ActionCardHelper {
             String message = player.getRepresentationUnfogged() + " if you did not just use the Codex to get that AC, please discard 1 AC due to your Cybernetic Madness ability";
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
+        ButtonHelper.checkACLimit(game, player);
     }
 
     public static void getActionCardFromDiscard(GenericInteractionCreateEvent event, Game game, Player player, int acIndex) {

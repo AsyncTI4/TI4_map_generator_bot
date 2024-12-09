@@ -6,14 +6,13 @@ import java.lang.reflect.Method;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.DataMigrationManager;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.migration.DataMigrationManager;
 
 class RunManualDataMigration extends Subcommand {
 
@@ -27,12 +26,12 @@ class RunManualDataMigration extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         String migrationName = event.getOption(Constants.MIGRATION_NAME).getAsString();
         String gameName = event.getOption(Constants.GAME_NAME).getAsString();
-        Game game = GameManager.getGame(gameName);
-        if (game == null) {
+        if (!GameManager.isValid(gameName)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Can't find map for game name" + gameName);
             return;
         }
 
+        Game game = GameManager.getManagedGame(gameName).getGame();
         try {
             Class<?>[] paramTypes = { Game.class };
             Method method = DataMigrationManager.class.getMethod(migrationName, paramTypes);
@@ -40,7 +39,7 @@ class RunManualDataMigration extends Subcommand {
             Boolean changesMade = (Boolean) method.invoke(null, game);
             if (changesMade) {
                 game.addMigration(migrationName);
-                GameSaveLoadManager.saveGame(game, "Migration ran: " + migrationName);
+                GameManager.save(game, "Migration ran: " + migrationName);
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully ran migration " + migrationName + " for map " + game.getName());
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully ran migration " + migrationName + " for map " + game.getName() + " but no changes were required.");

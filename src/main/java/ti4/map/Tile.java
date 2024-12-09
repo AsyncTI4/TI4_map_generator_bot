@@ -1,6 +1,6 @@
 package ti4.map;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,13 +12,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CalendarHelper;
@@ -353,8 +351,6 @@ public class Tile {
 
     @JsonIgnore
     public UnitHolder getSpaceUnitHolder() {
-        if (unitHolders.get("space") == null)
-            return null;
         return unitHolders.get("space");
     }
 

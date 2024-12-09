@@ -7,12 +7,12 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.ThreadGetter;
-import ti4.map.Game;
-import ti4.map.GameManager;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
+import ti4.service.game.GameNameService;
 
 @UtilityClass
 public class SusSlashCommandService {
@@ -25,27 +25,27 @@ public class SusSlashCommandService {
     private static final List<String> HARMLESS_SUBCOMMANDS = List.of(
         Constants.INFO, Constants.CREATE_GAME_BUTTON, "po_info", Constants.DICE_LUCK, Constants.SHOW_AC_DISCARD_LIST, "show_deck",
         Constants.TURN_STATS, Constants.SHOW_AC_REMAINING_CARD_COUNT, Constants.SHOW_HAND, Constants.SHOW_BAG, Constants.UNIT_INFO,
-        Constants.TURN_END, Constants.PING_ACTIVE_PLAYER, Constants.SHOW_ALL_SO_TO_ALL, Constants.END, Constants.REMATCH
+        Constants.TURN_END, Constants.PING_ACTIVE_PLAYER, Constants.CHANGE_COLOR, Constants.END, Constants.REMATCH, Constants.ABILITY_INFO,
+        Constants.SPENDS, Constants.SHOW_TO_ALL, Constants.SHOW_ALL, Constants.SHOW_ALL_TO_ALL, Constants.SHOW_REMAINING
     );
 
     private static final List<String> EXCLUDED_GAMES = List.of("pbd1000", "pbd100two");
 
     public static void checkIfShouldReportSusSlashCommand(SlashCommandInteractionEvent event, String jumpUrl) {
-        String gameName = CommandHelper.getGameName(event);
-        Game game = GameManager.getGame(gameName);
-        if (game == null) return;
-        if (game.isFowMode()) return;
+        String gameName = GameNameService.getGameName(event);
+        ManagedGame managedGame = GameManager.getManagedGame(gameName);
+        if (managedGame == null || managedGame.isFowMode()) return;
 
         if (HARMLESS_COMMANDS.contains(event.getInteraction().getName())) return;
 
         if (event.getInteraction().getSubcommandName() != null && HARMLESS_SUBCOMMANDS.contains(event.getInteraction().getSubcommandName())) return;
 
-        if (EXCLUDED_GAMES.contains(game.getName())) return;
+        if (EXCLUDED_GAMES.contains(managedGame.getName())) return;
 
         boolean isPrivateThread = event.getMessageChannel() instanceof ThreadChannel thread && !thread.isPublic();
         boolean isPublicThread = event.getMessageChannel() instanceof ThreadChannel thread && thread.isPublic();
-        boolean isNotGameChannel = event.getMessageChannel() != game.getActionsChannel()
-            && event.getMessageChannel() != game.getTableTalkChannel()
+        boolean isNotGameChannel = event.getMessageChannel() != managedGame.getActionsChannel()
+            && event.getMessageChannel() != managedGame.getTableTalkChannel()
             && !event.getMessageChannel().getName().contains("bot-map-updates");
 
         if ((isPrivateThread || isNotGameChannel) && !isPublicThread) {
