@@ -50,6 +50,7 @@ public class ModalListener extends ListenerAdapter {
             ModalContext context = new ModalContext(event);
             if (context.isValid()) {
                 resolveModalInteractionEvent(context);
+                context.save(event);
             }
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
