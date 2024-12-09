@@ -72,7 +72,7 @@ import ti4.model.UnitModel;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
-import ti4.users.UserSettingsManager;
+import ti4.settings.users.UserSettingsManager;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 

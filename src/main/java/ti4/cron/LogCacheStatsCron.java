@@ -1,8 +1,6 @@
 package ti4.cron;
 
 import java.text.DecimalFormat;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -10,30 +8,29 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import lombok.experimental.UtilityClass;
 import ti4.AsyncTI4DiscordBot;
-import ti4.helpers.GlobalSettings;
+import ti4.cache.CacheManager;
 import ti4.helpers.ToStringHelper;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 @UtilityClass
 public class LogCacheStatsCron {
 
-    private static final Map<String, Cache<?, ?>> cacheNameToCache = new ConcurrentHashMap<>();
-    private static final int LOG_CACHE_STATS_INTERVAL_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.LOG_CACHE_STATS_INTERVAL_MINUTES.toString(), Integer.class, 30);
     private static final ThreadLocal<DecimalFormat> percentFormatter = ThreadLocal.withInitial(() -> new DecimalFormat("##.##%"));
 
-    public static void registerCache(String name, Cache<?, ?> cache) {
-        cacheNameToCache.put(name, cache);
-    }
-
     public static void register() {
-        CronManager.register(LogCacheStatsCron.class, LogCacheStatsCron::logCacheStats, LOG_CACHE_STATS_INTERVAL_MINUTES, LOG_CACHE_STATS_INTERVAL_MINUTES, TimeUnit.MINUTES);
+        CronManager.schedulePeriodically(LogCacheStatsCron.class, LogCacheStatsCron::logCacheStats, 1, 4, TimeUnit.HOURS);
     }
 
     private static void logCacheStats() {
-        var cacheStats = cacheNameToCache.entrySet().stream()
+        try {
+            var cacheStats = CacheManager.getNamesToCaches().stream()
                 .map(entry -> cacheStatsToString(entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining("\n\n"));
-        MessageHelper.sendMessageToPrimaryBotLogChannel("```\n" + cacheStats + "\n```");
+            MessageHelper.sendMessageToPrimaryBotLogChannel("```\n" + cacheStats + "\n```");
+        } catch (Exception e) {
+            BotLogger.log("**LogCacheStatsCron failed.**", e);
+        }
     }
 
     private static String cacheStatsToString(String name, Cache<?, ?> cache) {

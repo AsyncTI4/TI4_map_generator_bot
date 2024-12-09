@@ -7,11 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -31,14 +29,13 @@ import org.reflections.util.ConfigurationBuilder;
 import ti4.commands2.CommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;
-import ti4.cron.GameCreationLockRemovalCron;
+import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.OldUndoFileCleanupCron;
+import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.UploadStatsCron;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.GlobalSettings;
-import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TimedRunnable;
@@ -48,6 +45,7 @@ import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
 import ti4.listeners.AutoCompleteListener;
 import ti4.listeners.ButtonListener;
+import ti4.listeners.ChannelCreationListener;
 import ti4.listeners.MessageListener;
 import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
@@ -58,7 +56,10 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.processors.ButtonProcessor;
 import ti4.selections.SelectionManager;
+import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
+import ti4.settings.GlobalSettings;
+import ti4.settings.GlobalSettings.ImplementedSettings;
 
 import static org.reflections.scanners.Scanners.SubTypes;
 
@@ -68,7 +69,7 @@ public class AsyncTI4DiscordBot {
     public static final List<Role> adminRoles = new ArrayList<>();
     public static final List<Role> developerRoles = new ArrayList<>();
     public static final List<Role> bothelperRoles = new ArrayList<>();
-    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
+    private static final ExecutorService THREAD_POOL = Executors.newVirtualThreadPerTaskExecutor();
 
     public static JDA jda;
     public static String userID;
@@ -110,6 +111,7 @@ public class AsyncTI4DiscordBot {
 
         jda.addEventListener(
             new MessageListener(),
+            new ChannelCreationListener(),
             new SlashCommandListener(),
             ButtonListener.getInstance(),
             ModalListener.getInstance(),
@@ -194,6 +196,7 @@ public class AsyncTI4DiscordBot {
         // LOAD DATA
         BotLogger.logWithTimestamp(" LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
+        ApplicationEmojiService.uploadNewEmojis();
         TileHelper.init();
         PositionMapper.init();
         Mapper.init();
@@ -217,16 +220,14 @@ public class AsyncTI4DiscordBot {
 
         // START ASYNC PIPELINES
         ImageIO.setUseCache(false);
-        MapRenderPipeline.start();
-        StatisticsPipeline.start();
-        ButtonProcessor.start();
 
         // START CRONS
         AutoPingCron.register();
+        ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
         UploadStatsCron.register();
-        GameCreationLockRemovalCron.register();
         OldUndoFileCleanupCron.register();
+        LogButtonRuntimeStatisticsCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
@@ -364,16 +365,6 @@ public class AsyncTI4DiscordBot {
             .toList();
     }
 
-    public static <T> CompletableFuture<T> completeAsync(Supplier<T> supplier) {
-        return CompletableFuture.supplyAsync(supplier, THREAD_POOL).handle((result, exception) -> {
-            if (exception != null) {
-                BotLogger.log("Unable to complete async process.", exception);
-                return null;
-            }
-            return result;
-        });
-    }
-
     public static void runAsync(String name, Runnable runnable) {
         var timedRunnable = new TimedRunnable(name, runnable);
         THREAD_POOL.submit(timedRunnable);
@@ -409,5 +400,9 @@ public class AsyncTI4DiscordBot {
                 .forEach(classes::add);
         }
         return classes;
+    }
+
+    public static boolean isValidGuild(String guildId) {
+        return AsyncTI4DiscordBot.guilds.stream().anyMatch(g -> g.getId().equals(guildId));
     }
 }

@@ -12,21 +12,18 @@ import ti4.message.BotLogger;
 public class OldUndoFileCleanupCron {
 
     public static void register() {
-        CronManager.register(OldUndoFileCleanupCron.class, OldUndoFileCleanupCron::cleanup, 3, 0, ZoneId.of("America/New_York"));
+        CronManager.schedulePeriodicallyAtTime(OldUndoFileCleanupCron.class, OldUndoFileCleanupCron::cleanup, 3, 0, ZoneId.of("America/New_York"));
     }
 
     private static void cleanup() {
-        BotLogger.logWithTimestamp("Cleaning up excess undo files...");
         try {
             for (Game game : GameManager.getGameNameToGame().values()) {
                 GameSaveLoadManager.cleanUpExcessUndoFilesAndReturnLatestIndex(game);
             }
-            BotLogger.logWithTimestamp("Cleaned excess undo files, starting on old undo files...");
-
             GameSaveLoadManager.cleanupOldUndoFiles();
         } catch (Exception e) {
-            BotLogger.log("**Error cleaning up old undo files!**", e);
+            BotLogger.log("**OldUndoFileCleanupCron failed.**", e);
         }
-        BotLogger.logWithTimestamp("Cleaned old undo files.");
+        BotLogger.log("Ran OldUndoFileCleanupCron.");
     }
 }

@@ -25,7 +25,6 @@ import ti4.commands2.CommandHelper;
 import ti4.commands2.uncategorized.ServerPromoteCommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -55,10 +54,12 @@ import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.UnitDecalService;
 import ti4.service.franken.FrankenDraftMode;
+import ti4.service.game.GameNameService;
 import ti4.service.game.UndoService;
 import ti4.service.map.MapPresetService;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
+import ti4.settings.GlobalSettings;
 
 public class AutoCompleteProvider {
 
@@ -84,7 +85,7 @@ public class AutoCompleteProvider {
             if (event.isAcknowledged()) return;
         }
 
-        String gameName = CommandHelper.getGameNameFromChannel(event);
+        String gameName = GameNameService.getGameNameFromChannel(event);
         Game game = GameManager.getGame(gameName);
         if (game != null && subCommandName != null) {
             switch (commandName) {
@@ -923,7 +924,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.SCORE_SO, Constants.DISCARD_SO, Constants.SHOW_SO, Constants.SHOW_SO_TO_ALL -> { // In hand, not safe to show Name/ID
+            case Constants.SCORE_SO, Constants.DISCARD_SO, Constants.SHOW_SO, Constants.SHOW_TO_ALL -> { // In hand, not safe to show Name/ID
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<Command.Choice> options = player.getSecretsUnscored().entrySet().stream()
                     .filter(entry -> (entry.getValue() + entry.getKey()).toLowerCase().contains(enteredValue))

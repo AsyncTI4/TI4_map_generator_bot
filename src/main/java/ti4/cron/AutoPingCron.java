@@ -19,12 +19,13 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.StrategyCardModel;
 import ti4.service.player.PlayerReactService;
 import ti4.service.tech.PlayerTechService;
-import ti4.users.UserSettingsManager;
+import ti4.settings.users.UserSettingsManager;
 
 import static java.util.function.Predicate.not;
 
@@ -36,12 +37,18 @@ public class AutoPingCron {
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
 
     public static void register() {
-        CronManager.register(AutoPingCron.class, AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
+        CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
     }
 
     private static void autoPingGames() {
         var games = GameManager.getGameNameToGame().values().stream().filter(not(Game::isHasEnded)).toList();
         for (Game game : games) {
+            autoPingGame(game);
+        }
+    }
+
+    private static void autoPingGame(Game game) {
+        try {
             handleTechSummary(game); // TODO, move this?
             checkAllSaboWindows(game);
             if (game.isFastSCFollowMode()) {
@@ -51,6 +58,8 @@ public class AutoPingCron {
             if (game.getAutoPingStatus() && !game.isTemporaryPingDisable()) {
                 handleAutoPing(game, player);
             }
+        } catch (Exception e) {
+            BotLogger.log("AutoPing failed for game: " + game.getName(), e);
         }
     }
 
@@ -182,12 +191,6 @@ public class AutoPingCron {
         pingMessage = getPingMessage(milliSinceLastTurnChange, spacer, pingMessage, realIdentity, pingNumber);
 
         pingPlayer(game, player, milliSinceLastTurnChange, spacer, pingMessage, pingNumber, realIdentity);
-
-        Game mapReference = GameManager.getGame("finreference");
-        if (mapReference != null) {
-            ButtonHelper.increasePingCounter(mapReference, player.getUserID());
-            GameSaveLoadManager.saveGame(mapReference, "Auto Ping");
-        }
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         game.setLastActivePlayerPing(new Date());
         GameSaveLoadManager.saveGame(game, "Auto Ping");
@@ -259,10 +262,10 @@ public class AutoPingCron {
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
                 }
                 if (timeDifference > twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("2")) {
-                    String sb = player.getRepresentationUnfogged() + Helper.getSCName(sc, game) +
-                        " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
-
-                    ButtonHelper.sendMessageToRightStratThread(player, game, sb, ButtonHelper.getStratName(sc));
+                    String message = player.getRepresentationUnfogged() + Helper.getSCName(sc, game) +
+                        " has been played and now it has been the allotted time and they haven't reacted, so they have " +
+                        "been marked as not following.\n";
+                    ButtonHelper.sendMessageToRightStratThread(player, game, message, ButtonHelper.getStratName(sc));
                     player.addFollowedSC(sc);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
                     String messageID = game.getStoredValue("scPlayMsgID" + sc);

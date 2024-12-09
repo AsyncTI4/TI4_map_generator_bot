@@ -37,11 +37,11 @@ class AddCaptureUnits extends GameStateSubcommand {
         for (ParsedUnit parsedUnit : parsedUnits) {
             // fighters and infantry are added as your own color
             if (parsedUnit.getUnitKey().getUnitType().equals(Units.UnitType.Fighter) ||
-                parsedUnit.getUnitKey().getUnitType().equals(Units.UnitType.Infantry)) {
+                    parsedUnit.getUnitKey().getUnitType().equals(Units.UnitType.Infantry)) {
                 Units.UnitKey unitKey = new Units.UnitKey(parsedUnit.getUnitKey().getUnitType(), getPlayer().getColor());
-                parsedUnit = new ParsedUnit(unitKey, parsedUnit.getCount(), parsedUnit.getLocation());
+                parsedUnit = new ParsedUnit(unitKey, parsedUnit.getCount(), "space");
             }
-            tile.addUnit(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
+            tile.addUnit("space", parsedUnit.getUnitKey(), parsedUnit.getCount());
         }
 
         UnitCommandHelper.handleGenerateMapOption(event, game);

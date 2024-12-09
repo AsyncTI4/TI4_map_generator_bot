@@ -24,6 +24,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 
@@ -57,16 +58,13 @@ public class AddPlanetService {
             unitHolder.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
         }
         String color = player.getColor();
-        boolean moveTitanPN = false;
         if (color != null && !"null".equals(color)) {
             String ccID = Mapper.getControlID(color);
             String ccPath = Mapper.getCCPath(ccID);
             if (ccPath != null) {
                 unitHolder.addControl(ccID);
             }
-            if (unitHolder.getTokenList().contains(Constants.ATTACHMENT_TITANSPN_PNG)) {
-                moveTitanPN = true;
-            } else if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
+            if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
                 unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
                 game.scorePublicObjective(player.getUserID(), 0);
                 MessageChannel channel = game.getMainGameChannel();
@@ -119,6 +117,16 @@ public class AddPlanetService {
                             Helper.checkEndGame(game, player);
                         }
                     }
+                    List<String> currentPns = new ArrayList<>(player_.getPromissoryNotesInPlayArea());
+                    for (String pn : currentPns) {
+                        PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn);
+                        if (pnModel.getAttachment().isPresent() 
+                            && unitHolder.getTokenList().stream().anyMatch(s -> s.contains(pnModel.getAttachment().get()))) {
+                            player_.removePromissoryNote(pn);
+                            player.setPromissoryNote(pn);
+                            player.setPromissoryNotesInPlayArea(pn);
+                        }
+                    }
                     if (Mapper.getPlanet(planet) != null &&
                             !"action_deck_2".equals(game.getAcDeckID()) &&
                             !game.isACInDiscard("Reparations")) {
@@ -126,13 +134,6 @@ public class AddPlanetService {
                                 + " has a window to play Reparations for the taking of "
                                 + Mapper.getPlanet(planet).getName();
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                    }
-                    if (moveTitanPN) {
-                        if (player_.getPromissoryNotesInPlayArea().contains(Constants.TERRAFORM)) {
-                            player_.removePromissoryNote(Constants.TERRAFORM);
-                            player.setPromissoryNote(Constants.TERRAFORM);
-                            player.setPromissoryNotesInPlayArea(Constants.TERRAFORM);
-                        }
                     }
                 }
             }

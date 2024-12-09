@@ -11,6 +11,7 @@ import ti4.commands2.Command;
 import ti4.commands2.CommandManager;
 import ti4.helpers.DateTimeHelper;
 import ti4.message.BotLogger;
+import ti4.service.SusSlashCommandService;
 
 public class SlashCommandListener extends ListenerAdapter {
 
@@ -33,7 +34,10 @@ public class SlashCommandListener extends ListenerAdapter {
         Member member = event.getMember();
         if (member != null) {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
-            event.getChannel().sendMessage(commandText).queue(m -> BotLogger.logSlashCommand(event, m), BotLogger::catchRestError);
+            event.getChannel().sendMessage(commandText).queue(m -> {
+                BotLogger.logSlashCommand(event, m);
+                SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, m.getJumpUrl());
+            }, BotLogger::catchRestError);
         }
 
         Command command = CommandManager.getCommand(event.getName());

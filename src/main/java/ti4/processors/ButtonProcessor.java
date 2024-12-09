@@ -42,10 +42,10 @@ public class ButtonProcessor {
     private boolean running = true;
 
     private ButtonProcessor() {
-        worker = new Thread(() -> {
+        worker = Thread.startVirtualThread(() -> {
             while (running || !buttonInteractionQueue.isEmpty()) {
                 try {
-                    ButtonInteractionEvent buttonInteractionEvent = buttonInteractionQueue.poll(2, TimeUnit.SECONDS);
+                    ButtonInteractionEvent buttonInteractionEvent = buttonInteractionQueue.poll(1, TimeUnit.SECONDS);
                     if (buttonInteractionEvent != null) {
                         process(buttonInteractionEvent);
                     }
@@ -57,10 +57,6 @@ public class ButtonProcessor {
                 }
             }
         });
-    }
-
-    public static void start() {
-        instance.worker.start();
     }
 
     public static boolean shutdown() {

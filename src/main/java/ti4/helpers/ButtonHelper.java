@@ -33,7 +33,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
-import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -92,6 +91,7 @@ import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.decks.ShowActionCardsService;
 import ti4.service.explore.ExploreService;
+import ti4.service.game.GameNameService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
@@ -105,8 +105,6 @@ import ti4.service.unit.RemoveUnitService;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelper {
-
-    public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
 
     public static String getButtonRepresentation(Button button) {
         String id = button.getId();
@@ -6037,7 +6035,7 @@ public class ButtonHelper {
             return;
 
         String userID = event.getUser().getId();
-        String gameName = CommandHelper.getGameNameFromChannel(event);
+        String gameName = GameNameService.getGameNameFromChannel(event);
         Game game = GameManager.getGame(gameName);
         if (game == null) {
             event.getChannel().sendMessage("Unable to determine active game.").queue();
@@ -6047,23 +6045,6 @@ public class ButtonHelper {
         if (player == null || !player.isRealPlayer()) {
             event.getChannel().sendMessage("You're not an active player of the game").queue();
             return;
-        }
-
-        Guild guild = event.getGuild();
-        if (guild == null) {
-            event.getChannel().sendMessage("Could not find server Emojis").queue();
-            return;
-        }
-        Map<String, Emoji> emojiMap = emoteMap.get(guild);
-        List<RichCustomEmoji> emojis = guild.getEmojis();
-        if (emojiMap != null && emojiMap.size() != emojis.size()) {
-            emojiMap.clear();
-        }
-        if (emojiMap == null || emojiMap.isEmpty()) {
-            emojiMap = new HashMap<>();
-            for (Emoji emoji : emojis) {
-                emojiMap.put(emoji.getName().toLowerCase(), emoji);
-            }
         }
 
         Message mainMessage = event.getInteraction().getMessage();
@@ -6113,22 +6094,6 @@ public class ButtonHelper {
     }
 
     public static void addReaction(Player player, boolean skipReaction, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
-        Guild guild = game.getGuild();
-        if (guild == null)
-            return;
-
-        Map<String, Emoji> emojiMap = emoteMap.get(guild);
-        List<RichCustomEmoji> emojis = guild.getEmojis();
-        if (emojiMap != null && emojiMap.size() != emojis.size()) {
-            emojiMap.clear();
-        }
-        if (emojiMap == null || emojiMap.isEmpty()) {
-            emojiMap = new HashMap<>();
-            for (Emoji emoji : emojis) {
-                emojiMap.put(emoji.getName().toLowerCase(), emoji);
-            }
-        }
-
         try {
             game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
                 Emoji emojiToUse = Helper.getPlayerEmoji(game, player, mainMessage);

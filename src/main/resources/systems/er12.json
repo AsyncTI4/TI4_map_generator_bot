@@ -1,8 +1,8 @@
 {
     "id": "er12",
-    "name": "Asteroid Ioda",
+    "name": "Asteroid Iota",
     "aliases": [
-        "asteroidioda"
+        "asteroidiota"
     ],
     "imagePath": "er_12_async.png",
     "shipPositionsType": "TYPE08",

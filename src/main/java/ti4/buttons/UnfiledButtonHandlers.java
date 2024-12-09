@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -1778,15 +1780,14 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
 
                 } else {
-                    String msg2 = "All players have indicated 'No Sabotage'";
-                    // if (game.getMessageIDsForSabo().contains(messageId)) {
+                    Matcher acToReact = Pattern.compile("Card\\s(.*?):").matcher(msg.getContentRaw());
+                    String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
                     String faction = "bob_" + game.getStoredValue(messageId) + "_";
                     faction = faction.split("_")[1];
                     Player p2 = game.getPlayerFromColorOrFaction(faction);
                     if (p2 != null && !game.isFowMode()) {
                         msg2 = p2.getRepresentation() + " " + msg2;
                     }
-                    // }
                     msg.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
                 }
             });
@@ -1829,7 +1830,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
             }
             case "no_sabotage" -> {
-                String msg = "All players have indicated 'No Sabotage'";
+                Message originalMessage = event.getInteraction().getMessage();
+                Matcher acToReact = Pattern.compile("Card\\s(.*?):").matcher(originalMessage.getContentRaw());
+                String msg = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
                 String faction = "bob_" + game.getStoredValue(event.getMessageId()) + "_";
                 faction = faction.split("_")[1];
                 Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -1839,7 +1842,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (game.getMessageIDsForSabo().contains(event.getMessageId())) {
                     game.removeMessageIDForSabo(event.getMessageId());
                 }
-                event.getInteraction().getMessage().reply(msg).queueAfter(1, TimeUnit.SECONDS);
+                originalMessage.reply(msg).queueAfter(1, TimeUnit.SECONDS);
 
             }
 

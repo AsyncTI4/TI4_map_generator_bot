@@ -11,10 +11,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.Nullable;
 import ti4.helpers.DisplayType;
-import ti4.helpers.GlobalSettings;
 import ti4.helpers.TimedRunnable;
 import ti4.map.Game;
 import ti4.message.BotLogger;
+import ti4.settings.GlobalSettings;
 
 public class MapRenderPipeline {
 
@@ -26,10 +26,10 @@ public class MapRenderPipeline {
     private boolean running = true;
 
     private MapRenderPipeline() {
-        worker = new Thread(() -> {
+        worker = Thread.startVirtualThread(() -> {
             while (running || !gameRenderQueue.isEmpty()) {
                 try {
-                    RenderEvent renderEvent = gameRenderQueue.poll(2, TimeUnit.SECONDS);
+                    RenderEvent renderEvent = gameRenderQueue.poll(1, TimeUnit.SECONDS);
                     if (renderEvent != null) {
                         render(renderEvent);
                     }
@@ -41,10 +41,6 @@ public class MapRenderPipeline {
                 }
             }
         });
-    }
-
-    public static void start() {
-        instance.worker.start();
     }
 
     public static boolean shutdown() {
