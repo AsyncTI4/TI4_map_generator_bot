@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import lombok.Data;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -6146,7 +6145,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         if (sc) {
             game.setComponentAction(false);
-            boolean used = ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player, event, "");
+            boolean used = ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
             StrategyCardModel scModel = game.getStrategyCardModelByName("technology").orElse(null);
             if (!used && scModel != null && scModel.usesAutomationForSCID("pok7technology")
                 && !player.getFollowedSCs().contains(scModel.getInitiative())) {
@@ -6156,7 +6155,7 @@ public class ButtonHelper {
                 if (player.getStrategicCC() > 0) {
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Tech");
                 }
-                String message = ButtonHelperSCs.deductCC(player, event);
+                String message = ButtonHelperSCs.deductCC(player);
                 addReaction(event, false, false, message, "");
             }
         } else {
