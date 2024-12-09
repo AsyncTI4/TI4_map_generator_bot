@@ -1,8 +1,10 @@
 package ti4.map.manage;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -10,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.map.Game;
+import ti4.map.Player;
 
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
@@ -33,6 +36,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final TextChannel actionsChannel;
     private final TextChannel tableTalkChannel;
     private final Set<ManagedPlayer> players;
+    private final Map<ManagedPlayer, Boolean> playerToIsReal;
 
     public ManagedGame(Game game) {
         name = game.getName();
@@ -53,6 +57,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         tableTalkChannel = game.getTableTalkChannel();
 
         players = game.getPlayers().values().stream().map(p -> GameManager.addOrMergePlayer(this, p)).collect(toUnmodifiableSet());
+        playerToIsReal = game.getPlayers().values().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::isRealPlayer));
     }
 
     private static String sanitizeToNull(String str) {
@@ -73,6 +78,10 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
 
     public List<String> getPlayerIds() {
         return players.stream().map(ManagedPlayer::getId).toList();
+    }
+
+    public List<ManagedPlayer> getRealPlayers() {
+        return playerToIsReal.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).toList();
     }
 
     public boolean matches(Game game) {
