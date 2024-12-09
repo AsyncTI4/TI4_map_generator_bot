@@ -42,7 +42,7 @@ class GameUndoService {
     private static int cleanUpExcessUndoFilesAndReturnLatestIndex(String gameName) {
         String gameNameFileNamePrefix = gameName + "_";
         var gameUndoPath = Storage.getGameUndoDirectory().toPath();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(gameUndoPath, gameName + "_*")) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(gameUndoPath, gameNameFileNamePrefix + "*")) {
             List<Integer> undoNumbers = new ArrayList<>();
             for (Path path : stream) {
                 String fileName = path.getFileName().toString();

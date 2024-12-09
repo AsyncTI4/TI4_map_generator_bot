@@ -33,6 +33,6 @@ jobs:
             fi
             
             echo "Creating new heap dump for PID $PID..."
-            jmap -dump:live,file=$HEAP_DUMP_DIR/heapdump_$(date +%Y%m%d%H%M%S).hprof $PID
+            /usr/bin/jmap -dump:live,file=$HEAP_DUMP_DIR/heapdump_$(date +%Y%m%d%H%M%S).hprof $PID
             
             echo "Heap dump process completed."
