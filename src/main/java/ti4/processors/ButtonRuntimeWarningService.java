@@ -44,9 +44,9 @@ class ButtonRuntimeWarningService {
                 String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
                 String message = "[" + event.getChannel().getName() + "](" + event.getMessage().getJumpUrl() + ") " + event.getUser().getEffectiveName() + " pressed button: " + ButtonHelper.getButtonRepresentation(event.getButton()) +
                     "\n> Warning: This button took over " + warningThresholdMilliseconds + "ms to respond or execute\n> " +
-                    DateTimeHelper.getTimestampFromMillesecondsEpoch(eventStartTime) + " button was pressed by user\n> " +
-                    DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
-                    DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventStartTime ? "😲" : "");
+                    DateTimeHelper.getTimestampFromMillisecondsEpoch(eventStartTime) + " button was pressed by user\n> " +
+                    DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
+                    DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventStartTime ? "😲" : "");
                 message += "\nContext time: " + (contextTime - startTime) + "ms\nResolve time: " + (resolveTime - contextTime) + "ms\nSave time: " + (saveTime - resolveTime) + "ms";
                 BotLogger.log(message);
                 if (++runtimeWarningCount > 20) {
