@@ -2,6 +2,7 @@ package ti4.commands2.help;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +12,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
@@ -20,8 +20,10 @@ import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
 import ti4.image.MapGenerator;
 import ti4.image.Mapper;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
+import ti4.service.image.FileUploadService;
 
 class SampleColors extends Subcommand {
 
@@ -114,9 +116,12 @@ class SampleColors extends Subcommand {
             return;
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        FileUpload fileUpload = MapGenerator.createFileUpload(coloursImage, 1.0f,
-                        "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.getFirst() : "ALL"))
-            .setDescription("Colour samples for " + (hues.size() == 1 ? "all the " + hues.getFirst() : "ALL the") + " units.");
-        MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
+        String fileNamePrefix = "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.getFirst() : "ALL");
+        try (var fileUpload = FileUploadService.createFileUpload(coloursImage, 1.0f, fileNamePrefix)) {
+            fileUpload.setDescription("Colour samples for " + (hues.size() == 1 ? "all the " + hues.getFirst() : "ALL the") + " units.");
+            MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
+        } catch (IOException e) {
+            BotLogger.log("Exception when closing FileUpload.", e);
+        }
     }
 }

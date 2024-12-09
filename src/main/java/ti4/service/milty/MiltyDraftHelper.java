@@ -18,7 +18,6 @@ import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
-import ti4.image.MapGenerator;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -34,6 +33,7 @@ import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.model.WormholeModel;
+import ti4.service.image.FileUploadService;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 
 @UtilityClass
@@ -96,7 +96,7 @@ public class MiltyDraftHelper {
             desc.append(slice.ttsString());
         }
 
-        FileUpload fileUpload = MapGenerator.createFileUpload(mainImage, 1.0f, game.getName() + "_miltydraft");
+        FileUpload fileUpload = FileUploadService.createFileUpload(mainImage, 1.0f, game.getName() + "_miltydraft");
         fileUpload.setDescription(desc.toString());
         return fileUpload;
     }

@@ -137,14 +137,18 @@ public class ImageHelper {
         return null;
     }
 
-    public static String writeWebpOrDefaultTo(BufferedImage image, ByteArrayOutputStream out, String defaultFormat) throws IOException {
+    public static String writeWebpOrDefaultTo(BufferedImage image, ByteArrayOutputStream out, String defaultFormat, float compressionForDefault) throws IOException {
         // max webp dimensions are 16383 x 16383
         if (image.getHeight() > 16383 || image.getWidth() > 16383) {
-            writeCompressedFormat(image, out, defaultFormat, 0.1f);
+            writeCompressedFormat(image, out, defaultFormat, compressionForDefault);
             return defaultFormat;
         }
         ImageIO.write(image, "webp", out);
         return "webp";
+    }
+
+    public static String writeWebpOrDefaultTo(BufferedImage image, ByteArrayOutputStream out, String defaultFormat) throws IOException {
+        return writeWebpOrDefaultTo(image, out, defaultFormat, .1f);
     }
 
     public static void writeCompressedFormat(BufferedImage image, ByteArrayOutputStream out, String format, float compressionQuality) throws IOException {

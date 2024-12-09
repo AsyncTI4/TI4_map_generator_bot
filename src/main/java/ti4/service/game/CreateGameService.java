@@ -38,12 +38,12 @@ import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.ThreadHelper;
 import ti4.image.ImageHelper;
-import ti4.image.MapGenerator;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.image.FileUploadService;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
@@ -311,7 +311,7 @@ public class CreateGameService {
                     }
                     MessageHelper.sendMessageToChannel(introThread, message);
                     BufferedImage colorsImage = ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile("Compiled_Async_colors.png"), 731, 593);
-                    FileUpload fileUpload = MapGenerator.createFileUpload(colorsImage, 1.0f, "colors");
+                    FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, 1.0f, "colors");
                     MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                 } catch (Exception e) {
                     BotLogger.log("newPlayerIntro", e);

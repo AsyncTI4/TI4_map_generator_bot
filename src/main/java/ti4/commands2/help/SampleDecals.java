@@ -14,14 +14,15 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands2.Subcommand;
+import ti4.helpers.Constants;
+import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
+import ti4.image.ImageHelper;
 import ti4.image.MapGenerator;
 import ti4.image.Mapper;
-import ti4.helpers.Constants;
-import ti4.image.ImageHelper;
-import ti4.helpers.Storage;
 import ti4.message.MessageHelper;
 import ti4.service.UnitDecalService;
+import ti4.service.image.FileUploadService;
 
 class SampleDecals extends Subcommand {
 
@@ -117,7 +118,7 @@ class SampleDecals extends Subcommand {
             }
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        FileUpload fileUpload = MapGenerator.createFileUpload(coloursImage, 1.0f,
+        FileUpload fileUpload = FileUploadService.createFileUpload(coloursImage, 1.0f,
                         "decal_sample_" + top + "_" + left)
             .setDescription("Decal samples for units.");
         MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);

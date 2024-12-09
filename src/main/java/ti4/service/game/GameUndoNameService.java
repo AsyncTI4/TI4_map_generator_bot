@@ -63,7 +63,7 @@ public class GameUndoNameService {
                 .map(s -> StringUtils.substringAfter(s, " "))
                 .map(Long::parseLong)
                 .map(lastModifiedDate -> DateTimeHelper.getTimeRepresentationToSeconds(dateTime - lastModifiedDate))
-                .orElse(DateTimeHelper.getTimestampFromMillesecondsEpoch(fileLastModifiedDate));
+                .orElse(DateTimeHelper.getTimestampFromMillisecondsEpoch(fileLastModifiedDate));
         } catch (Exception e) {
             BotLogger.log("Could not get AutoComplete data from undo file: " + file.getName());
         }

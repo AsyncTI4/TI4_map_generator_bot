@@ -1,5 +1,6 @@
 package ti4.buttons;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -768,10 +769,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         Player p1 = game.getPlayerFromColorOrFaction(rest.split("_")[1]);
         Player p2 = game.getPlayerFromColorOrFaction(rest.split("_")[2]);
         String groundOrSpace = rest.split("_")[3];
-        FileUpload systemWithContext = new TileGenerator(game, event, null, 0, pos).createFileUpload();
-        MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
-        List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, groundOrSpace, event);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
+        try (FileUpload systemWithContext = new TileGenerator(game, event, null, 0, pos).createFileUpload()) {
+            MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
+            List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, groundOrSpace, event);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
+        } catch (IOException e) {
+            BotLogger.log("Failed to close FileUpload", e);
+        }
     }
 
     @ButtonHandler("refresh_")

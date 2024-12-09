@@ -1,11 +1,14 @@
 package ti4.helpers;
 
 import java.sql.Timestamp;
-
-import org.apache.commons.lang3.StringUtils;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.ISnowflake;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 @UtilityClass
 public class DateTimeHelper {
@@ -64,11 +67,16 @@ public class DateTimeHelper {
     }
 
     public static String getCurrentTimestamp() {
-        return getTimestampFromMillesecondsEpoch(System.currentTimeMillis());
+        return getTimestampFromMillisecondsEpoch(System.currentTimeMillis());
     }
 
-    public static String getTimestampFromMillesecondsEpoch(long epochMillis) {
+    public static String getTimestampFromMillisecondsEpoch(long epochMillis) {
         return "`" + StringUtils.rightPad(new Timestamp(epochMillis).toString(), 23) + "`";
     }
 
+    @NotNull
+    public static String getFormattedTimestamp() {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss");
+        return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
+    }
 }

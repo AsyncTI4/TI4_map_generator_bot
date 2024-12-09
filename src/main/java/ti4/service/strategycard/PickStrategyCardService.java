@@ -19,7 +19,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.image.MapGenerator;
+import ti4.image.BannerGenerator;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -147,7 +147,7 @@ public class PickStrategyCardService {
             } else {
                 privatePlayer.setInRoundTurnCount(privatePlayer.getInRoundTurnCount() + 1);
                 if (game.isShowBanners()) {
-                    MapGenerator.drawBanner(privatePlayer);
+                    BannerGenerator.drawFactionBanner(privatePlayer);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.",
                     StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
@@ -178,7 +178,7 @@ public class PickStrategyCardService {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
                 privatePlayer.setInRoundTurnCount(privatePlayer.getInRoundTurnCount() + 1);
                 if (game.isShowBanners()) {
-                    MapGenerator.drawBanner(privatePlayer);
+                    BannerGenerator.drawFactionBanner(privatePlayer);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.",
                     StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
