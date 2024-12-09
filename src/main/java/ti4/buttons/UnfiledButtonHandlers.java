@@ -93,6 +93,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  */
 public class UnfiledButtonHandlers { // TODO: move all of these methods to a better location, closer to the original button call and/or other related code
 
+    private static final Pattern CARDS_PATTERN = Pattern.compile("Card\\s(.*?):");
+
     @ButtonHandler("declareUse_")
     public static void declareUse(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String msg = player.getFactionEmojiOrColor() + " is using " + buttonID.split("_")[1];
@@ -1788,7 +1790,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
             case "no_sabotage" -> {
                 Message originalMessage = event.getInteraction().getMessage();
-                Matcher acToReact = Pattern.compile("Card\\s(.*?):").matcher(originalMessage.getContentRaw());
+                Matcher acToReact = CARDS_PATTERN.matcher(originalMessage.getContentRaw());
                 String msg = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
                 String faction = "bob_" + game.getStoredValue(event.getMessageId()) + "_";
                 faction = faction.split("_")[1];

@@ -38,6 +38,7 @@ public class AutoPingCron {
     private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
     private static final long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
+    private static final Pattern CARDS_PATTERN = Pattern.compile("Card\\s(.*?):");
 
     public static void register() {
         CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
@@ -600,7 +601,7 @@ public class AutoPingCron {
                     msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
 
                 } else {
-                    Matcher acToReact = Pattern.compile("Card\\s(.*?):").matcher(msg.getContentRaw());
+                    Matcher acToReact = CARDS_PATTERN.matcher(msg.getContentRaw());
                     String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
                     String faction = "bob_" + game.getStoredValue(messageId) + "_";
                     faction = faction.split("_")[1];
