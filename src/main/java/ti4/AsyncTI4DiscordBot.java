@@ -29,6 +29,7 @@ import org.reflections.util.ConfigurationBuilder;
 import ti4.commands2.CommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;
+import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.ReuploadStaleEmojisCron;
@@ -226,6 +227,7 @@ public class AsyncTI4DiscordBot {
         LogCacheStatsCron.register();
         UploadStatsCron.register();
         OldUndoFileCleanupCron.register();
+        LogButtonRuntimeStatisticsCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
