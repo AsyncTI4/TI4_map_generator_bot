@@ -20,7 +20,7 @@ class ReloadGame extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         String gameName = event.getOption(Constants.GAME_NAME).getAsString();
         if (!GameManager.isValid(gameName)) {
-            MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exists, use /list_games");
+            MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exist. Use an autocompleted entry.");
             return;
         }
 
