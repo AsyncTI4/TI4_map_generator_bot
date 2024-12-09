@@ -5028,6 +5028,7 @@ public class ButtonHelper {
                 // CREATE BOT/MAP THREAD
                 ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
                     .queue();
+                ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName).queue();
                 gameToRestore.setBotMapUpdatesThreadID(botThread.getId());
                 for (Player player : gameToRestore.getRealPlayers()) {
                     player.setCardsInfoThreadID(null);
