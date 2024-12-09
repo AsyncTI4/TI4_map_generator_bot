@@ -37,6 +37,7 @@ import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
@@ -160,6 +161,7 @@ public class MiltyService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
             specs.presetSlices.forEach(draftManager::addSlice);
             draftManager.repostDraftInformation(game);
+            GameSaveLoadManager.saveGame(game, event);
         } else {
             event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
                 boolean slicesCreated = generateSlices(event, draftManager, specs);
@@ -172,6 +174,7 @@ public class MiltyService {
                 } else {
                     draftManager.repostDraftInformation(game);
                     game.setPhaseOfGame("miltydraft");
+                    GameSaveLoadManager.saveGame(game, event);
                 }
             });
         }

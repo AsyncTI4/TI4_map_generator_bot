@@ -7,7 +7,6 @@ import java.util.Objects;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -21,10 +20,10 @@ import ti4.helpers.Constants;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.fow.WhisperService;
@@ -110,8 +109,10 @@ public class MessageListener extends ListenerAdapter {
         if (!message.getContentRaw().toLowerCase().startsWith("endofround")) {
             return false;
         }
-        String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-        Game game = GameManager.getManagedGame(gameName).getGame();
+        String gameName = event.getChannel().getName();
+        gameName = gameName.replace("Cards Info-", "");
+        gameName = gameName.substring(0, gameName.indexOf("-"));
+        Game game = GameManager.getGame(gameName);
 
         String messageText = message.getContentRaw();
         String messageBeginning = StringUtils.substringBefore(messageText, " ");
@@ -119,7 +120,7 @@ public class MessageListener extends ListenerAdapter {
         if (game != null) {
             Player player = getPlayer(event, game);
             RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true, event.getChannel());
-            GameManager.save(game, "End of round summary.");
+            GameSaveLoadManager.saveGame(game, "End of round summary.");
         }
         return true;
     }
@@ -151,8 +152,10 @@ public class MessageListener extends ListenerAdapter {
             return false;
         }
 
-        String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-        Game game = GameManager.getManagedGame(gameName).getGame();
+        String gameName = event.getChannel().getName();
+        gameName = gameName.replace("Cards Info-", "");
+        gameName = gameName.substring(0, gameName.indexOf("-"));
+        Game game = GameManager.getGame(gameName);
 
         if (game == null) {
             return false;
@@ -208,7 +211,7 @@ public class MessageListener extends ListenerAdapter {
 
     private static void whisperToFutureMe(MessageReceivedEvent event) {
         String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-        Game game = GameManager.getManagedGame(gameName).getGame();
+        Game game = GameManager.getGame(gameName);
         String messageContent = StringUtils.substringAfter(event.getMessage().getContentRaw(), " ");
         Player player = getPlayer(event, game);
 
@@ -217,22 +220,21 @@ public class MessageListener extends ListenerAdapter {
             previousThoughts = game.getStoredValue("futureMessageFor" + player.getFaction()) + "\n\n";
         }
         game.setStoredValue("futureMessageFor" + player.getFaction(), previousThoughts + messageContent);
-        GameManager.save(game, "Whisper to future.");
+        GameSaveLoadManager.saveGame(game, "Whisper to future.");
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
         event.getMessage().delete().queue();
     }
 
     private static boolean addFactionEmojiReactionsToMessages(MessageReceivedEvent event) {
-        Channel channel = event.getChannel();
-        if (!channel.getName().contains("-")) {
+        if (!event.getChannel().getName().contains("-")) {
             return false;
         }
-        String gameName = GameNameService.getGameNameFromChannel(channel);
-        ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (managedGame == null || !managedGame.isFactionReactMode() || managedGame.isFowMode()) {
+        String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
+        Game game = GameManager.getGame(gameName);
+        if (game == null || !game.isBotFactionReacts() || game.isFowMode()) {
             return false;
         }
-        Player player = getPlayer(event, managedGame.getGame());
+        Player player = getPlayer(event, game);
         if (player == null || !player.isRealPlayer()) {
             return false;
         }
@@ -270,12 +272,11 @@ public class MessageListener extends ListenerAdapter {
         }
 
         String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
-        ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (!managedGame.isFowMode()) {
+        Game game = GameManager.getGame(gameName);
+        if (!game.isFowMode()) {
             return false;
         }
 
-        Game game = managedGame.getGame();
         Player player3 = game.getPlayer(event.getAuthor().getId());
         if (game.isCommunityMode()) {
             Collection<Player> players = game.getPlayers().values();

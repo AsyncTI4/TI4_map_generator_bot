@@ -17,7 +17,7 @@ public class LookAgendaService {
     public static void lookAtAgendas(Game game, Player player, int count, boolean lookFromBottom) {
         String sb = player.getRepresentationUnfogged() + " here " + (count == 1 ? "is" : "are") + " the agenda" + (count == 1 ? "" : "s") + " you have looked at:";
         List<MessageEmbed> agendaEmbeds = getAgendaEmbeds(count, lookFromBottom, game);
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, sb, agendaEmbeds);
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, player, sb, agendaEmbeds);
     }
 
     private static List<MessageEmbed> getAgendaEmbeds(int count, boolean fromBottom, Game game) {

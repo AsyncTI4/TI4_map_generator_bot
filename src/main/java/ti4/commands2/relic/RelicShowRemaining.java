@@ -11,7 +11,7 @@ import ti4.helpers.RelicHelper;
 class RelicShowRemaining extends GameStateSubcommand {
 
     public RelicShowRemaining() {
-        super(Constants.SHOW_REMAINING, "Show remaining relics in deck", false, true);
+        super(Constants.RELIC_SHOW_REMAINING, "Show remaining relics in deck", false, true);
         addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_FOW, "TRUE if override fog"));
     }
 

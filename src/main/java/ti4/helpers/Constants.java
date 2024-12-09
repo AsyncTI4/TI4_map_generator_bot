@@ -646,7 +646,7 @@ public class Constants {
     public static final String AGENDAS = "agendas";
     public static final String AGENDA_DECK = "agenda_deck";
     public static final String AGENDA = "agenda";
-    public static final String SHOW_REMAINING = "show_remaining";
+    public static final String RELIC_SHOW_REMAINING = "show_remaining";
     public static final String RELIC_DRAW_SPECIFIC = "draw_specific";
     public static final String DRAW = "draw";
     public static final String RELIC_DRAW = "draw";
@@ -1150,7 +1150,7 @@ public class Constants {
     public static final String GAMES_WITH_FACTIONS = "games_with_factions";
     public static final String GAME_STATISTIC = "game_statistic";
     public static final String PLAYER_STATISTIC = "player_statistic";
-    public static final String UNDO_TO_COMMAND = "undo_to_command";
+    public static final String UNDO_TO_BEFORE_COMMAND = "undo_to_before_command";
     public static final String SHOW_GAME_MODES = "show_game_modes";
     public static final String MAX_SO_COUNT = "max_so_count";
     public static final String REFRESH_RELIC_INFO = "refreshRelicInfo";

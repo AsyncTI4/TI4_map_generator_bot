@@ -99,7 +99,7 @@ public class OtherHeroButtonHandler {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event,
                 "vaylerianhero");
             if (!buttons.isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     "Use buttons to remove a token from the board", buttons);
             }
         }

@@ -63,7 +63,7 @@ public class ScorePublicObjectiveService {
                         + (p2.getTg() - 1) + " -> " + p2.getTg();
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
                     ButtonHelperAbilities.pillageCheck(p2, game);
-                    ButtonHelperAgents.resolveArtunoCheck(player, 1);
+                    ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                 }
             }
         }

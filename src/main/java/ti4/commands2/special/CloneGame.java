@@ -4,9 +4,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
-import ti4.service.game.CloneGameService;
 
 class CloneGame extends GameStateSubcommand {
 
@@ -17,11 +18,11 @@ class CloneGame extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        if (!"YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
+        Game game = getGame();
+        if ("YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
+            ButtonHelper.cloneGame(event, game);
+        } else {
             MessageHelper.sendMessageToEventChannel(event, "Please type YES.");
-            return;
         }
-
-        CloneGameService.cloneGame(getGame());
     }
 }

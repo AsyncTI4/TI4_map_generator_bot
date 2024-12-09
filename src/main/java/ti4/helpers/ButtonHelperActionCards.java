@@ -243,7 +243,7 @@ public class ButtonHelperActionCards {
                 + (player.getTg() + tgAlready) + ")");
         player.setTg(player.getTg() + tgAlready);
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, tgAlready);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, tgAlready);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -297,7 +297,7 @@ public class ButtonHelperActionCards {
                     + (player.getTg() + tgAlready) + ")");
             player.setTg(player.getTg() + tgAlready);
             ButtonHelperAbilities.pillageCheck(player, game);
-            ButtonHelperAgents.resolveArtunoCheck(player, tgAlready);
+            ButtonHelperAgents.resolveArtunoCheck(player, game, tgAlready);
         } else {
             tgAlready = tgAlready + (int) removedUnit.getCost();
             buttons.add(Buttons.green("startToScuttleAUnit_" + tgAlready, "Scuttle another Unit"));
@@ -374,7 +374,7 @@ public class ButtonHelperActionCards {
         } else {
             buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 AC"));
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message, buttons);
     }
 
     @ButtonHandler("resolveRally")
@@ -491,7 +491,7 @@ public class ButtonHelperActionCards {
             MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), player.getFactionEmojiOrColor() + " gained 1TG due to Forward Supply Base");
         }
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, 1);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -499,7 +499,7 @@ public class ButtonHelperActionCards {
     public static void resolveForwardSupplyBaseStep1(Player player, Game game, ButtonInteractionEvent event) {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " gained " + Emojis.tg(3) + " (" + player.gainTG(3) + ")");
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, 3);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -1159,7 +1159,7 @@ public class ButtonHelperActionCards {
         if (buttonID.split("_").length > 2 && buttonID.split("_")[2].contains("yes")) {
             p2.setTg(p2.getTg() + 2);
             ButtonHelperAbilities.pillageCheck(p2, game);
-            ButtonHelperAgents.resolveArtunoCheck(p2, 2);
+            ButtonHelperAgents.resolveArtunoCheck(p2, game, 2);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                 p2.getRepresentation() + " you gained 2TGs due to being hit by the tech Seeker Drones");
         }
@@ -1651,7 +1651,7 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(event.getChannel(),
             player.getFactionEmoji() + " gained " + resValue + "TG" + (resValue == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ")");
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, resValue);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, resValue);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " you exhausted " + planetRep);
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
@@ -1996,7 +1996,7 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(event.getChannel(),
             player.getFactionEmoji() + " gained " + count + "TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ")");
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, count);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, count);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -2014,7 +2014,7 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " gained " + count
             + " TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ") from their highest resource planet");
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, count);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, count);
         ButtonHelper.deleteMessage(event);
     }
 }

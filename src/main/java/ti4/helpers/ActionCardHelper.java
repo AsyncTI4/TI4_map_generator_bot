@@ -427,7 +427,7 @@ public class ActionCardHelper {
                 if (acbuttons.isEmpty()) {
                     msg = player.getRepresentation() + " there were no attachments found in the applicable exploration decks.";
                 }
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, acbuttons);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, acbuttons);
             }
 
             String codedMessage = player.getRepresentation() + " After checking for Sabos, use buttons to resolve. Reminder that all card targets (besides tech RESEARCH) should be declared now, before people decide on sabos. Resolve ";

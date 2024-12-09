@@ -29,7 +29,6 @@ import org.reflections.util.ConfigurationBuilder;
 import ti4.commands2.CommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;
-import ti4.cron.EndOldGamesCron;
 import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.OldUndoFileCleanupCron;
@@ -52,10 +51,9 @@ import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
 import ti4.listeners.UserJoinServerListener;
-import ti4.map.manage.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.migration.DataMigrationManager;
 import ti4.processors.ButtonProcessor;
 import ti4.selections.SelectionManager;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -212,12 +210,13 @@ public class AsyncTI4DiscordBot {
 
         // LOAD GAMES NAMES
         BotLogger.logWithTimestamp(" LOADING GAMES");
-        GameManager.initialize();
+        GameSaveLoadManager.loadGame();
+        BotLogger.logWithTimestamp(" FINISHED LOADING GAMES");
 
         // RUN DATA MIGRATIONS
-        if (DataMigrationManager.runMigrations()) {
-            BotLogger.logWithTimestamp(" RAN MIGRATIONS");
-        }
+        BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
+        DataMigrationManager.runMigrations();
+        BotLogger.logWithTimestamp(" FINISHED CHECKING FOR DATA MIGRATIONS");
 
         // START ASYNC PIPELINES
         ImageIO.setUseCache(false);
@@ -231,7 +230,6 @@ public class AsyncTI4DiscordBot {
         LogCacheStatsCron.register();
         UploadStatsCron.register();
         OldUndoFileCleanupCron.register();
-        EndOldGamesCron.register();
         LogButtonRuntimeStatisticsCron.register();
 
         // BOT IS READY

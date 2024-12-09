@@ -25,16 +25,15 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
 import ti4.service.combat.StartCombatService;
-import ti4.service.game.GameNameService;
 
 public class FoWHelper {
 
@@ -57,18 +56,21 @@ public class FoWHelper {
 		return isPrivateGame(game, null, null);
 	}
 
-	public static boolean isPrivateGame(Game game, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
+	public static boolean isPrivateGame(Game game, @Nullable GenericInteractionCreateEvent event,
+		@Nullable Channel channel_) {
 		Channel eventChannel = event == null ? null : event.getChannel();
 		Channel channel = channel_ != null ? channel_ : eventChannel;
 		if (channel == null) {
 			return game.isFowMode();
 		}
 		if (game == null) {
-			String gameName = GameNameService.getGameNameFromChannel(channel);
-			if (!GameManager.isValid(gameName)) {
+			String gameName = channel.getName();
+			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
+			gameName = gameName.substring(0, gameName.indexOf("-"));
+			game = GameManager.getGame(gameName);
+			if (game == null) {
 				return false;
 			}
-			game = GameManager.getManagedGame(gameName).getGame();
 		}
 		if (game.isFowMode() && channel_ != null || event != null) {
 			return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
@@ -76,6 +78,10 @@ public class FoWHelper {
 		return false;
 	}
 
+	/**
+	 * Method to determine of a viewing player should be able to see the stats of a
+	 * particular faction
+	 */
 	public static boolean canSeeStatsOfFaction(Game game, String faction, Player viewingPlayer) {
 		for (Player player : game.getPlayers().values()) {
 			if (faction.equals(player.getFaction())) {
@@ -85,6 +91,10 @@ public class FoWHelper {
 		return false;
 	}
 
+	/**
+	 * Method to determine of a viewing player should be able to see the stats of a
+	 * particular player
+	 */
 	public static boolean canSeeStatsOfPlayer(Game game, Player player, Player viewingPlayer) {
 		if (!player.isRealPlayer() || !viewingPlayer.isRealPlayer()) {
 			return false;

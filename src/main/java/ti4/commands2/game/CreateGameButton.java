@@ -98,7 +98,7 @@ class CreateGameButton extends Subcommand {
             }
             buttonMsg.append("\n\n").append(" Please hit this button after confirming that the members are the correct ones.");
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(buttonMsg.toString());
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), buttonMsg.toString(), buttons);
+            MessageHelper.sendMessageToChannel(event.getChannel(), buttonMsg.toString(), buttons);
             ActionRow actionRow = ActionRow.of(buttons);
             baseMessageObject.addComponents(actionRow);
         }

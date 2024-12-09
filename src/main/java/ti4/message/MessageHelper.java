@@ -48,15 +48,18 @@ import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.ThreadHelper;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
 import ti4.service.game.GameNameService;
 
 public class MessageHelper {
 
 	public interface MessageFunction {
 		void run(Message msg);
+	}
+
+	public interface ThreadFunction {
+		void run(ThreadChannel msg);
 	}
 
 	public static void sendMessageToChannel(MessageChannel channel, String messageText) {
@@ -75,6 +78,10 @@ public class MessageHelper {
 		splitAndSent(messageText, BotLogger.getPrimaryBotLogChannel());
 	}
 
+	public static void sendMessageToChannelWithButton(MessageChannel channel, String messageText, Button button) {
+		splitAndSent(messageText, channel, null, Collections.singletonList(button));
+	}
+
 	public static void sendMessageToChannelWithEmbed(MessageChannel channel, String messageText, MessageEmbed embed) {
 		splitAndSent(messageText, channel, Collections.singletonList(embed), null);
 	}
@@ -83,29 +90,31 @@ public class MessageHelper {
 		splitAndSent(messageText, channel, embeds, null);
 	}
 
-	public static void sendMessageToChannelWithButton(MessageChannel channel, String messageText, Button button) {
-		splitAndSent(messageText, channel, null, Collections.singletonList(button));
-	}
-
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
-		String gameName = GameNameService.getGameNameFromChannel(channel);
-		if (GameManager.isValid(gameName) && buttons instanceof ArrayList
-				&& !(channel instanceof ThreadChannel) && channel.getName().contains("actions")) {
-			buttons = addUndoButtonToList(buttons, gameName);
+		sendMessageToChannelWithEmbedsAndButtons(channel, messageText, null, buttons);
+	}
+
+	public static void sendMessageToChannelWithEmbedsAndButtons(@Nonnull MessageChannel channel, @Nullable String messageText, @Nullable List<MessageEmbed> embeds, @Nullable List<Button> buttons) {
+		if (messageText != null && messageText.contains("NO_UNDO")) {
+			messageText = messageText.replaceFirst("NO_UNDO", "");
+			splitAndSent(messageText, channel, embeds, buttons);
+			return;
 		}
-		sendMessageToChannelWithEmbedsAndButtons(channel, messageText, null, buttons);
-	}
 
-	public static void sendMessageToChannelWithButtonsAndNoUndo(MessageChannel channel, String messageText, List<Button> buttons) {
-		sendMessageToChannelWithEmbedsAndButtons(channel, messageText, null, buttons);
-	}
+		// Add UNDO button
+		String gameName = GameNameService.getGameNameFromChannel(channel);
+		Game game = GameManager.getGame(gameName);
+		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")
+			&& messageText != null && !messageText.contains("end of turn ability") && game != null && game.isUndoButtonOffered()) {
+			buttons = addUndoButtonToList(buttons, game);
 
-	public static void sendMessageToChannelWithEmbedsAndButtons(@Nonnull MessageChannel channel, @Nullable String messageText,
-																@Nullable List<MessageEmbed> embeds, @Nullable List<Button> buttons) {
+		}
 		splitAndSent(messageText, channel, embeds, buttons);
 	}
 
-	public static List<Button> addUndoButtonToList(List<Button> buttons, String gameName) {
+	public static List<Button> addUndoButtonToList(List<Button> buttons, Game game) {
+		if (game == null) return buttons;
+
 		for (Button button : buttons) {
 			if (button.getId().contains("ultimateUndo")) {
 				return buttons;
@@ -116,6 +125,7 @@ public class MessageHelper {
 			return buttons;
 		}
 
+		String gameName = game.getName();
 		String gameNameForUndoStart = gameName + "_";
 		String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
 		if (mapUndoFiles == null || mapUndoFiles.length == 0) {
@@ -135,6 +145,10 @@ public class MessageHelper {
 		}
 
 		return newButtons;
+	}
+
+	public static void sendMessageToChannel(MessageChannel channel, String messageText, List<Button> buttons) {
+		sendMessageToChannelWithButtons(channel, messageText, buttons);
 	}
 
 	private static void addFactionReactToMessage(Game game, Player player, Message message) {
@@ -359,13 +373,10 @@ public class MessageHelper {
 		buttons = sanitizeButtons(buttons, channel);
 
 		String gameName = GameNameService.getGameNameFromChannel(channel);
-		if (GameManager.isValid(gameName)) {
-			Game game = GameManager.getManagedGame(gameName).getGame();
-			if (game.isInjectRulesLinks() && !game.isFowMode()) {
-				messageText = injectRules(messageText);
-			}
+		Game game = GameManager.getGame(gameName);
+		if (game != null && game.isInjectRulesLinks() && !game.isFowMode()) {
+			messageText = injectRules(messageText);
 		}
-
 		final String message = messageText;
 		List<MessageCreateData> objects = getMessageCreateDataObjects(message, sanitizedEmbeds, buttons);
 		Iterator<MessageCreateData> iterator = objects.iterator();
@@ -376,9 +387,7 @@ public class MessageHelper {
 					error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send intermediate message", messageCreateData, error)));
 			} else { // last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
-					ManagedGame managedGame = GameManager.getManagedGame(gameName);
-					if (message != null && managedGame != null && !managedGame.isFowMode()) {
-						Game game = managedGame.getGame();
+					if (message != null && game != null && !game.isFowMode()) {
 						if (message.contains("Use buttons to do your turn") || message.contains("Use buttons to end turn")) {
 							game.setLatestTransactionMsg(complete.getId());
 						}
@@ -716,21 +725,18 @@ public class MessageHelper {
 			ThreadHelper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
 			channel.asTextChannel().createThreadChannel(threadName)
 				.setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-				.queueAfter(500, TimeUnit.MILLISECONDS,
-					t -> sendMessageToChannelWithEmbeds(t, null, embeds),
-					error -> BotLogger.log("Error creating thread channel: " + threadName + " in channel: " +
-						channel.getAsMention(), error));
+				.queueAfter(500, TimeUnit.MILLISECONDS, t -> sendMessageToChannelWithEmbedsAndButtons(t, null, embeds, null), error -> BotLogger.log("Error creating thread channel: " + threadName + " in channel: " + channel.getAsMention(), error));
 		} else if (channel instanceof ThreadChannel) {
-			sendMessageToChannelWithEmbeds(channel, null, embeds);
+			sendMessageToChannelWithEmbedsAndButtons(channel, null, embeds, null);
 		}
 	}
 
-	public static void sendMessageEmbedsToCardsInfoThread(Player player, String message, List<MessageEmbed> embeds) {
+	public static void sendMessageEmbedsToCardsInfoThread(Game game, Player player, String message, List<MessageEmbed> embeds) {
 		ThreadChannel channel = player.getCardsInfoThread();
 		if (embeds == null || embeds.isEmpty()) {
 			return;
 		}
-		sendMessageToChannelWithEmbeds(channel, message, embeds);
+		sendMessageToChannelWithEmbedsAndButtons(channel, message, embeds, null);
 	}
 
 	public static void sendMessageToBotLogWebhook(String message) {

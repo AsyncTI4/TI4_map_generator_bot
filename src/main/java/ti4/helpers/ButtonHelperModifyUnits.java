@@ -364,7 +364,7 @@ public class ButtonHelperModifyUnits {
                 Buttons.red(player.getFinsFactionCheckerPrefix() + "removeAllStructures_" + unitHolder.getName(),
                     "Remove Structures"));
             buttons.add(Buttons.gray("deleteButtons", "Don't Remove Structures"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
         }
         event.getMessage();
         event.getMessage().delete().queue();
@@ -403,7 +403,7 @@ public class ButtonHelperModifyUnits {
                     player.getRepresentation() + " gained 1TG from a mech dying while owning Self-Assembly Routines.");
                 ButtonHelperAbilities.pillageCheck(player, game);
             }
-            ButtonHelperAgents.resolveArtunoCheck(player, 1);
+            ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
         }
         if (player.hasUnit("mykomentori_mech")) {
             for (int x = 0; x < min; x++) {
@@ -444,7 +444,7 @@ public class ButtonHelperModifyUnits {
                         + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
                 ButtonHelperAbilities.pillageCheck(player, game);
             }
-            ButtonHelperAgents.resolveArtunoCheck(player, 1);
+            ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
         }
     }
 
@@ -964,7 +964,7 @@ public class ButtonHelperModifyUnits {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         String msg = player.getRepresentation() + " choose which unit of yours to destroy to";
         List<Button> buttons = getUnitsToDevote(player, game, event, tile, "devote");
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
 
     @ButtonHandler("resolveDevote_")
@@ -981,7 +981,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
         String devoteOrNo = buttonID.split("_")[3];
         if (devoteOrNo.equalsIgnoreCase("devote")) {
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
             CommanderUnlockCheckService.checkPlayer(player, "yin");
         }
     }
@@ -1077,7 +1077,7 @@ public class ButtonHelperModifyUnits {
             var parsedUnit = new ParsedUnit(key, 1, Constants.SPACE);
             RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
             ButtonHelperFactionSpecific.cabalEatsUnitIfItShould(player, game, player, 1, unitName, event, tile, tile.getSpaceUnitHolder());
-            MessageHelper.sendMessageToChannelWithButtons(channel, msg, buttons);
+            MessageHelper.sendMessageToChannel(channel, msg, buttons);
             event.getMessage().delete().queue();
             return;
         }
@@ -1107,7 +1107,7 @@ public class ButtonHelperModifyUnits {
         }
 
         buttons.add(Buttons.gray("deleteButtons", "Cancel the hit"));
-        MessageHelper.sendMessageToChannelWithButtons(channel, msg, buttons);
+        MessageHelper.sendMessageToChannel(channel, msg, buttons);
         event.getMessage().delete().queue();
     }
 
@@ -1360,7 +1360,7 @@ public class ButtonHelperModifyUnits {
                         shroadedFleets.add(
                             Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 fighter"));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
-                        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
+                        MessageHelper.sendMessageToChannel(event.getChannel(),
                             "You may use your cloaked fleets ability to capture this produced ship.",
                             shroadedFleets);
                     }
@@ -1369,7 +1369,7 @@ public class ButtonHelperModifyUnits {
                         shroadedFleets.add(
                             Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 fighter"));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
-                        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
+                        MessageHelper.sendMessageToChannel(event.getChannel(),
                             "You may use your cloaked fleets ability to capture this produced ship.",
                             shroadedFleets);
                     }
@@ -1384,7 +1384,7 @@ public class ButtonHelperModifyUnits {
                         List<Button> cloakedFleets = new ArrayList<>();
                         cloakedFleets.add(Buttons.green("cloakedFleets_" + tile.getPosition() + "_" + unitID, "Capture 1 " + Mapper.getUnit(unitID).getName()));
                         cloakedFleets.add(Buttons.red("deleteButtons", "Decline"));
-                        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "You may use your cloaked fleets ability to capture this produced ship.", cloakedFleets);
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "You may use your cloaked fleets ability to capture this produced ship.", cloakedFleets);
                     }
                 }
 
@@ -1606,7 +1606,7 @@ public class ButtonHelperModifyUnits {
                         List<Button> shroadedFleets = new ArrayList<>();
                         shroadedFleets.add(Buttons.green("cloakedFleets_" + tile2.getPosition() + "_" + unitID, "Capture 1 " + Mapper.getUnit(unitID).getName()));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
-                        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
+                        MessageHelper.sendMessageToChannel(event.getChannel(),
                             "You may use your cloaked fleets ability to capture this produced ship.",
                             shroadedFleets);
                     }
@@ -1619,7 +1619,7 @@ public class ButtonHelperModifyUnits {
                         List<Button> buttons2 = new ArrayList<>();
                         buttons2.add(Buttons.green("startRallyToTheCause", "Rally To The Cause"));
                         buttons2.add(Buttons.red("deleteButtons", "Decline"));
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg,
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg,
                             buttons2);
 
                     }
@@ -1671,8 +1671,7 @@ public class ButtonHelperModifyUnits {
                 List<Button> orbFollowUp = new ArrayList<>();
                 orbFollowUp.add(Buttons.green("orbitalMechDrop_" + planetName, "Pay 3r for Mech?"));
                 orbFollowUp.add(Buttons.red("finishComponentAction_spitItOut", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() +
-                    " you can pay 3r to drop a mech on the planet too", orbFollowUp);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you can pay 3r to drop a mech on the planet too", orbFollowUp);
             }
         }
 
@@ -1776,12 +1775,12 @@ public class ButtonHelperModifyUnits {
             buttons = getOpposingUnitsToHit(player, game, event, tile, true);
             msg = player.getRepresentation() + " choose which opposing unit to destroy";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(false, false) + " has chosen to destroy one of their dreadnoughts in order to choose 2 opposing ships to destroy. This occurs after any retreats. The dread has been removed.");
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
         } else {
             msg = opponent.getRepresentationUnfogged() + " your opponent used Assault Cannon to force you to destroy a non fighter ship. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
 
     }
 
@@ -2058,7 +2057,7 @@ public class ButtonHelperModifyUnits {
                                             + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
-                                ButtonHelperAgents.resolveArtunoCheck(player, 1);
+                                ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                             }
                             if (unitKey.getUnitType() == UnitType.Mech && player.hasUnit("mykomentori_mech")) {
                                 for (int x = 0; x < amount; x++) {
@@ -2170,7 +2169,7 @@ public class ButtonHelperModifyUnits {
                         + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain");
                     ButtonHelperAbilities.pillageCheck(player, game);
                 }
-                ButtonHelperAgents.resolveArtunoCheck(player, 1);
+                ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
             }
             if (unitKey.getUnitType() == UnitType.Mech && player.hasUnit("mykomentori_mech")) {
                 for (int x = 0; x < amount; x++) {

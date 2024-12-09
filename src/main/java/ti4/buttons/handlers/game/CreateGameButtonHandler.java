@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
+import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
 import ti4.settings.GlobalSettings;
@@ -50,7 +50,7 @@ class CreateGameButtonHandler {
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         String gameName = CreateGameService.getNextGameName();
         String lastGame = CreateGameService.getLastGameName();
-        Game game = GameManager.getManagedGame(lastGame).getGame();
+        Game game = GameManager.getGame(lastGame);
         if (game != null && game.getCustomName().equalsIgnoreCase(gameSillyName)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "The custom name of the last game is the same as the one for this game, so the bot suspects a double press " +

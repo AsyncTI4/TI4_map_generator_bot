@@ -1,17 +1,13 @@
 package ti4.service.game;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
@@ -21,29 +17,24 @@ import ti4.map.Game;
 import ti4.message.BotLogger;
 
 @UtilityClass
-public class GameUndoNameService {
+public class UndoService {
 
     private static final Pattern lastestCommandPattern = Pattern.compile("^(?>latest_command ).*$");
     private static final Pattern lastModifiedPattern = Pattern.compile("^(?>last_modified_date ).*$");
 
-    public static Map<String, String> getUndoNamesToCommandText(Game game, int limit) {
-        Path undoPath = Storage.getGameUndoDirectory().toPath();
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(undoPath, game.getName() + "_*")) {
-            return StreamSupport.stream(directoryStream.spliterator(), false)
-                .map(Path::toFile)
-                .sorted(Comparator.comparing(File::getName).reversed())
-                .limit(limit)
-                .collect(Collectors.toMap(
-                    File::getName,
-                    GameUndoNameService::getLastModifiedDateAndLastCommandTextFromFile
-                ));
-        } catch (IOException e) {
-            BotLogger.log("Error listing files in directory: " + undoPath, e);
-            return Collections.emptyMap();
-        }
+    public static Map<String, String> getAllUndoSavedGames(Game game) {
+        File mapUndoDirectory = Storage.getGameUndoDirectory();
+        String gameName = game.getName();
+        String gameNameForUndoStart = gameName + "_";
+        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
+        return Arrays.stream(mapUndoFiles)
+            .sorted(Comparator.reverseOrder())
+            .limit(25)
+            .map(Storage::getGameUndoStorage)
+            .collect(Collectors.toMap(File::getName, UndoService::getLastModifiedDateAndLastCommandTextFromFile));
     }
 
-    private static String getLastModifiedDateAndLastCommandTextFromFile(File file) {
+    public static String getLastModifiedDateAndLastCommandTextFromFile(File file) {
         long dateTime = System.currentTimeMillis();
         long fileLastModifiedDate = file.lastModified();
 

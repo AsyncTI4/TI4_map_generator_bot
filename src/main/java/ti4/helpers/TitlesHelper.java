@@ -11,9 +11,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
-import ti4.service.game.ManagedGameService;
+import ti4.map.GameManager;
 
 @UtilityClass
 public class TitlesHelper {
@@ -22,14 +20,14 @@ public class TitlesHelper {
         HashMap<String, String> gameHistory = new HashMap<>();
         Map<String, Integer> titles = new HashMap<>();
 
-        Predicate<ManagedGame> thisPlayerIsInGame = game -> game.getPlayer(userId) != null;
-        List<ManagedGame> games = GameManager.getManagedGames().stream()
-            .filter(thisPlayerIsInGame.and(ManagedGame::isHasEnded))
-            .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
+        Predicate<Game> thisPlayerIsInGame = game -> game.getPlayer(userId) != null;
+        List<Game> games = GameManager.getGameNameToGame().values().stream()
+            .filter(thisPlayerIsInGame.and(Game::isHasEnded))
+            .sorted(Comparator.comparing(Game::getGameNameForSorting))
             .toList();
 
         for (var managedGame : games) {
-            var game = managedGame.getGame();
+            var game = GameManager.getGame(managedGame.getName());
             String titlesForPlayer = game.getStoredValue("TitlesFor" + userId);
             if (titlesForPlayer.isEmpty()) {
                 continue;

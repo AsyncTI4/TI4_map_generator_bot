@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
-import ti4.AsyncTI4DiscordBot;
 import ti4.message.BotLogger;
 import ti4.settings.GlobalSettings;
 
@@ -12,7 +11,7 @@ public class ThreadHelper {
     public static void checkThreadLimitAndArchive(Guild guild) {
         if (guild == null) return;
 
-        AsyncTI4DiscordBot.runAsync("Archive threads task.", () -> {
+        new Thread(() -> {
             try {
                 long threadCount = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).count();
                 int closeCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.THREAD_AUTOCLOSE_COUNT.toString(), Integer.class, 25);
@@ -25,6 +24,6 @@ public class ThreadHelper {
             } catch (Exception e) {
                 BotLogger.log("Error in checkThreadLimitAndArchive", e);
             }
-        });
+        }).start();
     }
 }

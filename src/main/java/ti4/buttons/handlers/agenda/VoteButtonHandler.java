@@ -32,7 +32,7 @@ class VoteButtonHandler {
         buttons.add(Buttons.green("preVote", "Pre-Vote"));
         buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
         buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Erased the pre-vote", buttons);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Erased the pre-vote", buttons);
     }
 
     @ButtonHandler("preVote")

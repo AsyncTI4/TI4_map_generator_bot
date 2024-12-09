@@ -72,9 +72,9 @@ public class ButtonHelperAbilities {
             }
         }
         if (event.getMessageChannel().getName().contains("cards-info")) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         } else {
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
         }
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -99,8 +99,7 @@ public class ButtonHelperAbilities {
     @ButtonHandler("startRallyToTheCause")
     public static void startRallyToTheCause(Game game, Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Choose the tile to produce up to 2 ships in",
-            getTilesToRallyToTheCause(game, player));
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Choose the tile to produce up to 2 ships in", getTilesToRallyToTheCause(game, player));
     }
 
     @ButtonHandler("rallyToTheCauseStep2_")
@@ -146,7 +145,7 @@ public class ButtonHelperAbilities {
         }
         String msg = player.getRepresentation() + " choose the tile you wish to pull fighters from";
         ButtonHelper.deleteTheOneButton(event);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
 
     @ButtonHandler("mercenariesStep2_")
@@ -161,7 +160,7 @@ public class ButtonHelperAbilities {
         }
         String msg = player.getRepresentation() + " choose whether to pull 1 or 2 fighters";
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
 
     @ButtonHandler("mercenariesStep3_")
@@ -183,7 +182,7 @@ public class ButtonHelperAbilities {
         }
         String msg = player.getRepresentation() + " choose which player to give the fighters too";
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
 
     @ButtonHandler("mercenariesStep4_")
@@ -1046,8 +1045,10 @@ public class ButtonHelperAbilities {
                 buttons.add(remove);
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 planetButtons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Resolve remove", buttons);
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Resolve explore", planetButtons);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Resolve remove",
+                    buttons);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    "Resolve explore", planetButtons);
                 player.setHasUsedEnvironmentPlunderAbility(true);
             }
         }
@@ -1107,7 +1108,7 @@ public class ButtonHelperAbilities {
                 + Helper.getPlanetRepresentation(planetName, game) + " and gained 4TGs (" + oldTg + "->"
                 + player.getTg() + "). This is technically an optional gain");
         pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, 4);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, 4);
         List<Button> buttons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         String message = "Use buttons to end turn or do another action";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -1433,7 +1434,7 @@ public class ButtonHelperAbilities {
                 player, true, game, 1, false);
         } else {
             message = player.getFactionEmoji() + " used their Deep Mining ability to gain 1TG " + player.gainTG(1);
-            ButtonHelperAgents.resolveArtunoCheck(player, 1);
+            ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
             ButtonHelperAbilities.pillageCheck(player, game);
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }

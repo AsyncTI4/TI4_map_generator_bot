@@ -16,7 +16,7 @@ public class AdminCommand implements ParentCommand {
     private final Map<String, Subcommand> subcommands = Stream.of(
                     new DeleteGame(),
                     new DisableBot(),
-                    new ReloadGame(),
+                    new ReloadMap(),
                     new ReloadMapperObjects(),
                     new RestoreGame(),
                     new CardsInfoForPlayer(),

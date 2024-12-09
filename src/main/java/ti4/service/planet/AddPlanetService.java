@@ -212,7 +212,7 @@ public class AddPlanetService {
                     + "). Reminder that you do not legally have this TG prior to exploring, and that this was mandatory.");
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, game);
-            ButtonHelperAgents.resolveArtunoCheck(player, 1);
+            ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
         }
 
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
@@ -290,7 +290,7 @@ public class AddPlanetService {
                             + ").");
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, game);
-            ButtonHelperAgents.resolveArtunoCheck(player, 1);
+            ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
 
         }
 
@@ -322,7 +322,7 @@ public class AddPlanetService {
             buttons.add(Buttons.blue("integratedBuild_" + planet,
                     "Integrated on " + Helper.getPlanetRepresentation(planet, game)));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
         }
         CommanderUnlockCheckService.checkPlayer(player, "sol", "vaylerian", "olradin", "xxcha", "sardakk");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");

@@ -68,7 +68,7 @@ class ZelianHero extends GameStateSubcommand {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), tgGainMsg);
         player.gainTG(resourcesSum);
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, resourcesSum);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, resourcesSum);
 
         //Add the zelian asteroid field to the map and copy over the space unitholder
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);

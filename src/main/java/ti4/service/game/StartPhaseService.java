@@ -193,7 +193,7 @@ public class StartPhaseService {
                 String message = p2.getRepresentation() + " Click the names of up to 3 planets you wish to ready after Checks and Balances resolved against.";
                 List<Button> buttons = Helper.getPlanetRefreshButtons(event, p2, game);
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, buttons);
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message, buttons);
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 "# Sent buttons to refresh 3 planets due to Checks and Balances.");
@@ -205,7 +205,7 @@ public class StartPhaseService {
 
                 List<Button> buttons = Helper.getPlanetExhaustButtons(p2, game);
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting")); // spitItOut
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, buttons);
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message, buttons);
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Sent buttons to exhaust 1 planet for each tech due to Anti-Intellectual Revolution resolving against.");
         }

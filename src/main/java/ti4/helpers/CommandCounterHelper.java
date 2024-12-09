@@ -6,12 +6,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import org.jetbrains.annotations.Nullable;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
-import ti4.service.game.GameNameService;
 
 public class CommandCounterHelper {
 
@@ -24,16 +22,18 @@ public class CommandCounterHelper {
     }
 
     public static void addCC(GenericInteractionCreateEvent event, String color, Tile tile, boolean ping) {
+        String gameName = event.getChannel().getName();
+        gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
+        gameName = gameName.substring(0, gameName.indexOf("-"));
+        Game game = GameManager.getGame(gameName);
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
-        String gameName = GameNameService.getGameNameFromChannel(event);
-        ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (managedGame.isFowMode() && ping) {
+        if (game.isFowMode() && ping) {
             String colorMention = Emojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(managedGame.getGame(), event, tile.getPosition(), colorMention + " has placed a token in the system");
+            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has placed a token in the system");
         }
         tile.addCC(ccID);
     }

@@ -135,7 +135,7 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getSCName(dieResult, game) + " has been marked with Speygh, the Kyro hero, and the faction that played the hero as " + player.getFaction());
                 ListTurnOrderService.turnOrder(event, game);
             }
-            case "ghotihero" -> MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            case "ghotihero" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Choose the tiles in which you would like to resolve Nmenmede, the Ghoti hero.",
                 ButtonHelperHeroes.getTilesToGhotiHeroIn(player, game, event));
             case "gledgehero" -> ButtonHelperHeroes.resolveGledgeHero(player, game);
@@ -145,7 +145,7 @@ public class PlayHeroService {
                 ButtonHelperHeroes.resolveKhraskHero(player, game);
                 ButtonHelperHeroes.resolveKhraskHero(player, game);
             }
-            case "mortheushero" -> MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            case "mortheushero" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Choose the tiles in which you would like to resolve Bayan, the Mortheus hero.",
                 ButtonHelperHeroes.getTilesToGlimmersHeroIn(player, game, event));
             case "axishero" -> ButtonHelperHeroes.resolveAxisHeroStep1(player, game);
@@ -156,7 +156,7 @@ public class PlayHeroService {
                     Buttons.green("cymiaeHeroStep1_" + (game.getRealPlayers().size() + 1), "Resolve Cymiae Hero"));
                 buttons.add(Buttons.blue("cymiaeHeroAutonetic", "Resolve Autonetic Memory First"));
 
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentation() + " choose whether to resolve Autonetic Memory or not.", buttons);
 
             }
@@ -242,7 +242,7 @@ public class PlayHeroService {
                     List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event,
                         "kjalHero_" + tile.getPosition());
                     if (!buttons.isEmpty()) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             "Use buttons to remove token from "
                                 + tile.getRepresentationForButtons(game, player) + " or an adjacent tile",
                             buttons);
@@ -266,7 +266,7 @@ public class PlayHeroService {
                 List<Button> removeCCs = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
                 if (!removeCCs.isEmpty()) {
                     for (int x = 0; x < ButtonHelperAgents.getGloryTokenTiles(game).size(); x++) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to remove a token from the board", removeCCs);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Use buttons to remove a token from the board", removeCCs);
                     }
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -288,7 +288,7 @@ public class PlayHeroService {
                             String msg = player.getRepresentationUnfogged()
                                 + " you may retrieve a unit upgrade tech from players with branch offices, one for each branch office. Here is the possible techs from "
                                 + p2.getFactionEmojiOrColor();
-                            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg,
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg,
                                 ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
                         }
                     }

@@ -438,7 +438,7 @@ public class ComponentActionHelper {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     }
                     String message = "Select the tech you would like to ready";
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelper.getAllTechsToReady(p1));
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message, ButtonHelper.getAllTechsToReady(p1));
                     List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
                     String message2 = "Use buttons to end turn or do another action";
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
@@ -584,7 +584,7 @@ public class ComponentActionHelper {
                 message = player.getRepresentation()
                     + " choose one of the options. Reminder than you can't score more secrets than normal with this relic (even if they're someone else's), and you can't score the same secret twice."
                     + " If scoring one of your unscored secrets, just score it via the normal process after pressing the button.";
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                MessageHelper.sendMessageToChannel(event.getChannel(), message, buttons);
             }
             case "dynamiscore", "absol_dynamiscore" -> {
                 int oldTg = player.getTg();
@@ -598,7 +598,7 @@ public class ComponentActionHelper {
                     + player.getTg();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);
-                ButtonHelperAgents.resolveArtunoCheck(player, player.getTg() - oldTg);
+                ButtonHelperAgents.resolveArtunoCheck(player, game, player.getTg() - oldTg);
             }
             case "stellarconverter" -> {
                 message = player.getRepresentationUnfogged() + " Select the planet you want to destroy";

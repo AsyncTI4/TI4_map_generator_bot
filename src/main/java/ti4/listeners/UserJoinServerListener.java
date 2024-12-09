@@ -21,12 +21,10 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.ThreadGetter;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
-import ti4.map.manage.ManagedPlayer;
+import ti4.map.GameManager;
+import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.service.game.ManagedGameService;
 
 public class UserJoinServerListener extends ListenerAdapter {
 
@@ -75,51 +73,43 @@ public class UserJoinServerListener extends ListenerAdapter {
             return false;
         }
         String eventGuild = event.getGuild().getId();
-        return AsyncTI4DiscordBot.isValidGuild(eventGuild);
+        List<String> asyncGuilds = AsyncTI4DiscordBot.guilds.stream().map(Guild::getId).toList();
+        // Do not process these events in guilds that we aren't initialized in
+        return asyncGuilds.contains(eventGuild);
     }
 
     private void checkIfNewUserIsInExistingGamesAndAutoAddRole(Guild guild, User user) {
-        List<ManagedGame> mapsJoined = new ArrayList<>();
-
-        for (ManagedGame game : GameManager.getManagedGames()) {
-            boolean isInGame = checkIfNewUserIsInExistingGameAndAutoAddRole(game, guild, user);
-            if (isInGame) mapsJoined.add(game);
-        }
-
-        if (mapsJoined.isEmpty()) {
-            return;
-        }
-        for (ManagedGame managedGame : mapsJoined) {
-            String gameMessage = user.getAsMention() + " has joined the server!";
-            MessageHelper.sendMessageToChannel(managedGame.getTableTalkChannel(), gameMessage);
-            Game game = managedGame.getGame();
-            checkIfCanCloseGameLaunchThread(game, true);
-        }
-    }
-
-    private static boolean checkIfNewUserIsInExistingGameAndAutoAddRole(ManagedGame managedGame, Guild guild, User user) {
-        var gameGuild = managedGame.getGuild();
-        if (gameGuild == null || !gameGuild.equals(guild) || !managedGame.hasPlayer(user.getId())) {
-            return false;
-        }
-        Game game = managedGame.getGame();
-        Helper.fixGameChannelPermissions(guild, game);
-        ThreadChannel mapThread = game.getBotMapUpdatesThread();
-        if (mapThread != null && !mapThread.isLocked()) {
-            mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
-        }
-        var player = game.getPlayer(user.getId());
-        if (player == null || !ButtonHelper.isPlayerNew(player.getUserID()) || game.getTableTalkChannel() == null || game.isFowMode()) {
-            return true;
-        }
-        String msg = user.getAsMention() + " ping here";
-        List<ThreadChannel> threadChannels = game.getTableTalkChannel().getThreadChannels();
-        for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equalsIgnoreCase("Info for new players")) {
-                MessageHelper.sendMessageToChannel(threadChannel_, msg);
+        List<Game> mapsJoined = new ArrayList<>();
+        for (Game game : GameManager.getGameNameToGame().values()) {
+            Guild gameGuild = game.getGuild();
+            if (gameGuild != null && gameGuild.equals(guild) && game.getPlayers().containsKey(user.getId())) {
+                mapsJoined.add(game);
+                Helper.fixGameChannelPermissions(guild, game);
+                ThreadChannel mapThread = game.getBotMapUpdatesThread();
+                if (mapThread != null && !mapThread.isLocked()) {
+                    mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
+                }
+                Player player = game.getPlayer(user.getId());
+                if (player != null && ButtonHelper.isPlayerNew(game, player)) {
+                    String msg = player.getRepresentation() + " ping here";
+                    if (game.getTableTalkChannel() != null) {
+                        List<ThreadChannel> threadChannels = game.getTableTalkChannel().getThreadChannels();
+                        for (ThreadChannel threadChannel_ : threadChannels) {
+                            if (threadChannel_.getName().equalsIgnoreCase("Info for new players")) {
+                                MessageHelper.sendMessageToChannel(threadChannel_, msg);
+                            }
+                        }
+                    }
+                }
             }
         }
-        return true;
+        if (!mapsJoined.isEmpty()) {
+            for (Game g : mapsJoined) {
+                String gameMessage = user.getAsMention() + " has joined the server!";
+                MessageHelper.sendMessageToChannel(g.getTableTalkChannel(), gameMessage);
+                checkIfCanCloseGameLaunchThread(g, true);
+            }
+        }
     }
 
     public static void checkIfCanCloseGameLaunchThread(Game game, boolean notify) {
@@ -136,8 +126,8 @@ public class UserJoinServerListener extends ListenerAdapter {
             return;
         }
         List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
-        for (String playerIds : game.getPlayerIDs()) {
-            if (!guildMemberIDs.contains(playerIds)) {
+        for (String playerIDs : game.getPlayerIDs()) {
+            if (!guildMemberIDs.contains(playerIDs)) {
                 return;
             }
         }
@@ -149,26 +139,24 @@ public class UserJoinServerListener extends ListenerAdapter {
     }
 
     private void checkIfUserLeftActiveGames(Guild guild, User user, boolean voluntary) {
-        List<ManagedGame> gamesQuit = new ArrayList<>();
-
-        ManagedPlayer player = GameManager.getManagedPlayer(user.getId());
-        for (ManagedGame game : player.getGames()) {
-            if (game.isHasEnded() || game.isVpGoalReached()) continue;
+        List<Game> gamesQuit = new ArrayList<>();
+        for (Game game : GameManager.getGameNameToGame().values()) {
+            boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
+            if (game.isHasEnded() || endVPReachedButNotEnded) continue;
             Guild gameGuild = game.getGuild();
-            if (gameGuild != null && gameGuild.equals(guild)) {
+            if (gameGuild != null && gameGuild.equals(guild) && game.getPlayers().containsKey(user.getId())) {
                 gamesQuit.add(game);
             }
         }
-
         if (!gamesQuit.isEmpty()) {
             StringBuilder msg = new StringBuilder("User " + user.getName() + " has left the server " + guild.getName() + " with the following in-progress games:");
-            for (ManagedGame game : gamesQuit) {
-                String gameMessage = "Attention " + ManagedGameService.getPingAllPlayers(game) + ": " + user.getName();
+            for (Game g : gamesQuit) {
+                String gameMessage = "Attention " + g.getPing() + ": " + user.getName();
                 if (voluntary) gameMessage += " has left the server.\n> If this was not a mistake, you may make ";
                 if (!voluntary) gameMessage += " was removed from the server.\n> Make ";
                 gameMessage += "a post in https://discord.com/channels/943410040369479690/1176191865188536500 to get a replacement player";
-                MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), gameMessage);
-                msg.append("\n> ").append(game.getName()).append(" -> Link:").append(game.getTableTalkChannel().getJumpUrl());
+                MessageHelper.sendMessageToChannel(g.getTableTalkChannel(), gameMessage);
+                msg.append("\n> ").append(g.getName()).append(" -> Link:").append(g.getTableTalkChannel().getJumpUrl());
             }
             reportUserLeftServer(msg.toString());
 

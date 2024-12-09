@@ -135,7 +135,7 @@ public class StartCombatService {
                     Buttons.red(player2.getFinsFactionCheckerPrefix() + "removeAllStructures_" + unitHolder.getName(),
                         "Remove Structures"));
                 buttons.add(Buttons.gray("deleteButtons", "Don't remove Structures"));
-                MessageHelper.sendMessageToChannelWithButtons(player2.getCorrectChannel(), msg2, buttons);
+                MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), msg2, buttons);
             }
         } else {
             findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
@@ -363,7 +363,7 @@ public class StartCombatService {
             if (ButtonHelper.doesPlayerHaveFSHere("cymiae_flagship", player, tile)) {
                 buttons.add(Buttons.green("resolveSpyStep1", "Resolve Reprocessor Alpha (Cymiae Flagship) Ability"));
                 buttons.add(Buttons.red("deleteButtons", "Delete These"));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
                         + "if you win the combat, you have the opportunity to use the Reprocessor Alpha (the Cymiae flagship) to force the other player to send you a random action card. It will send buttons to the other player to confirm.",
                     buttons);
             }
@@ -394,14 +394,14 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons.add(Buttons.gray(finChecker + "mahactStealCC_" + otherPlayer.getColor(), "Add Opponent CC to Fleet", Emojis.Mahact));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
                         + " this is a reminder that if you win this combat, you may add the opponents CC to your fleet pool.",
                     buttons);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray("exhaustTech_dskortg_" + tile.getPosition(), "Tempest Drive", Emojis.kortali));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
                         + " this is a reminder that if you win the combat, you may use this button to remove a CC from the system.",
                     buttons);
             }
@@ -419,7 +419,7 @@ public class StartCombatService {
             if (type.equalsIgnoreCase("space") && player.hasTech("so")) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray("salvageOps_" + tile.getPosition(), "Salvage Operations", Emojis.Mentak));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
                         + " this is a reminder that if the combat does not end in a draw, you may use the button to resolve Salvage Operations.",
                     buttons);
             }
@@ -427,19 +427,16 @@ public class StartCombatService {
                 && game.playerHasLeaderUnlockedOrAlliance(player, "mentakcommander")) {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(finChecker + "mentakCommander_" + otherPlayer.getColor(), "Resolve Mentak Commander on " +
-                    otherPlayer.getColor(), Emojis.Mentak));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you win the combat, " +
-                    "you may use the button to resolve S'ula Mentarion, the Mentak commander.", buttons);
+                buttons.add(Buttons.gray(finChecker + "mentakCommander_" + otherPlayer.getColor(), "Resolve Mentak Commander on " + otherPlayer.getColor(), Emojis.Mentak));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that if you win the combat, you may use the button to resolve S'ula Mentarion, the Mentak commander.", buttons);
             }
             if (player.hasAbility("moult") && player != game.getActivePlayer()
                 && "space".equalsIgnoreCase(type)) {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(finChecker + "moult_" + tile.getPosition(), "Moult", Emojis.cheiran));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                        + " this is a reminder that if you win the combat, you may use the button to resolve Moult and produce one ship, reducing the cost " +
-                        "by 1 for each non-fighter ship you lost in the combat.",
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
+                        + " this is a reminder that if you win the combat, you may use the button to resolve Moult and produce one ship, reducing the cost by 1 for each non-fighter ship you lost in the combat.",
                     buttons);
             }
             if (player.getPromissoryNotes().containsKey("dspnmort")
@@ -448,9 +445,8 @@ public class StartCombatService {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(finChecker + "startFacsimile_" + tile.getPosition(), "Play Mortheus PN", Emojis.cheiran));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                        + " this is a reminder that you may play Morpheus PN here to spend influence equal to the cost of 1 of the opponent ships to " +
-                        "place 1 of that type of ship in the system.",
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
+                        + " this is a reminder that you may play Morpheus PN here to spend influence equal to the cost of 1 of the opponent ships to place 1 of that type of ship in the system.",
                     buttons);
             }
             boolean techOrLegendary = false;
@@ -464,7 +460,7 @@ public class StartCombatService {
                 && !player.hasLeaderUnlocked("augerscommander")) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.green("unlockCommander_augers", "Unlock Augurs Commander", Emojis.augers));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
                         + " this is a reminder that if you win the combat here, you may use the button to unlock Lachis, the Augurs commander.",
                     buttons);
             }
@@ -472,9 +468,8 @@ public class StartCombatService {
                 && !player.hasLeaderUnlocked("kortalicommander")) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.green("unlockCommander_kortali", "Unlock Kortali commander", Emojis.kortali));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                        + " this is a reminder that if you destroy all of the opponent's units in this system, you may use the button to unlock Queen Lorena, " +
-                        "the Kortali commander.",
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
+                        + " this is a reminder that if you destroy all of the opponent's units in this system, you may use the button to unlock Queen Lorena, the Kortali commander.",
                     buttons);
             }
         }

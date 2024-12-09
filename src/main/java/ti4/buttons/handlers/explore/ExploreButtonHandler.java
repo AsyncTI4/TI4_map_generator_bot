@@ -95,7 +95,7 @@ class ExploreButtonHandler {
         boolean failed = message.contains("Please try again.");
         if (!failed) {
             message += "Gained 1TG " + player.gainTG(1, true);
-            ButtonHelperAgents.resolveArtunoCheck(player, 1);
+            ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
         }
         ButtonHelper.addReaction(event, false, false, message, "");
         if (!failed) {

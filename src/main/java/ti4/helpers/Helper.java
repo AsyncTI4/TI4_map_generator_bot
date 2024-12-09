@@ -51,13 +51,12 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -2121,18 +2120,14 @@ public class Helper {
         }
 
         if (role == null) { // make sure players have access to the game channels
-            addMapPlayerPermissionsToGameChannels(guild, game.getName());
+            addMapPlayerPermissionsToGameChannels(guild, game);
         } else { // make sure players have the role
             addGameRoleToMapPlayers(guild, role, game);
         }
     }
 
-    public static void addMapPlayerPermissionsToGameChannels(Guild guild, String gameName) {
-        if (!GameManager.isValid(gameName)) {
-            return;
-        }
-        ManagedGame game = GameManager.getManagedGame(gameName);
-        var players = game.getPlayerIds();
+    public static void addMapPlayerPermissionsToGameChannels(Guild guild, Game game) {
+        var players = game.getPlayerIDs();
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null) {
             addPlayerPermissionsToGameChannel(guild, tableTalkChannel, players);
@@ -2141,6 +2136,7 @@ public class Helper {
         if (actionsChannel != null) {
             addPlayerPermissionsToGameChannel(guild, actionsChannel, players);
         }
+        String gameName = game.getName();
         List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
         for (GuildChannel channel : channels) {
             addPlayerPermissionsToGameChannel(guild, channel, players);
@@ -2156,7 +2152,7 @@ public class Helper {
         // long role = 1093925613288562768L;
         long role = 1166011604488425482L;
 
-        for (ManagedGame game : GameManager.getManagedGames()) {
+        for (var game : GameManager.getGameNameToGame().values()) {
             if (!game.isHasEnded()) {
                 if (game.getGuild() != null && game.getGuild().equals(guild)) {
                     var tableTalkChannel = game.getTableTalkChannel();

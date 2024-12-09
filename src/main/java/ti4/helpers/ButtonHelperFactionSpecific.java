@@ -146,9 +146,9 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " due to your mech ability, you may explore "
                 + Helper.getPlanetRepresentation(planet, game) + " twice now.");
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " Explore #1",
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Explore #1",
             buttons);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " Explore #2",
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Explore #2",
             buttons);
         event.getMessage().delete().queue();
     }
@@ -243,7 +243,7 @@ public class ButtonHelperFactionSpecific {
                 buttons.add(validTile2);
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
     }
 
     @ButtonHandler("cavStep2_")
@@ -360,7 +360,7 @@ public class ButtonHelperFactionSpecific {
         }
         String msg = player.getRepresentationUnfogged()
             + " select the planet that you wish to drop 1 mech and 1 infantry on";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
     }
 
     @ButtonHandler("mahactStealCC_")
@@ -832,7 +832,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), message);
         }
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, 2);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, 2);
         event.getMessage().delete().queue();
     }
 
@@ -852,7 +852,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), hacan.getFactionEmoji()
             + " spent a strategy CC and gained " + Emojis.tg(4) + " (" + oldTg + "->" + hacan.getTg() + ")");
         ButtonHelperAbilities.pillageCheck(hacan, game);
-        ButtonHelperAgents.resolveArtunoCheck(hacan, 4);
+        ButtonHelperAgents.resolveArtunoCheck(hacan, game, 4);
 
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
@@ -1723,9 +1723,9 @@ public class ButtonHelperFactionSpecific {
                     }
                     MessageHelper.sendMessageToChannel(channel, message);
                     // ButtonHelperAbilities.pillageCheck(sender, game);
-                    ButtonHelperAgents.resolveArtunoCheck(sender, 1);
+                    ButtonHelperAgents.resolveArtunoCheck(sender, game, 1);
                     // ButtonHelperAbilities.pillageCheck(receiver, game);
-                    ButtonHelperAgents.resolveArtunoCheck(receiver, 1);
+                    ButtonHelperAgents.resolveArtunoCheck(receiver, game, 1);
                 }
             }
         }
@@ -2412,7 +2412,7 @@ public class ButtonHelperFactionSpecific {
         String msg = player.getRepresentation() + " used Salvage Ops to get 1TG (you currently have " + player.getTg()
             + "TG" + (player.getTg() == 1 ? "" : "s") + ")";
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, 1);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
@@ -2492,7 +2492,7 @@ public class ButtonHelperFactionSpecific {
                 + " for " + toGain + " TG" + (toGain == 1 ? "" : "s") + " " + player.gainTG(toGain));
 
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, toGain);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, toGain);
 
         event.getMessage().delete().queue();
     }

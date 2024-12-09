@@ -31,6 +31,8 @@ import ti4.helpers.ThreadHelper;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -56,7 +58,7 @@ public class EndGameService {
         }
 
         // ADD USER PERMISSIONS DIRECTLY TO CHANNEL
-        Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), gameName);
+        Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), GameManager.getGame(gameName));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             "This game's channels' permissions have been updated.");
 
@@ -150,11 +152,13 @@ public class EndGameService {
 
     public static void gameEndStuff(Game game, GenericInteractionCreateEvent event, boolean publish) {
         String gameName = game.getName();
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
         game.setHasEnded(true);
         game.setEndedDate(System.currentTimeMillis());
         game.setAutoPing(false);
         game.setAutoPingSpacer(0);
+        GameSaveLoadManager.saveGame(game, event);
 
         if (!game.isFowMode()) {
             PlayerTitleHelper.offerEveryoneTitlePossibilities(game);

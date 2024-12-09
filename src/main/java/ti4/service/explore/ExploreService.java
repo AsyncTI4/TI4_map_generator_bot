@@ -487,7 +487,7 @@ public class ExploreService {
                     MessageHelper.sendMessageToEventChannel(event,
                         message);
                     ButtonHelperAbilities.pillageCheck(player, game);
-                    ButtonHelperAgents.resolveArtunoCheck(player, 1);
+                    ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                 }
 
                 String exploredMessage = player.getRepresentation() + " explored " + Emojis.Cultural +
@@ -577,17 +577,17 @@ public class ExploreService {
                     case "minent" -> {
                         message = "Gained 1" + Emojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(1) + " ";
                         ButtonHelperAbilities.pillageCheck(player, game);
-                        ButtonHelperAgents.resolveArtunoCheck(player, 1);
+                        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                     }
                     case "ent" -> {
                         message = "Gained 2" + Emojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(2) + " ";
                         ButtonHelperAbilities.pillageCheck(player, game);
-                        ButtonHelperAgents.resolveArtunoCheck(player, 2);
+                        ButtonHelperAgents.resolveArtunoCheck(player, game, 2);
                     }
                     case "majent" -> {
                         message = "Gained 3" + Emojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(3) + " ";
                         ButtonHelperAbilities.pillageCheck(player, game);
-                        ButtonHelperAgents.resolveArtunoCheck(player, 3);
+                        ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
                     }
                     case "kel1", "kel2" -> {
                         ccsToGain = 2;
@@ -675,7 +675,7 @@ public class ExploreService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " gained " + tgGain + "TG"
                     + (tgGain == 1 ? "" : "s") + " due to the forgotten trade station (" + oldTg + "->" + player.getTg() + ")");
                 ButtonHelperAbilities.pillageCheck(player, game);
-                ButtonHelperAgents.resolveArtunoCheck(player, tgGain);
+                ButtonHelperAgents.resolveArtunoCheck(player, game, tgGain);
             }
             case "starchartcultural", "starchartindustrial", "starcharthazardous", "starchartfrontier" -> {
                 game.purgeExplore(ogID);

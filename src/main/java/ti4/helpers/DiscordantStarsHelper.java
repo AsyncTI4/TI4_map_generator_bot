@@ -125,7 +125,7 @@ public class DiscordantStarsHelper {
         boolean hasAbility = planetHolder.isLegendary();
         if (hasAbility) {
             resolveEnvironmentPreserveAbility(player, planetModel, game);
-            resolveEconomyEmpowerAbility(player, planetModel);
+            resolveEconomyEmpowerAbility(player, game, planetModel);
             resolvePeopleConnectAbility(player, planetModel, game);
             return;
         }
@@ -134,7 +134,7 @@ public class DiscordantStarsHelper {
             switch (type) {
                 case "hazardous" -> resolveEnvironmentPreserveAbility(player, planetModel, game);
                 case "industrial" -> {
-                    resolveEconomyEmpowerAbility(player, planetModel);
+                    resolveEconomyEmpowerAbility(player, game, planetModel);
                     resolveEconomyExploitAbility(player, planetModel, game);
                 }
                 case "cultural" -> resolvePeopleConnectAbility(player, planetModel, game);
@@ -153,7 +153,7 @@ public class DiscordantStarsHelper {
                 + Emojis.fighter + "Fighter from your reinforcements in a system that contains 1 or more of your ships.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "ff", "placeOneNDone_skipbuild"));
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Resolve ability", buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Resolve ability", buttons);
         }
     }
 
@@ -165,11 +165,11 @@ public class DiscordantStarsHelper {
                 + Emojis.infantry + "Infantry on " + planetModel.getName() + " to another planet you control.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = ButtonHelperAbilities.offerOlradinConnectButtons(player, game, planetModel.getId());
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Resolve ability", buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Resolve ability", buttons);
         }
     }
 
-    private static void resolveEconomyEmpowerAbility(Player player, PlanetModel planetModel) {
+    private static void resolveEconomyEmpowerAbility(Player player, Game game, PlanetModel planetModel) {
         if (!player.getHasUsedEconomyEmpowerAbility() && player.hasAbility("policy_the_economy_empower")) {
             player.setHasUsedEconomyEmpowerAbility(true);
             String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName() + " you may resolve the following ability: **The Economy - Empower (+)**: You gain 1 " + Emojis.comm + "commodity.\n";
@@ -186,7 +186,7 @@ public class DiscordantStarsHelper {
                 String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName()
                     + " you may resolve the following ability: **The Environment - Preserve (+)**: You may reveal the top card of the planets types exploration deck; if it is a relic fragment, gain it, otherwise discard that card.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Resolve ability", buttons);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Resolve ability", buttons);
             }
         }
     }

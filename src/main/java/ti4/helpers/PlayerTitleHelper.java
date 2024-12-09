@@ -45,7 +45,7 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.red("bestowTitleStep1_Saltshaker", "Saltshaker"));
 
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Tiles here", buttons);
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Tiles here", buttons);
         }
     }
 
@@ -60,7 +60,7 @@ public class PlayerTitleHelper {
             }
             buttons.add(Buttons.green("bestowTitleStep2_" + title + "_" + player2.getFaction(), player2.getFactionModel().getFactionName() + " (" + player2.getUserName() + ")"));
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
 

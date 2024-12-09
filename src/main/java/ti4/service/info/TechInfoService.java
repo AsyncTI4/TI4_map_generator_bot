@@ -21,12 +21,12 @@ public class TechInfoService {
     public static void sendTechInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
-        sendTechInfo(player);
+        sendTechInfo(game, player);
     }
 
-    public static void sendTechInfo(Player player) {
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "_ _\n__**Technologies Researched:**__", getTechMessageEmbeds(player));
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "_ _\n__**Faction Technologies (Not Yet Researched)**__", getFactionTechMessageEmbeds(player));
+    public static void sendTechInfo(Game game, Player player) {
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, player, "_ _\n__**Technologies Researched:**__", getTechMessageEmbeds(player));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, player, "_ _\n__**Faction Technologies (Not Yet Researched)**__", getFactionTechMessageEmbeds(player));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), null, getTechButtons());
     }
 

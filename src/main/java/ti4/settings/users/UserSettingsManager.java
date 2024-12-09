@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import ti4.cache.CacheManager;
@@ -14,9 +16,11 @@ import ti4.message.BotLogger;
 public class UserSettingsManager {
 
     private static final String USER_SETTINGS_PATH = Storage.getStoragePath() + File.separator + "user_settings";
+    private static final ObjectMapper mapper = new ObjectMapper();
     private static final LoadingCache<String, UserSettings> userIdToSettingsCache;
 
     static {
+        mapper.writer(new DefaultPrettyPrinter());
         userIdToSettingsCache = Caffeine.newBuilder()
                 .maximumSize(200)
                 .expireAfterAccess(4, TimeUnit.HOURS)
