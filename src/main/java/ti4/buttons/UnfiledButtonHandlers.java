@@ -1002,7 +1002,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (player.getStrategicCC() > 0) {
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
         }
-        String message = ButtonHelperSCs.deductCC(player, event);
+        String message = ButtonHelperSCs.deductCC(player);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteTheOneButton(event);
     }

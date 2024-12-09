@@ -335,17 +335,17 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("titansConstructionMechDeployStep1")
     public static void handleTitansConstructionMechDeployStep1(Game game, Player player, ButtonInteractionEvent event) {
         String messageID = event.getMessageId();
-        boolean used = ButtonHelperSCs.addUsedSCPlayer(messageID, game, player, event, "");
+        boolean used = ButtonHelperSCs.addUsedSCPlayer(messageID, game, player);
         StrategyCardModel scModel = game.getStrategyCardModelByName("construction").orElse(null);
         boolean construction = scModel != null && scModel.usesAutomationForSCID("pok4construction");
         if (!used && scModel != null && construction && !player.getFollowedSCs().contains(scModel.getInitiative())
-            && game.getPlayedSCs().contains(scModel.getInitiative())) {
+                && game.getPlayedSCs().contains(scModel.getInitiative())) {
             player.addFollowedSC(scModel.getInitiative(), event);
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed construction");
             }
-            String message = ButtonHelperSCs.deductCC(player, event);
+            String message = ButtonHelperSCs.deductCC(player);
             ButtonHelper.addReaction(event, false, false, message, "");
         }
         List<Button> buttons = new ArrayList<>();
