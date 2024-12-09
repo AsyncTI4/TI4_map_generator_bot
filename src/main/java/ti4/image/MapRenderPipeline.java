@@ -26,10 +26,10 @@ public class MapRenderPipeline {
     private boolean running = true;
 
     private MapRenderPipeline() {
-        worker = new Thread(() -> {
+        worker = Thread.startVirtualThread(() -> {
             while (running || !gameRenderQueue.isEmpty()) {
                 try {
-                    RenderEvent renderEvent = gameRenderQueue.poll(2, TimeUnit.SECONDS);
+                    RenderEvent renderEvent = gameRenderQueue.poll(1, TimeUnit.SECONDS);
                     if (renderEvent != null) {
                         render(renderEvent);
                     }
@@ -41,10 +41,6 @@ public class MapRenderPipeline {
                 }
             }
         });
-    }
-
-    public static void start() {
-        instance.worker.start();
     }
 
     public static boolean shutdown() {
