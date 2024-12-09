@@ -53,11 +53,11 @@ public class MessageListener extends ListenerAdapter {
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
             if (!event.getAuthor().isBot()) {
-                if (addFactionEmojiReactionsToMessages(event)) return;
                 if (handleWhispers(event, message)) return;
+                if (endOfRoundSummary(event, message)) return;
+                if (addFactionEmojiReactionsToMessages(event)) return;
                 if (checkForFogOfWarInvitePrompt(message)) return;
                 if (copyLFGPingsToLFGPingsChannel(event, message)) return;
-                if (endOfRoundSummary(event, message)) return;
             }
             handleFogOfWarCombatThreadMirroring(event);
         } catch (Exception e) {
@@ -140,14 +140,15 @@ public class MessageListener extends ListenerAdapter {
             return false;
         }
 
-        String whoIsItTo = StringUtils.substringBetween(messageLowerCase, "to", " ");
-        boolean future = whoIsItTo.startsWith("future");
-        whoIsItTo = whoIsItTo.replaceFirst("future", "");
-        if (whoIsItTo.isEmpty()) {
+        String receivingColorOrFaction = StringUtils.substringBetween(messageLowerCase, "to", " ");
+        boolean future = receivingColorOrFaction.startsWith("future");
+        receivingColorOrFaction = receivingColorOrFaction.replaceFirst("future", "");
+        if (receivingColorOrFaction.isEmpty()) {
             return false;
         }
 
-        if (!Mapper.isValidColor(whoIsItTo) && !Mapper.isValidFaction(AliasHandler.resolveFaction(whoIsItTo))) {
+        receivingColorOrFaction = AliasHandler.resolveFaction(receivingColorOrFaction);
+        if (!Mapper.isValidColor(receivingColorOrFaction) && !Mapper.isValidFaction(receivingColorOrFaction)) {
             return false;
         }
 
@@ -164,45 +165,34 @@ public class MessageListener extends ListenerAdapter {
             return false;
         }
 
-        Player player = getPlayer(event, game);
-        Player player_ = game.getPlayer(event.getAuthor().getId());
+        Player sender = getPlayer(event, game);
+        Player receiver = null;
+
+        for (Player player : game.getRealPlayers()) {
+            if (Objects.equals(receivingColorOrFaction, player.getFaction()) || Objects.equals(receivingColorOrFaction, player.getColor())) {
+                receiver = player;
+                break;
+            }
+        }
+
+        if (receiver == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found: " + receivingColorOrFaction);
+            return false;
+        }
 
         if (future) {
-            whisperToFutureColorOrFaction(event, whoIsItTo, game, messageContent, player, player_);
+            whisperToFutureColorOrFaction(event, game, messageContent, sender, receiver);
         } else {
-            whoIsItTo = AliasHandler.resolveFaction(whoIsItTo);
-            for (Player player3 : game.getRealPlayers()) {
-                if (Objects.equals(whoIsItTo, player3.getFaction()) ||
-                    Objects.equals(whoIsItTo, player3.getColor())) {
-                    player_ = player3;
-                    break;
-                }
-            }
-
-            //if no target player was found
-            if (Objects.equals(player, player_)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found: " + whoIsItTo);
-                return false;
-            }
-            WhisperService.sendWhisper(game, player, player_, messageContent, "n", event.getChannel(), event.getGuild());
+            WhisperService.sendWhisper(game, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
             message.delete().queue();
         }
         return true;
     }
 
-    private static void whisperToFutureColorOrFaction(MessageReceivedEvent event, String whoIsItTo, Game game, String messageContent, Player player, Player player_) {
-        String factionColor = whoIsItTo;
-        factionColor = AliasHandler.resolveFaction(factionColor);
-        for (Player player3 : game.getPlayers().values()) {
-            if (Objects.equals(factionColor, player3.getFaction()) ||
-                Objects.equals(factionColor, player3.getColor())) {
-                player_ = player3;
-                break;
-            }
-        }
-        String futureMsgKey = "futureMessageFor_" + player_.getFaction() + "_" + player.getFaction();
+    private static void whisperToFutureColorOrFaction(MessageReceivedEvent event, Game game, String messageContent, Player sender, Player receiver) {
+        String futureMsgKey = "futureMessageFor_" + receiver.getFaction() + "_" + sender.getFaction();
         game.setStoredValue(futureMsgKey, game.getStoredValue(futureMsgKey) + "\n\n" + messageContent);
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent someone else a future message");
+        MessageHelper.sendMessageToChannel(event.getChannel(), sender.getFactionEmoji() + " sent someone else a future message");
         event.getMessage().delete().queue();
     }
 
