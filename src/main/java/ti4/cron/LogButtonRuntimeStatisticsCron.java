@@ -10,7 +10,7 @@ import ti4.processors.ButtonProcessor;
 public class LogButtonRuntimeStatisticsCron {
 
     public static void register() {
-        CronManager.register(LogButtonRuntimeStatisticsCron.class, LogButtonRuntimeStatisticsCron::logButtonRuntimeStatistics, 1, 4, TimeUnit.HOURS);
+        CronManager.schedulePeriodically(LogButtonRuntimeStatisticsCron.class, LogButtonRuntimeStatisticsCron::logButtonRuntimeStatistics, 1, 4, TimeUnit.HOURS);
     }
 
     private static void logButtonRuntimeStatistics() {

@@ -19,7 +19,7 @@ public class LogCacheStatsCron {
     private static final ThreadLocal<DecimalFormat> percentFormatter = ThreadLocal.withInitial(() -> new DecimalFormat("##.##%"));
 
     public static void register() {
-        CronManager.register(LogCacheStatsCron.class, LogCacheStatsCron::logCacheStats, 1, 4, TimeUnit.HOURS);
+        CronManager.schedulePeriodically(LogCacheStatsCron.class, LogCacheStatsCron::logCacheStats, 1, 4, TimeUnit.HOURS);
     }
 
     private static void logCacheStats() {
