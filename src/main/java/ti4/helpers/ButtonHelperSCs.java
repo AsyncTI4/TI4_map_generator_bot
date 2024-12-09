@@ -5,13 +5,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -38,11 +39,11 @@ public class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("diplomacy").orElse(null);
+            scModel = game.getStrategyCardModelByName("pok2diplomacy").orElse(null);
         }
         if (!used && scModel != null && scModel.usesAutomationForSCID("pok2diplomacy")
-                && !player.getFollowedSCs().contains(scModel.getInitiative())
-                && game.getPlayedSCs().contains(scModel.getInitiative())) {
+            && !player.getFollowedSCs().contains(scModel.getInitiative())
+            && game.getPlayedSCs().contains(scModel.getInitiative())) {
             int scNum = scModel.getInitiative();
             player.addFollowedSC(scNum, event);
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
@@ -534,10 +535,9 @@ public class ButtonHelperSCs {
             }
         } else {
             StringBuilder empelar = new StringBuilder();
-            List<Character> letters = Arrays.asList('m','e','l','p','a');
+            List<Character> letters = Arrays.asList('m', 'e', 'l', 'p', 'a');
             Collections.shuffle(letters);
-            for (Character c: letters)
-            {
+            for (Character c : letters) {
                 empelar.append(c);
             }
             empelar = new StringBuilder("E" + empelar + "r");

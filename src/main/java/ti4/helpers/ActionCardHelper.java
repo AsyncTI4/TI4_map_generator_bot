@@ -1039,6 +1039,7 @@ public class ActionCardHelper {
             String message = player.getRepresentationUnfogged() + " if you did not just use the Codex to get that AC, please discard 1 AC due to your Cybernetic Madness ability";
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
+        ButtonHelper.checkACLimit(game, player);
     }
 
     public static void getActionCardFromDiscard(GenericInteractionCreateEvent event, Game game, Player player, int acIndex) {
