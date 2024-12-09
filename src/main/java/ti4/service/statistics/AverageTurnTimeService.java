@@ -13,13 +13,13 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GamesPage;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -71,7 +71,7 @@ public class AverageTurnTimeService {
             .toList();
 
         for (var userTurnCountTotalTime : turnTimes) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(userTurnCountTotalTime.getKey());
+            var user = GameManager.getManagedGame(userTurnCountTotalTime.getKey());
             int turnCount = userTurnCountTotalTime.getValue().getKey();
             long totalMillis = userTurnCountTotalTime.getValue().getValue();
 
