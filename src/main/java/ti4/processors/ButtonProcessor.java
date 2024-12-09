@@ -97,7 +97,7 @@ public class ButtonProcessor {
             if (context.isValid()) {
                 resolveButtonInteractionEvent(context);
                 resolveTime = System.currentTimeMillis();
-                context.save(event);
+                context.save();
                 saveTime = System.currentTimeMillis();
             }
         } catch (Exception e) {

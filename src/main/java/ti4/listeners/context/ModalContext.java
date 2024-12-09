@@ -5,7 +5,11 @@ import java.util.Map;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import ti4.helpers.ButtonHelper;
+import ti4.map.manage.GameManager;
+import ti4.service.event.EventAuditService;
 
 @Getter
 public class ModalContext extends ListenerContext {
@@ -34,6 +38,21 @@ public class ModalContext extends ListenerContext {
         this.values = new HashMap<>();
         for (ModalMapping mapping : event.getValues()) {
             values.put(mapping.getId(), mapping.getAsString());
+        }
+    }
+
+    public void save(ButtonInteractionEvent event) {
+        boolean skippableButton = componentID.contains("ultimateUndo") ||
+            "showGameAgain".equalsIgnoreCase(componentID) ||
+            "cardsInfo".equalsIgnoreCase(componentID) ||
+            componentID.contains("showDeck") ||
+            componentID.contains("FactionInfo") ||
+            componentID.contains("searchMyGames") ||
+            componentID.contains("decline_explore") ||
+            componentID.contains("offerDeckButtons");
+        if (game != null && !skippableButton) {
+            ButtonHelper.saveButtons(event, game, player);
+            GameManager.save(game, EventAuditService.getReason(event, game.isFowMode()));
         }
     }
 }

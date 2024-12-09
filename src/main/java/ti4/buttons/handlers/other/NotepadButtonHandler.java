@@ -1,4 +1,4 @@
-package ti4.helpers.async;
+package ti4.buttons.handlers.other;
 
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -11,7 +11,8 @@ import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class NotepadHelper {
+public class NotepadButtonHandler {
+
     private static String getNotes(Player player) {
         return StringHelper.unescape(player.getNotes());
     }
@@ -31,9 +32,11 @@ public class NotepadHelper {
         String modalID = "notepadModal";
         String fieldID = "notes";
         String notes = getNotes(player);
-        TextInput.Builder bob = TextInput.create(fieldID, "Edit summary", TextInputStyle.PARAGRAPH).setPlaceholder("Start typing your notes...");
-        if (!notes.isBlank()) bob.setValue(notes);
-        Modal modal = Modal.create(modalID, player.getFlexibleDisplayName() + "'s Notepad").addActionRow(bob.build()).build();
+        TextInput.Builder textInputBuilder = TextInput.create(fieldID, "Edit summary", TextInputStyle.PARAGRAPH).setPlaceholder("Start typing your notes...");
+        if (!notes.isBlank()) {
+            textInputBuilder.setValue(notes);
+        }
+        Modal modal = Modal.create(modalID, player.getFlexibleDisplayName() + "'s Notepad").addActionRow(textInputBuilder.build()).build();
         event.replyModal(modal).queue();
     }
 
