@@ -82,7 +82,7 @@ public class ButtonHelperCommanders {
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         String msg = player.getRepresentationUnfogged()
             + " you may exhaust 1 planet to gain TGs equal to its influence or resources.";
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
     @ButtonHandler("mentakCommander_")
@@ -126,7 +126,7 @@ public class ButtonHelperCommanders {
         int count = Math.max(planet.getInfluence(), planet.getResources());
         PlanetExhaust.doAction(player, planetID, game);
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, count);
+        ButtonHelperAgents.resolveArtunoCheck(player, count);
         String msg = player.getRepresentationUnfogged() + " used Knak Halfear, the Olradin Commander, to exhaust "
             + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + " and gain " + count + "TG" + (count == 1 ? "" : "s") + " " + player.gainTG(count);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -333,7 +333,7 @@ public class ButtonHelperCommanders {
             msg += "\nThis tg can be spent before " + Emojis.Mentak + "**Pillage** resolves, since it is a when.";
         }
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+        ButtonHelperAgents.resolveArtunoCheck(player, 1);
         player.addSpentThing(msg);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
@@ -344,13 +344,13 @@ public class ButtonHelperCommanders {
                 String mMessage = player.getRepresentationUnfogged() + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, 1TG has been added automatically (" + player.gainTG(1) + ").";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
                 ButtonHelperAbilities.pillageCheck(player, game);
-                ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+                ButtonHelperAgents.resolveArtunoCheck(player, 1);
             } else {
                 String mMessage = player.getRepresentationUnfogged() + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, you may gain 1TG, but you are in pillage range, so this has not been done automatically.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1TG", Emojis.tg));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
             }
         }
     }
@@ -398,14 +398,14 @@ public class ButtonHelperCommanders {
                 String message = player.getRepresentationUnfogged() + " you gained a " + Emojis.tg + " from " + Emojis.MuaatCommander + "Magmus, the Muaat Commander, " + player.gainTG(1) + " (" + reason + ")";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);
-                ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+                ButtonHelperAgents.resolveArtunoCheck(player, 1);
             } else {
                 String mMessage = player.getRepresentationUnfogged()
                     + " you have Magmus, the Muaat Commander, unlocked, you may gain 1TG, but you are in Pillage range, so this has not been done automatically.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1TG", Emojis.tg));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
             }
         }
         if (player.hasUnit("kolume_mech")) {

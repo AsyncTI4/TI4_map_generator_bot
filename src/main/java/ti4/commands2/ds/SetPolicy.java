@@ -186,7 +186,7 @@ class SetPolicy extends GameStateSubcommand {
         DiscordantStarsHelper.checkOlradinMech(game);
 
         AbilityInfoService.sendAbilityInfo(game, player, event);
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, player, "", List.of(unitModel.getRepresentationEmbed(false)));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "", List.of(unitModel.getRepresentationEmbed(false)));
     }
 
     public static String convertChoice(String inputChoice) {
