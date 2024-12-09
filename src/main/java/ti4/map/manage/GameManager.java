@@ -6,12 +6,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import lombok.experimental.UtilityClass;
-import ti4.cache.CacheManager;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -20,18 +16,8 @@ import ti4.message.BotLogger;
 public class GameManager {
 
     private static final CopyOnWriteArrayList<String> allGameNames = new CopyOnWriteArrayList<>();
-    private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>(); // TODO: We can evaluate dropping the managed objects entirely
     private static final ConcurrentMap<String, ManagedPlayer> playerNameToManagedPlayer = new ConcurrentHashMap<>();
-    private static final LoadingCache<String, Game> activeGameCache;
-
-    static {
-        activeGameCache = Caffeine.newBuilder()
-            .maximumSize(1000)
-            .expireAfterAccess(2, TimeUnit.HOURS)
-            .recordStats()
-            .build(GameManager::load);
-        CacheManager.registerCache("gameCache", activeGameCache);
-    }
 
     public static void initialize() {
         GameLoadService.loadManagedGames()
@@ -60,12 +46,7 @@ public class GameManager {
         if (!isValid(gameName)) {
             return null;
         }
-        var managedGame = gameNameToManagedGame.get(gameName);
-        if (managedGame == null || managedGame.isHasEnded()) {
-            activeGameCache.invalidate(gameName);
-            return load(gameName);
-        }
-        return activeGameCache.get(gameName);
+        return load(gameName);
     }
 
     public static boolean isValid(String gameName) {
@@ -78,9 +59,6 @@ public class GameManager {
         }
         allGameNames.addIfAbsent(game.getName());
         gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
-        if (!game.isHasEnded()) {
-            activeGameCache.put(game.getName(), game);
-        }
         return true;
     }
 
@@ -93,7 +71,6 @@ public class GameManager {
         if (managedGame != null) {
             managedGame.getPlayers().forEach(player -> player.getGames().remove(managedGame));
         }
-        activeGameCache.invalidate(gameName);
         return true;
     }
 
@@ -107,7 +84,6 @@ public class GameManager {
         if (undo == null) {
             return null;
         }
-        activeGameCache.invalidate(undo.getName());
         if (doesNotHaveMatchingManagedGame(undo)) {
             gameNameToManagedGame.put(undo.getName(), new ManagedGame(undo));
         }
@@ -122,9 +98,8 @@ public class GameManager {
 
     @Nullable
     public static Game reload(String gameName) {
-        activeGameCache.invalidate(gameName);
         allGameNames.addIfAbsent(gameName);
-        return get(gameName);
+        return load(gameName);
     }
 
     public static List<String> getGameNames() {

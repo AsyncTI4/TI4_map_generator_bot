@@ -15,6 +15,7 @@ import ti4.helpers.ToStringHelper;
 @UtilityClass
 public class CacheStatsToStringConverter {
 
+    private static final ThreadLocal<DecimalFormat> percentFormatter = ThreadLocal.withInitial(() -> new DecimalFormat("##.##%"));
     private static final ThreadLocal<DecimalFormat> twoDecimalsFormatter = ThreadLocal.withInitial(() -> new DecimalFormat("##.##"));
 
     public static String convert(Set<Map.Entry<String, Cache<?, ?>>> namesToCaches) {
@@ -28,7 +29,7 @@ public class CacheStatsToStringConverter {
         return ToStringHelper.of(name)
             .add("liveTime", getLiveTime())
             .add("hitCount", stats.hitCount())
-            .add("hitRate", formatPercent(stats.hitRate()))
+            .add("hitRate", percentFormatter.get().format(stats.hitRate()))
             .add("loadCount", stats.loadCount())
             .add("loadFailureCount", stats.loadFailureCount())
             .add("averageLoadPenaltyMilliseconds", nanosecondsToMilliseconds(stats.averageLoadPenalty()))
@@ -46,9 +47,5 @@ public class CacheStatsToStringConverter {
         long liveTimeHours = TimeUnit.HOURS.convert(millisecondsSinceBotStarted, TimeUnit.MILLISECONDS);
         long liveTimeMinutes = TimeUnit.MINUTES.convert(millisecondsSinceBotStarted, TimeUnit.MILLISECONDS) - liveTimeHours * 60;
         return liveTimeHours + "h" + liveTimeMinutes + "m";
-    }
-
-    private static String formatPercent(double d) {
-        return twoDecimalsFormatter.get().format(d) + "%";
     }
 }
