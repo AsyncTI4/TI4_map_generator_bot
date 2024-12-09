@@ -205,6 +205,7 @@ public class AutoPingCron {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 game.getPing() + " the game has stalled on a player, and autoping will now stop pinging them.");
             game.setTemporaryPingDisable(true);
+            GameManager.save(game, "Disable Auto Ping");
             return;
         }
         if (game.isFowMode()) {
@@ -264,6 +265,7 @@ public class AutoPingCron {
                         .append("half you will be marked as not following.");
                     appendScMessages(game, player, sc, sb);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
+                    GameManager.save(game, "Fast SC Ping");
                 }
                 if (timeDifference > twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("2")) {
                     String message = player.getRepresentationUnfogged() + Helper.getSCName(sc, game) +
@@ -272,6 +274,7 @@ public class AutoPingCron {
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, ButtonHelper.getStratName(sc));
                     player.addFollowedSC(sc);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
+                    GameManager.save(game, "Fast SC Ping 2");
                     String messageID = game.getStoredValue("scPlayMsgID" + sc);
                     addReaction(player, true, "Not following", "", messageID, game);
 
@@ -315,26 +318,22 @@ public class AutoPingCron {
 
     private static void handleSecretObjectiveDrawOrder(Game game, Player player) {
         String key = "factionsThatAreNotDiscardingSOs";
+        if (!game.getStoredValue(key).contains(player.getFaction() + "*")) {
+            game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
+            GameManager.save(game, "Secret Objective Draw Order");
+        }
+
         String key2 = "queueToDrawSOs";
+        if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
+            game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+            GameManager.save(game, "Secret Objective Draw Order");
+        }
+
         String key3 = "potentialBlockers";
-        if (game.getStoredValue(key2)
-            .contains(player.getFaction() + "*")) {
-            game.setStoredValue(key2,
-                game.getStoredValue(key2)
-                    .replace(player.getFaction() + "*", ""));
-        }
-        if (!game.getStoredValue(key)
-            .contains(player.getFaction() + "*")) {
-            game.setStoredValue(key,
-                game.getStoredValue(key)
-                    + player.getFaction() + "*");
-        }
-        if (game.getStoredValue(key3)
-            .contains(player.getFaction() + "*")) {
-            game.setStoredValue(key3,
-                game.getStoredValue(key3)
-                    .replace(player.getFaction() + "*", ""));
+        if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
+            game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
             Helper.resolveQueue(game);
+            GameManager.save(game, "Secret Objective Draw Order");
         }
     }
 
@@ -553,11 +552,12 @@ public class AutoPingCron {
                 game.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
                 if (game.getStoredValue(messageId) != null) {
                     if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-                        game.setStoredValue(messageId,
-                            game.getStoredValue(messageId) + "_" + player.getFaction());
+                        game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
+                        GameManager.save(game, "Add Reaction");
                     }
                 } else {
                     game.setStoredValue(messageId, player.getFaction());
+                    GameManager.save(game, "Add Reaction");
                 }
                 checkForAllReactions(messageId, game);
                 if (message == null || message.isEmpty()) {
