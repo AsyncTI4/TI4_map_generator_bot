@@ -58,5 +58,6 @@ class RestoreGame extends Subcommand {
         }
 
         MessageHelper.sendMessageToEventChannel(event, game.getName() + " restored.");
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getName() + " was restored.");
     }
 }
