@@ -330,7 +330,7 @@ public class MiltyDraftHelper {
         if (mapTemplate == null) {
             MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(manager.getPlayers().size());
             if (defaultTemplate == null) {
-                throw new Exception("idk how to build this map yet: " + game.getName());
+                throw new Exception("idk how to build this map yet: " + game.getName() + ", players: " + manager.getPlayers().size());
             }
             mapTemplate = defaultTemplate.getAlias();
         }
