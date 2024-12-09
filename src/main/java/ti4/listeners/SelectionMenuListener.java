@@ -27,7 +27,7 @@ public class SelectionMenuListener extends ListenerAdapter {
             SelectionMenuContext context = new SelectionMenuContext(event);
             if (context.isValid()) {
                 SelectionMenuProvider.resolveSelectionMenu(context);
-                context.save(event);
+                context.save();
             }
         } catch (Exception e) {
             String message = "Selection Menu issue in event: " + event.getComponentId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();

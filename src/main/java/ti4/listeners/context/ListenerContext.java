@@ -117,9 +117,9 @@ public abstract class ListenerContext {
         return true;
     }
 
-    public void save(GenericInteractionCreateEvent event) {
+    public void save() {
         if (game != null) {
-            GameManager.save(game, EventAuditService.getReason(event, game.isFowMode()));
+            GameManager.save(game, EventAuditService.getReason(getEvent(), game.isFowMode()));
         }
     }
 }

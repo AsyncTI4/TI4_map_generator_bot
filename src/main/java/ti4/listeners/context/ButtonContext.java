@@ -46,7 +46,8 @@ public class ButtonContext extends ListenerContext {
         }
     }
 
-    public void save(ButtonInteractionEvent event) {
+    @Override
+    public void save() {
         boolean skippableButton = componentID.contains("ultimateUndo") ||
             "showGameAgain".equalsIgnoreCase(componentID) ||
             "cardsInfo".equalsIgnoreCase(componentID) ||
@@ -56,8 +57,8 @@ public class ButtonContext extends ListenerContext {
             componentID.contains("decline_explore") ||
             componentID.contains("offerDeckButtons");
         if (game != null && !skippableButton) {
-            ButtonHelper.saveButtons(event, game, player);
+            ButtonHelper.saveButtons(getEvent(), game, player);
         }
-        super.save(event);
+        super.save();
     }
 }
