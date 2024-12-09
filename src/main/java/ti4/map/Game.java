@@ -2210,12 +2210,6 @@ public class Game extends GameProperties {
         return succeeded;
     }
 
-    public boolean putSpecificAgendaOnTop(String agendaID) {
-        boolean succeeded = getAgendas().remove(agendaID);
-        addDiscardAgenda(agendaID);
-        return succeeded;
-    }
-
     public String getNextAgenda(boolean revealFromBottom) {
         int index = revealFromBottom ? getAgendas().size() - 1 : 0;
         return getAgendas().get(index);

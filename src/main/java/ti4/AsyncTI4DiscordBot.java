@@ -32,6 +32,7 @@ import ti4.cron.CronManager;
 import ti4.cron.EndOldGamesCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.OldUndoFileCleanupCron;
+import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.UploadStatsCron;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.FoWHelper;
@@ -56,6 +57,7 @@ import ti4.message.MessageHelper;
 import ti4.migration.DataMigrationManager;
 import ti4.processors.ButtonProcessor;
 import ti4.selections.SelectionManager;
+import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
@@ -68,7 +70,7 @@ public class AsyncTI4DiscordBot {
     public static final List<Role> adminRoles = new ArrayList<>();
     public static final List<Role> developerRoles = new ArrayList<>();
     public static final List<Role> bothelperRoles = new ArrayList<>();
-    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
+    private static final ExecutorService THREAD_POOL = Executors.newVirtualThreadPerTaskExecutor();
 
     public static JDA jda;
     public static String userID;
@@ -195,6 +197,7 @@ public class AsyncTI4DiscordBot {
         // LOAD DATA
         BotLogger.logWithTimestamp(" LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
+        ApplicationEmojiService.uploadNewEmojis();
         TileHelper.init();
         PositionMapper.init();
         Mapper.init();
@@ -217,12 +220,10 @@ public class AsyncTI4DiscordBot {
 
         // START ASYNC PIPELINES
         ImageIO.setUseCache(false);
-        MapRenderPipeline.start();
-        StatisticsPipeline.start();
-        ButtonProcessor.start();
 
         // START CRONS
         AutoPingCron.register();
+        ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
         UploadStatsCron.register();
         OldUndoFileCleanupCron.register();
