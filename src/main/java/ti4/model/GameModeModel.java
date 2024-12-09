@@ -4,9 +4,8 @@ import java.util.List;
 
 import lombok.Data;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.Player;
 
 @Data
 public class GameModeModel implements ModelInterface {
@@ -30,6 +29,10 @@ public class GameModeModel implements ModelInterface {
     private String scSetID;
     private String eventDeckID;
 
+    private Integer maxSecretObjectiveCountPerPlayer;
+    private Integer stage1PublicObjectiveCount;
+    private Integer stage2PublicObjectiveCount;
+
     private String addUnitsFromSource;
     private String swapInTechsFromSource;
     private String swapInUnitsFromSource;
@@ -51,12 +54,20 @@ public class GameModeModel implements ModelInterface {
         game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck(getStage1PublicDeckID()));
         game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck(getStage2PublicDeckID()));
         game.validateAndSetAgendaDeck(event, Mapper.getDeck(getAgendaDeckID()));
-        game.validateAndSetRelicDeck(event, Mapper.getDeck(getRelicDeckID()));
+        game.validateAndSetRelicDeck(Mapper.getDeck(getRelicDeckID()));
         game.validateAndSetExploreDeck(event, Mapper.getDeck(getExplorationDeckID()));
+        
         game.swapOutVariantTechs();
         game.setTechnologyDeckID(getTechnologyDeckID());
         game.swapInVariantTechs();
         game.swapInVariantUnits(getSwapInUnitsFromSource());
+
+        game.setUpPeakableObjectives(0);
+        game.setUpPeakableObjectives(stage1PublicObjectiveCount, 1);
+        game.setUpPeakableObjectives(stage2PublicObjectiveCount, 2);
+
+        game.setMaxSOCountPerPlayer(maxSecretObjectiveCountPerPlayer);
     }
+
 
 }
