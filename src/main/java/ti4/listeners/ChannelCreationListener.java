@@ -4,17 +4,22 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import ti4.AsyncTI4DiscordBot;
 import ti4.message.MessageHelper;
 
 public class ChannelCreationListener extends ListenerAdapter {
 
     @Override
     public void onChannelCreate(@NotNull ChannelCreateEvent event) {
+        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
+            return;
+        }
         handleMakingNewGamesThreadCreation(event);
     }
 
     private void handleMakingNewGamesThreadCreation(ChannelCreateEvent event) {
-        if (!(event.getChannel() instanceof ThreadChannel channel) || !channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
+        if (!(event.getChannel() instanceof ThreadChannel channel) ||
+                !channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
             return;
         }
         MessageHelper.sendMessageToChannel(channel,
