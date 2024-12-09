@@ -157,6 +157,7 @@ public class AutoPingCron {
             if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
                 PlayerTechService.postTechSummary(game);
             }
+            GameManager.save(game, "Tech summary.");
         }
     }
 
