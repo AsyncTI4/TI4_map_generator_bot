@@ -23,7 +23,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
@@ -230,7 +229,6 @@ public class MessageHelper {
 		sendFileUploadToChannel(channel, fileUpload);
 	}
 
-	//.setEphemeral(true).queue();
 	public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload) {
 		if (fileUpload == null) {
 			BotLogger.log("FileUpload null");
@@ -362,9 +360,12 @@ public class MessageHelper {
 
 		String gameName = GameNameService.getGameNameFromChannel(channel);
 		if (GameManager.isValid(gameName)) {
-			Game game = GameManager.getManagedGame(gameName).getGame();
-			if (game.isInjectRulesLinks() && !game.isFowMode()) {
-				messageText = injectRules(messageText);
+			ManagedGame managedGame = GameManager.getManagedGame(gameName);
+			if (!managedGame.isFowMode()) {
+				Game game = managedGame.getGame();
+				if (game.isInjectRulesLinks()) {
+					messageText = injectRules(messageText);
+				}
 			}
 		}
 

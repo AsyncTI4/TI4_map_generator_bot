@@ -13,13 +13,12 @@ import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.apache.commons.collections4.ListUtils;
 import ti4.helpers.ButtonHelper;
 import ti4.image.Mapper;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
+import ti4.listeners.context.SelectionMenuContext;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.selections.Selection;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.game.GameNameService;
 
 public class SelectFaction implements Selection {
 
@@ -31,16 +30,17 @@ public class SelectFaction implements Selection {
     }
 
     @Override
-    public void execute(StringSelectInteractionEvent event) {
-        String gameName = GameNameService.getGameNameFromChannel(event);
-        ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (managedGame == null) {
+    public void execute(StringSelectInteractionEvent event, SelectionMenuContext context) {
+        Game game = context.getGame();
+        if (game == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game could not be found");
             return;
         }
+
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You selected: " + event.getSelectedOptions().getFirst().getLabel());
+
         String fakeButtonID = selectionID + "_" + event.getUser().getId() + "_" + event.getValues().getFirst();
-        ButtonHelper.resolveSetupStep2(managedGame.getGame(), event, fakeButtonID);
+        ButtonHelper.resolveSetupStep2(game, event, fakeButtonID);
     }
 
     public static void offerFactionSelectionMenu(GenericInteractionCreateEvent event) {

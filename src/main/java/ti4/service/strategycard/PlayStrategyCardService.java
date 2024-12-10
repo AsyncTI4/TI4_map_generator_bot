@@ -24,6 +24,7 @@ import ti4.helpers.ThreadHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
@@ -153,7 +154,6 @@ public class PlayStrategyCardService {
         baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
         player.setWhetherPlayerShouldBeTenMinReminded(true);
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
-
             Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message_);
             if (reactionEmoji != null) {
                 message_.addReaction(reactionEmoji).queue();
@@ -233,9 +233,9 @@ public class PlayStrategyCardService {
                             MessageHelper.sendMessageToChannel(m5, neighborsMsg2.toString());
                         }
                     }
-
                 });
             }
+            GameManager.save(game, "Automation for SC play: " + scModel.getName());
         });
 
         // Trade Primary

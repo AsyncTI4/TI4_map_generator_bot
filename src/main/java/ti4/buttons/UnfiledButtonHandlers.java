@@ -71,6 +71,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.PlanetService;
 import ti4.service.StatusCleanupService;
+import ti4.service.button.ReactionService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -263,9 +264,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     @ButtonHandler("genericReact")
-    public static void genericReact(ButtonInteractionEvent event, Game game) {
+    public static void genericReact(ButtonInteractionEvent event, Game game, Player player) {
         String message = game.isFowMode() ? "Turned down window" : null;
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
     }
 
     @ButtonHandler("integratedBuild_")
@@ -1098,63 +1099,62 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     public static void poScoring(ButtonInteractionEvent event, Player player, String buttonID, Game game, MessageChannel privateChannel) {
-        if ("true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
-            String key2 = "queueToScorePOs";
-            String key3 = "potentialScorePOBlockers";
-            String key3b = "potentialScoreSOBlockers";
-            String message;
-            for (Player player2 : Helper.getInitativeOrder(game)) {
-                if (player2 == player) {
-                    if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
-                        game.setStoredValue(key2, game.getStoredValue(key2)
-                            .replace(player.getFaction() + "*", ""));
-                    }
-
-                    String poID = buttonID.replace(Constants.PO_SCORING, "");
-                    int poIndex = Integer.parseInt(poID);
-                    ScorePublicObjectiveService.scorePO(event, privateChannel, game, player, poIndex);
-                    ButtonHelper.addReaction(event, false, false, null, "");
-                    if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
-                        game.setStoredValue(key3, game.getStoredValue(key3)
-                            .replace(player.getFaction() + "*", ""));
-                        if (!game.getStoredValue(key3b).contains(player.getFaction() + "*")) {
-                            Helper.resolvePOScoringQueue(game, event);
-                        }
-                    }
-                    break;
-                }
-                if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
-                    message = "Wants to score a PO but has people ahead of them in iniative order who need to resolve first. They have been queued and will automatically score their PO when everyone ahead of them is clear. ";
-                    if (!game.isFowMode()) {
-                        message += player2.getRepresentationUnfogged()
-                            + " is the one the game is currently waiting on";
-                    }
-                    String poID = buttonID.replace(Constants.PO_SCORING, "");
-                    try {
-                        int poIndex = Integer.parseInt(poID);
-                        game.setStoredValue(player.getFaction() + "queuedPOScore", "" + poIndex);
-                    } catch (Exception e) {
-                        BotLogger.log(event, "Could not parse PO ID: " + poID, e);
-                        event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.")
-                            .queue();
-                    }
-                    game.setStoredValue(key2,
-                        game.getStoredValue(key2) + player.getFaction() + "*");
-                    ButtonHelper.addReaction(event, false, false, message, "");
-                    break;
-                }
-            }
-
-        } else {
+        if (!"true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
             String poID = buttonID.replace(Constants.PO_SCORING, "");
             try {
                 int poIndex = Integer.parseInt(poID);
                 ScorePublicObjectiveService.scorePO(event, privateChannel, game, player, poIndex);
-                ButtonHelper.addReaction(event, false, false, null, "");
+                ReactionService.addReaction(event, game, player);
             } catch (Exception e) {
                 BotLogger.log(event, "Could not parse PO ID: " + poID, e);
                 event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.")
                     .queue();
+            }
+            return;
+        }
+        String key2 = "queueToScorePOs";
+        String key3 = "potentialScorePOBlockers";
+        String key3b = "potentialScoreSOBlockers";
+        String message;
+        for (Player player2 : Helper.getInitativeOrder(game)) {
+            if (player2 == player) {
+                if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
+                    game.setStoredValue(key2, game.getStoredValue(key2)
+                        .replace(player.getFaction() + "*", ""));
+                }
+
+                String poID = buttonID.replace(Constants.PO_SCORING, "");
+                int poIndex = Integer.parseInt(poID);
+                ScorePublicObjectiveService.scorePO(event, privateChannel, game, player, poIndex);
+                ReactionService.addReaction(event, game, player);
+                if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
+                    game.setStoredValue(key3, game.getStoredValue(key3)
+                        .replace(player.getFaction() + "*", ""));
+                    if (!game.getStoredValue(key3b).contains(player.getFaction() + "*")) {
+                        Helper.resolvePOScoringQueue(game, event);
+                    }
+                }
+                break;
+            }
+            if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
+                message = "Wants to score a PO but has people ahead of them in iniative order who need to resolve first. They have been queued and will automatically score their PO when everyone ahead of them is clear. ";
+                if (!game.isFowMode()) {
+                    message += player2.getRepresentationUnfogged()
+                        + " is the one the game is currently waiting on";
+                }
+                String poID = buttonID.replace(Constants.PO_SCORING, "");
+                try {
+                    int poIndex = Integer.parseInt(poID);
+                    game.setStoredValue(player.getFaction() + "queuedPOScore", "" + poIndex);
+                } catch (Exception e) {
+                    BotLogger.log(event, "Could not parse PO ID: " + poID, e);
+                    event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.")
+                        .queue();
+                }
+                game.setStoredValue(key2,
+                    game.getStoredValue(key2) + player.getFaction() + "*");
+                ReactionService.addReaction(event, game, player, message);
+                break;
             }
         }
     }
@@ -1835,7 +1835,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         RelicModel relicModel = Mapper.getRelic(relicID);
         String rsb = "**Relic - Look at Top**\n" + player.getRepresentation() + "\n" + relicModel.getSimpleRepresentation();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, rsb);
-        ButtonHelper.addReaction(event, true, false, "Looked at top of the Relic deck.", "");
+        ReactionService.addReaction(event, game, player, true, false, "Looked at top of the Relic deck.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -2107,17 +2107,17 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
 
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
         if (!event.getMessage().getContentRaw().contains("fragment")) {
             ButtonHelper.deleteMessage(event);
         }
     }
 
     @ButtonHandler("run_status_cleanup")
-    public static void runStatusCleanup(ButtonInteractionEvent event, Game game) {
+    public static void runStatusCleanup(ButtonInteractionEvent event, Game game, Player player) {
         StatusCleanupService.runStatusCleanup(game);
         ButtonHelper.deleteTheOneButton(event);
-        ButtonHelper.addReaction(event, false, true, "Running Status Cleanup. ", "Status Cleanup Run!");
+        ReactionService.addReaction(event, game, player, false, true, "Running Status Cleanup. ", "Status Cleanup Run!");
     }
 
     @ButtonHandler("ChooseDifferentDestination")
@@ -2159,7 +2159,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             ActionCardHelper.sendActionCardInfo(game, player, event);
             message = "Drew 2 ACs With Scheming. Please Discard 1 AC.";
         }
-        ButtonHelper.addReaction(event, true, false, message, "");
+        ReactionService.addReaction(event, game, player, true, false, message);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " use buttons to discard",
             ActionCardHelper.getDiscardActionCardButtons(player, false));
@@ -2180,7 +2180,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             ActionCardHelper.sendActionCardInfo(game, player, event);
             message = "Drew 1 AC";
         }
-        ButtonHelper.addReaction(event, true, false, message, "");
+        ReactionService.addReaction(event, game, player, true, false, message);
         ButtonHelper.deleteMessage(event);
         ButtonHelper.checkACLimit(game, player);
     }
@@ -2197,18 +2197,18 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             ActionCardHelper.sendActionCardInfo(game, player, event);
             message = "Drew 1 AC";
         }
-        ButtonHelper.addReaction(event, true, false, message, "");
+        ReactionService.addReaction(event, game, player, true, false, message);
         ButtonHelper.checkACLimit(game, player);
     }
 
     @ButtonHandler("confirm_cc")
-    public static void confirmCC(ButtonInteractionEvent event, Player player) {
+    public static void confirmCC(ButtonInteractionEvent event, Game game, Player player) {
         String message = "Confirmed CCs: " + player.getTacticalCC() + "/" + player.getFleetCC();
         if (!player.getMahactCC().isEmpty()) {
             message += "(+" + player.getMahactCC().size() + ")";
         }
         message += "/" + player.getStrategicCC();
-        ButtonHelper.addReaction(event, true, false, message, "");
+        ReactionService.addReaction(event, game, player, true, false, message);
     }
 
     @ButtonHandler("shuffleExplores")
@@ -2225,7 +2225,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     public static void declineExplore(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
-        ButtonHelper.addReaction(event, false, false, "Declined Explore", "");
+        ReactionService.addReaction(event, game, player, "Declined Explore");
         ButtonHelper.deleteMessage(event);
         if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
             String pF = player.getFactionEmoji();
@@ -2300,7 +2300,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             message += "Gained 1TG " + player.gainTG(1, true) + ".";
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
         }
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
         if (!failed) {
             ButtonHelper.deleteMessage(event);
             if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
@@ -2463,7 +2463,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             message += ". Drew a second SO due to Plausible Deniability";
         }
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
     }
 
     @ButtonHandler("draw2 AC")
@@ -2485,7 +2485,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             ButtonHelper.checkACLimit(game, player);
         }
 
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
         if (hasSchemingAbility) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
@@ -2527,7 +2527,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
 
         if (!game.isFowMode() && "statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
-            ButtonHelper.addReaction(event, false, false, "", "");
+            ReactionService.addReaction(event, game, player);
         }
 
         if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
@@ -2604,7 +2604,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("leadershipExhaust")
     public static void leadershipExhaust(ButtonInteractionEvent event, Player player, Game game) {
-        ButtonHelper.addReaction(event, false, false, "", "");
+        ReactionService.addReaction(event, game, player);
         String message = player.getRepresentationUnfogged() + " Click the names of the planets you wish to exhaust.";
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         Button doneExhausting = Buttons.red("deleteButtons_leadership", "Done Exhausting Planets");
@@ -2638,9 +2638,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     @ButtonHandler("no_sabotage")
-    public static void noSabotage(ButtonInteractionEvent event, Game game) {
+    public static void noSabotage(ButtonInteractionEvent event, Game game, Player player) {
         String message = game.isFowMode() ? "No Sabotage" : null;
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
     }
 
     @ButtonHandler(Constants.SO_NO_SCORING)
@@ -2688,7 +2688,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }
         String reply = game.isFowMode() ? "No public objective scored" : null;
-        ButtonHelper.addReaction(event, false, false, reply, "");
+        ReactionService.addReaction(event, game, player, reply);
         String key2 = "queueToScorePOs";
         String key3 = "potentialScorePOBlockers";
         if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
@@ -2804,7 +2804,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             player.setTg(player.getTg() - 1);
             commOrTg = "trade good";
         } else {
-            ButtonHelper.addReaction(event, false, false, "Didn't have any comms/TGs to spend, no AC drawn", "");
+            ReactionService.addReaction(event, game, player, "Didn't have any comms/TGs to spend, no AC drawn");
         }
         String message = hasSchemingAbility
             ? "Spent 1 " + commOrTg + " to draw " + count2 + " Action Card (Scheming) - please discard 1 action card from your hand"
@@ -2828,7 +2828,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
 
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
         ButtonHelper.deleteMessage(event);
         if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
             String pF = player.getFactionEmoji();
