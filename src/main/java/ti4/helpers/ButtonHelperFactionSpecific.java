@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -35,6 +34,7 @@ import ti4.model.AgendaModel;
 import ti4.model.ExploreModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
+import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
@@ -349,7 +349,7 @@ public class ButtonHelperFactionSpecific {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed construction");
             }
             String message = ButtonHelperSCs.deductCC(player);
-            ButtonHelper.addReaction(event, false, false, message, "");
+            ReactionService.addReaction(event, game, player, message);
         }
         List<Button> buttons = new ArrayList<>();
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
@@ -2510,7 +2510,7 @@ public class ButtonHelperFactionSpecific {
             message += ". Drew a second SO due to Plausible Deniability";
         }
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
     }
 
     @ButtonHandler("quash")

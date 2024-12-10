@@ -18,6 +18,7 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.PlanetService;
+import ti4.service.button.ReactionService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.explore.ExploreService;
@@ -39,12 +40,12 @@ class ExploreButtonHandler {
             player.setTg(player.getTg() - 1);
             commOrTg = MiscEmojis.tg;
         } else {
-            ButtonHelper.addReaction(event, false, false, "Didn't have any Comms/TGs to spend, no mech placed", "");
+            ReactionService.addReaction(event, game, player, "Didn't have any Comms/TGs to spend, no mech placed");
             return;
         }
         AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), "mech " + planetName);
         planetName = Mapper.getPlanet(planetName) == null ? "`error?`" : Mapper.getPlanet(planetName).getName();
-        ButtonHelper.addReaction(event, false, false, "Spent a " + commOrTg + " for a Mech on " + planetName, "");
+        ReactionService.addReaction(event, game, player, "Spent a " + commOrTg + " for a Mech on " + planetName);
         ButtonHelper.deleteMessage(event);
         if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
             String pF = player.getFactionEmoji();
@@ -78,15 +79,15 @@ class ExploreButtonHandler {
         String planetName = buttonID.split("_")[1];
         String message = ExploreHelper.checkForMechOrRemoveInf(planetName, game, player);
         boolean failed = message.contains("Please try again.");
-        if (!failed) {
-            PlanetService.refreshPlanet(player, planetName);
-            planetName = Mapper.getPlanet(planetName) == null ? planetName : Mapper.getPlanet(planetName).getName();
-            message += "Readied " + planetName;
-            ButtonHelper.addReaction(event, false, false, message, "");
-            ButtonHelper.deleteMessage(event);
-        } else {
-            ButtonHelper.addReaction(event, false, false, message, "");
+        if (failed) {
+            ReactionService.addReaction(event, game, player, message);
+            return;
         }
+        PlanetService.refreshPlanet(player, planetName);
+        planetName = Mapper.getPlanet(planetName) == null ? planetName : Mapper.getPlanet(planetName).getName();
+        message += "Readied " + planetName;
+        ReactionService.addReaction(event, game, player, message);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("resolveCoreMine_")
@@ -98,7 +99,7 @@ class ExploreButtonHandler {
             message += "Gained 1TG " + player.gainTG(1, true);
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
         }
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
         if (!failed) {
             ButtonHelper.deleteMessage(event);
             if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
@@ -114,19 +115,19 @@ class ExploreButtonHandler {
         String mech = buttonID.split("_")[2];
         String message = ExploreHelper.checkForMechOrRemoveInf(planet, game, player);
         boolean failed = message.contains("Please try again.");
-        if (!failed) {
-            if ("mech".equalsIgnoreCase(mech)) {
-                AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "mech " + planet);
-                message += "Placed mech on" + Mapper.getPlanet(planet).getName();
-            } else {
-                AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "2 infantry " + planet);
-                message += "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
-            }
-            ButtonHelper.addReaction(event, false, false, message, "");
-            ButtonHelper.deleteMessage(event);
-        } else {
-            ButtonHelper.addReaction(event, false, false, message, "");
+        if (failed) {
+            ReactionService.addReaction(event, game, player, message);
+            return;
         }
+        if ("mech".equalsIgnoreCase(mech)) {
+            AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "mech " + planet);
+            message += "Placed mech on" + Mapper.getPlanet(planet).getName();
+        } else {
+            AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "2 infantry " + planet);
+            message += "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
+        }
+        ReactionService.addReaction(event, game, player, message);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("seedySpace_")
@@ -136,7 +137,7 @@ class ExploreButtonHandler {
         String message = ExploreHelper.checkForMechOrRemoveInf(planet, game, player);
         boolean failed = message.contains("Please try again.");
         if (failed) {
-            ButtonHelper.addReaction(event, false, false, message, "");
+            ReactionService.addReaction(event, game, player, message);
             return;
         }
         if ("ac".equalsIgnoreCase(acOrAgent)) {
@@ -161,7 +162,7 @@ class ExploreButtonHandler {
             RefreshLeaderService.refreshLeader(player, playerLeader, game);
             message += " Refreshed " + Mapper.getLeader(acOrAgent).getName();
         }
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
         ButtonHelper.deleteMessage(event);
     }
 

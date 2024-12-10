@@ -29,6 +29,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.button.ReactionService;
 
 public class ButtonProcessor {
 
@@ -157,7 +158,7 @@ public class ButtonProcessor {
         } else if (buttonID.startsWith(Constants.PO_SCORING)) {
             UnfiledButtonHandlers.poScoring(event, player, buttonID, game, privateChannel);
         } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
-            ButtonHelper.addReaction(event, false, false, null, "");
+            ReactionService.addReaction(event, game, player);
         } else if (buttonID.startsWith("movedNExplored_")) {
             UnfiledButtonHandlers.movedNExplored(event, player, buttonID, game, mainGameChannel);
         } else if (buttonID.startsWith("autoAssignGroundHits_")) {
@@ -194,14 +195,14 @@ public class ButtonProcessor {
                 case "convert_4_comms" -> ButtonHelperStats.convertComms(event, game, player, 4);
                 case "convert_2_comms_stay" -> ButtonHelperStats.convertComms(event, game, player, 2, false);
                 // Don't add anymore cases - use @ButtonHandler
-                case "play_when" -> AgendaHelper.playWhen(event, game, mainGameChannel);
+                case "play_when" -> AgendaHelper.playWhen(event, game, player, mainGameChannel);
                 case "gain_1_tg" -> UnfiledButtonHandlers.gain1TG(event, player, game, mainGameChannel);
                 case "gain1tgFromLetnevCommander" -> UnfiledButtonHandlers.gain1tgFromLetnevCommander(event, player, game, mainGameChannel);
                 case "gain1tgFromMuaatCommander" -> UnfiledButtonHandlers.gain1tgFromMuaatCommander(event, player, game, mainGameChannel);
                 case "gain1tgFromCommander" -> UnfiledButtonHandlers.gain1tgFromCommander(event, player, game, mainGameChannel); // should be deprecated
                 case "decline_explore" -> UnfiledButtonHandlers.declineExplore(event, player, game, mainGameChannel);
                 case "resolveHarness" -> ButtonHelperStats.replenishComms(event, game, player, false);
-                case "pass_on_abilities" -> ButtonHelper.addReaction(event, false, false, " Is " + event.getButton().getLabel(), "");
+                case "pass_on_abilities" -> ReactionService.addReaction(event, game, player, " Is " + event.getButton().getLabel());
                 case "lastMinuteDeliberation" -> UnfiledButtonHandlers.lastMinuteDeliberation(event, player, game, actionsChannel);
                 case "declinePDS" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmojiOrColor() + " officially declines to fire PDS");
                 case "searchMyGames" -> SearchGameHelper.searchGames(event.getUser(), event, false, false, false, true, false, true, false, false);

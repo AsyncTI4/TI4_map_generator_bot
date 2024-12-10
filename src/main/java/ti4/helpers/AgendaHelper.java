@@ -57,6 +57,7 @@ import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -383,9 +384,6 @@ public class AgendaHelper {
             if (!actionRow2.isEmpty()) {
                 event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue();
             }
-            // addReaction(event, true, false,"Exhausted
-            // "+Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName,
-            // activeMap) + " as "+ votes + " votes", "");
         } else {
             if ("Exhaust stuff".equalsIgnoreCase(totalVotesSoFar)) {
                 totalVotesSoFar = "Total votes exhausted so far: " + votes
@@ -400,14 +398,13 @@ public class AgendaHelper {
             if (!actionRow2.isEmpty()) {
                 event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue();
             }
+            String message;
             if (buttonID.contains("everything")) {
-                // addReaction(event, true, false,"Exhausted
-                // "+Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName,
-                // activeMap) + " as "+ votes + " votes", "");
-                ButtonHelper.addReaction(event, true, false, "Exhausted all planets for " + votes + " vote" + (votes.equals("1") ? "" : "s"), "");
+                  message = "Exhausted all planets for " + votes + " vote" + (votes.equals("1") ? "" : "s");
             } else {
-                ButtonHelper.addReaction(event, true, false, "Used ability for " + votes + " vote" + (votes.equals("1") ? "" : "s"), "");
+                message = "Used ability for " + votes + " vote" + (votes.equals("1") ? "" : "s");
             }
+            ReactionService.addReaction(event, game, player, true, false, message);
         }
     }
 
@@ -2460,10 +2457,10 @@ public class AgendaHelper {
                 }
             }
 
-            ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
+            ReactionService.addReaction(event, game, player, true, true, "Playing " + riderName, riderName + " Played");
             PromissoryNoteHelper.resolvePNPlay(pnKey, player, game, event);
         } else {
-            ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
+            ReactionService.addReaction(event, game, player, true, true, "Playing " + riderName, riderName + " Played");
 
             if (riderName.contains("Unity Algorithm")) {
                 player.exhaustTech("dsedyng");
@@ -3074,7 +3071,7 @@ public class AgendaHelper {
     public static void noWhenPersistent(ButtonInteractionEvent event, Player player, Game game) {
         String message = game.isFowMode() ? "No whens (locked in)" : null;
         game.addPlayersWhoHitPersistentNoWhen(player.getFaction());
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You hit no whens for this entire agenda. If you change your mind, you can just play a when or remove this setting by hitting no whens (for now)");
     }
 
@@ -3082,7 +3079,7 @@ public class AgendaHelper {
     public static void noAfterPersistent(ButtonInteractionEvent event, Player player, Game game) {
         String message = game.isFowMode() ? "No afters (locked in)" : null;
         game.addPlayersWhoHitPersistentNoAfter(player.getFaction());
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You hit no afters for this entire agenda. If you change your mind, you can just play an after or remove this setting by hitting no afters (for now)");
     }
 
@@ -3090,19 +3087,19 @@ public class AgendaHelper {
     public static void noAfter(ButtonInteractionEvent event, Player player, Game game) {
         String message = game.isFowMode() ? "No afters" : null;
         game.removePlayersWhoHitPersistentNoAfter(player.getFaction());
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
     }
 
     @ButtonHandler("no_when")
     public static void noWhen(ButtonInteractionEvent event, Player player, Game game) {
         String message = game.isFowMode() ? "No whens" : null;
         game.removePlayersWhoHitPersistentNoWhen(player.getFaction());
-        ButtonHelper.addReaction(event, false, false, message, "");
+        ReactionService.addReaction(event, game, player, message);
     }
 
-    public static void playWhen(ButtonInteractionEvent event, Game game, MessageChannel mainGameChannel) {
+    public static void playWhen(ButtonInteractionEvent event, Game game, Player player, MessageChannel mainGameChannel) {
         UnfiledButtonHandlers.clearAllReactions(event);
-        ButtonHelper.addReaction(event, true, true, "Playing When", "When Played");
+        ReactionService.addReaction(event, game, player, true, true, "Playing When", "When Played");
         List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
         Date newTime = new Date();
         game.setLastActivePlayerPing(newTime);

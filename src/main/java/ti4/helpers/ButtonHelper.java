@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,11 +13,6 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
@@ -40,10 +33,12 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
-import ti4.buttons.UnfiledButtonHandlers;
-import ti4.commands2.CommandHelper;
 import ti4.commands2.commandcounter.RemoveCommandCounterService;
 import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.DiceHelper.Die;
@@ -78,6 +73,7 @@ import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
 import ti4.service.PlanetService;
+import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.decks.ShowActionCardsService;
@@ -89,7 +85,6 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
-import ti4.service.game.GameNameService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
@@ -99,6 +94,8 @@ import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelper {
 
@@ -192,9 +189,9 @@ public class ButtonHelper {
         if (player.hasTech("so2")) {
             d1 = new Die(5);
         }
-        String msg = UnitEmojis.infantry.toString() + " rolled a " + d1.getGreenDieIfSuccessOrRedDieIfFailure();
+        String msg = UnitEmojis.infantry + " rolled a " + d1.getGreenDieIfSuccessOrRedDieIfFailure();
         if (player.hasTech("cl2")) {
-            msg = UnitEmojis.infantry.toString() + " died";
+            msg = UnitEmojis.infantry + " died";
         }
         if (d1.isSuccess() || player.hasTech("cl2")) {
             msg += " and revived. You will be prompted to place them on a planet in your HS at the start of your next turn.";
@@ -697,9 +694,8 @@ public class ButtonHelper {
     @ButtonHandler("drawStatusACs")
     public static void drawStatusACs(Game game, Player player, ButtonInteractionEvent event) {
         if (game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
-            addReaction(event, true, false,
-                "It seems you already drew ACs this status phase. As such, I will not deal you more. Please draw manually if this is a mistake.",
-                "");
+            ReactionService.addReaction(event, game, player, true, false,
+                "It seems you already drew ACs this status phase. As such, I will not deal you more. Please draw manually if this is a mistake.");
             return;
         }
         String message = "";
@@ -747,7 +743,7 @@ public class ButtonHelper {
                 ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
 
-        addReaction(event, true, false, message, "");
+        ReactionService.addReaction(event, game, player, true, false, message);
         checkACLimit(game, player);
         game.setCurrentACDrawStatusInfo(game.getCurrentACDrawStatusInfo() + "_" + player.getFaction());
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
@@ -5858,67 +5854,6 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static void addReaction(ButtonInteractionEvent event, boolean skipReaction, boolean sendPublic, String message, String additionalMessage) {
-        if (event == null) return;
-
-        String userID = event.getUser().getId();
-        String gameName = GameNameService.getGameNameFromChannel(event);
-        Game game = GameManager.getManagedGame(gameName).getGame();
-        if (game == null) {
-            event.getChannel().sendMessage("Unable to determine active game.").queue();
-            return;
-        }
-        Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
-        if (player == null || !player.isRealPlayer()) {
-            event.getChannel().sendMessage("You're not an active player of the game").queue();
-            return;
-        }
-
-        Message mainMessage = event.getInteraction().getMessage();
-        Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
-        String messageId = mainMessage.getId();
-
-        if (!skipReaction) {
-            if (event.getMessageChannel() instanceof ThreadChannel) {
-                game.getActionsChannel().addReactionById(event.getChannel().getId(), emojiToUse).queue();
-            }
-            event.getChannel().addReactionById(messageId, emojiToUse).queue(Consumers.nop(), BotLogger::catchRestError);
-            if (game.getStoredValue(messageId) != null) {
-                if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-                    game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
-                }
-            } else {
-                game.setStoredValue(messageId, player.getFaction());
-            }
-
-            UnfiledButtonHandlers.checkForAllReactions(event, game);
-            if (message == null || message.isEmpty()) {
-                return;
-            }
-        }
-
-        String text = player.getRepresentation();
-        if ("Not Following".equalsIgnoreCase(message))
-            text = player.getRepresentation(false, false);
-        text = text + " " + message;
-        if (game.isFowMode() && sendPublic) {
-            text = message;
-        } else if (game.isFowMode()) {
-            text = "(You) " + emojiToUse.getFormatted() + " " + message;
-        }
-
-        if (additionalMessage != null && !additionalMessage.isEmpty()) {
-            text += game.getPing() + " " + additionalMessage;
-        }
-
-        if (game.isFowMode() && !sendPublic) {
-            MessageHelper.sendPrivateMessageToPlayer(player, game, text);
-            return;
-        }
-
-        MessageHelper.sendMessageToChannel(Helper.getThreadChannelIfExists(event), text);
-    }
-
     public static Tile getTileOfPlanetWithNoTrait(Player player, Game game) {
         List<String> fakePlanets = new ArrayList<>(List.of("custodiavigilia", "ghoti"));
         List<String> ignoredPlanets = new ArrayList<>(Constants.MECATOLS);
@@ -6084,7 +6019,7 @@ public class ButtonHelper {
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Tech");
                 }
                 String message = ButtonHelperSCs.deductCC(player);
-                addReaction(event, false, false, message, "");
+                ReactionService.addReaction(event, game, player, message);
             }
         } else {
             game.setComponentAction(true);
