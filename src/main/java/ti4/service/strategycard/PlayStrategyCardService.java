@@ -25,7 +25,6 @@ import ti4.helpers.ThreadHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
@@ -377,7 +376,6 @@ public class PlayStrategyCardService {
                 }
             });
         }
-        GameManager.save(game, "Automation for SC play: " + scModel.getName());
     }
 
     private static List<Button> getSCButtons(int sc, Game game, boolean winnuHero) {
