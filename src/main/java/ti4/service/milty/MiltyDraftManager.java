@@ -13,7 +13,11 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -23,8 +27,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -34,6 +36,7 @@ import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -623,6 +626,7 @@ public class MiltyDraftManager {
         MessageHelper.splitAndSentWithAction(faction, chan, getFactionButtons(), (m) -> prevFactionMessage = m.getId());
         MessageHelper.splitAndSentWithAction(speaker, chan, getPositionButtons(), (m) -> prevOrderMessage = m.getId());
         ping(game);
+        GameManager.save(game, "Milty");
     }
 
     public void ping(Game game) {
