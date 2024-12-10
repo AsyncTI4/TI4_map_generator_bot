@@ -151,6 +151,7 @@ public class PlayStrategyCardService {
         // set the action rows
         baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
         player.setWhetherPlayerShouldBeTenMinReminded(true);
+      
         sendAndHandleMessageResponse(baseMessageObject.build(), game, player, event, scToPlay, scModel, scButtons);
         
         // Trade Primary
