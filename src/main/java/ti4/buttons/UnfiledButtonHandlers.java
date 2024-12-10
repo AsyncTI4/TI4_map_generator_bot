@@ -1193,7 +1193,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String pos2 = both.split("_")[1];
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmojiOrColor() + " retreated all units in space to " + game.getTileByPosition(pos2).getRepresentationForButtons(game, player));
         String message = player.getRepresentationUnfogged() + " Use below buttons to move any ground forces or conclude retreat.";
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatingGroundTroopsButtons(player, game, event, pos1, pos2));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatingGroundTroopsButtons(player, game, pos1, pos2));
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1750,8 +1750,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     factionReacted = true;
                 }
             }
-            if (factionReacted || (game.getStoredValue(messageId) != null
-                && game.getStoredValue(messageId).contains(player.getFaction()))) {
+            if (factionReacted || (game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction()))) {
                 matchingFactionReactions++;
             }
         }
@@ -1808,7 +1807,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 originalMessage.reply(msg).queueAfter(1, TimeUnit.SECONDS);
 
             }
-
             case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {
                 String message2 = "All players have indicated scoring. Flip the relevant PO using the buttons. This will automatically run status clean-up if it has not been run already.";
                 Button draw2Stage2 = Buttons.green("reveal_stage_2x2", "Reveal 2 Stage 2");
