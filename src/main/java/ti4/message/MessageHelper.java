@@ -380,9 +380,7 @@ public class MessageHelper {
 					error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send intermediate message", messageCreateData, error)));
 			} else { // last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
-					ManagedGame managedGame = GameManager.getManagedGame(gameName);
-					if (message != null && managedGame != null && !managedGame.isFowMode()) {
-						Game game = managedGame.getGame();
+					if (message != null && game != null && !game.isFowMode()) {
 						if (message.contains("Use buttons to do your turn") || message.contains("Use buttons to end turn")) {
 							game.setLatestTransactionMsg(complete.getId());
 						}

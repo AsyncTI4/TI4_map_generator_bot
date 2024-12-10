@@ -7,6 +7,7 @@ import ti4.selections.selectmenus.BigSelectDemo;
 import ti4.selections.selectmenus.SelectFaction;
 
 public class SelectionManager {
+
     private final List<Selection> selectionMenuList = new ArrayList<>();
     private static SelectionManager manager;
 
