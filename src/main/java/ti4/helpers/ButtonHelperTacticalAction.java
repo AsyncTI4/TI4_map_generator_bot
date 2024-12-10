@@ -776,7 +776,7 @@ public class ButtonHelperTacticalAction {
                 if (!"".equalsIgnoreCase(planet)) {
                     blabel = blabel + " from " + Helper.getPlanetRepresentation(planet.toLowerCase(), game);
                 }
-                UnitType unitType = Units.findUnitType(unitkey.toLowerCase().replace(" ", ""));
+                UnitType unitType = Units.findUnitType(AliasHandler.resolveUnit(unitkey.toLowerCase().replace(" ", "")));
                 Button validTile2 = Buttons.green(bID, blabel, unitType.getUnitTypeEmoji());
                 buttons.add(validTile2);
             }
