@@ -608,21 +608,21 @@ public class ButtonHelperSCs {
     @ButtonHandler("sc_follow_")
     public static void scFollow(Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID) {
         String messageID = event.getMessageId();
-        String lastchar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
+        String lastChar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         int scNum = 1;
         boolean setStatus = true;
         try {
             scNum = Integer.parseInt(StringUtils.substringAfterLast(buttonID, "_"));
         } catch (NumberFormatException e) {
             try {
-                scNum = Integer.parseInt(lastchar);
+                scNum = Integer.parseInt(lastChar);
             } catch (NumberFormatException e2) {
                 setStatus = false;
             }
         }
         if (player != null && player.getSCs().contains(scNum)) {
-            String message = player.getRepresentation()
-                + " you currently hold this strategy card and therefore should not be spending a CC here.\nYou may override this protection by running `/player stats strategy_cc:-1`.";
+            String message = player.getRepresentation() + " you currently hold this strategy card and therefore should not be spending a CC here." +
+                "\nYou may override this protection by running `/player stats strategy_cc:-1`.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             return;
         }
