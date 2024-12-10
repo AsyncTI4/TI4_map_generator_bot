@@ -11,8 +11,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
 import ti4.image.Mapper;
-import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.CardEmojis;
 
 @Data
 public class AgendaModel implements ModelInterface, EmbeddableModel {
@@ -133,7 +133,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
         String name = getName() == null ? "" : getName();
-        eb.setTitle(Emojis.Agenda + "__" + name + "__" + getSource().emoji(), null);
+        eb.setTitle(CardEmojis.Agenda + "__" + name + "__" + getSource().emoji(), null);
         eb.setColor(Color.blue);
 
         // DESCRIPTION
@@ -155,7 +155,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     public static MessageEmbed agendaIsInSomeonesHandEmbed() {
         EmbedBuilder eb = new EmbedBuilder();
         String name = "No info available";
-        eb.setTitle(Emojis.Agenda + "__" + name + "__", null);
+        eb.setTitle(CardEmojis.Agenda + "__" + name + "__", null);
         eb.setColor(Color.blue);
 
         // DESCRIPTION

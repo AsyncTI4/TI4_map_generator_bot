@@ -9,10 +9,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Subcommand;
-import ti4.helpers.Emojis;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 class TIGLShowHeroes extends Subcommand {
 
@@ -32,9 +34,9 @@ class TIGLShowHeroes extends Subcommand {
         for (TIGLRank rank : heroRanks) {
             Role role = rank.getRole();
             if (role == null) continue;
-            String faction = StringUtils.substringAfter(rank.toString(),"_");
-            String factionIcon = Emojis.getFactionIconFromDiscord(faction);
-            String heroEmoji = Emojis.getEmojiFromDiscord(faction + "hero");
+            String faction = StringUtils.substringAfter(rank.toString(), "_");
+            TI4Emoji factionIcon = FactionEmojis.getFactionIcon(faction);
+            TI4Emoji heroEmoji = LeaderEmojis.getLeaderEmoji(faction + "hero");
             List<Member> members = AsyncTI4DiscordBot.guildPrimary.getMembersWithRoles(role);
 
             sb.append("> ").append(factionIcon);
@@ -47,5 +49,5 @@ class TIGLShowHeroes extends Subcommand {
 
         MessageHelper.sendMessageToThread(event.getMessageChannel(), "Async Rank - Reigning Heroes", sb.toString());
     }
-    
+
 }

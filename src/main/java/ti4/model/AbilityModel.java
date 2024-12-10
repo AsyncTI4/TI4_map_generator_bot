@@ -8,9 +8,10 @@ import java.util.Optional;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 @Data
 public class AbilityModel implements ModelInterface, EmbeddableModel {
@@ -100,7 +101,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         String abilityText = getWindowEffect().orElse("");
 
         StringBuilder sb = new StringBuilder();
-        sb.append(Emojis.getFactionIconFromDiscord(abilitySourceFaction)).append("__**").append(abilityName).append("**__");
+        sb.append(FactionEmojis.getFactionIcon(abilitySourceFaction)).append("__**").append(abilityName).append("**__");
         if (!abilityRawModifier.isBlank()) sb.append(": ").append(abilityRawModifier);
         if (!abilityWindow.isBlank() || !abilityText.isBlank()) sb.append("\n> *").append(abilityWindow).append("*:\n> ").append(abilityText);
 
@@ -123,7 +124,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
             " [" + getSource() + "]";
     }
 
-    public String getFactionEmoji() {
-        return Emojis.getFactionIconFromDiscord(getFaction());
+    public TI4Emoji getFactionEmoji() {
+        return FactionEmojis.getFactionIcon(getFaction());
     }
 }

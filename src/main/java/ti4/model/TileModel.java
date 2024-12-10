@@ -12,9 +12,10 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
-import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.MiscEmojis;
 
 @Data
 public class TileModel implements ModelInterface, EmbeddableModel {
@@ -27,11 +28,16 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
-    @JsonProperty("isHyperlane") private boolean hyperlane = false;
-    @JsonProperty("isAsteroidField") private boolean asteroidField = false;
-    @JsonProperty("isSupernova") private boolean supernova = false;
-    @JsonProperty("isNebula") private boolean nebula = false;
-    @JsonProperty("isGravityRift") private boolean gravityRift = false;
+    @JsonProperty("isHyperlane")
+    private boolean hyperlane = false;
+    @JsonProperty("isAsteroidField")
+    private boolean asteroidField = false;
+    @JsonProperty("isSupernova")
+    private boolean supernova = false;
+    @JsonProperty("isNebula")
+    private boolean nebula = false;
+    @JsonProperty("isGravityRift")
+    private boolean gravityRift = false;
     private String imageURL;
     private ComponentSource source;
     private String tileBack;
@@ -58,11 +64,11 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(sb.toString());
 
         sb = new StringBuilder();
-        if (isEmpty()) sb.append(Emojis.Frontier);
-        if (isAsteroidField()) sb.append(Emojis.Asteroid);
-        if (isSupernova()) sb.append(Emojis.Supernova);
-        if (isNebula()) sb.append(Emojis.Nebula);
-        if (isGravityRift()) sb.append(Emojis.GravityRift);
+        if (isEmpty()) sb.append(ExploreEmojis.Frontier);
+        if (isAsteroidField()) sb.append(MiscEmojis.Asteroids);
+        if (isSupernova()) sb.append(MiscEmojis.Supernova);
+        if (isNebula()) sb.append(MiscEmojis.Nebula);
+        if (isGravityRift()) sb.append(MiscEmojis.GravityRift);
         if (hasPlanets()) sb.append("\nPlanets: ").append(getPlanets().toString());
         eb.setDescription(sb.toString());
 

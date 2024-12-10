@@ -6,11 +6,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.leader.RefreshLeaderService;
 
 class RefreshLeader extends GameStateSubcommand {
@@ -41,7 +41,7 @@ class RefreshLeader extends GameStateSubcommand {
             .append(" readied ")
             .append(Helper.getLeaderShortRepresentation(playerLeader));
         if (tgCount > 0) {
-            message.append(" - ").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(game)).append(" transferred from leader to player");
+            message.append(" - ").append(tgCount).append(MiscEmojis.getTGorNomadCoinEmoji(game)).append(" transferred from leader to player");
 
         }
         String msg = message.toString();

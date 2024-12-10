@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
@@ -63,6 +62,7 @@ import ti4.model.TileModel;
 import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
+import ti4.service.emoji.CardEmojis;
 
 public class Mapper {
     //private static final Properties colors = new Properties();
@@ -949,7 +949,7 @@ public class Mapper {
         switch (relatedType) {
             case Constants.AGENDA -> {
                 AgendaModel agenda = getAgenda(relatedID);
-                displayName = Emojis.Agenda + " " + agenda.getName();
+                displayName = CardEmojis.Agenda + " " + agenda.getName();
             }
             case Constants.AC -> {
                 ActionCardModel actionCard = getActionCard(relatedID);
@@ -957,7 +957,7 @@ public class Mapper {
             }
             case Constants.PROMISSORY_NOTES -> {
                 PromissoryNoteModel pn = getPromissoryNote(relatedID);
-                displayName = Emojis.PN + " " + pn.getName() + ": " + pn.getText();
+                displayName = CardEmojis.PN + " " + pn.getName() + ": " + pn.getText();
             }
             case Constants.TECH -> displayName = getTech(relatedID).getRepresentation(true);
             case Constants.RELIC -> displayName = getRelic(relatedID).getSimpleRepresentation();

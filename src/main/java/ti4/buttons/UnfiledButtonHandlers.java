@@ -45,7 +45,6 @@ import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerPreferenceHelper;
@@ -73,6 +72,12 @@ import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.PlanetService;
 import ti4.service.StatusCleanupService;
 import ti4.service.combat.StartCombatService;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.PlanetEmojis;
+import ti4.service.emoji.TechEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.game.SwapFactionService;
@@ -274,7 +279,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "integrated" + planet, "place");
         String message = player.getRepresentation()
-            + " Using " + Emojis.CyberneticTech + "**Integrated Economy** on " + Helper.getPlanetRepresentation(planet, game)
+            + " Using " + TechEmojis.CyberneticTech + "**Integrated Economy** on " + Helper.getPlanetRepresentation(planet, game)
             + ". Use the buttons to produce units with a combined cost up to the planet (" + resources + ") resources.\n"
             + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -446,7 +451,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
             case "absol_pa" -> { // Absol's Psychoarcheology
                 List<Button> absolPAButtons = new ArrayList<>();
-                absolPAButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard", Emojis.ActionCard));
+                absolPAButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard", CardEmojis.ActionCard));
                 for (String planetID : player.getReadiedPlanets()) {
                     Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
                     if (planet != null && isNotBlank(planet.getOriginalPlanetType())) {
@@ -659,7 +664,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     + planetName
                     + ") for its tech skip";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.blue("gain_1_comms", "Gain 1 Commodity", Emojis.comm));
+                buttons.add(Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm));
                 buttons.add(Buttons.red("deleteButtons", "Didn't use it for tech speciality"));
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getFactionEmoji()
@@ -936,7 +941,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             List<String> deck = game.getExploreDeck(type);
             List<String> discard = game.getExploreDiscard(type);
 
-            String traitNameWithEmoji = Emojis.getEmojiFromDiscord(type) + type;
+            String traitNameWithEmoji = ExploreEmojis.getTraitEmoji(type) + type;
             if (deck.isEmpty() && discard.isEmpty()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
@@ -950,10 +955,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
         }
 
-        String playerFactionNameWithEmoji = Emojis.getFactionIconFromDiscord(player.getFaction());
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            "Top of Cultural, Industrial, and Hazardous explore decks has been set to "
-                + playerFactionNameWithEmoji + " Cards info thread.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Top of Cultural, Industrial, and Hazardous explore decks has been set to " + player.getFactionEmoji() + " Cards info thread.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1062,7 +1064,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             for (Player player_ : game.getPlayers().values()) {
                 if (player_.getFaction().equals(faction)) {
                     game.setSpeakerUserID(player_.getUserID());
-                    String message = Emojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
+                    String message = MiscEmojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                     if (!game.isFowMode()) {
                         ButtonHelper.sendMessageToRightStratThread(player, game, message, "politics");
@@ -1082,7 +1084,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         for (Player player_ : game.getPlayers().values()) {
             if (player_.getFaction().equals(faction)) {
                 game.setSpeakerUserID(player_.getUserID());
-                String message = Emojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
+                String message = MiscEmojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 if (game.isFowMode() && player != player_) {
                     MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
@@ -1177,7 +1179,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             ButtonHelper.deleteMessage(event);
         }
         if (buttonID.contains("foresight")) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " lost a strategy CC to resolve the " + Emojis.Naalu + "**Foresight** ability");
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " lost a strategy CC to resolve the " + FactionEmojis.Naalu + "**Foresight** ability");
             player.setStrategicCC(player.getStrategicCC() - 1);
             skilled = true;
         }
@@ -1200,7 +1202,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("getPsychoButtons")
     public static void offerPsychoButtons(Player player, Game game) {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " use buttons to gain " + Emojis.tg + " per planet exhausted.",
+            player.getRepresentationUnfogged() + " use buttons to gain " + MiscEmojis.tg + " per planet exhausted.",
             ButtonHelper.getPsychoTechPlanets(game, player));
     }
 
@@ -1354,7 +1356,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 ButtonHelper.deleteMessage(event);
                 if (player.hasUnexhaustedLeader("cymiaeagent")) {
                     List<Button> buttons2 = new ArrayList<>();
-                    Button hacanButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", Emojis.cymiae);
+                    Button hacanButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", FactionEmojis.cymiae);
                     buttons2.add(hacanButton);
                     MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
@@ -1511,13 +1513,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
                 if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
-                    Button sar = Buttons.red("exhaustTech_sar", "Exhaust Self Assembly Routines", Emojis.WarfareTech);
-                    buttons.add(sar);
+                    buttons.add(Buttons.red("exhaustTech_sar", "Exhaust Self Assembly Routines", TechEmojis.WarfareTech));
                 }
                 if (player.hasTechReady("htp") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
-                    Button sar = Buttons.red("exhaustTech_htp", "Exhaust Hegemonic Trade Policy", Emojis.Winnu);
-                    buttons.add(sar);
+                    buttons.add(Buttons.red("exhaustTech_htp", "Exhaust Hegemonic Trade Policy", FactionEmojis.Winnu));
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")
                     && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)
@@ -1527,57 +1527,44 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (player.hasTechReady("dsbenty")
                     && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                     && !buttonID.contains("integrated")) {
-                    Button sar2 = Buttons.green("exhaustTech_dsbenty", "Use Merged Replicators", Emojis.bentor);
-                    buttons.add(sar2);
+                    buttons.add(Buttons.green("exhaustTech_dsbenty", "Use Merged Replicators", FactionEmojis.bentor));
                 }
                 if (ButtonHelper.getNumberOfUnitUpgrades(player) > 0 && player.hasTechReady("aida")
                     && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                     && !buttonID.contains("integrated")) {
-                    Button aiDEVButton = Buttons.red("exhaustTech_aida",
-                        "Exhaust AI Development Algorithm (" + ButtonHelper.getNumberOfUnitUpgrades(player) + "r)", Emojis.WarfareTech);
-                    buttons.add(aiDEVButton);
+                    buttons.add(Buttons.red("exhaustTech_aida", "Exhaust AI Development Algorithm (" + ButtonHelper.getNumberOfUnitUpgrades(player) + "r)", TechEmojis.WarfareTech));
                 }
                 if (player.hasTechReady("st") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
-                    Button sarweenButton = Buttons.red("useTech_st", "Use Sarween Tools", Emojis.CyberneticTech);
-                    buttons.add(sarweenButton);
+                    buttons.add(Buttons.red("useTech_st", "Use Sarween Tools", TechEmojis.CyberneticTech));
                 }
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
-                    Button sarweenButton = Buttons.red("useRelic_boon", "Use Boon Of The Cerulean God Relic");
-                    buttons.add(sarweenButton);
+                    buttons.add(Buttons.red("useRelic_boon", "Use Boon Of The Cerulean God Relic"));
                 }
                 if (player.hasTechReady("absol_st")) {
-                    Button sarweenButton = Buttons.red("useTech_absol_st", "Use Sarween Tools");
-                    buttons.add(sarweenButton);
+                    buttons.add(Buttons.red("useTech_absol_st", "Use Sarween Tools"));
                 }
                 if (player.hasUnexhaustedLeader("winnuagent") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
-                    Button winnuButton = Buttons.red("exhaustAgent_winnuagent",
-                        "Use Winnu Agent", Emojis.Winnu);
-                    buttons.add(winnuButton);
+                    buttons.add(Buttons.red("exhaustAgent_winnuagent", "Use Winnu Agent", FactionEmojis.Winnu));
                 }
                 if (player.hasUnexhaustedLeader("gledgeagent") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
-                    Button winnuButton = Buttons.red("exhaustAgent_gledgeagent_" + player.getFaction(), "Use Gledge Agent", Emojis.gledge);
-                    buttons.add(winnuButton);
+                    buttons.add(Buttons.red("exhaustAgent_gledgeagent_" + player.getFaction(), "Use Gledge Agent", FactionEmojis.gledge));
                 }
                 if (player.hasUnexhaustedLeader("ghotiagent")) {
-                    Button winnuButton = Buttons.red("exhaustAgent_ghotiagent_" + player.getFaction(), "Use Ghoti Agent", Emojis.ghoti);
-                    buttons.add(winnuButton);
+                    buttons.add(Buttons.red("exhaustAgent_ghotiagent_" + player.getFaction(), "Use Ghoti Agent", FactionEmojis.ghoti));
                 }
                 if (player.hasUnexhaustedLeader("mortheusagent")) {
-                    Button winnuButton = Buttons.red("exhaustAgent_mortheusagent_" + player.getFaction(), "Use Mortheus Agent", Emojis.mortheus);
-                    buttons.add(winnuButton);
+                    buttons.add(Buttons.red("exhaustAgent_mortheusagent_" + player.getFaction(), "Use Mortheus Agent", FactionEmojis.mortheus));
                 }
                 if (player.hasUnexhaustedLeader("rohdhnaagent") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
-                    Button rohdhnaButton = Buttons.red("exhaustAgent_rohdhnaagent_" + player.getFaction(), "Use Roh'Dhna Agent", Emojis.rohdhna);
-                    buttons.add(rohdhnaButton);
+                    buttons.add(Buttons.red("exhaustAgent_rohdhnaagent_" + player.getFaction(), "Use Roh'Dhna Agent", FactionEmojis.rohdhna));
                 }
                 if (player.hasLeaderUnlocked("hacanhero") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
-                    Button hacanButton = Buttons.red("purgeHacanHero", "Purge Hacan Hero", Emojis.Hacan);
-                    buttons.add(hacanButton);
+                    buttons.add(Buttons.red("purgeHacanHero", "Purge Hacan Hero", FactionEmojis.Hacan));
                 }
                 Button doneExhausting;
                 if (!buttonID.contains("deleteButtons")) {
@@ -1615,26 +1602,19 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 ButtonHelperFactionSpecific.cleanCavUp(game, event);
                 if (player.hasAbility("cunning")) {
                     List<Button> trapButtons = new ArrayList<>();
-                    for (UnitHolder uH : game.getTileByPosition(game.getActiveSystem()).getUnitHolders()
-                        .values()) {
-                        if (uH instanceof Planet) {
-                            String planet = uH.getName();
-                            trapButtons.add(Buttons.gray("setTrapStep3_" + planet,
-                                Helper.getPlanetRepresentation(planet, game)));
-                        }
+                    for (Planet uH : game.getTileByPosition(game.getActiveSystem()).getPlanetUnitHolders()) {
+                        String planet = uH.getName();
+                        trapButtons.add(Buttons.gray("setTrapStep3_" + planet, Helper.getPlanetRepresentation(planet, game)));
                     }
                     trapButtons.add(Buttons.red("deleteButtons", "Decline"));
-                    String msg = player.getRepresentationUnfogged()
-                        + " you may use the buttons to place a trap on a planet.";
+                    String msg = player.getRepresentationUnfogged() + " you may use the buttons to place a trap on a planet.";
                     if (trapButtons.size() > 1) {
-                        MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCorrectChannel(), msg, trapButtons);
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, trapButtons);
                     }
                 }
                 if (player.hasUnexhaustedLeader("celdauriagent")) {
                     List<Button> buttons = new ArrayList<>();
-                    Button hacanButton = Buttons.gray("exhaustAgent_celdauriagent_" + player.getFaction(), "Use Celdauri Agent", Emojis.celdauri);
-                    buttons.add(hacanButton);
+                    buttons.add(Buttons.gray("exhaustAgent_celdauriagent_" + player.getFaction(), "Use Celdauri Agent", FactionEmojis.celdauri));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
@@ -1648,7 +1628,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 List<Button> systemButtons2 = new ArrayList<>();
                 if (!game.isAbsolMode() && player.getRelics().contains("emphidia")
                     && !player.getExhaustedRelics().contains("emphidia")) {
-                    String message = player.getRepresentationUnfogged() + " You may use the button to explore a planet using " + Emojis.Relic
+                    String message = player.getRepresentationUnfogged() + " You may use the button to explore a planet using " + ExploreEmojis.Relic
                         + "Crown of Emphidia.";
                     systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
                     systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
@@ -1715,16 +1695,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     factionReacted = true;
                 }
                 Message mainMessage = event.getMessage();
-                Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-                if (game.isFowMode()) {
-                    int index = 0;
-                    for (Player player_ : game.getPlayers().values()) {
-                        if (player_ == player)
-                            break;
-                        index++;
-                    }
-                    reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, event.getMessageId()));
-                }
+
+                Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
                 MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
                 if (reaction != null) {
                     factionReacted = true;
@@ -1735,16 +1707,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     factionReacted = true;
                 }
                 Message mainMessage = event.getMessage();
-                Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-                if (game.isFowMode()) {
-                    int index = 0;
-                    for (Player player_ : game.getPlayers().values()) {
-                        if (player_ == player)
-                            break;
-                        index++;
-                    }
-                    reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, event.getMessageId()));
-                }
+                Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
                 MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
                 if (reaction != null) {
                     factionReacted = true;
@@ -1999,7 +1962,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("crownofemphidiaexplore")
     public static void crownOfEmphidiaExplore(ButtonInteractionEvent event, Player player, Game game) {
         player.addExhaustedRelic("emphidia");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmojiOrColor() + " Exhausted " + Emojis.Relic + "Crown of Emphidia");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmojiOrColor() + " Exhausted " + ExploreEmojis.Relic + "Crown of Emphidia");
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
         ButtonHelper.deleteMessage(event);
@@ -2034,7 +1997,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("useLawsOrder")
     public static void useLawsOrder(ButtonInteractionEvent event, Player player, Game game) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " is paying " + Emojis.Influence_1 + " influence to ignore laws for the turn.");
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " is paying " + MiscEmojis.Influence_1 + " influence to ignore laws for the turn.");
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
         buttons.add(doneExhausting);
@@ -2051,8 +2014,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         player.removeRelic(relicId);
         player.removeExhaustedRelic(relicId);
         String relicName = Mapper.getRelic(relicId).getName();
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            purgeOrExhaust + Emojis.Relic + " relic: " + relicName);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), purgeOrExhaust + ExploreEmojis.Relic + " relic: " + relicName);
         ButtonHelper.deleteMessage(event);
         String message = "Choose a system to move from.";
         List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, game, event);
@@ -2708,25 +2670,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         List<Button> buttons = new ArrayList<>();
         String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
         game.setComponentAction(true);
-        Button propulsionTech = Buttons.blue(finsFactionCheckerPrefix + "getAllTechOfType_propulsion_noPay", "Get a Blue Tech");
-        propulsionTech = propulsionTech.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
-        buttons.add(propulsionTech);
-
-        Button bioticTech = Buttons.green(finsFactionCheckerPrefix + "getAllTechOfType_biotic_noPay", "Get a Green Tech");
-        bioticTech = bioticTech.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
-        buttons.add(bioticTech);
-
-        Button cyberneticTech = Buttons.gray(finsFactionCheckerPrefix + "getAllTechOfType_cybernetic_noPay", "Get a Yellow Tech");
-        cyberneticTech = cyberneticTech.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
-        buttons.add(cyberneticTech);
-
-        Button warfareTech = Buttons.red(finsFactionCheckerPrefix + "getAllTechOfType_warfare_noPay", "Get a Red Tech");
-        warfareTech = warfareTech.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
-        buttons.add(warfareTech);
-
-        Button unitupgradesTech = Buttons.gray(finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Tech");
-        unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Emojis.UnitUpgradeTech));
-        buttons.add(unitupgradesTech);
+        buttons.add(Buttons.blue(finsFactionCheckerPrefix + "getAllTechOfType_propulsion_noPay", "Get a Blue Tech", TechEmojis.PropulsionTech));
+        buttons.add(Buttons.green(finsFactionCheckerPrefix + "getAllTechOfType_biotic_noPay", "Get a Green Tech", TechEmojis.BioticTech));
+        buttons.add(Buttons.gray(finsFactionCheckerPrefix + "getAllTechOfType_cybernetic_noPay", "Get a Yellow Tech", TechEmojis.CyberneticTech));
+        buttons.add(Buttons.red(finsFactionCheckerPrefix + "getAllTechOfType_warfare_noPay", "Get a Red Tech", TechEmojis.WarfareTech));
+        buttons.add(Buttons.gray(finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Tech", TechEmojis.UnitUpgradeTech));
         String message = player.getRepresentation() + " What type of tech would you want?";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
@@ -2802,7 +2750,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (game.getSpeakerUserID().equals(player.getUserID()) || "rollIxthianIgnoreSpeaker".equals(buttonID)) {
             AgendaHelper.rollIxthian(game, true);
         } else {
-            Button ixthianButton = Buttons.green("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact", Emojis.Mecatol);
+            Button ixthianButton = Buttons.green("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact", PlanetEmojis.Mecatol);
             String msg = "The speaker should roll for Ixthain Artifact. Click this button to roll anyway!";
             MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg, ixthianButton);
         }

@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import ti4.service.emoji.TechEmojis;
+
 public class TechSpecialtyModel {
     public enum TechSpecialty {
         BIOTIC, CYBERNETIC, PROPULSION, WARFARE, UNITSKIP, NONUNITSKIP;
@@ -11,6 +13,17 @@ public class TechSpecialtyModel {
         @Override
         public String toString() {
             return super.toString().toLowerCase();
+        }
+
+        public String getEmoji() {
+            return (switch (this) {
+                case BIOTIC -> TechEmojis.BioticTech;
+                case CYBERNETIC -> TechEmojis.CyberneticTech;
+                case PROPULSION -> TechEmojis.PropulsionTech;
+                case WARFARE -> TechEmojis.WarfareTech;
+                case UNITSKIP -> TechEmojis.UnitTechSkip;
+                case NONUNITSKIP -> TechEmojis.NonUnitTechSkip;
+            }).toString();
         }
     }
 

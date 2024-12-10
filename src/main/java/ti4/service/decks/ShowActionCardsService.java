@@ -11,11 +11,11 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.CardEmojis;
 
 @UtilityClass
 public class ShowActionCardsService {
@@ -61,7 +61,7 @@ public class ShowActionCardsService {
         for (Map.Entry<String, List<Map.Entry<String, Integer>>> acEntryList : entries) {
             List<String> ids = acEntryList.getValue().stream().map(i -> "`(" + i.getValue() + ")`").toList();
             sb.append("\n").append(index).append(". ");
-            sb.append(Emojis.ActionCard.repeat(ids.size()));
+            sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
             sb.append(" **").append(acEntryList.getKey()).append("** - ");
             sb.append(Mapper.getActionCard(acEntryList.getValue().getFirst().getKey()).getRepresentationJustText());
             index++;
@@ -89,7 +89,7 @@ public class ShowActionCardsService {
         for (Map.Entry<String, List<Map.Entry<String, Integer>>> acEntryList : entries) {
             List<String> ids = acEntryList.getValue().stream().map(i -> "`(" + i.getValue() + ")`").toList();
             sb.append("\n`").append(Helper.leftpad(index + ".", pad)).append("` - ");
-            sb.append(Emojis.ActionCard.repeat(ids.size()));
+            sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
             sb.append(" **").append(acEntryList.getKey()).append("**");
             sb.append(String.join(",", ids));
             index++;

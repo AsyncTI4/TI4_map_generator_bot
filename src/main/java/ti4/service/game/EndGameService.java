@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
@@ -34,6 +33,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.ColorEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.statistics.game.GameStatisticsService;
 import ti4.service.statistics.game.WinningPathHelper;
 
@@ -194,7 +195,7 @@ public class EndGameService {
                 // TIGL Extras
                 if (game.isCompetitiveTIGLGame() && game.getWinner().isPresent()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.BLT + Constants.bltPing());
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), MiscEmojis.BLT + Constants.bltPing());
                     TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
                 }
             });
@@ -283,7 +284,7 @@ public class EndGameService {
         for (Player player : game.getRealAndEliminatedPlayers()) {
             sb.append("> `").append(index).append(".` ");
             sb.append(player.getFactionEmoji());
-            sb.append(Emojis.getColorEmojiWithName(player.getColor())).append(" ");
+            sb.append(ColorEmojis.getColorEmojiWithName(player.getColor())).append(" ");
             appendUserName(sb, player, event);
             sb.append(" - *");
             if (player.isEliminated()) {
@@ -327,7 +328,7 @@ public class EndGameService {
 
     public static String getTIGLFormattedGameEndText(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
-        sb.append("# ").append(Emojis.TIGL).append("TIGL\n\n");
+        sb.append("# ").append(MiscEmojis.TIGL).append("TIGL\n\n");
         sb.append("This was a TIGL game! 👑").append(game.getWinner().get().getPing())
             .append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
         sb.append("```\nMatch Start Date: ").append(Helper.getDateRepresentationTIGL(game.getEndedDate()))

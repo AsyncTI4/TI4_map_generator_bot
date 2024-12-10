@@ -12,13 +12,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
+import ti4.service.emoji.CardEmojis;
 
 @UtilityClass
 public class SecretObjectiveInfoService {
@@ -107,7 +107,7 @@ public class SecretObjectiveInfoService {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
         String soName = so.getName();
-        sb.append(Emojis.SecretObjective).append("__").append(soName).append("__").append("\n");
+        sb.append(CardEmojis.SecretObjective).append("__").append(soName).append("__").append("\n");
         return sb.toString();
     }
 
@@ -126,9 +126,9 @@ public class SecretObjectiveInfoService {
         String soPhase = so.getPhase();
         String soDescription = so.getText();
         if (newLine) {
-            sb.append(Emojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
+            sb.append(CardEmojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
         } else {
-            sb.append(Emojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription);
+            sb.append(CardEmojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription);
         }
         return sb.toString();
     }

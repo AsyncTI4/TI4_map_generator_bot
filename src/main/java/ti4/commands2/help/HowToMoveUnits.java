@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.MiscEmojis;
 
 class HowToMoveUnits extends Subcommand {
 
@@ -72,7 +72,7 @@ class HowToMoveUnits extends Subcommand {
             "- /move_units is really just doing /remove_units in the first tile and /add_units + /add_cc in the second tile, which has some interesting consequences.\n" +
             "- If you are using the ghosts commander with cruiser 2, the following would add all the fighters you'd gain (assuming this took you through a wormhole):\n" +
             " - `/move_units tile_name: creuss unit_names: 6 cr tile_name_to: 104 unit_names_to: 6cr, 6 ff`\n" +
-            "# " + Emojis.BLT + "\n";
+            "# " + MiscEmojis.BLT + "\n";
 
         String examples = """
             # Examples of the `/move_units` command:

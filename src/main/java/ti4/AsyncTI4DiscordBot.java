@@ -36,7 +36,6 @@ import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.UploadStatsCron;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TimedRunnable;
@@ -148,9 +147,6 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 5) {
             guildFogOfWar = jda.getGuildById(args[4]);
             startBot(guildFogOfWar);
-
-            // JAZZ WILL GET PINGED IF SHIT IS BROKEN FOR FOG GAMES
-            FoWHelper.sanityCheckFowReacts();
         }
 
         // Async: Stroter's Paradise

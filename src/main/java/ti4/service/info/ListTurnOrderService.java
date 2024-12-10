@@ -10,11 +10,13 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 @UtilityClass
 public class ListTurnOrderService {
@@ -45,7 +47,7 @@ public class ListTurnOrderService {
             for (int sc_ : SCs) {
                 Boolean found = scPlayed.get(sc_);
                 boolean isPlayed = found != null ? found : false;
-                String scEmoji = isPlayed ? Emojis.getSCBackEmojiFromInteger(sc_) : Emojis.getSCEmojiFromInteger(sc_);
+                TI4Emoji scEmoji = isPlayed ? CardEmojis.getSCBackFromInteger(sc_) : CardEmojis.getSCFrontFromInteger(sc_);
                 if (isPlayed) {
                     textBuilder.append("~~");
                 }
@@ -69,7 +71,7 @@ public class ListTurnOrderService {
             }
 
             if (player.getUserID().equals(game.getSpeakerUserID())) {
-                text += " " + Emojis.SpeakerToken;
+                text += " " + MiscEmojis.SpeakerToken;
             }
 
             order.put(sc, text);

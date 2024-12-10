@@ -8,9 +8,9 @@ import java.util.Optional;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.ExploreEmojis;
 
 @Data
 public class RelicModel implements ModelInterface, EmbeddableModel {
@@ -46,16 +46,14 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getShortName() {
-        if (getHomebrewReplacesID().isEmpty())
-        {
+        if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shortName).orElse(getName());
         }
         return Optional.ofNullable(shortName).orElse(Mapper.getRelic(getHomebrewReplacesID().get()).getShortName());
     }
 
     public boolean getShrinkName() {
-        if (getHomebrewReplacesID().isEmpty())
-        {
+        if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shrinkName).orElse(false);
         }
         return Optional.ofNullable(shrinkName).orElse(Mapper.getRelic(getHomebrewReplacesID().get()).getShrinkName());
@@ -80,13 +78,13 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeFlavourText) {
         EmbedBuilder eb = new EmbedBuilder();
         StringBuilder title = new StringBuilder();
-        if (!isFakeRelic()) title.append(Emojis.Relic);
+        if (!isFakeRelic()) title.append(ExploreEmojis.Relic);
         title.append("__").append(getName()).append("__").append(getSource().emoji());
         eb.setTitle(title.toString(), null);
 
         eb.setDescription(getText());
         if (includeFlavourText && getFlavourText() != null) eb.addField("", getFlavourText(), false);
-                
+
         // Colour
         if (isFakeRelic()) {
             eb.setColor(Color.gray);
@@ -104,7 +102,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         }
         if (isFakeRelic()) footer.append("\nNOTE: NOT ACTUALLY A RELIC");
         if (!footer.isEmpty()) eb.setFooter(footer.toString());
-        
+
         return eb.build();
     }
 

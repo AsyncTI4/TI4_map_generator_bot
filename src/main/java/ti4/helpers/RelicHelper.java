@@ -16,6 +16,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.RelicModel;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
@@ -135,17 +136,9 @@ public class RelicHelper {
             return;
         }
 
-        String emojiName = switch (trait) {
-            case "cultural" -> "CFrag";
-            case "hazardous" -> "HFrag";
-            case "industrial" -> "IFrag";
-            case "frontier" -> "UFrag";
-            default -> "";
-        };
-
         String p1 = sender.getRepresentation();
         String p2 = receiver.getRepresentation();
-        String fragString = count + " " + trait + " " + Emojis.getEmojiFromDiscord(emojiName) + " relic fragments";
+        String fragString = count + " " + trait + " " + ExploreEmojis.getFragEmoji(trait) + " relic fragments";
         String message = p1 + " sent " + fragString + " to " + p2;
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
@@ -175,7 +168,7 @@ public class RelicHelper {
         if (allRelics.isEmpty()) {
             text = new StringBuilder("**RELIC DECK IS EMPTY**");
         } else {
-            text = new StringBuilder(Emojis.Relic).append(" **RELICS REMAINING IN DECK** (").append(deckCount).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
+            text = new StringBuilder(ExploreEmojis.Relic.toString()).append(" **RELICS REMAINING IN DECK** (").append(deckCount).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
             Collections.sort(allRelics);
             for (String relicId : allRelics) {
                 String relicName = Mapper.getRelic(relicId).getName();
