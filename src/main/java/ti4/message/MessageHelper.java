@@ -229,7 +229,6 @@ public class MessageHelper {
 		sendFileUploadToChannel(channel, fileUpload);
 	}
 
-	//.setEphemeral(true).queue();
 	public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload) {
 		if (fileUpload == null) {
 			BotLogger.log("FileUpload null");
