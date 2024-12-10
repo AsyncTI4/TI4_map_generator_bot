@@ -64,11 +64,11 @@ public class RematchService {
             gameRole = guild.createRole()
                 .setName(newName)
                 .setMentionable(true)
-                .complete();
+                .queue();
             for (Player player : game.getRealPlayers()) {
                 Member member = guild.getMemberById(player.getUserID());
                 if (member != null) {
-                    guild.addRoleToMember(member, gameRole).complete();
+                    guild.addRoleToMember(member, gameRole).queue();
                 }
             }
 
@@ -129,7 +129,7 @@ public class RematchService {
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
-            .complete();
+            .queue();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
         newGame.setUpPeakableObjectives(5, 1);
         newGame.setUpPeakableObjectives(5, 2);
