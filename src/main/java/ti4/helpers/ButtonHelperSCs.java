@@ -5,14 +5,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
@@ -23,7 +22,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
-import ti4.service.emoji.CardEmojis;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.ScorePublicObjectiveService;
@@ -45,8 +43,8 @@ public class ButtonHelperSCs {
             scModel = game.getStrategyCardModelByName("pok2diplomacy").orElse(null);
         }
         if (!used && scModel != null && scModel.usesAutomationForSCID("pok2diplomacy")
-            && !player.getFollowedSCs().contains(scModel.getInitiative())
-            && game.getPlayedSCs().contains(scModel.getInitiative())) {
+                && !player.getFollowedSCs().contains(scModel.getInitiative())
+                && game.getPlayedSCs().contains(scModel.getInitiative())) {
             int scNum = scModel.getInitiative();
             player.addFollowedSC(scNum, event);
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
@@ -67,8 +65,7 @@ public class ButtonHelperSCs {
         Button doneRefreshing = Buttons.red("deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
         buttons.add(doneRefreshing);
         if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(), message, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         } else {
             MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
         }
@@ -85,7 +82,7 @@ public class ButtonHelperSCs {
     }
 
     @ButtonHandler("nekroFollowTech")
-    public static void nekroFollowTech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    public static void nekroFollowTech(Game game, Player player, ButtonInteractionEvent event) {
         boolean used = addUsedSCPlayer(event.getMessageId(), game, player);
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
