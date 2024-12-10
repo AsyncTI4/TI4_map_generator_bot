@@ -1,0 +1,32 @@
+{
+    "id": "pok",
+    "name": "Prophecy of Kings",
+    "description": "Prophecy of Kings expansion",
+    "gameTagsToAdd": [
+        "PoK"
+    ],
+    "factionSources": [
+        "base",
+        "pok",
+        "codex3"
+    ],
+    "tileSources": [
+        "base",
+        "pok",
+        "codex3"
+    ],
+    "acDeckID": "action_cards_pok",
+    "soDeckID": "secret_objectives_pok",
+    "stage1PublicDeckID": "public_stage_1_objectives_pok",
+    "stage2PublicDeckID": "public_stage_2_objectives_pok",
+    "relicDeckID": "relics_pok",
+    "agendaDeckID": "agendas_pok",
+    "explorationDeckID": "explores_pok",
+    "technologyDeckID": "techs_pok",
+    "scSetID": "pok",
+    "eventDeckID": null,
+    "addUnitsFromSource": null,
+    "swapInTechsFromSource": null,
+    "swapInUnitsFromSource": null,
+    "addLeadersFromSource": null
+}
