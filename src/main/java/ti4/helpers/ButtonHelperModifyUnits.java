@@ -817,10 +817,9 @@ public class ButtonHelperModifyUnits {
     }
 
     private static boolean canRetreatTo(Game game, Player player, Tile tile, boolean skilledRetreat) {
-        if ((tile.isAsteroidField() && !player.getTechs().contains("amd")) || (tile.isSupernova() && !player.getTechs().contains("mr"))) {
-            return false;
-        }
-        if (FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+        if ((tile.isAsteroidField() && !player.getTechs().contains("amd")) ||
+                (tile.isSupernova() && !player.getTechs().contains("mr")) ||
+                FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             return false;
         }
         if (skilledRetreat) {
