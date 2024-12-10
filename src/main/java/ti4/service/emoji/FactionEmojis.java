@@ -47,8 +47,8 @@ public enum FactionEmojis implements TI4Emoji {
 
     @Nullable
     public static TI4Emoji getFactionEmoji(String faction) {
+        if (faction == null) return null;
         return switch (faction.toLowerCase()) {
-            case null -> null;
             case "arborec" -> Arborec;
             case "argent" -> Argent;
             case "cabal" -> Cabal;
