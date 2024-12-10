@@ -4241,7 +4241,7 @@ public class ButtonHelper {
                 planet = unit.substring(unit.lastIndexOf("_") + 1);
                 unit = unit.replace("_" + planet, "");
             }
-            UnitType unitType = Units.findUnitType(unit.toLowerCase());
+            UnitType unitType = Units.findUnitType(AliasHandler.resolveUnit(unit.toLowerCase()));
             if (landing) {
                 messageBuilder.append(prefix).append(" Landed ").append(amount).append(" ").append(damagedMsg)
                     .append(unitType.getUnitTypeEmoji());
