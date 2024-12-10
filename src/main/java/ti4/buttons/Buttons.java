@@ -7,8 +7,13 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.message.BotLogger;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.PlanetEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
 
 public class Buttons {
 
@@ -24,16 +29,16 @@ public class Buttons {
     public static final Button EDIT_NOTEPAD = blue("notepadEdit~MDL", "Edit Notes");
     public static final Button POST_NOTEPAD = blue("notepadPost", "Post Notes");
     public static final Button REFRESH_INFO = green("refreshInfoButtons", "Other Info");
-    public static final Button REFRESH_AC_INFO = green("refreshACInfo", "Action Card Info", Emojis.ActionCard);
-    public static final Button REFRESH_PN_INFO = green("refreshPNInfo", "Promissory Notes Info", Emojis.PN);
-    public static final Button REFRESH_SO_INFO = green("refreshSOInfo", "Secret Objectives Info", Emojis.SecretObjective);
+    public static final Button REFRESH_AC_INFO = green("refreshACInfo", "Action Card Info", CardEmojis.ActionCard);
+    public static final Button REFRESH_PN_INFO = green("refreshPNInfo", "Promissory Notes Info", CardEmojis.PN);
+    public static final Button REFRESH_SO_INFO = green("refreshSOInfo", "Secret Objectives Info", CardEmojis.SecretObjective);
     public static final Button REFRESH_ABILITY_INFO = green("refreshAbilityInfo", "Ability Info");
-    public static final Button REFRESH_RELIC_INFO = green(Constants.REFRESH_RELIC_INFO, "Relic Info", Emojis.Relic);
-    public static final Button REFRESH_LEADER_INFO = green(Constants.REFRESH_LEADER_INFO, "Leader Info", Emojis.Hero);
-    public static final Button REFRESH_UNIT_INFO = green(Constants.REFRESH_UNIT_INFO, "Unit Info", Emojis.UnitUpgradeTech);
+    public static final Button REFRESH_RELIC_INFO = green(Constants.REFRESH_RELIC_INFO, "Relic Info", ExploreEmojis.Relic);
+    public static final Button REFRESH_LEADER_INFO = green(Constants.REFRESH_LEADER_INFO, "Leader Info", LeaderEmojis.Hero);
+    public static final Button REFRESH_UNIT_INFO = green(Constants.REFRESH_UNIT_INFO, "Unit Info", TechEmojis.UnitUpgradeTech);
     public static final Button REFRESH_ALL_UNIT_INFO = green(Constants.REFRESH_ALL_UNIT_INFO, "Show All Units");
     public static final Button REFRESH_TECH_INFO = green(Constants.REFRESH_TECH_INFO, "Tech Info");
-    public static final Button REFRESH_PLANET_INFO = green(Constants.REFRESH_PLANET_INFO, "Planet Info", Emojis.SemLor);
+    public static final Button REFRESH_PLANET_INFO = green(Constants.REFRESH_PLANET_INFO, "Planet Info", PlanetEmojis.SemLor);
 
     public static final Button OFFER_PING_OPTIONS_BUTTON = Buttons.gray("playerPref_personalPingInterval", "Change Personal Ping Interval");
 
@@ -59,6 +64,11 @@ public class Buttons {
         return makeButton(ButtonStyle.PRIMARY, buttonID, buttonLabel, emoji);
     }
 
+    /** A blue button (primary style) with an emoji */
+    public static Button blue(String buttonID, String buttonLabel, TI4Emoji emoji) {
+        return makeButton(ButtonStyle.PRIMARY, buttonID, buttonLabel, emoji == null ? null : emoji.toString());
+    }
+
     /** A gray button (secondary style) */
     public static Button gray(String buttonID, String buttonLabel) {
         return makeButton(ButtonStyle.SECONDARY, buttonID, buttonLabel, null);
@@ -67,6 +77,11 @@ public class Buttons {
     /** A gray button (secondary style) with an emoji */
     public static Button gray(String buttonID, String buttonLabel, String emoji) {
         return makeButton(ButtonStyle.SECONDARY, buttonID, buttonLabel, emoji);
+    }
+
+    /** A gray button (secondary style) with an emoji */
+    public static Button gray(String buttonID, String buttonLabel, TI4Emoji emoji) {
+        return makeButton(ButtonStyle.SECONDARY, buttonID, buttonLabel, emoji == null ? null : emoji.toString());
     }
 
     /** A green button (success style) */
@@ -79,6 +94,11 @@ public class Buttons {
         return makeButton(ButtonStyle.SUCCESS, buttonID, buttonLabel, emoji);
     }
 
+    /** A green button (success style) with an emoji */
+    public static Button green(String buttonID, String buttonLabel, TI4Emoji emoji) {
+        return makeButton(ButtonStyle.SUCCESS, buttonID, buttonLabel, emoji == null ? null : emoji.toString());
+    }
+
     /** A red button (danger style) */
     public static Button red(String buttonID, String buttonLabel) {
         return makeButton(ButtonStyle.DANGER, buttonID, buttonLabel, null);
@@ -87,6 +107,11 @@ public class Buttons {
     /** A red button (danger style) with an emoji */
     public static Button red(String buttonID, String buttonLabel, String emoji) {
         return makeButton(ButtonStyle.DANGER, buttonID, buttonLabel, emoji);
+    }
+
+    /** A red button (danger style) with an emoji */
+    public static Button red(String buttonID, String buttonLabel, TI4Emoji emoji) {
+        return makeButton(ButtonStyle.DANGER, buttonID, buttonLabel, emoji == null ? null : emoji.toString());
     }
 
     private static Button makeButton(ButtonStyle style, String id, String label, String emoji) {

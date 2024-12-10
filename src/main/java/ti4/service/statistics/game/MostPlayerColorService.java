@@ -8,12 +8,12 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands2.statistics.GameStatisticsFilterer;
-import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GamesPage;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.ColorEmojis;
 
 @UtilityClass
 class MostPlayerColorService {
@@ -23,8 +23,7 @@ class MostPlayerColorService {
 
         GamesPage.consumeAllGames(
             GameStatisticsFilterer.getGamesFilter(event),
-            game -> getMostPlayedColor(game, colorCount)
-        );
+            game -> getMostPlayedColor(game, colorCount));
 
         StringBuilder sb = new StringBuilder();
         sb.append("Plays per Colour:").append("\n");
@@ -34,7 +33,7 @@ class MostPlayerColorService {
             .forEach(entry -> sb.append("`")
                 .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                 .append("x` ")
-                .append(Emojis.getColorEmojiWithName(entry.getKey()))
+                .append(ColorEmojis.getColorEmojiWithName(entry.getKey()))
                 .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Plays per Colour", sb.toString());
     }

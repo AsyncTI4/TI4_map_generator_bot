@@ -16,6 +16,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -31,7 +32,7 @@ public class SecretObjectiveHelper {
             return;
         }
 
-        StringBuilder message = new StringBuilder(player.getRepresentation() + " scored " + Emojis.SecretObjectiveAlt + " ");
+        StringBuilder message = new StringBuilder(player.getRepresentation() + " scored " + CardEmojis.SecretObjectiveAlt + " ");
         for (Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
@@ -138,7 +139,7 @@ public class SecretObjectiveHelper {
                 String soName = so_.getName();
                 Integer idValue = so.getValue();
                 if (soName != null) {
-                    soButtons.add(Buttons.blue(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName, Emojis.SecretObjective));
+                    soButtons.add(Buttons.blue(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName, CardEmojis.SecretObjective));
                 }
             }
         }
@@ -171,7 +172,7 @@ public class SecretObjectiveHelper {
                 String soName = so_.getName();
                 Integer idValue = so.getValue();
                 if (soName != null) {
-                    soButtons.add(Buttons.red("discardSecret_" + idValue + suffix, "(" + idValue + ") " + soName, Emojis.SecretObjective));
+                    soButtons.add(Buttons.red("discardSecret_" + idValue + suffix, "(" + idValue + ") " + soName, CardEmojis.SecretObjective));
                 }
             }
         }

@@ -21,7 +21,6 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
@@ -36,6 +35,9 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -182,10 +184,10 @@ public class EndTurnService {
                 Integer value = objective.getValue();
                 Button objectiveButton;
                 if (poStatus == 0) { //Stage 1 Objectives
-                    objectiveButton = Buttons.green(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, Emojis.Public1alt);
+                    objectiveButton = Buttons.green(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, CardEmojis.Public1alt);
                     poButtons1.add(objectiveButton);
                 } else if (poStatus == 1) { //Stage 2 Objectives
-                    objectiveButton = Buttons.blue(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, Emojis.Public2alt);
+                    objectiveButton = Buttons.blue(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, CardEmojis.Public2alt);
                     poButtons2.add(objectiveButton);
                 } else { //Other Objectives
                     objectiveButton = Buttons.gray(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name);
@@ -199,7 +201,7 @@ public class EndTurnService {
         poButtons.addAll(poButtonsCustom);
         for (Player player : game.getRealPlayers()) {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !game.isFowMode()) {
-                poButtons.add(Buttons.gray("edynCommanderSODraw", "Draw SO instead of Scoring PO", Emojis.edyn));
+                poButtons.add(Buttons.gray("edynCommanderSODraw", "Draw SO instead of Scoring PO", FactionEmojis.edyn));
                 break;
             }
         }
@@ -323,11 +325,11 @@ public class EndTurnService {
                     if (unitHolder != null && unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         if (player.hasRelic("emphidia")) {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation() + "Reminder this is not the window to use " + Emojis.Relic + "Crown of Emphidia. You may purge " +
-                                    Emojis.Relic + "Crown of Emphidia in the status homework phase, which is when buttons will appear.");
+                                player.getRepresentation() + "Reminder this is not the window to use " + ExploreEmojis.Relic + "Crown of Emphidia. You may purge " +
+                                    ExploreEmojis.Relic + "Crown of Emphidia in the status homework phase, which is when buttons will appear.");
                         } else {
-                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to use " + Emojis.Relic + "Crown of Emphidia.");
-                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You may use these buttons to resolve " + Emojis.Relic + "Crown of Emphidia.", ButtonHelper.getCrownButtons());
+                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to use " + ExploreEmojis.Relic + "Crown of Emphidia.");
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You may use these buttons to resolve " + ExploreEmojis.Relic + "Crown of Emphidia.", ButtonHelper.getCrownButtons());
                         }
                     }
                 }

@@ -18,7 +18,6 @@ import ti4.image.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
@@ -31,6 +30,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
+import ti4.service.emoji.ColorEmojis;
 
 class SystemInfo extends GameStateSubcommand {
 
@@ -141,10 +141,10 @@ class SystemInfo extends GameStateSubcommand {
                     Player player = game.getPlayerFromColorOrFaction(color);
                     if (player == null) continue;
                     UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                    sb.append(player.getFactionEmojiOrColor()).append(Emojis.getColorEmojiWithName(color));
+                    sb.append(player.getFactionEmojiOrColor()).append(ColorEmojis.getColorEmojiWithName(color));
                     sb.append(" `").append(unitEntry.getValue()).append("x` ");
                     if (unitModel != null) {
-                        sb.append(Emojis.getEmojiFromDiscord(unitModel.getBaseType())).append(" ").append(unitModel.getName()).append("\n");
+                        sb.append(unitModel.getUnitEmoji()).append(" ").append(unitModel.getName()).append("\n");
                     } else {
                         sb.append(unitKey).append("\n");
                     }

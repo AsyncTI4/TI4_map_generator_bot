@@ -20,6 +20,10 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.Source;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ColorEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.SourceEmojis;
 import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.unit.AddUnitService;
@@ -29,9 +33,9 @@ public class PromissoryNoteHelper {
 
     public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat) {
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                getPromissoryNoteCardInfo(game, player, longFormat, false),
-                getPNButtons(game, player));
+            player.getCardsInfoThread(),
+            getPromissoryNoteCardInfo(game, player, longFormat, false),
+            getPNButtons(game, player));
     }
 
     public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
@@ -99,8 +103,8 @@ public class PromissoryNoteHelper {
         String pnName = pnModel.getName();
         StringBuilder sb = new StringBuilder();
 
-        sb.append(Emojis.PN);
-        if (pnModel.getFaction().isPresent()) sb.append(Emojis.getFactionIconFromDiscord(pnModel.getFaction().get()));
+        sb.append(CardEmojis.PN);
+        if (pnModel.getFaction().isPresent()) sb.append(FactionEmojis.getFactionIcon(pnModel.getFaction().get()));
         sb.append("__**").append(pnName).append("**__");
         sb.append(pnModel.getSource().emoji());
         sb.append("   ");
@@ -109,13 +113,13 @@ public class PromissoryNoteHelper {
         Player pnOwner = game.getPNOwner(pnID);
         if (pnOwner != null && pnOwner.isRealPlayer()) {
             if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
-            sb.append(Emojis.getColorEmojiWithName(pnOwner.getColor()));
-            pnText = pnText.replaceAll(pnOwner.getColor(), Emojis.getColorEmojiWithName(pnOwner.getColor()));
+            sb.append(ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
+            pnText = pnText.replaceAll(pnOwner.getColor(), ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
         }
 
         if (longFormat ||
-                Mapper.isValidFaction(pnModel.getFaction().orElse("").toLowerCase()) ||
-                (pnModel.getSource() != Source.ComponentSource.base && pnModel.getSource() != Source.ComponentSource.pok)) {
+            Mapper.isValidFaction(pnModel.getFaction().orElse("").toLowerCase()) ||
+            (pnModel.getSource() != Source.ComponentSource.base && pnModel.getSource() != Source.ComponentSource.pok)) {
             sb.append("      ").append(pnText);
         }
         sb.append("\n");
@@ -164,7 +168,7 @@ public class PromissoryNoteHelper {
             Button transact;
             if (game.isFowMode()) {
                 transact = Buttons.green("resolvePNPlay_" + pnShortHand,
-                        "Play " + owner.getColor() + " " + promissoryNote.getName());
+                    "Play " + owner.getColor() + " " + promissoryNote.getName());
             } else {
                 transact = Buttons.green("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
             }
@@ -205,12 +209,12 @@ public class PromissoryNoteHelper {
 
         String emojiToUse = game.isFowMode() ? "" : owner.getFactionEmoji();
         StringBuilder sb = new StringBuilder(player.getRepresentation() + " played promissory note: " + pnName + "\n");
-        sb.append(emojiToUse).append(Emojis.PN);
+        sb.append(emojiToUse).append(CardEmojis.PN);
         String pnText;
 
         // Handle AbsolMode Political Secret
         if (game.isAbsolMode() && id.endsWith("_ps")) {
-            pnText = "Political Secret" + Emojis.Absol
+            pnText = "Political Secret" + SourceEmojis.Absol
                 + ":  *When you cast votes:* You may exhaust up to 3 of the {color} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {color} player.";
         } else {
             pnText = Mapper.getPromissoryNote(id).getName();

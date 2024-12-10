@@ -280,7 +280,7 @@ public class AutoCompleteProvider {
             case Constants.PRIMARY_TILE_DIRECTION -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 var values = List.of("North", "Northeast", "Southeast", "South", "Southwest", "Northwest");
-                List<Command.Choice> options =  mapTo25ChoicesThatContain(values, enteredValue);
+                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
                 event.replyChoices(options).queue();
             }
             case Constants.CATEGORY -> {
@@ -321,8 +321,8 @@ public class AutoCompleteProvider {
             }
             case Constants.CREUSS_TOKEN_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var phases = List.of("alpha", "beta", "gamma");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(phases, enteredValue);
+                var tokens = List.of("alpha", "beta", "gamma");
+                List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue();
             }
             case Constants.DECK_NAME -> {
@@ -723,7 +723,7 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveActionCardDiscardAutoComplete(@NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-                                                                @NotNull String optionName, @NotNull Game game) {
+        @NotNull String optionName, @NotNull Game game) {
         if (!optionName.equals(Constants.ACTION_CARD_ID)) return;
         switch (subCommandName) {
             case Constants.PICK_AC_FROM_DISCARD, Constants.SHUFFLE_AC_BACK_INTO_DECK -> {
@@ -743,7 +743,7 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveDeveloperCommandAutoComplete(@NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-                                                            @NotNull String optionName) {
+        @NotNull String optionName) {
         if (!subCommandName.equals(Constants.SET_SETTING)) return;
         switch (optionName) {
             case Constants.SETTING_TYPE -> event.replyChoiceStrings("string", "number", "bool").queue();
@@ -757,7 +757,7 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveSearchCommandAutoComplete(@NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-                                                            @NotNull String optionName) {
+        @NotNull String optionName) {
         if (!optionName.equals(Constants.SEARCH)) return;
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         List<Command.Choice> options = null;
@@ -783,7 +783,7 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveFrankenAutoComplete(@NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-                                                    @NotNull String optionName) {
+        @NotNull String optionName) {
         switch (subCommandName) {
             case Constants.FACTION_TECH_ADD, Constants.FACTION_TECH_REMOVE -> {
                 switch (optionName) {
@@ -811,7 +811,7 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveMapAutoComplete(@NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-                                                @NotNull String optionName, @NotNull Game game) {
+        @NotNull String optionName, @NotNull Game game) {
         switch (subCommandName) {
             case Constants.ADD_TILE -> {
                 if (!optionName.equals(Constants.TILE_NAME)) return;
@@ -852,7 +852,7 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveExploreAutoComplete(@NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-                                                    @NotNull String optionName, @NotNull Game game) {
+        @NotNull String optionName, @NotNull Game game) {
         if (!subCommandName.equals(Constants.USE)) return;
         if (!optionName.equals(Constants.EXPLORE_CARD_ID)) return;
         if (game.isFowMode()) {
@@ -872,7 +872,7 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveStatusAutoComplete(@NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-                                                    @NotNull String optionName, @NotNull Game game) {
+        @NotNull String optionName, @NotNull Game game) {
         if (!subCommandName.equals(Constants.SHUFFLE_OBJECTIVE_BACK) &&
             !subCommandName.equals(Constants.SCORE_OBJECTIVE) &&
             !subCommandName.equals(Constants.UNSCORE_OBJECTIVE)) {
@@ -892,7 +892,7 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveAgendaAutoComplete(@NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-                                                    @NotNull String optionName, @NotNull Game game) {
+        @NotNull String optionName, @NotNull Game game) {
         if (!Constants.AGENDA_ID.equals(optionName)) {
             return;
         }
@@ -921,7 +921,7 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveSecretObjectiveAutoComplete(@NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-                                                            @NotNull String optionName, @NotNull Game game) {
+        @NotNull String optionName, @NotNull Game game) {
         if (!Constants.SECRET_OBJECTIVE_ID.equals(optionName) && !Constants.SO_ID.equals(optionName)) return;
         Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
         if (player == null) return;

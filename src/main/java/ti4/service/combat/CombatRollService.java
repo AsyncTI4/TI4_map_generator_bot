@@ -27,7 +27,6 @@ import ti4.helpers.CombatModHelper;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
@@ -43,6 +42,8 @@ import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
@@ -79,16 +80,14 @@ public class CombatRollService {
                 playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
                     .filter(e -> !"naaz_mech_space".equals(e.getKey().getAlias()))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Skipping " + Emojis.Naaz + " Z-Grav Eidolon due to Articles of War agenda.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping " + FactionEmojis.Naaz + " Z-Grav Eidolon due to Articles of War agenda.");
             }
             if (rollType == CombatRollType.SpaceCannonDefence || rollType == CombatRollType.SpaceCannonOffence) {
                 if (playerUnitsByQuantity.keySet().stream().anyMatch(unit -> "xxcha_mech".equals(unit.getAlias()))) {
                     playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
                         .filter(e -> !"xxcha_mech".equals(e.getKey().getAlias()))
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Skipping " + Emojis.Xxcha + " mechs due to Articles of War agenda.");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping " + FactionEmojis.Xxcha + " mechs due to Articles of War agenda.");
                 }
             }
             if (rollType == CombatRollType.bombardment) {
@@ -96,8 +95,7 @@ public class CombatRollService {
                     playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
                         .filter(e -> !"l1z1x_mech".equals(e.getKey().getAlias()))
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Skipping " + Emojis.L1Z1X + " mechs due to Articles of War agenda.");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping " + FactionEmojis.L1Z1X + " mechs due to Articles of War agenda.");
                 }
             }
 
@@ -176,7 +174,7 @@ public class CombatRollService {
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (message.contains("adding +1, at the risk of your")) {
-            Button thalnosButton = Buttons.green("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", Emojis.Relic);
+            Button thalnosButton = Buttons.green("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", ExploreEmojis.Relic);
             Button decline = Buttons.gray("editMessage_" + player.getFactionEmoji() + " declined Thalnos", "Decline");
             String thalnosMessage = "Use this button to roll for Thalnos.\n-# Note that if it matters, the dice were just rolled in the following format: (normal dice for unit 1)+(normal dice for unit 2)...etc...+(extra dice for unit 1)+(extra dice for unit 2)...etc.\n-# Sol and Letnev agents automatically are given as extra dice for unit 1.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), thalnosMessage, List.of(thalnosButton, decline));
@@ -375,7 +373,7 @@ public class CombatRollService {
 
             int toHit = unitModel.getCombatDieHitsOnForAbility(rollType, player, game);
             int modifierToHit = CombatModHelper.getCombinedModifierForUnit(unitModel, numOfUnit, mods, player, opponent, game,
-                    playerUnitsList, rollType, activeSystem);
+                playerUnitsList, rollType, activeSystem);
             int extraRollsForUnit = CombatModHelper.getCombinedModifierForUnit(unitModel, numOfUnit, extraRolls, player,
                 opponent, game, playerUnitsList, rollType, activeSystem);
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player, game);

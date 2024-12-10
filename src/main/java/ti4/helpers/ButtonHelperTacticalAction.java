@@ -23,6 +23,11 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -294,8 +299,7 @@ public class ButtonHelperTacticalAction {
             }
             if (player.hasUnexhaustedLeader("celdauriagent")) {
                 List<Button> buttons = new ArrayList<>();
-                Button hacanButton = Buttons.gray("exhaustAgent_celdauriagent_" + player.getFaction(), "Use Celdauri Agent", Emojis.celdauri);
-                buttons.add(hacanButton);
+                buttons.add(Buttons.gray("exhaustAgent_celdauriagent_" + player.getFaction(), "Use Celdauri Agent", FactionEmojis.celdauri));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
@@ -307,7 +311,7 @@ public class ButtonHelperTacticalAction {
 
         if (!game.isAbsolMode() && player.getRelics().contains("emphidia")
             && !player.getExhaustedRelics().contains("emphidia")) {
-            String message = player.getRepresentation() + " You can use the button to explore a planet using the " + Emojis.Relic + "Crown of Emphidia";
+            String message = player.getRepresentation() + " You can use the button to explore a planet using the " + ExploreEmojis.Relic + "Crown of Emphidia";
             List<Button> systemButtons2 = new ArrayList<>();
             systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
@@ -341,12 +345,12 @@ public class ButtonHelperTacticalAction {
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
             && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message3 = message3
-                + "You also have That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 " + Emojis.fighter + "/" + Emojis.infantry + " that don't count towards production limit.\n";
+                + "You also have That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 " + UnitEmojis.fighter + "/" + UnitEmojis.infantry + " that don't count towards production limit.\n";
         }
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
             && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
             message3 = message3
-                + "Reminder that you have Prophecy of Ixth and should produce 2 " + Emojis.fighter + " if you want to keep it. Its removal is not automated.\n";
+                + "Reminder that you have Prophecy of Ixth and should produce 2 " + UnitEmojis.fighter + " if you want to keep it. Its removal is not automated.\n";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true));
@@ -404,8 +408,7 @@ public class ButtonHelperTacticalAction {
             List<Button> empyButtons = new ArrayList<>();
             if (!game.getMovedUnitsFromCurrentActivation().isEmpty()
                 && (tile.getUnitHolders().size() == 1) && player.hasUnexhaustedLeader("empyreanagent")) {
-                Button empyButton = Buttons.gray("exhaustAgent_empyreanagent",
-                    "Use Empyrean Agent", Emojis.Empyrean);
+                Button empyButton = Buttons.gray("exhaustAgent_empyreanagent", "Use Empyrean Agent", FactionEmojis.Empyrean);
                 empyButtons.add(empyButton);
                 empyButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -599,7 +602,7 @@ public class ButtonHelperTacticalAction {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
             && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock).contains(activeSystem)) {
             List<Button> buttons = new ArrayList<>();
-            Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", Emojis.comm);
+            Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
             buttons.add(getCommButton);
             String msg = player.getRepresentation()
                 + " you have Henry Storcher, the Celdauri Commander, and activated a system with your space dock. Please use the button to get a commodity.";
@@ -742,7 +745,7 @@ public class ButtonHelperTacticalAction {
             doAll = Buttons.gray(finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_moveAll", "Move all units");
             concludeMove = Buttons.blue(finChecker + "doneWithOneSystem_" + tile.getPosition(), "Done moving units from this system");
             if (game.playerHasLeaderUnlockedOrAlliance(player, "tneliscommander") && game.getStoredValue("tnelisCommanderTracker").isEmpty()) {
-                buttons.add(Buttons.blue("declareUse_Tnelis Commander_" + tile.getPosition(), "Use Tnelis Commander", Emojis.tnelis));
+                buttons.add(Buttons.blue("declareUse_Tnelis Commander_" + tile.getPosition(), "Use Tnelis Commander", FactionEmojis.tnelis));
             }
         }
         buttons.add(doAll);
@@ -773,7 +776,8 @@ public class ButtonHelperTacticalAction {
                 if (!"".equalsIgnoreCase(planet)) {
                     blabel = blabel + " from " + Helper.getPlanetRepresentation(planet.toLowerCase(), game);
                 }
-                Button validTile2 = Buttons.green(bID, blabel).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unitkey.toLowerCase().replace(" ", ""))));
+                UnitType unitType = Units.findUnitType(unitkey.toLowerCase().replace(" ", ""));
+                Button validTile2 = Buttons.green(bID, blabel, unitType.getUnitTypeEmoji());
                 buttons.add(validTile2);
             }
         }

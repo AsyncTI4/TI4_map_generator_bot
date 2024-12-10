@@ -10,7 +10,6 @@ import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
@@ -18,6 +17,10 @@ import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.MapTemplateModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.MiltyDraftEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.SourceEmojis;
 
 // This is a sub-menu
 @Getter
@@ -54,13 +57,13 @@ public class GameSettings extends SettingsMenu {
         mapTemplate = new ChoiceSetting<>("Template", "Map Template", "6pStandard");
 
         // Emojis
-        pointTotal.setEmoji(Emojis.CustodiansVP);
-        stage1s.setEmoji(Emojis.Public1);
-        stage2s.setEmoji(Emojis.Public2);
-        secrets.setEmoji(Emojis.SecretObjective);
-        tigl.setEmoji(Emojis.TIGL);
-        alliance.setEmoji(Emojis.StrategicAlliance);
-        mapTemplate.setEmoji(Emojis.sliceA);
+        pointTotal.setEmoji(MiscEmojis.CustodiansVP);
+        stage1s.setEmoji(CardEmojis.Public1);
+        stage2s.setEmoji(CardEmojis.Public2);
+        secrets.setEmoji(CardEmojis.SecretObjective);
+        tigl.setEmoji(MiscEmojis.TIGL);
+        alliance.setEmoji(SourceEmojis.StrategicAlliance);
+        mapTemplate.setEmoji(MiltyDraftEmojis.sliceA);
 
         // Other initialization
         mapTemplate.setAllValues(Mapper.getMapTemplates().stream().collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x)));

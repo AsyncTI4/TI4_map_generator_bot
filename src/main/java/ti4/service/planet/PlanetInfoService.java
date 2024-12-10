@@ -6,7 +6,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.buttons.Buttons;
-import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -14,6 +13,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
+import ti4.service.emoji.MiscEmojis;
 
 @UtilityClass
 public class PlanetInfoService {
@@ -46,12 +46,12 @@ public class PlanetInfoService {
         } else {
             sb.append("Exhausted: ");
         }
-        sb.append(Emojis.getResourceEmoji(planet.getResources())).append(Emojis.getInfluenceEmoji(planet.getInfluence())).append("\n");
+        sb.append(MiscEmojis.getResourceEmoji(planet.getResources())).append(MiscEmojis.getInfluenceEmoji(planet.getInfluence())).append("\n");
         eb.setDescription(sb.toString());
         Mapper.getTokensToName();
         if (!planet.getTokenList().isEmpty()) eb.addField("Attachments", planet.getTokenList().stream().map(Mapper::getTokenIDFromTokenPath).toList().toString(), true);
 
-        if (planetModel.getLegendaryAbilityName() != null) eb.addField(Emojis.LegendaryPlanet + planetModel.getLegendaryAbilityName(), planetModel.getLegendaryAbilityText(), false);
+        if (planetModel.getLegendaryAbilityName() != null) eb.addField(MiscEmojis.LegendaryPlanet + planetModel.getLegendaryAbilityName(), planetModel.getLegendaryAbilityText(), false);
 
         return eb.build();
     }

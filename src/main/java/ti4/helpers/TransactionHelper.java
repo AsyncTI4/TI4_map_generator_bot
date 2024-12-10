@@ -21,6 +21,11 @@ import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.SourceEmojis;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
@@ -138,17 +143,17 @@ public class TransactionHelper {
                     case "TGs" -> {
                         amountToTransact = Integer.parseInt(furtherDetail);
                         if (amountToTransact > 4) {
-                            trans.append(amountToTransact).append(Emojis.tg);
+                            trans.append(amountToTransact).append(MiscEmojis.tg);
                         } else {
-                            trans.append(Emojis.tg(amountToTransact));
+                            trans.append(MiscEmojis.tg(amountToTransact));
                         }
                     }
                     case "Comms" -> {
                         amountToTransact = Integer.parseInt(furtherDetail);
                         if (amountToTransact > 4) {
-                            trans.append(amountToTransact).append(Emojis.comm);
+                            trans.append(amountToTransact).append(MiscEmojis.comm);
                         } else {
-                            trans.append(Emojis.comm(amountToTransact));
+                            trans.append(MiscEmojis.comm(amountToTransact));
                         }
                     }
                     case "SendDebt" -> {
@@ -159,11 +164,11 @@ public class TransactionHelper {
                         amountToTransact = Integer.parseInt(furtherDetail);
                         trans.append("Clear ").append(amountToTransact).append(" debt tokens");
                     }
-                    case "shipOrders" -> trans.append(Mapper.getRelic(furtherDetail).getName()).append(Emojis.axis);
-                    case "starCharts" -> trans.append(Mapper.getRelic(furtherDetail).getName()).append(Emojis.DiscordantStars);
+                    case "shipOrders" -> trans.append(Mapper.getRelic(furtherDetail).getName()).append(FactionEmojis.axis);
+                    case "starCharts" -> trans.append(Mapper.getRelic(furtherDetail).getName()).append(SourceEmojis.DiscordantStars);
                     case "ACs" -> {
                         switch (furtherDetail) {
-                            case "generic" -> trans.append(amountToTransact).append(" ").append(Emojis.ActionCard).append(" to be specified verbally");
+                            case "generic" -> trans.append(amountToTransact).append(" ").append(CardEmojis.ActionCard).append(" to be specified verbally");
                             default -> {
                                 int acNum = Integer.parseInt(furtherDetail);
                                 String acID = null;
@@ -175,7 +180,7 @@ public class TransactionHelper {
                                         acID = ac.getKey();
                                     }
                                 }
-                                trans.append(Emojis.ActionCard);
+                                trans.append(CardEmojis.ActionCard);
                                 if (!hidePrivateCardText) {
                                     trans.append(" ").append(Mapper.getActionCard(acID).getName());
                                 }
@@ -187,9 +192,9 @@ public class TransactionHelper {
                         switch (furtherDetail) {
                             case "generic" -> {
                                 if (!hidePrivateCardText) {
-                                    trans.append(amountToTransact).append(" ").append(Emojis.PN).append(" to be specified verbally");
+                                    trans.append(amountToTransact).append(" ").append(CardEmojis.PN).append(" to be specified verbally");
                                 } else {
-                                    trans.append(Emojis.PN);
+                                    trans.append(CardEmojis.PN);
                                 }
                             }
                             default -> {
@@ -205,14 +210,14 @@ public class TransactionHelper {
                                 } catch (NumberFormatException e) {
                                     id = furtherDetail.replace("fin9", "_");
                                 }
-                                trans.append(Emojis.PN);
+                                trans.append(CardEmojis.PN);
                                 if (!hidePrivateCardText) {
                                     trans.append(" ").append(StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse(""))).append(" ").append(Mapper.getPromissoryNote(id).getName());
                                 }
                             }
                         }
                     }
-                    case "Frags" -> trans.append(Emojis.getFragEmoji(furtherDetail).repeat(amountToTransact));
+                    case "Frags" -> trans.append(ExploreEmojis.getFragEmoji(furtherDetail).toString().repeat(amountToTransact));
                     case "Planets", "AlliancePlanets", "dmz" -> trans.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(furtherDetail, game));
                     case "action" -> trans.append("An in-game ").append(furtherDetail).append(" action");
                     default -> trans.append(" some odd thing: `").append(item).append("`");
@@ -1015,7 +1020,7 @@ public class TransactionHelper {
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
                 CardsInfoService.sendVariousAdditionalButtons(game, p2);
                 String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-                message2 = p1.getRepresentation() + " sent " + Emojis.PN + text + "PN to " + ident2;
+                message2 = p1.getRepresentation() + " sent " + CardEmojis.PN + text + "PN to " + ident2;
                 Helper.checkEndGame(game, p2);
             }
             case "Frags" -> {
@@ -1078,11 +1083,11 @@ public class TransactionHelper {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
         }
         if (player.hasAbility("policy_the_people_control") && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
-            sb.append("cannot transact during the agenda phase due to the ").append(Emojis.olradin).append("Control policy");
+            sb.append("cannot transact during the agenda phase due to the ").append(FactionEmojis.olradin).append("Control policy");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         }
         if (player2.hasAbility("policy_the_people_control") && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
-            sb.append(player2.getRepresentation(false, false)).append(" cannot transact during the agenda phase due to their ").append(Emojis.olradin).append("Control policy");
+            sb.append(player2.getRepresentation(false, false)).append(" cannot transact during the agenda phase due to their ").append(FactionEmojis.olradin).append("Control policy");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         }
     }
@@ -1121,81 +1126,55 @@ public class TransactionHelper {
     public static List<Button> getStuffToTransButtonsNew(Game game, Player player, Player p1, Player p2) {
         List<Button> stuffToTransButtons = new ArrayList<>();
         if (p1.getTg() > 0) {
-            Button transact = Buttons.green("newTransact_TGs_" + p1.getFaction() + "_" + p2.getFaction(), "TGs");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green("newTransact_TGs_" + p1.getFaction() + "_" + p2.getFaction(), "TGs"));
         }
         if (p1.getDebtTokenCount(p2.getColor()) > 0) {
-            Button transact = Buttons.blue("newTransact_ClearDebt_" + p1.getFaction() + "_" + p2.getFaction(),
-                "Clear Debt");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.blue("newTransact_ClearDebt_" + p1.getFaction() + "_" + p2.getFaction(), "Clear Debt"));
         }
-        stuffToTransButtons
-            .add(Buttons.red("newTransact_SendDebt_" + p1.getFaction() + "_" + p2.getFaction(), "Send Debt"));
+        stuffToTransButtons.add(Buttons.red("newTransact_SendDebt_" + p1.getFaction() + "_" + p2.getFaction(), "Send Debt"));
         if (p1.getCommodities() > 0 && !p1.hasAbility("military_industrial_complex")) {
-            Button transact = Buttons.green("newTransact_Comms_" + p1.getFaction() + "_" + p2.getFaction(),
-                "Commodities");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green("newTransact_Comms_" + p1.getFaction() + "_" + p2.getFaction(), "Commodities"));
         }
 
         if (p1 == player && !game.isFowMode() && (p1.getCommodities() > 0 || p2.getCommodities() > 0)
             && !p1.hasAbility("military_industrial_complex")
             && !p1.getAllianceMembers().contains(p2.getFaction())) {
-            Button transact = Buttons.gray("offerToTransact_washComms_" + player.getFaction() + "_" + p2.getFaction() + "_0",
-                "Wash Both Players Comms");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.gray("offerToTransact_washComms_" + player.getFaction() + "_" + p2.getFaction() + "_0", "Wash Both Players Comms"));
         }
         if (!ButtonHelper.getPlayersShipOrders(p1).isEmpty()) {
-            Button transact = Buttons.gray("newTransact_shipOrders_" + p1.getFaction() + "_" + p2.getFaction(),
-                "Axis Orders");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.gray("newTransact_shipOrders_" + p1.getFaction() + "_" + p2.getFaction(), "Axis Orders"));
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 0) {
-            Button transact = Buttons.gray("newTransact_starCharts_" + p1.getFaction() + "_" + p2.getFaction(),
-                "Star Charts");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.gray("newTransact_starCharts_" + p1.getFaction() + "_" + p2.getFaction(), "Star Charts"));
         }
         if ((p1.hasAbility("arbiters") || p2.hasAbility("arbiters")) && p1.getAc() > 0) {
-            Button transact = Buttons.green("newTransact_ACs_" + p1.getFaction() + "_" + p2.getFaction(),
-                "Action Cards");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green("newTransact_ACs_" + p1.getFaction() + "_" + p2.getFaction(), "Action Cards"));
         }
         if (p1.getPnCount() > 0) {
-            Button transact = Buttons.green("newTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction(),
-                "Promissory Notes");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green("newTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction(), "Promissory Notes"));
         }
         if (!p1.getFragments().isEmpty()) {
-            Button transact = Buttons.green("newTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction(),
-                "Fragments");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green("newTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction(), "Fragments"));
         }
         if (!ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).isEmpty()) {
-            Button transact = Button
-                .success("newTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction(), "Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("hacan")));
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green("newTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction(), "Planets", FactionEmojis.Hacan));
         }
         if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).isEmpty()) {
-            Button transact = Buttons.green("newTransact_AlliancePlanets_" + p1.getFaction() + "_" + p2.getFaction(), "Alliance Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(p2.getFaction())));
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green("newTransact_AlliancePlanets_" + p1.getFaction() + "_" + p2.getFaction(), "Alliance Planets", p2.getFactionEmoji()));
         }
         if ((game.getPhaseOfGame().toLowerCase().contains("agenda") || game.getPhaseOfGame().toLowerCase().contains("strategy"))
             && !"no".equalsIgnoreCase(ButtonHelper.playerHasDMZPlanet(p1, game))) {
-            Button transact = Buttons.gray(
-                "offerToTransact_dmz_" + p1.getFaction() + "_" + p2.getFaction() + "_"
-                    + ButtonHelper.playerHasDMZPlanet(p1, game),
-                "Trade " + Mapper.getPlanet(ButtonHelper.playerHasDMZPlanet(p1, game)).getName() + " (DMZ)");
+            Button transact = Buttons.gray("offerToTransact_dmz_" + p1.getFaction() + "_" + p2.getFaction() + "_" + ButtonHelper.playerHasDMZPlanet(p1, game), "Trade " + Mapper.getPlanet(ButtonHelper.playerHasDMZPlanet(p1, game)).getName() + " (DMZ)");
             stuffToTransButtons.add(transact);
         }
 
         if (player == p1) {
             stuffToTransButtons.add(Buttons.gray("resetOffer_" + p2.getFaction(), "Reset Offer"));
-            stuffToTransButtons.add(
-                Buttons.red("getNewTransaction_" + p2.getFaction() + "_" + p1.getFaction(), "Ask for Stuff"));
+            stuffToTransButtons.add(Buttons.red("getNewTransaction_" + p2.getFaction() + "_" + p1.getFaction(), "Ask for Stuff"));
             stuffToTransButtons.add(Buttons.gray("sendOffer_" + p2.getFaction(), "Send the Offer"));
         } else {
             stuffToTransButtons.add(Buttons.gray("resetOffer_" + p1.getFaction(), "Reset Offer"));
-            stuffToTransButtons
-                .add(Buttons.red("getNewTransaction_" + p2.getFaction() + "_" + p1.getFaction(), "Offer More"));
+            stuffToTransButtons.add(Buttons.red("getNewTransaction_" + p2.getFaction() + "_" + p1.getFaction(), "Offer More"));
             stuffToTransButtons.add(Buttons.gray("sendOffer_" + p1.getFaction(), "Send the Offer"));
         }
 
@@ -1212,54 +1191,41 @@ public class TransactionHelper {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
         List<Button> stuffToTransButtons = new ArrayList<>();
         if (p1.getTg() > 0) {
-            Button transact = Buttons.green(finChecker + "transact_TGs_" + p2.getFaction(), "TGs");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green(finChecker + "transact_TGs_" + p2.getFaction(), "TGs"));
         }
         if (p1.getDebtTokenCount(p2.getColor()) > 0) {
-            Button transact = Buttons.blue(finChecker + "transact_ClearDebt_" + p2.getFaction(), "Clear Debt");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.blue(finChecker + "transact_ClearDebt_" + p2.getFaction(), "Clear Debt"));
         }
         stuffToTransButtons.add(Buttons.red(finChecker + "transact_SendDebt_" + p2.getFaction(), "Send Debt"));
         if (p1.getCommodities() > 0 && !p1.hasAbility("military_industrial_complex")) {
-            Button transact = Buttons.green(finChecker + "transact_Comms_" + p2.getFaction(), "Commodities");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green(finChecker + "transact_Comms_" + p2.getFaction(), "Comms"));
         }
 
         if (!game.isFowMode() && (p1.getCommodities() > 0 || p2.getCommodities() > 0)
             && !p1.hasAbility("military_industrial_complex")
             && !p1.getAllianceMembers().contains(p2.getFaction())) {
-            Button transact = Buttons.gray(finChecker + "send_WashComms_" + p2.getFaction() + "_0",
-                "Wash Both Players Comms");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.gray(finChecker + "send_WashComms_" + p2.getFaction() + "_0", "Wash Both Players Comms"));
         }
         if (!ButtonHelper.getPlayersShipOrders(p1).isEmpty()) {
-            Button transact = Buttons.gray(finChecker + "transact_shipOrders_" + p2.getFaction(), "Axis Orders");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.gray(finChecker + "transact_shipOrders_" + p2.getFaction(), "Axis Orders"));
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 0) {
-            Button transact = Buttons.gray(finChecker + "transact_starCharts_" + p2.getFaction(), "Star Charts");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.gray(finChecker + "transact_starCharts_" + p2.getFaction(), "Star Charts"));
         }
         if ((p1.hasAbility("arbiters") || p2.hasAbility("arbiters")) && p1.getAc() > 0) {
-            Button transact = Buttons.green(finChecker + "transact_ACs_" + p2.getFaction(), "Action Cards");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green(finChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
         }
         if (p1.getPnCount() > 0) {
-            Button transact = Buttons.green(finChecker + "transact_PNs_" + p2.getFaction(), "Promissory Notes");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green(finChecker + "transact_PNs_" + p2.getFaction(), "Promissory Notes"));
         }
         if (!p1.getFragments().isEmpty()) {
-            Button transact = Buttons.green(finChecker + "transact_Frags_" + p2.getFaction(), "Fragments");
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green(finChecker + "transact_Frags_" + p2.getFaction(), "Fragments"));
         }
         if (!ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).isEmpty()) {
-            Button transact = Buttons.green(finChecker + "transact_Planets_" + p2.getFaction(), "Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("hacan")));
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green(finChecker + "transact_Planets_" + p2.getFaction(), "Planets", FactionEmojis.Hacan));
         }
         if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).isEmpty()) {
-            Button transact = Button
-                .success(finChecker + "transact_AlliancePlanets_" + p2.getFaction(), "Alliance Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(p2.getFaction())));
-            stuffToTransButtons.add(transact);
+            stuffToTransButtons.add(Buttons.green(finChecker + "transact_AlliancePlanets_" + p2.getFaction(), "Alliance Planets", p2.getFactionEmoji()));
         }
         if (game.getPhaseOfGame().toLowerCase().contains("agenda")
             && !"no".equalsIgnoreCase(ButtonHelper.playerHasDMZPlanet(p1, game))) {

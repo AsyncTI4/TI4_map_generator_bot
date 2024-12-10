@@ -138,7 +138,7 @@ public class MessageHelper {
 	}
 
 	private static void addFactionReactToMessage(Game game, Player player, Message message) {
-		Emoji reactionEmoji = Helper.getPlayerEmoji(game, player, message);
+		Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
 		if (reactionEmoji != null) {
 			message.addReaction(reactionEmoji).queue(null,
 				error -> BotLogger.log(getRestActionFailureMessage(message.getChannel(), "Failed to add reaction to message", null, error)));
@@ -168,7 +168,7 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game game, Player player,
-																	 List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
+		List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
 		MessageFunction addFactionReact = (msg) -> {
 			addFactionReactToMessage(game, player, msg);
 			if (saboable) {

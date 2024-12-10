@@ -7,10 +7,10 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.MiscEmojis;
 
 @UtilityClass
 public class SetOrderService {
@@ -34,7 +34,7 @@ public class SetOrderService {
         for (Player player : game.getPlayers().values()) {
             sb.append("\n> ").append(player.getRepresentationNoPing());
             if (player.isSpeaker()) {
-                sb.append(Emojis.SpeakerToken);
+                sb.append(MiscEmojis.SpeakerToken);
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
