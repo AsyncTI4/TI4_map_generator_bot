@@ -10,11 +10,6 @@ public enum DiceEmojis implements TI4Emoji {
     // Gray
     d10grey_0, d10grey_1, d10grey_2, d10grey_3, d10grey_4, d10grey_5, d10grey_6, d10grey_7, d10grey_8, d10grey_9;
 
-    @Override
-    public String toString() {
-        return emojiString();
-    }
-
     public static String getDieEmoji(String color, int value) {
         return switch (color) {
             case "red" -> getRedDieEmoji(value);
@@ -88,4 +83,10 @@ public enum DiceEmojis implements TI4Emoji {
             default -> String.valueOf(value);
         };
     }
+
+    @Override
+    public String toString() {
+        return emojiString();
+    }
+
 }

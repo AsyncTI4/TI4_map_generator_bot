@@ -5,10 +5,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.MiscEmojis;
 
 class Speaker extends GameStateSubcommand {
 
@@ -22,7 +22,7 @@ class Speaker extends GameStateSubcommand {
         Game game = getGame();
         Player player = getPlayer();
         game.setSpeakerUserID(player.getUserID());
-        String msg = Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation();
+        String msg = MiscEmojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation();
         MessageHelper.sendMessageToEventChannel(event, msg);
     }
 }

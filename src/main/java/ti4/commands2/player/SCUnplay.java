@@ -9,10 +9,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.CardEmojis;
 
 class SCUnplay extends GameStateSubcommand {
 
@@ -50,7 +50,7 @@ class SCUnplay extends GameStateSubcommand {
             player_.addFollowedSC(scToUnplay);
         }
 
-        MessageHelper.sendMessageToEventChannel(event, "Strategy card has been flipped: " + Emojis.getSCBackEmojiFromInteger(scToUnplay) + " to " + Emojis.getSCEmojiFromInteger(scToUnplay) + " (unplayed).");
+        MessageHelper.sendMessageToEventChannel(event, "Strategy card has been flipped: " + CardEmojis.getSCBackFromInteger(scToUnplay) + " to " + CardEmojis.getSCFrontFromInteger(scToUnplay) + " (unplayed).");
     }
 
 }

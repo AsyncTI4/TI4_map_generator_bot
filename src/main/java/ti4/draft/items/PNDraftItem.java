@@ -6,10 +6,11 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
-import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 public class PNDraftItem extends DraftItem {
     public PNDraftItem(String itemId) {
@@ -37,8 +38,8 @@ public class PNDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
-    public String getItemEmoji() {
-        return Emojis.PN;
+    public TI4Emoji getItemEmoji() {
+        return CardEmojis.PN;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {

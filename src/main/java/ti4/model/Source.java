@@ -1,6 +1,8 @@
 package ti4.model;
 
-import ti4.helpers.Emojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.SourceEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 public class Source {
 
@@ -65,24 +67,25 @@ public class Source {
         }
 
         public String emoji() {
-            return switch (this) {
-                case absol -> Emojis.Absol;
-                case ds -> Emojis.DiscordantStars;
-                case uncharted_space -> Emojis.UnchartedSpace;
-                case eronous -> Emojis.Eronous;
-                case admins -> Emojis.AdminsFaction;
-                case ignis_aurora, pbd2000 -> Emojis.IgnisAurora;
-                case keleresplus -> Emojis.KeleresPlus;
-                case project_pi -> Emojis.ProjectPi;
-                case flagshipping -> Emojis.Flagshipping;
-                case promises_promises -> Emojis.PromisesPromises;
-                case miltymod -> Emojis.MiltyMod;
-                case lazax -> Emojis.Lazax;
-                case neutral -> Emojis.Neutral;
-                case salliance -> Emojis.StrategicAlliance;
-                case monuments -> Emojis.Monuments;
-                default -> "";
+            TI4Emoji emoji = switch (this) {
+                case absol -> SourceEmojis.Absol;
+                case ds -> SourceEmojis.DiscordantStars;
+                case uncharted_space -> SourceEmojis.UnchartedSpace;
+                case eronous -> SourceEmojis.Eronous;
+                case admins -> FactionEmojis.AdminsFaction;
+                case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
+                case keleresplus -> SourceEmojis.KeleresPlus;
+                case project_pi -> SourceEmojis.ProjectPi;
+                case flagshipping -> SourceEmojis.Flagshipping;
+                case promises_promises -> SourceEmojis.PromisesPromises;
+                case miltymod -> SourceEmojis.MiltyMod;
+                case lazax -> FactionEmojis.Lazax;
+                case neutral -> FactionEmojis.Neutral;
+                case salliance -> SourceEmojis.StrategicAlliance;
+                case monuments -> SourceEmojis.Monuments;
+                default -> null;
             };
+            return emoji == null ? "" : emoji.toString();
         }
 
         public String prettyName() {

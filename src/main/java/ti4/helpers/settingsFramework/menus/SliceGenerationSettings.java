@@ -7,23 +7,22 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import ti4.buttons.Buttons;
-import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.MiltyDraftEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftSlice;
 
@@ -62,11 +61,11 @@ public class SliceGenerationSettings extends SettingsMenu {
         numLegends = new IntegerRangeSetting("Legends", "Legendary Count", 1, 0, 2, 2, 0, 20, 1);
 
         // Emojis
-        minimumRes.setEmoji(Emojis.resources);
-        minimumInf.setEmoji(Emojis.influence);
-        totalValue.setEmoji(Emojis.ResInf);
-        extraWorms.setEmoji(Emojis.WHalpha);
-        numLegends.setEmoji(Emojis.LegendaryPlanet);
+        minimumRes.setEmoji(MiscEmojis.resources);
+        minimumInf.setEmoji(MiscEmojis.influence);
+        totalValue.setEmoji(MiscEmojis.ResInf);
+        extraWorms.setEmoji(MiscEmojis.WHalpha);
+        numLegends.setEmoji(MiscEmojis.LegendaryPlanet);
 
         // Other Initialization
         minimumRes.setExtraInfo("(this value does not account for flexibly spent planets (you may be used to those appearing as +0.5))");
@@ -113,9 +112,9 @@ public class SliceGenerationSettings extends SettingsMenu {
         String idPrefix = menuAction + "_" + navId() + "_";
         List<Button> ls = new ArrayList<>(super.specialButtons());
         ls.add(Buttons.gray(idPrefix + "scpt2025quals", "SCPT 2025 Qualifiers", "<:scpt:1289722139750039634>"));
-        ls.add(Button.of(ButtonStyle.DANGER, idPrefix + "richPreset", "Rich galaxy", Emoji.fromFormatted(Emojis.tg)));
-        ls.add(Button.of(ButtonStyle.DANGER, idPrefix + "poorPreset", "Poor galaxy", Emoji.fromFormatted(Emojis.comm)));
-        ls.add(Button.of(ButtonStyle.SECONDARY, idPrefix + "presetSlices~MDL", "Use preset slices", Emoji.fromFormatted(Emojis.sliceA)));
+        ls.add(Buttons.red(idPrefix + "richPreset", "Rich galaxy", MiscEmojis.tg));
+        ls.add(Buttons.red(idPrefix + "poorPreset", "Poor galaxy", MiscEmojis.comm));
+        ls.add(Buttons.blue(idPrefix + "presetSlices~MDL", "Use preset slices", MiltyDraftEmojis.sliceA));
         return ls;
     }
 

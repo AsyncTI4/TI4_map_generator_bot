@@ -7,9 +7,9 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperStats;
-import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
@@ -19,7 +19,7 @@ public class TradeStrategyCardService {
         boolean reacted = false;
         if (event instanceof ButtonInteractionEvent e) {
             reacted = true;
-            String msg = " gained 3" + Emojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(3) + " and replenished commodities (" + player.getCommodities() + " -> " + player.getCommoditiesTotal() + Emojis.comm + ")";
+            String msg = " gained 3" + MiscEmojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(3) + " and replenished commodities (" + player.getCommodities() + " -> " + player.getCommoditiesTotal() + MiscEmojis.comm + ")";
             ButtonHelper.addReaction(e, false, false, msg, "");
         }
         CommanderUnlockCheckService.checkPlayer(player, "hacan");

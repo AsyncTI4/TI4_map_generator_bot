@@ -24,7 +24,6 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
@@ -38,6 +37,10 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.PlanetEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
@@ -726,7 +729,7 @@ class AgendaResolveButtonHandler {
                     }
                 }
                 if ("for".equalsIgnoreCase(winner)) {
-                    Button ixthianButton = Buttons.green("rollIxthian", "Roll Ixthian Artifact", Emojis.Mecatol);
+                    Button ixthianButton = Buttons.green("rollIxthian", "Roll Ixthian Artifact", PlanetEmojis.Mecatol);
                     String msg = game.getPing() + "Click this button to roll Ixthian Artifact! 🥁";
                     MessageHelper.sendMessageToChannelWithButton(actionsChannel, msg, ixthianButton);
                 } else {
@@ -903,8 +906,7 @@ class AgendaResolveButtonHandler {
                         MessageHelper.sendMessageToChannel(watchParty,
                             "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate " + maxLoss + " trade goods to the less economically fortunate citizens of the galaxy.");
                     }
-                    MessageHelper.sendMessageToChannel(watchParty,
-                        Emojis.tg.repeat(maxLoss));
+                    MessageHelper.sendMessageToChannel(watchParty, MiscEmojis.tg(maxLoss));
                 }
             }
             if ("crisis".equalsIgnoreCase(agID)) {
@@ -913,17 +915,17 @@ class AgendaResolveButtonHandler {
                     switch (winner) {
                         case "1" -> scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain CCs"));
                         case "2" -> scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
-                        case "3" -> scButtons.add(Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", Emojis.ActionCard));
+                        case "3" -> scButtons.add(Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", CardEmojis.ActionCard));
                         case "4" -> {
-                            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", Emojis.spacedock));
-                            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", Emojis.pds));
+                            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
+                            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
                         }
-                        case "5" -> scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", Emojis.comm));
+                        case "5" -> scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
                         case "6" -> scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
                         case "7" -> scButtons.add(Buttons.GET_A_TECH);
                         case "8" -> {
                             PlayStrategyCardService.handleSOQueueing(game, false);
-                            scButtons.add(Buttons.gray("sc_draw_so", "Draw Secret Objective", Emojis.SecretObjective));
+                            scButtons.add(Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
                         }
                     }
                     MessageHelper.sendMessageToChannelWithButtons(actionsChannel,
@@ -950,7 +952,7 @@ class AgendaResolveButtonHandler {
             String message;
             if (rid.hasAbility("future_sight")) {
                 message = rep
-                    + " you have a Rider to resolve or you voted for the correct outcome. Either way a " + Emojis.tg + " has been added to your total due to your **Future Sight** ability. "
+                    + " you have a Rider to resolve or you voted for the correct outcome. Either way a " + MiscEmojis.tg + " has been added to your total due to your **Future Sight** ability. "
                     + rid.gainTG(1, true);
                 ButtonHelperAgents.resolveArtunoCheck(rid, 1);
             } else {

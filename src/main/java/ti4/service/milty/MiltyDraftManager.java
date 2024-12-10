@@ -27,7 +27,6 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.StringHelper;
@@ -40,6 +39,9 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiltyDraftEmojis;
+import ti4.service.emoji.TI4Emoji;
 import ti4.service.map.AddTileListService;
 
 @Data
@@ -77,15 +79,17 @@ public class MiltyDraftManager {
         }
 
         private String factionEmoji(String doggy) {
-            return faction == null ? doggy : Emojis.getFactionIconFromDiscord(faction);
+            return faction == null ? doggy : FactionEmojis.getFactionIcon(faction).toString();
         }
 
         private String sliceEmoji() {
-            return slice == null ? Emojis.sliceUnpicked : Emojis.getMiltyDraftEmoji(slice.getName());
+            String ord = slice == null ? null : slice.getName();
+            return MiltyDraftEmojis.getMiltyDraftEmoji(ord).toString();
         }
 
         private String positionEmoji() {
-            return position == null ? Emojis.positionUnpicked : Emojis.getSpeakerPickEmoji(position);
+            int ord = position == null ? -1 : position;
+            return MiltyDraftEmojis.getSpeakerPickEmoji(ord).toString();
         }
 
         @JsonIgnore
@@ -551,9 +555,7 @@ public class MiltyDraftManager {
         List<Button> sliceButtons = new ArrayList<>();
         for (MiltyDraftSlice slice : getSlices()) {
             if (isSliceTaken(slice.getName())) continue;
-            Emoji emoji = Emoji.fromFormatted(Emojis.getMiltyDraftEmoji(slice.getName()));
-            Button button = Buttons.green("milty_slice_" + slice.getName(), " ", emoji.getFormatted());
-            sliceButtons.add(button);
+            sliceButtons.add(Buttons.green("milty_slice_" + slice.getName(), " ", MiltyDraftEmojis.getMiltyDraftEmoji(slice.getName())));
         }
         return sliceButtons;
     }
@@ -564,12 +566,10 @@ public class MiltyDraftManager {
             FactionModel model = Mapper.getFaction(faction);
             if (model == null || isFactionTaken(faction)) continue;
 
-            Emoji emoji = Emoji.fromFormatted(model.getFactionEmoji());
             String name = model.getFactionName();
             if (faction.startsWith("keleres"))
                 name = "The Council Keleres";
-            Button button = Buttons.gray("milty_faction_" + faction, name).withEmoji(emoji);
-            factionButtons.add(button);
+            factionButtons.add(Buttons.gray("milty_faction_" + faction, name, model.getFactionEmoji()));
         }
         return factionButtons;
     }
@@ -578,16 +578,14 @@ public class MiltyDraftManager {
         List<Button> orderButtons = new ArrayList<>();
         for (int speakerOrder = 1; speakerOrder <= players.size(); speakerOrder++) {
             if (isOrderTaken(speakerOrder)) continue;
-            Emoji emoji = Emoji.fromFormatted(Emojis.getSpeakerPickEmoji(speakerOrder));
-            Button button = Buttons.green("milty_order_" + speakerOrder, " ", emoji.getFormatted());
-            orderButtons.add(button);
+            orderButtons.add(Buttons.green("milty_order_" + speakerOrder, " ", MiltyDraftEmojis.getSpeakerPickEmoji(speakerOrder)));
         }
         return orderButtons;
     }
 
     private String getOverallSummaryString(Game game) {
         int padding = String.format("%s", getPlayers().size()).length() + 1;
-        String goodDogOfTheDay = Emojis.getRandomGoodDog();
+        String goodDogOfTheDay = TI4Emoji.getRandomGoodDog().toString();
         StringBuilder sb = new StringBuilder();
         sb.append("# **__Draft Picks So Far__**:");
         int pickNum = 1;
@@ -790,8 +788,8 @@ public class MiltyDraftManager {
         if (result == null) {
             TileModel tileRequested = TileHelper.getTileById(tileId);
             Set<ComponentSource> currentsources = all.stream()
-                    .map(t -> t.getTile().getTileModel().getSource())
-                    .filter(Objects::nonNull).collect(Collectors.toSet());
+                .map(t -> t.getTile().getTileModel().getSource())
+                .filter(Objects::nonNull).collect(Collectors.toSet());
             if (tileRequested.getSource() != null) currentsources.add(tileRequested.getSource());
             if (tileId.matches("d\\d{1,3}")) currentsources.add(ComponentSource.uncharted_space);
             if (tileId.matches("e\\d{1,3}")) currentsources.add(ComponentSource.eronous);

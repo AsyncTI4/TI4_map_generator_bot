@@ -9,6 +9,7 @@ import ti4.image.Mapper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
+import ti4.service.emoji.TI4Emoji;
 
 public class TechDraftItem extends DraftItem {
     public TechDraftItem(String itemId) {
@@ -33,9 +34,8 @@ public class TechDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
-    public String getItemEmoji() {
-        TechnologyModel model = getTech();
-        return model.getCondensedReqsEmojis(true);
+    public TI4Emoji getItemEmoji() {
+        return getTech().getSingleTechEmoji();
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {

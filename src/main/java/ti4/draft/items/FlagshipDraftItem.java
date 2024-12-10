@@ -7,10 +7,11 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
-import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.UnitEmojis;
 
 public class FlagshipDraftItem extends DraftItem {
     public FlagshipDraftItem(String itemId) {
@@ -67,8 +68,8 @@ public class FlagshipDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
-    public String getItemEmoji() {
-        return Emojis.flagship;
+    public TI4Emoji getItemEmoji() {
+        return UnitEmojis.flagship;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {

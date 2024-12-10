@@ -11,6 +11,7 @@ import ti4.map.Game;
 import ti4.model.AbilityModel;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
+import ti4.service.emoji.TI4Emoji;
 
 public class AbilityDraftItem extends DraftItem {
     public AbilityDraftItem(String itemId) {
@@ -39,7 +40,7 @@ public class AbilityDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
-    public String getItemEmoji() {
+    public TI4Emoji getItemEmoji() {
         return getAbilityModel().getFactionEmoji();
     }
 

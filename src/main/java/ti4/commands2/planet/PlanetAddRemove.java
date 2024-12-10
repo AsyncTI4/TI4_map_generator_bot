@@ -16,13 +16,14 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.PlanetEmojis;
 
 abstract class PlanetAddRemove extends GameStateSubcommand {
 
@@ -107,19 +108,19 @@ abstract class PlanetAddRemove extends GameStateSubcommand {
     private String resolvePlanetMessage(String planet) {
         if (getName().equals(Constants.PLANET_EXHAUST_ABILITY)) {
             return switch (planet) {
-                case "hopesend" -> Emojis.HopesEnd + Emojis.LegendaryPlanet + " **Imperial Arms Vault**: You may exhaust this card at the end of your turn to place 1 mech from your reinforcements on any planet you control, or draw 1 action card";
-                case "primor" -> Emojis.Primor + Emojis.LegendaryPlanet + " **The Atrament**: You may exhaust this card at the end of your turn to place up to 2 infantry from your reinforcements on any planet you control";
-                case "mallice" -> Emojis.Mallice + Emojis.LegendaryPlanet + " **Exterrix Headquarters**: You may exhaust this card at the end of your turn to gain 2 trade goods or convert all of your commodities into trade goods";
-                case "mirage" -> Emojis.LegendaryPlanet + " **Mirage Flight Academy**: You may exhaust this card at the end of your turn to place up to 2 fighters from your reinforcements in any system that contains 1 or more of your ships";
+                case "hopesend" -> PlanetEmojis.HopesEnd + "" + MiscEmojis.LegendaryPlanet + " **Imperial Arms Vault**: You may exhaust this card at the end of your turn to place 1 mech from your reinforcements on any planet you control, or draw 1 action card";
+                case "primor" -> PlanetEmojis.Primor + "" + MiscEmojis.LegendaryPlanet + " **The Atrament**: You may exhaust this card at the end of your turn to place up to 2 infantry from your reinforcements on any planet you control";
+                case "mallice" -> PlanetEmojis.Mallice + "" + MiscEmojis.LegendaryPlanet + " **Exterrix Headquarters**: You may exhaust this card at the end of your turn to gain 2 trade goods or convert all of your commodities into trade goods";
+                case "mirage" -> MiscEmojis.LegendaryPlanet + " **Mirage Flight Academy**: You may exhaust this card at the end of your turn to place up to 2 fighters from your reinforcements in any system that contains 1 or more of your ships";
                 default -> planet;
             };
         }
         if (getName().equals(Constants.PLANET_REFRESH_ABILITY)) {
             return switch (planet) {
-                case "hopesend" -> Emojis.HopesEnd + Emojis.LegendaryPlanet + " **Imperial Arms Vault**";
-                case "primor" -> Emojis.Primor + Emojis.LegendaryPlanet + " **The Atrament**";
-                case "mallice" -> Emojis.Mallice + Emojis.LegendaryPlanet + " **Exterrix Headquarters**";
-                case "mirage" -> Emojis.LegendaryPlanet + " **Mirage Flight Academy**";
+                case "hopesend" -> PlanetEmojis.HopesEnd + "" + MiscEmojis.LegendaryPlanet + " **Imperial Arms Vault**";
+                case "primor" -> PlanetEmojis.Primor + "" + MiscEmojis.LegendaryPlanet + " **The Atrament**";
+                case "mallice" -> PlanetEmojis.Mallice + "" + MiscEmojis.LegendaryPlanet + " **Exterrix Headquarters**";
+                case "mirage" -> MiscEmojis.LegendaryPlanet + " **Mirage Flight Academy**";
                 default -> planet;
             };
         }

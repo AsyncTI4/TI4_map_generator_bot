@@ -6,7 +6,7 @@ public class EmojiService {
 
     @NotNull
     public static String getFactionIconFromDiscord(String faction) {
-        return FactionEmojis.getFactionIconFromDiscord(faction);
+        return FactionEmojis.getFactionIcon(faction).toString();
     }
 
 }

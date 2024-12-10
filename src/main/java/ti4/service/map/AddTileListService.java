@@ -14,7 +14,6 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
@@ -23,6 +22,7 @@ import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.explore.AddFrontierTokensService;
 
 @UtilityClass
@@ -102,9 +102,9 @@ public class AddTileListService {
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
         if (!game.isBaseGameMode()) {
             AddFrontierTokensService.addFrontierTokens(event, game);
-            MessageHelper.sendMessageToChannel(channel, Emojis.Frontier + "Frontier Tokens have been added to empty spaces.");
+            MessageHelper.sendMessageToChannel(channel, ExploreEmojis.Frontier + " Frontier Tokens have been added to empty spaces.");
         }
-        
+
         MessageHelper.sendMessageToChannelWithButtons(
             game.getMainGameChannel(), "Press this button after every player is setup",
             List.of(Buttons.green("deal2SOToAll", "Deal 2 SO To All")));

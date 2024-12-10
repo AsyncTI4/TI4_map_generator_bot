@@ -9,13 +9,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
+import ti4.service.emoji.UnitEmojis;
 
 @Data
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
@@ -44,11 +49,11 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
         public String emoji() {
             return switch (this) {
-                case PROPULSION -> Emojis.PropulsionTech;
-                case CYBERNETIC -> Emojis.CyberneticTech;
-                case WARFARE -> Emojis.WarfareTech;
-                case BIOTIC -> Emojis.BioticTech;
-                case UNITUPGRADE -> Emojis.UnitUpgradeTech;
+                case PROPULSION -> TechEmojis.PropulsionTech.toString();
+                case CYBERNETIC -> TechEmojis.CyberneticTech.toString();
+                case WARFARE -> TechEmojis.WarfareTech.toString();
+                case BIOTIC -> TechEmojis.BioticTech.toString();
+                case UNITUPGRADE -> TechEmojis.UnitUpgradeTech.toString();
                 default -> "";
             };
         }
@@ -206,25 +211,22 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getShortName() {
-        if (getHomebrewReplacesID().isEmpty())
-        {
+        if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shortName).orElse(getName());
         }
         return Optional.ofNullable(shortName).orElse(Mapper.getTech(getHomebrewReplacesID().get()).getShortName());
     }
 
     public boolean getShrinkName() {
-        if (getHomebrewReplacesID().isEmpty())
-        {
+        if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shrinkName).orElse(false);
         }
         return Optional.ofNullable(shrinkName).orElse(Mapper.getTech(getHomebrewReplacesID().get()).getShrinkName());
     }
 
     public String getInitials() {
-        if (getHomebrewReplacesID().isEmpty())
-        {
-            return Optional.ofNullable(initials).orElse(getName().substring(0,1));
+        if (getHomebrewReplacesID().isEmpty()) {
+            return Optional.ofNullable(initials).orElse(getName().substring(0, 1));
         }
         return Optional.ofNullable(initials).orElse(Mapper.getTech(getHomebrewReplacesID().get()).getInitials());
     }
@@ -234,8 +236,8 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         TechnologyType techType = getType();
         String techFaction = getFaction().orElse("");
         String factionEmoji = "";
-        if (!techFaction.isBlank()) factionEmoji = Emojis.getFactionIconFromDiscord(techFaction);
-        String techEmoji = Emojis.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
+        if (!techFaction.isBlank()) factionEmoji = FactionEmojis.getFactionIcon(techFaction).toString();
+        String techEmoji = techType.emoji();
         StringBuilder sb = new StringBuilder();
         sb.append(techEmoji).append("**").append(techName).append("**").append(factionEmoji);
         sb.append(getSource().emoji());
@@ -253,10 +255,10 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         //TITLE
         StringBuilder title = new StringBuilder();
         for (TechnologyType techType : types) {
-            title.append(Emojis.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech"));
+            title.append(techType.emoji());
         }
         title.append("**__").append(getName()).append("__**");
-        if (getFaction().isPresent()) title.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
+        if (getFaction().isPresent()) title.append(FactionEmojis.getFactionIcon(getFaction().get()));
         title.append(getSource().emoji());
         eb.setTitle(title.toString());
 
@@ -279,8 +281,8 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         StringBuilder title = new StringBuilder();
         String factionEmoji = "";
         String techFaction = getFaction().orElse("");
-        if (!techFaction.isBlank()) factionEmoji = Emojis.getFactionIconFromDiscord(techFaction);
-        String techEmoji = Emojis.getEmojiFromDiscord(getType().toString().toLowerCase() + "tech");
+        if (!techFaction.isBlank()) factionEmoji = FactionEmojis.getFactionIcon(techFaction).toString();
+        String techEmoji = getType().emoji();
         title.append(factionEmoji).append(techEmoji).append(" ").append(getName()).append(" ").append(getSource().emoji());
         return title.toString();
     }
@@ -296,6 +298,10 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         };
     }
 
+    public TI4Emoji getSingleTechEmoji() {
+        return TechEmojis.getBasicTechEmoji(getType().toString());
+    }
+
     public String getCondensedReqsEmojis(boolean single) {
         String reqs = getRequirements().orElse("");
         StringBuilder output = new StringBuilder();
@@ -305,52 +311,52 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                 case PROPULSION -> {
                     String blues = reqs.replaceAll("[^B]", "");
                     switch (blues) {
-                        case "" -> output.append(Emojis.PropulsionDisabled);
-                        case "B" -> output.append(Emojis.PropulsionTech);
-                        case "BB" -> output.append(Emojis.Propulsion2);
-                        case "BBB" -> output.append(Emojis.Propulsion3);
+                        case "" -> output.append(TechEmojis.PropulsionDisabled);
+                        case "B" -> output.append(TechEmojis.PropulsionTech);
+                        case "BB" -> output.append(TechEmojis.Propulsion2);
+                        case "BBB" -> output.append(TechEmojis.Propulsion3);
                     }
                 }
                 case CYBERNETIC -> {
                     String yellows = reqs.replaceAll("[^Y]", "");
                     switch (yellows) {
-                        case "" -> output.append(Emojis.CyberneticDisabled);
-                        case "Y" -> output.append(Emojis.CyberneticTech);
-                        case "YY" -> output.append(Emojis.Cybernetic2);
-                        case "YYY" -> output.append(Emojis.Cybernetic3);
+                        case "" -> output.append(TechEmojis.CyberneticDisabled);
+                        case "Y" -> output.append(TechEmojis.CyberneticTech);
+                        case "YY" -> output.append(TechEmojis.Cybernetic2);
+                        case "YYY" -> output.append(TechEmojis.Cybernetic3);
                     }
                 }
                 case BIOTIC -> {
                     String greens = reqs.replaceAll("[^G]", "");
                     switch (greens) {
-                        case "" -> output.append(Emojis.BioticDisabled);
-                        case "G" -> output.append(Emojis.BioticTech);
-                        case "GG" -> output.append(Emojis.Biotic2);
-                        case "GGG" -> output.append(Emojis.Biotic3);
+                        case "" -> output.append(TechEmojis.BioticDisabled);
+                        case "G" -> output.append(TechEmojis.BioticTech);
+                        case "GG" -> output.append(TechEmojis.Biotic2);
+                        case "GGG" -> output.append(TechEmojis.Biotic3);
                     }
                 }
                 case WARFARE -> {
                     String reds = reqs.replaceAll("[^R]", "");
                     switch (reds) {
-                        case "" -> output.append(Emojis.WarfareDisabled);
-                        case "R" -> output.append(Emojis.WarfareTech);
-                        case "RR" -> output.append(Emojis.Warfare2);
-                        case "RRR" -> output.append(Emojis.Warfare3);
+                        case "" -> output.append(TechEmojis.WarfareDisabled);
+                        case "R" -> output.append(TechEmojis.WarfareTech);
+                        case "RR" -> output.append(TechEmojis.Warfare2);
+                        case "RRR" -> output.append(TechEmojis.Warfare3);
                     }
                 }
                 case UNITUPGRADE -> {
                     String unitType = getBaseUpgrade().isEmpty() ? getAlias() : getBaseUpgrade().get();
                     switch (unitType) {
-                        case "inf2" -> output.append(Emojis.infantry);
-                        case "ff2" -> output.append(Emojis.fighter);
-                        case "pds2" -> output.append(Emojis.pds);
-                        case "sd2" -> output.append(Emojis.spacedock);
-                        case "dd2" -> output.append(Emojis.destroyer);
-                        case "cr2" -> output.append(Emojis.cruiser);
-                        case "cv2" -> output.append(Emojis.carrier);
-                        case "dn2" -> output.append(Emojis.dreadnought);
-                        case "ws" -> output.append(Emojis.warsun);
-                        default -> output.append(Emojis.flagship);
+                        case "inf2" -> output.append(UnitEmojis.infantry);
+                        case "ff2" -> output.append(UnitEmojis.fighter);
+                        case "pds2" -> output.append(UnitEmojis.pds);
+                        case "sd2" -> output.append(UnitEmojis.spacedock);
+                        case "dd2" -> output.append(UnitEmojis.destroyer);
+                        case "cr2" -> output.append(UnitEmojis.cruiser);
+                        case "cv2" -> output.append(UnitEmojis.carrier);
+                        case "dn2" -> output.append(UnitEmojis.dreadnought);
+                        case "ws" -> output.append(UnitEmojis.warsun);
+                        default -> output.append(UnitEmojis.flagship);
                     }
                 }
                 default -> {
@@ -358,17 +364,16 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             }
             if (single) return output.toString();
         }
-
         return output.toString();
     }
 
     public String getRequirementsEmoji() {
         if (getRequirements().isPresent()) {
             String reqs = getRequirements().get();
-            reqs = reqs.replace("B", Emojis.PropulsionTech);
-            reqs = reqs.replace("Y", Emojis.CyberneticTech);
-            reqs = reqs.replace("G", Emojis.BioticTech);
-            reqs = reqs.replace("R", Emojis.WarfareTech);
+            reqs = reqs.replace("B", TechEmojis.PropulsionTech.toString());
+            reqs = reqs.replace("Y", TechEmojis.CyberneticTech.toString());
+            reqs = reqs.replace("G", TechEmojis.BioticTech.toString());
+            reqs = reqs.replace("R", TechEmojis.WarfareTech.toString());
             return reqs;
         }
         return "None";

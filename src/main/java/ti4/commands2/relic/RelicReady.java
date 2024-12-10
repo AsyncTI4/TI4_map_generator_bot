@@ -6,9 +6,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.image.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.ExploreEmojis;
 
 class RelicReady extends GameStateSubcommand {
 
@@ -25,8 +25,8 @@ class RelicReady extends GameStateSubcommand {
         if (player.hasRelic(relicId)) {
             player.removeExhaustedRelic(relicId);
             String relicName = Mapper.getRelic(relicId).getName();
-            MessageHelper.sendMessageToEventChannel(event, "Refreshed " + Emojis.Relic + "Relic: " + relicName);
-		} else {
+            MessageHelper.sendMessageToEventChannel(event, "Refreshed " + ExploreEmojis.Relic + "Relic: " + relicName);
+        } else {
             MessageHelper.sendMessageToEventChannel(event, "Invalid Relic or player does not have specified Relic");
         }
     }

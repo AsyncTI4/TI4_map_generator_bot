@@ -5,11 +5,11 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.planet.FlipTileService;
@@ -34,7 +34,7 @@ public class AddUnitService {
 
         if (isTileAlreadyPinged(game, tile)) return;
 
-        String message = Emojis.getColorEmojiWithName(color) + " has modified units in the system.";
+        String message = ColorEmojis.getColorEmojiWithName(color) + " has modified units in the system.";
         message += " Specific units modified: " + unitList;
         message += " Refresh map to see changes.";
         FoWHelper.pingSystem(game, event, tile.getPosition(), message);

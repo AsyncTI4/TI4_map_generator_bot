@@ -7,12 +7,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.service.emoji.ExploreEmojis;
 
 class ExploreLookAtTop extends GameStateSubcommand {
 
@@ -33,7 +33,7 @@ class ExploreLookAtTop extends GameStateSubcommand {
         List<String> deck = game.getExploreDeck(trait);
         List<String> discardPile = game.getExploreDiscard(trait);
 
-        String traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
+        String traitNameWithEmoji = ExploreEmojis.getTraitEmoji(trait) + trait;
         Player player = getPlayer();
         String playerFactionNameWithEmoji = player.getFactionEmoji();
         if (deck.isEmpty() && discardPile.isEmpty()) {

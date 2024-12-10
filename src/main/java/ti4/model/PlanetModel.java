@@ -10,17 +10,20 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.sticker.Sticker;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.image.TileHelper;
 import ti4.image.UnitTokenPosition;
-import ti4.helpers.Emojis;
 import ti4.helpers.Stickers;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.PlanetEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
 
 @Data
 public class PlanetModel implements ModelInterface, EmbeddableModel {
@@ -130,7 +133,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (tile != null) sb.append("\nSystem: ").append(tile.getName());
         eb.setDescription(sb.toString());
         if (getBasicAbilityText() != null) eb.addField("Ability:", getBasicAbilityText(), false);
-        if (getLegendaryAbilityName() != null) eb.addField(Emojis.LegendaryPlanet + getLegendaryAbilityName(), getLegendaryAbilityText(), false);
+        if (getLegendaryAbilityName() != null) eb.addField(MiscEmojis.LegendaryPlanet + getLegendaryAbilityName(), getLegendaryAbilityText(), false);
         if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
         if (getFlavourText() != null) eb.addField("", getFlavourText(), false);
 
@@ -151,7 +154,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
         EmbedBuilder eb = new EmbedBuilder();
 
-        eb.setTitle(Emojis.LegendaryPlanet + "__" + getLegendaryAbilityName() + "__");
+        eb.setTitle(MiscEmojis.LegendaryPlanet + "__" + getLegendaryAbilityName() + "__");
         eb.setColor(Color.black);
 
         eb.setDescription(getLegendaryAbilityText());
@@ -166,15 +169,15 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     private String getInfResEmojis() {
-        return Emojis.getResourceEmoji(resources) + Emojis.getInfluenceEmoji(influence);
+        return MiscEmojis.getResourceEmoji(resources) + MiscEmojis.getInfluenceEmoji(influence);
     }
 
     @JsonIgnore
     private String getPlanetTypeEmoji() {
         return switch (getPlanetType()) {
-            case HAZARDOUS -> Emojis.Hazardous;
-            case INDUSTRIAL -> Emojis.Industrial;
-            case CULTURAL -> Emojis.Cultural;
+            case HAZARDOUS -> ExploreEmojis.Hazardous.toString();
+            case INDUSTRIAL -> ExploreEmojis.Industrial.toString();
+            case CULTURAL -> ExploreEmojis.Cultural.toString();
             default -> "";
         };
     }
@@ -185,12 +188,12 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder();
         for (TechSpecialty techSpecialty : getTechSpecialties()) {
             switch (techSpecialty) {
-                case BIOTIC -> sb.append(Emojis.BioticTech);
-                case CYBERNETIC -> sb.append(Emojis.CyberneticTech);
-                case PROPULSION -> sb.append(Emojis.PropulsionTech);
-                case WARFARE -> sb.append(Emojis.WarfareTech);
-                case UNITSKIP -> sb.append(Emojis.UnitTechSkip);
-                case NONUNITSKIP -> sb.append(Emojis.NonUnitTechSkip);
+                case BIOTIC -> sb.append(TechEmojis.BioticTech);
+                case CYBERNETIC -> sb.append(TechEmojis.CyberneticTech);
+                case PROPULSION -> sb.append(TechEmojis.PropulsionTech);
+                case WARFARE -> sb.append(TechEmojis.WarfareTech);
+                case UNITSKIP -> sb.append(TechEmojis.UnitTechSkip);
+                case NONUNITSKIP -> sb.append(TechEmojis.NonUnitTechSkip);
             }
         }
         return sb.toString();
@@ -219,17 +222,17 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
-    public String getEmoji() {
-        return Emojis.getPlanetEmoji(getId());
+    public TI4Emoji getEmoji() {
+        return PlanetEmojis.getPlanetEmoji(getId());
     }
 
     @JsonIgnore
     public String getEmojiURL() {
-        Emoji emoji = Emoji.fromFormatted(getEmoji());
-        if (getEmoji().equals(Emojis.SemLore) && !getId().equals("semlore")) {
+        TI4Emoji emoji = getEmoji();
+        if (getEmoji().equals(PlanetEmojis.SemLore) && !getId().equals("semlore")) {
             return null;
         }
-        if (emoji instanceof CustomEmoji customEmoji) {
+        if (emoji.asEmoji() instanceof CustomEmoji customEmoji) {
             return customEmoji.getImageUrl();
         }
         return null;

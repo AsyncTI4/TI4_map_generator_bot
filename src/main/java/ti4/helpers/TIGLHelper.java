@@ -18,6 +18,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
 
 public class TIGLHelper {
 
@@ -52,7 +54,7 @@ public class TIGLHelper {
         HERO_SOL("Async Rank - Jace X, 4th Air Legion", -1), //
         HERO_TITANS("Async Rank - Ul the Progenitor", -1), //
         HERO_WINNU("Async Rank - Mathis Mathinus", -1), //
-        HERO_XXCHA("Async Rank - Xxekir Grom", -1),//
+        HERO_XXCHA("Async Rank - Xxekir Grom", -1), //
         HERO_YIN("Async Rank - Dannel of the Tenth", -1), //
         HERO_YSSARIL("Async Rank - Kyver, Blade and Key", -1);
 
@@ -158,7 +160,7 @@ public class TIGLHelper {
     }
 
     public static void sendTIGLSetupText(Game game) {
-        String message = "# " + Emojis.TIGL + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n" +
+        String message = "# " + MiscEmojis.TIGL + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n" +
             "Please ensure you have all:\n" +
             "- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6) - there is no need to confirm your signup was successful\n" +
             "- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n" +
@@ -270,7 +272,7 @@ public class TIGLHelper {
             AsyncTI4DiscordBot.guildPrimary.removeRoleFromMember(member, heroRank.getRole()).queueAfter(10, TimeUnit.SECONDS);
         }
         AsyncTI4DiscordBot.guildPrimary.addRoleToMember(user, heroRank.getRole()).queue();
-        MessageHelper.sendMessageToChannel(getTIGLChannel(), Emojis.getEmojiFromDiscord(faction + "hero"));
+        MessageHelper.sendMessageToChannel(getTIGLChannel(), LeaderEmojis.getLeaderEmoji(faction + "hero").toString());
         MessageHelper.sendMessageToChannel(getTIGLChannel(), sb.toString());
         // do stuff
     }

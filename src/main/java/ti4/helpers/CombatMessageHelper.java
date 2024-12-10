@@ -22,6 +22,9 @@ import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollType;
+import ti4.service.emoji.DiceEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 public class CombatMessageHelper {
     public static void displayDuplicateUnits(GenericInteractionCreateEvent event, List<String> dupes) {
@@ -84,14 +87,14 @@ public class CombatMessageHelper {
         String optionalText = optionalInfoParts.stream().filter(StringUtils::isNotBlank)
             .collect(Collectors.joining(" "));
 
-        String unitEmoji = unitModel.getUnitEmoji();
-        
+        TI4Emoji unitEmoji = unitModel.getUnitEmoji();
+
         String resultRollsString = "[" + resultRolls.stream().map(Die::getRedDieIfSuccessOrGrayDieIfFailure).collect(Collectors.joining("")) + "]";
-        if ("jolnar_flagship".equals(unitModel.getId()))
-        {
-            resultRollsString = resultRollsString.replace(Emojis.d10red_9, Emojis.d10blue_9).replace(Emojis.d10red_0, Emojis.d10blue_0);
+        if ("jolnar_flagship".equals(unitModel.getId())) {
+            resultRollsString = resultRollsString.replace(DiceEmojis.d10red_9.toString(), DiceEmojis.d10blue_9.toString());
+            resultRollsString = resultRollsString.replace(DiceEmojis.d10red_0.toString(), DiceEmojis.d10blue_0.toString());
         }
-        
+
         return String.format("> `%sx`%s %s %s - %s hit%s\n", unitQuantity, unitEmoji, optionalText, resultRollsString, numHit, hitsSuffix);
     }
 
@@ -109,7 +112,7 @@ public class CombatMessageHelper {
                     Optional<UnitModel> unitScopeModel = units.keySet().stream()
                         .filter(unit -> unit.getAsyncId().equals(mod.getScope())).findFirst();
                     if (unitScopeModel.isPresent()) {
-                        unitScope = Emojis.getEmojiFromDiscord(unitScopeModel.get().getBaseType());
+                        unitScope = unitScopeModel.get().getUnitEmoji().toString();
                     }
                 } else {
                     unitScope = "all";
@@ -183,6 +186,6 @@ public class CombatMessageHelper {
             }
         }
         return String.format("%s rolls for %s %s :  \n",
-            player.getFactionEmoji(), combatTypeName, Emojis.RollDice);
+            player.getFactionEmoji(), combatTypeName, MiscEmojis.RollDice);
     }
 }

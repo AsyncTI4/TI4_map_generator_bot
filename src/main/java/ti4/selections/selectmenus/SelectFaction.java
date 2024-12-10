@@ -12,13 +12,13 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.apache.commons.collections4.ListUtils;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.selections.Selection;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.game.GameNameService;
 
 public class SelectFaction implements Selection {
@@ -51,7 +51,7 @@ public class SelectFaction implements Selection {
         for (List<FactionModel> factionPage : factionPages) {
             StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(selectionID);
             for (FactionModel faction : factionPage) {
-                Emoji emojiToUse = Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(faction.getAlias()));
+                Emoji emojiToUse = FactionEmojis.getFactionIcon(faction.getAlias()).asEmoji();
                 SelectOption option = SelectOption.of(faction.getFactionName(), faction.getAlias())
                     .withDescription(faction.getAlias())
                     .withLabel(faction.getAutoCompleteName());

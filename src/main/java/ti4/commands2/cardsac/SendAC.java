@@ -9,11 +9,11 @@ import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.CardEmojis;
 
 class SendAC extends GameStateSubcommand {
 
@@ -50,7 +50,7 @@ class SendAC extends GameStateSubcommand {
 
         // FoW specific pinging
         if (game.isFowMode()) {
-            FoWHelper.pingPlayersTransaction(game, event, player, playerToSendTo, Emojis.ActionCard + " Action Card", null);
+            FoWHelper.pingPlayersTransaction(game, event, player, playerToSendTo, CardEmojis.ActionCard + " Action Card", null);
         }
 
         ActionCardHelper.sendActionCard(event, game, player, playerToSendTo, acID);

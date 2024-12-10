@@ -3,13 +3,13 @@ package ti4.service.leader;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.emoji.MiscEmojis;
 
 @UtilityClass
 public class ExhaustLeaderService {
@@ -31,10 +31,10 @@ public class ExhaustLeaderService {
         if (tgCount != null) {
             StringBuilder sb = new StringBuilder();
             leader.setTgCount(tgCount);
-            sb.append("\n").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(game))
+            sb.append("\n").append(tgCount).append(MiscEmojis.getTGorNomadCoinEmoji(game))
                 .append(" was placed on top of the leader");
             if (leader.getTgCount() != tgCount) {
-                sb.append(" *(").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(game)).append(" total)*\n");
+                sb.append(" *(").append(tgCount).append(MiscEmojis.getTGorNomadCoinEmoji(game)).append(" total)*\n");
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         }

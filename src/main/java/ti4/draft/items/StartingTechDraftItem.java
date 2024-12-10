@@ -7,10 +7,11 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
-import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
 
 public class StartingTechDraftItem extends DraftItem {
     public StartingTechDraftItem(String itemId) {
@@ -76,8 +77,8 @@ public class StartingTechDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
-    public String getItemEmoji() {
-        return Emojis.UnitTechSkip;
+    public TI4Emoji getItemEmoji() {
+        return TechEmojis.UnitTechSkip;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {

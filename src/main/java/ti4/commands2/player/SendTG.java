@@ -8,12 +8,12 @@ import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.TransactionHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 class SendTG extends GameStateSubcommand {
@@ -50,7 +50,7 @@ class SendTG extends GameStateSubcommand {
         String p1 = player.getRepresentation();
         String p2 = targetPlayer.getRepresentation();
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
-        String tgString = sendTG + " " + Emojis.getTGorNomadCoinEmoji(game) + " trade goods";
+        String tgString = sendTG + " " + MiscEmojis.getTGorNomadCoinEmoji(game) + " trade goods";
         String message = p1 + " sent " + tgString + " to " + p2;
         MessageHelper.sendMessageToEventChannel(event, message);
 

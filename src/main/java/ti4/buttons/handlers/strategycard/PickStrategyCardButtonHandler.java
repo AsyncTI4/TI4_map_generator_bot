@@ -16,13 +16,13 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperCommanders;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.player.PlayerStatsService;
@@ -194,7 +194,7 @@ class PickStrategyCardButtonHandler {
             tg += tgCount;
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scPicked, game));
             if (game.isFowMode()) {
-                String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scPicked, game);
+                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scPicked, game);
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);

@@ -7,12 +7,12 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.info.SecretObjectiveInfoService;
 
 @UtilityClass
@@ -51,7 +51,7 @@ public class DrawSecretService {
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), count + Emojis.SecretObjective + " dealt to all players. Check your Cards-Info threads.");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your Cards-Info threads.");
         if (game.getRound() == 1) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("startOfGameObjReveal", "Reveal Objectives and Start Strategy Phase"));

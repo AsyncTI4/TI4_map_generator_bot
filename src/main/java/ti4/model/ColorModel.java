@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.image.Mapper;
-import ti4.helpers.Emojis;
+import ti4.service.emoji.ColorEmojis;
 
 @Data
 public class ColorModel implements ModelInterface {
@@ -61,8 +61,8 @@ public class ColorModel implements ModelInterface {
     @JsonIgnore
     public String getRepresentation(boolean includeName) {
         if (includeName)
-            return Emojis.getColorEmojiWithName(name);
-        return Emojis.getColorEmoji(name);
+            return ColorEmojis.getColorEmojiWithName(name);
+        return ColorEmojis.getColorEmoji(name).toString();
     }
 
     @JsonIgnore

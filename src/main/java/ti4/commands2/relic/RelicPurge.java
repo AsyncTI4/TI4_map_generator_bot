@@ -6,11 +6,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.info.RelicInfoService;
 
 class RelicPurge extends GameStateSubcommand {
@@ -32,7 +32,7 @@ class RelicPurge extends GameStateSubcommand {
         player.removeRelic(relicId);
         player.removeExhaustedRelic(relicId);
         RelicModel relicData = Mapper.getRelic(relicId);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " purged relic Relic:\n" + Emojis.Relic + " __**" + relicData.getName() + "**__\n> " + relicData.getText() + "\n");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " purged relic Relic:\n" + ExploreEmojis.Relic + " __**" + relicData.getName() + "**__\n> " + relicData.getText() + "\n");
         RelicInfoService.sendRelicInfo(getGame(), player, event);
     }
 }

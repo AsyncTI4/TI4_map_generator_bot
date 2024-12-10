@@ -7,11 +7,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 public class HomeSystemDraftItem extends DraftItem {
     public HomeSystemDraftItem(String itemId) {
@@ -53,8 +54,8 @@ public class HomeSystemDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
-    public String getItemEmoji() {
-        return Emojis.getFactionIconFromDiscord(ItemId);
+    public TI4Emoji getItemEmoji() {
+        return FactionEmojis.getFactionIcon(ItemId);
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {

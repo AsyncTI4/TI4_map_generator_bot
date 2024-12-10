@@ -6,11 +6,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.LeaderEmojis;
 
 class PurgeLeader extends GameStateSubcommand {
 
@@ -27,7 +27,7 @@ class PurgeLeader extends GameStateSubcommand {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
-            MessageHelper.sendMessageToEventChannel(event, Emojis.getFactionLeaderEmoji(playerLeader));
+            MessageHelper.sendMessageToEventChannel(event, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
             String message = player.getRepresentation() +
                 " purged " + Helper.getLeaderShortRepresentation(playerLeader);
             MessageHelper.sendMessageToEventChannel(event, message);

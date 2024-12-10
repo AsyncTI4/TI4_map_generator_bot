@@ -11,11 +11,11 @@ import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.milty.MiltyService;
 
 @Getter
@@ -44,7 +44,7 @@ public class MiltySettings extends SettingsMenu {
 
         // Initialize default values
         draftMode = new ChoiceSetting<>("DraftType", "Draft Type", "milty");
-        draftMode.setEmoji(Emojis.sliceA);
+        draftMode.setEmoji(MiltyDraftEmojis.sliceA);
         draftMode.setAllValues(Arrays.stream(DraftingMode.values()).collect(Collectors.toMap(DraftingMode::toString, x -> x)));
         draftMode.setShow(DraftingMode::toString);
 

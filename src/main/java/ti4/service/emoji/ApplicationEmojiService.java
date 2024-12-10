@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -70,7 +71,9 @@ public class ApplicationEmojiService {
     public static void spoofEmojis() {
         List<TI4Emoji> ti4Emojis = new ArrayList<>(TI4Emoji.allEmojiEnums());
         for (TI4Emoji e : ti4Emojis) {
-            emojis.put(e.name(), new CachedEmoji(e.name(), "<id>", fallbackEmoji, 0));
+            String formatted = "<normalEmoji>";
+            if (MiscEmojis.goodDogs().contains(e)) formatted = "<goodDoggy>";
+            emojis.put(e.name(), new CachedEmoji(e.name(), "1234", formatted, 0));
         }
         spoofing = true;
         cacheInitialized = true;
@@ -166,28 +169,38 @@ public class ApplicationEmojiService {
     private static boolean reuploadAppEmojis(List<EmojiFileData> toReupload) {
         if (toReupload.isEmpty()) return true;
         try {
+            boolean success = true;
             for (EmojiFileData f : toReupload) {
                 ApplicationEmoji emoji = reuploadAppEmoji(f);
-                Thread.sleep(500);
-                if (emoji == null) continue;
+                Thread.sleep(50);
+                if (emoji == null) {
+                    success = false;
+                    continue;
+                }
                 CachedEmoji cached = new CachedEmoji(emoji);
                 emojis.put(cached.getName(), cached);
             }
+            return success;
         } catch (Exception e) {
             BotLogger.log(Constants.jazzPing() + " Failed to upload emoji files: ", e);
             return false;
         }
-        return true;
     }
 
     // Footgun
     private static void resetCacheFromDiscord() {
         List<ApplicationEmoji> appEmojis = AsyncTI4DiscordBot.jda.retrieveApplicationEmojis().complete();
+        BotLogger.log("> - Discord has " + appEmojis.size() + " emojis.");
+        emojis.clear();
         appEmojis.stream().map(CachedEmoji::new).forEach(e -> emojis.put(e.getName(), e));
         pushEmojiListToCache();
     }
 
     // SERVICE ------------------------------------------------------------------------------------------------------
+    public static boolean isValidAppEmoji(CustomEmoji emoji) {
+        return emojis.get(emoji.getName()).getFormatted().equals(emoji.getFormatted());
+    }
+
     @Getter
     public static class EmojiFileData {
         private File file;
@@ -207,6 +220,10 @@ public class ApplicationEmojiService {
     }
 
     public static CachedEmoji getApplicationEmoji(String name) {
+        CachedEmoji fin = emojis.get(name);
+        if (fin == null) {
+            System.out.println("AJAHHAHHAHSFKLNFLKE - " + name);
+        }
         return emojis.getOrDefault(name, null);
     }
 

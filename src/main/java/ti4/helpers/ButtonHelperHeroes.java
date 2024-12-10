@@ -35,6 +35,10 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
 import ti4.service.PlanetService;
 import ti4.service.combat.StartCombatService;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.franken.FrankenLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
@@ -708,15 +712,12 @@ public class ButtonHelperHeroes {
                 if (!allowedUnits.contains(unitKey.getUnitType())) {
                     continue;
                 }
-                EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
                 String unitName = unitKey.unitName();
                 Button validTile2 = Buttons.red(finChecker + "glimmersHeroOn_" + tile.getPosition() + "_" + unitName,
-                    "Duplicate " + prettyName);
-                validTile2 = validTile2.withEmoji(emoji);
+                    "Duplicate " + prettyName, unitKey.unitEmoji());
                 buttons.add(validTile2);
-
             }
         }
         Button validTile2 = Buttons.red(finChecker + "deleteButtons", "Decline");
@@ -1218,7 +1219,7 @@ public class ButtonHelperHeroes {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
         String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-        message2 = p1.getRepresentation() + " sent " + Emojis.PN + text + "PN to " + ident2;
+        message2 = p1.getRepresentation() + " sent " + CardEmojis.PN + text + "PN to " + ident2;
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message2);
@@ -1549,7 +1550,7 @@ public class ButtonHelperHeroes {
         String planet = planetNInf.split("_")[0];
         String amount = planetNInf.split("_")[1];
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
-        AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planet)), game, player.getColor(),  amount + " inf " + planet);
+        AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planet)), game, player.getColor(), amount + " inf " + planet);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " Chose to land " + amount + " infantry on " + Helper.getPlanetRepresentation(planet, game));
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
         boolean groundCombatStarted = StartCombatService.groundCombatCheck(game, unitHolder, tile, event);
@@ -1936,14 +1937,13 @@ public class ButtonHelperHeroes {
         for (Integer sc : game.getSCList()) {
             if (sc <= 0)
                 continue; // some older games have a 0 in the list of SCs
-            Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
             Button button;
             String label = " ";
-            if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                && !game.isHomebrewSCMode()) {
-                button = Buttons.gray("winnuHero_" + sc, label).withEmoji(scEmoji);
+            TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
+            if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
+                button = Buttons.gray("winnuHero_" + sc, label, scEmoji);
             } else {
-                button = Buttons.gray("winnuHero_" + sc, sc + label);
+                button = Buttons.gray("winnuHero_" + sc, sc + label, scEmoji);
             }
             scButtons.add(button);
         }
@@ -1960,14 +1960,14 @@ public class ButtonHelperHeroes {
             scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
         }
         if (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3)) {
-            scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", Emojis.ActionCard));
+            scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
-            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", Emojis.spacedock));
-            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", Emojis.pds));
+            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
+            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
         }
         if (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5)) {
-            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", Emojis.comm));
+            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
         }
         if (game.getScPlayed().get(6) == null || !game.getScPlayed().get(6)) {
             scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
@@ -1976,7 +1976,7 @@ public class ButtonHelperHeroes {
             scButtons.add(Buttons.GET_A_TECH);
         }
         if (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8)) {
-            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", Emojis.SecretObjective));
+            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
 
@@ -1997,7 +1997,7 @@ public class ButtonHelperHeroes {
                 offerName = player.getColor();
             }
             ButtonHelper.deleteMessage(event);
-            acButtons.add(Buttons.green("takeAC_" + acID + "_" + player.getFaction(), buttonLabel, Emojis.ActionCard));
+            acButtons.add(Buttons.green("takeAC_" + acID + "_" + player.getFaction(), buttonLabel, CardEmojis.ActionCard));
             acButtons.add(Buttons.red("yssarilHeroRejection_" + player.getFaction(),
                 "Reject " + buttonLabel + " and force them to discard of 3 random ACs"));
             String message = yssaril.getRepresentationUnfogged() + " " + offerName
@@ -2077,7 +2077,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged() + " Chose to invade " + Helper.getPlanetRepresentation(planet, game));
         List<Button> buttons = new ArrayList<>();
         for (int x = 1; x < 4; x++) {
-            buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "yinHeroInfantry_" + planet + "_" + x, "Land " + x + " infantry", Emojis.infantry));
+            buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "yinHeroInfantry_" + planet + "_" + x, "Land " + x + " infantry", UnitEmojis.infantry));
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
             "Use buttons to select how many infantry you'd like to land on the planet", buttons);

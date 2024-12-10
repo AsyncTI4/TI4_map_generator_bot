@@ -23,7 +23,6 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.TIGLHelper;
@@ -46,6 +45,7 @@ import ti4.model.MapTemplateModel;
 import ti4.model.Source;
 import ti4.model.TechnologyModel;
 import ti4.service.PlanetService;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.info.AbilityInfoService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.info.LeaderInfoService;
@@ -520,7 +520,7 @@ public class MiltyService {
 
         if (setSpeaker) {
             game.setSpeakerUserID(player.getUserID());
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), MiscEmojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
         }
 
         // STARTING PNs

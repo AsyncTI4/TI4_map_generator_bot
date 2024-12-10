@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import ti4.service.emoji.DiceEmojis;
+
 public class DiceHelper {
 
     public static class Die {
@@ -26,17 +28,17 @@ public class DiceHelper {
 
         public String getGreenDieIfSuccessOrRedDieIfFailure() {
             if (isSuccess()) {
-                return Emojis.getGreenDieEmoji(result);
+                return DiceEmojis.getGreenDieEmoji(result);
             } else {
-                return Emojis.getRedDieEmoji(result);
+                return DiceEmojis.getRedDieEmoji(result);
             }
         }
 
         public String getRedDieIfSuccessOrGrayDieIfFailure() {
             if (isSuccess())
-                return Emojis.getRedDieEmoji(result);
+                return DiceEmojis.getRedDieEmoji(result);
             else
-                return Emojis.getGrayDieEmoji(result);
+                return DiceEmojis.getGrayDieEmoji(result);
         }
 
         public String printResult() {

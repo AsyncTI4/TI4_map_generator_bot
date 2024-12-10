@@ -9,12 +9,12 @@ import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.TransactionHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.MiscEmojis;
 
 class SendCommodities extends GameStateSubcommand {
 
@@ -62,7 +62,7 @@ class SendCommodities extends GameStateSubcommand {
 
         String p1 = player.getRepresentation();
         String p2 = targetPlayer.getRepresentation();
-        String commString = sendCommodities + " " + Emojis.comm + " commodities";
+        String commString = sendCommodities + " " + MiscEmojis.comm + " commodities";
         String message = p1 + " sent " + commString + " to " + p2;
         MessageHelper.sendMessageToEventChannel(event, message);
         ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, targetPlayer, sendCommodities);

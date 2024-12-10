@@ -57,7 +57,7 @@ public class FrankenDraftBagService {
                 }
                 List<Button> buttons = new ArrayList<>();
                 for (DraftItem item : items) {
-                    buttons.add(item.getAddButton().withEmoji(Emoji.fromFormatted(item.getItemEmoji())));
+                    buttons.add(item.getAddButton());
                 }
                 String message = getLongCategoryRepresentation(draft, bag, category) +
                     "\nClick the buttons below to add or remove items from your faction.";
@@ -107,13 +107,12 @@ public class FrankenDraftBagService {
                 categoryCounter = (categoryCounter + 1) % 4;
             }
 
-            ButtonStyle style = switch (categoryCounter) {
-                case 0 -> ButtonStyle.PRIMARY;
-                case 1 -> ButtonStyle.DANGER;
-                case 2 -> ButtonStyle.SECONDARY;
-                default -> ButtonStyle.SUCCESS;
-            };
-            Button b = Button.of(style, player.getFinsFactionCheckerPrefix() + ACTION_NAME + item.getAlias(), item.getShortDescription()).withEmoji(Emoji.fromFormatted(item.getItemEmoji()));
+            Button b = Buttons.green(player.getFinsFactionCheckerPrefix() + ACTION_NAME + item.getAlias(), item.getShortDescription(), item.getItemEmoji());
+            switch (categoryCounter) {
+                case 0 -> b = b.withStyle(ButtonStyle.PRIMARY);
+                case 1 -> b = b.withStyle(ButtonStyle.DANGER);
+                case 2 -> b = b.withStyle(ButtonStyle.SECONDARY);
+            }
             buttons.add(b);
         }
         return buttons;

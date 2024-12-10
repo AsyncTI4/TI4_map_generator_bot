@@ -11,11 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 public class FrankenItemTest extends BaseTi4Test {
     @Test
     public void testAllCardsGenerateSuccessfully() {
+        beforeAll();
         assertDoesNotThrow(DraftItem::generateAllDraftableCards);
     }
 
     @Test
     public void testAllCardsHaveValidShortNames() {
+        beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
             assert !card.getShortDescription().isEmpty() : card.getAlias();
@@ -24,6 +26,7 @@ public class FrankenItemTest extends BaseTi4Test {
 
     @Test
     public void testAllCardsHaveValidLongNames() {
+        beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
             try {
@@ -36,14 +39,16 @@ public class FrankenItemTest extends BaseTi4Test {
 
     @Test
     public void testAllCardsHaveValidEmoji() {
+        beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
-            assert !card.getItemEmoji().isEmpty() : card.getAlias();
+            assert card.getItemEmoji() != null : card.getAlias();
         }
     }
 
     @Test
     public void errataFileSanityTest() {
+        beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
             // PoK

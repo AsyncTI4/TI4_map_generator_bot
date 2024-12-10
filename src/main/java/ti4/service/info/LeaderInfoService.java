@@ -11,13 +11,14 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.LeaderEmojis;
 
 @UtilityClass
 public class LeaderInfoService {
@@ -75,7 +76,7 @@ public class LeaderInfoService {
             }
         }
         if (!yssarilEmbeds.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), Emojis.YssarilAgent + "**Clever, Clever Agents:**", yssarilEmbeds);
+            MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), LeaderEmojis.YssarilAgent + "**Clever, Clever Agents:**", yssarilEmbeds);
         }
 
         //ADD MAHACT IMPERIA REFERENCE
@@ -94,7 +95,7 @@ public class LeaderInfoService {
             }
         }
         if (!imperiaEmbeds.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), "**Commanders from " + Emojis.Mahact + " Imperia:**", imperiaEmbeds);
+            MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), "**Commanders from " + FactionEmojis.Mahact + " Imperia:**", imperiaEmbeds);
         }
     }
 

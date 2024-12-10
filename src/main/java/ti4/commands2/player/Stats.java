@@ -12,11 +12,11 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.player.PlayerStatsService;
 import ti4.settings.users.UserSettingsManager;
@@ -202,8 +202,8 @@ class Stats extends GameStateSubcommand {
                 Boolean scIsPlayed = game.getScPlayed().get(sc);
                 if (scIsPlayed == null || !scIsPlayed) {
                     game.setSCPlayed(sc, true);
-                    message.append("> flipped ").append(Emojis.getSCEmojiFromInteger(sc)).append(" to ")
-                        .append(Emojis.getSCBackEmojiFromInteger(sc)).append(" (played)");
+                    message.append("> flipped ").append(CardEmojis.getSCFrontFromInteger(sc)).append(" to ")
+                        .append(CardEmojis.getSCBackFromInteger(sc)).append(" (played)");
                 } else {
                     game.setSCPlayed(sc, false);
                     for (Player player_ : game.getPlayers().values()) {
@@ -215,8 +215,8 @@ class Stats extends GameStateSubcommand {
                             continue;
                         player_.addFollowedSC(sc);
                     }
-                    message.append("> flipped ").append(Emojis.getSCBackEmojiFromInteger(sc)).append(" to ")
-                        .append(Emojis.getSCEmojiFromInteger(sc)).append(" (unplayed)");
+                    message.append("> flipped ").append(CardEmojis.getSCBackFromInteger(sc)).append(" to ")
+                        .append(CardEmojis.getSCFrontFromInteger(sc)).append(" (unplayed)");
                 }
             } else {
                 message.append(

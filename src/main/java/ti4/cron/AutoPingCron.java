@@ -49,7 +49,7 @@ public class AutoPingCron {
             .filter(not(ManagedGame::isHasEnded))
             .map(ManagedGame::getGame)
             .forEach(AutoPingCron::autoPingGame);
-}
+    }
 
     private static void autoPingGame(Game game) {
         try {
@@ -107,7 +107,7 @@ public class AutoPingCron {
     }
 
     private static boolean canPlayerConceivablySabo(Player player, Game game) {
-        return player.getStrategicCC() > 0 && player.hasTechReady("it")  ||
+        return player.getStrategicCC() > 0 && player.hasTechReady("it") ||
             player.hasUnit("empyrean_mech") && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Mech).isEmpty() ||
             player.getAc() > 0;
     }
@@ -176,7 +176,7 @@ public class AutoPingCron {
         }
         long milliSinceLastPing = System.currentTimeMillis() - game.getLastActivePlayerPing().getTime();
         if (milliSinceLastPing <= ONE_HOUR_IN_MILLISECONDS * spacer &&
-                (!player.shouldPlayerBeTenMinReminded() || milliSinceLastPing <= TEN_MINUTES_IN_MILLISECONDS)) {
+            (!player.shouldPlayerBeTenMinReminded() || milliSinceLastPing <= TEN_MINUTES_IN_MILLISECONDS)) {
             return;
         }
         String realIdentity = player.getRepresentationUnfogged();
@@ -547,7 +547,7 @@ public class AutoPingCron {
     private static void addReaction(Player player, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
         try {
             game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
-                Emoji emojiToUse = Helper.getPlayerEmoji(game, player, mainMessage);
+                Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
                 String messageId = mainMessage.getId();
 
                 game.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();

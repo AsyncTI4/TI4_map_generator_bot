@@ -17,6 +17,8 @@ import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.ManagedGameService;
 
 @UtilityClass
@@ -25,19 +27,11 @@ public class SearchGameHelper {
     public static int searchGames(User user, GenericInteractionCreateEvent event, boolean onlyMyTurn, boolean includeEndedGames, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes, boolean ignoreSpectate, boolean ignoreAborted, boolean wantNum) {
         String userID = user.getId();
 
-        Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate ?
-            game -> game.getRealPlayers().stream().anyMatch(player -> player.getId().equals(user.getId())) :
-            game -> game.getPlayers().stream().anyMatch(player -> player.getId().equals(user.getId()));
-        Predicate<ManagedGame> onlyMyTurnFilter = onlyMyTurn ?
-            game -> Objects.equals(game.getActivePlayerId(), user.getId()) :
-            game -> true;
-        Predicate<ManagedGame> endedGamesFilter = includeEndedGames ?
-            game -> true :
-            game -> !game.isHasEnded() && !game.isFowMode();
+        Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate ? game -> game.getRealPlayers().stream().anyMatch(player -> player.getId().equals(user.getId())) : game -> game.getPlayers().stream().anyMatch(player -> player.getId().equals(user.getId()));
+        Predicate<ManagedGame> onlyMyTurnFilter = onlyMyTurn ? game -> Objects.equals(game.getActivePlayerId(), user.getId()) : game -> true;
+        Predicate<ManagedGame> endedGamesFilter = includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();
         Predicate<ManagedGame> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
-        Predicate<ManagedGame> ignoreAbortedFilter = ignoreAborted ?
-            game -> !game.isHasEnded() || game.isHasWinner() :
-            game -> true;
+        Predicate<ManagedGame> ignoreAbortedFilter = ignoreAborted ? game -> !game.isHasEnded() || game.isHasWinner() : game -> true;
         Predicate<ManagedGame> allFilterPredicates = ignoreSpectateFilter.and(onlyMyTurnFilter).and(endedGamesFilter).and(onlyEndedFoWGames)
             .and(ignoreAbortedFilter);
 
@@ -74,7 +68,7 @@ public class SearchGameHelper {
         String gameChannelLink = game.getActionsChannel() == null ? "" : game.getActionsChannel().getAsMention();
         StringBuilder sb = new StringBuilder();
         if (Mapper.isValidFaction(player.getFaction())) sb.append(player.getFactionEmoji());
-        if (player.getColor() != null && !"null".equals(player.getColor())) sb.append(Emojis.getColorEmoji(player.getColor()));
+        if (player.getColor() != null && !"null".equals(player.getColor())) sb.append(ColorEmojis.getColorEmoji(player.getColor()));
         sb.append("**").append(game.getName()).append("**");
         sb.append(gameChannelLink);
         if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(playerAverageMapTurnLength(player)).append("`]");
@@ -84,7 +78,7 @@ public class SearchGameHelper {
             List<String> secondaries = new ArrayList<>();
             for (int sc : game.getPlayedSCs()) {
                 if (!player.hasFollowedSC(sc) && !player.getSCs().contains(sc)) {
-                    secondaries.add(Emojis.getSCBackEmojiFromInteger(sc));
+                    secondaries.add(CardEmojis.getSCBackFromInteger(sc).toString());
                 }
             }
             if (!secondaries.isEmpty()) {
