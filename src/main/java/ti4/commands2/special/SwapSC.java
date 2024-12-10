@@ -6,10 +6,10 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.CardEmojis;
 
 class SwapSC extends GameStateSubcommand {
 
@@ -54,8 +54,8 @@ class SwapSC extends GameStateSubcommand {
         player2.removeSC(player2SC);
 
         String sb = player1.getRepresentation() + " swapped SC with " + player2.getRepresentation() + "\n" +
-            "> " + player2.getRepresentation() + Emojis.getSCEmojiFromInteger(player2SC) + " " + ":arrow_right:" + " " + Emojis.getSCEmojiFromInteger(player1SC) + "\n" +
-            "> " + player1.getRepresentation() + Emojis.getSCEmojiFromInteger(player1SC) + " " + ":arrow_right:" + " " + Emojis.getSCEmojiFromInteger(player2SC) + "\n";
+            "> " + player2.getRepresentation() + CardEmojis.getSCFrontFromInteger(player2SC) + " " + ":arrow_right:" + " " + CardEmojis.getSCFrontFromInteger(player1SC) + "\n" +
+            "> " + player1.getRepresentation() + CardEmojis.getSCFrontFromInteger(player1SC) + " " + ":arrow_right:" + " " + CardEmojis.getSCFrontFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.draft.items.AbilityDraftItem;
@@ -27,6 +26,7 @@ import ti4.map.Player;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.ModelInterface;
+import ti4.service.emoji.TI4Emoji;
 
 public abstract class DraftItem implements ModelInterface {
     @Override
@@ -51,8 +51,7 @@ public abstract class DraftItem implements ModelInterface {
     public DraftErrataModel Errata;
 
     public static DraftItem generate(Category category, String itemId) {
-        DraftItem item = null;
-        switch (category) {
+        DraftItem item = switch (category) {
             case ABILITY -> item = new AbilityDraftItem(itemId);
             case TECH -> item = new TechDraftItem(itemId);
             case AGENT -> item = new AgentDraftItem(itemId);
@@ -68,7 +67,8 @@ public abstract class DraftItem implements ModelInterface {
             case BLUETILE -> item = new BlueTileDraftItem(itemId);
             case REDTILE -> item = new RedTileDraftItem(itemId);
             case DRAFTORDER -> item = new SpeakerOrderDraftItem(itemId);
-        }
+        };
+
         item.Errata = Mapper.getFrankenErrata().get(item.getAlias());
         return item;
     }
@@ -164,7 +164,7 @@ public abstract class DraftItem implements ModelInterface {
     protected abstract String getLongDescriptionImpl();
 
     @JsonIgnore
-    public abstract String getItemEmoji();
+    public abstract TI4Emoji getItemEmoji();
 
     public boolean isDraftable(Player player) {
         BagDraft draftRules = player.getGame().getActiveBagDraft();
@@ -191,11 +191,11 @@ public abstract class DraftItem implements ModelInterface {
 
     @JsonIgnore
     public Button getAddButton() {
-        return Buttons.green("frankenItemAdd" + getAlias(), "Add " + getShortDescription()).withEmoji(Emoji.fromFormatted(getItemEmoji()));
+        return Buttons.green("frankenItemAdd" + getAlias(), "Add " + getShortDescription(), getItemEmoji());
     }
 
     @JsonIgnore
     public Button getRemoveButton() {
-        return Buttons.red("frankenItemRemove" + getAlias(), "Remove " + getShortDescription()).withEmoji(Emoji.fromFormatted(getItemEmoji()));
+        return Buttons.red("frankenItemRemove" + getAlias(), "Remove " + getShortDescription(), getItemEmoji());
     }
 }

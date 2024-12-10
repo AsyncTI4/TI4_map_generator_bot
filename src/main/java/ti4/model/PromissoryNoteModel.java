@@ -9,9 +9,10 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
-import ti4.helpers.Emojis;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.FactionEmojis;
 
 @Data
 public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNoteModel>, EmbeddableModel {
@@ -68,16 +69,14 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     }
 
     public String getShortName() {
-        if (getHomebrewReplacesID().isEmpty())
-        {
+        if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shortName).orElse(getName());
         }
         return Optional.ofNullable(shortName).orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShortName());
     }
 
     public boolean getShrinkName() {
-        if (getHomebrewReplacesID().isEmpty())
-        {
+        if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shrinkName).orElse(false);
         }
         return Optional.ofNullable(shrinkName).orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShrinkName());
@@ -135,8 +134,8 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
         //TITLE
         StringBuilder title = new StringBuilder();
-        title.append(Emojis.PN);
-        if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
+        title.append(CardEmojis.PN);
+        if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(FactionEmojis.getFactionIcon(getFaction().get()));
         title.append("__**").append(getName()).append("**__");
         if (!StringUtils.isBlank(getColor().orElse(""))) {
             title.append(" (");
@@ -180,8 +179,8 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
     public String getNameRepresentation() {
         StringBuilder sb = new StringBuilder();
-        if (!StringUtils.isBlank(getFaction().orElse(""))) sb.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
-        sb.append(Emojis.PN);
+        if (!StringUtils.isBlank(getFaction().orElse(""))) sb.append(FactionEmojis.getFactionIcon(getFaction().get()));
+        sb.append(CardEmojis.PN);
         sb.append(" ").append(getName());
         if (!StringUtils.isBlank(getColor().orElse(""))) {
             sb.append(" (");

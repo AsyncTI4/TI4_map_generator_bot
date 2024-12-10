@@ -9,7 +9,6 @@ import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.image.Mapper;
@@ -17,6 +16,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.emoji.CardEmojis;
 
 class SendPN extends GameStateSubcommand {
 
@@ -102,7 +102,7 @@ class SendPN extends GameStateSubcommand {
 		PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
 
 		String extraText = placeDirectlyInPlayArea ? "**" + pnModel.getName() + "**" : "";
-		String message = player.getRepresentation() + " sent " + Emojis.PN + extraText + " to " + targetPlayer.getRepresentation();
+		String message = player.getRepresentation() + " sent " + CardEmojis.PN + extraText + " to " + targetPlayer.getRepresentation();
 		if (game.isFowMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
 			String success = message + "\nThe other player has been notified";
@@ -116,7 +116,7 @@ class SendPN extends GameStateSubcommand {
 		if (game.isFowMode()) {
 			String extra = null;
 			if (id.endsWith("_sftt")) extra = "Scores changed.";
-			FoWHelper.pingPlayersTransaction(game, event, player, targetPlayer, Emojis.PN + extraText + "PN", extra);
+			FoWHelper.pingPlayersTransaction(game, event, player, targetPlayer, CardEmojis.PN + extraText + "PN", extra);
 		}
 	}
 }

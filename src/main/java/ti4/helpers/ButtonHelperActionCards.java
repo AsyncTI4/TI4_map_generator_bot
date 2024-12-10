@@ -28,6 +28,10 @@ import ti4.model.ActionCardModel;
 import ti4.model.ExploreModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -113,20 +117,17 @@ public class ButtonHelperActionCards {
                     damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitKey, 0);
                 }
 
-                EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
                 for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
                     String buttonID = finChecker + "scuttleOn_" + tile.getPosition() + "_" + unitName + "damaged" + "_"
                         + tgAlready;
-                    Button validTile2 = Buttons.red(buttonID, "Remove A Damaged " + prettyName);
-                    validTile2 = validTile2.withEmoji(emoji);
+                    Button validTile2 = Buttons.red(buttonID, "Remove A Damaged " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
                 totalUnits = totalUnits - damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Buttons.red(
                         finChecker + "scuttleOn_" + tile.getPosition() + "_" + unitName + "_" + tgAlready,
-                        "Remove " + x + " " + prettyName);
-                    validTile2 = validTile2.withEmoji(emoji);
+                        "Remove " + x + " " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
             }
@@ -169,19 +170,16 @@ public class ButtonHelperActionCards {
                     damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitKey, 0);
                 }
 
-                EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
                 for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
                     String buttonID = finChecker + "luckyShotOn_" + tile.getPosition() + "_" + unitName + "damaged"
                         + "_" + unitKey.getColor();
-                    Button validTile2 = Buttons.red(buttonID, "Destroy A Damaged " + prettyName);
-                    validTile2 = validTile2.withEmoji(emoji);
+                    Button validTile2 = Buttons.red(buttonID, "Destroy A Damaged " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
                 totalUnits = totalUnits - damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Buttons.red(finChecker + "luckyShotOn_" + tile.getPosition() + "_" + unitName
-                        + "_" + unitKey.getColor(), "Destroy " + x + " " + prettyName);
-                    validTile2 = validTile2.withEmoji(emoji);
+                        + "_" + unitKey.getColor(), "Destroy " + x + " " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
             }
@@ -225,7 +223,7 @@ public class ButtonHelperActionCards {
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColor());
         var parsedUnit = new ParsedUnit(unitKey);
         RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
-        String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " owned by "
+        String msg = (damaged ? "A damaged " : "") + unitKey.unitEmoji() + " owned by "
             + p2.getFactionEmojiOrColor() + " in tile " + tile.getRepresentationForButtons(game, player)
             + " was removed via the Lucky Shot AC";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -284,7 +282,7 @@ public class ButtonHelperActionCards {
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
         var parsedUnit = new ParsedUnit(unitKey);
         RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
-        String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile "
+        String msg = (damaged ? "A damaged " : "") + unitKey.unitEmoji() + " in tile "
             + tile.getRepresentation() + " was removed via the Scuttle AC by "
             + player.getFactionEmoji();
 
@@ -356,8 +354,8 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveFreeTrade")
     public static void resolveFreeTrade(Game game, Player player, ButtonInteractionEvent event) {
-        Button convert2CommButton = Buttons.green("convert_2_comms_stay", "Convert 2 Commodities Into TG", Emojis.Wash);
-        Button get2CommButton = Buttons.blue("gain_2_comms_stay", "Gain 2 Commodities", Emojis.comm);
+        Button convert2CommButton = Buttons.green("convert_2_comms_stay", "Convert 2 Commodities Into TG", MiscEmojis.Wash);
+        Button get2CommButton = Buttons.blue("gain_2_comms_stay", "Gain 2 Commodities", MiscEmojis.comm);
         List<Button> buttons = List.of(convert2CommButton, get2CommButton,
             Buttons.red("deleteButtons", "Done resolving"));
         String message = "Use buttons to gain or convert commodities as appropriate. You may trade in this window/in between gaining commodities.";
@@ -497,7 +495,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("forwardSupplyBase")
     public static void resolveForwardSupplyBaseStep1(Player player, Game game, ButtonInteractionEvent event) {
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " gained " + Emojis.tg(3) + " (" + player.gainTG(3) + ")");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " gained " + MiscEmojis.tg(3) + " (" + player.gainTG(3) + ")");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 3);
         List<Button> buttons = new ArrayList<>();
@@ -513,7 +511,7 @@ public class ButtonHelperActionCards {
             }
         }
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " choose who should get a " + Emojis.tg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " choose who should get a " + MiscEmojis.tg, buttons);
     }
 
     @ButtonHandler("resolveReparationsStep1")
@@ -885,14 +883,13 @@ public class ButtonHelperActionCards {
         for (Integer sc : game.getSCList()) {
             if (sc <= 0)
                 continue; // some older games have a 0 in the list of SCs
-            Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
             Button button;
             String label = Helper.getSCName(sc, game);
-            if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                && !game.isHomebrewSCMode()) {
-                button = Buttons.gray("psStep2_" + sc, label).withEmoji(scEmoji);
+            TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
+            if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
+                button = Buttons.gray("psStep2_" + sc, label, scEmoji);
             } else {
-                button = Buttons.gray("psStep2_" + sc, sc + " " + label);
+                button = Buttons.gray("psStep2_" + sc, sc + " " + label, scEmoji);
             }
             buttons.add(button);
         }
@@ -1394,14 +1391,13 @@ public class ButtonHelperActionCards {
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0)
                     continue; // some older games have a 0 in the list of SCs
-                Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
                 Button button;
                 String label = Helper.getSCName(sc, game);
-                if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                    && !game.isHomebrewSCMode()) {
-                    button = Buttons.gray("resolvePreassignment_Coup_" + sc, label).withEmoji(scEmoji);
+                TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
+                if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
+                    button = Buttons.gray("resolvePreassignment_Coup_" + sc, label, scEmoji);
                 } else {
-                    button = Buttons.gray("resolvePreassignment_Coup_" + sc, sc + " " + label);
+                    button = Buttons.gray("resolvePreassignment_Coup_" + sc, sc + " " + label, scEmoji);
                 }
                 scButtons.add(button);
             }
@@ -1486,14 +1482,13 @@ public class ButtonHelperActionCards {
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0)
                     continue; // some older games have a 0 in the list of SCs
-                Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
                 Button button;
                 String label = Helper.getSCName(sc, game);
-                if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                    && !game.isHomebrewSCMode()) {
-                    button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, label).withEmoji(scEmoji);
+                TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
+                if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
+                    button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, label, scEmoji);
                 } else {
-                    button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, sc + " " + label);
+                    button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, sc + " " + label, scEmoji);
                 }
                 scButtons.add(button);
             }
@@ -1668,7 +1663,7 @@ public class ButtonHelperActionCards {
         int amount = uH.getUnitCount(UnitType.Infantry, p2.getColor());
         int hits = 0;
         if (amount > 0) {
-            StringBuilder msg = new StringBuilder(Emojis.getEmojiFromDiscord("infantry") + " rolled ");
+            StringBuilder msg = new StringBuilder(UnitEmojis.infantry + " rolled ");
             for (int x = 0; x < amount; x++) {
                 Die d1 = new Die(6);
                 msg.append(d1.getResult()).append(", ");
@@ -1729,7 +1724,7 @@ public class ButtonHelperActionCards {
         int amount = uH.getUnitCount(UnitType.Fighter, p2.getColor());
         int hits = 0;
         if (amount > 0) {
-            StringBuilder msg = new StringBuilder(Emojis.getEmojiFromDiscord("fighter") + " rolled ");
+            StringBuilder msg = new StringBuilder(UnitEmojis.fighter + " rolled ");
             int threshold = "action_deck_2".equals(game.getAcDeckID()) ? 7 : 6;
             for (int x = 0; x < amount; x++) {
                 Die d1 = new Die(threshold);
@@ -1739,7 +1734,7 @@ public class ButtonHelperActionCards {
                 }
             }
             msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
-            UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("fighter"), p2.getColor());
+            UnitKey key = Units.getUnitKey(UnitType.Fighter, p2.getColor());
             var unitParsed = new ParsedUnit(key, hits, Constants.SPACE);
             RemoveUnitService.removeUnit(event, tile, game, unitParsed);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
@@ -1815,7 +1810,7 @@ public class ButtonHelperActionCards {
     public static void focusedResearch(Game game, Player player, String buttonID,
         ButtonInteractionEvent event) {
         if (player.getTg() < 4 && (!player.hasUnexhaustedLeader("keleresagent") || player.getCommodities() < 1)) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "You did not have " + Emojis.tg(4) + " and thus cannot resolve Focused Research");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "You did not have " + MiscEmojis.tg(4) + " and thus cannot resolve Focused Research");
             return;
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(false, false) + " has spent 4tg " + player.gainTG(-4) + " on focused research");

@@ -14,13 +14,13 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import ti4.buttons.Buttons;
-import ti4.helpers.Emojis;
 import ti4.helpers.RegexHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.TI4Emoji;
 
 public class RoundSummaryHelper {
 
@@ -93,6 +93,6 @@ public class RoundSummaryHelper {
     }
 
     public static String resolvePlayerEmoji(Player player) {
-        return player.isRealPlayer() || player.isEliminated() ? player.getFactionEmoji() : Emojis.getRandomGoodDog(player.getUserID());
+        return player.isRealPlayer() || player.isEliminated() ? player.getFactionEmoji() : TI4Emoji.getRandomGoodDog(player.getUserID()).toString();
     }
 }

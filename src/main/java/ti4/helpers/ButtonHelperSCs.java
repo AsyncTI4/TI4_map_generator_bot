@@ -14,6 +14,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.helpers.Units.UnitKey;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -21,6 +23,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.ScorePublicObjectiveService;
@@ -422,8 +425,9 @@ public class ButtonHelperSCs {
         }
         ButtonHelper.addReaction(event, false, false, "", "");
         String unit = buttonID.replace("construction_", "");
+        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
         String message = player.getRepresentationUnfogged() + " Click the name of the planet you wish to put your "
-            + Emojis.getEmojiFromDiscord(unit) + " on for construction. If you are resolving the secondary, it will place a command counter in the system as well.";
+            + unitKey.unitEmoji() + " on for construction. If you are resolving the secondary, it will place a command counter in the system as well.";
         List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);

@@ -58,7 +58,6 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
@@ -85,6 +84,8 @@ import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.SourceEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 
@@ -479,19 +480,19 @@ public class Game extends GameProperties {
         boolean isNormalGame = isNormalGame();
         Map<String, Boolean> gameModes = new HashMap<>() {
             {
-                put(Emojis.TI4PoK + "Normal", isNormalGame);
-                put(Emojis.TI4BaseGame + "Base Game", isBaseGameMode());
-                put(Emojis.MiltyMod + "MiltyMod", isMiltyModMode());
-                put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
+                put(SourceEmojis.TI4PoK + "Normal", isNormalGame);
+                put(SourceEmojis.TI4BaseGame + "Base Game", isBaseGameMode());
+                put(SourceEmojis.MiltyMod + "MiltyMod", isMiltyModMode());
+                put(MiscEmojis.TIGL + "TIGL", isCompetitiveTIGLGame());
                 put("Community", isCommunityMode());
                 put("Minor Factions", isMinorFactionsMode());
                 put("Age of Exploration", isAgeOfExplorationMode());
                 put("Alliance", isAllianceMode());
                 put("FoW", isFowMode());
                 put("Franken", isFrankenGame());
-                put(Emojis.Absol + "Absol", isAbsolMode());
+                put(SourceEmojis.Absol + "Absol", isAbsolMode());
                 put("VotC", isVotcMode());
-                put(Emojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
+                put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
                 put("HomebrewSC", isHomebrewSCMode());
                 put("Little Omega", isLittleOmega());
                 put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));

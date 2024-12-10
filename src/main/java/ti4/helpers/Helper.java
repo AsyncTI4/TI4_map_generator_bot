@@ -69,6 +69,15 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.PlanetEmojis;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.milty.MiltyDraftManager;
@@ -122,7 +131,7 @@ public class Helper {
                 if (p2 == player) continue;
                 if (!p2.isPassed()) return null;
             }
-            return "Player has " + Emojis.Yssaril + " **Transparasteel Plating**, and all other players have passed.";
+            return "Player has " + FactionEmojis.Yssaril + " **Transparasteel Plating**, and all other players have passed.";
         }
         return null;
     }
@@ -469,17 +478,7 @@ public class Helper {
         for (String messageID : messageIDs) {
             if (!PlayerReactService.checkForASpecificPlayerReact(messageID, player, game)) {
                 game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
-                    Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-                    if (game.isFowMode()) {
-                        int index = 0;
-                        for (Player player_ : game.getPlayers().values()) {
-                            if (player_ == player)
-                                break;
-                            index++;
-                        }
-                        reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageID));
-                    }
-
+                    Emoji reactionEmoji = getPlayerReactionEmoji(game, player, messageID);
                     MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
                     if (reaction == null) {
                         Calendar rightNow = Calendar.getInstance();
@@ -603,14 +602,14 @@ public class Helper {
             return getSCName(sc, game);
         }
         return switch (sc) {
-            case 1 -> Emojis.SC1Mention;
-            case 2 -> Emojis.SC2Mention;
-            case 3 -> Emojis.SC3Mention;
-            case 4 -> Emojis.SC4Mention;
-            case 5 -> Emojis.SC5Mention;
-            case 6 -> Emojis.SC6Mention;
-            case 7 -> Emojis.SC7Mention;
-            case 8 -> Emojis.SC8Mention;
+            case 1 -> CardEmojis.SC1Mention();
+            case 2 -> CardEmojis.SC2Mention();
+            case 3 -> CardEmojis.SC3Mention();
+            case 4 -> CardEmojis.SC4Mention();
+            case 5 -> CardEmojis.SC5Mention();
+            case 6 -> CardEmojis.SC6Mention();
+            case 7 -> CardEmojis.SC7Mention();
+            case 8 -> CardEmojis.SC8Mention();
             default -> "**SC" + sc + "**";
         };
     }
@@ -663,11 +662,12 @@ public class Helper {
         return new File(scImagePath);
     }
 
-    public static Emoji getPlayerEmoji(Game game, Player player, Message message) {
-        Emoji emojiToUse;
-        emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
-        String messageId = message.getId();
+    public static Emoji getPlayerReactionEmoji(Game game, Player player, Message message) {
+        return getPlayerReactionEmoji(game, player, message.getId());
+    }
 
+    public static Emoji getPlayerReactionEmoji(Game game, Player player, String messageId) {
+        Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
         if (game.isFowMode()) {
             int index = 0;
             for (Player player_ : game.getPlayers().values()) {
@@ -675,15 +675,14 @@ public class Helper {
                     break;
                 index++;
             }
-            emojiToUse = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
+            emojiToUse = Emoji.fromFormatted(TI4Emoji.getRandomizedEmoji(index, messageId).toString());
         }
-
         return emojiToUse;
     }
 
     public static String getPlanetRepresentationPlusEmoji(String planet) {
         String planetProper = Mapper.getPlanetRepresentations().get(planet);
-        return Emojis.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
+        return PlanetEmojis.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
     }
 
     public static String getBasicTileRep(String tileID) {
@@ -741,14 +740,14 @@ public class Helper {
             }
             if (!"".equalsIgnoreCase(techType)) {
                 switch (techType) {
-                    case "propulsion" -> techEmoji = Emojis.PropulsionTech;
-                    case "warfare" -> techEmoji = Emojis.WarfareTech;
-                    case "cybernetic" -> techEmoji = Emojis.CyberneticTech;
-                    case "biotic" -> techEmoji = Emojis.BioticTech;
+                    case "propulsion" -> techEmoji = TechEmojis.PropulsionTech.toString();
+                    case "warfare" -> techEmoji = TechEmojis.WarfareTech.toString();
+                    case "cybernetic" -> techEmoji = TechEmojis.CyberneticTech.toString();
+                    case "biotic" -> techEmoji = TechEmojis.BioticTech.toString();
                 }
             }
-            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getResourceEmoji(unitHolder.getResources())
-                + Emojis.getInfluenceEmoji(unitHolder.getInfluence()) + techEmoji;
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + MiscEmojis.getResourceEmoji(unitHolder.getResources())
+                + MiscEmojis.getInfluenceEmoji(unitHolder.getInfluence()) + techEmoji;
         }
     }
 
@@ -757,7 +756,7 @@ public class Helper {
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
-            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getInfluenceEmoji(unitHolder.getInfluence());
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + MiscEmojis.getInfluenceEmoji(unitHolder.getInfluence());
         }
     }
 
@@ -776,14 +775,13 @@ public class Helper {
             }
             if (!"".equalsIgnoreCase(techType)) {
                 switch (techType) {
-                    case "propulsion" -> techEmoji = Emojis.PropulsionTech;
-                    case "warfare" -> techEmoji = Emojis.WarfareTech;
-                    case "cybernetic" -> techEmoji = Emojis.CyberneticTech;
-                    case "biotic" -> techEmoji = Emojis.BioticTech;
+                    case "propulsion" -> techEmoji = TechEmojis.PropulsionTech.toString();
+                    case "warfare" -> techEmoji = TechEmojis.WarfareTech.toString();
+                    case "cybernetic" -> techEmoji = TechEmojis.CyberneticTech.toString();
+                    case "biotic" -> techEmoji = TechEmojis.BioticTech.toString();
                 }
             }
-            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getResourceEmoji(unitHolder.getResources())
-                + techEmoji;
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + MiscEmojis.getResourceEmoji(unitHolder.getResources()) + techEmoji;
         }
     }
 
@@ -828,7 +826,7 @@ public class Helper {
             }
             if (held)
                 continue;
-            Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
+            TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
             Button button;
             String label = getSCName(sc, game);
             if (game.getScTradeGoods().get(sc) > 0 && !game.isFowMode()) {
@@ -840,13 +838,10 @@ public class Helper {
             if (!game.getStoredValue("exhaustedSC" + sc).isEmpty()) {
                 label += " - Exhausted";
             }
-            if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                && !game.isHomebrewSCMode()) {
-
-                button = Buttons.gray("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, label)
-                    .withEmoji(scEmoji);
+            if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
+                button = Buttons.gray("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, label, scEmoji);
             } else {
-                button = Buttons.gray("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, sc + " " + label);
+                button = Buttons.gray("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, sc + " " + label, scEmoji);
             }
             scButtons.add(button);
         }
@@ -885,13 +880,12 @@ public class Helper {
                     getPlanetRepresentation(planet, game));
                 planetButtons.add(button);
             } else {
-                Button techB = Buttons.red("spend_" + planet + "_" + whatIsItFor,
-                    getPlanetRepresentation(planet, game));
+                Button techB = Buttons.red("spend_" + planet + "_" + whatIsItFor, getPlanetRepresentation(planet, game));
                 switch (techType) {
-                    case "propulsion" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
-                    case "warfare" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
-                    case "cybernetic" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
-                    case "biotic" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
+                    case "propulsion" -> techB = techB.withEmoji(TechEmojis.PropulsionTech.asEmoji());
+                    case "warfare" -> techB = techB.withEmoji(TechEmojis.WarfareTech.asEmoji());
+                    case "cybernetic" -> techB = techB.withEmoji(TechEmojis.CyberneticTech.asEmoji());
+                    case "biotic" -> techB = techB.withEmoji(TechEmojis.BioticTech.asEmoji());
                 }
                 planetButtons.add(techB);
             }
@@ -910,7 +904,7 @@ public class Helper {
             }
             Button button = Buttons.red("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet, getPlanetRepresentation(planet, game));
             if (unit.equalsIgnoreCase("2gf") || unit.equalsIgnoreCase("3gf")) {
-                button = button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
+                button = button.withEmoji(UnitEmojis.infantry.asEmoji());
             }
             planetButtons.add(button);
         }
@@ -921,6 +915,7 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         player.resetProducedUnits();
+        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
         for (String planet : planets) {
             if (planet.contains("ghoti") || planet.contains("custodia")) {
                 continue;
@@ -929,8 +924,7 @@ public class Helper {
                 continue;
             }
             Button button = Buttons.red("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet,
-                getPlanetRepresentation(planet, game));
-            button = button.withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit)));
+                getPlanetRepresentation(planet, game), unitKey.unitEmoji());
             planetButtons.add(button);
         }
         return planetButtons;
@@ -1115,13 +1109,13 @@ public class Helper {
             System.out.println("Spent thing: " + thing);
             switch (thing) {
                 case "sarween" -> {
-                    msg.append("> Used Sarween Tools " + Emojis.CyberneticTech + "\n");
+                    msg.append("> Used Sarween Tools " + TechEmojis.CyberneticTech + "\n");
                     res += 1;
                     found = true;
                 }
                 case "absol_sarween" -> {
                     int sarweenVal = 1 + calculateCostOfProducedUnits(player, game, true) / 10;
-                    msg.append("> Used Sarween Tools " + Emojis.CyberneticTech + " for ").append(sarweenVal).append(" resources\n");
+                    msg.append("> Used Sarween Tools " + TechEmojis.CyberneticTech + " for ").append(sarweenVal).append(" resources\n");
                     res += sarweenVal;
                     found = true;
                 }
@@ -1182,11 +1176,11 @@ public class Helper {
             } else {
 
                 if (thing.contains("boon")) {
-                    msg.append("> Used Boon Relic ").append(Emojis.Relic).append("\n");
+                    msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append("\n");
                     res = res + 1;
                 }
                 if (thing.contains("warmachine")) {
-                    msg.append("> Used War Machine ").append(Emojis.ActionCard).append("\n");
+                    msg.append("> Used War Machine ").append(CardEmojis.ActionCard).append("\n");
                     res = res + 1;
                 }
                 if (thing.contains("aida")) {
@@ -1197,7 +1191,7 @@ public class Helper {
                     } else {
                         msg.append(" for a technology skip on a unit upgrade ");
                     }
-                    msg.append(Emojis.WarfareTech).append(".\n");
+                    msg.append(TechEmojis.WarfareTech).append(".\n");
                 }
                 if (thing.contains("commander") || thing.contains("Gledge Agent")) {
                     msg.append("> ").append(thing).append("\n");
@@ -1224,7 +1218,7 @@ public class Helper {
         res = res + tg + keleresAgent;
         inf = inf + tg + keleresAgent;
         if (tg > 0) {
-            msg.append("> Spent ").append(tg).append(" trade good").append(tg == 1 ? "" : "s").append(" ").append(Emojis.getTGorNomadCoinEmoji(game)).append(" (").append(player.getTg() + tg).append("->").append(player.getTg()).append(") \n");
+            msg.append("> Spent ").append(tg).append(" trade good").append(tg == 1 ? "" : "s").append(" ").append(MiscEmojis.getTGorNomadCoinEmoji(game)).append(" (").append(player.getTg() + tg).append("->").append(player.getTg()).append(") \n");
             if (player.hasTech("mc")) {
                 res = res + tg + keleresAgent;
                 inf = inf + tg + keleresAgent;
@@ -1489,7 +1483,7 @@ public class Helper {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
                 if (!"flagship".equalsIgnoreCase(removedUnit.getBaseType()) ||
-                        !game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")) {
+                    !game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")) {
                     cost = cost + (int) removedUnit.getCost() * producedUnits.get(unit);
                 }
                 totalUnits = totalUnits + producedUnits.get(unit);
@@ -1531,26 +1525,19 @@ public class Helper {
                         if (uH instanceof Planet planet) {
                             if (player.getPlanetsAllianceMode().contains(uH.getName())) {
                                 String pp = planet.getName();
-                                Button inf1Button = Buttons.green(
-                                    "FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_" + pp,
-                                    "Produce 1 Infantry on " + getPlanetRepresentation(pp, game));
-                                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.Saar));
+                                Button inf1Button = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_" + pp,
+                                    "Produce 1 Infantry on " + getPlanetRepresentation(pp, game), FactionEmojis.Saar);
                                 unitButtons.add(inf1Button);
                             }
                         } else {
-                            Button inf1Button = Buttons.green(
-                                "FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_space"
-                                    + tile.getPosition(),
-                                "Produce 1 Inf in " + tile.getPosition() + " space");
-                            inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.Saar));
+                            Button inf1Button = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_space" + tile.getPosition(),
+                                "Produce 1 Inf in " + tile.getPosition() + " space", FactionEmojis.Saar);
                             unitButtons.add(inf1Button);
                         }
                     }
                 }
-                Button ff1Button = Buttons.green(
-                    "FFCC_" + player.getFaction() + "_" + placePrefix + "_fighter_" + tile.getPosition(),
-                    "Produce 1 Fighter in " + tile.getPosition());
-                ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(Emojis.Saar));
+                Button ff1Button = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_fighter_" + tile.getPosition(),
+                    "Produce 1 Fighter in " + tile.getPosition(), FactionEmojis.Saar);
                 unitButtons.add(ff1Button);
             }
         }
@@ -1576,81 +1563,56 @@ public class Helper {
         String tp = tile.getPosition();
         if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
             if (player.hasWarsunTech() && resourcelimit > 9) {
-                Button wsButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
-                    "Produce War Sun");
+                Button wsButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp, "Produce War Sun", UnitEmojis.warsun);
                 if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun") > 1) {
-                    wsButton = Buttons.gray("FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
-                        "Produce War Sun");
+                    wsButton = Buttons.gray("FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp, "Produce War Sun", UnitEmojis.warsun);
                 }
-                wsButton = wsButton.withEmoji(Emoji.fromFormatted(Emojis.warsun));
                 unitButtons.add(wsButton);
             }
             if (player.ownsUnit("ghemina_flagship_lady") && resourcelimit > 7) {
-                Button wsButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_lady_" + tp,
-                    "Produce The Lady");
-                wsButton = wsButton.withEmoji(Emoji.fromFormatted(Emojis.flagship));
+                Button wsButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_lady_" + tp, "Produce The Lady", UnitEmojis.flagship);
                 unitButtons.add(wsButton);
             }
-            Button fsButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
-                "Produce Flagship");
+            Button fsButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp, "Produce Flagship", UnitEmojis.flagship);
             if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship") > 0) {
-                fsButton = Buttons.gray("FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
-                    "Produce Flagship");
+                fsButton = Buttons.gray("FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp, "Produce Flagship", UnitEmojis.flagship);
             }
-            fsButton = fsButton.withEmoji(Emoji.fromFormatted(Emojis.flagship));
             if (resourcelimit > 7) {
                 unitButtons.add(fsButton);
             }
         }
-        Button dnButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
-            "Produce Dreadnought");
+        Button dnButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp, "Produce Dreadnought", UnitEmojis.dreadnought);
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought") > 4) {
-            dnButton = Buttons.gray("FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
-                "Produce Dreadnought");
+            dnButton = Buttons.gray("FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp, "Produce Dreadnought", UnitEmojis.dreadnought);
         }
-        dnButton = dnButton.withEmoji(Emoji.fromFormatted(Emojis.dreadnought));
         if (resourcelimit > 3) {
             unitButtons.add(dnButton);
         }
-        Button cvButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp,
-            "Produce Carrier");
+        Button cvButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp, "Produce Carrier", UnitEmojis.carrier);
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "carrier") > 3) {
-            cvButton = Buttons.gray("FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp,
-                "Produce Carrier");
+            cvButton = cvButton.withStyle(ButtonStyle.SECONDARY);
         }
-        cvButton = cvButton.withEmoji(Emoji.fromFormatted(Emojis.carrier));
         if (resourcelimit > 2) {
             unitButtons.add(cvButton);
         }
-        Button caButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
-            "Produce Cruiser");
+        Button caButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp, "Produce Cruiser", UnitEmojis.cruiser);
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser") > 7) {
-            caButton = Buttons.gray("FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
-                "Produce Cruiser");
+            caButton = Buttons.gray("FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp, "Produce Cruiser", UnitEmojis.cruiser);
         }
-        caButton = caButton.withEmoji(Emoji.fromFormatted(Emojis.cruiser));
         if (resourcelimit > 1) {
             unitButtons.add(caButton);
         }
-        Button ddButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
-            "Produce Destroyer");
+        Button ddButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp, "Produce Destroyer", UnitEmojis.destroyer);
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer") > 7) {
-            ddButton = Buttons.gray("FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
-                "Produce Destroyer");
+            ddButton = Buttons.gray("FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp, "Produce Destroyer", UnitEmojis.destroyer);
         }
-        ddButton = ddButton.withEmoji(Emoji.fromFormatted(Emojis.destroyer));
         unitButtons.add(ddButton);
-        Button ff1Button = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_fighter_" + tp,
-            "Produce 1 Fighter");
-        ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(Emojis.fighter));
-        unitButtons.add(ff1Button);
+        unitButtons.add(Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_fighter_" + tp, "Produce 1 Fighter", UnitEmojis.fighter));
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff) && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
             && unitHolders.size() < 4 && !regulated && !"sling".equalsIgnoreCase(warfareNOtherstuff)
             && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)
             && getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix).isEmpty()) {
-            Button ff2Button = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_2ff_" + tp,
-                "Produce 2 Fighters");
-            ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Emojis.fighter));
+            Button ff2Button = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_2ff_" + tp, "Produce 2 Fighters", UnitEmojis.fighter);
             unitButtons.add(ff2Button);
         }
 
@@ -1659,21 +1621,13 @@ public class Helper {
             && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
 
             if (player.hasUnexhaustedLeader("argentagent")) {
-                Button argentButton = Buttons.green(
-                    "FFCC_" + player.getFaction() + "_" + "exhaustAgent_argentagent_" + tile.getPosition(),
-                    "Use Argent Agent");
-                argentButton = argentButton.withEmoji(Emoji.fromFormatted(Emojis.Argent));
-                unitButtons.add(argentButton);
+                unitButtons.add(Buttons.green("FFCC_" + player.getFaction() + "_" + "exhaustAgent_argentagent_" + tile.getPosition(), "Use Argent Agent", FactionEmojis.Argent));
             }
             if (player.hasTechReady("sar")) {
-                Button argentButton = Buttons.green("sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff,
-                    "Use Self-Assembly Routines");
-                argentButton = argentButton.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
-                unitButtons.add(argentButton);
+                unitButtons.add(Buttons.green("sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff, "Use Self-Assembly Routines", TechEmojis.WarfareTech));
             }
             if (playerHasWarMachine(player)) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
-                    + " Reminder that you have War Machine and this is the window for it");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " Reminder that you have War Machine and this is the window for it");
             }
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
@@ -1701,18 +1655,14 @@ public class Helper {
                 String pp = planet.getName();
                 if ("genericBuild".equalsIgnoreCase(warfareNOtherstuff)) {
                     Button sdButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_sd_" + pp,
-                        "Place 1 Space Dock on " + getPlanetRepresentation(pp, game));
-                    sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
+                        "Place 1 Space Dock on " + getPlanetRepresentation(pp, game), UnitEmojis.spacedock);
                     unitButtons.add(sdButton);
                     Button pdsButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_pds_" + pp,
-                        "Place 1 PDS on " + getPlanetRepresentation(pp, game));
-                    pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
+                        "Place 1 PDS on " + getPlanetRepresentation(pp, game), UnitEmojis.pds);
                     unitButtons.add(pdsButton);
                 }
-                Button inf1Button = Buttons.green(
-                    "FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_" + pp,
-                    "Produce 1 Infantry on " + getPlanetRepresentation(pp, game));
-                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
+                Button inf1Button = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_" + pp,
+                    "Produce 1 Infantry on " + getPlanetRepresentation(pp, game), UnitEmojis.infantry);
                 unitButtons.add(inf1Button);
                 if (!"genericBuild".equalsIgnoreCase(warfareNOtherstuff)
                     && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
@@ -1720,15 +1670,13 @@ public class Helper {
                     && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)
                     && getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix).isEmpty()) {
                     Button inf2Button = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_" + pp,
-                        "Produce 2 Infantry on " + getPlanetRepresentation(pp, game));
-                    inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
+                        "Produce 2 Infantry on " + getPlanetRepresentation(pp, game), UnitEmojis.infantry);
                     unitButtons.add(inf2Button);
                 }
-                Button mfButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp, "Produce Mech on " + getPlanetRepresentation(pp, game));
+                Button mfButton = Buttons.green("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp, "Produce Mech on " + getPlanetRepresentation(pp, game), UnitEmojis.mech);
                 if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
-                    mfButton = Buttons.gray("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp, "Produce Mech on " + getPlanetRepresentation(pp, game));
+                    mfButton = Buttons.gray("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp, "Produce Mech on " + getPlanetRepresentation(pp, game), UnitEmojis.mech);
                 }
-                mfButton = mfButton.withEmoji(Emoji.fromFormatted(Emojis.mech));
                 if (resourcelimit > 1) {
                     unitButtons.add(mfButton);
                 }
@@ -1737,8 +1685,7 @@ public class Helper {
                 && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
                 Button inf1Button = Buttons.green(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_space" + tile.getPosition(),
-                    "Produce 1 Infantry in space");
-                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
+                    "Produce 1 Infantry in space", UnitEmojis.infantry);
                 unitButtons.add(inf1Button);
                 if (!"genericBuild".equalsIgnoreCase(warfareNOtherstuff)
                     && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
@@ -1747,14 +1694,12 @@ public class Helper {
                     && getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix).isEmpty()) {
                     Button inf2Button = Buttons.green(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_space" + tile.getPosition(),
-                        "Produce 2 Infantry in space");
-                    inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
+                        "Produce 2 Infantry in space", UnitEmojis.infantry);
                     unitButtons.add(inf2Button);
                 }
                 Button mfButton = Buttons.green(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_space" + tile.getPosition(),
-                    "Produce Mech in space");
-                mfButton = mfButton.withEmoji(Emoji.fromFormatted(Emojis.mech));
+                    "Produce Mech in space", UnitEmojis.mech);
                 unitButtons.add(mfButton);
             }
         }
@@ -1769,11 +1714,10 @@ public class Helper {
         if (player.hasTech("yso")) {
             if ("sling".equalsIgnoreCase(warfareNOtherstuff) || "freelancers".equalsIgnoreCase(warfareNOtherstuff) || "chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
                 List<Button> unitButtons2 = new ArrayList<>();
-                unitButtons2.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders", Emojis.Yin));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " you may use this to Yin Spin.", unitButtons2);
+                unitButtons2.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders", FactionEmojis.Yin));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you may use this to Yin Spin.", unitButtons2);
             } else {
-                unitButtons.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders", Emojis.Yin));
+                unitButtons.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders", FactionEmojis.Yin));
             }
         }
 
@@ -1856,7 +1800,7 @@ public class Helper {
         String leaderUnlockCondition = leaderModel.getUnlockCondition();
 
         StringBuilder representation = new StringBuilder();
-        representation.append(Emojis.getFactionLeaderEmoji(leader)).append(" __**").append(leaderName).append("**");
+        representation.append(LeaderEmojis.getLeaderEmoji(leader)).append(" __**").append(leaderName).append("**");
         if (includeTitle)
             representation.append(" - ").append(leaderTitle).append("__"); // add title
         if (includeAbility && Constants.HERO.equals(leader.getType()))
@@ -2413,7 +2357,7 @@ public class Helper {
                 for (Player player : sortedPlayers) {
                     SetOrderService.setPlayerOrder(newPlayerOrder, players, player);
                     if (player.isSpeaker()) {
-                        msg.append(player.getRepresentationUnfogged()).append(" ").append(Emojis.SpeakerToken).append(" \n");
+                        msg.append(player.getRepresentationUnfogged()).append(" ").append(MiscEmojis.SpeakerToken).append(" \n");
                     } else {
                         msg.append(player.getRepresentationUnfogged()).append(" \n");
                     }
@@ -2617,7 +2561,8 @@ public class Helper {
             if (alias.isEmpty()) {
                 continue;
             }
-            sb.append(StringUtils.repeat(Emojis.getEmojiFromDiscord(Mapper.getUnitBaseTypeFromAsyncID(AliasHandler.resolveUnit(alias))), count));
+            UnitType ut = Units.findUnitType(AliasHandler.resolveUnit(alias));
+            sb.append(StringUtils.repeat(ut.getUnitTypeEmoji().toString(), count));
         }
         return sb.toString();
     }

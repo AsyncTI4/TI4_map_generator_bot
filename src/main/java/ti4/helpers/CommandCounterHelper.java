@@ -11,6 +11,7 @@ import ti4.map.Tile;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.GameNameService;
 
 public class CommandCounterHelper {
@@ -32,7 +33,7 @@ public class CommandCounterHelper {
         String gameName = GameNameService.getGameNameFromChannel(event);
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.isFowMode() && ping) {
-            String colorMention = Emojis.getColorEmojiWithName(color);
+            String colorMention = ColorEmojis.getColorEmojiWithName(color);
             FoWHelper.pingSystem(managedGame.getGame(), event, tile.getPosition(), colorMention + " has placed a token in the system");
         }
         tile.addCC(ccID);
@@ -45,7 +46,7 @@ public class CommandCounterHelper {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         if (game.isFowMode() && ping) {
-            String colorMention = Emojis.getColorEmojiWithName(color);
+            String colorMention = ColorEmojis.getColorEmojiWithName(color);
             FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has placed a token in the system");
         }
         tile.addCC(ccID);

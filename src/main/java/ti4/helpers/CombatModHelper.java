@@ -27,6 +27,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollType;
+import ti4.service.emoji.CardEmojis;
 
 public class CombatModHelper {
 
@@ -126,7 +127,7 @@ public class CombatModHelper {
                 && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
                     game)) {
                 modifiers
-                    .add(new NamedCombatModifierModel(relevantMod.get(), Emojis.Agenda + " " + agenda.getName()));
+                    .add(new NamedCombatModifierModel(relevantMod.get(), CardEmojis.Agenda + " " + agenda.getName()));
             }
         }
 
@@ -139,10 +140,7 @@ public class CombatModHelper {
             if (relevantMod.isPresent()
                 && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
                     game)) {
-                modifiers.add(
-                    new NamedCombatModifierModel(relevantMod.get(),
-                        Emojis.getEmojiFromDiscord(unit.getBaseType()) + " "
-                            + unit.getName() + " " + unit.getAbility()));
+                modifiers.add(new NamedCombatModifierModel(relevantMod.get(), unit.getUnitEmoji() + " " + unit.getName() + " " + unit.getAbility()));
             }
         }
 
@@ -178,7 +176,7 @@ public class CombatModHelper {
     }
 
     public static Integer getCombinedModifierForUnit(UnitModel unit, Integer numOfUnit, List<NamedCombatModifierModel> modifiers, Player player,
-                                                     Player opponent, Game game, List<UnitModel> playerUnits, CombatRollType rollType, Tile tile) {
+        Player opponent, Game game, List<UnitModel> playerUnits, CombatRollType rollType, Tile tile) {
         int modsValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
@@ -368,7 +366,7 @@ public class CombatModHelper {
     }
 
     public static Integer getVariableModValue(CombatModifierModel mod, Player player, Player opponent, Game game,
-                                                UnitModel origUnit, Tile activeSystem) {
+        UnitModel origUnit, Tile activeSystem) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
         long scalingCount = 0;

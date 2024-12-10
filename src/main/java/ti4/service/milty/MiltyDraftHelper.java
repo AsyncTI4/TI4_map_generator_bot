@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
-import ti4.helpers.Emojis;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
@@ -33,6 +32,9 @@ import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.model.WormholeModel;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
 import ti4.service.image.FileUploadService;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 
@@ -134,20 +136,19 @@ public class MiltyDraftHelper {
         List<BufferedImage> yellowSkips = new ArrayList<>();
         List<BufferedImage> redSkips = new ArrayList<>();
         for (MiltyDraftTile tile : slice.getTiles()) {
-            if (tile.isHasAlphaWH()) whs.add(getEmojiImage(Emojis.WHalpha));
-            if (tile.isHasBetaWH()) whs.add(getEmojiImage(Emojis.WHbeta));
-            if (tile.isHasOtherWH()) whs.add(getEmojiImage(Emojis.WHgamma));
-
-            if (tile.isLegendary()) legendary.add(getEmojiImage(Emojis.LegendaryPlanet));
+            if (tile.isHasAlphaWH()) whs.add(getEmojiImage(MiscEmojis.WHalpha));
+            if (tile.isHasBetaWH()) whs.add(getEmojiImage(MiscEmojis.WHbeta));
+            if (tile.isHasOtherWH()) whs.add(getEmojiImage(MiscEmojis.WHgamma));
+            if (tile.isLegendary()) legendary.add(getEmojiImage(MiscEmojis.LegendaryPlanet));
 
             for (UnitHolder uh : tile.getTile().getPlanetUnitHolders()) {
                 if (uh instanceof Planet p) {
                     for (String spec : p.getTechSpecialities()) {
                         switch (spec) {
-                            case "propulsion" -> blueSkips.add(getEmojiImage(Emojis.PropulsionTech));
-                            case "biotic" -> greenSkips.add(getEmojiImage(Emojis.BioticTech));
-                            case "cybernetic" -> yellowSkips.add(getEmojiImage(Emojis.CyberneticTech));
-                            case "warfare" -> redSkips.add(getEmojiImage(Emojis.WarfareTech));
+                            case "propulsion" -> blueSkips.add(getEmojiImage(TechEmojis.PropulsionTech));
+                            case "biotic" -> greenSkips.add(getEmojiImage(TechEmojis.BioticTech));
+                            case "cybernetic" -> yellowSkips.add(getEmojiImage(TechEmojis.CyberneticTech));
+                            case "warfare" -> redSkips.add(getEmojiImage(TechEmojis.WarfareTech));
                         }
                     }
                 }
@@ -237,6 +238,10 @@ public class MiltyDraftHelper {
         }
 
         return sliceImage;
+    }
+
+    private static BufferedImage getEmojiImage(TI4Emoji emoji) {
+        return ImageHelper.readEmojiImageScaled(emoji.toString(), 40);
     }
 
     private static BufferedImage getEmojiImage(String emojiString) {

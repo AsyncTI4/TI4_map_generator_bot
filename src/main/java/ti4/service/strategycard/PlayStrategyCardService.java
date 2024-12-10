@@ -19,7 +19,6 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.ThreadHelper;
 import ti4.image.Mapper;
@@ -28,6 +27,13 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ColorEmojis;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.PlanetEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.turn.StartTurnService;
 
 @UtilityClass
@@ -135,11 +141,11 @@ public class PlayStrategyCardService {
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero));
         if (scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
-            scButtons.add(Buttons.gray("nekroFollowTech", "Get CCs", Emojis.Nekro));
+            scButtons.add(Buttons.gray("nekroFollowTech", "Get CCs", FactionEmojis.Nekro));
         }
 
         if (scModel.usesAutomationForSCID("pok4construction") && !game.isFowMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
-            scButtons.add(Buttons.gray("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf", Emojis.Titans));
+            scButtons.add(Buttons.gray("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf", FactionEmojis.Titans));
         }
         scButtons.add(Buttons.gray("requestAllFollow_" + scToPlay, "Request All Resolve Now"));
 
@@ -148,7 +154,7 @@ public class PlayStrategyCardService {
         player.setWhetherPlayerShouldBeTenMinReminded(true);
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
 
-            Emoji reactionEmoji = Helper.getPlayerEmoji(game, player, message_);
+            Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message_);
             if (reactionEmoji != null) {
                 message_.addReaction(reactionEmoji).queue();
                 player.addFollowedSC(scToPlay, event);
@@ -159,7 +165,7 @@ public class PlayStrategyCardService {
                         continue;
                     }
                     if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1) && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8)) && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar") && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
-                        Emoji reactionEmoji2 = Helper.getPlayerEmoji(game, p2, message_);
+                        Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message_);
                         if (reactionEmoji2 != null) {
                             message_.addReaction(reactionEmoji2).queue();
                             p2.addFollowedSC(scToPlay, event);
@@ -242,7 +248,7 @@ public class PlayStrategyCardService {
             game.setStoredValue("hasntSetSpeaker", "waiting");
             String assignSpeakerMessage = player.getRepresentation()
                 + ", please, before you draw your action cards or look at agendas, click a faction below to assign Speaker "
-                + Emojis.SpeakerToken;
+                + MiscEmojis.SpeakerToken;
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(game, player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), assignSpeakerMessage, assignSpeakerActionRow);
@@ -259,7 +265,7 @@ public class PlayStrategyCardService {
         // Politics Agenda Draw Buttons
         if (scModel.usesAutomationForSCID("pok3politics") || scModel.usesAutomationForSCID("cryypter_3")) {
             String drawAgendasMessage = player.getRepresentation() + " after assigning speaker, use this button to draw agendas into your cards info thread.";
-            Button draw2Agenda = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawAgenda_2", "Draw 2 Agendas", Emojis.Agenda);
+            Button draw2Agenda = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawAgenda_2", "Draw 2 Agendas", CardEmojis.Agenda);
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), drawAgendasMessage, draw2Agenda);
 
         }
@@ -267,7 +273,7 @@ public class PlayStrategyCardService {
         // Cryypter's Additional Look at Top Agenda Buttons
         if (scModel.usesAutomationForSCID("cryypter_3")) {
             String lookAtTopMessage = player.getRepresentation() + " after placing the drawn agendas on top/bottom, you must look a the top two cards of the agenda deck.";
-            Button draw2Agenda = Buttons.green(player.getFinsFactionCheckerPrefix() + "agendaLookAt[count:2][lookAtBottom:false]", "Look at top 2 Agendas", Emojis.Agenda);
+            Button draw2Agenda = Buttons.green(player.getFinsFactionCheckerPrefix() + "agendaLookAt[count:2][lookAtBottom:false]", "Look at top 2 Agendas", CardEmojis.Agenda);
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), lookAtTopMessage, draw2Agenda);
         }
 
@@ -317,9 +323,7 @@ public class PlayStrategyCardService {
                         empNMahButtons);
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent") && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty() && !winnuHero) {
-                    Button mahactA = Buttons.red("mahactA_follow_" + scToPlay,
-                        "Use Mahact Agent", Emojis.Mahact);
-                    empNMahButtons.addFirst(mahactA);
+                    empNMahButtons.addFirst(Buttons.red("mahactA_follow_" + scToPlay, "Use Mahact Agent", FactionEmojis.Mahact));
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
                         player3.getRepresentationUnfogged() + " You may follow " + Helper.getSCName(scToPlay, game) + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                             + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.",
@@ -462,7 +466,7 @@ public class PlayStrategyCardService {
     private static List<Button> getPoliticsButtons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-        Button draw2AC = Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", Emojis.ActionCard);
+        Button draw2AC = Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", CardEmojis.ActionCard);
         return List.of(followButton, noFollowButton, draw2AC);
     }
 
@@ -476,7 +480,7 @@ public class PlayStrategyCardService {
                         Button button = Buttons.gray(politicsHolder.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ", player.getFactionEmoji());
                         assignSpeakerButtons.add(button);
                     } else {
-                        Button button = Buttons.gray(politicsHolder.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, player.getColor(), Emojis.getColorEmoji(player.getColor()));
+                        Button button = Buttons.gray(politicsHolder.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, player.getColor(), ColorEmojis.getColorEmoji(player.getColor()));
                         assignSpeakerButtons.add(button);
                     }
                 }
@@ -490,8 +494,8 @@ public class PlayStrategyCardService {
      */
     private static List<Button> getConstructionButtons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
-        Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", Emojis.spacedock);
-        Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", Emojis.pds);
+        Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock);
+        Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, sdButton, pdsButton, noFollowButton);
     }
@@ -500,8 +504,8 @@ public class PlayStrategyCardService {
         // Button tradePrimary = Buttons.green("trade_primary", "Resolve Primary");
         Button followButton = Buttons.green("sc_trade_follow", "Spend A Strategy CC");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-        Button refreshAndWash = Buttons.gray("sc_refresh_and_wash", "Replenish and Wash", Emojis.Wash);
-        Button refresh = Buttons.gray("sc_refresh", "Replenish Commodities", Emojis.comm);
+        Button refreshAndWash = Buttons.gray("sc_refresh_and_wash", "Replenish and Wash", MiscEmojis.Wash);
+        Button refresh = Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm);
         return List.of(followButton, noFollowButton, refresh, refreshAndWash);
     }
 
@@ -523,9 +527,9 @@ public class PlayStrategyCardService {
     private static List<Button> getImperialButtons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-        Button drawSo = Buttons.gray("sc_draw_so", "Draw Secret Objective", Emojis.SecretObjective);
-        Button scoreImperial = Buttons.gray("score_imperial", "Score Imperial", Emojis.Mecatol);
-        Button scoreAnObjective = Buttons.gray("scoreAnObjective", "Score A Public", Emojis.Public1);
+        Button drawSo = Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective);
+        Button scoreImperial = Buttons.gray("score_imperial", "Score Imperial", PlanetEmojis.Mecatol);
+        Button scoreAnObjective = Buttons.gray("scoreAnObjective", "Score A Public", CardEmojis.Public1);
         return List.of(followButton, noFollowButton, drawSo, scoreImperial, scoreAnObjective);
     }
 
@@ -538,7 +542,7 @@ public class PlayStrategyCardService {
     private static List<Button> getIgnisAuroraSC8Buttons(int sc) {
         Button primary = Buttons.blue("ignisAuroraSC8Primary", "[Primary] Gain Relic & Reveal Event");
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
-        Button secondary = Buttons.green("ignisAuroraSC8Secondary", "Draw Unknown Relic Fragment", Emojis.UFrag);
+        Button secondary = Buttons.green("ignisAuroraSC8Secondary", "Draw Unknown Relic Fragment", ExploreEmojis.UFrag);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(primary, followButton, secondary, noFollowButton);
     }
@@ -548,9 +552,9 @@ public class PlayStrategyCardService {
      */
     private static List<Button> getMonumentsConstructionButtons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
-        Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", Emojis.spacedock);
-        Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", Emojis.pds);
-        Button monumentButton = Buttons.red("construction_monument", "Place 1 Monument", Emojis.Monument);
+        Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock);
+        Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
+        Button monumentButton = Buttons.red("construction_monument", "Place 1 Monument", UnitEmojis.Monument);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, sdButton, pdsButton, monumentButton, noFollowButton);
     }

@@ -13,8 +13,10 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.apache.commons.lang3.StringUtils;
 import ti4.image.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 @Data
 public class LeaderModel implements ModelInterface, EmbeddableModel {
@@ -30,7 +32,6 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String abilityText;
     private String unlockCondition;
     private String flavourText;
-    private String emoji;
     private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
@@ -62,14 +63,11 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(shrinkName).orElse(false);
     }
 
-    public String getLeaderEmoji() {
-        if (getEmoji() != null) {
-            return getEmoji();
-        }
+    public TI4Emoji getLeaderEmoji() {
         if (getHomebrewReplacesID().isPresent()) {
-            return Emojis.getEmojiFromDiscord(getHomebrewReplacesID().get());
+            return LeaderEmojis.getLeaderEmoji(getHomebrewReplacesID().get());
         }
-        return Emojis.getEmojiFromDiscord(getID());
+        return LeaderEmojis.getLeaderEmoji(getID());
     }
 
     public Optional<String> getAbilityName() {
@@ -103,17 +101,17 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeFactionType, boolean showUnlockConditions, boolean includeFlavourText) {
         EmbedBuilder eb = new EmbedBuilder();
         FactionModel factionModel = Mapper.getFaction(getFaction());
-        String factionEmoji = Emojis.getFactionIconFromDiscord(getFaction());
-        if (factionModel != null) factionEmoji = Emojis.getFactionIconFromDiscord(factionModel.getAlias());
+        String factionEmoji = FactionEmojis.getFactionIcon(getFaction()).toString();
+        if (factionModel != null) factionEmoji = FactionEmojis.getFactionIcon(factionModel.getAlias()).toString();
 
         String factionName = getFaction();
         if (factionModel != null) factionName = factionModel.getFactionName();
 
         //TITLE
-        String title = factionEmoji + " __**" + getName() + "**__ " + Emojis.getLeaderTypeEmoji(type) + " " + getTitle() + getSource().emoji();
+        String title = factionEmoji + " __**" + getName() + "**__ " + LeaderEmojis.getLeaderTypeEmoji(type) + " " + getTitle() + getSource().emoji();
         eb.setTitle(title);
 
-        Emoji emoji = Emoji.fromFormatted(getLeaderEmoji());
+        Emoji emoji = getLeaderEmoji().asEmoji();
         if (emoji instanceof CustomEmoji customEmoji) {
             eb.setThumbnail(customEmoji.getImageUrl());
         }
@@ -143,7 +141,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return Emojis.getFactionIconFromDiscord(getFaction()) + Emojis.getLeaderTypeEmoji(getType()) + getLeaderEmoji() + " " + getName() + " " + " (" + getTitle() + ") " + getSource().emoji();
+        return FactionEmojis.getFactionIcon(getFaction()) + " " + LeaderEmojis.getLeaderTypeEmoji(getType()) + getLeaderEmoji() + " " + getName() + " " + " (" + getTitle() + ") " + getSource().emoji();
     }
 
     public boolean search(String searchString) {

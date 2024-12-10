@@ -7,19 +7,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -29,7 +25,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.map.manage.GameManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
@@ -187,8 +182,8 @@ public class FoWHelper {
 	public static boolean hasHomeSystemInView(@NotNull Game game, @NotNull Player player,
 		@NotNull Player viewingPlayer) {
 		Tile tile = player.getHomeSystemTile();
-        return tile != null && !tile.hasFog(viewingPlayer);
-    }
+		return tile != null && !tile.hasFog(viewingPlayer);
+	}
 
 	private static boolean hasPlayersPromInPlayArea(@NotNull Player player, @NotNull Player viewingPlayer) {
 		boolean hasPromInPA = false;
@@ -518,8 +513,8 @@ public class FoWHelper {
 				}
 				for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
 					if (tokenName.contains(wh.getWhString())) {
-							wormholeIDs.add(wh.toString());
-  						break;
+						wormholeIDs.add(wh.toString());
+						break;
 					}
 				}
 			}
@@ -556,8 +551,8 @@ public class FoWHelper {
 				Set<String> tokenList = unitHolder.getTokenList();
 				for (String token : tokenList) {
 					for (String wormholeID : wormholeIDs) {
-						if (token.contains(wormholeID) && !(wormholeID.equals("eta") 
-              && (token.contains("beta") || token.contains("theta") || token.contains("zeta") ))) {
+						if (token.contains(wormholeID) && !(wormholeID.equals("eta")
+							&& (token.contains("beta") || token.contains("theta") || token.contains("zeta")))) {
 							adjacentPositions.add(position_);
 						}
 					}
@@ -873,7 +868,7 @@ public class FoWHelper {
 				sb.append("???");
 			}
 			sb.append(" sent ").append(transactedObject).append(" to ");
-            if (receiverVisible) {
+			if (receiverVisible) {
 				sb.append(receivingPlayer.getRepresentation());
 			} else {
 				sb.append("???");
@@ -905,23 +900,5 @@ public class FoWHelper {
 			return false;
 		initializeFog(game, viewer, false);
 		return canSeeStatsOfPlayer(game, player, viewer);
-	}
-
-	public static void sanityCheckFowReacts() {
-		List<String> badEmojis = new ArrayList<>(Emojis.symbols).stream()
-			.map(Emoji::fromFormatted)
-			.map(emoji -> (emoji instanceof CustomEmoji c) ? c : null)
-			.filter(Objects::nonNull)
-			.filter(e -> AsyncTI4DiscordBot.jda.getEmojiById(e.getId()) == null)
-			.map(emoji -> emoji.getName() + " " + emoji.getId())
-			.toList();
-		if (!badEmojis.isEmpty()) {
-			StringBuilder sb = new StringBuilder(Constants.jazzPing());
-			sb.append(" Bad emojis are being used for FOW reacts:\n");
-			for (String err : badEmojis) {
-				sb.append("```\n").append(err).append("\n```");
-			}
-			BotLogger.log(sb.toString());
-		}
 	}
 }

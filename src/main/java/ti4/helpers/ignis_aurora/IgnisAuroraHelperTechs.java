@@ -12,7 +12,6 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.CommandCounterHelper;
-import ti4.helpers.Emojis;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -20,6 +19,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.CardEmojis;
 
 public class IgnisAuroraHelperTechs {
     public static void handleExhaustIgnisAuroraTech(GenericInteractionCreateEvent event, Game game, Player player, String tech) {
@@ -34,8 +34,8 @@ public class IgnisAuroraHelperTechs {
             }
             case "fabrilerealignment" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.red("fibrileRealign_AC", "Discard/draw Action Card", Emojis.ActionCard));
-                buttons.add(Buttons.red("fibrileRealign_SO", "Discard/draw Secret Objective", Emojis.SecretObjective));
+                buttons.add(Buttons.red("fibrileRealign_AC", "Discard/draw Action Card", CardEmojis.ActionCard));
+                buttons.add(Buttons.red("fibrileRealign_SO", "Discard/draw Secret Objective", CardEmojis.SecretObjective));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to resolve:", buttons);
             }
             case "stellarcorridors" -> postStellarCorridors(event, game, player);

@@ -10,7 +10,6 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
-import ti4.helpers.Emojis;
 import ti4.helpers.ExploreHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -19,6 +18,8 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.PlanetService;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
@@ -30,13 +31,13 @@ class ExploreButtonHandler {
     @ButtonHandler("resolveLocalFab_")
     public static void resolveLocalFabricators(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
         String planetName = buttonID.split("_")[1];
-        String commOrTg;
+        TI4Emoji commOrTg;
         if (player.getCommodities() > 0) {
             player.setCommodities(player.getCommodities() - 1);
-            commOrTg = Emojis.comm;
+            commOrTg = MiscEmojis.comm;
         } else if (player.getTg() > 0) {
             player.setTg(player.getTg() - 1);
-            commOrTg = Emojis.tg;
+            commOrTg = MiscEmojis.tg;
         } else {
             ButtonHelper.addReaction(event, false, false, "Didn't have any Comms/TGs to spend, no mech placed", "");
             return;
@@ -115,7 +116,7 @@ class ExploreButtonHandler {
         boolean failed = message.contains("Please try again.");
         if (!failed) {
             if ("mech".equalsIgnoreCase(mech)) {
-                AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(),"mech " + planet);
+                AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "mech " + planet);
                 message += "Placed mech on" + Mapper.getPlanet(planet).getName();
             } else {
                 AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "2 infantry " + planet);

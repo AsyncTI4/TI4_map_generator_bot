@@ -5,10 +5,10 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import software.amazon.awssdk.utils.StringUtils;
-import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.ColorEmojis;
 
 @UtilityClass
 public class WhisperService {
@@ -16,7 +16,7 @@ public class WhisperService {
     public static void sendWhisper(Game game, Player player, Player player_, String msg, String anonY, MessageChannel feedbackChannel, Guild guild) {
         String message;
         String realIdentity = player_.getRepresentationUnfogged();
-        String player1 = Emojis.getColorEmojiWithName(player.getColor());
+        String player1 = ColorEmojis.getColorEmojiWithName(player.getColor());
         if (!game.isFowMode() && !(feedbackChannel instanceof ThreadChannel)) {
             feedbackChannel = player.getCardsInfoThread();
             MessageHelper.sendMessageToChannel(feedbackChannel, player.getRepresentation() + " Reminder you should start all whispers from your cards info channel, and do not need to use the /fow whisper command, you can just start a message with toblue or something");
@@ -36,7 +36,7 @@ public class WhisperService {
         if (game.isFowMode()) {
             String fail = "Could not notify receiving player.";
             String success;
-            String player2 = Emojis.getColorEmojiWithName(player_.getColor());
+            String player2 = ColorEmojis.getColorEmojiWithName(player_.getColor());
             if (message.contains("[REDACTED]")) {
                 success = player1 + "(You) anonymously said: \"" + msg + "\" to " + player2;
             } else {
@@ -49,7 +49,7 @@ public class WhisperService {
         } else {
             String fail = "Could not notify receiving player.";
             String success;
-            String player2 = Emojis.getColorEmojiWithName(player_.getColor());
+            String player2 = ColorEmojis.getColorEmojiWithName(player_.getColor());
             player2 = player_.getFactionEmoji() + "(" + StringUtils.capitalize(player_.getFaction()) + ") " + player2;
             if (message.contains("[REDACTED]")) {
                 success = player1 + "(You) anonymously said: \"" + msg + "\" to " + player2;

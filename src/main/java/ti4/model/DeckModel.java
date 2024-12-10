@@ -10,8 +10,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
-import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.TechEmojis;
 
 public class DeckModel implements ModelInterface, EmbeddableModel {
 
@@ -23,16 +24,17 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
     private ComponentSource source;
 
     public enum DeckType {
-        @JsonProperty("action_card") ACTION_CARD,
-        @JsonProperty("agenda") AGENDA,
-        @JsonProperty("event") EVENT,
-        @JsonProperty("explore") EXPLORE,
-        @JsonProperty("public_stage_1_objective") PUBLIC_STAGE_1_OBJECTIVE,
-        @JsonProperty("public_stage_2_objective") PUBLIC_STAGE_2_OBJECTIVE,
-        @JsonProperty("relic") RELIC,
-        @JsonProperty("secret_objective") SECRET_OBJECTIVE,
-        @JsonProperty("technology") TECHNOLOGY,
-        @JsonEnumDefaultValue OTHER
+        @JsonProperty("action_card")
+        ACTION_CARD, @JsonProperty("agenda")
+        AGENDA, @JsonProperty("event")
+        EVENT, @JsonProperty("explore")
+        EXPLORE, @JsonProperty("public_stage_1_objective")
+        PUBLIC_STAGE_1_OBJECTIVE, @JsonProperty("public_stage_2_objective")
+        PUBLIC_STAGE_2_OBJECTIVE, @JsonProperty("relic")
+        RELIC, @JsonProperty("secret_objective")
+        SECRET_OBJECTIVE, @JsonProperty("technology")
+        TECHNOLOGY, @JsonEnumDefaultValue
+        OTHER
     }
 
     public boolean isValid() {
@@ -130,14 +132,14 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
 
     private String getTypeEmoji() {
         return switch (getType()) {
-            case TECHNOLOGY -> Emojis.NonUnitTechSkip;
-            case AGENDA -> Emojis.Agenda;
-            case ACTION_CARD -> Emojis.ActionCard;
-            case PUBLIC_STAGE_1_OBJECTIVE -> Emojis.Public1;
-            case PUBLIC_STAGE_2_OBJECTIVE -> Emojis.Public2;
-            case SECRET_OBJECTIVE -> Emojis.SecretObjective;
-            case RELIC -> Emojis.RelicCard;
-            case EXPLORE -> Emojis.FrontierCard + Emojis.CulturalCard + Emojis.IndustrialCard + Emojis.HazardousCard;
+            case TECHNOLOGY -> TechEmojis.NonUnitTechSkip.toString();
+            case AGENDA -> CardEmojis.Agenda.toString();
+            case ACTION_CARD -> CardEmojis.ActionCard.toString();
+            case PUBLIC_STAGE_1_OBJECTIVE -> CardEmojis.Public1.toString();
+            case PUBLIC_STAGE_2_OBJECTIVE -> CardEmojis.Public2.toString();
+            case SECRET_OBJECTIVE -> CardEmojis.SecretObjective.toString();
+            case RELIC -> CardEmojis.RelicCard.toString();
+            case EXPLORE -> CardEmojis.FrontierCard.toString() + CardEmojis.CulturalCard + CardEmojis.IndustrialCard + CardEmojis.HazardousCard;
             default -> "";
         };
     }
