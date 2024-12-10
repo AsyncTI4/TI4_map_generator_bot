@@ -5988,22 +5988,22 @@ public class ButtonHelper {
 
     private static void acquireATechWithResources(Player player, Game game, ButtonInteractionEvent event, boolean sc) {
         acquireATech(player, game, event, sc,
-            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT),
-            "res");
+            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT)
+        );
     }
 
     @ButtonHandler("acquireAUnitTechWithInf")
     public static void acquireAUnitTechWithInf(Player player, Game game, ButtonInteractionEvent event) {
-        acquireATech(player, game, event, false, Set.of(Constants.UNIT), "inf");
+        acquireATech(player, game, event, false, Set.of(Constants.UNIT));
     }
 
-    private static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc, final String payType) {
+    private static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc) {
         acquireATech(player, game, event, sc,
-            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT),
-            payType);
+            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT)
+        );
     }
 
-    private static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc, final Set<String> techTypes, final String payType) {
+    private static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc, final Set<String> techTypes) {
         String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
         List<Button> buttons = new ArrayList<>();
         if (sc) {
@@ -6011,7 +6011,7 @@ public class ButtonHelper {
             boolean used = ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
             StrategyCardModel scModel = game.getStrategyCardModelByName("technology").orElse(null);
             if (!used && scModel != null && scModel.usesAutomationForSCID("pok7technology")
-                && !player.getFollowedSCs().contains(scModel.getInitiative())) {
+                    && !player.getFollowedSCs().contains(scModel.getInitiative())) {
                 int scNum = scModel.getInitiative();
                 player.addFollowedSC(scNum, event);
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
