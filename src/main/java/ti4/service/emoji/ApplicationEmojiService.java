@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -196,6 +197,10 @@ public class ApplicationEmojiService {
     }
 
     // SERVICE ------------------------------------------------------------------------------------------------------
+    public static boolean isValidAppEmoji(CustomEmoji emoji) {
+        return emojis.get(emoji.getName()).getFormatted().equals(emoji.getFormatted());
+    }
+
     @Getter
     public static class EmojiFileData {
         private File file;

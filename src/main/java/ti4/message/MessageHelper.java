@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
@@ -51,6 +52,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
+import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.GameNameService;
 
 public class MessageHelper {
@@ -90,7 +92,7 @@ public class MessageHelper {
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
 		String gameName = GameNameService.getGameNameFromChannel(channel);
 		if (GameManager.isValid(gameName) && buttons instanceof ArrayList
-				&& !(channel instanceof ThreadChannel) && channel.getName().contains("actions")) {
+			&& !(channel instanceof ThreadChannel) && channel.getName().contains("actions")) {
 			buttons = addUndoButtonToList(buttons, gameName);
 		}
 		sendMessageToChannelWithEmbedsAndButtons(channel, messageText, null, buttons);
@@ -101,7 +103,7 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageToChannelWithEmbedsAndButtons(@Nonnull MessageChannel channel, @Nullable String messageText,
-																@Nullable List<MessageEmbed> embeds, @Nullable List<Button> buttons) {
+		@Nullable List<MessageEmbed> embeds, @Nullable List<Button> buttons) {
 		splitAndSent(messageText, channel, embeds, buttons);
 	}
 
@@ -782,7 +784,8 @@ public class MessageHelper {
 
 			// REMOVE EMOJIS IF BOT CAN'T SEE IT
 			if (button.getEmoji() instanceof CustomEmoji emoji) {
-				if (AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
+				if (ApplicationEmojiService.isValidAppEmoji(emoji)) {
+				} else if (AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
 					String label = button.getLabel();
 					if (label.isBlank()) {
 						label = String.format(":%s:", emoji.getName());
