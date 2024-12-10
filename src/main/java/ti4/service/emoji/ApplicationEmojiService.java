@@ -198,7 +198,10 @@ public class ApplicationEmojiService {
 
     // SERVICE ------------------------------------------------------------------------------------------------------
     public static boolean isValidAppEmoji(CustomEmoji emoji) {
-        return emojis.get(emoji.getName()).getFormatted().equals(emoji.getFormatted());
+        CachedEmoji cached = emojis.get(emoji.getName());
+        if (cached == null)
+            return false;
+        return cached.getFormatted().equals(emoji.getFormatted());
     }
 
     @Getter
