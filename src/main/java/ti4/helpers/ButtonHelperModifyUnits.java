@@ -808,29 +808,32 @@ public class ButtonHelperModifyUnits {
         for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, player, false)) {
             Tile tile = game.getTileByPosition(pos2);
             if (pos1.equalsIgnoreCase(pos2) || (!Mapper.getFrontierTileIds().contains(tile.getTileID()) && tile.getPlanetUnitHolders().isEmpty() && tile.getUnitHolders().size() != 2)) {
-                continue;
+                continue; // TODO: Can we name the second half of this boolean to make it clear what it is doing?
             }
-            if ((tile.isAsteroidField() && !player.getTechs().contains("amd")) || (tile.isSupernova() && !player.getTechs().contains("mr"))) {
-                continue;
+            if (canRetreatTo(game, player, tile, skilled)) {
+                buttons.add(Buttons.gray(finChecker + "retreatUnitsFrom_" + pos1 + "_" + pos2 + skilledS,
+                    "Retreat to " + tile.getRepresentationForButtons(game, player)));
             }
-            Tile tile2 = game.getTileByPosition(pos2);
-            if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, game)) {
-                if (!FoWHelper.otherPlayersHaveUnitsInSystem(player, tile2, game) || skilled
-                    || FoWHelper.playerIsInSystem(game, tile2, player, false)) {
-                    if (FoWHelper.playerIsInSystem(game, tile2, player, false) || player.hasTech("det")
-                        || player.hasTech("absol_det") || skilled) {
-                        buttons.add(Buttons.gray(finChecker + "retreatUnitsFrom_" + pos1 + "_" + pos2 + skilledS,
-                            "Retreat to " + tile2.getRepresentationForButtons(game, player)));
-                    }
-                }
-            }
-
         }
         return buttons;
     }
 
-    public static List<Button> getRetreatingGroundTroopsButtons(Player player, Game game,
-        ButtonInteractionEvent event, String pos1, String pos2) {
+    private static boolean canRetreatTo(Game game, Player player, Tile tile, boolean skilledRetreat) {
+        if ((tile.isAsteroidField() && !player.getTechs().contains("amd")) ||
+                (tile.isSupernova() && !player.getTechs().contains("mr")) ||
+                FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+            return false;
+        }
+        if (skilledRetreat) {
+            return true;
+        }
+        if (FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+            return false;
+        }
+        return FoWHelper.playerIsInSystem(game, tile, player, false) || player.hasTech("det") || player.hasTech("absol_det");
+    }
+
+    public static List<Button> getRetreatingGroundTroopsButtons(Player player, Game game, String pos1, String pos2) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
@@ -1129,7 +1132,7 @@ public class ButtonHelperModifyUnits {
         var unit = new ParsedUnit(unitKey, amount, planet);
         RemoveUnitService.removeUnit(event, game.getTileByPosition(pos1), game, unit, damaged);
 
-        List<Button> systemButtons = getRetreatingGroundTroopsButtons(player, game, event, pos1, pos2);
+        List<Button> systemButtons = getRetreatingGroundTroopsButtons(player, game, pos1, pos2);
         String retreatMessage = player.getFactionEmojiOrColor() + " Retreated " + amount + " " + unitType + " on " + planet + " to "
             + game.getTileByPosition(pos2).getRepresentationForButtons(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), retreatMessage);

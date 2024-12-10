@@ -47,12 +47,11 @@ public class CommandHelper {
                 "Execute command in correctly named channel that starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`");
             return false;
         }
-        var game = managedGame.getGame();
-        if (checkChannel && !event.getChannel().getName().startsWith(game.getName() + "-")) {
+        if (checkChannel && !event.getChannel().getName().startsWith(managedGame.getName() + "-")) {
             MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' can only be executed in a game channel.");
             return false;
         }
-        if (checkPlayer && getPlayerFromEvent(game, event) == null) {
+        if (checkPlayer && getPlayerFromEvent(managedGame.getGame(), event) == null) {
             MessageHelper.replyToMessage(event, "Command must be ran by a player in the game, please use `/game join gameName` or `/special2 setup_neutral_player`.");
             return false;
         }
