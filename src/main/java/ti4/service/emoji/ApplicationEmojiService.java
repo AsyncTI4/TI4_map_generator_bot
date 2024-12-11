@@ -5,12 +5,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.collections4.SetUtils;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Icon;
@@ -66,6 +70,20 @@ public class ApplicationEmojiService {
         BotLogger.logWithTimestamp("Deleting " + hangingEmojis.size() + " hanging emojis...");
         boolean success = deleteAppEmojis(hangingEmojis);
         pushEmojiListToCache(success);
+    }
+
+    public static void reportMissingEnums() {
+        initAll(); // Redundant, probably. Short circuits anyway.
+        Set<String> emojiEnumNames = new HashSet<>(TI4Emoji.allEmojiEnums().stream().map(TI4Emoji::name).toList());
+        Set<String> emojiFileNames = new HashSet<>(enumerateEmojiFilesRecursive().map(EmojiFileData::new).map(EmojiFileData::getName).toList());
+        Set<String> missingEnums = SetUtils.difference(emojiFileNames, emojiEnumNames);
+        if (!missingEnums.isEmpty()) {
+            BotLogger.log("Missing " + missingEnums.size() + " enums: " + missingEnums);
+        }
+        Set<String> missingFiles = SetUtils.difference(emojiEnumNames, emojiFileNames);
+        if (!missingFiles.isEmpty()) {
+            BotLogger.log("Missing " + missingFiles.size() + " files: " + missingFiles);
+        }
     }
 
     public static void spoofEmojis() {
