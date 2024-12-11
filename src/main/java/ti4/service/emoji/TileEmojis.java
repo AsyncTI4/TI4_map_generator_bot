@@ -1,6 +1,7 @@
 package ti4.service.emoji;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import ti4.image.TileHelper;
 import ti4.model.TileModel;
@@ -41,14 +42,14 @@ public enum TileEmojis implements TI4Emoji {
     d116, d117, d118, d119, d120, d121, d122, d123,
 
     // other
-    NULLTile;
+    ;
 
     @Override
     public String toString() {
         return emojiString();
     }
 
-    @Nonnull
+    @Nullable
     public static TI4Emoji getTileEmojiFromTileID(String tileID) {
         return switch (tileID) {
             case "01" -> Jord_01;
@@ -210,17 +211,17 @@ public enum TileEmojis implements TI4Emoji {
         };
     }
 
-    @Nonnull
+    @Nullable
     public static TI4Emoji getTileBackEmojiFromTileID(String tileID) {
-        if (!TileHelper.isValidTile(tileID)) return NULLTile;
+        if (!TileHelper.isValidTile(tileID)) return null;
         TileModel tileModel = TileHelper.getTileById(tileID);
-        if (tileModel.getTileBackOption().isEmpty()) return NULLTile;
+        if (tileModel.getTileBackOption().isEmpty()) return null;
 
         return switch (tileModel.getTileBack()) {
             case "green" -> TileGreenBack;
             case "blue" -> TileBlueBack;
             case "red" -> TileRedBack;
-            default -> NULLTile;
+            default -> null;
         };
     }
 }

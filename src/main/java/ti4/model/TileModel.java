@@ -171,7 +171,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
-    @Nonnull
+    @Nullable
     public TI4Emoji getEmoji() {
         return TileEmojis.getTileEmojiFromTileID(getId());
     }
