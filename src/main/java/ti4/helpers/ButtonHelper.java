@@ -2285,7 +2285,7 @@ public class ButtonHelper {
                 return;
             }
         }
-        List<ThreadChannel> hiddenThreadChannels = channel.retrieveArchivedPublicThreadChannels().complete();
+        List<ThreadChannel> hiddenThreadChannels = channel.retrieveArchivedPublicThreadChannels().queue();
         for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
                 MessageHelper.sendMessageToChannel(threadChannel_, message);
@@ -4886,6 +4886,88 @@ public class ButtonHelper {
         } catch (NumberFormatException nfe) {
             return false;
         }
+    }
+
+    public static void cloneGame(GenericInteractionCreateEvent event, Game game) {
+        String name = game.getName();
+        GameSaveLoadManager.saveGame(game, event);
+        String newName = name + "clone";
+        Guild guild = game.getGuild();
+        String gameFunName = game.getCustomName();
+        String newChatChannelName = newName + "-" + gameFunName;
+        String newActionsChannelName = newName + Constants.ACTIONS_CHANNEL_SUFFIX;
+        String newBotThreadName = newName + Constants.BOT_CHANNEL_SUFFIX;
+
+        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+
+        Role gameRole = guild.createRole()
+            .setName(newName)
+            .setMentionable(true)
+            .queue();
+        for (Player player : game.getRealPlayers()) {
+            Member member = guild.getMemberById(player.getUserID());
+            if (member != null) {
+                guild.addRoleToMember(member, gameRole).queue();
+            }
+        }
+        Category category = game.getMainGameChannel().getParentCategory();
+        long gameRoleID = gameRole.getIdLong();
+        // CREATE TABLETALK CHANNEL
+        TextChannel chatChannel = guild.createTextChannel(newChatChannelName, category)
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .queue();
+
+        // CREATE ACTIONS CHANNEL
+        TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .queue();
+
+        File originalGameFile = Storage.getGameFile(game.getName() + Constants.TXT);
+
+        File mapUndoDirectory = Storage.getGameUndoDirectory();
+        if (!mapUndoDirectory.exists()) {
+            return;
+        }
+
+        String gameName = game.getName();
+        String gameNameForUndoStart = gameName + "_";
+        String[] mapUndoFiles = mapUndoDirectory.list((dir, name2) -> name2.startsWith(gameNameForUndoStart));
+        if (mapUndoFiles != null && mapUndoFiles.length > 0) {
+            try {
+                List<Integer> numbers = Arrays.stream(mapUndoFiles)
+                    .map(fileName -> fileName.replace(gameNameForUndoStart, ""))
+                    .map(fileName -> fileName.replace(Constants.TXT, ""))
+                    .map(Integer::parseInt).toList();
+                int maxNumber = numbers.isEmpty() ? 0
+                    : numbers.stream().mapToInt(value -> value)
+                        .max().orElseThrow(NoSuchElementException::new);
+
+                File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + maxNumber + Constants.TXT);
+                CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
+                Files.copy(mapUndoStorage.toPath(), originalGameFile.toPath(), options);
+                Game gameToRestore = GameSaveLoadManager.loadGame(originalGameFile);
+                gameToRestore.setTableTalkChannelID(chatChannel.getId());
+                gameToRestore.setMainChannelID(actionsChannel.getId());
+                gameToRestore.setName(newName);
+                gameToRestore.shuffleDecks();
+                GameManager.addGame(gameToRestore);
+                // CREATE BOT/MAP THREAD
+                ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
+                    .queue();
+                ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName).queue();
+                gameToRestore.setBotMapUpdatesThreadID(botThread.getId());
+                for (Player player : gameToRestore.getRealPlayers()) {
+                    player.setCardsInfoThreadID(null);
+                }
+                GameSaveLoadManager.saveGame(gameToRestore, event);
+            } catch (Exception ignored) {
+
+            }
+
+        }
+
     }
 
     public static List<Button> getColorSetupButtons(Game game, String buttonID) {

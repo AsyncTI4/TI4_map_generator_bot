@@ -38,7 +38,7 @@ class ListButtons extends Subcommand {
             return;
         }
 
-        Message msg = Objects.requireNonNullElse(channel, threadChannel).getHistoryAround(messageId, 1).complete().getMessageById(messageId);
+        Message msg = Objects.requireNonNullElse(channel, threadChannel).getHistoryAround(messageId, 1).queue().getMessageById(messageId);
 
         if (msg == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find message");
