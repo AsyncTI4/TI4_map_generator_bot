@@ -56,6 +56,8 @@ public class GameModeModel implements ModelInterface {
         game.validateAndSetAgendaDeck(event, Mapper.getDeck(getAgendaDeckID()));
         game.validateAndSetRelicDeck(Mapper.getDeck(getRelicDeckID()));
         game.validateAndSetExploreDeck(event, Mapper.getDeck(getExplorationDeckID()));
+
+        getGameTagsToAdd().forEach(game::addTag);
         
         game.swapOutVariantTechs();
         game.setTechnologyDeckID(getTechnologyDeckID());
