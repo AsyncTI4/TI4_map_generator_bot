@@ -17,9 +17,14 @@ public enum TileEmojis implements TI4Emoji {
     Quann_25, Lodor_26, NewAlbion_27, Tequran_28, Qucenn_29, Mellon_30, Lazar_31, DalBootha_32, //
     Corneeq_33, Centauri_34, Bereg_35, Arnor_36, Arinam_37, Abyz_38, AlphaWH_39, BetaWH_40, //
     GravityRift_41, Nebula_42, Supernova_43, Asteroids_44, Asteroids_45, Void_46, Void_47, Void_48, //
-    Void_49, Void_50, Creuss_51
+    Void_49, Void_50, Creuss_51,
 
     // pok
+    Ixth_52, Arcturus_53, Acheron_54, Elysium_55, TheDark_56, NaazirRokha_57, YlirAvarValk_58, //
+    ArchonVail_59, Perimeter_60, Ang_61, SemLore_62, Vorhal_63, Atlas_64, Primor_65, HopesEnd_66, //
+    Cormund_67, Everra_68, AccoenJeolIr_69, KraagSiig_70, BakalAlioPrima_71, LisisVelnor_72, //
+    CealdriXanhact_73, Vegas_74, Devils_75, Rigels_76, Void_77, Void_78, AsteroidsAlphaWH_79, //
+    Supernova_80, NovaSeed_81, MalliceLocked_82a, MalliceUnlocked_82b
 
     // codex 3
 
