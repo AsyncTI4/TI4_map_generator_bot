@@ -78,11 +78,11 @@ public class ApplicationEmojiService {
         Set<String> emojiFileNames = new HashSet<>(enumerateEmojiFilesRecursive().map(EmojiFileData::new).map(EmojiFileData::getName).toList());
         Set<String> missingEnums = SetUtils.difference(emojiFileNames, emojiEnumNames);
         if (!missingEnums.isEmpty()) {
-            BotLogger.log("Missing " + missingEnums.size() + " enums: " + missingEnums);
+            BotLogger.log("Missing " + missingEnums.size() + " Emoji enums: " + missingEnums);
         }
         Set<String> missingFiles = SetUtils.difference(emojiEnumNames, emojiFileNames);
         if (!missingFiles.isEmpty()) {
-            BotLogger.log("Missing " + missingFiles.size() + " files: " + missingFiles);
+            BotLogger.log("Missing " + missingFiles.size() + " Emoji files: " + missingFiles);
         }
     }
 
