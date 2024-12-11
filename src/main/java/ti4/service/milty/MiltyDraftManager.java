@@ -13,7 +13,11 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -23,11 +27,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.StringHelper;
@@ -35,11 +36,15 @@ import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiltyDraftEmojis;
+import ti4.service.emoji.TI4Emoji;
 import ti4.service.map.AddTileListService;
 
 @Data
@@ -68,24 +73,26 @@ public class MiltyDraftManager {
 
     @Data
     public static class PlayerDraft {
-        private String faction = null;
-        private MiltyDraftSlice slice = null;
-        private Integer position = null;
+        private String faction;
+        private MiltyDraftSlice slice;
+        private Integer position;
 
         public String summary(String doggy) {
             return String.join(" ", factionEmoji(doggy), sliceEmoji(), positionEmoji());
         }
 
         private String factionEmoji(String doggy) {
-            return faction == null ? doggy : Emojis.getFactionIconFromDiscord(faction);
+            return faction == null ? doggy : FactionEmojis.getFactionIcon(faction).toString();
         }
 
         private String sliceEmoji() {
-            return slice == null ? Emojis.sliceUnpicked : Emojis.getMiltyDraftEmoji(slice.getName());
+            String ord = slice == null ? null : slice.getName();
+            return MiltyDraftEmojis.getMiltyDraftEmoji(ord).toString();
         }
 
         private String positionEmoji() {
-            return position == null ? Emojis.positionUnpicked : Emojis.getSpeakerPickEmoji(position);
+            int ord = position == null ? -1 : position;
+            return MiltyDraftEmojis.getSpeakerPickEmoji(ord).toString();
         }
 
         @JsonIgnore
@@ -513,7 +520,6 @@ public class MiltyDraftManager {
         } catch (Exception e) {
             BotLogger.log("Unable to clear out old buttons and messages.", e);
         }
-        // And then null them out so we don't mess with 'em again
         prevPingMessage = null;
     }
 
@@ -542,7 +548,6 @@ public class MiltyDraftManager {
             BotLogger.log("Unable to clear out old buttons and messages.", e);
         }
 
-        // And then null them out so we don't mess with 'em again
         prevSliceMessage = null;
         prevFactionMessage = null;
         prevOrderMessage = null;
@@ -553,9 +558,7 @@ public class MiltyDraftManager {
         List<Button> sliceButtons = new ArrayList<>();
         for (MiltyDraftSlice slice : getSlices()) {
             if (isSliceTaken(slice.getName())) continue;
-            Emoji emoji = Emoji.fromFormatted(Emojis.getMiltyDraftEmoji(slice.getName()));
-            Button button = Buttons.green("milty_slice_" + slice.getName(), " ", emoji.getFormatted());
-            sliceButtons.add(button);
+            sliceButtons.add(Buttons.green("milty_slice_" + slice.getName(), " ", MiltyDraftEmojis.getMiltyDraftEmoji(slice.getName())));
         }
         return sliceButtons;
     }
@@ -566,12 +569,10 @@ public class MiltyDraftManager {
             FactionModel model = Mapper.getFaction(faction);
             if (model == null || isFactionTaken(faction)) continue;
 
-            Emoji emoji = Emoji.fromFormatted(model.getFactionEmoji());
             String name = model.getFactionName();
             if (faction.startsWith("keleres"))
                 name = "The Council Keleres";
-            Button button = Buttons.gray("milty_faction_" + faction, name).withEmoji(emoji);
-            factionButtons.add(button);
+            factionButtons.add(Buttons.gray("milty_faction_" + faction, name, model.getFactionEmoji()));
         }
         return factionButtons;
     }
@@ -580,16 +581,14 @@ public class MiltyDraftManager {
         List<Button> orderButtons = new ArrayList<>();
         for (int speakerOrder = 1; speakerOrder <= players.size(); speakerOrder++) {
             if (isOrderTaken(speakerOrder)) continue;
-            Emoji emoji = Emoji.fromFormatted(Emojis.getSpeakerPickEmoji(speakerOrder));
-            Button button = Buttons.green("milty_order_" + speakerOrder, " ", emoji.getFormatted());
-            orderButtons.add(button);
+            orderButtons.add(Buttons.green("milty_order_" + speakerOrder, " ", MiltyDraftEmojis.getSpeakerPickEmoji(speakerOrder)));
         }
         return orderButtons;
     }
 
     private String getOverallSummaryString(Game game) {
         int padding = String.format("%s", getPlayers().size()).length() + 1;
-        String goodDogOfTheDay = Emojis.getRandomGoodDog();
+        String goodDogOfTheDay = TI4Emoji.getRandomGoodDog().toString();
         StringBuilder sb = new StringBuilder();
         sb.append("# **__Draft Picks So Far__**:");
         int pickNum = 1;
@@ -627,6 +626,7 @@ public class MiltyDraftManager {
         MessageHelper.splitAndSentWithAction(faction, chan, getFactionButtons(), (m) -> prevFactionMessage = m.getId());
         MessageHelper.splitAndSentWithAction(speaker, chan, getPositionButtons(), (m) -> prevOrderMessage = m.getId());
         ping(game);
+        GameManager.save(game, "Milty");
     }
 
     public void ping(Game game) {
@@ -641,7 +641,7 @@ public class MiltyDraftManager {
         buttons.add(Buttons.blue("miltyFactionInfo_remaining", "Remaining faction info"));
         buttons.add(Buttons.blue("miltyFactionInfo_picked", "Picked faction info"));
         buttons.add(Buttons.blue("miltyFactionInfo_all", "All faction info"));
-        buttons = MessageHelper.addUndoButtonToList(buttons, game);
+        buttons = MessageHelper.addUndoButtonToList(buttons, game.getName());
         MessageHelper.splitAndSentWithAction(ping, game.getMainGameChannel(), buttons, m -> prevPingMessage = m.getId());
     }
 
@@ -792,8 +792,8 @@ public class MiltyDraftManager {
         if (result == null) {
             TileModel tileRequested = TileHelper.getTileById(tileId);
             Set<ComponentSource> currentsources = all.stream()
-                    .map(t -> t.getTile().getTileModel().getSource())
-                    .filter(Objects::nonNull).collect(Collectors.toSet());
+                .map(t -> t.getTile().getTileModel().getSource())
+                .filter(Objects::nonNull).collect(Collectors.toSet());
             if (tileRequested.getSource() != null) currentsources.add(tileRequested.getSource());
             if (tileId.matches("d\\d{1,3}")) currentsources.add(ComponentSource.uncharted_space);
             if (tileId.matches("e\\d{1,3}")) currentsources.add(ComponentSource.eronous);

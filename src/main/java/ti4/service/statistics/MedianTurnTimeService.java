@@ -9,16 +9,15 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GamesPage;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -45,8 +44,7 @@ public class MedianTurnTimeService {
             .map(e -> Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList())))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("## __**Median Turn Time:**__\n");
+        StringBuilder sb = new StringBuilder("## __**Median Turn Time:**__\n");
 
         int index = 1;
         int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
@@ -58,8 +56,8 @@ public class MedianTurnTimeService {
             .limit(topLimit)
             .toList();
 
-        for (Map.Entry<String, Long> userMedianTurnTime : medianTurnTimes) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(userMedianTurnTime.getKey());
+        for (var userMedianTurnTime : medianTurnTimes) {
+            var user = GameManager.getManagedPlayer(userMedianTurnTime.getKey());
             long totalMillis = userMedianTurnTime.getValue();
             int turnCount = playerTurnCount.get(userMedianTurnTime.getKey());
 
@@ -67,7 +65,7 @@ public class MedianTurnTimeService {
 
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
             sb.append(DateTimeHelper.getTimeRepresentationToSeconds(userMedianTurnTime.getValue()));
-            sb.append("` ").append(user.getEffectiveName());
+            sb.append("` ").append(user.getName());
             sb.append("   [").append(turnCount).append(" total turns]");
             sb.append("\n");
             index++;
@@ -80,8 +78,9 @@ public class MedianTurnTimeService {
                                                     Map<String, Set<Long>> playerAverageTurnTimes) {
         for (Player player : game.getRealPlayers()) {
             int totalTurns = player.getNumberTurns();
-            if (totalTurns == 0) continue;
             long totalTurnTime = player.getTotalTurnTime();
+            if (totalTurns == 0 || totalTurnTime == 0) continue;
+
             Map.Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
             Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
             playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {

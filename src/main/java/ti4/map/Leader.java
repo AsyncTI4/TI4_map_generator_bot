@@ -12,8 +12,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import ti4.image.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.model.LeaderModel;
+import ti4.service.emoji.MiscEmojis;
 
 public class Leader {
     private final String id;
@@ -25,11 +25,11 @@ public class Leader {
 
     @JsonCreator
     public Leader(@JsonProperty("id") String id,
-                  @JsonProperty("type") String type,
-                  @JsonProperty("tgCount") int tgCount,
-                  @JsonProperty("exhausted") boolean exhausted,
-                  @JsonProperty("locked") boolean locked,
-                  @JsonProperty("active") boolean active) {
+        @JsonProperty("type") String type,
+        @JsonProperty("tgCount") int tgCount,
+        @JsonProperty("exhausted") boolean exhausted,
+        @JsonProperty("locked") boolean locked,
+        @JsonProperty("active") boolean active) {
         this.id = id;
         this.type = type;
         this.tgCount = tgCount;
@@ -55,7 +55,7 @@ public class Leader {
     public String getId() {
         return id;
     }
-    
+
     public String getType() {
         return type;
     }
@@ -113,7 +113,7 @@ public class Leader {
 
         if (getTgCount() > 0) {
             String desc = modelEmbed.getDescription();
-            eb.setDescription(desc + "\n" + StringUtils.repeat(Emojis.tg, getTgCount()));
+            eb.setDescription(desc + "\n" + MiscEmojis.tg(getTgCount()));
         }
 
         if (isExhausted()) {
@@ -126,7 +126,7 @@ public class Leader {
             eb.setColor(Color.RED);
             eb.setAuthor("🔒 Locked");
         }
-        
+
         if (isActive()) {
             eb.setColor(Color.BLUE);
             eb.setAuthor("🔒 ACTIVE - Leader will be purged during status phase cleanup");

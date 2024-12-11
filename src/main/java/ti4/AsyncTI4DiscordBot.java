@@ -29,13 +29,13 @@ import org.reflections.util.ConfigurationBuilder;
 import ti4.commands2.CommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;
+import ti4.cron.EndOldGamesCron;
 import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.UploadStatsCron;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TimedRunnable;
@@ -51,9 +51,10 @@ import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
 import ti4.listeners.UserJoinServerListener;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.migration.DataMigrationManager;
 import ti4.processors.ButtonProcessor;
 import ti4.selections.SelectionManager;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -69,7 +70,7 @@ public class AsyncTI4DiscordBot {
     public static final List<Role> adminRoles = new ArrayList<>();
     public static final List<Role> developerRoles = new ArrayList<>();
     public static final List<Role> bothelperRoles = new ArrayList<>();
-    private static final ExecutorService THREAD_POOL = Executors.newVirtualThreadPerTaskExecutor();
+    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
 
     public static JDA jda;
     public static String userID;
@@ -146,9 +147,6 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 5) {
             guildFogOfWar = jda.getGuildById(args[4]);
             startBot(guildFogOfWar);
-
-            // JAZZ WILL GET PINGED IF SHIT IS BROKEN FOR FOG GAMES
-            FoWHelper.sanityCheckFowReacts();
         }
 
         // Async: Stroter's Paradise
@@ -210,16 +208,18 @@ public class AsyncTI4DiscordBot {
 
         // LOAD GAMES NAMES
         BotLogger.logWithTimestamp(" LOADING GAMES");
-        GameSaveLoadManager.loadGame();
-        BotLogger.logWithTimestamp(" FINISHED LOADING GAMES");
+        GameManager.initialize();
 
         // RUN DATA MIGRATIONS
-        BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
-        DataMigrationManager.runMigrations();
-        BotLogger.logWithTimestamp(" FINISHED CHECKING FOR DATA MIGRATIONS");
+        if (DataMigrationManager.runMigrations()) {
+            BotLogger.logWithTimestamp(" RAN MIGRATIONS");
+        }
 
         // START ASYNC PIPELINES
         ImageIO.setUseCache(false);
+        MapRenderPipeline.start();
+        StatisticsPipeline.start();
+        ButtonProcessor.start();
 
         // START CRONS
         AutoPingCron.register();
@@ -227,6 +227,7 @@ public class AsyncTI4DiscordBot {
         LogCacheStatsCron.register();
         UploadStatsCron.register();
         OldUndoFileCleanupCron.register();
+        EndOldGamesCron.register();
         LogButtonRuntimeStatisticsCron.register();
 
         // BOT IS READY

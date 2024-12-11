@@ -141,15 +141,15 @@ public class RiftUnitsHelper {
             damaged = true;
         }
         Die d1 = new Die(4);
-        String msg = Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile " + tile.getPosition() + " rolled a " + d1.getGreenDieIfSuccessOrRedDieIfFailure();
+        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
+        String msg = unitKey.unitEmoji() + " in tile " + tile.getPosition() + " rolled a " + d1.getGreenDieIfSuccessOrRedDieIfFailure();
         if (damaged) {
             msg = "A damaged " + msg;
         }
         if (d1.isSuccess()) {
             msg = msg + " and survived. May you always be so lucky.";
         } else {
-            UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
-            var parsedUnit = new ParsedUnit(key);
+            var parsedUnit = new ParsedUnit(unitKey);
             RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
             msg = msg + " and failed. Condolences for your loss.";
             if (cabal != null && cabal != player
@@ -194,20 +194,17 @@ public class RiftUnitsHelper {
                     if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
                         damagedUnits = unitHolder.getUnitDamage().get(key);
                     }
-                    EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
                     for (int x = 1; x < damagedUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
                             finChecker + "riftUnit_" + tile.getPosition() + "_" + x + asyncID + "damaged",
-                            "Rift " + x + " damaged " + unitModel.getBaseType());
-                        validTile2 = validTile2.withEmoji(emoji);
+                            "Rift " + x + " damaged " + unitModel.getBaseType(), unitModel.getUnitEmoji());
                         buttons.add(validTile2);
                     }
                     totalUnits = totalUnits - damagedUnits;
                     for (int x = 1; x < totalUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
                             finChecker + "riftUnit_" + tile.getPosition() + "_" + x + asyncID,
-                            "Rift " + x + " " + unitModel.getBaseType());
-                        validTile2 = validTile2.withEmoji(emoji);
+                            "Rift " + x + " " + unitModel.getBaseType(), unitModel.getUnitEmoji());
                         buttons.add(validTile2);
                     }
                 }
@@ -237,7 +234,7 @@ public class RiftUnitsHelper {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("unflipMallice", "Unflip Mallice"));
             buttons.add(Buttons.red("deleteButtons", "Leave it alone"));
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
     }
 

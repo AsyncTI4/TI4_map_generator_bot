@@ -17,10 +17,9 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ComponentActionHelper;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.image.MapGenerator;
+import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -28,6 +27,11 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -59,7 +63,7 @@ public class StartTurnService {
         boolean goingToPass = false;
         if (game.getStoredValue("Pre Pass " + player.getFaction()) != null
             && game.getStoredValue("Pre Pass " + player.getFaction())
-            .contains(player.getFaction())) {
+                .contains(player.getFaction())) {
             if (game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())
                 && !player.isPassed()) {
                 game.setStoredValue("Pre Pass " + player.getFaction(), "");
@@ -117,7 +121,7 @@ public class StartTurnService {
         } else {
             //checkhere
             if (game.isShowBanners()) {
-                MapGenerator.drawBanner(player);
+                BannerGenerator.drawFactionBanner(player);
             }
             MessageHelper.sendMessageToChannel(gameChannel, text);
             if (!goingToPass) {
@@ -265,13 +269,8 @@ public class StartTurnService {
                     if (game.getName().equalsIgnoreCase("pbd1000")) {
                         name = name + "(" + SC + ")";
                     }
-                    if (game.isHomebrewSCMode()) {
-                        Button strategicAction = Buttons.green(finChecker + "strategicAction_" + SC, "Play " + name);
-                        startButtons.add(strategicAction);
-                    } else {
-                        Button strategicAction = Buttons.green(finChecker + "strategicAction_" + SC, "Play " + name).withEmoji(Emoji.fromFormatted(Emojis.getSCEmojiFromInteger(SC)));
-                        startButtons.add(strategicAction);
-                    }
+                    Button strategicAction = Buttons.green(finChecker + "strategicAction_" + SC, "Play " + name, CardEmojis.getSCFrontFromInteger(SC));
+                    startButtons.add(strategicAction);
                 }
             }
             String prefix = "componentActionRes_";
@@ -284,23 +283,23 @@ public class StartTurnService {
                     }
                     String leaderName = leaderModel.getName();
                     String leaderAbilityWindow = leaderModel.getAbilityWindow();
-                    String factionEmoji = Emojis.getFactionLeaderEmoji(leader);
+                    TI4Emoji leaderEmoji = LeaderEmojis.getLeaderEmoji(leader);
                     if ("ACTION:".equalsIgnoreCase(leaderAbilityWindow) || leaderName.contains("Ssruu")) {
                         if (leaderName.contains("Ssruu")) {
                             String led = "naaluagent";
                             if (player.hasExternalAccessToLeader(led)) {
-                                Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Naalu Agent", factionEmoji);
+                                Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Naalu Agent", leaderEmoji);
                                 startButtons.add(lButton);
                             }
                         } else {
                             if (leaderID.equalsIgnoreCase("naaluagent")) {
-                                Button lButton = Buttons.gray(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName, factionEmoji);
+                                Button lButton = Buttons.gray(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName, leaderEmoji);
                                 startButtons.add(lButton);
                             }
                         }
                     } else if ("mahactcommander".equalsIgnoreCase(leaderID) && player.getTacticalCC() > 0
                         && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty()) {
-                        Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use Mahact Commander", factionEmoji);
+                        Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use Mahact Commander", leaderEmoji);
                         startButtons.add(lButton);
                     }
                 }
@@ -343,43 +342,30 @@ public class StartTurnService {
         } else {
             game.setJustPlayedComponentAC(false);
             if (player.getTechs().contains("cm")) {
-                Button chaos = Buttons.gray("startChaosMapping", "Use Chaos Mapping", Emojis.Saar);
-                startButtons.add(chaos);
+                startButtons.add(Buttons.gray("startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
             }
             if (player.getTechs().contains("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
-                Button worm = Buttons.gray("exhaustTech_dscymiy", "Exhaust Recursive Worm", Emojis.cymiae);
-                startButtons.add(worm);
+                startButtons.add(Buttons.gray("exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
             }
-            if (player.hasUnexhaustedLeader("florzenagent")
-                && !ButtonHelperAgents.getAttachments(game, player).isEmpty()) {
-                startButtons.add(Buttons.green(finChecker + "exhaustAgent_florzenagent_" + player.getFaction(), "Use Florzen Agent", Emojis.florzen));
+            if (player.hasUnexhaustedLeader("florzenagent") && !ButtonHelperAgents.getAttachments(game, player).isEmpty()) {
+                startButtons.add(Buttons.green(finChecker + "exhaustAgent_florzenagent_" + player.getFaction(), "Use Florzen Agent", FactionEmojis.florzen));
             }
             if (player.hasUnexhaustedLeader("vadenagent")) {
-                Button chaos = Buttons.gray("exhaustAgent_vadenagent_" + player.getFaction(),
-                    "Use Vaden Agent", Emojis.vaden);
-                startButtons.add(chaos);
+                startButtons.add(Buttons.gray("exhaustAgent_vadenagent_" + player.getFaction(), "Use Vaden Agent", FactionEmojis.vaden));
             }
             if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
-                Button chaos = Buttons.gray("useLawsOrder", "Pay To Ignore Laws", Emojis.Keleres);
-                startButtons.add(chaos);
+                startButtons.add(Buttons.gray("useLawsOrder", "Pay To Ignore Laws", FactionEmojis.Keleres));
             }
             if ((player.hasTech("td") && !player.getExhaustedTechs().contains("td")) ||
                 (player.hasTech("absol_td") && !player.getExhaustedTechs().contains("absol_td"))) {
-                Button transit = Buttons.gray(finChecker + "exhaustTech_td", "Exhaust Transit Diodes");
-                transit = transit.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
-                startButtons.add(transit);
+                startButtons.add(Buttons.gray(finChecker + "exhaustTech_td", "Exhaust Transit Diodes", TechEmojis.CyberneticTech));
             }
             if (player.hasUnexhaustedLeader("kolleccagent")) {
-                Button nekroButton = Buttons.gray("exhaustAgent_kolleccagent",
-                    "Use Kollecc Agent", Emojis.kollecc);
-                startButtons.add(nekroButton);
+                startButtons.add(Buttons.gray("exhaustAgent_kolleccagent", "Use Kollecc Agent", FactionEmojis.kollecc));
             }
         }
         if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
-            Button psycho = Buttons.green(finChecker + "getPsychoButtons",
-                "Use Psychoarcheology");
-            psycho = psycho.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
-            startButtons.add(psycho);
+            startButtons.add(Buttons.green(finChecker + "getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
         }
 
         Button transaction = Buttons.blue("transaction", "Transaction");
@@ -387,17 +373,13 @@ public class StartTurnService {
         Button modify = Buttons.gray("getModifyTiles", "Modify Units");
         startButtons.add(modify);
         if (player.hasUnexhaustedLeader("hacanagent")) {
-            Button hacanButton = Buttons.gray("exhaustAgent_hacanagent",
-                "Use Hacan Agent", Emojis.Hacan);
-            startButtons.add(hacanButton);
+            startButtons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
         if (player.hasRelicReady("e6-g0_network")) {
             startButtons.add(Buttons.green("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
         }
         if (player.hasUnexhaustedLeader("nekroagent") && player.getAc() > 0) {
-            Button nekroButton = Buttons.gray("exhaustAgent_nekroagent",
-                "Use Nekro Agent", Emojis.Nekro);
-            startButtons.add(nekroButton);
+            startButtons.add(Buttons.gray("exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
         }
 
         if (game.getLatestTransactionMsg() != null

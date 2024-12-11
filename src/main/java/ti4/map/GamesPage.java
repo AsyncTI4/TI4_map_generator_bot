@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import lombok.Getter;
+import ti4.map.manage.GameManager;
 
 public class GamesPage {
 
@@ -43,7 +44,8 @@ public class GamesPage {
         var gameNames = GameManager.getGameNames();
         var pagedGames = new GamesPage();
         for (int i = PAGE_SIZE * page; i < gameNames.size() && pagedGames.getGames().size() < PAGE_SIZE; i++) {
-            pagedGames.games.add(GameManager.getGame(gameNames.get(i)));
+            var game = GameManager.getManagedGame(gameNames.get(i)).getGame();
+            pagedGames.games.add(game);
         }
         pagedGames.hasNextPage = gameNames.size() / PAGE_SIZE > page;
         return pagedGames;

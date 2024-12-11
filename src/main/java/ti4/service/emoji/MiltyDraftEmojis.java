@@ -20,86 +20,58 @@ public enum MiltyDraftEmojis implements TI4Emoji {
         return emojiString();
     }
 
-    public static String getMiltyDraftEmoji(int ord) {
-        return switch (ord) {
-            case 1 -> sliceA.toString();
-            case 2 -> sliceB.toString();
-            case 3 -> sliceC.toString();
-            case 4 -> sliceD.toString();
-            case 5 -> sliceE.toString();
-            case 6 -> sliceF.toString();
-            case 7 -> sliceG.toString();
-            case 8 -> sliceH.toString();
-            case 9 -> sliceI.toString();
-            case 10 -> sliceJ.toString();
-            case 11 -> sliceK.toString();
-            case 12 -> sliceL.toString();
-            case 13 -> sliceM.toString();
-            case 14 -> sliceN.toString();
-            case 15 -> sliceO.toString();
-            case 16 -> sliceP.toString();
-            case 17 -> sliceQ.toString();
-            case 18 -> sliceR.toString();
-            case 19 -> sliceS.toString();
-            case 20 -> sliceT.toString();
-            case 21 -> sliceU.toString();
-            case 22 -> sliceV.toString();
-            case 23 -> sliceW.toString();
-            case 24 -> sliceX.toString();
-            case 25 -> sliceY.toString();
-            case 26 -> sliceZ.toString();
-            default -> sliceUnpicked.toString();
-        };
+    public static TI4Emoji getMiltyDraftEmoji(int ord) {
+        return getMiltyDraftEmoji(Integer.toString(ord));
     }
 
-    public static String getMiltyDraftEmoji(String ord) {
-        if (ord == null) return sliceUnpicked.toString();
+    public static TI4Emoji getMiltyDraftEmoji(String ord) {
+        if (ord == null) return sliceUnpicked;
         return switch (ord.toLowerCase()) {
-            case "1", "a" -> sliceA.toString();
-            case "2", "b" -> sliceB.toString();
-            case "3", "c" -> sliceC.toString();
-            case "4", "d" -> sliceD.toString();
-            case "5", "e" -> sliceE.toString();
-            case "6", "f" -> sliceF.toString();
-            case "7", "g" -> sliceG.toString();
-            case "8", "h" -> sliceH.toString();
-            case "9", "i" -> sliceI.toString();
-            case "10", "j" -> sliceJ.toString();
-            case "11", "k" -> sliceK.toString();
-            case "12", "l" -> sliceL.toString();
-            case "13", "m" -> sliceM.toString();
-            case "14", "n" -> sliceN.toString();
-            case "15", "o" -> sliceO.toString();
-            case "16", "p" -> sliceP.toString();
-            case "17", "q" -> sliceQ.toString();
-            case "18", "r" -> sliceR.toString();
-            case "19", "s" -> sliceS.toString();
-            case "20", "t" -> sliceT.toString();
-            case "21", "u" -> sliceU.toString();
-            case "22", "v" -> sliceV.toString();
-            case "23", "w" -> sliceW.toString();
-            case "24", "x" -> sliceX.toString();
-            case "25", "y" -> sliceY.toString();
-            case "26", "z" -> sliceZ.toString();
-            default -> sliceUnpicked.toString();
+            case "1", "a" -> sliceA;
+            case "2", "b" -> sliceB;
+            case "3", "c" -> sliceC;
+            case "4", "d" -> sliceD;
+            case "5", "e" -> sliceE;
+            case "6", "f" -> sliceF;
+            case "7", "g" -> sliceG;
+            case "8", "h" -> sliceH;
+            case "9", "i" -> sliceI;
+            case "10", "j" -> sliceJ;
+            case "11", "k" -> sliceK;
+            case "12", "l" -> sliceL;
+            case "13", "m" -> sliceM;
+            case "14", "n" -> sliceN;
+            case "15", "o" -> sliceO;
+            case "16", "p" -> sliceP;
+            case "17", "q" -> sliceQ;
+            case "18", "r" -> sliceR;
+            case "19", "s" -> sliceS;
+            case "20", "t" -> sliceT;
+            case "21", "u" -> sliceU;
+            case "22", "v" -> sliceV;
+            case "23", "w" -> sliceW;
+            case "24", "x" -> sliceX;
+            case "25", "y" -> sliceY;
+            case "26", "z" -> sliceZ;
+            default -> sliceUnpicked;
         };
     }
 
-    public static String getSpeakerPickEmoji(int ord) {
+    public static TI4Emoji getSpeakerPickEmoji(int ord) {
         return switch (ord) {
-            case 1 -> position1.toString();
-            case 2 -> position2.toString();
-            case 3 -> position3.toString();
-            case 4 -> position4.toString();
-            case 5 -> position5.toString();
-            case 6 -> position6.toString();
-            case 7 -> position7.toString();
-            case 8 -> position8.toString();
-            case 9 -> position9.toString();
-            case 10 -> position10.toString();
-            case 11 -> position11.toString();
-            case 12 -> position12.toString();
-            default -> positionUnpicked.toString();
+            case 1 -> position1;
+            case 2 -> position2;
+            case 3 -> position3;
+            case 4 -> position4;
+            case 5 -> position5;
+            case 6 -> position6;
+            case 7 -> position7;
+            case 8 -> position8;
+            case 9 -> position9;
+            case 10 -> position10;
+            case 11 -> position11;
+            case 12 -> position12;
+            default -> positionUnpicked;
         };
     }
 

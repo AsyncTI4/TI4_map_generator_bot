@@ -50,6 +50,7 @@ public class ModalListener extends ListenerAdapter {
             ModalContext context = new ModalContext(event);
             if (context.isValid()) {
                 resolveModalInteractionEvent(context);
+                context.save();
             }
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
@@ -61,9 +62,9 @@ public class ModalListener extends ListenerAdapter {
             String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
             String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
             String errorMessage = "Modal took over " + milliThreshold + "ms to process:\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(eventTime) + " message was sent\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(startTime) + " `" + responseTime + "` to receive\n> " +
-                DateTimeHelper.getTimestampFromMillesecondsEpoch(endTime) + " `" + executionTime + "` to execute";
+                DateTimeHelper.getTimestampFromMillisecondsEpoch(eventTime) + " message was sent\n> " +
+                DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime) + " `" + responseTime + "` to receive\n> " +
+                DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute";
             BotLogger.log(errorMessage);
         }
     }

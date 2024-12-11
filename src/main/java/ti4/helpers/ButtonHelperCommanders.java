@@ -27,6 +27,11 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
@@ -82,7 +87,7 @@ public class ButtonHelperCommanders {
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         String msg = player.getRepresentationUnfogged()
             + " you may exhaust 1 planet to gain TGs equal to its influence or resources.";
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
     @ButtonHandler("mentakCommander_")
@@ -126,7 +131,7 @@ public class ButtonHelperCommanders {
         int count = Math.max(planet.getInfluence(), planet.getResources());
         PlanetExhaust.doAction(player, planetID, game);
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, count);
+        ButtonHelperAgents.resolveArtunoCheck(player, count);
         String msg = player.getRepresentationUnfogged() + " used Knak Halfear, the Olradin Commander, to exhaust "
             + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + " and gain " + count + "TG" + (count == 1 ? "" : "s") + " " + player.gainTG(count);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -136,7 +141,7 @@ public class ButtonHelperCommanders {
     @ButtonHandler("cymiaeCommanderRes_")
     public static void cymiaeCommanderRes(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " will discard 1 " + Emojis.ActionCard + " AC to move or place 1 " + Emojis.mech + "mech on " + Helper.getPlanetRepresentation(planet, game);
+        String msg = player.getFactionEmoji() + " will discard 1 " + CardEmojis.ActionCard + " AC to move or place 1 " + UnitEmojis.mech + "mech on " + Helper.getPlanetRepresentation(planet, game);
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "mech " + planet);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
@@ -209,10 +214,10 @@ public class ButtonHelperCommanders {
     public static void mykoCommanderUsage(Player player, Game game, ButtonInteractionEvent event) {
         String msg = player.getFactionEmoji() + " spent 1 ";
         if (player.getCommodities() > 0) {
-            msg += Emojis.comm + " commodity (" + player.getCommodities() + "->" + (player.getCommodities() - 1) + ") ";
+            msg += MiscEmojis.comm + " commodity (" + player.getCommodities() + "->" + (player.getCommodities() - 1) + ") ";
             player.setCommodities(player.getCommodities() - 1);
         } else {
-            msg += Emojis.tg + "TG (" + player.gainTG(-1) + ") ";
+            msg += MiscEmojis.tg + "TG (" + player.gainTG(-1) + ") ";
         }
         msg += " to cancel one hit";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
@@ -253,7 +258,7 @@ public class ButtonHelperCommanders {
                     .collect(Collectors.toSet());
                 String prefix = player.getFinsFactionCheckerPrefix() + "ravenMigration_" + from.getPosition() + "_" + uh.getName() + "_";
                 keys.stream().filter(uk -> !player.getUnitFromUnitKey(uk).getIsStructure())
-                    .map(uk -> Buttons.gray(prefix + uk.asyncID(), uk.getUnitType().humanReadableName() + " " + planetName).withEmoji(Emoji.fromFormatted(uk.unitEmoji())))
+                    .map(uk -> Buttons.gray(prefix + uk.asyncID(), uk.getUnitType().humanReadableName() + " " + planetName, uk.unitEmoji()))
                     .forEach(newButtons::add);
             }
 
@@ -328,12 +333,12 @@ public class ButtonHelperCommanders {
 
     @ButtonHandler("titansCommanderUsage")
     public static void titansCommanderUsage(ButtonInteractionEvent event, Game game, Player player) {
-        String msg = player.getFactionEmojiOrColor() + " Automatically used Tungstantus, the Ul commander, to gain 1" + Emojis.tg + "TG " + player.gainTG(1) + ".";
+        String msg = player.getFactionEmojiOrColor() + " Automatically used Tungstantus, the Ul commander, to gain 1" + MiscEmojis.tg + "TG " + player.gainTG(1) + ".";
         if (Helper.getPlayerFromAbility(game, "pillage") != null) {
-            msg += "\nThis tg can be spent before " + Emojis.Mentak + "**Pillage** resolves, since it is a when.";
+            msg += "\nThis tg can be spent before " + FactionEmojis.Mentak + "**Pillage** resolves, since it is a when.";
         }
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+        ButtonHelperAgents.resolveArtunoCheck(player, 1);
         player.addSpentThing(msg);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
@@ -344,13 +349,13 @@ public class ButtonHelperCommanders {
                 String mMessage = player.getRepresentationUnfogged() + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, 1TG has been added automatically (" + player.gainTG(1) + ").";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
                 ButtonHelperAbilities.pillageCheck(player, game);
-                ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+                ButtonHelperAgents.resolveArtunoCheck(player, 1);
             } else {
                 String mMessage = player.getRepresentationUnfogged() + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, you may gain 1TG, but you are in pillage range, so this has not been done automatically.";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1TG", Emojis.tg));
+                buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1TG", MiscEmojis.tg));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
             }
         }
     }
@@ -395,17 +400,17 @@ public class ButtonHelperCommanders {
     public static void resolveMuaatCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event, String reason) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander")) {
             if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
-                String message = player.getRepresentationUnfogged() + " you gained a " + Emojis.tg + " from " + Emojis.MuaatCommander + "Magmus, the Muaat Commander, " + player.gainTG(1) + " (" + reason + ")";
+                String message = player.getRepresentationUnfogged() + " you gained a " + MiscEmojis.tg + " from " + LeaderEmojis.MuaatCommander + "Magmus, the Muaat Commander, " + player.gainTG(1) + " (" + reason + ")";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);
-                ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+                ButtonHelperAgents.resolveArtunoCheck(player, 1);
             } else {
                 String mMessage = player.getRepresentationUnfogged()
                     + " you have Magmus, the Muaat Commander, unlocked, you may gain 1TG, but you are in Pillage range, so this has not been done automatically.";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1TG", Emojis.tg));
+                buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1TG", MiscEmojis.tg));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
             }
         }
         if (player.hasUnit("kolume_mech")) {
@@ -573,12 +578,12 @@ public class ButtonHelperCommanders {
                     if (numInf > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         String id = "sardakkcommander_infantry_" + planetId + "_" + planetId2;
                         String label = "Commit 1 infantry from " + planetRepresentation2 + " to " + planetRepresentation;
-                        buttons.add(Buttons.green(id, label, Emojis.Sardakk));
+                        buttons.add(Buttons.green(id, label, FactionEmojis.Sardakk));
                     }
                     if (numMechs > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         String id = "sardakkcommander_mech_" + planetId + "_" + planetId2;
                         String label = "Commit 1 mech from " + planetRepresentation2 + " to " + planetRepresentation;
-                        buttons.add(Buttons.blue(id, label, Emojis.Sardakk));
+                        buttons.add(Buttons.blue(id, label, FactionEmojis.Sardakk));
                     }
                 }
             }

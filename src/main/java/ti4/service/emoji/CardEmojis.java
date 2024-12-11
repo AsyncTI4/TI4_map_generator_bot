@@ -1,6 +1,15 @@
 package ti4.service.emoji;
 
-public enum StratCardEmojis implements TI4Emoji {
+public enum CardEmojis implements TI4Emoji {
+    // Cards base
+    ActionCard, ActionCardAlt, //
+    Agenda, AgendaAlt, //
+    SecretObjective, SecretObjectiveAlt, //
+    Public1, Public1alt, //
+    Public2, Public2alt, //
+    PN, //
+    // Cards pok
+    RelicCard, CulturalCard, HazardousCard, IndustrialCard, FrontierCard,
 
     // Normal Strategy Cards
     SC1, SC1Back, // Leadership
@@ -11,6 +20,7 @@ public enum StratCardEmojis implements TI4Emoji {
     SC6, SC6Back, // Warfare
     SC7, SC7Back, // Technology
     SC8, SC8Back, // Imperial
+    SCFrontBlank, SCBackBlank, // Generic
 
     // Strat Card Pings
     sc_1_1, sc_1_2, sc_1_3, sc_1_4, sc_1_5, sc_1_6, // Leadership
@@ -22,9 +32,45 @@ public enum StratCardEmojis implements TI4Emoji {
     sc_7_1, sc_7_2, sc_7_3, sc_7_4, sc_7_5, sc_7_6, sc_7_7, // Technology
     sc_8_1, sc_8_2, sc_8_3, sc_8_4, sc_8_5; // Imperial
 
-    @Override
-    public String toString() {
-        return emojiString();
+    public static TI4Emoji getObjectiveEmoji(String type) {
+        return switch (type.toLowerCase()) {
+            case "1", "public1alt" -> Public1alt;
+            case "2", "public2alt" -> Public2alt;
+            case "secret", "secretalt", "secretobjectivealt" -> SecretObjectiveAlt;
+            case "public1" -> Public1;
+            case "public2" -> Public2;
+            case "secretobjective" -> SecretObjective;
+
+            default -> SecretObjective;
+        };
+    }
+
+    public static TI4Emoji getSCFrontFromInteger(int sc) {
+        return switch (sc) {
+            case 1 -> SC1;
+            case 2 -> SC2;
+            case 3 -> SC3;
+            case 4 -> SC4;
+            case 5 -> SC5;
+            case 6 -> SC6;
+            case 7 -> SC7;
+            case 8 -> SC8;
+            default -> SCFrontBlank;
+        };
+    }
+
+    public static TI4Emoji getSCBackFromInteger(int sc) {
+        return switch (sc) {
+            case 1 -> SC1Back;
+            case 2 -> SC2Back;
+            case 3 -> SC3Back;
+            case 4 -> SC4Back;
+            case 5 -> SC5Back;
+            case 6 -> SC6Back;
+            case 7 -> SC7Back;
+            case 8 -> SC8Back;
+            default -> SCBackBlank;
+        };
     }
 
     // Full Mentions
@@ -96,4 +142,10 @@ public enum StratCardEmojis implements TI4Emoji {
             + sc_8_4.toString()
             + sc_8_5.toString();
     }
+
+    @Override
+    public String toString() {
+        return emojiString();
+    }
+
 }

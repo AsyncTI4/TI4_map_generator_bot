@@ -2,11 +2,9 @@ package ti4.commands2.cardsac;
 
 import java.util.Map;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.ActionCardHelper;
@@ -54,11 +52,6 @@ class ShowAC extends GameStateSubcommand {
         Player playerToShowTo = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (playerToShowTo == null) {
             MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
-        User user = AsyncTI4DiscordBot.jda.getUserById(playerToShowTo.getUserID());
-        if (user == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
             return;
         }
 

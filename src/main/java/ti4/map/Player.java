@@ -47,7 +47,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper.TIGLRank;
@@ -69,6 +68,9 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.ColorEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
@@ -1432,7 +1434,7 @@ public class Player {
         Game game = getGame();
         boolean privateGame = FoWHelper.isPrivateGame(game);
         if (privateGame && !overrideFow) {
-            return Emojis.getColorEmojiWithName(getColor());
+            return ColorEmojis.getColorEmojiWithName(getColor());
         }
 
         if (game != null && game.isCommunityMode()) {
@@ -1449,19 +1451,19 @@ public class Player {
                     }
                 }
                 if (getColor() != null && !"null".equals(getColor()) && !noColor) {
-                    sb.append(" ").append(Emojis.getColorEmojiWithName(getColor()));
+                    sb.append(" ").append(ColorEmojis.getColorEmojiWithName(getColor()));
                 }
                 return sb.toString();
             } else if (roleForCommunity != null) {
                 if (ping) {
                     return getFactionEmoji() + " " + roleForCommunity.getAsMention() + " "
-                        + Emojis.getColorEmojiWithName(getColor());
+                        + ColorEmojis.getColorEmojiWithName(getColor());
                 } else {
                     return getFactionEmoji() + " " + roleForCommunity.getName() + " "
-                        + Emojis.getColorEmojiWithName(getColor());
+                        + ColorEmojis.getColorEmojiWithName(getColor());
                 }
             } else {
-                return getFactionEmoji() + " " + Emojis.getColorEmojiWithName(getColor());
+                return getFactionEmoji() + " " + ColorEmojis.getColorEmojiWithName(getColor());
             }
         }
 
@@ -1476,7 +1478,7 @@ public class Player {
             sb.append(getUserName());
         }
         if (getColor() != null && !"null".equals(getColor()) && !noColor) {
-            sb.append(" ").append(Emojis.getColorEmojiWithName(getColor()));
+            sb.append(" ").append(ColorEmojis.getColorEmojiWithName(getColor()));
         }
         return sb.toString();
     }
@@ -1489,9 +1491,9 @@ public class Player {
 
         StringBuilder sb = new StringBuilder(userById.getAsMention());
         switch (getUserID()) {
-            case Constants.bortId -> sb.append(Emojis.BortWindow); // mysonisalsonamedbort
-            case Constants.tspId -> sb.append(Emojis.SpoonAbides); // tispoon
-            case Constants.jazzId -> sb.append(Emojis.Scout); // Jazzx
+            case Constants.bortId -> sb.append(MiscEmojis.BortWindow); // mysonisalsonamedbort
+            case Constants.tspId -> sb.append(MiscEmojis.SpoonAbides); // tispoon
+            case Constants.jazzId -> sb.append(MiscEmojis.Scout); // Jazzx
         }
         return sb.toString();
     }
@@ -1505,20 +1507,20 @@ public class Player {
         if (emoji == null && getFactionModel() != null) {
             emoji = getFactionModel().getFactionEmoji();
         }
-        return emoji != null ? emoji : Emojis.getFactionIconFromDiscord(faction);
+        return emoji != null ? emoji : FactionEmojis.getFactionIcon(faction).toString();
     }
 
     @JsonIgnore
     public String fogSafeEmoji() {
         if (getGame() != null && getGame().isFowMode())
-            return Emojis.getColorEmoji(getColor());
+            return ColorEmojis.getColorEmoji(getColor()).toString();
         return getFactionEmoji();
     }
 
     @JsonIgnore
     public String getFactionEmojiOrColor() {
         if (getGame().isFowMode() || FoWHelper.isPrivateGame(getGame())) {
-            return Emojis.getColorEmojiWithName(getColor());
+            return ColorEmojis.getColorEmojiWithName(getColor());
         }
         return getFactionEmoji();
     }
@@ -1938,8 +1940,7 @@ public class Player {
 
         followedSCs.add(sc);
         if (game != null && game.getActivePlayer() != null) {
-            if (game.getStoredValue("endTurnWhenSCFinished")
-                .equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
+            if (game.getStoredValue("endTurnWhenSCFinished").equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (!p2.hasFollowedSC(sc)) {
                         return;
@@ -2946,8 +2947,8 @@ public class Player {
         // }
 
         // DESCRIPTION
-        String desc = Emojis.getColorEmojiWithName(getColor()) +
-            "\n" + StringUtils.repeat(Emojis.comm, getCommoditiesTotal());
+        String desc = ColorEmojis.getColorEmojiWithName(getColor()) +
+            "\n" + MiscEmojis.comm(getCommoditiesTotal());
         eb.setDescription(desc);
 
         // FIELDS

@@ -29,6 +29,12 @@ import ti4.model.GenericCardModel;
 import ti4.model.PlanetModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -134,7 +140,7 @@ public class ActionCardHelper {
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
-                    acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name, Emojis.ActionCard));
+                    acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name, CardEmojis.ActionCard));
                 }
             }
         }
@@ -164,7 +170,7 @@ public class ActionCardHelper {
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
                 if (ac_name != null && "Action".equalsIgnoreCase(actionCardWindow)) {
-                    acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name, Emojis.ActionCard));
+                    acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name, CardEmojis.ActionCard));
                 }
             }
         }
@@ -197,7 +203,7 @@ public class ActionCardHelper {
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
-                    acButtons.add(Buttons.blue("ac_discard_from_hand_" + value + suffix, "(" + value + ") " + ac_name, Emojis.ActionCard));
+                    acButtons.add(Buttons.blue("ac_discard_from_hand_" + value + suffix, "(" + value + ") " + ac_name, CardEmojis.ActionCard));
                 }
             }
         }
@@ -213,7 +219,7 @@ public class ActionCardHelper {
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
-                    acButtons.add(Buttons.red("takeAC_" + value + "_" + player.getFaction(), ac_name, Emojis.ActionCard));
+                    acButtons.add(Buttons.red("takeAC_" + value + "_" + player.getFaction(), ac_name, CardEmojis.ActionCard));
                 }
             }
         }
@@ -327,11 +333,11 @@ public class ActionCardHelper {
         }
 
         List<Button> buttons = new ArrayList<>();
-        Button sabotageButton = Buttons.red("sabotage_ac_" + actionCardTitle, "Cancel AC With Sabotage", Emojis.Sabotage);
+        Button sabotageButton = Buttons.red("sabotage_ac_" + actionCardTitle, "Cancel AC With Sabotage", MiscEmojis.Sabotage);
         buttons.add(sabotageButton);
         Player empy = Helper.getPlayerFromUnit(game, "empyrean_mech");
         if (empy != null && ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy) && !ButtonHelper.isLawInPlay(game, "articles_war")) {
-            Button empyButton = Buttons.gray("sabotage_empy_" + actionCardTitle, "Cancel " + actionCardTitle + " With Empyrean Mech ", Emojis.mech);
+            Button empyButton = Buttons.gray("sabotage_empy_" + actionCardTitle, "Cancel " + actionCardTitle + " With Empyrean Mech ", UnitEmojis.mech);
             List<Button> empyButtons = new ArrayList<>();
             empyButtons.add(empyButton);
             Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
@@ -344,17 +350,15 @@ public class ActionCardHelper {
         String instinctTrainingID = "it";
         for (Player player2 : game.getPlayers().values()) {
             if (!player.equals(player2) && player2.hasTechReady(instinctTrainingID) && player2.getStrategicCC() > 0) {
-                Button instinctButton = Buttons.gray("sabotage_xxcha_" + actionCardTitle, "Cancel " + actionCardTitle + " With Instinct Training", Emojis.Xxcha);
                 List<Button> xxchaButtons = new ArrayList<>();
-                xxchaButtons.add(instinctButton);
-                Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
-                xxchaButtons.add(refuse);
+                xxchaButtons.add(Buttons.gray("sabotage_xxcha_" + actionCardTitle, "Cancel " + actionCardTitle + " With Instinct Training", FactionEmojis.Xxcha));
+                xxchaButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), player2.getRepresentationUnfogged() + "You have Instinct Training unexhausted and a CC available. Use Buttons to decide whether to cancel", xxchaButtons);
             }
 
         }
         MessageEmbed acEmbed = actionCard.getRepresentationEmbed();
-        Button noSabotageButton = Buttons.blue("no_sabotage", "No Sabotage", Emojis.NoSabotage);
+        Button noSabotageButton = Buttons.blue("no_sabotage", "No Sabotage", MiscEmojis.NoSabo);
         buttons.add(noSabotageButton);
         buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_" + actionCardTitle, "Pause Timer While Waiting For Sabo"));
         if (acID.contains("sabo")) {
@@ -371,11 +375,11 @@ public class ActionCardHelper {
                 for (Player p : game.getRealPlayers()) {
                     if (p == player) continue;
                     if (game.isFowMode() || (!it && p.hasTechReady("it"))) {
-                        noSabosMessage.append("\n> A player may have access to " + Emojis.Xxcha + "**Instinct Training**, watch out");
+                        noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Xxcha + "**Instinct Training**, watch out");
                         it = true;
                     }
                     if (game.isFowMode() || (!watcher && Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
-                        noSabosMessage.append("\n> A player may have access to " + Emojis.Empyrean + Emojis.mech + "**Watcher**, watch out");
+                        noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Empyrean + UnitEmojis.mech + "**Watcher**, watch out");
                         watcher = true;
                     }
                 }
@@ -385,12 +389,12 @@ public class ActionCardHelper {
             if (actionCardTitle.contains("Manipulate Investments")) {
                 List<Button> scButtons = new ArrayList<>();
                 for (int sc : game.getSCList()) {
-                    Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
                     Button button;
-                    if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
-                        button = Buttons.gray(player.getFinsFactionCheckerPrefix() + "increaseTGonSC_" + sc, " ").withEmoji(scEmoji);
+                    TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
+                    if (scEmoji != CardEmojis.SCBackBlank) {
+                        button = Buttons.gray(player.finChecker() + "increaseTGonSC_" + sc, null, scEmoji);
                     } else {
-                        button = Buttons.gray(player.getFinsFactionCheckerPrefix() + "increaseTGonSC_" + sc, sc + " " + Helper.getSCName(sc, game));
+                        button = Buttons.gray(player.finChecker() + "increaseTGonSC_" + sc, sc + " " + Helper.getSCName(sc, game), scEmoji);
                     }
                     scButtons.add(button);
                 }
@@ -400,14 +404,12 @@ public class ActionCardHelper {
             if (actionCardTitle.contains("Deflection")) {
                 List<Button> scButtons = new ArrayList<>();
                 for (int sc : game.getSCList()) {
-                    Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
+                    TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
                     Button button;
-                    if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
-                        button = Buttons.gray(player.getFinsFactionCheckerPrefix() + "deflectSC_" + sc, " ")
-                            .withEmoji(scEmoji);
+                    if (scEmoji != CardEmojis.SCBackBlank) {
+                        button = Buttons.gray(player.finChecker() + "deflectSC_" + sc, null, scEmoji);
                     } else {
-                        button = Buttons.gray(player.getFinsFactionCheckerPrefix() + "deflectSC_" + sc,
-                            sc + " " + Helper.getSCName(sc, game));
+                        button = Buttons.gray(player.finChecker() + "deflectSC_" + sc, sc + " " + Helper.getSCName(sc, game), scEmoji);
                     }
                     scButtons.add(button);
                 }
@@ -427,7 +429,7 @@ public class ActionCardHelper {
                 if (acbuttons.isEmpty()) {
                     msg = player.getRepresentation() + " there were no attachments found in the applicable exploration decks.";
                 }
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, acbuttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, acbuttons);
             }
 
             String codedMessage = player.getRepresentation() + " After checking for Sabos, use buttons to resolve. Reminder that all card targets (besides tech RESEARCH) should be declared now, before people decide on sabos. Resolve ";
@@ -824,7 +826,7 @@ public class ActionCardHelper {
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
                     String message2 = player.getRepresentationUnfogged() + " you may unlock Suffi An, your commander, by paying 1TG (if the AC isn't Sabo'd).";
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Buttons.green("pay1tgforKeleres", "Pay 1TG to Unlock Suffi An", Emojis.MentakAgent));
+                    buttons2.add(Buttons.green("pay1tgforKeleres", "Pay 1TG to Unlock Suffi An", LeaderEmojis.KeleresAgent));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }
@@ -839,11 +841,9 @@ public class ActionCardHelper {
             MessageHelper.sendPrivateMessageToPlayer(player, game, "Played action card: " + actionCardTitle);
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
-            List<Button> buttons2 = new ArrayList<>();
-            Button cymiaeButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", Emojis.cymiae);
-            buttons2.add(cymiaeButton);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Skhot Unit X-12, the Cymiae" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw 1AC.", buttons2);
+            Button cymiaeButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", FactionEmojis.cymiae);
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Skhot Unit X-12, the Cymiae" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw 1AC.", cymiaeButton);
         }
 
         sendActionCardInfo(game, player);
@@ -872,7 +872,7 @@ public class ActionCardHelper {
 
                     String id = reversePrefix + model.getName();
                     String label = "Reverse Engineer " + model.getName();
-                    reverseButtons.add(Buttons.green(id, label, Emojis.ActionCard));
+                    reverseButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
                     if (actionCards.size() == 1) msg.append(model.getName()).append(".");
                 }
 
@@ -954,7 +954,7 @@ public class ActionCardHelper {
         String acID = actionCards.getFirst();
         // FoW specific pinging
         if (game.isFowMode()) {
-            FoWHelper.pingPlayersTransaction(game, event, player, player_, Emojis.ActionCard + " Action Card", null);
+            FoWHelper.pingPlayersTransaction(game, event, player, player_, CardEmojis.ActionCard + " Action Card", null);
         }
         player.removeActionCard(actionCardsMap.get(acID));
         player_.setActionCard(acID);
@@ -996,7 +996,7 @@ public class ActionCardHelper {
         displayOrder.sort(Map.Entry.comparingByKey());
         for (Map.Entry<String, List<String>> acEntryList : displayOrder) {
             sb.append("\n").append(index).append(". ");
-            sb.append(Emojis.ActionCard.repeat(acEntryList.getValue().size()));
+            sb.append(CardEmojis.ActionCard.toString().repeat(acEntryList.getValue().size()));
             sb.append(" **").append(acEntryList.getKey()).append("**");
             // sb.append(Mapper.getActionCard()
             index++;
@@ -1039,6 +1039,7 @@ public class ActionCardHelper {
             String message = player.getRepresentationUnfogged() + " if you did not just use the Codex to get that AC, please discard 1 AC due to your Cybernetic Madness ability";
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
+        ButtonHelper.checkACLimit(game, player);
     }
 
     public static void getActionCardFromDiscard(GenericInteractionCreateEvent event, Game game, Player player, int acIndex) {
@@ -1076,7 +1077,7 @@ public class ActionCardHelper {
     public static void doRise(Player player, GenericInteractionCreateEvent event, Game game) {
         List<String> planets = player.getPlanetsAllianceMode();
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentationNoPing()).append(" added one ").append(Emojis.infantry).append(" to each of: ");
+        sb.append(player.getRepresentationNoPing()).append(" added one ").append(UnitEmojis.infantry).append(" to each of: ");
         int count = 0;
         for (Tile tile : game.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {

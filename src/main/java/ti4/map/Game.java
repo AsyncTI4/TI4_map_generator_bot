@@ -2,9 +2,6 @@ package ti4.map;
 
 import java.awt.*;
 import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,7 +53,6 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
@@ -83,6 +79,8 @@ import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.SourceEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 
@@ -480,19 +478,19 @@ public class Game extends GameProperties {
         boolean isNormalGame = isNormalGame();
         Map<String, Boolean> gameModes = new HashMap<>() {
             {
-                put(Emojis.TI4PoK + "Normal", isNormalGame);
-                put(Emojis.TI4BaseGame + "Base Game", isBaseGameMode());
-                put(Emojis.MiltyMod + "MiltyMod", isMiltyModMode());
-                put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
+                put(SourceEmojis.TI4PoK + "Normal", isNormalGame);
+                put(SourceEmojis.TI4BaseGame + "Base Game", isBaseGameMode());
+                put(SourceEmojis.MiltyMod + "MiltyMod", isMiltyModMode());
+                put(MiscEmojis.TIGL + "TIGL", isCompetitiveTIGLGame());
                 put("Community", isCommunityMode());
                 put("Minor Factions", isMinorFactionsMode());
                 put("Age of Exploration", isAgeOfExplorationMode());
                 put("Alliance", isAllianceMode());
                 put("FoW", isFowMode());
                 put("Franken", isFrankenGame());
-                put(Emojis.Absol + "Absol", isAbsolMode());
+                put(SourceEmojis.Absol + "Absol", isAbsolMode());
                 put("VotC", isVotcMode());
-                put(Emojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
+                put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
                 put("HomebrewSC", isHomebrewSCMode());
                 put("Little Omega", isLittleOmega());
                 put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
@@ -1047,7 +1045,7 @@ public class Game extends GameProperties {
             if (player != null) {
                 player.setTg(player.getTg() + tradeGoodCount);
                 ButtonHelperAbilities.pillageCheck(player, this);
-                ButtonHelperAgents.resolveArtunoCheck(player, this, tradeGoodCount);
+                ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
                 tradeGoodCount = 0;
                 MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + tradeGoodCount + "TGs"
                     + " that would be placed on the SC " + sc + " have instead been given to the Kyro Hero player, as per Kyro Hero text");
@@ -3067,16 +3065,6 @@ public class Game extends GameProperties {
         this.discardActionCards = discardActionCards;
     }
 
-    public String getGameNameForSorting() {
-        if (getName().startsWith("pbd")) {
-            return StringUtils.leftPad(getName(), 10, "0");
-        }
-        if (getName().startsWith("fow")) {
-            return StringUtils.leftPad(getName(), 10, "1");
-        }
-        return getName();
-    }
-
     @JsonIgnore
     public String getPing() {
         Role role = getGameRole();
@@ -3344,23 +3332,6 @@ public class Game extends GameProperties {
             }
         }
         return planets.keySet();
-    }
-
-    public void endGameIfOld() {
-        if (isHasEnded())
-            return;
-
-        LocalDate currentDate = LocalDate.now();
-        LocalDate lastModifiedDate = (new Date(getLastModifiedDate())).toInstant().atZone(ZoneId.systemDefault())
-            .toLocalDate();
-        Period period = Period.ofMonths(2); // TODO: CANDIDATE FOR GLOBAL VARIABLE
-        LocalDate oldestLastModifiedDateBeforeEnding = currentDate.minus(period);
-
-        if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
-            BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate + " - the game flag `hasEnded` has been set to true");
-            setHasEnded(true);
-            GameSaveLoadManager.saveGame(this, "Game ended");
-        }
     }
 
     public void rebuildTilePositionAutoCompleteList() {

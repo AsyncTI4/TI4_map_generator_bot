@@ -6,12 +6,13 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
-import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.menus.MiltySettings.DraftingMode;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.SourceEmojis;
 
 // This is a sub-menu
 @Getter
@@ -47,14 +48,14 @@ public class SourceSettings extends SettingsMenu {
         // cryypter = new BooleanSetting("Cryypter", "Voices of the Council", false);
 
         // Emojis
-        base.setEmoji(Emojis.TI4BaseGame);
-        pok.setEmoji(Emojis.TI4PoK);
-        codexes.setEmoji(Emojis.Keleres);
-        discoStars.setEmoji(Emojis.DiscordantStars);
-        unchartedSpace.setEmoji(Emojis.DiscordantStars);
-        absol.setEmoji(Emojis.Absol);
-        miltymod.setEmoji(Emojis.MiltyMod);
-        eronous.setEmoji(Emojis.Eronous);
+        base.setEmoji(SourceEmojis.TI4BaseGame);
+        pok.setEmoji(SourceEmojis.TI4PoK);
+        codexes.setEmoji(FactionEmojis.Keleres);
+        discoStars.setEmoji(SourceEmojis.DiscordantStars);
+        unchartedSpace.setEmoji(SourceEmojis.DiscordantStars);
+        absol.setEmoji(SourceEmojis.Absol);
+        miltymod.setEmoji(SourceEmojis.MiltyMod);
+        eronous.setEmoji(SourceEmojis.Eronous);
 
         // Other Initialization
         miltymod.setExtraInfo("NOTE: this is NOT \"milty draft\", this is a homebrew mod that replaces components in the game");

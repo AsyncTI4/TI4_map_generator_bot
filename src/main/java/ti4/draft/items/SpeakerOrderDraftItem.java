@@ -5,9 +5,10 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
-import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.model.DraftErrataModel;
+import ti4.service.emoji.MiltyDraftEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 public class SpeakerOrderDraftItem extends DraftItem {
     public SpeakerOrderDraftItem(String itemId) {
@@ -31,11 +32,11 @@ public class SpeakerOrderDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
-    public String getItemEmoji() {
+    public TI4Emoji getItemEmoji() {
         try {
-            return Emojis.getSpeakerPickEmoji(getSpeakerOrder());
+            return MiltyDraftEmojis.getSpeakerPickEmoji(getSpeakerOrder());
         } catch (Exception e) {
-            return Emojis.getResourceEmoji(getSpeakerOrder());
+            return null;
         }
     }
 

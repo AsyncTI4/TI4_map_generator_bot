@@ -20,7 +20,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -136,14 +135,11 @@ class Replace extends GameStateSubcommand {
 
         game.getMiltyDraftManager().replacePlayer(oldPlayerUserId, replacedPlayer.getUserID());
 
-        GameSaveLoadManager.saveGame(game, event);
-        // Load the new game instance so that we can repost the milty draft
-        game = GameSaveLoadManager.reload(game.getName());
         if (game.getMiltyDraftManager().getDraftIndex() < game.getMiltyDraftManager().getDraftOrder().size()) {
             game.getMiltyDraftManager().repostDraftInformation(game);
         }
 
-        String message = "Game: " + game.getName() + "  Player: " + replacedPlayer.getUserName() + " replaced by player: " + replacementUser.getName();
+        String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: " + replacementUser.getName();
         if (FoWHelper.isPrivateGame(game)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {

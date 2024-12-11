@@ -21,13 +21,12 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.Units;
 import ti4.helpers.async.RoundSummaryHelper;
-import ti4.image.MapGenerator;
+import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -36,6 +35,9 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -182,10 +184,10 @@ public class EndTurnService {
                 Integer value = objective.getValue();
                 Button objectiveButton;
                 if (poStatus == 0) { //Stage 1 Objectives
-                    objectiveButton = Buttons.green(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, Emojis.Public1alt);
+                    objectiveButton = Buttons.green(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, CardEmojis.Public1alt);
                     poButtons1.add(objectiveButton);
                 } else if (poStatus == 1) { //Stage 2 Objectives
-                    objectiveButton = Buttons.blue(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, Emojis.Public2alt);
+                    objectiveButton = Buttons.blue(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, CardEmojis.Public2alt);
                     poButtons2.add(objectiveButton);
                 } else { //Other Objectives
                     objectiveButton = Buttons.gray(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name);
@@ -199,7 +201,7 @@ public class EndTurnService {
         poButtons.addAll(poButtonsCustom);
         for (Player player : game.getRealPlayers()) {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !game.isFowMode()) {
-                poButtons.add(Buttons.gray("edynCommanderSODraw", "Draw SO instead of Scoring PO", Emojis.edyn));
+                poButtons.add(Buttons.gray("edynCommanderSODraw", "Draw SO instead of Scoring PO", FactionEmojis.edyn));
                 break;
             }
         }
@@ -210,7 +212,7 @@ public class EndTurnService {
     public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
         if (game.isShowBanners()) {
-            MapGenerator.drawPhaseBanner("status", game.getRound(), game.getActionsChannel());
+            BannerGenerator.drawPhaseBanner("status", game.getRound(), game.getActionsChannel());
         }
         String message = "Please score objectives, " + game.getPing() + ".";
 
@@ -233,7 +235,7 @@ public class EndTurnService {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("bindingDebtsRes_" + vaden.getFaction(), "Pay 1TG"));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
         }
@@ -272,7 +274,7 @@ public class EndTurnService {
                 player.setTg(player.getTg() + numScoredSOs);
                 if (numScoredSOs > 0) {
                     ButtonHelperAbilities.pillageCheck(player, game);
-                    ButtonHelperAgents.resolveArtunoCheck(player, game, numScoredSOs);
+                    ButtonHelperAgents.resolveArtunoCheck(player, numScoredSOs);
                 }
                 player.setCommodities(player.getCommodities() + numScoredPos);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -323,11 +325,11 @@ public class EndTurnService {
                     if (unitHolder != null && unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         if (player.hasRelic("emphidia")) {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation() + "Reminder this is not the window to use " + Emojis.Relic + "Crown of Emphidia. You may purge " +
-                                    Emojis.Relic + "Crown of Emphidia in the status homework phase, which is when buttons will appear.");
+                                player.getRepresentation() + "Reminder this is not the window to use " + ExploreEmojis.Relic + "Crown of Emphidia. You may purge " +
+                                    ExploreEmojis.Relic + "Crown of Emphidia in the status homework phase, which is when buttons will appear.");
                         } else {
-                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to use " + Emojis.Relic + "Crown of Emphidia.");
-                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You may use these buttons to resolve " + Emojis.Relic + "Crown of Emphidia.", ButtonHelper.getCrownButtons());
+                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to use " + ExploreEmojis.Relic + "Crown of Emphidia.");
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You may use these buttons to resolve " + ExploreEmojis.Relic + "Crown of Emphidia.", ButtonHelper.getCrownButtons());
                         }
                     }
                 }
@@ -394,7 +396,7 @@ public class EndTurnService {
             game.setStoredValue("forcedScoringOrder", "true");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.red("turnOffForcedScoring", "Turn off forced scoring order"));
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), game.getPing() +
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), game.getPing() +
                 "Players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
             for (Player player : Helper.getInitativeOrder(game)) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");

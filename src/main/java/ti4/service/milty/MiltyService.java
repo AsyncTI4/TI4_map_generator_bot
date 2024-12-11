@@ -10,11 +10,12 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
@@ -23,7 +24,6 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.TIGLHelper;
@@ -37,9 +37,9 @@ import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -47,6 +47,7 @@ import ti4.model.MapTemplateModel;
 import ti4.model.Source;
 import ti4.model.TechnologyModel;
 import ti4.service.PlanetService;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.info.AbilityInfoService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.info.LeaderInfoService;
@@ -161,7 +162,6 @@ public class MiltyService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
             specs.presetSlices.forEach(draftManager::addSlice);
             draftManager.repostDraftInformation(game);
-            GameSaveLoadManager.saveGame(game, event);
         } else {
             event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
                 boolean slicesCreated = generateSlices(event, draftManager, specs);
@@ -174,7 +174,7 @@ public class MiltyService {
                 } else {
                     draftManager.repostDraftInformation(game);
                     game.setPhaseOfGame("miltydraft");
-                    GameSaveLoadManager.saveGame(game, event);
+                    GameManager.save(game, "Milty");
                 }
             });
         }
@@ -523,7 +523,7 @@ public class MiltyService {
 
         if (setSpeaker) {
             game.setSpeakerUserID(player.getUserID());
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), MiscEmojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
         }
 
         // STARTING PNs

@@ -10,10 +10,10 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.MiscEmojis;
 
 class JazzCommand extends Subcommand {
 
@@ -29,7 +29,7 @@ class JazzCommand extends Subcommand {
 
     public static void sendJazzButton(GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.gray("jazzButton", "Jazz button", Emojis.scoutSpinner));
+        buttons.add(Buttons.gray("jazzButton", "Jazz button", MiscEmojis.ScoutSpinner));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Constants.jazzPing() + " button", buttons);
     }
 

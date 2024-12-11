@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -40,19 +38,18 @@ import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.ThreadHelper;
 import ti4.image.ImageHelper;
-import ti4.image.MapGenerator;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.image.FileUploadService;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
 public class CreateGameService {
 
-    public static Game createNewGame(GenericInteractionCreateEvent event, String gameName, Member gameOwner) {
+    public static Game createNewGame(String gameName, Member gameOwner) {
         Game newGame = new Game();
         newGame.newGameSetup();
         String ownerID = gameOwner.getId();
@@ -61,9 +58,8 @@ public class CreateGameService {
         newGame.setName(gameName);
         newGame.setAutoPing(true);
         newGame.setAutoPingSpacer(24);
-        GameManager.addGame(newGame);
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
-        GameSaveLoadManager.saveGame(newGame, event);
+        GameManager.save(newGame, "Game created");
         return newGame;
     }
 
@@ -128,7 +124,7 @@ public class CreateGameService {
         }
 
         // CREATE GAME
-        Game newGame = createNewGame(event, gameName, gameOwner);
+        Game newGame = createNewGame(gameName, gameOwner);
 
         // ADD PLAYERS
         for (Member member : members) {
@@ -187,7 +183,7 @@ public class CreateGameService {
             actionsChannel.getAsMention();
         MessageHelper.sendMessageToEventChannel(event, message);
 
-        GameSaveLoadManager.saveGame(newGame, event);
+        GameManager.save(newGame, "Created game channels");
         reportNewGameCreated(newGame);
 
         presentSetupToPlayers(newGame);
@@ -262,9 +258,7 @@ public class CreateGameService {
         buttons.add(Buttons.green("anonDeclare_Friendly", "Friendly"));
         buttons.add(Buttons.blue("anonDeclare_No Strong Preference", "No Strong Preference"));
         buttons.add(Buttons.red("anonDeclare_Aggressive", "Aggressive"));
-        game.setUndoButtonOffered(false);
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), aggressionMsg, buttons);
-        game.setUndoButtonOffered(true);
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(game.getActionsChannel(), aggressionMsg, buttons);
     }
 
     private static void introductionToActionsChannel(Game game) {
@@ -294,7 +288,7 @@ public class CreateGameService {
 
         // Find new players
         for (Player player : game.getPlayers().values()) {
-            if (ButtonHelper.isPlayerNew(game, player)) {
+            if (ButtonHelper.isPlayerNew(player.getUserID())) {
                 newPlayers.add(player);
             }
         }
@@ -317,7 +311,7 @@ public class CreateGameService {
                     }
                     MessageHelper.sendMessageToChannel(introThread, message);
                     BufferedImage colorsImage = ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile("Compiled_Async_colors.png"), 731, 593);
-                    FileUpload fileUpload = MapGenerator.createFileUpload(colorsImage, 1.0f, "colors");
+                    FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, 1.0f, "colors");
                     MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                 } catch (Exception e) {
                     BotLogger.log("newPlayerIntro", e);
@@ -386,8 +380,7 @@ public class CreateGameService {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        Set<String> gameNames = new HashSet<>(GameManager.getGameNames());
-        gameAndRoleNames.addAll(gameNames);
+        gameAndRoleNames.addAll(GameManager.getGameNames());
 
         // CHECK
         return gameAndRoleNames.contains(name);
@@ -650,6 +643,7 @@ public class CreateGameService {
         List<Button> homebrewButtons = new ArrayList<>();
         homebrewButtons.add(Buttons.green("getHomebrewButtons", "Yes, use Homebrew"));
         homebrewButtons.add(Buttons.red("deleteButtons", "No Homebrew"));
-        MessageHelper.sendMessageToChannel(channel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons. 4/4/4 is a type of homebrew btw", homebrewButtons);
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, "If you plan to have a supported homebrew mode in this game, please indicate " +
+            "so with these buttons. 4/4/4 is a type of homebrew btw", homebrewButtons);
     }
 }

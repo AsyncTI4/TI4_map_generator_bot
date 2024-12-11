@@ -63,6 +63,6 @@ class ShowPN extends GameStateSubcommand {
 
         MessageHelper.sendMessageToEventChannel(event, "PN shown");
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, longPNDisplay);
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, targetPlayer, message, List.of(pnEmbed));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(targetPlayer, message, List.of(pnEmbed));
     }
 }

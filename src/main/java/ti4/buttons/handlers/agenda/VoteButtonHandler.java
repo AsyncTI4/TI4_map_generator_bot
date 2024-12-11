@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -19,6 +18,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 @UtilityClass
 class VoteButtonHandler {
@@ -32,7 +33,7 @@ class VoteButtonHandler {
         buttons.add(Buttons.green("preVote", "Pre-Vote"));
         buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
         buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Erased the pre-vote", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Erased the pre-vote", buttons);
     }
 
     @ButtonHandler("preVote")
@@ -171,11 +172,11 @@ class VoteButtonHandler {
         for (int x = 1; x < 9; x++) {
             Button button;
             if (rider == null) {
-                Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(x));
-                if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
-                    button = Buttons.gray(prefix + "_" + x, " ").withEmoji(scEmoji);
+                TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(x);
+                if (scEmoji != CardEmojis.SCBackBlank) {
+                    button = Buttons.gray(prefix + "_" + x, null, scEmoji);
                 } else {
-                    button = Buttons.gray(prefix + "_" + x, x + "");
+                    button = Buttons.gray(prefix + "_" + x, Integer.toString(x), scEmoji);
                 }
 
             } else {

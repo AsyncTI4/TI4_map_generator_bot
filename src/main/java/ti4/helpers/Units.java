@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.UnitEmojis;
+
 import org.jetbrains.annotations.Nullable;
 
 public class Units {
@@ -44,7 +47,7 @@ public class Units {
             return unitType.plainName();
         }
 
-        public String unitEmoji() {
+        public TI4Emoji unitEmoji() {
             return unitType.getUnitTypeEmoji();
         }
 
@@ -108,66 +111,63 @@ public class Units {
         }
 
         public String humanReadableName() {
-            return switch (value) {
-                case "gf" -> "Infantry";
-                case "mf" -> "Mech";
-                case "pd" -> "PDS";
-                case "sd", "csd" -> "Space Dock";
-                case "ff" -> "Fighter";
-                case "dd" -> "Destroyer";
-                case "ca" -> "Cruiser";
-                case "cv" -> "Carrier";
-                case "dn" -> "Dreadnought";
-                case "fs" -> "Flagship";
-                case "ws" -> "War Sun";
-                case "plenaryorbital" -> "Plenary Orbital";
-                case "tyrantslament" -> "Tyrant's Lament";
-                case "cavalry" -> "The Cavalry";
-                case "lady" -> "The Lady";
-                case "monument" -> "Monument";
-                default -> null;
+            return switch (this) {
+                case Infantry -> "Infantry";
+                case Mech -> "Mech";
+                case Pds -> "PDS";
+                case Spacedock, CabalSpacedock -> "Space Dock";
+                case Fighter -> "Fighter";
+                case Destroyer -> "Destroyer";
+                case Cruiser -> "Cruiser";
+                case Carrier -> "Carrier";
+                case Dreadnought -> "Dreadnought";
+                case Flagship -> "Flagship";
+                case Warsun -> "War Sun";
+                case PlenaryOrbital -> "Plenary Orbital";
+                case TyrantsLament -> "Tyrant's Lament";
+                case Cavalry -> "The Cavalry";
+                case Lady -> "The Lady";
+                case Monument -> "Monument";
             };
         }
 
         public String plainName() {
-            return switch (value) {
-                case "gf" -> "infantry";
-                case "mf" -> "mech";
-                case "pd" -> "pds";
-                case "sd", "csd" -> "spacedock";
-                case "ff" -> "fighter";
-                case "dd" -> "destroyer";
-                case "ca" -> "cruiser";
-                case "cv" -> "carrier";
-                case "dn" -> "dreadnought";
-                case "fs" -> "flagship";
-                case "ws" -> "warsun";
-                case "plenaryorbital" -> "plenaryorbital";
-                case "tyrantslament" -> "tyrantslament";
-                case "cavalry" -> "cavalry";
-                case "lady" -> "lady";
-                case "monument" -> "monument";
-                default -> null;
+            return switch (this) {
+                case Infantry -> "infantry";
+                case Mech -> "mech";
+                case Pds -> "pds";
+                case Spacedock, CabalSpacedock -> "spacedock";
+                case Fighter -> "fighter";
+                case Destroyer -> "destroyer";
+                case Cruiser -> "cruiser";
+                case Carrier -> "carrier";
+                case Dreadnought -> "dreadnought";
+                case Flagship -> "flagship";
+                case Warsun -> "warsun";
+                case PlenaryOrbital -> "plenaryorbital";
+                case TyrantsLament -> "tyrantslament";
+                case Cavalry -> "cavalry";
+                case Lady -> "lady";
+                case Monument -> "monument";
             };
         }
 
-        public String getUnitTypeEmoji() {
-            return switch (value) {
-                case "gf" -> Emojis.infantry;
-                case "mf" -> Emojis.mech;
-                case "pd" -> Emojis.pds;
-                case "sd", "csd" -> Emojis.spacedock;
-                case "plenaryorbital" -> Emojis.PlenaryOrbital;
-                case "ff" -> Emojis.fighter;
-                case "dd" -> Emojis.destroyer;
-                case "ca" -> Emojis.cruiser;
-                case "cv" -> Emojis.carrier;
-                case "dn" -> Emojis.dreadnought;
-                case "fs", "lady", "cavalry" -> Emojis.flagship;
-                case "tyrantslament" -> Emojis.TyrantsLament;
-                case "ws" -> Emojis.warsun;
-                case "monument" -> Emojis.Monument;
-                default -> null;
+        public TI4Emoji getUnitTypeEmoji() {
+            return switch (this) {
+                case Infantry -> UnitEmojis.infantry;
+                case Mech -> UnitEmojis.mech;
+                case Pds -> UnitEmojis.pds;
+                case Spacedock, CabalSpacedock -> UnitEmojis.spacedock;
+                case PlenaryOrbital -> UnitEmojis.PlenaryOrbital;
+                case Fighter -> UnitEmojis.fighter;
+                case Destroyer -> UnitEmojis.destroyer;
+                case Cruiser -> UnitEmojis.cruiser;
+                case Carrier -> UnitEmojis.carrier;
+                case Dreadnought -> UnitEmojis.dreadnought;
+                case Flagship, Cavalry, Lady -> UnitEmojis.flagship;
+                case TyrantsLament -> UnitEmojis.TyrantsLament;
+                case Warsun -> UnitEmojis.warsun;
+                case Monument -> UnitEmojis.Monument;
             };
         }
 

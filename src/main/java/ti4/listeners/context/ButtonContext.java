@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
-import ti4.map.GameSaveLoadManager;
 
 @Getter
 public class ButtonContext extends ListenerContext {
@@ -47,8 +46,9 @@ public class ButtonContext extends ListenerContext {
         }
     }
 
-    public void save(ButtonInteractionEvent event) {
-        boolean skippableButton = componentID.contains("ultimateUndo") ||
+    @Override
+    public void save() {
+        boolean skip = componentID.contains("ultimateUndo") ||
             "showGameAgain".equalsIgnoreCase(componentID) ||
             "cardsInfo".equalsIgnoreCase(componentID) ||
             componentID.contains("showDeck") ||
@@ -56,9 +56,12 @@ public class ButtonContext extends ListenerContext {
             componentID.contains("searchMyGames") ||
             componentID.contains("decline_explore") ||
             componentID.contains("offerDeckButtons");
-        if (game != null && !skippableButton) {
-            ButtonHelper.saveButtons(event, game, player);
-            GameSaveLoadManager.saveGame(game, event);
+        if (skip) {
+            return;
         }
+        if (game != null) {
+            ButtonHelper.saveButtons(getEvent(), game, player);
+        }
+        super.save();
     }
 }

@@ -5,9 +5,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
@@ -16,9 +19,9 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -35,22 +38,23 @@ public class AutoPingCron {
     private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
     private static final long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
+    private static final Pattern CARDS_PATTERN = Pattern.compile("Card\\s(.*?):");
 
     public static void register() {
         CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
     }
 
     private static void autoPingGames() {
-        var games = GameManager.getGameNameToGame().values().stream().filter(not(Game::isHasEnded)).toList();
-        for (Game game : games) {
-            autoPingGame(game);
-        }
+        GameManager.getManagedGames().stream()
+            .filter(not(ManagedGame::isHasEnded))
+            .map(ManagedGame::getGame)
+            .forEach(AutoPingCron::autoPingGame);
     }
 
     private static void autoPingGame(Game game) {
         try {
             handleTechSummary(game); // TODO, move this?
-            checkAllSaboWindows(game);
+            checkAllSaboWindows(game); // TODO, move this?
             if (game.isFastSCFollowMode()) {
                 handleFastScFollowMode(game);
             }
@@ -76,7 +80,7 @@ public class AutoPingCron {
                 for (String messageID : messageIDs) {
                     if (shouldPlayerLeaveAReact(player, game, messageID)) {
                         String message = game.isFowMode() ? "No Sabotage" : null;
-                        ButtonHelper.addReaction(player, false, false, message, null, messageID, game);
+                        addReaction(player, false, message, null, messageID, game);
                     }
                 }
             }
@@ -89,13 +93,13 @@ public class AutoPingCron {
                     if (!doesPlayerHaveAnyWhensOrAfters(player)
                         && !PlayerReactService.checkForASpecificPlayerReact(whensID, player, game)) {
                         String message = game.isFowMode() ? "No whens" : null;
-                        ButtonHelper.addReaction(player, false, false, message, null, whensID, game);
+                        addReaction(player, false, message, null, whensID, game);
                     }
                     String aftersID = game.getLatestAfterMsg();
                     if (!doesPlayerHaveAnyWhensOrAfters(player)
                         && !PlayerReactService.checkForASpecificPlayerReact(aftersID, player, game)) {
                         String message = game.isFowMode() ? "No afters" : null;
-                        ButtonHelper.addReaction(player, false, false, message, null, aftersID, game);
+                        addReaction(player, false, message, null, aftersID, game);
                     }
                 }
             }
@@ -103,7 +107,7 @@ public class AutoPingCron {
     }
 
     private static boolean canPlayerConceivablySabo(Player player, Game game) {
-        return player.getStrategicCC() > 0 && player.hasTechReady("it")  ||
+        return player.getStrategicCC() > 0 && player.hasTechReady("it") ||
             player.hasUnit("empyrean_mech") && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Mech).isEmpty() ||
             player.getAc() > 0;
     }
@@ -148,12 +152,14 @@ public class AutoPingCron {
 
     private static void handleTechSummary(Game game) {
         String key2 = "TechForRound" + game.getRound() + "Counter";
-        if (!game.getStoredValue(key2).isEmpty() && !game.getStoredValue(key2).equalsIgnoreCase("0")) {
-            game.setStoredValue(key2, (Integer.parseInt(game.getStoredValue(key2)) - 1) + "");
-            if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
-                PlayerTechService.postTechSummary(game);
-            }
+        if (game.getStoredValue(key2).isEmpty() || game.getStoredValue(key2).equalsIgnoreCase("0")) {
+            return;
         }
+        game.setStoredValue(key2, (Integer.parseInt(game.getStoredValue(key2)) - 1) + "");
+        if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
+            PlayerTechService.postTechSummary(game);
+        }
+        GameManager.save(game, "Tech summary.");
     }
 
     private static void handleAutoPing(Game game, Player player) {
@@ -170,7 +176,7 @@ public class AutoPingCron {
         }
         long milliSinceLastPing = System.currentTimeMillis() - game.getLastActivePlayerPing().getTime();
         if (milliSinceLastPing <= ONE_HOUR_IN_MILLISECONDS * spacer &&
-                (!player.shouldPlayerBeTenMinReminded() || milliSinceLastPing <= TEN_MINUTES_IN_MILLISECONDS)) {
+            (!player.shouldPlayerBeTenMinReminded() || milliSinceLastPing <= TEN_MINUTES_IN_MILLISECONDS)) {
             return;
         }
         String realIdentity = player.getRepresentationUnfogged();
@@ -189,11 +195,10 @@ public class AutoPingCron {
         long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange().getTime();
         int pingNumber = (int) (milliSinceLastTurnChange / (ONE_HOUR_IN_MILLISECONDS * spacer));
         pingMessage = getPingMessage(milliSinceLastTurnChange, spacer, pingMessage, realIdentity, pingNumber);
-
         pingPlayer(game, player, milliSinceLastTurnChange, spacer, pingMessage, pingNumber, realIdentity);
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         game.setLastActivePlayerPing(new Date());
-        GameSaveLoadManager.saveGame(game, "Auto Ping");
+        GameManager.save(game, "Auto Ping");
     }
 
     private static void pingPlayer(Game game, Player player, long milliSinceLastTurnChange, int spacer, String pingMessage, int pingNumber, String realIdentity) {
@@ -201,6 +206,7 @@ public class AutoPingCron {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 game.getPing() + " the game has stalled on a player, and autoping will now stop pinging them.");
             game.setTemporaryPingDisable(true);
+            GameManager.save(game, "Disable Auto Ping");
             return;
         }
         if (game.isFowMode()) {
@@ -229,7 +235,7 @@ public class AutoPingCron {
         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS * game.getAutoPingSpacer())) {
             AgendaHelper.pingMissingPlayers(game);
             game.setLastActivePlayerPing(new Date());
-            GameSaveLoadManager.saveGame(game, "Auto Ping");
+            GameManager.save(game, "Auto Ping");
         }
     }
 
@@ -260,6 +266,7 @@ public class AutoPingCron {
                         .append("half you will be marked as not following.");
                     appendScMessages(game, player, sc, sb);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
+                    GameManager.save(game, "Fast SC Ping");
                 }
                 if (timeDifference > twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("2")) {
                     String message = player.getRepresentationUnfogged() + Helper.getSCName(sc, game) +
@@ -268,8 +275,9 @@ public class AutoPingCron {
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, ButtonHelper.getStratName(sc));
                     player.addFollowedSC(sc);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
+                    GameManager.save(game, "Fast SC Ping 2");
                     String messageID = game.getStoredValue("scPlayMsgID" + sc);
-                    ButtonHelper.addReaction(player, false, true, "Not following", "", messageID, game);
+                    addReaction(player, true, "Not following", "", messageID, game);
 
                     StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
                     if (scModel != null && scModel.usesAutomationForSCID("pok8imperial")) {
@@ -311,26 +319,22 @@ public class AutoPingCron {
 
     private static void handleSecretObjectiveDrawOrder(Game game, Player player) {
         String key = "factionsThatAreNotDiscardingSOs";
+        if (!game.getStoredValue(key).contains(player.getFaction() + "*")) {
+            game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
+            GameManager.save(game, "Secret Objective Draw Order");
+        }
+
         String key2 = "queueToDrawSOs";
+        if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
+            game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+            GameManager.save(game, "Secret Objective Draw Order");
+        }
+
         String key3 = "potentialBlockers";
-        if (game.getStoredValue(key2)
-            .contains(player.getFaction() + "*")) {
-            game.setStoredValue(key2,
-                game.getStoredValue(key2)
-                    .replace(player.getFaction() + "*", ""));
-        }
-        if (!game.getStoredValue(key)
-            .contains(player.getFaction() + "*")) {
-            game.setStoredValue(key,
-                game.getStoredValue(key)
-                    + player.getFaction() + "*");
-        }
-        if (game.getStoredValue(key3)
-            .contains(player.getFaction() + "*")) {
-            game.setStoredValue(key3,
-                game.getStoredValue(key3)
-                    .replace(player.getFaction() + "*", ""));
+        if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
+            game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
             Helper.resolveQueue(game);
+            GameManager.save(game, "Secret Objective Draw Order");
         }
     }
 
@@ -538,5 +542,83 @@ public class AutoPingCron {
             }
         }
         return false;
+    }
+
+    private static void addReaction(Player player, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
+        try {
+            game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
+                Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
+                String messageId = mainMessage.getId();
+
+                game.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
+                if (game.getStoredValue(messageId) != null) {
+                    if (!game.getStoredValue(messageId).contains(player.getFaction())) {
+                        game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
+                        GameManager.save(game, "Add Reaction");
+                    }
+                } else {
+                    game.setStoredValue(messageId, player.getFaction());
+                    GameManager.save(game, "Add Reaction");
+                }
+                checkForAllReactions(messageId, game);
+                if (message == null || message.isEmpty()) {
+                    return;
+                }
+
+                String text = player.getRepresentation() + " " + message;
+                if (game.isFowMode() && sendPublic) {
+                    text = message;
+                } else if (game.isFowMode()) {
+                    text = "(You) " + emojiToUse.getFormatted() + " " + message;
+                }
+
+                if (additionalMessage != null && !additionalMessage.isEmpty()) {
+                    text += game.getPing() + " " + additionalMessage;
+                }
+
+                if (game.isFowMode() && !sendPublic) {
+                    MessageHelper.sendPrivateMessageToPlayer(player, game, text);
+                }
+            }, BotLogger::catchRestError);
+        } catch (Throwable e) {
+            game.removeMessageIDForSabo(messageID);
+        }
+    }
+
+    private static void checkForAllReactions(String messageId, Game game) {
+        int matchingFactionReactions = 0;
+        for (Player player : game.getRealPlayers()) {
+            if (game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction())) {
+                matchingFactionReactions++;
+            }
+        }
+        int numberOfPlayers = game.getRealPlayers().size();
+        if (matchingFactionReactions >= numberOfPlayers) {
+            game.getMainGameChannel().retrieveMessageById(messageId).queue(msg -> {
+                if (game.getLatestAfterMsg().equalsIgnoreCase(messageId)) {
+                    msg.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
+                    AgendaHelper.startTheVoting(game);
+                    GameManager.save(game, "Started Voting");
+                } else if (game.getLatestWhenMsg().equalsIgnoreCase(messageId)) {
+                    msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
+
+                } else {
+                    Matcher acToReact = CARDS_PATTERN.matcher(msg.getContentRaw());
+                    String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
+                    String faction = "bob_" + game.getStoredValue(messageId) + "_";
+                    faction = faction.split("_")[1];
+                    Player p2 = game.getPlayerFromColorOrFaction(faction);
+                    if (p2 != null && !game.isFowMode()) {
+                        msg2 = p2.getRepresentation() + " " + msg2;
+                    }
+                    msg.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
+                }
+            });
+
+            if (game.getMessageIDsForSabo().contains(messageId)) {
+                game.removeMessageIDForSabo(messageId);
+                GameManager.save(game, "No Sabo");
+            }
+        }
     }
 }

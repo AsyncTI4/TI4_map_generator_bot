@@ -14,12 +14,12 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.leader.HeroUnlockCheckService;
 
@@ -63,7 +63,7 @@ public class ScorePublicObjectiveService {
                         + (p2.getTg() - 1) + " -> " + p2.getTg();
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
                     ButtonHelperAbilities.pillageCheck(p2, game);
-                    ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+                    ButtonHelperAgents.resolveArtunoCheck(player, 1);
                 }
             }
         }
@@ -87,10 +87,10 @@ public class ScorePublicObjectiveService {
         String emojiName = "Custom";
         if (poName1 != null) {
             poName = poName1;
-            emojiName = Emojis.Public1alt;
+            emojiName = CardEmojis.Public1alt.toString();
         } else if (poName2 != null) {
             poName = poName2;
-            emojiName = Emojis.Public2alt;
+            emojiName = CardEmojis.Public2alt.toString();
         }
         return poName + "_" + emojiName;
     }
@@ -150,7 +150,7 @@ public class ScorePublicObjectiveService {
             if (currentStrat + currentTact > 2) {
                 if (currentStrat > 2) {
                     for (int x = 0; x < 3; x++) {
-                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + Emojis.Public1 + " Lead from the Front");
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public1 + " Lead from the Front");
                     }
                     player.setStrategicCC(currentStrat - 3);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Automatically deducted 3 strategy CCs (" + currentStrat + "->" + player.getStrategicCC() + ")");
@@ -158,7 +158,7 @@ public class ScorePublicObjectiveService {
                     String currentCC = player.getCCRepresentation();
                     int subtract = 3 - currentStrat;
                     for (int x = 0; x < currentStrat; x++) {
-                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + Emojis.Public1 + " Lead from the Front");
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public1 + " Lead from the Front");
                     }
                     player.setStrategicCC(0);
                     player.setTacticalCC(currentTact - subtract);
@@ -175,7 +175,7 @@ public class ScorePublicObjectiveService {
             if (currentStrat + currentTact > 5) {
                 if (currentStrat > 5) {
                     for (int x = 0; x < 6; x++) {
-                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + Emojis.Public2 + " Galvanize the People");
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public2 + " Galvanize the People");
                     }
                     player.setStrategicCC(currentStrat - 6);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Automatically deducted 6 strategy CCs (" + currentStrat + "->" + player.getStrategicCC() + ")");
@@ -183,7 +183,7 @@ public class ScorePublicObjectiveService {
                     String currentCC = player.getCCRepresentation();
                     int subtract = 6 - currentStrat;
                     for (int x = 0; x < currentStrat; x++) {
-                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + Emojis.Public2 + " Galvanize the People");
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public2 + " Galvanize the People");
                     }
                     player.setStrategicCC(0);
                     player.setTacticalCC(currentTact - subtract);

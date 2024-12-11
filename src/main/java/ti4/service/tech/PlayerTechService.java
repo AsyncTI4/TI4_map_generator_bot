@@ -22,7 +22,6 @@ import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.DiscordantStarsHelper;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
@@ -36,6 +35,9 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -130,14 +132,14 @@ public class PlayerTechService {
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "absol_dxa" -> { // Dacxive
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     "Use buttons to drop 2 infantry on a planet",
                     Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "absol_nm" -> { // Absol's Neural Motivator
                 deleteIfButtonEvent(event);
-                Button draw2ACButton = Buttons.gray(player.getFinsFactionCheckerPrefix() + "draw2 AC", "Draw 2 Action Cards", Emojis.ActionCard);
+                Button draw2ACButton = Buttons.gray(player.getFinsFactionCheckerPrefix() + "draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard);
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
                 //sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -392,11 +394,10 @@ public class PlayerTechService {
         if (techM.isUnitUpgrade()) {
             if (player.hasUnexhaustedLeader("mirvedaagent") && player.getStrategicCC() > 0) {
                 List<Button> buttons = new ArrayList<>();
-                Button mirvedaButton = Buttons.gray("exhaustAgent_mirvedaagent_" + player.getFaction(), "Use Mirveda Agent", Emojis.mirveda);
-                buttons.add(mirvedaButton);
+                buttons.add(Buttons.gray("exhaustAgent_mirvedaagent_" + player.getFaction(), "Use Mirveda Agent", FactionEmojis.mirveda));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged()
-                        + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Logic Machina, the Mirveda"
-                        + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to spend 1 CC and research a tech of the same color as a prerequisite of the tech you just got.",
+                    + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Logic Machina, the Mirveda"
+                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to spend 1 CC and research a tech of the same color as a prerequisite of the tech you just got.",
                     buttons);
             }
             if (player.hasAbility("obsessive_designs") && paymentRequired
@@ -437,8 +438,7 @@ public class PlayerTechService {
 
         if (player.hasUnexhaustedLeader("zealotsagent")) {
             List<Button> buttons = new ArrayList<>();
-            Button zealotsButton = Buttons.gray("exhaustAgent_zealotsagent_" + player.getFaction(), "Use Zealots Agent", Emojis.zealots);
-            buttons.add(zealotsButton);
+            buttons.add(Buttons.gray("exhaustAgent_zealotsagent_" + player.getFaction(), "Use Zealots Agent", FactionEmojis.zealots));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged()
                     + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh, the Rhodun"
@@ -510,8 +510,8 @@ public class PlayerTechService {
     }
 
     public static void postTechSummary(Game game) {
-        if (game.isFowMode() || game.getTableTalkChannel() == null
-            || !game.getStoredValue("TechSummaryRound" + game.getRound()).isEmpty() || game.isHomebrewSCMode()) {
+        if (game.isFowMode() || game.getTableTalkChannel() == null || !game.getStoredValue("TechSummaryRound" + game.getRound()).isEmpty()
+                || game.isHomebrewSCMode()) {
             return;
         }
         StringBuilder msg = new StringBuilder("**__Tech Summary For Round " + game.getRound() + "__**\n");
@@ -555,15 +555,14 @@ public class PlayerTechService {
         if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg.toString());
             game.setStoredValue("TechSummaryRound" + game.getRound(), "yes");
-        } else {
-            if (game.getStoredValue(key2).isEmpty()) {
-                game.setStoredValue(key2, "6");
-            }
+        } else if (game.getStoredValue(key2).isEmpty()) {
+            game.setStoredValue(key2, "6");
         }
     }
 
     /**
      * Generate buttons to pay for tech.
+     * 
      * @param game
      * @param player
      * @param event
@@ -590,22 +589,22 @@ public class PlayerTechService {
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {
 
             for (int x = 1; x < player.getCrf() + 1; x++) {
-                Button transact = Buttons.blue("purge_Frags_CRF_" + x, "Purge Cultural Fragments (" + x + ")", Emojis.CFrag);
+                Button transact = Buttons.blue("purge_Frags_CRF_" + x, "Purge Cultural Fragments (" + x + ")", ExploreEmojis.CFrag);
                 buttons.add(transact);
             }
 
             for (int x = 1; (x < player.getIrf() + 1 && x < 4); x++) {
-                Button transact = Buttons.green("purge_Frags_IRF_" + x, "Purge Industrial Fragments (" + x + ")", Emojis.IFrag);
+                Button transact = Buttons.green("purge_Frags_IRF_" + x, "Purge Industrial Fragments (" + x + ")", ExploreEmojis.IFrag);
                 buttons.add(transact);
             }
 
             for (int x = 1; (x < player.getHrf() + 1 && x < 4); x++) {
-                Button transact = Buttons.red("purge_Frags_HRF_" + x, "Purge Hazardous Fragments (" + x + ")", Emojis.HFrag);
+                Button transact = Buttons.red("purge_Frags_HRF_" + x, "Purge Hazardous Fragments (" + x + ")", ExploreEmojis.HFrag);
                 buttons.add(transact);
             }
 
             for (int x = 1; x < player.getUrf() + 1; x++) {
-                Button transact = Buttons.gray("purge_Frags_URF_" + x, "Purge Frontier Fragments (" + x + ")", Emojis.UFrag);
+                Button transact = Buttons.gray("purge_Frags_URF_" + x, "Purge Frontier Fragments (" + x + ")", ExploreEmojis.UFrag);
                 buttons.add(transact);
             }
 
@@ -615,32 +614,25 @@ public class PlayerTechService {
             buttons.add(inheritanceSystemsButton);
         }
         if (player.hasRelicReady("prophetstears")) {
-            Button pT1 = Buttons.red("prophetsTears_AC", "Exhaust Prophets Tears for AC");
-            buttons.add(pT1);
-            Button pT2 = Buttons.red("prophetsTears_TechSkip", "Exhaust Prophets Tears for Tech Skip");
-            buttons.add(pT2);
+            buttons.add(Buttons.red("prophetsTears_AC", "Exhaust Prophets Tears for AC"));
+            buttons.add(Buttons.red("prophetsTears_TechSkip", "Exhaust Prophets Tears for Tech Skip"));
         }
         if (player.hasExternalAccessToLeader("jolnaragent") || player.hasUnexhaustedLeader("jolnaragent")) {
-            Button pT2 = Buttons.gray("exhaustAgent_jolnaragent", "Use Jol-Nar Agent", Emojis.Jolnar);
-            buttons.add(pT2);
+            buttons.add(Buttons.gray("exhaustAgent_jolnaragent", "Use Jol-Nar Agent", FactionEmojis.Jolnar));
         }
         if (player.hasUnexhaustedLeader("veldyragent")) {
-            Button winnuButton = Buttons.red("exhaustAgent_veldyragent_" + player.getFaction(), "Use Veldyr Agent", Emojis.veldyr);
-            buttons.add(winnuButton);
+            buttons.add(Buttons.red("exhaustAgent_veldyragent_" + player.getFaction(), "Use Veldyr Agent", FactionEmojis.veldyr));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
-            Button pT2 = Buttons.gray("yinCommanderStep1_", "Remove infantry via Yin Commander", Emojis.Yin);
-            buttons.add(pT2);
+            buttons.add(Buttons.gray("yinCommanderStep1_", "Remove infantry via Yin Commander", FactionEmojis.Yin));
         }
-        Button doneExhausting = Buttons.red("deleteButtons_technology", "Done Exhausting Planets");
-        buttons.add(doneExhausting);
+        buttons.add(Buttons.red("deleteButtons_technology", "Done Exhausting Planets"));
         if (!player.hasAbility("propagation")) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         }
         if (ButtonHelper.isLawInPlay(game, "revolution")) {
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(),
-                player.getRepresentation()
-                    + " Due to the Anti-Intellectual Revolution law, you now have to kill a non-fighter ship if you researched the tech you just acquired",
+                player.getRepresentation() + " Due to the Anti-Intellectual Revolution law, you now have to kill a non-fighter ship if you researched the tech you just acquired",
                 Buttons.gray("getModifyTiles", "Modify Units"));
         }
     }

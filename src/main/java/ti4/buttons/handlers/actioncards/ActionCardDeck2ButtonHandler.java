@@ -15,7 +15,6 @@ import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -26,6 +25,9 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
@@ -128,7 +130,8 @@ class ActionCardDeck2ButtonHandler {
         if (game.getActiveSystem() != null && !game.getActiveSystem().isEmpty()) {
             buttons.add(Buttons.red("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign Hit" + (hits == 1 ? "" : "s")));
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg + "\n " + player.getRepresentation() + " your opponent needs to assign " + hits + " hit" + (hits == 1 ? "" : "s"), buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg + "\n " + player.getRepresentation() +
+            " your opponent needs to assign " + hits + " hit" + (hits == 1 ? "" : "s"), buttons);
     }
 
     @ButtonHandler("resolveFlawlessStrategy")
@@ -139,14 +142,14 @@ class ActionCardDeck2ButtonHandler {
             scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
         }
         if (player.getSCs().contains(3)) {
-            scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", Emojis.ActionCard));
+            scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
         }
         if (player.getSCs().contains(4)) {
-            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", Emojis.spacedock));
-            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", Emojis.pds));
+            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
+            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
         }
         if (player.getSCs().contains(5)) {
-            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", Emojis.comm));
+            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
         }
         if (player.getSCs().contains(6)) {
             scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
@@ -155,10 +158,10 @@ class ActionCardDeck2ButtonHandler {
             scButtons.add(Buttons.GET_A_TECH);
         }
         if (player.getSCs().contains(8)) {
-            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", Emojis.SecretObjective));
+            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " use buttons to resolve", scButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " use buttons to resolve", scButtons);
 
     }
 
@@ -228,10 +231,12 @@ class ActionCardDeck2ButtonHandler {
         if (p2 == null) return;
         List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
         buttons.add(Buttons.red("deleteButtons", "Don't place"));
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + "Use buttons to put 1 cruiser with your ships due to the arms deal", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() +
+            "Use buttons to put 1 cruiser with your ships due to the arms deal", buttons);
         buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
         buttons.add(Buttons.red("deleteButtons", "Don't place"));
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + "Use buttons to put 1 destroyer with your ships due to the arms deal", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() +
+            "Use buttons to put 1 destroyer with your ships due to the arms deal", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -389,7 +394,7 @@ class ActionCardDeck2ButtonHandler {
         if (player.getStrategicCC() > 0) {
             successMessage = player.getFactionEmoji() + " Reduced strategy pool CCs by 1 (" + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ")";
             player.setStrategicCC(player.getStrategicCC() - 1);
-            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, Emojis.ActionCard + "Side Project");
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, CardEmojis.ActionCard + "Side Project");
         } else {
             successMessage = player.getFactionEmoji() + " Exhausted Scepter of Emelpar";
             player.addExhaustedRelic("emelpar");
@@ -407,7 +412,8 @@ class ActionCardDeck2ButtonHandler {
             buttons.add(Buttons.green("brutalOccupationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the target of **Brutal Occupation**", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() +
+            " choose the target of **Brutal Occupation**", buttons);
     }
 
     @ButtonHandler("resolveShrapnelTurrets_")

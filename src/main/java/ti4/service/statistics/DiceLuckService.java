@@ -13,12 +13,12 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GamesPage;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -45,7 +45,7 @@ public class DiceLuckService {
             .sorted(comparator)
             .limit(topLimit)
             .forEach(entry  -> {
-                var user = AsyncTI4DiscordBot.jda.getUserById(entry.getKey());
+                var user = GameManager.getManagedPlayer(entry.getKey());
                 double expectedHits = entry.getValue().getKey();
                 int actualHits = entry.getValue().getValue();
                 if (expectedHits > 0 && actualHits > 0) {

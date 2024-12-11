@@ -22,9 +22,9 @@ import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameNameService;
 
@@ -41,17 +41,17 @@ public class CommandHelper {
 
     public static boolean acceptIfValidGame(SlashCommandInteractionEvent event, boolean checkChannel, boolean checkPlayer) {
         var gameName = GameNameService.getGameName(event);
-        var game = GameManager.getGame(gameName);
-        if (game == null) {
+        var managedGame = GameManager.getManagedGame(gameName);
+        if (managedGame == null) {
             MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' command canceled. Game name '" + gameName + "' is not valid. " +
                 "Execute command in correctly named channel that starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`");
             return false;
         }
-        if (checkChannel && !event.getChannel().getName().startsWith(game.getName() + "-")) {
+        if (checkChannel && !event.getChannel().getName().startsWith(managedGame.getName() + "-")) {
             MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' can only be executed in a game channel.");
             return false;
         }
-        if (checkPlayer && getPlayerFromEvent(game, event) == null) {
+        if (checkPlayer && getPlayerFromEvent(managedGame.getGame(), event) == null) {
             MessageHelper.replyToMessage(event, "Command must be ran by a player in the game, please use `/game join gameName` or `/special2 setup_neutral_player`.");
             return false;
         }

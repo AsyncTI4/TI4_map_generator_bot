@@ -1,10 +1,10 @@
 package ti4.service.emoji;
 
+import java.util.Objects;
+
 import javax.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
-
-import ti4.helpers.Emojis;
 
 public enum FactionEmojis implements TI4Emoji {
 
@@ -22,6 +22,13 @@ public enum FactionEmojis implements TI4Emoji {
     // Franken
     Franken1, Franken2, Franken3, Franken4, Franken5, Franken6, Franken7, Franken8, //
     Franken9, Franken10, Franken11, Franken12, Franken13, Franken14, Franken15, Franken16, //
+    // Franken Emblems
+    franken_aurilian_vanguard, franken_aelorian_clans, franken_dakari_hegemony, franken_durethian_shard, franken_elyndor_consortium, //
+    franken_fal_kesh_covenant, franken_ghaldir_union, franken_helian_imperium, franken_jhoran_brotherhood, franken_kyrenic_republic, //
+    franken_lysarian_order, franken_mydran_assembly, franken_nyridian_coalition, franken_olthax_collective, franken_qalorian_federation, //
+    franken_prayers_of_trudval, franken_rak_thul_tribes, franken_sol_tari_dynasty, franken_syrketh_conclave, franken_thalassian_guild, //
+    franken_thraxian_imperium, franken_thymarian_league, franken_valxian_pact, franken_var_sul_syndicate, franken_veridian_empire, //
+    franken_zel_tharr_dominion, franken_zircon_ascendancy, franken_zor_thul_matriarchate, //
 
     // Other (random homebrew)
     Lazax, Neutral, RandomFaction, AdminsFaction, netharii, Drahn, //misc
@@ -33,16 +40,15 @@ public enum FactionEmojis implements TI4Emoji {
     }
 
     @NotNull
-    public static String getFactionIconFromDiscord(String faction) {
-        TI4Emoji emoji = getFactionEmojiFromDiscord(faction);
-        if (emoji == null) return Emojis.getRandomizedEmoji(0, null);
-        return emoji.toString();
+    public static TI4Emoji getFactionIcon(String faction) {
+        TI4Emoji factionEmoji = getFactionEmoji(faction);
+        return Objects.requireNonNullElse(factionEmoji, TI4Emoji.getRandomizedEmoji(0, null));
     }
 
     @Nullable
-    public static TI4Emoji getFactionEmojiFromDiscord(String faction) {
+    public static TI4Emoji getFactionEmoji(String faction) {
+        if (faction == null) return null;
         return switch (faction.toLowerCase()) {
-            case null -> null;
             case "arborec" -> Arborec;
             case "argent" -> Argent;
             case "cabal" -> Cabal;
