@@ -16,6 +16,8 @@ import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TileEmojis;
 
 @Data
 public class TileModel implements ModelInterface, EmbeddableModel {
@@ -156,5 +158,10 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public Optional<String> getTileBackOption() {
         return Optional.ofNullable(tileBack);
+    }
+
+    @JsonIgnore
+    public TI4Emoji getEmoji() {
+        return TileEmojis.getTileEmojiFromTileID(tileBack);
     }
 }
