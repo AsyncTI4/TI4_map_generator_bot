@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -13,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -483,17 +484,17 @@ public class StartCombatService {
     }
 
     private static void sendAFBButtonsToThread(GenericInteractionCreateEvent event, ThreadChannel threadChannel, Game game, List<Player> combatPlayers, Tile tile) {
-        boolean thereAreAFBUnits = false;
-        for (Player player : combatPlayers) {
-            if (!CombatRollService.getUnitsInAFB(tile, player, event).isEmpty())
-                thereAreAFBUnits = true;
-        }
-        if (!thereAreAFBUnits)
-            return;
+        // boolean thereAreAFBUnits = false;
+        // for (Player player : combatPlayers) {
+        //     if (!CombatRollService.getUnitsInAFB(tile, player, event).isEmpty())
+        //         thereAreAFBUnits = true;
+        // }
+        // if (!thereAreAFBUnits)
+        //     return;
 
         List<Button> afbButtons = new ArrayList<>();
         afbButtons.add(Buttons.gray("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
-        MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll AFB:", afbButtons);
+        MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll AFB (if applicable):", afbButtons);
         for (Player player : combatPlayers) {
             if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !ButtonHelper.isLawInPlay(game, "articles_war")) {
                 MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use AFB against " + player.getFactionEmojiOrColor() + " due to their mech power");

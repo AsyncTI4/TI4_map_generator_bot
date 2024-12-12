@@ -1,5 +1,7 @@
 package ti4.service.combat;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,12 +12,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -30,6 +33,7 @@ import ti4.helpers.DiceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
@@ -345,8 +349,8 @@ public class CombatRollService {
     }
 
     public static String rollForUnits(Map<UnitModel, Integer> playerUnits, List<NamedCombatModifierModel> extraRolls,
-                                        List<NamedCombatModifierModel> autoMods, List<NamedCombatModifierModel> tempMods, Player player,
-                                        Player opponent, Game game, CombatRollType rollType, GenericInteractionCreateEvent event, Tile activeSystem) {
+        List<NamedCombatModifierModel> autoMods, List<NamedCombatModifierModel> tempMods, Player player,
+        Player opponent, Game game, CombatRollType rollType, GenericInteractionCreateEvent event, Tile activeSystem) {
         String result = "";
 
         List<NamedCombatModifierModel> mods = new ArrayList<>(autoMods);
@@ -480,6 +484,58 @@ public class CombatRollService {
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unitModel, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
                 resultBuilder.append("Rerolling ").append(numMisses).append(" miss").append(numMisses == 1 ? "" : "es").append(" due to Ta Zern, the Jol-Nar Commander:\n ").append(unitRoll2);
+            }
+            if (rollType == CombatRollType.SpaceCannonOffence || rollType == CombatRollType.SpaceCannonDefence) {
+                if (player.ownsUnit("gledge_pds2") && totalHits > 0) {
+                    String msg = player.getRepresentation() + " use the buttons to explore a planet with the pds that got the hit. It should be " +
+                        "noted that the bot has no idea which pds rolled which dice, but default practice would be to go from lowest tile position to highest" +
+                        ", with plasma applying to the last die. You can specify any order before rolling though.";
+                    for (int x = 0; x < totalHits; x++) {
+                        List<Button> buttons = new ArrayList<>();
+                        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds)) {
+                            for (String planet : ButtonHelper.getPlanetsWithSpecificUnit(player, tile, "pds")) {
+                                UnitHolder planetUnit = game.getUnitHolderFromPlanet(planet);
+                                if ("space".equalsIgnoreCase(planetUnit.getName())) {
+                                    continue;
+                                }
+                                Planet planetReal = (Planet) planetUnit;
+                                planet = planetReal.getName();
+                                if (isNotBlank(planetReal.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)
+                                    && FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
+                                    List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
+                                    buttons.addAll(planetButtons);
+                                }
+                            }
+                        }
+                        buttons.add(Buttons.red("deleteButtons", "No Valid Explore"));
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                    }
+                }
+                if (player.ownsUnit("gledge_pds")) {
+                    String msg = player.getRepresentation() + " use the buttons to explore a planet with the pds that got the hit.";
+                    for (DiceHelper.Die die : resultRolls) {
+                        if (die.getResult() < 8) {
+                            continue;
+                        }
+                        List<Button> buttons = new ArrayList<>();
+                        for (String planet : ButtonHelper.getPlanetsWithSpecificUnit(player, activeSystem, "pds")) {
+                            UnitHolder planetUnit = game.getUnitHolderFromPlanet(planet);
+                            if ("space".equalsIgnoreCase(planetUnit.getName())) {
+                                continue;
+                            }
+                            Planet planetReal = (Planet) planetUnit;
+                            planet = planetReal.getName();
+                            if (isNotBlank(planetReal.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)
+                                && FoWHelper.playerHasUnitsOnPlanet(player, activeSystem, planet)) {
+                                List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
+                                buttons.addAll(planetButtons);
+                            }
+                        }
+                        buttons.add(Buttons.red("deleteButtons", "No Valid Explore"));
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                    }
+
+                }
             }
 
             if (game.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround && numMisses > 0) {

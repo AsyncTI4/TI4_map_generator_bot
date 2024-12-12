@@ -809,7 +809,6 @@ public class ButtonHelper {
         }
         String activePlayerident = player.getRepresentation();
         MessageChannel channel = game.getActionsChannel();
-        System.out.println("beep");
         Player ghostPlayer = Helper.getPlayerFromUnit(game, "ghost_mech");
         if (!game.isFowMode() && ghostPlayer != null && ghostPlayer != player
             && getNumberOfUnitsOnTheBoard(game, ghostPlayer, "mech", false) > 0
@@ -6118,6 +6117,7 @@ public class ButtonHelper {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "mech " + planet);
         deleteMessage(event);
         sendMessageToRightStratThread(player, game, msg1, warfareOrNot);
+        CommanderUnlockCheckService.checkPlayer(player, "naaz");
     }
 
     public static String resolveACDraw(Player p2, Game game, GenericInteractionCreateEvent event) {

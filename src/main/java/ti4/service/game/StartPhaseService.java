@@ -410,7 +410,7 @@ public class StartPhaseService {
         Button yssarilPolicy = null;
         for (Player player : game.getRealPlayers()) {
             if (ButtonHelper.isPlayerElected(game, player, "minister_policy") && player.hasAbility("scheming")) {
-                yssarilPolicy = Buttons.gray(player.getFinsFactionCheckerPrefix() + "_yssarilMinisterOfPolicy", "Draw Minister of Policy AC", FactionEmojis.Yssaril);
+                yssarilPolicy = Buttons.gray(player.getFinsFactionCheckerPrefix() + "yssarilMinisterOfPolicy", "Draw Minister of Policy AC", FactionEmojis.Yssaril);
             }
         }
         boolean custodiansTaken = game.isCustodiansScored();
