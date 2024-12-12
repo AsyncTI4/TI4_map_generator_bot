@@ -10,7 +10,7 @@ import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.metadata.TechSummaryMetadataManager;
+import ti4.model.metadata.TechSummariesMetadataManager;
 
 @UtilityClass
 public class TechSummaryCron {
@@ -20,19 +20,19 @@ public class TechSummaryCron {
     }
 
     private static void postTechSummaries() {
-        var techSummaries = TechSummaryMetadataManager.readFile();
+        TechSummariesMetadataManager.consumeAndPersist(TechSummaryCron::postTechSummaries);
+    }
+
+    private static void postTechSummaries(TechSummariesMetadataManager.TechSummaries techSummaries) {
         if (techSummaries == null) {
             BotLogger.log("Unable to run TechSummaryCron: TechSummary was unavailable.");
             return;
         }
-
         techSummaries.gameNameToTechSummary().entrySet()
             .removeIf(e -> tryToPostTechSummary(e.getKey(), e.getValue()));
-
-        TechSummaryMetadataManager.persistFile(techSummaries);
     }
 
-    private static boolean tryToPostTechSummary(String gameName, TechSummaryMetadataManager.RoundTechSummaries roundTechSummaries) {
+    private static boolean tryToPostTechSummary(String gameName, TechSummariesMetadataManager.RoundTechSummaries roundTechSummaries) {
         try {
             var managedGame = GameManager.getManagedGame(gameName);
             if (managedGame == null || managedGame.isHasEnded() ||  managedGame.getTableTalkChannel() == null) {
@@ -50,7 +50,7 @@ public class TechSummaryCron {
         }
     }
 
-    private static void postTechSummary(Game game, List<TechSummaryMetadataManager.FactionTechSummary> techSummaries) {
+    private static void postTechSummary(Game game, List<TechSummariesMetadataManager.FactionTechSummary> techSummaries) {
         StringBuilder msg = new StringBuilder("**__Tech Summary For Round " + game.getRound() + "__**\n");
         for (var techSummary : techSummaries) {
             Player player = game.getPlayerFromColorOrFaction(techSummary.getFaction());

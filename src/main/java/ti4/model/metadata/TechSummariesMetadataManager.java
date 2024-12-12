@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,11 +16,11 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 
 @UtilityClass
-public class TechSummaryMetadataManager {
+public class TechSummariesMetadataManager {
 
-    private static final String TECH_SUMMARIES_PATH = "TechSummaries.json";
+    private static final String TECH_SUMMARIES_FILE = "TechSummaries.json";
 
-    public static synchronized void updateTechSummaryMetadata(Game game, Player player, String techId, boolean isResearchAgreement) {
+    public static synchronized void addTech(Game game, Player player, String techId, boolean isResearchAgreement) {
         if (game.isFowMode() || game.isHomebrewSCMode()) {
             return;
         }
@@ -50,9 +51,15 @@ public class TechSummaryMetadataManager {
         persistFile(techSummaries);
     }
 
-    public static TechSummaries readFile() {
+    public static synchronized void consumeAndPersist(Consumer<TechSummaries> consumer) {
+        TechSummaries techSummaries = readFile();
+        consumer.accept(techSummaries);
+        persistFile(techSummaries);
+    }
+
+    private static TechSummaries readFile() {
         try {
-            var techSummary = PersistenceManager.readObjectFromJsonFile(TECH_SUMMARIES_PATH, TechSummaries.class);
+            var techSummary = PersistenceManager.readObjectFromJsonFile(TECH_SUMMARIES_FILE, TechSummaries.class);
             return techSummary != null ? techSummary : new TechSummaries(new HashMap<>());
         } catch (IOException e) {
             BotLogger.log("Failed to read json data for TechSummaries.", e);
@@ -60,9 +67,9 @@ public class TechSummaryMetadataManager {
         }
     }
 
-    public static void persistFile(TechSummaries toPersist) {
+    private static void persistFile(TechSummaries toPersist) {
         try {
-            PersistenceManager.writeObjectToJsonFile(TECH_SUMMARIES_PATH, toPersist);
+            PersistenceManager.writeObjectToJsonFile(TECH_SUMMARIES_FILE, toPersist);
         } catch (Exception e) {
             BotLogger.log("Failed to write json data for TechSummaries.", e);
         }

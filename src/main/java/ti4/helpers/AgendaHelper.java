@@ -3112,7 +3112,7 @@ public class AgendaHelper {
     @ButtonHandler("refreshVotes_")
     public static void refreshVotes(GenericInteractionCreateEvent event, Game game, Player player, String buttonID) {
         String votes = buttonID.replace("refreshVotes_", "");
-        List<Button> voteActionRow = Helper.getPlanetRefreshButtons(event, player, game);
+        List<Button> voteActionRow = Helper.getPlanetRefreshButtons(player, game);
         Button concludeRefreshing = Buttons.red(player.getFinsFactionCheckerPrefix() + "votes_" + votes, "Done readying planets.");
         voteActionRow.add(concludeRefreshing);
         String voteMessage2 = "Use the buttons to ready planets. When you're done it will prompt the next person to vote.";

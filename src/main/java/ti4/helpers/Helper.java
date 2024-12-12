@@ -25,7 +25,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -49,7 +48,6 @@ import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -69,12 +67,12 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
-import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -195,32 +193,6 @@ public class Helper {
         return new ArrayList<>(allTiles);
     }
 
-    public static void getRandomBlueTile(Game game, GenericInteractionCreateEvent event) {
-        List<MiltyDraftTile> unusedBlueTiles = new ArrayList<>(getUnusedTiles(game).stream()
-            .filter(tile -> tile.getTierList().isBlue())
-            .toList());
-        if (unusedBlueTiles.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There are no blue tiles available to draw.");
-        } else {
-            Collections.shuffle(unusedBlueTiles);
-            Tile tile = unusedBlueTiles.getFirst().getTile();
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You randomly drew the tile: " + tile.getRepresentation());
-        }
-    }
-
-    public static void getRandomRedTile(Game game, GenericInteractionCreateEvent event) {
-        List<MiltyDraftTile> unusedRedTiles = new ArrayList<>(getUnusedTiles(game).stream()
-            .filter(tile -> !tile.getTierList().isBlue())
-            .toList());
-        if (unusedRedTiles.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There are no red tiles available to draw.");
-        } else {
-            Collections.shuffle(unusedRedTiles);
-            Tile tile = unusedRedTiles.getFirst().getTile();
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You randomly drew the tile: " + tile.getRepresentation());
-        }
-    }
-
     public static void giveMeBackMyAgendaButtons(Game game) {
         List<Button> proceedButtons = new ArrayList<>();
         String msg = "Press this button if the last player forgot to react, but verbally said \"No Whens or Afters\".";
@@ -265,35 +237,7 @@ public class Helper {
 
     }
 
-    public static List<Player> getInitativeOrderFromThisPlayer(Player p1, Game game) {
-        List<Player> players = new ArrayList<>();
-
-        List<Player> initiativeOrder = getInitativeOrder(game);
-        boolean found = false;
-        for (Player p2 : initiativeOrder) {
-            if (p2 == p1) {
-                found = true;
-                players.add(p1);
-            } else {
-                if (found) {
-                    players.add(p2);
-                }
-            }
-        }
-        for (Player p2 : initiativeOrder) {
-            if (p2 == p1) {
-                found = false;
-            } else {
-                if (found) {
-                    players.add(p2);
-                }
-            }
-        }
-        return players;
-    }
-
     public static void resolveQueue(Game game) {
-
         Player imperialHolder = getPlayerWithThisSC(game, 8);
         if (game.getPhaseOfGame().contains("agenda")) {
             imperialHolder = game.getPlayer(game.getSpeakerUserID());
@@ -394,37 +338,6 @@ public class Helper {
         }
     }
 
-    public static void resolveSOScoringQueue(Game game, GenericInteractionCreateEvent event) {
-        String key2 = "queueToScoreSOs";
-        String key3 = "potentialScoreSOBlockers";
-        if (game.getStoredValue(key2).length() < 2
-            || game.getHighestScore() + 1 > game.getVp()) {
-            return;
-        }
-        for (Player player : getInitativeOrder(game)) {
-            if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
-                int soIndex = Integer
-                    .parseInt(game.getStoredValue(player.getFaction() + "queuedSOScore"));
-                SecretObjectiveHelper.scoreSO(event, game, player, soIndex, game.getMainGameChannel());
-                game.setStoredValue(key2,
-                    game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
-                game.setStoredValue(key3,
-                    game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
-            } else {
-                if (game.getStoredValue(key3).contains(player.getFaction() + "*")
-                    && game.getStoredValue(key2).length() > 2) {
-                    String message = player.getRepresentationUnfogged()
-                        + " is the one the game is currently waiting on before advancing to the next player, with regards to queued secret objective scoring.";
-                    if (game.isFowMode()) {
-                        message = "Waiting on someone else before proceeding with scoring.";
-                    }
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                    break;
-                }
-            }
-        }
-    }
-
     public static Player getPlayerWithThisSC(Game game, int sc) {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(sc)) {
@@ -460,34 +373,21 @@ public class Helper {
         return players;
     }
 
-    public static boolean hasEveryoneResolvedBeforeMe(Player player, String factionsThatHaveResolved,
-        List<Player> orderList) {
-        for (Player p2 : orderList) {
-            if (p2 == player) {
-                return true;
-            }
-            if (!factionsThatHaveResolved.contains(p2.getFaction())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
         List<String> messageIDs = new ArrayList<>(game.getMessageIDsForSabo());
         for (String messageID : messageIDs) {
-            if (!PlayerReactService.checkForASpecificPlayerReact(messageID, player, game)) {
-                game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
-                    Emoji reactionEmoji = getPlayerReactionEmoji(game, player, messageID);
-                    MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                    if (reaction == null) {
-                        Calendar rightNow = Calendar.getInstance();
-                        if (rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() > 2 || rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() < -100) {
-                            game.removeMessageIDForSabo(messageID);
-                        }
+            if (PlayerReactService.checkForASpecificPlayerReact(messageID, player, game)) continue;
+
+            game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
+                Emoji reactionEmoji = getPlayerReactionEmoji(game, player, messageID);
+                MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+                if (reaction == null) {
+                    Calendar rightNow = Calendar.getInstance();
+                    if (rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() > 2 || rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() < -100) {
+                        game.removeMessageIDForSabo(messageID);
                     }
-                });
-            }
+                }
+            });
         }
     }
 
@@ -527,21 +427,6 @@ public class Helper {
         return tokenPath;
     }
 
-    @Nullable
-    public static String getAdjacencyOverridePath(int direction) {
-        String file = "adjacent_";
-        switch (direction) {
-            case 0, 5, 1 -> file += "north.png";
-            case 2, 4, 3 -> file += "south.png";
-        }
-        String tokenPath = ResourceHelper.getResourceFromFolder("extra/", file);
-        if (tokenPath == null) {
-            BotLogger.log("Could not find token: " + file);
-            return null;
-        }
-        return tokenPath;
-    }
-
     public static void addMirageToTile(Tile tile) {
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         if (unitHolders.get(Constants.MIRAGE) == null) {
@@ -564,12 +449,6 @@ public class Helper {
         return simpleDateFormat.format(date);
     }
 
-    public static String getDateTimeRepresentation(long dateInfo) {
-        Date date = new Date(dateInfo);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return simpleDateFormat.format(date);
-    }
-
     public static int getDateDifference(String date1, String date2) {
         if (date1 == null || date1.isEmpty()) {
             return 1000;
@@ -585,19 +464,7 @@ public class Helper {
         return (year2 - year1) * 365 + (month2 - month1) * 30 + (day2 - day1);
     }
 
-    public static String getRoleMentionByName(Guild guild, String roleName) {
-        if (roleName == null) {
-            return "[@Oopsidoops no name]";
-        }
-        List<Role> roles = guild.getRolesByName(roleName, true);
-        if (!roles.isEmpty()) {
-            return roles.getFirst().getAsMention();
-        }
-        return "[@" + roleName + "]";
-    }
-
     public static String getSCAsMention(int sc, Game game) {
-        //StrategyCardModel scModel = game.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
         if (game.isHomebrewSCMode()) {
             return getSCName(sc, game);
         }
@@ -685,29 +552,6 @@ public class Helper {
         return PlanetEmojis.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
     }
 
-    public static String getBasicTileRep(String tileID) {
-        StringBuilder name = new StringBuilder(TileHelper.getTileById(tileID).getName());
-        if (!TileHelper.getTileById(tileID).getPlanets().isEmpty()) {
-            name.append(" (");
-        }
-        for (String planet : TileHelper.getTileById(tileID).getPlanets()) {
-            name.append(Mapper.getPlanet(planet).getResources()).append("/")
-                .append(Mapper.getPlanet(planet).getInfluence()).append(", ");
-        }
-        if (!TileHelper.getTileById(tileID).getPlanets().isEmpty()) {
-            name = new StringBuilder(name.substring(0, name.length() - 2) + ")");
-        }
-        return name.toString();
-    }
-
-    public static String getUnitHolderRepresentation(Tile tile, String planetOrSpace, Game game, Player player) {
-        if (planetOrSpace.equals("space")) {
-            return tile.getRepresentationForButtons(game, player);
-        } else {
-            return Helper.getPlanetRepresentation(planetOrSpace, game);
-        }
-    }
-
     public static String getPlanetRepresentation(String planetID, Game game) {
         planetID = planetID.toLowerCase().replace(" ", "");
         planetID = planetID.replace("'", "");
@@ -785,8 +629,7 @@ public class Helper {
         }
     }
 
-    public static List<Button> getPlanetRefreshButtons(GenericInteractionCreateEvent event, Player player,
-        Game game) {
+    public static List<Button> getPlanetRefreshButtons(Player player, Game game) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getExhaustedPlanets());
         for (String planet : planets) {
@@ -796,19 +639,7 @@ public class Helper {
         return planetButtons;
     }
 
-    public static String getPlayerDependingOnFog(Game game, Player player) {
-        String ident;
-
-        if (game.isFowMode()) {
-            ident = player.getColor();
-        } else {
-            ident = player.getFactionEmoji();
-        }
-        return ident;
-    }
-
-    public static List<Button> getRemainingSCButtons(GenericInteractionCreateEvent event, Game game,
-        Player playerPicker) {
+    public static List<Button> getRemainingSCButtons(Game game, Player playerPicker) {
         List<Button> scButtons = new ArrayList<>();
 
         for (Integer sc : game.getSCList()) {
@@ -1845,7 +1676,7 @@ public class Helper {
 
     public static void isCCCountCorrect(GenericInteractionCreateEvent event, Game game, String color) {
         int ccCount = getCCCount(game, color);
-        informUserCCOverLimit(event, game, color, ccCount);
+        informUserCCOverLimit(game, color, ccCount);
     }
 
     public static int getCCCount(Game game, String color) {
@@ -1884,7 +1715,7 @@ public class Helper {
         return ccCount;
     }
 
-    private static void informUserCCOverLimit(GenericInteractionCreateEvent event, Game game, String color, int ccCount) {
+    private static void informUserCCOverLimit(Game game, String color, int ccCount) {
         int limit = 16;
         if (!game.getStoredValue("ccLimit").isEmpty()) {
             limit = Integer.parseInt(game.getStoredValue("ccLimit"));
@@ -1972,22 +1803,6 @@ public class Helper {
 
     public static Integer getPlayerFlexResourcesInfluenceAvailable(Player player, Game game) {
         return getAvailablePlanetSumValue(game, player, Planet::getFlexResourcesOrInfluence);
-    }
-
-    public static Integer getPlayerFlexResourcesInfluenceTotal(Player player, Game game) {
-        return getTotalPlanetSumValue(game, player, Planet::getFlexResourcesOrInfluence);
-    }
-
-    public static String getPlayerResourceInfluenceRepresentation(Player player, Game game) {
-        return player.getRepresentation() + ":\n" +
-            "Resources: " + getPlayerResourcesAvailable(player, game) + "/"
-            + getPlayerResourcesTotal(player, game) + "  Optimal: "
-            + getPlayerOptimalResourcesAvailable(player, game)
-            + "/" + getPlayerOptimalResourcesTotal(player, game) + "\n" +
-            "Influence: " + getPlayerInfluenceAvailable(player, game) + "/"
-            + getPlayerInfluenceTotal(player, game) + "  Optimal: "
-            + getPlayerOptimalInfluenceAvailable(player, game)
-            + "/" + getPlayerOptimalInfluenceTotal(player, game) + "\n";
     }
 
     public static Map<String, Integer> getLastEntryInHashMap(Map<String, Integer> linkedHashMap) {
@@ -2518,30 +2333,6 @@ public class Helper {
         } else {
             return (turnTimesSorted.get(middle - 1) + turnTimesSorted.get(middle)) / 2;
         }
-    }
-
-    public static boolean embedContainsSearchTerm(MessageEmbed messageEmbed, String searchString) {
-        if (messageEmbed == null)
-            return false;
-        if (searchString == null)
-            return true;
-        searchString = searchString.toLowerCase();
-
-        if (messageEmbed.getTitle() != null && messageEmbed.getTitle().toLowerCase().contains(searchString))
-            return true;
-        if (messageEmbed.getDescription() != null && messageEmbed.getDescription().toLowerCase().contains(searchString))
-            return true;
-        if (messageEmbed.getFooter() != null && messageEmbed.getFooter().getText() != null
-            && messageEmbed.getFooter().getText().toLowerCase().contains(searchString))
-            return true;
-        for (MessageEmbed.Field field : messageEmbed.getFields()) {
-            if (field.getName() != null && field.getName().toLowerCase().contains(searchString))
-                return true;
-            if (field.getValue() != null && field.getValue().toLowerCase().contains(searchString))
-                return true;
-        }
-
-        return false;
     }
 
     public static String getUnitListEmojis(String unitList) {

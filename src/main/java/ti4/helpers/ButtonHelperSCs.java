@@ -61,7 +61,7 @@ public class ButtonHelperSCs {
         ReactionService.addReaction(event, game, player);
         String message = player.getRepresentationUnfogged() + " Click the names of the planets you wish to ready";
 
-        List<Button> buttons = Helper.getPlanetRefreshButtons(event, player, game);
+        List<Button> buttons = Helper.getPlanetRefreshButtons(player, game);
         Button doneRefreshing = Buttons.red("deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
         buttons.add(doneRefreshing);
         if (!game.isFowMode()) {

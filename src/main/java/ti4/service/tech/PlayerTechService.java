@@ -35,7 +35,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
-import ti4.model.metadata.TechSummaryMetadataManager;
+import ti4.model.metadata.TechSummariesMetadataManager;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -479,7 +479,7 @@ public class PlayerTechService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         } else {
             ButtonHelper.sendMessageToRightStratThread(player, game, message.toString(), "technology");
-            TechSummaryMetadataManager.updateTechSummaryMetadata(game, player, techID, false);
+            TechSummariesMetadataManager.addTech(game, player, techID, false);
         }
         if (paymentRequired) {
             payForTech(game, player, event, techID, paymentType);
