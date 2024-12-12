@@ -3,10 +3,12 @@ package ti4.settings.users;
 import java.io.File;
 import java.io.IOException;
 
+import lombok.experimental.UtilityClass;
 import ti4.helpers.Storage;
 import ti4.json.PersistenceManager;
 import ti4.message.BotLogger;
 
+@UtilityClass
 public class UserSettingsManager {
 
     private static final String USER_SETTINGS_PATH = Storage.getStoragePath() + File.separator + "user_settings";

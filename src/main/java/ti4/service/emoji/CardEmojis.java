@@ -76,71 +76,71 @@ public enum CardEmojis implements TI4Emoji {
     // Full Mentions
     public static String SC1Mention() {
         return sc_1_1.toString()
-            + sc_1_2.toString()
-            + sc_1_3.toString()
-            + sc_1_4.toString()
-            + sc_1_5.toString()
-            + sc_1_6.toString();
+            + sc_1_2
+            + sc_1_3
+            + sc_1_4
+            + sc_1_5
+            + sc_1_6;
     }
 
     public static String SC2Mention() {
         return sc_2_1.toString()
-            + sc_2_2.toString()
-            + sc_2_3.toString()
-            + sc_2_4.toString()
-            + sc_2_5.toString()
-            + sc_2_6.toString();
+            + sc_2_2
+            + sc_2_3
+            + sc_2_4
+            + sc_2_5
+            + sc_2_6;
     }
 
     public static String SC3Mention() {
         return sc_3_1.toString()
-            + sc_3_2.toString()
-            + sc_3_3.toString()
-            + sc_3_4.toString()
-            + sc_3_5.toString();
+            + sc_3_2
+            + sc_3_3
+            + sc_3_4
+            + sc_3_5;
     }
 
     public static String SC4Mention() {
         return sc_4_1.toString()
-            + sc_4_2.toString()
-            + sc_4_3.toString()
-            + sc_4_4.toString()
-            + sc_4_5.toString()
-            + sc_4_6.toString()
-            + sc_4_7.toString();
+            + sc_4_2
+            + sc_4_3
+            + sc_4_4
+            + sc_4_5
+            + sc_4_6
+            + sc_4_7;
     }
 
     public static String SC5Mention() {
         return sc_5_1.toString()
-            + sc_5_2.toString()
-            + sc_5_3.toString()
-            + sc_5_4.toString();
+            + sc_5_2
+            + sc_5_3
+            + sc_5_4;
     }
 
     public static String SC6Mention() {
         return sc_6_1.toString()
-            + sc_6_2.toString()
-            + sc_6_3.toString()
-            + sc_6_4.toString()
-            + sc_6_5.toString();
+            + sc_6_2
+            + sc_6_3
+            + sc_6_4
+            + sc_6_5;
     }
 
     public static String SC7Mention() {
         return sc_7_1.toString()
-            + sc_7_2.toString()
-            + sc_7_3.toString()
-            + sc_7_4.toString()
-            + sc_7_5.toString()
-            + sc_7_6.toString()
-            + sc_7_7.toString();
+            + sc_7_2
+            + sc_7_3
+            + sc_7_4
+            + sc_7_5
+            + sc_7_6
+            + sc_7_7;
     }
 
     public static String SC8Mention() {
         return sc_8_1.toString()
-            + sc_8_2.toString()
-            + sc_8_3.toString()
-            + sc_8_4.toString()
-            + sc_8_5.toString();
+            + sc_8_2
+            + sc_8_3
+            + sc_8_4
+            + sc_8_5;
     }
 
     @Override

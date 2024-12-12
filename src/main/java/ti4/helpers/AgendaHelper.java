@@ -689,7 +689,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("eraseMyRiders")
-    public static void reverseAllRiders(ButtonInteractionEvent event, Game game, Player player) {
+    public static void reverseAllRiders(Game game, Player player) {
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
         for (String outcome : outcomes.keySet()) {
             String existingData = outcomes.getOrDefault(outcome, "empty");

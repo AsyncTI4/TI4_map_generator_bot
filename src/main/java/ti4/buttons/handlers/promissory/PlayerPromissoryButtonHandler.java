@@ -14,6 +14,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
+import ti4.model.metadata.TechSummaryMetadataManager;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
@@ -29,12 +30,7 @@ class PlayerPromissoryButtonHandler {
             pnID = pnID.replace("_" + tech, "");
             String message = player.getFactionEmojiOrColor() + " Acquired The Tech " + techModel.getRepresentation(false) + " via Research Agreement";
             player.addTech(tech);
-            String key = "RAForRound" + game.getRound() + player.getFaction();
-            if (game.getStoredValue(key).isEmpty()) {
-                game.setStoredValue(key, tech);
-            } else {
-                game.setStoredValue(key, game.getStoredValue(key) + "." + tech);
-            }
+            TechSummaryMetadataManager.updateTechSummaryMetadata(game, player, tech, true);
             ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
             CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);

@@ -3,31 +3,23 @@ package ti4.cron;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.Units;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.ActionCardModel;
 import ti4.model.StrategyCardModel;
-import ti4.service.player.PlayerReactService;
-import ti4.service.tech.PlayerTechService;
+import ti4.service.button.ReactionService;
 import ti4.settings.users.UserSettingsManager;
 
 import static java.util.function.Predicate.not;
@@ -38,10 +30,9 @@ public class AutoPingCron {
     private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
     private static final long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
-    private static final Pattern CARDS_PATTERN = Pattern.compile("Card\\s(.*?):");
 
     public static void register() {
-        CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
+        CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 5, 10, TimeUnit.MINUTES);
     }
 
     private static void autoPingGames() {
@@ -53,8 +44,6 @@ public class AutoPingCron {
 
     private static void autoPingGame(Game game) {
         try {
-            handleTechSummary(game); // TODO, move this?
-            checkAllSaboWindows(game); // TODO, move this?
             if (game.isFastSCFollowMode()) {
                 handleFastScFollowMode(game);
             }
@@ -65,101 +54,6 @@ public class AutoPingCron {
         } catch (Exception e) {
             BotLogger.log("AutoPing failed for game: " + game.getName(), e);
         }
-    }
-
-    private static void checkAllSaboWindows(Game game) {
-        List<String> messageIDs = new ArrayList<>(game.getMessageIDsForSabo());
-        for (Player player : game.getRealPlayers()) {
-            if (player.getAutoSaboPassMedian() == 0) {
-                continue;
-            }
-            int highNum = player.getAutoSaboPassMedian() * 6 * 3 / 2;
-            int result = ThreadLocalRandom.current().nextInt(1, highNum + 1);
-            boolean shouldDoIt = result == highNum;
-            if (shouldDoIt || !canPlayerConceivablySabo(player, game)) {
-                for (String messageID : messageIDs) {
-                    if (shouldPlayerLeaveAReact(player, game, messageID)) {
-                        String message = game.isFowMode() ? "No Sabotage" : null;
-                        addReaction(player, false, message, null, messageID, game);
-                    }
-                }
-            }
-            if ("agendawaiting".equals(game.getPhaseOfGame())) {
-                int highNum2 = player.getAutoSaboPassMedian() * 4 / 2;
-                int result2 = ThreadLocalRandom.current().nextInt(1, highNum2 + 1);
-                boolean shouldDoIt2 = result2 == highNum2;
-                if (shouldDoIt2) {
-                    String whensID = game.getLatestWhenMsg();
-                    if (!doesPlayerHaveAnyWhensOrAfters(player)
-                        && !PlayerReactService.checkForASpecificPlayerReact(whensID, player, game)) {
-                        String message = game.isFowMode() ? "No whens" : null;
-                        addReaction(player, false, message, null, whensID, game);
-                    }
-                    String aftersID = game.getLatestAfterMsg();
-                    if (!doesPlayerHaveAnyWhensOrAfters(player)
-                        && !PlayerReactService.checkForASpecificPlayerReact(aftersID, player, game)) {
-                        String message = game.isFowMode() ? "No afters" : null;
-                        addReaction(player, false, message, null, aftersID, game);
-                    }
-                }
-            }
-        }
-    }
-
-    private static boolean canPlayerConceivablySabo(Player player, Game game) {
-        return player.getStrategicCC() > 0 && player.hasTechReady("it") ||
-            player.hasUnit("empyrean_mech") && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Mech).isEmpty() ||
-            player.getAc() > 0;
-    }
-
-    private static boolean shouldPlayerLeaveAReact(Player player, Game game, String messageID) {
-        if (player.hasTechReady("it") && player.getStrategicCC() > 0) {
-            return false;
-        }
-        if ((playerHasSabotage(player)
-            || (game.getActionCardDeckSize() + game.getDiscardActionCards().size()) > 180)
-            && !ButtonHelper.isPlayerElected(game, player, "censure")
-            && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
-            return false;
-        }
-        if (player.hasUnit("empyrean_mech")
-            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Mech).isEmpty()) {
-            return false;
-        }
-        if (player.getAc() == 0) {
-            return !PlayerReactService.checkForASpecificPlayerReact(messageID, player, game);
-        }
-        if (player.isAFK()) {
-            return false;
-        }
-        if (player.getAutoSaboPassMedian() == 0) {
-            return false;
-        }
-        return !PlayerReactService.checkForASpecificPlayerReact(messageID, player, game);
-    }
-
-    private static boolean playerHasSabotage(Player player) {
-        return player.getActionCards().containsKey("sabo1")
-            || player.getActionCards().containsKey("sabo2")
-            || player.getActionCards().containsKey("sabo3")
-            || player.getActionCards().containsKey("sabo4")
-            || player.getActionCards().containsKey("sabotage_ds")
-            || player.getActionCards().containsKey("sabotage1_acd2")
-            || player.getActionCards().containsKey("sabotage2_acd2")
-            || player.getActionCards().containsKey("sabotage3_acd2")
-            || player.getActionCards().containsKey("sabotage4_acd2");
-    }
-
-    private static void handleTechSummary(Game game) {
-        String key2 = "TechForRound" + game.getRound() + "Counter";
-        if (game.getStoredValue(key2).isEmpty() || game.getStoredValue(key2).equalsIgnoreCase("0")) {
-            return;
-        }
-        game.setStoredValue(key2, (Integer.parseInt(game.getStoredValue(key2)) - 1) + "");
-        if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
-            PlayerTechService.postTechSummary(game);
-        }
-        GameManager.save(game, "Tech summary.");
     }
 
     private static void handleAutoPing(Game game, Player player) {
@@ -277,7 +171,7 @@ public class AutoPingCron {
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
                     GameManager.save(game, "Fast SC Ping 2");
                     String messageID = game.getStoredValue("scPlayMsgID" + sc);
-                    addReaction(player, true, "Not following", "", messageID, game);
+                    ReactionService.addReaction(player, true, "Not following", "", messageID, game);
 
                     StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
                     if (scModel != null && scModel.usesAutomationForSCID("pok8imperial")) {
@@ -511,114 +405,5 @@ public class AutoPingCron {
                 + " Rumors of the bot running out of stamina are greatly exaggerated. The bot will win this stare-down, it is simply a matter of time.";
         }
         return ping;
-    }
-
-    private static boolean doesPlayerHaveAnyWhensOrAfters(Player player) {
-        if (!player.doesPlayerAutoPassOnWhensAfters()) {
-            return true;
-        }
-        if (player.hasAbility("quash") || player.ownsPromissoryNote("rider")
-            || player.getPromissoryNotes().containsKey("riderm")
-            || player.hasAbility("radiance") || player.hasAbility("galactic_threat")
-            || player.hasAbility("conspirators")
-            || player.ownsPromissoryNote("riderx")
-            || player.ownsPromissoryNote("riderm") || player.ownsPromissoryNote("ridera")) {
-            return true;
-        }
-        for (String acID : player.getActionCards().keySet()) {
-            ActionCardModel actionCard = Mapper.getActionCard(acID);
-            String actionCardWindow = actionCard.getWindow();
-            if (actionCardWindow.contains("When an agenda is revealed")
-                || actionCardWindow.contains("After an agenda is revealed")) {
-                return true;
-            }
-        }
-        for (String pnID : player.getPromissoryNotes().keySet()) {
-            if (player.ownsPromissoryNote(pnID)) {
-                continue;
-            }
-            if (pnID.endsWith("_ps") && !pnID.contains("absol_")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static void addReaction(Player player, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
-        try {
-            game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
-                Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
-                String messageId = mainMessage.getId();
-
-                game.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
-                if (game.getStoredValue(messageId) != null) {
-                    if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-                        game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
-                        GameManager.save(game, "Add Reaction");
-                    }
-                } else {
-                    game.setStoredValue(messageId, player.getFaction());
-                    GameManager.save(game, "Add Reaction");
-                }
-                checkForAllReactions(messageId, game);
-                if (message == null || message.isEmpty()) {
-                    return;
-                }
-
-                String text = player.getRepresentation() + " " + message;
-                if (game.isFowMode() && sendPublic) {
-                    text = message;
-                } else if (game.isFowMode()) {
-                    text = "(You) " + emojiToUse.getFormatted() + " " + message;
-                }
-
-                if (additionalMessage != null && !additionalMessage.isEmpty()) {
-                    text += game.getPing() + " " + additionalMessage;
-                }
-
-                if (game.isFowMode() && !sendPublic) {
-                    MessageHelper.sendPrivateMessageToPlayer(player, game, text);
-                }
-            }, BotLogger::catchRestError);
-        } catch (Throwable e) {
-            game.removeMessageIDForSabo(messageID);
-        }
-    }
-
-    private static void checkForAllReactions(String messageId, Game game) {
-        int matchingFactionReactions = 0;
-        for (Player player : game.getRealPlayers()) {
-            if (game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction())) {
-                matchingFactionReactions++;
-            }
-        }
-        int numberOfPlayers = game.getRealPlayers().size();
-        if (matchingFactionReactions >= numberOfPlayers) {
-            game.getMainGameChannel().retrieveMessageById(messageId).queue(msg -> {
-                if (game.getLatestAfterMsg().equalsIgnoreCase(messageId)) {
-                    msg.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
-                    AgendaHelper.startTheVoting(game);
-                    GameManager.save(game, "Started Voting");
-                } else if (game.getLatestWhenMsg().equalsIgnoreCase(messageId)) {
-                    msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
-
-                } else {
-                    Matcher acToReact = CARDS_PATTERN.matcher(msg.getContentRaw());
-                    String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
-                    String faction = "bob_" + game.getStoredValue(messageId) + "_";
-                    faction = faction.split("_")[1];
-                    Player p2 = game.getPlayerFromColorOrFaction(faction);
-                    if (p2 != null && !game.isFowMode()) {
-                        msg2 = p2.getRepresentation() + " " + msg2;
-                    }
-                    msg.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
-                }
-            });
-
-            if (game.getMessageIDsForSabo().contains(messageId)) {
-                game.removeMessageIDForSabo(messageId);
-                GameManager.save(game, "No Sabo");
-            }
-        }
     }
 }

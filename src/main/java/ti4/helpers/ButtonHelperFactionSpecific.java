@@ -1397,8 +1397,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void checkIihqAttachment(Game game) {
         Tile tile = game.getMecatolTile();
-        if (tile == null)
-            return; // no mecatol tile
+        if (tile == null) return; // no mecatol tile
         for (Planet mecatol : tile.getPlanetUnitHolders()) {
             if (Constants.MECATOLS.contains(mecatol.getName())) {
                 if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_1)) mecatol.removeToken(Constants.ATTACHMENT_IIHQ_1);
@@ -1417,7 +1416,7 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
-    public static void KeleresIIHQCCGainCheck(Player player, Game game) {
+    public static void keleresIIHQCCGainCheck(Player player, Game game) {
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
                 continue;
@@ -1425,58 +1424,52 @@ public class ButtonHelperFactionSpecific {
             if (p2.hasTech("iihq")) {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(p2);
                 String trueIdentity = p2.getRepresentationUnfogged();
-                String message = trueIdentity
-                    + " Due to your IIHQ tech, you get to gain 2 commmand counters when someone scores an imperial point.";
-                String message2 = trueIdentity + "! Your current CCs are " + p2.getCCRepresentation()
-                    + ". Use buttons to gain CCs";
+                String message = trueIdentity + " Due to your IIHQ tech, you get to gain 2 commmand counters when someone scores an imperial point.";
+                String message2 = trueIdentity + "! Your current CCs are " + p2.getCCRepresentation() + ". Use buttons to gain CCs";
                 game.setStoredValue("originalCCsFor" + p2.getFaction(), p2.getCCRepresentation());
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message);
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2,
-                    buttons);
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);
                 break;
             }
         }
     }
 
     public static void resolveResearchAgreementCheck(Player player, String tech, Game game) {
-        if (game.getPNOwner("ra") != null && game.getPNOwner("ra") == player) {
-            if (Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse("").isEmpty()) {
-                for (Player p2 : game.getRealPlayers()) {
-                    if (p2 == player) {
-                        continue;
-                    }
-                    if (p2.getPromissoryNotes().containsKey("ra") && !p2.getTechs().contains(tech)) {
-                        String msg = p2.getRepresentationUnfogged() + " the RA owner has researched the tech "
-                            + Mapper.getTech(AliasHandler.resolveTech(tech)).getRepresentation(false)
-                            + "\nUse the below button if you want to play RA to get it.";
-                        Button transact = Buttons.green("resolvePNPlay_ra_" + AliasHandler.resolveTech(tech),
-                            "Acquire " + Mapper.getTech(AliasHandler.resolveTech(tech)).getName());
-                        List<Button> buttons = new ArrayList<>();
-                        buttons.add(transact);
-                        buttons.add(Buttons.red("deleteButtons", "Decline"));
-                        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
-                    }
-                }
+        if (game.getPNOwner("ra") == null || game.getPNOwner("ra") != player ||
+                !Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse("").isEmpty()) {
+            return;
+        }
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == player || !p2.getPromissoryNotes().containsKey("ra") || p2.getTechs().contains(tech)) {
+                continue;
             }
+            String msg = p2.getRepresentationUnfogged() + " the RA owner has researched the tech "
+                + Mapper.getTech(AliasHandler.resolveTech(tech)).getRepresentation(false)
+                + "\nUse the below button if you want to play RA to get it.";
+            Button transact = Buttons.green("resolvePNPlay_ra_" + AliasHandler.resolveTech(tech),
+                "Acquire " + Mapper.getTech(AliasHandler.resolveTech(tech)).getName());
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(transact);
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
         }
     }
 
     public static void resolveMilitarySupportCheck(Player player, Game game) {
-        if (game.getPlayerFromColorOrFaction(Mapper.getPromissoryNote("ms").getOwner()) == player) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player) {
-                    continue;
-                }
-                if (p2.getPromissoryNotes().containsKey("ms")) {
-                    String msg = p2.getRepresentationUnfogged()
-                        + " the Military Support owner has started their turn, use the button to play Military Support if you want";
-                    Button transact = Buttons.green("resolvePNPlay_ms", "Play Military Support ");
-                    List<Button> buttons = new ArrayList<>();
-                    buttons.add(transact);
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
-                }
+        if (game.getPlayerFromColorOrFaction(Mapper.getPromissoryNote("ms").getOwner()) != player) {
+            return;
+        }
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == player || !p2.getPromissoryNotes().containsKey("ms")) {
+                continue;
             }
+            String msg = p2.getRepresentationUnfogged()
+                + " the Military Support owner has started their turn, use the button to play Military Support if you want";
+            Button transact = Buttons.green("resolvePNPlay_ms", "Play Military Support ");
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(transact);
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
         }
     }
 

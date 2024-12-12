@@ -206,8 +206,8 @@ public class ApplicationEmojiService {
 
     @Getter
     public static class EmojiFileData {
-        private File file;
-        private String name;
+        private final File file;
+        private final String name;
         private Icon icon = null;
 
         public Icon getIcon() throws IOException {
