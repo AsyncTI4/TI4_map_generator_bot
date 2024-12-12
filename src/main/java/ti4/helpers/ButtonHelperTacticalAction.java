@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
@@ -26,7 +25,6 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
@@ -542,7 +540,7 @@ public class ButtonHelperTacticalAction {
         }
         for (String pos : initialOffering) {
             Tile tile = game.getTileByPosition(pos);
-            buttons.add(Buttons.green("ringTile_" + pos, tile.getRepresentationForButtons(game, player), tile.getTileEmoji()));
+            buttons.add(Buttons.green("ringTile_" + pos, tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player)));
         }
         buttons.add(Buttons.gray("getTilesThisFarAway_" + (maxDistance + 1), "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
         if (Constants.prisonerOneId.equals(player.getUserID())) buttons.addAll(ButtonHelper.getPossibleRings(player, game)); //TODO: Add option for this
@@ -561,7 +559,7 @@ public class ButtonHelperTacticalAction {
             Tile tile = game.getTileByPosition(pos);
             String tileRepresentation = tile.getRepresentationForButtons(game, player);
             if (!tileRepresentation.contains("Hyperlane")) {
-                buttons.add(Buttons.green("ringTile_" + pos, tileRepresentation, tile.getTileEmoji()));
+                buttons.add(Buttons.green("ringTile_" + pos, tileRepresentation, tile.getTileEmoji(player)));
             }
         }
         buttons.add(Buttons.gray("getTilesThisFarAway_" + (desiredDistance + 1), "Get Tiles " + (desiredDistance + 1) + " Spaces Away"));
