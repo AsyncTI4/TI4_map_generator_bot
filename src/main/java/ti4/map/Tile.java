@@ -32,6 +32,7 @@ import ti4.message.BotLogger;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
+import ti4.service.emoji.TI4Emoji;
 
 public class Tile {
     private final String tileID;
@@ -653,5 +654,10 @@ public class Tile {
     public String getHexTileSummary() {
         // TILE +-X +-Y SPACE ; PLANET1 ; PLANET2 ;
         return getTileID() + AliasHandler.resolveTTPGPosition(getPosition());
+    }
+
+    @JsonIgnore
+    public TI4Emoji getTileEmoji() {
+        return getTileModel().getEmoji();
     }
 }

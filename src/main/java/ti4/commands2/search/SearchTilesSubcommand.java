@@ -74,7 +74,7 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
         List<Entry<TileModel, MessageEmbed>> tileEmbeds = new ArrayList<>();
         if (TileHelper.isValidTile(searchString)) {
             TileModel tile = TileHelper.getTileById(searchString);
-            tileEmbeds.add(Map.entry(tile, tile.getHelpMessageEmbed(includeAliases)));
+            tileEmbeds.add(Map.entry(tile, tile.getRepresentationEmbed(includeAliases)));
         } else {
             TileHelper.getAllTileModels().stream()
                 .filter(tile -> tile.search(searchString, source))
@@ -88,42 +88,9 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
                 .filter(tile -> with_nebula == null || with_nebula == tile.isNebula())
                 .filter(tile -> with_supernova == null || with_supernova == tile.isSupernova())
                 .sorted(Comparator.comparing(TileModel::getId))
-                .map(tile -> Map.entry(tile, tile.getHelpMessageEmbed(includeAliases)))
+                .map(tile -> Map.entry(tile, tile.getRepresentationEmbed(includeAliases)))
                 .forEach(tileEmbeds::add);
         }
-        //TODO: upload tiles as emojis and use the URL for the image instead of as an attachment - alternatively, use the github URL link
-        MessageChannel channel = event.getMessageChannel();
-        CompletableFuture<ThreadChannel> futureThread = null;
-        if (tileEmbeds.size() > 3) {
-            if (event.getChannel() instanceof TextChannel) {
-                String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
-                futureThread = ((IThreadContainer) channel).createThreadChannel(threadName).setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).submitAfter(1, TimeUnit.SECONDS);
-            }
-        }
-
-        List<MessageCreateAction> messageCreateActions = new ArrayList<>();
-
-        for (List<Entry<TileModel, MessageEmbed>> entries : ListUtils.partition(tileEmbeds, 10)) { //max 10 embeds per message
-            List<MessageEmbed> messageEmbeds = new ArrayList<>();
-            List<FileUpload> fileUploads = new ArrayList<>();
-
-            for (Entry<TileModel, MessageEmbed> entry : entries) {
-                messageEmbeds.add(entry.getValue());
-                try {
-                    File file = new File(entry.getKey().getTilePath());
-                    if (file.exists()) fileUploads.add(FileUpload.fromData(file, entry.getKey().getImagePath()));
-                } catch (Exception e) {
-                    BotLogger.log("Error finding image file for tile: " + entry.getKey().getImagePath(), e);
-                }
-            }
-
-            if (futureThread != null && !futureThread.isDone()) channel = futureThread.join();
-
-            messageCreateActions.add(channel.sendMessageEmbeds(messageEmbeds).addFiles(fileUploads));
-        }
-
-        for (MessageCreateAction messageCreateAction : messageCreateActions) {
-            messageCreateAction.queue();
-        }
+        SearchHelper.sendSearchEmbedsToEventChannel(event, tileEmbeds.stream().map(Entry::getValue).toList());
     }
 }

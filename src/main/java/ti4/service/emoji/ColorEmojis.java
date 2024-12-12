@@ -12,10 +12,72 @@ public enum ColorEmojis implements TI4Emoji {
     splitpetrol, splitpink, splitpurple, splitrainbow, splitred, splittan, splitteal, splitturquoise, splityellow, riftset; //
 
     public static String getColorEmojiWithName(String color) {
+        if (getColorEmojiWithNameLegacy(color) != null) {
+            return getColorEmojiWithNameLegacy(color);
+        }
         ColorModel model = Mapper.getColor(color);
         if (model != null)
             return getColorEmoji(color) + " **" + model.getName() + "**";
         return getColorEmoji(color) + " " + color;
+    }
+
+    /**
+     * @deprecated TODO: add the proper name to ColorModel data
+     */
+    @Deprecated
+    private static String getColorEmojiWithNameLegacy(String color) {
+        return switch (color) {
+            case "gry", "gray" -> gray + "**Gray**";
+            case "blk", "black" -> black + "**Black**";
+            case "blu", "blue" -> blue + "**Blue**";
+            case "grn", "green" -> green + "**Green**";
+            case "org", "orange" -> orange + "**Orange**";
+            case "pnk", "pink" -> pink + "**Pink**";
+            case "ppl", "purple" -> purple + "**Purple**";
+            case "red" -> red + "**Red**";
+            case "ylw", "yellow" -> yellow + "**Yellow**";
+            case "ptr", "petrol" -> petrol + "**Petrol**";
+            case "bwn", "brown" -> brown + "**Brown**";
+            case "tan" -> tan + "**Tan**";
+            case "frs", "forest" -> forest + "**Forest**";
+            case "crm", "chrome" -> chrome + "**Chrome**";
+            case "sns", "sunset" -> sunset + "**Sunset**";
+            case "tqs", "turquoise" -> turquoise + "**Turquoise**";
+            case "gld", "gold" -> gold + "**Gold**";
+            case "lgy", "lightgray" -> lightgray + "**LightGray**";
+            case "tea", "teal" -> teal + "**Teal**";
+            case "bld", "bloodred" -> bloodred + "**BloodRed**";
+            case "eme", "emerald" -> emerald + "**Emerald**";
+            case "nvy", "navy" -> navy + "**Navy**";
+            case "rse", "rose" -> rose + "**Rose**";
+            case "lme", "lime" -> lime + "**Lime**";
+            case "lvn", "lavender" -> lavender + "**Lavender**";
+            case "spr", "spring" -> spring + "**Spring**";
+            case "chk", "chocolate" -> chocolate + "**Chocolate**";
+            case "rbw", "rainbow" -> rainbow + "**Rainbow**";
+            case "eth", "ethereal" -> ethereal + "**Ethereal**";
+            case "orca" -> orca + "**Orca**";
+            case "splitred" -> splitred + "**SplitRed**";
+            case "splitblu", "splitblue" -> splitblue + "**SplitBlue**";
+            case "splitgrn", "splitgreen" -> splitgreen + "**SplitGreen**";
+            case "splitppl", "splitpurple" -> splitpurple + "**SplitPurple**";
+            case "splitorg", "splitorange" -> splitorange + "**SplitOrange**";
+            case "splitylw", "splityellow" -> splityellow + "**SplitYellow**";
+            case "splitpnk", "splitpink" -> splitpink + "**SplitPink**";
+            case "splitgld", "splitgold" -> splitgold + "**SplitGold**";
+            case "splitlme", "splitlime" -> splitlime + "**SplitLime**";
+            case "splittan" -> splittan + "**SplitTan**";
+            case "splittea", "splitteal" -> splitteal + "**SplitTeal**";
+            case "splittqs", "splitturquoise" -> splitturquoise + "**SplitTurquoise**";
+            case "splitbld", "splitbloodred" -> splitbloodred + "**SplitBloodRed**";
+            case "splitchk", "splitchocolate" -> splitchocolate + "**SplitChocolate**";
+            case "spliteme", "splitemerald" -> splitemerald + "**SplitEmerald**";
+            case "splitnvy", "splitnavy" -> splitnavy + "**SplitNavy**";
+            case "splitptr", "splitpetrol" -> splitpetrol + "**SplitPetrol**";
+            case "splitrbw", "splitrainbow" -> splitrainbow + "**SplitRainbow**";
+            case "ero", "riftset" -> riftset + "**RiftSet**";
+            default -> null;
+        };
     }
 
     public static TI4Emoji getColorEmoji(String color) {

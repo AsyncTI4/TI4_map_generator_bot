@@ -3109,7 +3109,7 @@ public class ButtonHelper {
                 if (t != null && !CommandCounterHelper.hasCC(event, player.getColor(), t)
                     && (!game.isNaaluAgent() || !t.isHomeSystem())) {
                     Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                        t.getRepresentationForButtons(game, player));
+                        t.getRepresentationForButtons(game, player), t.getTileEmoji());
                     ringButtons.add(corners);
                 }
             }
@@ -3132,7 +3132,7 @@ public class ButtonHelper {
                             && (!game.isNaaluAgent() || !tile.isHomeSystem()
                                 || "17".equalsIgnoreCase(tile.getTileID()))) {
                             Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                                tile.getRepresentationForButtons(game, player));
+                                tile.getRepresentationForButtons(game, player), tile.getTileEmoji());
                             ringButtons.add(corners);
                         }
                     }
@@ -3143,7 +3143,7 @@ public class ButtonHelper {
                         && (!game.isNaaluAgent() || !tile.isHomeSystem()
                             || "17".equalsIgnoreCase(tile.getTileID()))) {
                         Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                            tile.getRepresentationForButtons(game, player));
+                            tile.getRepresentationForButtons(game, player), tile.getTileEmoji());
                         ringButtons.add(corners);
                     }
                 } else {
@@ -3157,7 +3157,7 @@ public class ButtonHelper {
                             && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
                             && (!game.isNaaluAgent() || !tile.isHomeSystem())) {
                             Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                                tile.getRepresentationForButtons(game, player));
+                                tile.getRepresentationForButtons(game, player), tile.getTileEmoji());
                             ringButtons.add(corners);
                         }
                     }
@@ -3174,7 +3174,7 @@ public class ButtonHelper {
                             && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
                             && (!game.isNaaluAgent() || !tile.isHomeSystem())) {
                             Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                                tile.getRepresentationForButtons(game, player));
+                                tile.getRepresentationForButtons(game, player), tile.getTileEmoji());
                             ringButtons.add(corners);
                         }
                     }
@@ -3745,8 +3745,7 @@ public class ButtonHelper {
                 && (!CommandCounterHelper.hasCC(event, player.getColor(), tileEntry.getValue())
                     || nomadHeroAndDomOrbCheck(player, game))) {
                 Tile tile = tileEntry.getValue();
-                Button validTile = Buttons.green(finChecker + "tacticalMoveFrom_" + tileEntry.getKey(), tile.getRepresentationForButtons(game, player));
-                buttons.add(validTile);
+                buttons.add(Buttons.green(finChecker + "tacticalMoveFrom_" + tileEntry.getKey(), tile.getRepresentationForButtons(game, player), tile.getTileEmoji()));
             }
         }
 
@@ -5988,8 +5987,7 @@ public class ButtonHelper {
 
     private static void acquireATechWithResources(Player player, Game game, ButtonInteractionEvent event, boolean sc) {
         acquireATech(player, game, event, sc,
-            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT)
-        );
+            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT));
     }
 
     @ButtonHandler("acquireAUnitTechWithInf")
@@ -5999,8 +5997,7 @@ public class ButtonHelper {
 
     private static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc) {
         acquireATech(player, game, event, sc,
-            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT)
-        );
+            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT));
     }
 
     private static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc, final Set<String> techTypes) {
@@ -6011,7 +6008,7 @@ public class ButtonHelper {
             boolean used = ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
             StrategyCardModel scModel = game.getStrategyCardModelByName("technology").orElse(null);
             if (!used && scModel != null && scModel.usesAutomationForSCID("pok7technology")
-                    && !player.getFollowedSCs().contains(scModel.getInitiative())) {
+                && !player.getFollowedSCs().contains(scModel.getInitiative())) {
                 int scNum = scModel.getInitiative();
                 player.addFollowedSC(scNum, event);
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
