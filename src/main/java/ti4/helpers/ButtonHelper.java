@@ -3109,7 +3109,7 @@ public class ButtonHelper {
                 if (t != null && !CommandCounterHelper.hasCC(event, player.getColor(), t)
                     && (!game.isNaaluAgent() || !t.isHomeSystem())) {
                     Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                        t.getRepresentationForButtons(game, player), t.getTileEmoji());
+                        t.getRepresentationForButtons(game, player), t.getTileEmoji(player));
                     ringButtons.add(corners);
                 }
             }
@@ -3132,7 +3132,7 @@ public class ButtonHelper {
                             && (!game.isNaaluAgent() || !tile.isHomeSystem()
                                 || "17".equalsIgnoreCase(tile.getTileID()))) {
                             Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                                tile.getRepresentationForButtons(game, player), tile.getTileEmoji());
+                                tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player));
                             ringButtons.add(corners);
                         }
                     }
@@ -3143,7 +3143,7 @@ public class ButtonHelper {
                         && (!game.isNaaluAgent() || !tile.isHomeSystem()
                             || "17".equalsIgnoreCase(tile.getTileID()))) {
                         Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                            tile.getRepresentationForButtons(game, player), tile.getTileEmoji());
+                            tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player));
                         ringButtons.add(corners);
                     }
                 } else {
@@ -3157,7 +3157,7 @@ public class ButtonHelper {
                             && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
                             && (!game.isNaaluAgent() || !tile.isHomeSystem())) {
                             Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                                tile.getRepresentationForButtons(game, player), tile.getTileEmoji());
+                                tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player));
                             ringButtons.add(corners);
                         }
                     }
@@ -3174,7 +3174,7 @@ public class ButtonHelper {
                             && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
                             && (!game.isNaaluAgent() || !tile.isHomeSystem())) {
                             Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                                tile.getRepresentationForButtons(game, player), tile.getTileEmoji());
+                                tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player));
                             ringButtons.add(corners);
                         }
                     }
@@ -3745,7 +3745,7 @@ public class ButtonHelper {
                 && (!CommandCounterHelper.hasCC(event, player.getColor(), tileEntry.getValue())
                     || nomadHeroAndDomOrbCheck(player, game))) {
                 Tile tile = tileEntry.getValue();
-                buttons.add(Buttons.green(finChecker + "tacticalMoveFrom_" + tileEntry.getKey(), tile.getRepresentationForButtons(game, player), tile.getTileEmoji()));
+                buttons.add(Buttons.green(finChecker + "tacticalMoveFrom_" + tileEntry.getKey(), tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player)));
             }
         }
 
