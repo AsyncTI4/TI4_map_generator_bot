@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import lombok.experimental.UtilityClass;
 import ti4.json.PersistenceManager;
@@ -31,7 +32,13 @@ public class SabotageReactsMetadataManager {
         persistFile(allSabotageReacts);
     }
 
-    public static AllSabotageReacts readFile() {
+    public static synchronized void consumeAndPersist(Consumer<AllSabotageReacts> consumer) {
+        AllSabotageReacts allSabotageReacts = readFile();
+        consumer.accept(allSabotageReacts);
+        persistFile(allSabotageReacts);
+    }
+
+    private static AllSabotageReacts readFile() {
         try {
             var allSabotageReacts = PersistenceManager.readObjectFromJsonFile(SABOTAGE_AUTO_REACT_FILE, AllSabotageReacts.class);
             return allSabotageReacts != null ? allSabotageReacts : new AllSabotageReacts(new HashMap<>());
@@ -41,7 +48,7 @@ public class SabotageReactsMetadataManager {
         }
     }
 
-    public static void persistFile(AllSabotageReacts toPersist) {
+    private static void persistFile(AllSabotageReacts toPersist) {
         try {
             PersistenceManager.writeObjectToJsonFile(SABOTAGE_AUTO_REACT_FILE, toPersist);
         } catch (Exception e) {
