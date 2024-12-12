@@ -604,7 +604,7 @@
         "name": "Hkot Tokal",
         "title": "Crystal Druid",
         "abilityWindow": "At the start of invasion in a system that contains 1 or more planets:",
-        "abilityText": "You may place 1 infantry unit from your reinforcements in the active system's space area if you have unused capacity in that system.",
+        "abilityText": "You may place 1 infantry unit from your reinforcements in the active system's space area if you have unused capacity in that system. [Note: this occurs even if you control all planets in the system]",
         "unlockCondition": "Win a ground combat on a planet you do not control.",
         "source": "ds"
     },
