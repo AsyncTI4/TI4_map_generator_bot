@@ -29,18 +29,22 @@ public class TechSummaryMetadataManager {
             return;
         }
 
-        var roundTechSummaries = techSummaries.gameNameToTechSummary.computeIfAbsent(game.getName(),
-            k -> new RoundTechSummaries(game.getRound(), new ArrayList<>()));
+        var roundTechSummaries = techSummaries.gameNameToTechSummary
+            .computeIfAbsent(game.getName(), k -> new RoundTechSummaries(game.getRound(), new ArrayList<>()));
 
-        var playerTechSummary = roundTechSummaries.techSummaries.stream()
+        FactionTechSummary factionTechSummary = roundTechSummaries.techSummaries.stream()
             .filter(summary -> summary.faction.equals(player.getFaction()))
             .findFirst()
-            .orElseGet(() -> new FactionTechSummary(player.getFaction()));
+            .orElseGet(() -> {
+                var newSummary = new FactionTechSummary(player.getFaction());
+                roundTechSummaries.techSummaries.add(newSummary);
+                return newSummary;
+            });
 
         if (isResearchAgreement) {
-            playerTechSummary.addResearchAgreementTech(techId);
+            factionTechSummary.addResearchAgreementTech(techId);
         } else {
-            playerTechSummary.addTech(techId);
+            factionTechSummary.addTech(techId);
         }
 
         persistFile(techSummaries);
