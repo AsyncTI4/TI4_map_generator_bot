@@ -8,11 +8,13 @@ import java.util.Map;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 import ti4.json.PersistenceManager;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 
+@UtilityClass
 public class TechSummaryMetadataManager {
 
     private static final String TECH_SUMMARIES_PATH = "TechSummaries.json";
@@ -22,12 +24,12 @@ public class TechSummaryMetadataManager {
             return;
         }
 
-        var techSummaries = readFile();
+        TechSummaries techSummaries = readFile();
         if (techSummaries == null) {
             return;
         }
 
-        var roundTechSummaries = techSummaries.gameNameToTechSummary
+        RoundTechSummaries roundTechSummaries = techSummaries.gameNameToTechSummary
             .computeIfAbsent(game.getName(), k -> new RoundTechSummaries(game.getRound(), new ArrayList<>()));
 
         FactionTechSummary factionTechSummary = roundTechSummaries.techSummaries.stream()
