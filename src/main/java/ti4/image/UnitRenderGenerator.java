@@ -157,7 +157,12 @@ public class UnitRenderGenerator {
                     tileGraphics.drawImage(decal, imagePos.x(), imagePos.y(), null);
                 }
 
-                if (spoopy != null) {
+                if ("81".equals(tile.getTileID()) && "muaat".equals(player.getFaction()) && unitKey.getUnitType() == UnitType.Warsun)
+                {
+                    BufferedImage faceNovaSeed = ImageHelper.read(resourceHelper.getDecalFile("NovaSeed.png"));
+                    tileGraphics.drawImage(faceNovaSeed, imagePos.x(), imagePos.y(), null);
+                }
+                else if (spoopy != null) {
                     tileGraphics.drawImage(spoopy, imagePos.x(), imagePos.y(), null);
                 }
 
