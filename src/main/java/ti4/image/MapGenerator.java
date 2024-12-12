@@ -23,6 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -77,6 +78,7 @@ import ti4.model.UnitModel;
 import ti4.service.fow.FowConstants;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 import ti4.service.image.FileUploadService;
+import ti4.service.user.AFKService;
 import ti4.settings.GlobalSettings;
 import ti4.website.WebsiteOverlay;
 
@@ -502,6 +504,8 @@ public class MapGenerator implements AutoCloseable {
             graphics.setFont(Storage.getFont32());
             int realX = x;
             Map<UnitKey, Integer> unitCount = new HashMap<>();
+
+            // PLAYER AREAS
             for (Player player : players) {
                 if (player == null) continue;
                 int baseY = y;
@@ -515,36 +519,53 @@ public class MapGenerator implements AutoCloseable {
                     continue;
                 }
 
-                // PAINT AVATAR AND USERNAME
-                StringBuilder userName = new StringBuilder();
-                String playerName = player.getUserName();
-                boolean fowHidePlayerNames = Boolean.parseBoolean(game.getFowOption(FowConstants.HIDE_NAMES));
-                if (!fowHidePlayerNames) {
-                    graphics.drawImage(DrawingUtil.getPlayerDiscordAvatar(player), x, y + 5, null);
-                    userName.append(" ").append(playerName, 0, Math.min(playerName.length(), 20));
-                }
-                y += 34;
-                graphics.setFont(Storage.getFont32());
-                Color color = getColor(player.getColor());
-                graphics.setColor(Color.WHITE);
-
                 // PAINT FACTION OR DISPLAY NAME
+                List<String> teammateIDs = new ArrayList<>(player.getTeamMateIDs());
+                teammateIDs.remove(player.getUserID());
+                teammateIDs.addFirst(player.getUserID());
+                boolean hasTeammates = teammateIDs.size() > 1;
+
+                // Faction/Colour/DisplayName
                 String factionText = player.getFaction();
                 if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
                     factionText = player.getDisplayName();
                 }
                 if (factionText != null && !"null".equals(factionText)) {
-                    userName.append(" [").append(StringUtils.capitalize(factionText)).append("]");
+                    factionText += " [" + StringUtils.capitalize(factionText) + "]";
                 }
 
                 if (!"null".equals(player.getColor())) {
-                    userName.append(" (").append(player.getColor()).append(")");
-                }
-                if (player.isAFK()) {
-                    userName.append(" -- AFK");
+                    factionText += " (" + player.getColor() + ")";
                 }
 
-                graphics.drawString(userName.toString(), !fowHidePlayerNames ? x + 34 : x, y);
+                Color color = getColor(player.getColor());
+
+                int factionTextWidth = graphics.getFontMetrics().stringWidth(factionText);
+                int maxWidthForPlayerNameBeforeLeaders = 475;
+
+                // Player/Teammate Names
+                for (String teammateID : teammateIDs) {
+                    // PAINT AVATAR AND USERNAME
+                    StringBuilder userName = new StringBuilder();
+                    Member member = game.getGuild().getMemberById(teammateID);
+                    if (member == null) {
+                        member = AsyncTI4DiscordBot.guildPrimary.getMemberById(teammateID);
+                    }
+                    if (member == null) continue;
+
+                    String playerName = member.getEffectiveName();
+                    if (!game.hideUserNames()) {
+                        graphics.drawImage(DrawingUtil.getMemberDiscordAvatar(member), x, y + 5, null);
+                        userName.append(" ").append(playerName, 0, Math.min(playerName.length(), 20));
+                    }
+                    y += 34;
+                    if (AFKService.userIsAFK(teammateID)) {
+                        userName.append(" -- AFK");
+                    }
+                    graphics.setFont(Storage.getFont32());
+                    graphics.setColor(Color.WHITE);
+                    graphics.drawString(userName.toString(), !game.hideUserNames() ? x + 34 : x, y);
+                }
                 if (player.getFaction() == null || "null".equals(player.getColor()) || player.getColor() == null) {
                     continue;
                 }
@@ -673,7 +694,7 @@ public class MapGenerator implements AutoCloseable {
                     g2.translate(x + 47 - 3, y + 47 - 6);
                     g2.rotate(-Math.PI / 4);
                     g2.setFont(Storage.getFont20());
-                    DrawingUtil.superDrawString(g2, "ELIMINATED", 0, 0, EliminatedColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
+                    DrawingUtil.superDrawString(g2, "DUMMY", 0, 0, EliminatedColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
                     g2.setTransform(transform);
                 } else if (player.isPassed()) {
                     AffineTransform transform = g2.getTransform();
@@ -691,6 +712,7 @@ public class MapGenerator implements AutoCloseable {
                     g2.setTransform(transform);
                 }
 
+                // Eliminated Rectangle
                 g2.setStroke(stroke5);
                 if (player.isEliminated()) {
                     g2.setColor(color);
@@ -743,7 +765,7 @@ public class MapGenerator implements AutoCloseable {
                 graphics.drawString(ccCount, x + 40, y + deltaY + 40);
                 graphics.drawString("T/F/S", x + 40, y + deltaY);
 
-                // Additional FS
+                // Additional Fleet Supply
                 int additionalFleetSupply = 0;
                 if (player.hasAbility("edict")) {
                     additionalFleetSupply += player.getMahactCC().size();
@@ -773,6 +795,7 @@ public class MapGenerator implements AutoCloseable {
                 drawPAImage(x + 280, y + yDelta, pnImage);
                 graphics.drawString(Integer.toString(player.getPnCount()), x + 300, y + deltaY + 50);
 
+                // Trade Goods
                 if (game.isNomadCoin()) {
                     drawPAImage(x + 345, y + yDelta, nomadCoinImage);
                 } else {
@@ -780,6 +803,7 @@ public class MapGenerator implements AutoCloseable {
                 }
                 graphics.drawString(Integer.toString(player.getTg()), x + 360, y + deltaY + 50);
 
+                // Comms
                 drawPAImage(x + 410, y + yDelta, commoditiesImage);
                 String comms = player.getCommodities() + "/" + player.getCommoditiesTotal();
                 graphics.drawString(comms, x + 415, y + deltaY + 50);
@@ -875,6 +899,8 @@ public class MapGenerator implements AutoCloseable {
                 if (soCount > 4) {
                     y += (soCount - 4) * 43;
                 }
+
+                // Draw Full Rect
                 g2.drawRect(realX - 5, baseY, mapWidth - realX, y - baseY);
                 y += 15;
             }
@@ -1532,7 +1558,7 @@ public class MapGenerator implements AutoCloseable {
             if (!game.isShowOwnedPNsInPlayerArea() && promissoryNote.getFaction().isEmpty()) {
                 continue;
             }
-            
+
             if (promissoryNote.getSource() == ComponentSource.promises_promises) {
                 drawPAImageScaled(x + deltaX + 1, y + 1, "pa_promissory_light_pp.png", 38, 28);
             } else {
@@ -3216,7 +3242,7 @@ public class MapGenerator implements AutoCloseable {
             graphics.setFont(Storage.getFont32());
             String userName = player.getUserName();
             point = PositionMapper.getPlayerStats("newuserName");
-            if (!Boolean.parseBoolean(game.getFowOption(FowConstants.HIDE_NAMES))) {
+            if (!game.hideUserNames()) {
                 String name = userName.substring(0, Math.min(userName.length(), 15));
                 DrawingUtil.superDrawString(graphics, name, statTileMid.x + point.x, statTileMid.y + point.y, Color.WHITE, center, null, stroke5, Color.BLACK);
             }
@@ -3785,7 +3811,7 @@ public class MapGenerator implements AutoCloseable {
 
         // PAINT USERNAME
         Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
-        if (!Boolean.parseBoolean(game.getFowOption(FowConstants.HIDE_NAMES))) {
+        if (!game.hideUserNames()) {
             graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX,
                 point.y + deltaY);
         }
