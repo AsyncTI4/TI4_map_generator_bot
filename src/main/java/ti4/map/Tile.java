@@ -287,6 +287,9 @@ public class Tile {
         Boolean hasFog = fog.get(player);
 
         Game game = player.getGame();
+        if (!game.isFowMode()) {
+            return false;
+        }
         if (game.isLightFogMode() && player.getFogTiles().containsKey(getPosition())) {
             return false;
         }
