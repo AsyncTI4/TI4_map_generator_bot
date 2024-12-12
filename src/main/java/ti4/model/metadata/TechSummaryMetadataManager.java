@@ -1,6 +1,5 @@
 package ti4.model.metadata;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,8 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import ti4.helpers.Storage;
+import lombok.NoArgsConstructor;
 import ti4.json.PersistenceManager;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -17,7 +15,7 @@ import ti4.message.BotLogger;
 
 public class TechSummaryMetadataManager {
 
-    private static final String TECH_SUMMARIES_PATH = Storage.getStoragePath() + File.separator + "TechSummaries.json";
+    private static final String TECH_SUMMARIES_PATH = "TechSummaries.json";
 
     public static synchronized void updateTechSummaryMetadata(Game game, Player player, String techId, boolean isResearchAgreement) {
         if (game.isFowMode() || game.isHomebrewSCMode()) {
@@ -73,12 +71,16 @@ public class TechSummaryMetadataManager {
     public record RoundTechSummaries(int round, List<FactionTechSummary> techSummaries) {}
 
     @Getter
-    @RequiredArgsConstructor
+    @NoArgsConstructor
     public static class FactionTechSummary {
 
-        private final String faction;
+        private String faction;
         private List<String> tech;
         private List<String> researchAgreementTech;
+
+        public FactionTechSummary(String faction) {
+            this.faction = faction;
+        }
 
         public void addTech(String techId) {
             if (tech == null) {

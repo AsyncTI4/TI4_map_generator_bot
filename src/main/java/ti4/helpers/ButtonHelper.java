@@ -6005,13 +6005,11 @@ public class ButtonHelper {
 
     private static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc, final Set<String> techTypes) {
         String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
-        List<Button> buttons = new ArrayList<>();
+        game.setComponentAction(!sc);
         if (sc) {
-            game.setComponentAction(false);
             boolean used = ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
             StrategyCardModel scModel = game.getStrategyCardModelByName("technology").orElse(null);
-            if (!used && scModel != null && scModel.usesAutomationForSCID("pok7technology")
-                    && !player.getFollowedSCs().contains(scModel.getInitiative())) {
+            if (!used && scModel != null && scModel.usesAutomationForSCID("pok7technology") && !player.getFollowedSCs().contains(scModel.getInitiative())) {
                 int scNum = scModel.getInitiative();
                 player.addFollowedSC(scNum, event);
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
@@ -6021,10 +6019,9 @@ public class ButtonHelper {
                 String message = ButtonHelperSCs.deductCC(player);
                 ReactionService.addReaction(event, game, player, message);
             }
-        } else {
-            game.setComponentAction(true);
         }
         String techPrefix = finsFactionCheckerPrefix + "getAllTechOfType_";
+        List<Button> buttons = new ArrayList<>();
         for (String type : techTypes) {
             switch (type) {
                 case Constants.PROPULSION -> buttons.add(Buttons.blue(techPrefix + "propulsion", "Get a Blue Tech", TechEmojis.PropulsionTech));
