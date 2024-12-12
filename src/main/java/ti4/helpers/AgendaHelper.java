@@ -400,7 +400,7 @@ public class AgendaHelper {
             }
             String message;
             if (buttonID.contains("everything")) {
-                  message = "Exhausted all planets for " + votes + " vote" + (votes.equals("1") ? "" : "s");
+                message = "Exhausted all planets for " + votes + " vote" + (votes.equals("1") ? "" : "s");
             } else {
                 message = "Used ability for " + votes + " vote" + (votes.equals("1") ? "" : "s");
             }
@@ -483,6 +483,7 @@ public class AgendaHelper {
                 String skippedMessage = nextInLine.getRepresentation(true, false)
                     + " You are being skipped because you cannot vote";
                 if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
+                    ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
                     skippedMessage = realIdentity2
                         + "You are being skipped because you told the bot you wanted to preset an abstain";
                     game.setStoredValue("Abstain On Agenda", game
@@ -504,6 +505,7 @@ public class AgendaHelper {
                         MessageHelper.sendMessageToChannel(nextInLine.getPrivateChannel(),
                             getSummaryOfVotes(game, true) + "\n ");
                     }
+                    ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
                     MessageHelper.sendMessageToChannel(nextInLine.getCorrectChannel(), skippedMessage);
                     resolvingAnAgendaVote("resolveAgendaVote_" + votes, event, game, nextInLine);
                     return;

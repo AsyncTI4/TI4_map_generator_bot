@@ -8,12 +8,11 @@ import java.util.Map;
 import java.util.Set;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -820,8 +819,8 @@ public class ButtonHelperModifyUnits {
 
     private static boolean canRetreatTo(Game game, Player player, Tile tile, boolean skilledRetreat) {
         if ((tile.isAsteroidField() && !player.getTechs().contains("amd")) ||
-                (tile.isSupernova() && !player.getTechs().contains("mr")) ||
-                FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+            (tile.isSupernova() && !player.getTechs().contains("mr")) ||
+            FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             return false;
         }
         if (skilledRetreat) {
@@ -1375,7 +1374,7 @@ public class ButtonHelperModifyUnits {
                     successMessage = "Produced a " + unitKey.unitEmoji() + " in tile " + game.getTileByPosition(AliasHandler.resolveTile(planetName)).getRepresentationForButtons(game, player) + ".";
                     if (player.hasAbility("cloaked_fleets")) {
                         List<Button> cloakedFleets = new ArrayList<>();
-                        cloakedFleets.add(Buttons.green("cloakedFleets_" + tile.getPosition() + "_" + unitID, "Capture 1 " + Mapper.getUnit(unitID).getName()));
+                        cloakedFleets.add(Buttons.green("cloakedFleets_" + tile.getPosition() + "_" + unitID, "Capture 1 " + StringUtils.capitalize(Mapper.getUnitBaseTypeFromAsyncID(unitID))));
                         cloakedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "You may use your cloaked fleets ability to capture this produced ship.", cloakedFleets);
                     }
