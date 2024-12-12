@@ -2665,7 +2665,7 @@ public class ButtonHelper {
             buttons.add(Buttons.red("deleteButtons",
                 "Dismiss These Buttons"));
 
-            FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
+            FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition(), player).createFileUpload();
             MessageHelper.sendFileToChannelWithButtonsAfter(player.getCorrectChannel(), systemWithContext, message, buttons);
 
         }
