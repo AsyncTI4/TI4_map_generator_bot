@@ -187,7 +187,7 @@ public class StartCombatService {
         }
 
         int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
-        FileUpload systemWithContext = new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
+        FileUpload systemWithContext = new TileGenerator(game, event, null, context, tile.getPosition(), player1).createFileUpload();
 
         // Create the thread
         final String finalThreadName = threadName;
@@ -223,7 +223,7 @@ public class StartCombatService {
         // PDS2 Context
         int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
         if (file == null) {
-            file = new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
+            file = new TileGenerator(game, event, null, context, tile.getPosition(), player1).createFileUpload();
         }
 
         message.append("\nImage of System:");
@@ -280,7 +280,7 @@ public class StartCombatService {
 
     private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
         ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
-        FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
+        FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition(), player).createFileUpload();
 
         // Use existing thread, if it exists
         TextChannel textChannel = (TextChannel) player.getPrivateChannel();
