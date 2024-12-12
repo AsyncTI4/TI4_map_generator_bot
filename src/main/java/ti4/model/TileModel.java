@@ -5,17 +5,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TileEmojis;
 
 @Data
 public class TileModel implements ModelInterface, EmbeddableModel {
@@ -55,12 +61,14 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(name).orElse("");
     }
 
-    public MessageEmbed getHelpMessageEmbed(boolean includeAliases) {
+    public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
         StringBuilder sb = new StringBuilder();
-        sb.append("(").append(getId()).append(") __").append(getNameNullSafe()).append("__");
+        sb.append("(").append(getId()).append(") ");
+        if (getEmoji() != null) sb.append(getEmoji().emojiString()).append(" ");
+        if (!getNameNullSafe().isEmpty()) sb.append("__").append(getNameNullSafe()).append("__");
         eb.setTitle(sb.toString());
 
         sb = new StringBuilder();
@@ -72,7 +80,11 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         if (hasPlanets()) sb.append("\nPlanets: ").append(getPlanets().toString());
         eb.setDescription(sb.toString());
 
-        eb.setThumbnail("attachment://" + getImagePath());
+        // Image
+        if (getEmoji() != null && getEmoji().asEmoji() instanceof CustomEmoji customEmoji) {
+            eb.setThumbnail(customEmoji.getImageUrl());
+        }
+
         if (includeAliases) eb.setFooter("Aliases: " + getAliases());
         return eb.build();
     }
@@ -145,7 +157,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public MessageEmbed getRepresentationEmbed() {
-        throw new UnsupportedOperationException("Unimplemented method 'getRepresentationEmbed'");
+        return getRepresentationEmbed(false);
     }
 
     @JsonIgnore
@@ -156,5 +168,11 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public Optional<String> getTileBackOption() {
         return Optional.ofNullable(tileBack);
+    }
+
+    @JsonIgnore
+    @Nullable
+    public TI4Emoji getEmoji() {
+        return TileEmojis.getTileEmojiFromTileID(getId());
     }
 }

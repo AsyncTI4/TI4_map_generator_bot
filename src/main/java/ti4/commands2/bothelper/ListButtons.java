@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands2.Subcommand;
+import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
 
 class ListButtons extends Subcommand {
@@ -48,11 +49,7 @@ class ListButtons extends Subcommand {
         msg.getButtons();
         StringBuilder sb = new StringBuilder("Button details:\n>>> ");
         for (Button b : msg.getButtons()) {
-            sb.append(b.getId()).append(" - ");
-            if (b.getEmoji() != null) {
-                sb.append(b.getEmoji().getFormatted()).append(" ");
-            }
-            sb.append(b.getLabel()).append("\n");
+            sb.append(ButtonHelper.getButtonRepresentation(b)).append("\n");
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }

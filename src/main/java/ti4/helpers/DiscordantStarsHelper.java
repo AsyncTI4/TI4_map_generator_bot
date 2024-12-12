@@ -242,7 +242,7 @@ public class DiscordantStarsHelper {
             String tileID = tilesToPullFrom.get(i);
             ids.add(tileID);
             TileModel tile = TileHelper.getTileById(tileID);
-            tileEmbeds.add(tile.getHelpMessageEmbed(false));
+            tileEmbeds.add(tile.getRepresentationEmbed(false));
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew " + count + " red back tiles from this list:\n> " + tileToPullFromUnshuffled);
 
@@ -270,7 +270,7 @@ public class DiscordantStarsHelper {
         for (int i = 0; i < count; i++) {
             Tile tile = unusedBlueTiles.get(i).getTile();
             TileModel tileModel = tile.getTileModel();
-            tileEmbeds.add(tileModel.getHelpMessageEmbed(false));
+            tileEmbeds.add(tileModel.getRepresentationEmbed(false));
         }
         String tileString = String.join(",", tileToPullFromUnshuffled.stream().map(t -> t.getTile().getTileID()).toList());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileString);

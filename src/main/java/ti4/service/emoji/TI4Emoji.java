@@ -52,6 +52,7 @@ public interface TI4Emoji {
         values.addAll(Arrays.asList(SourceEmojis.values()));
         values.addAll(Arrays.asList(TechEmojis.values()));
         values.addAll(Arrays.asList(UnitEmojis.values()));
+        values.addAll(Arrays.asList(TileEmojis.values()));
         // And then everything else
         values.addAll(Arrays.asList(MiscEmojis.values()));
         return values;
