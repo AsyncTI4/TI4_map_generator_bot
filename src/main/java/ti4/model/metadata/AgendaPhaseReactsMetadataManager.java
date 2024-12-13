@@ -33,6 +33,17 @@ public class AgendaPhaseReactsMetadataManager {
         persistFile(agendaPhaseReacts);
     }
 
+    public static synchronized void resetAgendaPhaseReacts(String gameName) {
+        AllAgendaPhaseReacts agendaPhaseReacts = readFile();
+        if (agendaPhaseReacts == null) {
+            return;
+        }
+
+        agendaPhaseReacts.gameNameToAllAgendaPhaseReacts.remove(gameName);
+
+        persistFile(agendaPhaseReacts);
+    }
+
     public static AllAgendaPhaseReacts readFile() {
         try {
             var allAgendaPhaseReacts = PersistenceManager.readObjectFromJsonFile(AGENDA_PHASE_REACTS_FILE, AllAgendaPhaseReacts.class);

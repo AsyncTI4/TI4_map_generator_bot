@@ -13,16 +13,17 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.SecretObjectiveModel;
+import ti4.model.metadata.AgendaPhaseReactsMetadataManager;
 import ti4.service.emoji.CardEmojis;
 
 class RevealSpecificAgenda extends GameStateSubcommand {
@@ -148,6 +149,7 @@ class RevealSpecificAgenda extends GameStateSubcommand {
         }
         game.setLatestWhenMsg("");
         game.setLatestAfterMsg("");
+        AgendaPhaseReactsMetadataManager.resetAgendaPhaseReacts(game.getName());
         MessageHelper.sendMessageToChannel(channel, Helper.getAgendaRepresentation(agendaID, uniqueID));
         String text = game.getPing()
             + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you may simply play it.";

@@ -169,4 +169,16 @@ public class ReactionService {
             }
         }
     }
+
+    public static boolean checkForASpecificPlayerReact(String messageId, Player player, Game game) {
+        boolean foundReact = false;
+        try {
+            if (game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction())) {
+                return true;
+            }
+        } catch (Exception e) {
+            return true;
+        }
+        return foundReact;
+    }
 }

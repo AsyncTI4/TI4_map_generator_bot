@@ -12,7 +12,6 @@ import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.model.ActionCardModel;
 import ti4.service.button.ReactionService;
-import ti4.service.player.PlayerReactService;
 
 import static java.util.function.Predicate.not;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -43,10 +42,6 @@ public class AgendaPhaseAutoReactCron {
     }
 
     private static void automaticallyReactToWhensAndAfters(Game game) {
-        handleAgendaReactions(game);
-    }
-
-    private static void handleAgendaReactions(Game game) {
         if (!"agendawaiting".equals(game.getPhaseOfGame())) {
             return;
         }
@@ -70,10 +65,9 @@ public class AgendaPhaseAutoReactCron {
 
     private static void handleWhens(Game game, Player player) {
         String whensId = game.getLatestWhenMsg();
-        //TODO: updates game...
-        if (isNotBlank(whensId) && !playerHasWhens(player) && !PlayerReactService.checkForASpecificPlayerReact(whensId, player, game)) {
+        if (isNotBlank(whensId) && !playerHasWhens(player) && !ReactionService.checkForASpecificPlayerReact(whensId, player, game)) {
             String message = game.isFowMode() ? "No whens" : null;
-            ReactionService.addReaction(player, false, message, null, whensId, game);
+            ReactionService.addReaction(player, false, message, null, whensId, game);//TODO: updates game...
         }
     }
 
@@ -101,7 +95,7 @@ public class AgendaPhaseAutoReactCron {
         //TODO: updates game...
         if (isNotBlank(aftersId) && !playerHasAfters(player) && !PlayerReactService.checkForASpecificPlayerReact(aftersId, player, game)) {
             String message = game.isFowMode() ? "No afters" : null;
-            ReactionService.addReaction(player, false, message, null, aftersId, game);
+            ReactionService.addReaction(player, false, message, null, aftersId, game);//TODO: updates game...
         }
     }
 
@@ -125,4 +119,6 @@ public class AgendaPhaseAutoReactCron {
         }
         return false;
     }
+
+
 }

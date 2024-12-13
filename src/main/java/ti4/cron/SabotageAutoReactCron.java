@@ -14,7 +14,6 @@ import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.service.button.ReactionService;
-import ti4.service.player.PlayerReactService;
 
 import static java.util.function.Predicate.not;
 
@@ -55,10 +54,9 @@ public class SabotageAutoReactCron {
             }
 
             for (String messageId : messageIds) {
-                //TODO: updates game...
                 if (!PlayerReactService.checkForASpecificPlayerReact(messageId, player, game)) {
                     String message = game.isFowMode() ? "No Sabotage" : null;
-                    ReactionService.addReaction(player, false, message, null, messageId, game);
+                    ReactionService.addReaction(player, false, message, null, messageId, game);//TODO: updates game...
                 }
             }
         }
@@ -69,8 +67,7 @@ public class SabotageAutoReactCron {
             return true;
         }
 
-        if (player.hasUnit("empyrean_mech")
-            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Mech).isEmpty()) {
+        if (player.hasUnit("empyrean_mech") && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Mech).isEmpty()) {
             return true;
         }
 

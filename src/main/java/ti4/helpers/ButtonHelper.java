@@ -370,8 +370,7 @@ public class ButtonHelper {
             return playersWhoAreMissed;
         }
         try {
-            Message mainMessage = mainGameChannel.retrieveMessageById(messageId).completeAfter(100,
-                TimeUnit.MILLISECONDS);
+            Message mainMessage = mainGameChannel.retrieveMessageById(messageId).completeAfter(100, TimeUnit.MILLISECONDS);
             for (Player player : game.getPlayers().values()) {
                 if (!player.isRealPlayer()) {
                     continue;

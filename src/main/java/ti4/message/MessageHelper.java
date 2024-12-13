@@ -183,8 +183,7 @@ public class MessageHelper {
 		splitAndSentWithAction(messageText, channel, addFactionReact, embeds, buttons);
 	}
 
-	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText,
-		Game game, List<Button> buttons, String whenOrAfter) {
+	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText, Game game, List<Button> buttons, String whenOrAfter) {
 		MessageFunction addFactionReact = (msg) -> {
 			StringTokenizer players;
 			if ("when".equalsIgnoreCase(whenOrAfter)) {
