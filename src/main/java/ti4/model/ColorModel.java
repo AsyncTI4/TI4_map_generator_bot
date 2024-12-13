@@ -14,6 +14,7 @@ public class ColorModel implements ModelInterface {
 
     private String alias;
     private String name;
+    private String displayName;
     private List<String> aliases;
     private String textColor;
     private String hue;
@@ -28,6 +29,10 @@ public class ColorModel implements ModelInterface {
         if (primaryColorRef != null && primaryColorRef.equals(name)) return false;
         if (secondaryColorRef != null && secondaryColorRef.equals(name)) return false;
         return alias != null && name != null && textColor != null;
+    }
+
+    public String getDisplayName() {
+        return displayName == null ? name : displayName;
     }
 
     public Color getPrimaryColor() {

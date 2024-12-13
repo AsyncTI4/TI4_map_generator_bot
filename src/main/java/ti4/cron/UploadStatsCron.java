@@ -10,7 +10,7 @@ import ti4.message.BotLogger;
 public class UploadStatsCron {
 
     public static void register() {
-        CronManager.schedulePeriodicallyAtTime(UploadStatsCron.class, UploadStatsCron::uploadStats, 0, 0, ZoneId.of("America/New_York"));
+        CronManager.schedulePeriodicallyAtTime(UploadStatsCron.class, UploadStatsCron::uploadStats, 13, 30, ZoneId.of("UTC")); // ParsleySage is currently pulling at 14:00 UTC
     }
 
     private static void uploadStats() {

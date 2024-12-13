@@ -74,6 +74,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettingsManager;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -1353,6 +1354,11 @@ public class Player {
     }
 
     @JsonIgnore
+    public Member getMember() {
+        return getGame().getGuild().getMemberById(getUserID());
+    }
+
+    @JsonIgnore
     public User getUser() {
         return AsyncTI4DiscordBot.jda.getUserById(userID);
     }
@@ -1608,19 +1614,7 @@ public class Player {
     }
 
     public boolean isAFK() {
-        String afkHours = UserSettingsManager.get(userID).getAfkHours();
-        if (isBlank(afkHours)) {
-            return false;
-        }
-        String[] hoursAFK = afkHours.split(";");
-        int currentHour = Helper.getCurrentHour();
-        for (String hour : hoursAFK) {
-            int h = Integer.parseInt(hour);
-            if (h == currentHour) {
-                return true;
-            }
-        }
-        return false;
+        return AFKService.userIsAFK(getUserID());
     }
 
     public boolean hasUnexhaustedLeader(String leaderId) {
@@ -2069,7 +2063,7 @@ public class Player {
 
     public List<String> getTeamMateIDs() {
         if (!teamMateIDs.contains(getUserID())) {
-            teamMateIDs.add(getUserID());
+            teamMateIDs.add(getUserID()); // a few things depend on the "primary" user being here
         }
         return teamMateIDs;
     }
@@ -2263,12 +2257,12 @@ public class Player {
         return factionTechs.remove(techID);
     }
 
-    public void addTeamMateID(String techID) {
-        teamMateIDs.add(techID);
+    public void addTeamMateID(String userID) {
+        teamMateIDs.add(userID);
     }
 
-    public void removeTeamMateID(String techID) {
-        teamMateIDs.remove(techID);
+    public void removeTeamMateID(String userID) {
+        teamMateIDs.remove(userID);
     }
 
     public void addTech(String techID) {

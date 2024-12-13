@@ -1,5 +1,7 @@
 package ti4.listeners;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -26,10 +28,32 @@ public class ButtonListener extends ListenerAdapter {
         }
 
         // Only defer if button does not spawn a Modal
-        if (!event.getButton().getId().endsWith("~MDL")) {
-            event.deferEdit().queue();
+        if (!isModalSpawner(event)) {
+            if (shouldShowBotIsThinking(event)) {
+                event.deferReply(true).queue();
+            } else {
+                event.deferEdit().queue();
+            }
         }
-
         ButtonProcessor.queue(event);
+    }
+
+    private static final List<String> buttonsToThinkAbout = List.of("showGameAgain");
+
+    /**
+     * @return whether a button should show the bot is thinking - need to add the following at end of execution:
+     * `    if (event instanceof ButtonInteractionEvent buttonEvent) {
+                buttonEvent.getHook().deleteOriginal().queue();
+            }`
+     */
+    private static boolean shouldShowBotIsThinking(ButtonInteractionEvent event) {
+        return buttonsToThinkAbout.contains(event.getButton().getId());
+    }
+
+    /**
+     * @return whether the button spawns a Modal - modals must be a raw undeferred reply
+     */
+    private static boolean isModalSpawner(ButtonInteractionEvent event) {
+        return event.getButton().getId().endsWith("~MDL");
     }
 }

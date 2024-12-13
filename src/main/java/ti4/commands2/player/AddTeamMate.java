@@ -15,7 +15,7 @@ class AddTeamMate extends GameStateSubcommand {
     public AddTeamMate() {
         super(Constants.ADD_TEAMMATE, "Add a teammate", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "User who is on your team").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to add the user to").setAutoComplete(true));
     }
 
     @Override

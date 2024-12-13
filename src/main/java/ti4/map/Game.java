@@ -81,6 +81,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.fow.FowConstants;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 
@@ -471,6 +472,10 @@ public class Game extends GameProperties {
 
     public void setFowOption(String optionName, String value) {
         fowOptions.put(optionName, value);
+    }
+
+    public boolean hideUserNames() {
+        return Boolean.parseBoolean(getFowOption(FowConstants.HIDE_NAMES));
     }
 
     @JsonIgnore
@@ -3231,8 +3236,7 @@ public class Game extends GameProperties {
     }
 
     public Player getPlayer(String userID) {
-        if (userID == null)
-            return null;
+        if (userID == null) return null;
         return players.get(userID);
     }
 
@@ -4186,5 +4190,14 @@ public class Game extends GameProperties {
             }
         }
         return false;
+    }
+
+    public List<String> getAllTeamMateIDs() {
+        List<String> teamMateIDs = new ArrayList<>();
+        for (Player player : getPlayers().values()) {
+            teamMateIDs.addAll(player.getTeamMateIDs());
+            teamMateIDs.remove(player.getUserID());
+        }
+        return teamMateIDs;
     }
 }
