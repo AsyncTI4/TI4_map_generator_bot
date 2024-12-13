@@ -1,6 +1,17 @@
 package ti4.image;
 
-import java.awt.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -22,17 +33,18 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands2.CommandHelper;
@@ -81,8 +93,6 @@ import ti4.service.image.FileUploadService;
 import ti4.service.user.AFKService;
 import ti4.settings.GlobalSettings;
 import ti4.website.WebsiteOverlay;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class MapGenerator implements AutoCloseable {
 
@@ -2084,57 +2094,59 @@ public class MapGenerator implements AutoCloseable {
         }
 
         Tile homeTile = player.getHomeSystemTile();
-        if (homeTile.getTileID().equals("51")) {
-            Tile creussGate = game.getTile("17");
-            if (creussGate != null) {
-                homeTile = creussGate;
-            }
-        }
-        Point homePosition = PositionMapper.getTilePosition(homeTile.getPosition());
-        Comparator<String> planetComparator = (planet1, planet2) -> {
-            Tile tile1 = game.getTileFromPlanet(planet1);
-            if (tile1.getTileID().equals("51")) {
+        if (homeTile != null) {
+            if (homeTile.getTileID().equals("51")) {
                 Tile creussGate = game.getTile("17");
                 if (creussGate != null) {
-                    tile1 = creussGate;
+                    homeTile = creussGate;
                 }
             }
-            Point position1 = PositionMapper.getTilePosition(tile1.getPosition());
-            int distance1 = ((homePosition.x - position1.x) * (homePosition.x - position1.x)
-                + (homePosition.y - position1.y) * (homePosition.y - position1.y)) / 4000;
-            Tile tile2 = game.getTileFromPlanet(planet2);
-            if (tile2.getTileID().equals("51")) {
-                Tile creussGate = game.getTile("17");
-                if (creussGate != null) {
-                    tile2 = creussGate;
+            Point homePosition = PositionMapper.getTilePosition(homeTile.getPosition());
+            Comparator<String> planetComparator = (planet1, planet2) -> {
+                Tile tile1 = game.getTileFromPlanet(planet1);
+                if (tile1.getTileID().equals("51")) {
+                    Tile creussGate = game.getTile("17");
+                    if (creussGate != null) {
+                        tile1 = creussGate;
+                    }
                 }
-            }
-            Point position2 = PositionMapper.getTilePosition(tile2.getPosition());
-            int distance2 = ((homePosition.x - position2.x) * (homePosition.x - position2.x)
-                + (homePosition.y - position2.y) * (homePosition.y - position2.y)) / 4000;
-            if (distance1 != distance2) {
-                return distance1 - distance2;
-            }
-            if (!tile1.getPosition().equalsIgnoreCase(tile2.getPosition())) {
-                return tile2.getPosition().compareToIgnoreCase(tile1.getPosition());
-            }
-            return planet1.compareToIgnoreCase(planet2);
-        };
-        realPlanets.sort(planetComparator);
+                Point position1 = PositionMapper.getTilePosition(tile1.getPosition());
+                int distance1 = ((homePosition.x - position1.x) * (homePosition.x - position1.x)
+                    + (homePosition.y - position1.y) * (homePosition.y - position1.y)) / 4000;
+                Tile tile2 = game.getTileFromPlanet(planet2);
+                if (tile2.getTileID().equals("51")) {
+                    Tile creussGate = game.getTile("17");
+                    if (creussGate != null) {
+                        tile2 = creussGate;
+                    }
+                }
+                Point position2 = PositionMapper.getTilePosition(tile2.getPosition());
+                int distance2 = ((homePosition.x - position2.x) * (homePosition.x - position2.x)
+                    + (homePosition.y - position2.y) * (homePosition.y - position2.y)) / 4000;
+                if (distance1 != distance2) {
+                    return distance1 - distance2;
+                }
+                if (!tile1.getPosition().equalsIgnoreCase(tile2.getPosition())) {
+                    return tile2.getPosition().compareToIgnoreCase(tile1.getPosition());
+                }
+                return planet1.compareToIgnoreCase(planet2);
+            };
+            realPlanets.sort(planetComparator);
 
-        for (String planet : realPlanets) {
-            deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
-        }
-        if (!nonTile.isEmpty()) {
-            deltaX += 30;
-            for (String planet : nonTile) {
+            for (String planet : realPlanets) {
                 deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
             }
-        }
-        if (!fakePlanets.isEmpty()) {
-            deltaX += 30;
-            for (String planet : fakePlanets) {
-                deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
+            if (!nonTile.isEmpty()) {
+                deltaX += 30;
+                for (String planet : nonTile) {
+                    deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
+                }
+            }
+            if (!fakePlanets.isEmpty()) {
+                deltaX += 30;
+                for (String planet : fakePlanets) {
+                    deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
+                }
             }
         }
 
