@@ -310,7 +310,9 @@ public class StartCombatService {
         } else {
             message.append("## Space Combat");
         }
-        message.append("\nPlease note, that although you can see the combat participants' messages, you cannot communicate with them.\n");
+        if (!game.isAllianceMode()) {
+            message.append("\nPlease note, that although you can see the combat participants' messages, you cannot communicate with them.\n");
+        }
         message.append("\nImage of System:");
         MessageHelper.sendMessageWithFile(threadChannel, systemWithContext, message.toString(), false);
         sendGeneralCombatButtonsToThread(threadChannel, game, player, player, tile, "justPicture", event);

@@ -1,6 +1,7 @@
 package ti4.listeners;
 
 import javax.annotation.Nonnull;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -8,7 +9,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -20,11 +20,11 @@ import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.GameNameService;
@@ -243,77 +243,6 @@ public class MessageListener extends ListenerAdapter {
             return;
         } // else it's probably a dev/test server, so execute
 
-        String messageText = event.getMessage().getContentRaw();
-        boolean isFowCombatThread = event.getChannel() instanceof ThreadChannel
-            && event.getChannel().getName().contains("vs")
-            && event.getChannel().getName().contains("private");
-        if (!isFowCombatThread) {
-            return;
-        }
-
-        String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
-        ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (!managedGame.isFowMode()) {
-            return;
-        }
-
-        Game game = managedGame.getGame();
-        Player player = game.getPlayer(event.getAuthor().getId());
-        if (game.isCommunityMode()) {
-            List<Role> roles = event.getMember().getRoles();
-            for (Player player2 : game.getPlayers().values()) {
-                if (roles.contains(player2.getRoleForCommunity())) {
-                    player = player2;
-                }
-            }
-        }
-
-        boolean isPlayerInvalid = player == null || !player.isRealPlayer() || !event.getChannel().getName().contains(player.getColor());
-        boolean isBotMessage = event.getAuthor().isBot();
-        boolean isTotalHitsMessage = messageText.contains("Total hits ");
-        if ((isPlayerInvalid || isBotMessage) && (!isBotMessage || !isTotalHitsMessage)) {
-            return;
-        }
-        if (StringUtils.countMatches(event.getChannel().getName(), "-") <= 4) {
-            return;
-        }
-
-        String systemPos = event.getChannel().getName().split("-")[4];
-
-        Tile tile = game.getTileByPosition(systemPos);
-        for (Player playerOther : game.getRealPlayers()) {
-            if (player != null && playerOther == player) {
-                continue;
-            }
-            if (!tile.getRepresentationForButtons(game, playerOther).contains("(")) {
-                continue;
-            }
-            MessageChannel pChannel = playerOther.getPrivateChannel();
-            TextChannel pChan = (TextChannel) pChannel;
-            if (pChan != null) {
-                String threadName = event.getChannel().getName();
-                boolean combatParticipant = threadName.contains("-" + playerOther.getColor() + "-");
-                String newMessage = playerOther.getRepresentation(true, combatParticipant) + " Someone said: " + messageText;
-                if (event.getAuthor().isBot() && messageText.contains("Total hits ")) {
-                    String hits = StringUtils.substringAfter(messageText, "Total hits ");
-                    String location = StringUtils.substringAfter(messageText, "rolls for ");
-                    location = StringUtils.substringBefore(location, " Combat");
-                    newMessage = playerOther.getRepresentation(true, combatParticipant) + " Someone rolled dice for " + location
-                        + " and got a total of **" + hits + " hit" + (hits.equals("1") ? "" : "s");
-                }
-                if (!event.getAuthor().isBot() && player != null && player.isRealPlayer()) {
-                    newMessage = playerOther.getRepresentation(true, combatParticipant) + " "
-                        + StringUtils.capitalize(player.getColor()) + " said: " + messageText;
-                }
-
-                newMessage = newMessage.replace("Total hits", "");
-                List<ThreadChannel> threadChannels = pChan.getThreadChannels();
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().contains(threadName) && threadChannel_ != event.getChannel()) {
-                        MessageHelper.sendMessageToChannel(threadChannel_, newMessage);
-                    }
-                }
-            }
-        }
+        FOWCombatThreadMirroring.mirrorEvent(event);
     }
 }
