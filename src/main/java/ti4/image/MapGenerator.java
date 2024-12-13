@@ -524,10 +524,9 @@ public class MapGenerator implements AutoCloseable {
                 List<String> teammateIDs = new ArrayList<>(player.getTeamMateIDs());
                 teammateIDs.remove(player.getUserID());
                 teammateIDs.addFirst(player.getUserID());
-                boolean hasTeammates = teammateIDs.size() > 1;
 
                 // Faction/Colour/DisplayName
-                // String factionText = player.getFactionModel() != null ? player.getFactionModel().getShortName() : player.getFaction();
+                // String factionText = player.getFactionModel() != null ? player.getFactionModel().getShortName() : player.getFaction(); //TODO use this but make it look better
                 String factionText = StringUtils.capitalize(player.getFaction());
                 if (player.getDisplayName() != null && !"null".equalsIgnoreCase(player.getDisplayName())) {
                     factionText = player.getDisplayName(); // overwrites faction
