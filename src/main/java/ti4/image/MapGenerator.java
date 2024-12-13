@@ -1,6 +1,17 @@
 package ti4.image;
 
-import java.awt.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -22,17 +33,18 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands2.CommandHelper;
@@ -82,8 +94,6 @@ import ti4.service.user.AFKService;
 import ti4.settings.GlobalSettings;
 import ti4.website.WebsiteOverlay;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 public class MapGenerator implements AutoCloseable {
 
     private static final int RING_MAX_COUNT = 8;
@@ -107,8 +117,6 @@ public class MapGenerator implements AutoCloseable {
 
     private final Graphics graphics;
     private final BufferedImage mainImage;
-    private byte[] imageBytes;
-    private String format;
     private final GenericInteractionCreateEvent event;
     private final int scoreTokenWidth;
     private final Game game;
@@ -133,7 +141,6 @@ public class MapGenerator implements AutoCloseable {
     private StopWatch debugTileTime;
     private StopWatch debugImageGraphicsTime;
     private StopWatch debugDrawTime;
-    private StopWatch debugWriteTime;
     private StopWatch debugDiscordTime;
     private StopWatch debugWebsiteTime;
 
@@ -243,44 +250,24 @@ public class MapGenerator implements AutoCloseable {
     }
 
     FileUpload createFileUpload() {
-        if (imageBytes == null) {
-            throw new IllegalStateException("Image has not been converted to bytes yet!");
-        }
         if (debug) debugDiscordTime = StopWatch.createStarted();
         AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(game.getName()));
         game.incrementMapImageGenerationCount();
-        FileUpload fileUpload = FileUploadService.createFileUpload(imageBytes, game.getName(), format);
+        FileUpload fileUpload = FileUploadService.createFileUpload(mainImage, 0.25f, game.getName());
         if (debug) debugDiscordTime.stop();
         return fileUpload;
     }
 
     void uploadToWebsite() {
-        if (imageBytes == null) {
-            throw new IllegalStateException("Image has not been converted to bytes yet!");
-        }
         if (debug) debugWebsiteTime = StopWatch.createStarted();
-        sendToWebsite(imageBytes, format);
+        sendToWebsite();
         if (debug) debugWebsiteTime.stop();
     }
 
     void draw() {
         if (debug) debugDrawTime = StopWatch.createStarted();
         drawGame();
-        writeImage();
         if (debug) debugDrawTime.stop();
-    }
-
-    private void writeImage() {
-        if (debug) debugWriteTime = StopWatch.createStarted();
-
-        if (mainImage.getWidth() > 16383 || mainImage.getHeight() > 16383) {
-            format = "jpg";
-        } else {
-            format = "webp";
-        }
-        imageBytes = ImageHelper.writeImage(mainImage, format);
-
-        if (debug)debugWriteTime.stop();
     }
 
     private void setupTilesForDisplayTypeAllAndMap(Map<String, Tile> tilesToDisplay) {
@@ -396,7 +383,6 @@ public class MapGenerator implements AutoCloseable {
         sb.append(debugString("  Draw time:", 36, debugDrawTime, debugAbsoluteStartTime));
         sb.append(debugString("    Tile time (of Draw Time):", 38, debugTileTime, debugDrawTime));
         sb.append(debugString("    Graphics time (of Draw Time):", 38, debugImageGraphicsTime, debugDrawTime));
-        sb.append(debugString("    Write time (of Draw Time):", 38, debugWriteTime, debugDrawTime));
         sb.append(debugString("  Discord time:", 36, debugDiscordTime, debugAbsoluteStartTime));
         sb.append(debugString("  Website time:", 36, debugWebsiteTime, debugAbsoluteStartTime));
         sb.append("\n");
@@ -416,15 +402,15 @@ public class MapGenerator implements AutoCloseable {
         return String.format("\n%-" + padRight + "s%s (%2.2f%%)", name, timeStr, percentage);
     }
 
-    private void sendToWebsite(byte[] imageBytes, String format) {
+    private void sendToWebsite() {
         String testing = System.getenv("TESTING");
         if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
-            WebHelper.putMap(game.getName(), imageBytes, format);
+            WebHelper.putMap(game.getName(), mainImage);
             WebHelper.putData(game.getName(), game);
             WebHelper.putOverlays(game.getID(), websiteOverlays);
         } else if (isFoWPrivate) {
             Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
-            WebHelper.putMap(game.getName(), imageBytes, format, true, player);
+            WebHelper.putMap(game.getName(), mainImage, true, player);
         }
     }
 
@@ -3319,6 +3305,12 @@ public class MapGenerator implements AutoCloseable {
             }
             factionText = StringUtils.capitalize(factionText);
             DrawingUtil.superDrawString(graphics, factionText, point.x, point.y, Color.WHITE, center, null, stroke5, Color.BLACK);
+
+            // BufferedImage img = ImageHelper.readEmojiImageScaled(Emojis.getColorEmoji(player.getColor()), 30);
+            // int offset = graphics.getFontMetrics().stringWidth(factionText) / 2 + 10;
+            // point.translate(0, -25);
+            // graphics.drawImage(img, point.x - offset - 30, point.y, null);
+            // graphics.drawImage(img, point.x + offset, point.y, null);
         }
 
         { // PAINT VICTORY POINTS
