@@ -22,7 +22,7 @@ import ti4.message.BotLogger;
 @UtilityClass
 public class ImageHelper {
 
-    private static final WebpWriter WEBP_WRITER = WebpWriter.DEFAULT.withMultiThread().withoutAlpha();
+    private static final WebpWriter WEBP_WRITER = WebpWriter.DEFAULT.withMultiThread();
     private static final JpegWriter JPG_WRITER = JpegWriter.Default;
 
     @Nullable
@@ -147,9 +147,10 @@ public class ImageHelper {
 
     @SneakyThrows
     public static byte[] writeImage(BufferedImage image, String format) {
+        var immutableImage = ImmutableImage.fromAwt(image).removeTransparency(Color.BLACK);
         return switch (format) {
-            case "jpg", "jpeg" -> ImmutableImage.fromAwt(image).removeTransparency(Color.BLACK).bytes(JPG_WRITER);
-            default -> ImmutableImage.fromAwt(image).bytes(WEBP_WRITER);
+            case "jpg", "jpeg" -> immutableImage.bytes(JPG_WRITER);
+            default -> immutableImage.bytes(WEBP_WRITER);
         };
     }
 }
