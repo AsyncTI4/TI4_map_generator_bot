@@ -116,13 +116,13 @@ public class FOWCombatThreadMirroring {
 
                 //Assign hit
                 else if (isBotMessage && isAssignHit(messageText)) {
-                    String assignedHits = matchPattern(messageText, "(?:Removed|Sustained)\\s+([^from]+?)(?:\\s+from|$)");
+                    String assignedHits = matchPattern(messageText, "(?:Removed|Sustained)\\s+(.+?)(?:\\s+from|$)");
                     newMessage += "Someone assigned hits to " + assignedHits;
                 }
                 
                 //Normal message
                 else if (!isBotMessage && player != null) {
-                    newMessage += (combatParticipant ? player.getRepresentationNoPing() : "Someone") + " said: " + messageText;  
+                    newMessage += player.getRepresentationNoPing() + " said: " + messageText;  
                 }
 
                 List<ThreadChannel> threadChannels = pChan.getThreadChannels();
