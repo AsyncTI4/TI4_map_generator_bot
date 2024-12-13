@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +23,6 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.ResourceHelper;
-import ti4.image.ImageHelper;
 import ti4.map.Game;
 import ti4.map.GameStatsDashboardPayload;
 import ti4.map.Player;
@@ -143,17 +140,17 @@ public class WebHelper {
         }
     }
 
-    public static void putMap(String gameName, BufferedImage img) {
-        putMap(gameName, img, false, null);
+    public static void putMap(String gameName, byte[] imageBytes, String format) {
+        putMap(gameName, imageBytes, format, false, null);
     }
 
-    public static void putMap(String gameName, BufferedImage img, Boolean frog, Player player) {
+    public static void putMap(String gameName, byte[] imageBytes, String format, boolean frog, Player player) {
         if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
             return;
 
         try {
             String mapPath;
-            if (frog != null && frog && player != null) {
+            if (frog && player != null) {
                 mapPath = "fogmap/" + player.getUserID() + "/%s/%s.";
             } else {
                 mapPath = "map/%s/%s.";
@@ -162,20 +159,16 @@ public class WebHelper {
             LocalDateTime date = LocalDateTime.now();
             String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
-            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                String format = ImageHelper.writeWebpOrDefaultTo(img, out, "png");
-                mapPath += format;
-                PutObjectRequest request = PutObjectRequest.builder()
-                    .bucket(webProperties.getProperty("bucket"))
-                    .key(String.format(mapPath, gameName, dtstamp))
-                    .contentType("image/" + format)
-                    .build();
-                s3AsyncClient.putObject(request, AsyncRequestBody.fromBytes(out.toByteArray()))
-                    .exceptionally(e -> {
-                        BotLogger.log("An exception occurred while performing an async send of the game image to the website.", e);
-                        return null;
-                    });
-            }
+            PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(webProperties.getProperty("bucket"))
+                .key(String.format(mapPath, gameName, dtstamp))
+                .contentType("image/" + format)
+                .build();
+            s3AsyncClient.putObject(request, AsyncRequestBody.fromBytes(imageBytes))
+                .exceptionally(e -> {
+                    BotLogger.log("An exception occurred while performing an async send of the game image to the website.", e);
+                    return null;
+                });
         } catch (SdkClientException e) {
             BotLogger.log("Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.", e);
         } catch (Exception e) {

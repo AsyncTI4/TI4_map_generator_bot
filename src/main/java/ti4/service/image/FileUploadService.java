@@ -1,9 +1,7 @@
 package ti4.service.image;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import lombok.experimental.UtilityClass;
@@ -15,28 +13,32 @@ import ti4.message.BotLogger;
 @UtilityClass
 public class FileUploadService {
 
-    public static FileUpload createFileUpload(BufferedImage imageToUpload, float compressionQuality, String filenamePrefix) {
-        if (imageToUpload == null) return null;
+    public static FileUpload createWebpFileUpload(BufferedImage bufferedImage, String fileNamePrefix) {
+        byte[] bytes = ImageHelper.writeImage(bufferedImage);
+        return createFileUpload(bytes, fileNamePrefix, "webp");
+    }
 
-        String saveLocalFormat = System.getenv("SAVE_LOCAL_FORMAT");
-        if (saveLocalFormat != null) {
-            try {
-                File file = new File(filenamePrefix + "." + saveLocalFormat);
-                ImageIO.write(imageToUpload, saveLocalFormat, file);
+    public static FileUpload createWebpFileUpload(byte[] bytes, String filenamePrefix) {
+        return createFileUpload(bytes, filenamePrefix, "webp");
+    }
+
+    public static FileUpload createFileUpload(byte[] bytes, String filenamePrefix, String format) {
+        if (bytes == null || bytes.length == 0) return null;
+
+        optionallySaveToLocal(bytes, filenamePrefix, format);
+
+        String fileName = filenamePrefix + "_" + DateTimeHelper.getFormattedTimestamp() + "." + format;
+        return FileUpload.fromData(bytes, fileName);
+    }
+
+    private static void optionallySaveToLocal(byte[] bytes, String filenamePrefix, String format) {
+        String saveLocal = System.getenv("SAVE_LOCAL");
+        if (Boolean.parseBoolean(saveLocal)) {
+            try (FileOutputStream fileOutputStream = new FileOutputStream(filenamePrefix + "." + format)) {
+                fileOutputStream.write(bytes);
             } catch (IOException e) {
-                BotLogger.log("Could not create File for " + filenamePrefix + "." + saveLocalFormat, e);
+                BotLogger.log("Could not create File for " + filenamePrefix + "." + format, e);
             }
         }
-
-        FileUpload fileUpload = null;
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            BufferedImage mapWithoutTransparentBackground = ImageHelper.redrawWithoutAlpha(imageToUpload);
-            String format = ImageHelper.writeWebpOrDefaultTo(mapWithoutTransparentBackground, out, "jpg", compressionQuality);
-            String fileName = filenamePrefix + "_" + DateTimeHelper.getFormattedTimestamp() + "." + format;
-            fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
-        } catch (IOException e) {
-            BotLogger.log("Could not create FileUpload for " + filenamePrefix, e);
-        }
-        return fileUpload;
     }
 }

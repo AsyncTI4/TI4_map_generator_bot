@@ -98,7 +98,7 @@ public class MiltyDraftHelper {
             desc.append(slice.ttsString());
         }
 
-        FileUpload fileUpload = FileUploadService.createFileUpload(mainImage, 1.0f, game.getName() + "_miltydraft");
+        FileUpload fileUpload = FileUploadService.createWebpFileUpload(mainImage, game.getName() + "_miltydraft");
         fileUpload.setDescription(desc.toString());
         return fileUpload;
     }
