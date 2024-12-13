@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -75,7 +76,6 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
-import ti4.service.fow.FowConstants;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 import ti4.service.image.FileUploadService;
 import ti4.service.user.AFKService;
@@ -88,7 +88,7 @@ public class MapGenerator implements AutoCloseable {
 
     private static final int RING_MAX_COUNT = 8;
     private static final int RING_MIN_COUNT = 3;
-    private static final int PLAYER_STATS_HEIGHT = 650;
+    private static final int PLAYER_STATS_HEIGHT = 650; // + 34 per teammate + 34 if line is long
     private static final int TILE_PADDING = 100;
     private static final int EXTRA_X = 300;
     private static final int EXTRA_Y = 200;
@@ -213,7 +213,7 @@ public class MapGenerator implements AutoCloseable {
     private static int getHeightStats(Game game, int playerCountForMap, int objectivesY) {
         int playerY = playerCountForMap * 340;
         int unrealPlayers = game.getNotRealPlayers().size();
-        playerY += unrealPlayers * 26;
+        playerY += unrealPlayers * 36;
         for (Player player : game.getPlayers().values()) {
             if (player.isEliminated()) {
                 playerY -= 190;
@@ -222,10 +222,11 @@ public class MapGenerator implements AutoCloseable {
             } else if (player.getSecretsScored().size() > 4) {
                 playerY += (player.getSecretsScored().size() - 4) * 43 + 23;
             }
+            playerY += (player.getTeamMateIDs().size() - 1) * 35;
         }
 
         int lawsY = (game.getLaws().size() / 2 + 1) * 115;
-        return playerY + lawsY + objectivesY + 600;
+        return playerY + lawsY + objectivesY + 20;
     }
 
     private DisplayType defaultIfNull(DisplayType displayType) {
@@ -526,47 +527,82 @@ public class MapGenerator implements AutoCloseable {
                 boolean hasTeammates = teammateIDs.size() > 1;
 
                 // Faction/Colour/DisplayName
-                String factionText = player.getFaction();
-                if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
-                    factionText = player.getDisplayName();
+                // String factionText = player.getFactionModel() != null ? player.getFactionModel().getShortName() : player.getFaction();
+                String factionText = StringUtils.capitalize(player.getFaction());
+                if (player.getDisplayName() != null && !"null".equalsIgnoreCase(player.getDisplayName())) {
+                    factionText = player.getDisplayName(); // overwrites faction
                 }
-                if (factionText != null && !"null".equals(factionText)) {
-                    factionText += " [" + StringUtils.capitalize(factionText) + "]";
+                if (factionText != null && !"null".equalsIgnoreCase(factionText)) {
+                    factionText = "[" + factionText + "]";
                 }
 
                 if (!"null".equals(player.getColor())) {
-                    factionText += " (" + player.getColor() + ")";
+                    factionText += " (" + player.getColor() + ")"; // TODO: colour model display name
+                }
+                if ("null".equalsIgnoreCase(factionText)) {
+                    factionText = "";
                 }
 
                 Color color = getColor(player.getColor());
 
-                int factionTextWidth = graphics.getFontMetrics().stringWidth(factionText);
-                int maxWidthForPlayerNameBeforeLeaders = 475;
-
                 // Player/Teammate Names
                 for (String teammateID : teammateIDs) {
-                    // PAINT AVATAR AND USERNAME
-                    StringBuilder userName = new StringBuilder();
-                    Member member = game.getGuild().getMemberById(teammateID);
-                    if (member == null) {
-                        member = AsyncTI4DiscordBot.guildPrimary.getMemberById(teammateID);
-                    }
-                    if (member == null) continue;
+                    User user = AsyncTI4DiscordBot.jda.getUserById(teammateID);
 
-                    String playerName = member.getEffectiveName();
+                    int leftJustified = x;
+                    int topOfName = y + 10;
+
+                    StringBuilder userName = new StringBuilder();
                     if (!game.hideUserNames()) {
-                        graphics.drawImage(DrawingUtil.getMemberDiscordAvatar(member), x, y + 5, null);
-                        userName.append(" ").append(playerName, 0, Math.min(playerName.length(), 20));
+                        Member member = game.getGuild().getMemberById(teammateID);
+                        if (member == null) {
+                            member = AsyncTI4DiscordBot.guildPrimary.getMemberById(teammateID);
+                        }
+                        userName.append(" ");
+
+                        if (member != null) {
+                            userName.append(member.getEffectiveName());
+                        } else if (user != null) {
+                            userName.append(user.getEffectiveName());
+                        } else {
+                            userName.append(player.getUserName());
+                        }
+
+                        leftJustified += 30; // to accommodate avater
                     }
-                    y += 34;
                     if (AFKService.userIsAFK(teammateID)) {
                         userName.append(" -- AFK");
                     }
+
                     graphics.setFont(Storage.getFont32());
                     graphics.setColor(Color.WHITE);
-                    graphics.drawString(userName.toString(), !game.hideUserNames() ? x + 34 : x, y);
+                    int usernameWidth = graphics.getFontMetrics().stringWidth(userName.toString());
+                    int factionTextWidth = graphics.getFontMetrics().stringWidth(factionText);
+                    int maxWidthForPlayerNameBeforeLeaders = 715;
+
+                    if (player.getUserID().equals(teammateID)) { // "real" player, first row
+                        if (factionTextWidth + usernameWidth > maxWidthForPlayerNameBeforeLeaders) { // is a team, or too long, two lines
+                            DrawingUtil.superDrawString(graphics, factionText, x, topOfName, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Top, stroke2, Color.BLACK);
+                            y += 34;
+                            DrawingUtil.superDrawString(graphics, userName.toString(), leftJustified, topOfName + 34, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Top, stroke2, Color.BLACK);
+                        } else { // can one-line it
+                            String fullText = userName.toString() + (factionText == null ? "" : " " + factionText);
+                            DrawingUtil.superDrawString(graphics, fullText, leftJustified, topOfName, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Top, stroke2, Color.BLACK);
+                        }
+                    } else { // 2nd+ row, teammates - one-line it, just username
+                        DrawingUtil.superDrawString(graphics, userName.toString(), leftJustified, topOfName, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Top, stroke2, Color.BLACK);
+                    }
+
+                    // Avatar
+                    if (!game.hideUserNames()) {
+                        graphics.drawImage(DrawingUtil.getUserDiscordAvatar(user), x, y + 5, null);
+                    }
+
+                    y += 34;
                 }
+
                 if (player.getFaction() == null || "null".equals(player.getColor()) || player.getColor() == null) {
+                    y += 2;
                     continue;
                 }
 

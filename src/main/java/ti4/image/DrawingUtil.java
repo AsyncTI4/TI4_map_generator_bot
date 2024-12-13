@@ -8,13 +8,12 @@ import java.util.List;
 import java.util.Set;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.Storage;
 import ti4.map.Player;
@@ -211,14 +210,13 @@ public class DrawingUtil {
     }
 
     public static Image getPlayerDiscordAvatar(Player player) {
-        return getMemberDiscordAvatar(player.getMember());
+        return getUserDiscordAvatar(player.getUser());
     }
 
-    public static Image getMemberDiscordAvatar(Member member) {
+    public static Image getUserDiscordAvatar(User user) {
         try {
-            if (member == null) return null;
-
-            return ImageHelper.readURLScaled(member.getEffectiveAvatar().getUrl(), 32, 32);
+            if (user == null) return null;
+            return ImageHelper.readURLScaled(user.getEffectiveAvatar().getUrl(), 32, 32);
         } catch (Exception e) {
             BotLogger.log("Could not get Avatar", e);
         }
