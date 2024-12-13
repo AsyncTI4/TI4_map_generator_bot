@@ -4191,4 +4191,13 @@ public class Game extends GameProperties {
         }
         return false;
     }
+
+    public List<String> getAllTeamMateIDs() {
+        List<String> teamMateIDs = new ArrayList<>();
+        for (Player player : getPlayers().values()) {
+            teamMateIDs.addAll(player.getTeamMateIDs());
+            teamMateIDs.remove(player.getUserID());
+        }
+        return teamMateIDs;
+    }
 }
