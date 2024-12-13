@@ -1,4 +1,4 @@
-Oh mypackage ti4.image;
+package ti4.image;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
