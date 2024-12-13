@@ -117,7 +117,7 @@ class SampleColors extends Subcommand {
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
         String fileNamePrefix = "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.getFirst() : "ALL");
-        try (var fileUpload = FileUploadService.createWebpFileUpload(coloursImage, fileNamePrefix)) {
+        try (var fileUpload = FileUploadService.createFileUpload(coloursImage, 1.0f, fileNamePrefix)) {
             fileUpload.setDescription("Colour samples for " + (hues.size() == 1 ? "all the " + hues.getFirst() : "ALL the") + " units.");
             MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
         } catch (IOException e) {

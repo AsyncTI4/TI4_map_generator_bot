@@ -3,6 +3,8 @@ package ti4.image;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -42,7 +44,6 @@ import ti4.model.BorderAnomalyModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.UnitModel;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
-import ti4.service.image.FileUploadService;
 
 public class TileGenerator {
 
@@ -138,7 +139,15 @@ public class TileGenerator {
             BotLogger.log(game.getName() + ": Could not save generated system info image");
         }
 
-        return FileUploadService.createWebpFileUpload(mainImage, game.getName() + "_" + getTimeStamp());
+        FileUpload fileUpload = null;
+        try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
+            ImageHelper.writeCompressedFormat(mainImage, byteArrayOutputStream, "jpg", 1f);
+            String imageName = game.getName() + "_" + getTimeStamp() + ".jpg";
+            fileUpload = FileUpload.fromData(byteArrayOutputStream.toByteArray(), imageName);
+        } catch (IOException e) {
+            BotLogger.log("Failed to create FileUpload for tile.", e);
+        }
+        return fileUpload;
     }
 
     private static Set<String> getTilesToShow(Game game, int context, String focusTile) {
