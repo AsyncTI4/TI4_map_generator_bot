@@ -1,4 +1,4 @@
-package ti4.image;
+Oh mypackage ti4.image;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -236,7 +236,7 @@ public class MapGenerator implements AutoCloseable {
         }
 
         int lawsY = (game.getLaws().size() / 2 + 1) * 115;
-        return playerY + lawsY + objectivesY + 20;
+        return playerY + lawsY + objectivesY + 600;
     }
 
     private DisplayType defaultIfNull(DisplayType displayType) {
