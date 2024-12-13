@@ -136,6 +136,13 @@ public class MessageListener extends ListenerAdapter {
         if (game == null) {
             return true;
         }
+        
+        //Prevent whispers from fow combat threads
+        if (game.isFowMode() && event.getChannel() instanceof ThreadChannel
+            && event.getChannel().getName().contains("vs")
+            && event.getChannel().getName().contains("private")) {
+            return false;
+        }
 
         Player sender = getPlayer(event, game);
         if (sender == null || !sender.isRealPlayer()) {
