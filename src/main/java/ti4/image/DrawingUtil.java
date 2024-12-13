@@ -8,13 +8,12 @@ import java.util.List;
 import java.util.Set;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.Storage;
 import ti4.map.Player;
@@ -44,7 +43,7 @@ public class DrawingUtil {
      * @param outlineColor
      */
     public static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, MapGenerator.HorizontalAlign horizontalAlignment, MapGenerator.VerticalAlign verticalAlignment,
-                                        Stroke outlineSize, Color outlineColor) {
+        Stroke outlineSize, Color outlineColor) {
         if (txt == null) return;
 
         int width = g.getFontMetrics().stringWidth(txt);
@@ -198,7 +197,7 @@ public class DrawingUtil {
             // Handle homebrew factions based on real factions
             if (Mapper.getFaction(factionID) != null && Mapper.getFaction(factionID).getHomebrewReplacesID().isPresent()) {
                 factionFile = ResourceHelper.getInstance()
-                        .getFactionFile(Mapper.getFaction(factionID).getHomebrewReplacesID().get() + ".png");
+                    .getFactionFile(Mapper.getFaction(factionID).getHomebrewReplacesID().get() + ".png");
             }
         }
         if (factionFile == null) {
@@ -211,12 +210,13 @@ public class DrawingUtil {
     }
 
     public static Image getPlayerDiscordAvatar(Player player) {
-        try {
-            Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(player.getUserID());
-            if (member == null)
-                return null;
+        return getUserDiscordAvatar(player.getUser());
+    }
 
-            return ImageHelper.readURLScaled(member.getEffectiveAvatar().getUrl(), 32, 32);
+    public static Image getUserDiscordAvatar(User user) {
+        try {
+            if (user == null) return null;
+            return ImageHelper.readURLScaled(user.getEffectiveAvatar().getUrl(), 32, 32);
         } catch (Exception e) {
             BotLogger.log("Could not get Avatar", e);
         }
@@ -263,7 +263,7 @@ public class DrawingUtil {
                 String playerCC = Mapper.getCCID(player_.getColor());
                 String playerSweep = Mapper.getSweepID(player_.getColor());
                 if (controlID.equals(playerControlMarker) || controlID.equals(playerCC)
-                        || controlID.equals(playerSweep)) {
+                    || controlID.equals(playerSweep)) {
                     player = player_;
                     break;
                 }
@@ -274,7 +274,7 @@ public class DrawingUtil {
 
     public static String getBlackWhiteFileSuffix(String colorID) {
         Set<String> lightColors = Set.of("ylw", "org", "pnk", "tan", "crm", "sns", "tqs", "gld", "lme", "lvn", "rse",
-                "spr", "tea", "lgy", "eth");
+            "spr", "tea", "lgy", "eth");
         if (lightColors.contains(colorID)) {
             return "_blk.png";
         }

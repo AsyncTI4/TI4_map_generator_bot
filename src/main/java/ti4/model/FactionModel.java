@@ -21,6 +21,7 @@ import ti4.service.emoji.MiscEmojis;
 public class FactionModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String factionName;
+    private String shortName;
     private String shortTag;
     private String homeSystem;
     private String startingFleet;
@@ -60,6 +61,10 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     public String getFactionEmoji() {
         if (homebrewReplacesID != null) return FactionEmojis.getFactionIcon(homebrewReplacesID).toString();
         return FactionEmojis.getFactionIcon(getAlias()).toString();
+    }
+
+    public String getShortName() {
+        return Optional.ofNullable(shortName).orElse(getFactionName().replace("The ", ""));
     }
 
     public String getShortTag() {
