@@ -52,7 +52,8 @@ public class BannerGenerator {
 
         String turnOrdinal = StringHelper.ordinal(player.getInRoundTurnCount());
         String descr = player.getFlexibleDisplayName() + "'s " + turnOrdinal + " turn";
-        FileUpload fileUpload = FileUploadService.createFileUpload(bannerImage, 1.0f, player.getFaction() + player.getColor() + "banner").setDescription(descr);
+        FileUpload fileUpload = FileUploadService.createWebpFileUpload(bannerImage, player.getFaction() + player.getColor() + "banner")
+            .setDescription(descr);
         MessageHelper.sendFileUploadToChannel(player.getCorrectChannel(), fileUpload);
     }
 
@@ -79,7 +80,7 @@ public class BannerGenerator {
 
         DrawingUtil.superDrawString(bannerG, "Agenda #" + num, 55, 35, Color.WHITE, MapGenerator.HorizontalAlign.Left, MapGenerator.VerticalAlign.Bottom, stroke2, Color.BLACK);
 
-        FileUpload fileUpload = FileUploadService.createFileUpload(bannerImage, 1.0f, "agenda" + num + "banner");
+        FileUpload fileUpload = FileUploadService.createWebpFileUpload(bannerImage, "agenda" + num + "banner");
         MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload);
     }
 
@@ -98,7 +99,8 @@ public class BannerGenerator {
         DrawingUtil.superDrawString(bannerG, roundText, 255, 221, Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Center, stroke6, Color.BLACK);
 
         String descr = "Start of " + phase + " phase, round " + round + ".";
-        FileUpload fileUpload = FileUploadService.createFileUpload(bannerImage, 1.0f, phase + round + "banner").setDescription(descr);
+        FileUpload fileUpload = FileUploadService.createWebpFileUpload(bannerImage, phase + round + "banner")
+            .setDescription(descr);
         MessageHelper.sendFileUploadToChannel(channel, fileUpload);
     }
 }
