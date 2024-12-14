@@ -1,7 +1,5 @@
 package ti4.listeners.context;
 
-import java.util.Date;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -14,6 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
+import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
 
@@ -82,7 +81,7 @@ public abstract class ListenerContext {
             }
 
             if (player != null && game.getActivePlayerID() != null && player.getUserID().equalsIgnoreCase(game.getActivePlayerID())) {
-                game.setLastActivePlayerPing(new Date());
+                AutoPingMetadataManager.addPing(gameName);
             }
         }
 

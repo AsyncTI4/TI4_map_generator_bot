@@ -1,5 +1,6 @@
 package ti4.map.manage;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -10,11 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -92,17 +90,15 @@ class GameUndoService {
         return undo(game, undoIndex, latestUndoIndex);
     }
 
-    private static Game undo(Game game, int undoIndex, int latestUndoIndex) {
+    private static Game undo(Game gameToUndo, int undoIndex, int latestUndoIndex) {
         if (latestUndoIndex <= 1) return null;
-        String gameName = game.getName();
+        String gameName = gameToUndo.getName();
         try {
             File currentGameFile = Storage.getGameFile(gameName + Constants.TXT);
             if (!currentGameFile.exists()) {
                 BotLogger.log("Game file for " + gameName + " doesn't exist!");
                 return null;
-
             }
-            generateSavedButtons(game);
 
             replaceGameFileWithUndo(gameName, undoIndex, currentGameFile.toPath());
             Game loadedGame = GameLoadService.load(gameName);
@@ -111,32 +107,23 @@ class GameUndoService {
                 return null;
             }
 
-            for (Player p1 : loadedGame.getRealPlayers()) {
-                Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
-                if (p2 != null && (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo())) {
-                    CardsInfoService.sendCardsInfo(loadedGame, p1);
-                }
-            }
+            generateSavedButtons(gameToUndo);
+            sendAnyChangedCardsInfo(gameToUndo, loadedGame);
 
-            Map<String, String> undoNamesToCommandText = GameUndoNameService.getUndoNamesToCommandText(game, latestUndoIndex - undoIndex);
-            List<String> undoCommands = new ArrayList<>();
-            for (int i = latestUndoIndex; i > undoIndex; i--) {
-                String fileName = getUndoFileName(gameName, i);
-                File currentUndo = Storage.getGameUndoStorage(fileName);
-                if (!currentUndo.delete()) {
-                    BotLogger.log("Failed to delete undo file: " + currentUndo.getAbsolutePath());
-                } else {
-                    undoCommands.add(undoNamesToCommandText.get(fileName));
-                }
-            }
-
-            if (!game.isFowMode()) {
-                sendUndoConfirmationMessage(game, undoIndex, latestUndoIndex, undoCommands);
-            }
+            sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex);
             return loadedGame;
         } catch (Exception e) {
             BotLogger.log("Error trying to undo: " + gameName, e);
             return null;
+        }
+    }
+
+    private static void sendAnyChangedCardsInfo(Game game, Game loadedGame) {
+        for (Player p1 : loadedGame.getRealPlayers()) {
+            Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
+            if (p2 != null && (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo())) {
+                CardsInfoService.sendCardsInfo(loadedGame, p1);
+            }
         }
     }
 
@@ -147,6 +134,25 @@ class GameUndoService {
 
     private static String getUndoFileName(String gameName, int undoIndex) {
         return gameName + "_" + undoIndex + Constants.TXT;
+    }
+
+    private static void sendUndoConfirmationMessage(Game gameToUndo, int undoIndex, int latestUndoIndex) {
+        if (gameToUndo.isFowMode()) {
+            return;
+        }
+        Map<String, String> undoNamesToCommandText = GameUndoNameService.getUndoNamesToCommandText(gameToUndo, latestUndoIndex - undoIndex);
+        List<String> undoCommands = new ArrayList<>();
+        for (int i = latestUndoIndex; i > undoIndex; i--) {
+            String fileName = getUndoFileName(gameToUndo.getName(), i);
+            File currentUndo = Storage.getGameUndoStorage(fileName);
+            if (!currentUndo.delete()) {
+                BotLogger.log("Failed to delete undo file: " + currentUndo.getAbsolutePath());
+            } else {
+                undoCommands.add(undoNamesToCommandText.get(fileName));
+            }
+        }
+
+        sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex, undoCommands);
     }
 
     private static void sendUndoConfirmationMessage(Game game, int undoIndex, int latestUndoIndex, List<String> undoCommands) {

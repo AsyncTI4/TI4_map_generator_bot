@@ -26,7 +26,6 @@ import ti4.service.button.ReactionService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.ScorePublicObjectiveService;
-import ti4.service.tech.PlayerTechService;
 
 public class ButtonHelperSCs {
 
@@ -62,7 +61,7 @@ public class ButtonHelperSCs {
         ReactionService.addReaction(event, game, player);
         String message = player.getRepresentationUnfogged() + " Click the names of the planets you wish to ready";
 
-        List<Button> buttons = Helper.getPlanetRefreshButtons(event, player, game);
+        List<Button> buttons = Helper.getPlanetRefreshButtons(player, game);
         Button doneRefreshing = Buttons.red("deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
         buttons.add(doneRefreshing);
         if (!game.isFowMode()) {
@@ -137,7 +136,7 @@ public class ButtonHelperSCs {
         }
         boolean used = addUsedSCPlayer(event.getMessageId() + "score_imperial", game, player);
         if (used) return;
-        ButtonHelperFactionSpecific.KeleresIIHQCCGainCheck(player, game);
+        ButtonHelperFactionSpecific.keleresIIHQCCGainCheck(player, game);
         ScorePublicObjectiveService.scorePO(event, player.getCorrectChannel(), game, player, 0);
     }
 
@@ -575,9 +574,6 @@ public class ButtonHelperSCs {
         }
         if (setStatus) {
             player.addFollowedSC(scNum, event);
-            if (scNum == 7 || scNum / 10 == 7) {
-                PlayerTechService.postTechSummary(game);
-            }
         }
         ReactionService.addReaction(event, game, player, "Not Following");
         String players = game.getStoredValue(messageID + "SCReacts");

@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,7 +10,6 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -29,6 +27,7 @@ import ti4.model.GenericCardModel;
 import ti4.model.PlanetModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -793,8 +792,7 @@ public class ActionCardHelper {
             if (actionCardWindow.contains("After an agenda is revealed")) {
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, "after");
-                Date newTime = new Date();
-                game.setLastActivePlayerPing(newTime);
+                AutoPingMetadataManager.addPing(game.getName());
 
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
@@ -810,8 +808,7 @@ public class ActionCardHelper {
 
             }
             if (actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto")) {
-                Date newTime = new Date();
-                game.setLastActivePlayerPing(newTime);
+                AutoPingMetadataManager.addPing(game.getName());
                 List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", game, whenButtons, "when");
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(game);

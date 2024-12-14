@@ -2139,7 +2139,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void lastMinuteDeliberation(ButtonInteractionEvent event, Player player, Game game, MessageChannel actionsChannel) {
         ButtonHelper.deleteMessage(event);
         String message = player.getRepresentation() + " Click the names of up to 2 planets you wish to ready ";
-        List<Button> buttons = Helper.getPlanetRefreshButtons(event, player, game);
+        List<Button> buttons = Helper.getPlanetRefreshButtons(player, game);
         buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         AgendaHelper.revealAgenda(event, false, game, actionsChannel);

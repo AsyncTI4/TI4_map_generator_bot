@@ -35,6 +35,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.model.metadata.TechSummariesMetadataManager;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -452,7 +453,7 @@ public class PlayerTechService {
             message.append("\n Automatically added the Custodia Vigilia planet");
         }
         if ("cm".equalsIgnoreCase(techID) && game.getActivePlayer() != null
-            && game.getActivePlayerID().equalsIgnoreCase(player.getUserID()) && !player.getSCs().contains(7)) {
+                && game.getActivePlayerID().equalsIgnoreCase(player.getUserID()) && !player.getSCs().contains(7)) {
             if (!game.isFowMode()) {
                 try {
                     if (game.getLatestTransactionMsg() != null && !game.getLatestTransactionMsg().isEmpty()) {
@@ -478,13 +479,7 @@ public class PlayerTechService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         } else {
             ButtonHelper.sendMessageToRightStratThread(player, game, message.toString(), "technology");
-            String key = "TechForRound" + game.getRound() + player.getFaction();
-            if (game.getStoredValue(key).isEmpty()) {
-                game.setStoredValue(key, techID);
-            } else {
-                game.setStoredValue(key, game.getStoredValue(key) + "." + techID);
-            }
-            postTechSummary(game);
+            TechSummariesMetadataManager.addTech(game, player, techID, false);
         }
         if (paymentRequired) {
             payForTech(game, player, event, techID, paymentType);
@@ -507,57 +502,6 @@ public class PlayerTechService {
         }
 
         ButtonHelper.deleteMessage(event);
-    }
-
-    public static void postTechSummary(Game game) {
-        if (game.isFowMode() || game.getTableTalkChannel() == null || !game.getStoredValue("TechSummaryRound" + game.getRound()).isEmpty()
-                || game.isHomebrewSCMode()) {
-            return;
-        }
-        StringBuilder msg = new StringBuilder("**__Tech Summary For Round " + game.getRound() + "__**\n");
-        for (Player player : game.getRealPlayers()) {
-            if (!player.hasFollowedSC(7)) {
-                return;
-            }
-            String key = "TechForRound" + game.getRound() + player.getFaction();
-            msg.append(player.getFactionEmoji()).append(":");
-            String key2 = "RAForRound" + game.getRound() + player.getFaction();
-            if (!game.getStoredValue(key2).isEmpty()) {
-                msg.append("(From RA: ");
-                if (game.getStoredValue(key2).contains(".")) {
-                    for (String tech : game.getStoredValue(key2).split("\\.")) {
-                        msg.append(" ").append(Mapper.getTech(tech).getNameRepresentation());
-                    }
-
-                } else {
-                    msg.append(" ").append(Mapper.getTech(game.getStoredValue(key2)).getNameRepresentation());
-                }
-                msg.append(")");
-            }
-            if (!game.getStoredValue(key).isEmpty()) {
-                if (game.getStoredValue(key).contains(".")) {
-                    String tech1 = StringUtils.substringBefore(game.getStoredValue(key), ".");
-                    String tech2 = StringUtils.substringAfter(game.getStoredValue(key), ".");
-                    msg.append(" ").append(Mapper.getTech(tech1).getNameRepresentation());
-                    for (String tech2Plus : tech2.split("\\.")) {
-                        msg.append("and ").append(Mapper.getTech(tech2Plus).getNameRepresentation());
-                    }
-
-                } else {
-                    msg.append(" ").append(Mapper.getTech(game.getStoredValue(key)).getNameRepresentation());
-                }
-                msg.append("\n");
-            } else {
-                msg.append(" Did not follow for tech\n");
-            }
-        }
-        String key2 = "TechForRound" + game.getRound() + "Counter";
-        if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
-            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg.toString());
-            game.setStoredValue("TechSummaryRound" + game.getRound(), "yes");
-        } else if (game.getStoredValue(key2).isEmpty()) {
-            game.setStoredValue(key2, "6");
-        }
     }
 
     /**

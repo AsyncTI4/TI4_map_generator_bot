@@ -13,9 +13,7 @@ public class SelectionMenuProvider {
         for (Selection selection : selectionManager.getSelectionMenuList()) {
             if (selection.accept(event)) {
                 try {
-                    if (context.isValid()) {
-                        selection.execute(event, context);
-                    }
+                    selection.execute(event, context);
                     selection.postExecute(event);
                 } catch (Exception e) {
                     String messageText = "Error trying to execute selection: " + event.getComponentId();

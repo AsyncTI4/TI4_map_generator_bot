@@ -77,8 +77,6 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettingsManager;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 public class Player {
 
     private String userID;
@@ -2444,7 +2442,6 @@ public class Player {
 
     public void setAutoSaboPassMedian(int median) {
         autoSaboPassMedian = median;
-        // setGlobalUserSetting("autoSaboPassMedianHours", String.valueOf(median));
     }
 
     public void setStasisInfantry(int stasisInfantry) {
@@ -2897,9 +2894,8 @@ public class Player {
     public MessageChannel getCorrectChannel() {
         if (getGame().isFowMode()) {
             return getPrivateChannel();
-        } else {
-            return getGame().getMainGameChannel();
         }
+        return getGame().getMainGameChannel();
     }
 
     public String bannerName() {

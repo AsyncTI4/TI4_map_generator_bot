@@ -195,7 +195,7 @@ public class StartPhaseService {
             game.setStoredValue("agendaChecksNBalancesAgainst", "");
             for (Player p2 : game.getRealPlayers()) {
                 String message = p2.getRepresentation() + " Click the names of up to 3 planets you wish to ready after Checks and Balances resolved against.";
-                List<Button> buttons = Helper.getPlanetRefreshButtons(event, p2, game);
+                List<Button> buttons = Helper.getPlanetRefreshButtons(p2, game);
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, buttons);
             }
@@ -248,13 +248,13 @@ public class StartPhaseService {
         game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", System.currentTimeMillis() + "");
         if (game.isFowMode()) {
             if (!game.isHomebrewSCMode()) {
-                MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(), message + pickSCMsg, Helper.getRemainingSCButtons(event, game, speaker));
+                MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(), message + pickSCMsg, Helper.getRemainingSCButtons(game, speaker));
             } else {
                 MessageHelper.sendPrivateMessageToPlayer(speaker, game, message);
             }
         } else {
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message + pickSCMsg,
-                Helper.getRemainingSCButtons(event, game, speaker));
+                Helper.getRemainingSCButtons(game, speaker));
         }
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "Start of Strategy Phase For Round #" + game.getRound());
@@ -500,7 +500,7 @@ public class StartPhaseService {
 
             if (!allPicked) {
                 game.setPhaseOfGame("strategy");
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick a strategy card.", Helper.getRemainingSCButtons(event, game, privatePlayer));
+                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick a strategy card.", Helper.getRemainingSCButtons(game, privatePlayer));
             } else {
 
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.", StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));

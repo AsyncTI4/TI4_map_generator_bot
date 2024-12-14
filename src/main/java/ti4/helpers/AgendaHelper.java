@@ -3,7 +3,6 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -57,6 +56,7 @@ import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -295,8 +295,6 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageAfters);
             }
         }
-        Date newTime = new Date();
-        game.setLastActivePlayerPing(newTime);
     }
 
     public static void exhaustPlanetsForVotingVersion2(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
@@ -691,7 +689,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("eraseMyRiders")
-    public static void reverseAllRiders(ButtonInteractionEvent event, Game game, Player player) {
+    public static void reverseAllRiders(Game game, Player player) {
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
         for (String outcome : outcomes.keySet()) {
             String existingData = outcomes.getOrDefault(outcome, "empty");
@@ -2715,7 +2713,7 @@ public class AgendaHelper {
         if (action) {
             whensAftersMessage.append("\nYou may play afters during this agenda.");
         }
-        game.setLastActivePlayerPing(new Date());
+        AutoPingMetadataManager.addPing(game.getName());
         List<Button> whenButtons = getWhenButtons(game);
         List<Button> afterButtons = getAfterButtons(game);
 
@@ -3103,8 +3101,7 @@ public class AgendaHelper {
         UnfiledButtonHandlers.clearAllReactions(event);
         ReactionService.addReaction(event, game, player, true, true, "Playing When", "When Played");
         List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
-        Date newTime = new Date();
-        game.setLastActivePlayerPing(newTime);
+        AutoPingMetadataManager.addPing(game.getName());
         MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", game, whenButtons, "when");
         List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
         MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, "after");
@@ -3114,7 +3111,7 @@ public class AgendaHelper {
     @ButtonHandler("refreshVotes_")
     public static void refreshVotes(GenericInteractionCreateEvent event, Game game, Player player, String buttonID) {
         String votes = buttonID.replace("refreshVotes_", "");
-        List<Button> voteActionRow = Helper.getPlanetRefreshButtons(event, player, game);
+        List<Button> voteActionRow = Helper.getPlanetRefreshButtons(player, game);
         Button concludeRefreshing = Buttons.red(player.getFinsFactionCheckerPrefix() + "votes_" + votes, "Done readying planets.");
         voteActionRow.add(concludeRefreshing);
         String voteMessage2 = "Use the buttons to ready planets. When you're done it will prompt the next person to vote.";
