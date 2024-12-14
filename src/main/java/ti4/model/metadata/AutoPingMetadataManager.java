@@ -51,7 +51,7 @@ public class AutoPingMetadataManager {
 
         AutoPing autoPing = autoPings.gameNameToAutoPing.get(gameName);
         if (autoPing == null) {
-            autoPing = new AutoPing(System.currentTimeMillis(), 1);
+            autoPing = new AutoPing(System.currentTimeMillis(), 0);
             autoPings.gameNameToAutoPing.put(gameName, autoPing);
             persistFile(autoPings);
         }
