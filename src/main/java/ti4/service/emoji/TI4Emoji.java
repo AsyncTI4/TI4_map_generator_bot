@@ -18,13 +18,13 @@ import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 
 public interface TI4Emoji {
 
-    default public Emoji asEmoji() {
+    default Emoji asEmoji() {
         String mention = this.toString();
         if (mention.isBlank()) return null;
         return Emoji.fromFormatted(mention);
     }
 
-    default public String emojiString() {
+    default String emojiString() {
         CachedEmoji emoji = ApplicationEmojiService.getApplicationEmoji(name());
         if (emoji == null) {
             BotLogger.log(Constants.jazzPing() + " could not find requested emoji: " + name());
@@ -33,13 +33,13 @@ public interface TI4Emoji {
         return emoji.getFormatted();
     }
 
-    public String name();
+    String name();
 
     // -------------------------------------------------------------------------------------------------------------------------------
     // Static Stuff
     // -------------------------------------------------------------------------------------------------------------------------------
 
-    public static Set<TI4Emoji> allEmojiEnums() {
+    static Set<TI4Emoji> allEmojiEnums() {
         Set<TI4Emoji> values = new HashSet<>();
         values.addAll(Arrays.asList(CardEmojis.values()));
         values.addAll(Arrays.asList(ColorEmojis.values()));
@@ -58,14 +58,14 @@ public interface TI4Emoji {
         return values;
     }
 
-    public static TI4Emoji getRandomGoodDog() {
+    static TI4Emoji getRandomGoodDog() {
         List<TI4Emoji> goodDogs = new ArrayList<>(MiscEmojis.goodDogs());
         Random seed = ThreadLocalRandom.current();
         Collections.shuffle(goodDogs, seed);
         return goodDogs.getFirst();
     }
 
-    public static TI4Emoji getRandomGoodDog(String randomSeed) {
+    static TI4Emoji getRandomGoodDog(String randomSeed) {
         List<TI4Emoji> goodDogs = new ArrayList<>(MiscEmojis.goodDogs());
         Random seed = new Random(randomSeed.hashCode());
         Collections.shuffle(goodDogs, seed);
@@ -73,7 +73,7 @@ public interface TI4Emoji {
     }
 
     @NotNull
-    public static TI4Emoji getRandomizedEmoji(int value, String messageID) {
+    static TI4Emoji getRandomizedEmoji(int value, String messageID) {
         List<TI4Emoji> symbols = new ArrayList<>(symbols());
         Random seed = messageID == null ? ThreadLocalRandom.current() : new Random(messageID.hashCode());
         Collections.shuffle(symbols, seed);
@@ -82,7 +82,7 @@ public interface TI4Emoji {
     }
 
     // LIST OF SYMBOLS FOR FOG STUFF
-    public static List<TI4Emoji> symbols() {
+    static List<TI4Emoji> symbols() {
         return new ArrayList<>(Arrays.asList(
             // Unit emojis
             UnitEmojis.warsun, UnitEmojis.spacedock, UnitEmojis.pds, UnitEmojis.mech, UnitEmojis.infantry, UnitEmojis.flagship,

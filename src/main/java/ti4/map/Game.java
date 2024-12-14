@@ -79,6 +79,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.fow.FowConstants;
@@ -114,9 +115,7 @@ public class Game extends GameProperties {
     @Getter
     private DisplayType displayTypeForced;
     private @Getter @Setter List<BorderAnomalyHolder> borderAnomalies = new ArrayList<>();
-    private Date lastActivePlayerPing = new Date(0);
     private Date lastActivePlayerChange = new Date(0);
-    private Date lastTimeGamesChecked = new Date(0);
     @JsonProperty("autoPingStatus")
     private boolean autoPingEnabled;
 
@@ -939,19 +938,7 @@ public class Game extends GameProperties {
         // reset timers for ping and stats
         setActivePlayerID(player == null ? null : player.getUserID());
         setLastActivePlayerChange(newTime);
-        setLastActivePlayerPing(newTime);
-    }
-
-    public Date getLastActivePlayerPing() {
-        return lastActivePlayerPing;
-    }
-
-    public Date getLastTimeGamesChecked() {
-        return lastTimeGamesChecked;
-    }
-
-    public void setLastTimeGamesChecked(Date time) {
-        lastTimeGamesChecked = time;
+        AutoPingMetadataManager.addPing(getName());
     }
 
     public void setAutoPing(boolean status) {
@@ -960,10 +947,6 @@ public class Game extends GameProperties {
 
     public boolean getAutoPingStatus() {
         return autoPingEnabled;
-    }
-
-    public void setLastActivePlayerPing(Date time) {
-        lastActivePlayerPing = time;
     }
 
     public Date getLastActivePlayerChange() {
