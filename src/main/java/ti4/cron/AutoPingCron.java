@@ -189,17 +189,18 @@ public class AutoPingCron {
             return;
         }
         MessageChannel gameChannel = player.getCorrectChannel();
-        if (gameChannel != null) {
-            MessageHelper.sendMessageToChannel(gameChannel, pingMessage);
-            if (pingMessage.contains("courtesy notice")) {
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.red("temporaryPingDisable",
-                    "Disable Pings For Turn"));
-                buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
-                MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity
-                    + " if the game is not waiting on you, you may disable the auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
-                    buttons);
-            }
+        if (gameChannel == null) {
+            return;
+        }
+        MessageHelper.sendMessageToChannel(gameChannel, pingMessage);
+        if (pingMessage.contains("courtesy notice")) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.red("temporaryPingDisable",
+                "Disable Pings For Turn"));
+            buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
+            MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity
+                + " if the game is not waiting on you, you may disable the auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
+                buttons);
         }
     }
 
