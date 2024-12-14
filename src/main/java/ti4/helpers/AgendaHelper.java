@@ -57,7 +57,6 @@ import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
-import ti4.model.metadata.AgendaPhaseReactsMetadataManager;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -2696,7 +2695,6 @@ public class AgendaHelper {
         }
         game.setLatestWhenMsg("");
         game.setLatestAfterMsg("");
-        AgendaPhaseReactsMetadataManager.resetAgendaPhaseReacts(game.getName());
         if (!action) {
             offerEveryonePrepassOnShenanigans(game);
             offerEveryonePreAbstain(game);

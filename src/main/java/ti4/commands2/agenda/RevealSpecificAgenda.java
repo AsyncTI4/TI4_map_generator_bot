@@ -23,7 +23,6 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.SecretObjectiveModel;
-import ti4.model.metadata.AgendaPhaseReactsMetadataManager;
 import ti4.service.emoji.CardEmojis;
 
 class RevealSpecificAgenda extends GameStateSubcommand {
@@ -149,7 +148,6 @@ class RevealSpecificAgenda extends GameStateSubcommand {
         }
         game.setLatestWhenMsg("");
         game.setLatestAfterMsg("");
-        AgendaPhaseReactsMetadataManager.resetAgendaPhaseReacts(game.getName());
         MessageHelper.sendMessageToChannel(channel, Helper.getAgendaRepresentation(agendaID, uniqueID));
         String text = game.getPing()
             + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you may simply play it.";

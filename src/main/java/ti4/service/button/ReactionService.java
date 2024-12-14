@@ -19,7 +19,6 @@ import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.metadata.MessageReactionsMetadataManager;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -139,13 +138,12 @@ public class ReactionService {
         int matchingFactionReactions = 0;
         for (Player player : game.getRealPlayers()) {
             if (game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction())) {
-                matchingFactionReactions++; // TODO: this can go away after a few weeks of storing current game reactions in MessageReactionsMetadataManager...
+                matchingFactionReactions++;
             }
         }
         List<String> userIds = game.getRealPlayers().stream().map(Player::getUserID).toList();
-        boolean allPlayersHaveReacted = MessageReactionsMetadataManager.hasReacted(game.getName(), messageId, userIds);
         int numberOfPlayers = game.getRealPlayers().size();
-        if (matchingFactionReactions < numberOfPlayers && !allPlayersHaveReacted) {
+        if (matchingFactionReactions < numberOfPlayers) {
             return;
         }
         game.getMainGameChannel().retrieveMessageById(messageId).queue(msg -> {
@@ -159,26 +157,23 @@ public class ReactionService {
                 Matcher acToReact = CARDS_PATTERN.matcher(msg.getContentRaw());
                 String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
                 if (!game.isFowMode()) {
-                    String messageOwnerUserId = MessageReactionsMetadataManager.getMessageOwnerUserId(game.getName(), messageId);
-                    Player playerToPing = game.getPlayer(messageOwnerUserId);
+                    String faction = "bob_" + game.getStoredValue(messageId) + "_";
+                    faction = faction.split("_")[1];
+                    Player playerToPing = game.getPlayerFromColorOrFaction(faction);
                     if (playerToPing != null) {
                         msg2 = playerToPing.getRepresentation() + " " + msg2;
                     }
                 }
                 msg.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
             }
-            MessageReactionsMetadataManager.remove(game.getName(), List.of(messageId));
             if (game.getMessageIDsForSabo().contains(messageId)) {
-                game.removeMessageIDForSabo(messageId);// TODO: this can go away after a few weeks of storing current game reactions in MessageReactionsMetadataManager...
+                game.removeMessageIDForSabo(messageId);
                 GameManager.save(game, "No Sabo");
             }
         });
     }
 
     public static boolean checkForASpecificPlayerReact(String messageId, Player player, Game game) {
-        if (game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction())) {
-            return true; // TODO: this can go away after a few weeks of storing current game reactions in MessageReactionsMetadataManager...
-        }
-        return MessageReactionsMetadataManager.hasReacted(game.getName(), messageId, List.of(player.getUserID()));
+        return game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction());
     }
 }
