@@ -54,7 +54,7 @@ public class SabotageAutoReactCron {
             }
 
             for (String messageId : messageIds) {
-                if (!PlayerReactService.checkForASpecificPlayerReact(messageId, player, game)) {
+                if (!ReactionService.checkForASpecificPlayerReact(messageId, player, game)) {
                     String message = game.isFowMode() ? "No Sabotage" : null;
                     ReactionService.addReaction(player, false, message, null, messageId, game);//TODO: updates game...
                 }

@@ -1,5 +1,6 @@
 package ti4.service.button;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,6 +19,7 @@ import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.metadata.MessageReactionsMetadataManager;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -137,48 +139,46 @@ public class ReactionService {
         int matchingFactionReactions = 0;
         for (Player player : game.getRealPlayers()) {
             if (game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction())) {
-                matchingFactionReactions++;
+                matchingFactionReactions++; // TODO: this can go away after a few weeks of storing current game reactions in MessageReactionsMetadataManager...
             }
         }
+        List<String> userIds = game.getRealPlayers().stream().map(Player::getUserID).toList();
+        boolean allPlayersHaveReacted = MessageReactionsMetadataManager.hasReacted(game.getName(), messageId, userIds);
         int numberOfPlayers = game.getRealPlayers().size();
-        if (matchingFactionReactions >= numberOfPlayers) {
-            game.getMainGameChannel().retrieveMessageById(messageId).queue(msg -> {
-                if (game.getLatestAfterMsg().equalsIgnoreCase(messageId)) {
-                    msg.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
-                    AgendaHelper.startTheVoting(game);
-                    GameManager.save(game, "Started Voting");
-                } else if (game.getLatestWhenMsg().equalsIgnoreCase(messageId)) {
-                    msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
-
-                } else {
-                    Matcher acToReact = CARDS_PATTERN.matcher(msg.getContentRaw());
-                    String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
-                    String faction = "bob_" + game.getStoredValue(messageId) + "_";
-                    faction = faction.split("_")[1];
-                    Player p2 = game.getPlayerFromColorOrFaction(faction);
-                    if (p2 != null && !game.isFowMode()) {
-                        msg2 = p2.getRepresentation() + " " + msg2;
+        if (matchingFactionReactions < numberOfPlayers && !allPlayersHaveReacted) {
+            return;
+        }
+        game.getMainGameChannel().retrieveMessageById(messageId).queue(msg -> {
+            if (game.getLatestAfterMsg().equalsIgnoreCase(messageId)) {
+                msg.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
+                AgendaHelper.startTheVoting(game);
+                GameManager.save(game, "Started Voting"); // TODO: CHANGE TO A BUTTON AND PING PLAYERS?
+            } else if (game.getLatestWhenMsg().equalsIgnoreCase(messageId)) {
+                msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
+            } else {
+                Matcher acToReact = CARDS_PATTERN.matcher(msg.getContentRaw());
+                String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
+                if (!game.isFowMode()) {
+                    String messageOwnerUserId = MessageReactionsMetadataManager.getMessageOwnerUserId(game.getName(), messageId);
+                    Player playerToPing = game.getPlayer(messageOwnerUserId);
+                    if (playerToPing != null) {
+                        msg2 = playerToPing.getRepresentation() + " " + msg2;
                     }
-                    msg.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
                 }
-            });
-
+                msg.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
+            }
+            MessageReactionsMetadataManager.remove(game.getName(), List.of(messageId));
             if (game.getMessageIDsForSabo().contains(messageId)) {
-                game.removeMessageIDForSabo(messageId);
+                game.removeMessageIDForSabo(messageId);// TODO: this can go away after a few weeks of storing current game reactions in MessageReactionsMetadataManager...
                 GameManager.save(game, "No Sabo");
             }
-        }
+        });
     }
 
     public static boolean checkForASpecificPlayerReact(String messageId, Player player, Game game) {
-        boolean foundReact = false;
-        try {
-            if (game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction())) {
-                return true;
-            }
-        } catch (Exception e) {
-            return true;
+        if (game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction())) {
+            return true; // TODO: this can go away after a few weeks of storing current game reactions in MessageReactionsMetadataManager...
         }
-        return foundReact;
+        return MessageReactionsMetadataManager.hasReacted(game.getName(), messageId, List.of(player.getUserID()));
     }
 }

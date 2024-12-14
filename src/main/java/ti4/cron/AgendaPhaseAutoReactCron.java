@@ -93,7 +93,7 @@ public class AgendaPhaseAutoReactCron {
     private static void handleAfters(Game game, Player player) {
         String aftersId = game.getLatestAfterMsg();
         //TODO: updates game...
-        if (isNotBlank(aftersId) && !playerHasAfters(player) && !PlayerReactService.checkForASpecificPlayerReact(aftersId, player, game)) {
+        if (isNotBlank(aftersId) && !playerHasAfters(player) && !ReactionService.checkForASpecificPlayerReact(aftersId, player, game)) {
             String message = game.isFowMode() ? "No afters" : null;
             ReactionService.addReaction(player, false, message, null, aftersId, game);//TODO: updates game...
         }

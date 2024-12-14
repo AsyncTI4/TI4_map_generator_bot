@@ -67,6 +67,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -375,7 +376,7 @@ public class Helper {
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
         List<String> messageIDs = new ArrayList<>(game.getMessageIDsForSabo());
         for (String messageID : messageIDs) {
-            if (PlayerReactService.checkForASpecificPlayerReact(messageID, player, game)) continue;
+            if (ReactionService.checkForASpecificPlayerReact(messageID, player, game)) continue;
 
             game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
                 Emoji reactionEmoji = getPlayerReactionEmoji(game, player, messageID);
