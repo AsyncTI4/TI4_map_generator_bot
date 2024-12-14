@@ -108,7 +108,7 @@ public class AutoPingCron {
     );
 
     public static void register() {
-        CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 1, 1, TimeUnit.MINUTES);
+        CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 5, 10, TimeUnit.MINUTES);
     }
 
     private static void autoPingGames() {
