@@ -77,8 +77,6 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettingsManager;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 public class Player {
 
     private String userID;
