@@ -1,6 +1,17 @@
 package ti4.image;
 
-import java.awt.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -22,15 +33,18 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.Nullable;
+
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands2.CommandHelper;
@@ -74,19 +88,17 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
-import ti4.service.fow.FowConstants;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 import ti4.service.image.FileUploadService;
+import ti4.service.user.AFKService;
 import ti4.settings.GlobalSettings;
 import ti4.website.WebsiteOverlay;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class MapGenerator implements AutoCloseable {
 
     private static final int RING_MAX_COUNT = 8;
     private static final int RING_MIN_COUNT = 3;
-    private static final int PLAYER_STATS_HEIGHT = 650;
+    private static final int PLAYER_STATS_HEIGHT = 650; // + 34 per teammate + 34 if line is long
     private static final int TILE_PADDING = 100;
     private static final int EXTRA_X = 300;
     private static final int EXTRA_Y = 200;
@@ -211,7 +223,7 @@ public class MapGenerator implements AutoCloseable {
     private static int getHeightStats(Game game, int playerCountForMap, int objectivesY) {
         int playerY = playerCountForMap * 340;
         int unrealPlayers = game.getNotRealPlayers().size();
-        playerY += unrealPlayers * 26;
+        playerY += unrealPlayers * 36;
         for (Player player : game.getPlayers().values()) {
             if (player.isEliminated()) {
                 playerY -= 190;
@@ -220,6 +232,7 @@ public class MapGenerator implements AutoCloseable {
             } else if (player.getSecretsScored().size() > 4) {
                 playerY += (player.getSecretsScored().size() - 4) * 43 + 23;
             }
+            playerY += (player.getTeamMateIDs().size() - 1) * 35;
         }
 
         int lawsY = (game.getLaws().size() / 2 + 1) * 115;
@@ -502,6 +515,8 @@ public class MapGenerator implements AutoCloseable {
             graphics.setFont(Storage.getFont32());
             int realX = x;
             Map<UnitKey, Integer> unitCount = new HashMap<>();
+
+            // PLAYER AREAS
             for (Player player : players) {
                 if (player == null) continue;
                 int baseY = y;
@@ -515,37 +530,88 @@ public class MapGenerator implements AutoCloseable {
                     continue;
                 }
 
-                // PAINT AVATAR AND USERNAME
-                StringBuilder userName = new StringBuilder();
-                String playerName = player.getUserName();
-                boolean fowHidePlayerNames = Boolean.parseBoolean(game.getFowOption(FowConstants.HIDE_NAMES));
-                if (!fowHidePlayerNames) {
-                    graphics.drawImage(DrawingUtil.getPlayerDiscordAvatar(player), x, y + 5, null);
-                    userName.append(" ").append(playerName, 0, Math.min(playerName.length(), 20));
-                }
-                y += 34;
-                graphics.setFont(Storage.getFont32());
-                Color color = getColor(player.getColor());
-                graphics.setColor(Color.WHITE);
-
                 // PAINT FACTION OR DISPLAY NAME
-                String factionText = player.getFaction();
-                if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
-                    factionText = player.getDisplayName();
+                List<String> teammateIDs = new ArrayList<>(player.getTeamMateIDs());
+                teammateIDs.remove(player.getUserID());
+                teammateIDs.addFirst(player.getUserID());
+
+                // Faction/Colour/DisplayName
+                // String factionText = player.getFactionModel() != null ? player.getFactionModel().getShortName() : player.getFaction(); //TODO use this but make it look better
+                String factionText = StringUtils.capitalize(player.getFaction());
+                if (player.getDisplayName() != null && !"null".equalsIgnoreCase(player.getDisplayName())) {
+                    factionText = player.getDisplayName(); // overwrites faction
                 }
-                if (factionText != null && !"null".equals(factionText)) {
-                    userName.append(" [").append(StringUtils.capitalize(factionText)).append("]");
+                if (factionText != null && !"null".equalsIgnoreCase(factionText)) {
+                    factionText = "[" + factionText + "]";
                 }
 
                 if (!"null".equals(player.getColor())) {
-                    userName.append(" (").append(player.getColor()).append(")");
+                    factionText += " (" + player.getColor() + ")"; // TODO: colour model display name
                 }
-                if (player.isAFK()) {
-                    userName.append(" -- AFK");
+                if ("null".equalsIgnoreCase(factionText)) {
+                    factionText = "";
                 }
 
-                graphics.drawString(userName.toString(), !fowHidePlayerNames ? x + 34 : x, y);
+                Color color = getColor(player.getColor());
+
+                // Player/Teammate Names
+                for (String teammateID : teammateIDs) {
+                    User user = AsyncTI4DiscordBot.jda.getUserById(teammateID);
+
+                    int leftJustified = x;
+                    int topOfName = y + 10;
+
+                    StringBuilder userName = new StringBuilder();
+                    if (!game.hideUserNames()) {
+                        Member member = game.getGuild().getMemberById(teammateID);
+                        if (member == null) {
+                            member = AsyncTI4DiscordBot.guildPrimary.getMemberById(teammateID);
+                        }
+                        userName.append(" ");
+
+                        if (member != null) {
+                            userName.append(member.getEffectiveName());
+                        } else if (user != null) {
+                            userName.append(user.getEffectiveName());
+                        } else {
+                            userName.append(player.getUserName());
+                        }
+
+                        leftJustified += 30; // to accommodate avater
+                    }
+                    if (AFKService.userIsAFK(teammateID)) {
+                        userName.append(" -- AFK");
+                    }
+
+                    graphics.setFont(Storage.getFont32());
+                    graphics.setColor(Color.WHITE);
+                    int usernameWidth = graphics.getFontMetrics().stringWidth(userName.toString());
+                    int factionTextWidth = graphics.getFontMetrics().stringWidth(factionText);
+                    int maxWidthForPlayerNameBeforeLeaders = 715;
+
+                    if (player.getUserID().equals(teammateID)) { // "real" player, first row
+                        if (factionTextWidth + usernameWidth > maxWidthForPlayerNameBeforeLeaders) { // is a team, or too long, two lines
+                            DrawingUtil.superDrawString(graphics, factionText, x, topOfName, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Top, stroke2, Color.BLACK);
+                            y += 34;
+                            DrawingUtil.superDrawString(graphics, userName.toString(), leftJustified, topOfName + 34, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Top, stroke2, Color.BLACK);
+                        } else { // can one-line it
+                            String fullText = userName.toString() + (factionText == null ? "" : " " + factionText);
+                            DrawingUtil.superDrawString(graphics, fullText, leftJustified, topOfName, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Top, stroke2, Color.BLACK);
+                        }
+                    } else { // 2nd+ row, teammates - one-line it, just username
+                        DrawingUtil.superDrawString(graphics, userName.toString(), leftJustified, topOfName, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Top, stroke2, Color.BLACK);
+                    }
+
+                    // Avatar
+                    if (!game.hideUserNames()) {
+                        graphics.drawImage(DrawingUtil.getUserDiscordAvatar(user), x, y + 5, null);
+                    }
+
+                    y += 34;
+                }
+
                 if (player.getFaction() == null || "null".equals(player.getColor()) || player.getColor() == null) {
+                    y += 2;
                     continue;
                 }
 
@@ -673,7 +739,7 @@ public class MapGenerator implements AutoCloseable {
                     g2.translate(x + 47 - 3, y + 47 - 6);
                     g2.rotate(-Math.PI / 4);
                     g2.setFont(Storage.getFont20());
-                    DrawingUtil.superDrawString(g2, "ELIMINATED", 0, 0, EliminatedColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
+                    DrawingUtil.superDrawString(g2, "DUMMY", 0, 0, EliminatedColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
                     g2.setTransform(transform);
                 } else if (player.isPassed()) {
                     AffineTransform transform = g2.getTransform();
@@ -691,6 +757,7 @@ public class MapGenerator implements AutoCloseable {
                     g2.setTransform(transform);
                 }
 
+                // Eliminated Rectangle
                 g2.setStroke(stroke5);
                 if (player.isEliminated()) {
                     g2.setColor(color);
@@ -743,7 +810,7 @@ public class MapGenerator implements AutoCloseable {
                 graphics.drawString(ccCount, x + 40, y + deltaY + 40);
                 graphics.drawString("T/F/S", x + 40, y + deltaY);
 
-                // Additional FS
+                // Additional Fleet Supply
                 int additionalFleetSupply = 0;
                 if (player.hasAbility("edict")) {
                     additionalFleetSupply += player.getMahactCC().size();
@@ -773,6 +840,7 @@ public class MapGenerator implements AutoCloseable {
                 drawPAImage(x + 280, y + yDelta, pnImage);
                 graphics.drawString(Integer.toString(player.getPnCount()), x + 300, y + deltaY + 50);
 
+                // Trade Goods
                 if (game.isNomadCoin()) {
                     drawPAImage(x + 345, y + yDelta, nomadCoinImage);
                 } else {
@@ -780,6 +848,7 @@ public class MapGenerator implements AutoCloseable {
                 }
                 graphics.drawString(Integer.toString(player.getTg()), x + 360, y + deltaY + 50);
 
+                // Comms
                 drawPAImage(x + 410, y + yDelta, commoditiesImage);
                 String comms = player.getCommodities() + "/" + player.getCommoditiesTotal();
                 graphics.drawString(comms, x + 415, y + deltaY + 50);
@@ -875,6 +944,8 @@ public class MapGenerator implements AutoCloseable {
                 if (soCount > 4) {
                     y += (soCount - 4) * 43;
                 }
+
+                // Draw Full Rect
                 g2.drawRect(realX - 5, baseY, mapWidth - realX, y - baseY);
                 y += 15;
             }
@@ -1532,7 +1603,7 @@ public class MapGenerator implements AutoCloseable {
             if (!game.isShowOwnedPNsInPlayerArea() && promissoryNote.getFaction().isEmpty()) {
                 continue;
             }
-            
+
             if (promissoryNote.getSource() == ComponentSource.promises_promises) {
                 drawPAImageScaled(x + deltaX + 1, y + 1, "pa_promissory_light_pp.png", 38, 28);
             } else {
@@ -2023,57 +2094,59 @@ public class MapGenerator implements AutoCloseable {
         }
 
         Tile homeTile = player.getHomeSystemTile();
-        if (homeTile.getTileID().equals("51")) {
-            Tile creussGate = game.getTile("17");
-            if (creussGate != null) {
-                homeTile = creussGate;
-            }
-        }
-        Point homePosition = PositionMapper.getTilePosition(homeTile.getPosition());
-        Comparator<String> planetComparator = (planet1, planet2) -> {
-            Tile tile1 = game.getTileFromPlanet(planet1);
-            if (tile1.getTileID().equals("51")) {
+        if (homeTile != null) {
+            if (homeTile.getTileID().equals("51")) {
                 Tile creussGate = game.getTile("17");
                 if (creussGate != null) {
-                    tile1 = creussGate;
+                    homeTile = creussGate;
                 }
             }
-            Point position1 = PositionMapper.getTilePosition(tile1.getPosition());
-            int distance1 = ((homePosition.x - position1.x) * (homePosition.x - position1.x)
-                + (homePosition.y - position1.y) * (homePosition.y - position1.y)) / 4000;
-            Tile tile2 = game.getTileFromPlanet(planet2);
-            if (tile2.getTileID().equals("51")) {
-                Tile creussGate = game.getTile("17");
-                if (creussGate != null) {
-                    tile2 = creussGate;
+            Point homePosition = PositionMapper.getTilePosition(homeTile.getPosition());
+            Comparator<String> planetComparator = (planet1, planet2) -> {
+                Tile tile1 = game.getTileFromPlanet(planet1);
+                if (tile1.getTileID().equals("51")) {
+                    Tile creussGate = game.getTile("17");
+                    if (creussGate != null) {
+                        tile1 = creussGate;
+                    }
                 }
-            }
-            Point position2 = PositionMapper.getTilePosition(tile2.getPosition());
-            int distance2 = ((homePosition.x - position2.x) * (homePosition.x - position2.x)
-                + (homePosition.y - position2.y) * (homePosition.y - position2.y)) / 4000;
-            if (distance1 != distance2) {
-                return distance1 - distance2;
-            }
-            if (!tile1.getPosition().equalsIgnoreCase(tile2.getPosition())) {
-                return tile2.getPosition().compareToIgnoreCase(tile1.getPosition());
-            }
-            return planet1.compareToIgnoreCase(planet2);
-        };
-        realPlanets.sort(planetComparator);
+                Point position1 = PositionMapper.getTilePosition(tile1.getPosition());
+                int distance1 = ((homePosition.x - position1.x) * (homePosition.x - position1.x)
+                    + (homePosition.y - position1.y) * (homePosition.y - position1.y)) / 4000;
+                Tile tile2 = game.getTileFromPlanet(planet2);
+                if (tile2.getTileID().equals("51")) {
+                    Tile creussGate = game.getTile("17");
+                    if (creussGate != null) {
+                        tile2 = creussGate;
+                    }
+                }
+                Point position2 = PositionMapper.getTilePosition(tile2.getPosition());
+                int distance2 = ((homePosition.x - position2.x) * (homePosition.x - position2.x)
+                    + (homePosition.y - position2.y) * (homePosition.y - position2.y)) / 4000;
+                if (distance1 != distance2) {
+                    return distance1 - distance2;
+                }
+                if (!tile1.getPosition().equalsIgnoreCase(tile2.getPosition())) {
+                    return tile2.getPosition().compareToIgnoreCase(tile1.getPosition());
+                }
+                return planet1.compareToIgnoreCase(planet2);
+            };
+            realPlanets.sort(planetComparator);
 
-        for (String planet : realPlanets) {
-            deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
-        }
-        if (!nonTile.isEmpty()) {
-            deltaX += 30;
-            for (String planet : nonTile) {
+            for (String planet : realPlanets) {
                 deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
             }
-        }
-        if (!fakePlanets.isEmpty()) {
-            deltaX += 30;
-            for (String planet : fakePlanets) {
-                deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
+            if (!nonTile.isEmpty()) {
+                deltaX += 30;
+                for (String planet : nonTile) {
+                    deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
+                }
+            }
+            if (!fakePlanets.isEmpty()) {
+                deltaX += 30;
+                for (String planet : fakePlanets) {
+                    deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
+                }
             }
         }
 
@@ -3216,7 +3289,7 @@ public class MapGenerator implements AutoCloseable {
             graphics.setFont(Storage.getFont32());
             String userName = player.getUserName();
             point = PositionMapper.getPlayerStats("newuserName");
-            if (!Boolean.parseBoolean(game.getFowOption(FowConstants.HIDE_NAMES))) {
+            if (!game.hideUserNames()) {
                 String name = userName.substring(0, Math.min(userName.length(), 15));
                 DrawingUtil.superDrawString(graphics, name, statTileMid.x + point.x, statTileMid.y + point.y, Color.WHITE, center, null, stroke5, Color.BLACK);
             }
@@ -3785,7 +3858,7 @@ public class MapGenerator implements AutoCloseable {
 
         // PAINT USERNAME
         Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
-        if (!Boolean.parseBoolean(game.getFowOption(FowConstants.HIDE_NAMES))) {
+        if (!game.hideUserNames()) {
             graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX,
                 point.y + deltaY);
         }

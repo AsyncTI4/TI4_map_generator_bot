@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -13,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -187,7 +188,7 @@ public class StartCombatService {
         }
 
         int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
-        FileUpload systemWithContext = new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
+        FileUpload systemWithContext = new TileGenerator(game, event, null, context, tile.getPosition(), player1).createFileUpload();
 
         // Create the thread
         final String finalThreadName = threadName;
@@ -223,7 +224,7 @@ public class StartCombatService {
         // PDS2 Context
         int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
         if (file == null) {
-            file = new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
+            file = new TileGenerator(game, event, null, context, tile.getPosition(), player1).createFileUpload();
         }
 
         message.append("\nImage of System:");
@@ -280,7 +281,7 @@ public class StartCombatService {
 
     private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
         ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
-        FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
+        FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition(), player).createFileUpload();
 
         // Use existing thread, if it exists
         TextChannel textChannel = (TextChannel) player.getPrivateChannel();
@@ -309,7 +310,9 @@ public class StartCombatService {
         } else {
             message.append("## Space Combat");
         }
-        message.append("\nPlease note, that although you can see the combat participants' messages, you cannot communicate with them.\n");
+        if (!game.isAllianceMode()) {
+            message.append("\nPlease note, that although you can see the combat participants' messages, you cannot communicate with them.\n");
+        }
         message.append("\nImage of System:");
         MessageHelper.sendMessageWithFile(threadChannel, systemWithContext, message.toString(), false);
         sendGeneralCombatButtonsToThread(threadChannel, game, player, player, tile, "justPicture", event);
@@ -483,17 +486,17 @@ public class StartCombatService {
     }
 
     private static void sendAFBButtonsToThread(GenericInteractionCreateEvent event, ThreadChannel threadChannel, Game game, List<Player> combatPlayers, Tile tile) {
-        boolean thereAreAFBUnits = false;
-        for (Player player : combatPlayers) {
-            if (!CombatRollService.getUnitsInAFB(tile, player, event).isEmpty())
-                thereAreAFBUnits = true;
-        }
-        if (!thereAreAFBUnits)
-            return;
+        // boolean thereAreAFBUnits = false;
+        // for (Player player : combatPlayers) {
+        //     if (!CombatRollService.getUnitsInAFB(tile, player, event).isEmpty())
+        //         thereAreAFBUnits = true;
+        // }
+        // if (!thereAreAFBUnits)
+        //     return;
 
         List<Button> afbButtons = new ArrayList<>();
         afbButtons.add(Buttons.gray("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
-        MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll AFB:", afbButtons);
+        MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll AFB (if applicable):", afbButtons);
         for (Player player : combatPlayers) {
             if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !ButtonHelper.isLawInPlay(game, "articles_war")) {
                 MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use AFB against " + player.getFactionEmojiOrColor() + " due to their mech power");

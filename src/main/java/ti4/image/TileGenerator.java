@@ -70,17 +70,21 @@ public class TileGenerator {
     private final boolean allEyesOnMe;
 
     public TileGenerator(@NotNull Game game, @NotNull GenericInteractionCreateEvent event, DisplayType displayType) {
-        this(game, event, displayType, 0, "000");
+        this(game, event, displayType, 0, "000", null);
     }
 
     public TileGenerator(@NotNull Game game, @NotNull GenericInteractionCreateEvent event, @Nullable DisplayType displayType, int context, @NotNull String focusTile) {
+        this(game, event, displayType, context, focusTile, null);
+    }
+    
+    public TileGenerator(@NotNull Game game, @NotNull GenericInteractionCreateEvent event, @Nullable DisplayType displayType, int context, @NotNull String focusTile, @Nullable Player fowPlayer) {
         this.game = game;
         this.event = event;
         this.displayType = displayType;
         this.context = context;
         this.focusTile = focusTile;
         isFoWPrivate = isFowModeActive();
-        fowPlayer = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
+        this.fowPlayer = fowPlayer != null ? fowPlayer : CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
         allEyesOnMe = displayType != null && displayType.equals(DisplayType.googly);
     }
 

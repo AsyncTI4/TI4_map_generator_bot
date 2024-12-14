@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -8,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -36,8 +37,6 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperCommanders {
 
@@ -171,7 +170,29 @@ public class ButtonHelperCommanders {
         if (!techsSummed.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary.toString());
         }
+    }
 
+    public static void veldyrCommanderSummary(Player player, Game game) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "veldyrcommander")) {
+            return;
+        }
+        StringBuilder summary = new StringBuilder(player.getRepresentation() + " you could potentially use the Veldyr Commander, to ignore one pre-req for these techs (the bot did not check if you have the prerequisites otherwise):\n");
+        List<String> techsSummed = new ArrayList<>();
+        for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)) {
+            for (String tech : p2.getTechs()) {
+                if (!player.getTechs().contains(tech) && !techsSummed.contains(tech)) {
+                    TechnologyModel model = Mapper.getTech(tech);
+                    if (model.getFaction().isPresent() || model.getFaction().isPresent() || model.getRequirements().isEmpty() || model.getRequirements().isEmpty()) {
+                        continue;
+                    }
+                    techsSummed.add(tech);
+                    summary.append(model.getRepresentation(false)).append("\n");
+                }
+            }
+        }
+        if (!techsSummed.isEmpty()) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary.toString());
+        }
     }
 
     @ButtonHandler("yinCommanderStep1_")

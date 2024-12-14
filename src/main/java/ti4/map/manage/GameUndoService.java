@@ -1,6 +1,5 @@
 package ti4.map.manage;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -11,8 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import lombok.experimental.UtilityClass;
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.StringUtils;
+
+import lombok.experimental.UtilityClass;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -99,6 +101,7 @@ class GameUndoService {
                 BotLogger.log("Game file for " + gameName + " doesn't exist!");
                 return null;
             }
+            generateSavedButtons(game);
 
             replaceGameFileWithUndo(gameName, undoIndex, currentGameFile.toPath());
             Game loadedGame = GameLoadService.load(gameName);

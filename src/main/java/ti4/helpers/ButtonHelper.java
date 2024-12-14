@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +15,11 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
@@ -33,10 +40,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands2.commandcounter.RemoveCommandCounterService;
@@ -94,8 +97,6 @@ import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelper {
 
@@ -807,7 +808,6 @@ public class ButtonHelper {
         }
         String activePlayerident = player.getRepresentation();
         MessageChannel channel = game.getActionsChannel();
-        System.out.println("beep");
         Player ghostPlayer = Helper.getPlayerFromUnit(game, "ghost_mech");
         if (!game.isFowMode() && ghostPlayer != null && ghostPlayer != player
             && getNumberOfUnitsOnTheBoard(game, ghostPlayer, "mech", false) > 0
@@ -2663,7 +2663,7 @@ public class ButtonHelper {
             buttons.add(Buttons.red("deleteButtons",
                 "Dismiss These Buttons"));
 
-            FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
+            FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition(), player).createFileUpload();
             MessageHelper.sendFileToChannelWithButtonsAfter(player.getCorrectChannel(), systemWithContext, message, buttons);
 
         }
@@ -3108,7 +3108,7 @@ public class ButtonHelper {
                 if (t != null && !CommandCounterHelper.hasCC(event, player.getColor(), t)
                     && (!game.isNaaluAgent() || !t.isHomeSystem())) {
                     Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                        t.getRepresentationForButtons(game, player));
+                        t.getRepresentationForButtons(game, player), t.getTileEmoji(player));
                     ringButtons.add(corners);
                 }
             }
@@ -3131,7 +3131,7 @@ public class ButtonHelper {
                             && (!game.isNaaluAgent() || !tile.isHomeSystem()
                                 || "17".equalsIgnoreCase(tile.getTileID()))) {
                             Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                                tile.getRepresentationForButtons(game, player));
+                                tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player));
                             ringButtons.add(corners);
                         }
                     }
@@ -3142,7 +3142,7 @@ public class ButtonHelper {
                         && (!game.isNaaluAgent() || !tile.isHomeSystem()
                             || "17".equalsIgnoreCase(tile.getTileID()))) {
                         Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                            tile.getRepresentationForButtons(game, player));
+                            tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player));
                         ringButtons.add(corners);
                     }
                 } else {
@@ -3156,7 +3156,7 @@ public class ButtonHelper {
                             && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
                             && (!game.isNaaluAgent() || !tile.isHomeSystem())) {
                             Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                                tile.getRepresentationForButtons(game, player));
+                                tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player));
                             ringButtons.add(corners);
                         }
                     }
@@ -3173,7 +3173,7 @@ public class ButtonHelper {
                             && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
                             && (!game.isNaaluAgent() || !tile.isHomeSystem())) {
                             Button corners = Buttons.green(finChecker + "ringTile_" + pos,
-                                tile.getRepresentationForButtons(game, player));
+                                tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player));
                             ringButtons.add(corners);
                         }
                     }
@@ -3744,8 +3744,7 @@ public class ButtonHelper {
                 && (!CommandCounterHelper.hasCC(event, player.getColor(), tileEntry.getValue())
                     || nomadHeroAndDomOrbCheck(player, game))) {
                 Tile tile = tileEntry.getValue();
-                Button validTile = Buttons.green(finChecker + "tacticalMoveFrom_" + tileEntry.getKey(), tile.getRepresentationForButtons(game, player));
-                buttons.add(validTile);
+                buttons.add(Buttons.green(finChecker + "tacticalMoveFrom_" + tileEntry.getKey(), tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player)));
             }
         }
 
@@ -5987,8 +5986,7 @@ public class ButtonHelper {
 
     private static void acquireATechWithResources(Player player, Game game, ButtonInteractionEvent event, boolean sc) {
         acquireATech(player, game, event, sc,
-            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT)
-        );
+            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT));
     }
 
     @ButtonHandler("acquireAUnitTechWithInf")
@@ -5998,8 +5996,7 @@ public class ButtonHelper {
 
     private static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc) {
         acquireATech(player, game, event, sc,
-            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT)
-        );
+            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT));
     }
 
     private static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc, final Set<String> techTypes) {
@@ -6032,6 +6029,7 @@ public class ButtonHelper {
         }
 
         ButtonHelperCommanders.yinCommanderSummary(player, game);
+        ButtonHelperCommanders.veldyrCommanderSummary(player, game);
         String message = player.getRepresentation() + " What type of tech would you want?";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
@@ -6056,16 +6054,16 @@ public class ButtonHelper {
 
     public static void sendMessageToRightStratThread(Player player, Game game, String message, String stratName, @Nullable List<Button> buttons) {
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
-        String threadName = game.getName() + "-round-" + game.getRound() + "-" + stratName;
+        String threadName = game.getName() + "-round-" + game.getRound() + "-" + stratName.toLowerCase();
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
                 if (!threadChannel_.getMembers().contains(game.getGuild().getMemberById(player.getUserID()))) {
                     continue;
                 }
             }
-            if ((threadChannel_.getName().startsWith(threadName)
-                || threadChannel_.getName().equals(threadName + "WinnuHero"))
-                && (!"technology".equalsIgnoreCase(stratName) || !game.isComponentAction())) {
+            if ((threadChannel_.getName().toLowerCase().startsWith(threadName.toLowerCase())
+                || threadChannel_.getName().toLowerCase().equals(threadName.toLowerCase() + "WinnuHero".toLowerCase()))
+                && (!"technology".equalsIgnoreCase(stratName.toLowerCase()) || !game.isComponentAction())) {
                 MessageHelper.sendMessageToChannelWithButtons(threadChannel_, message, buttons);
                 return;
             }
@@ -6114,6 +6112,7 @@ public class ButtonHelper {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "mech " + planet);
         deleteMessage(event);
         sendMessageToRightStratThread(player, game, msg1, warfareOrNot);
+        CommanderUnlockCheckService.checkPlayer(player, "naaz");
     }
 
     public static String resolveACDraw(Player p2, Game game, GenericInteractionCreateEvent event) {

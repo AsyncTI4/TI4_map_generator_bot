@@ -2206,18 +2206,24 @@ public class Helper {
         if (player.getTotalVictoryPoints() >= game.getVp()) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("gameEnd", "End Game"));
-            buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
+            if (!game.isFowMode()) {
+                buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
+            }
             buttons.add(Buttons.red("deleteButtons", "Mistake, delete these"));
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
                 "# " + game.getPing() + " it appears as though " + player.getRepresentationNoPing()
                     + " has won the game!\nPress the **End Game** button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
                 buttons);
             if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## Note about FoW\n"
+                    + "When you press **End Game** all the game channels will be deleted immediately!\n"
+                    + "A new thread will be generated under the **#fow-war-stories** channel.\n"
+                    + "Round Summaries will be shared there. So it is adviced to hold end-of-game chat until then.");
                 List<Button> titleButton = new ArrayList<>();
                 titleButton.add(Buttons.blue("offerToGiveTitles", "Offer to bestow a Title"));
                 titleButton.add(Buttons.gray("deleteButtons", "No titles for this game"));
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
-                    "Offer everyone a chance to bestow a title. This is totally optional.\n"
+                    "### Offer everyone a chance to bestow a title. This is totally optional.\n"
                         + "Press **End Game** only after done giving titles.",
                     titleButton);
             }

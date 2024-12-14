@@ -1,6 +1,6 @@
 package ti4.map;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,11 +12,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CalendarHelper;
@@ -32,6 +34,7 @@ import ti4.message.BotLogger;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
+import ti4.service.emoji.TI4Emoji;
 
 public class Tile {
     private final String tileID;
@@ -284,11 +287,17 @@ public class Tile {
         Boolean hasFog = fog.get(player);
 
         Game game = player.getGame();
+        if (!game.isFowMode()) {
+            return false;
+        }
         if (game.isLightFogMode() && player.getFogTiles().containsKey(getPosition())) {
             return false;
         }
         // default all tiles to being foggy to prevent unintended info leaks
-        return hasFog == null || hasFog;
+        if (hasFog == null) {
+            return true;
+        }
+        return hasFog;
     }
 
     public void setTileFog(@NotNull Player player, Boolean fog_) {
@@ -653,5 +662,15 @@ public class Tile {
     public String getHexTileSummary() {
         // TILE +-X +-Y SPACE ; PLANET1 ; PLANET2 ;
         return getTileID() + AliasHandler.resolveTTPGPosition(getPosition());
+    }
+
+    @JsonIgnore
+    public TI4Emoji getTileEmoji(Player player) {
+        if (hasFog(player)) {
+            return TI4Emoji.getRandomGoodDog();
+        } else {
+            return getTileModel().getEmoji();
+        }
+
     }
 }

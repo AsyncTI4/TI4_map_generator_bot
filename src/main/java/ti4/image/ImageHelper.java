@@ -139,12 +139,13 @@ public class ImageHelper {
 
     public static String writeWebpOrDefaultTo(BufferedImage image, ByteArrayOutputStream out, String defaultFormat, float compressionForDefault) throws IOException {
         // max webp dimensions are 16383 x 16383
-        if (image.getHeight() > 16383 || image.getWidth() > 16383) {
-            writeCompressedFormat(image, out, defaultFormat, compressionForDefault);
-            return defaultFormat;
-        }
-        ImageIO.write(image, "webp", out);
-        return "webp";
+        // if (image.getHeight() > 16383 || image.getWidth() > 16383) {
+        // TODO: Disabling WEBP until we find a new library. Old one was segfaulting in native code.
+        writeCompressedFormat(image, out, defaultFormat, compressionForDefault);
+        return defaultFormat;
+        //}
+        //ImageIO.write(image, "webp", out);
+        //return "webp";
     }
 
     public static String writeWebpOrDefaultTo(BufferedImage image, ByteArrayOutputStream out, String defaultFormat) throws IOException {
