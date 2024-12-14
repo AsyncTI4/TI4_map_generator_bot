@@ -2902,9 +2902,8 @@ public class Player {
     public MessageChannel getCorrectChannel() {
         if (getGame().isFowMode()) {
             return getPrivateChannel();
-        } else {
-            return getGame().getMainGameChannel();
         }
+        return getGame().getMainGameChannel();
     }
 
     public String bannerName() {

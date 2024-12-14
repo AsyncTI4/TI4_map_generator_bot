@@ -1,12 +1,12 @@
 package ti4.model.metadata;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 import ti4.json.PersistenceManager;
 import ti4.message.BotLogger;
 
@@ -23,9 +23,9 @@ public class AutoPingMetadataManager {
 
         AutoPing autoPing = autoPings.gameNameToAutoPing.get(gameName);
         if (autoPing == null) {
-            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(Instant.now(), 1));
+            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), 1));
         } else {
-            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(Instant.now(), autoPing.pingCount + 1));
+            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount + 1));
         }
 
         persistFile(autoPings);
@@ -42,13 +42,20 @@ public class AutoPingMetadataManager {
         persistFile(autoPings);
     }
 
-    public static AutoPing getLatestAutoPing(String gameName) {
+    @NotNull
+    public static synchronized AutoPing getLatestAutoPing(String gameName) {
         AutoPings autoPings = readFile();
         if (autoPings == null) {
-            return null;
+            autoPings = new AutoPings(new HashMap<>());
         }
 
-        return autoPings.gameNameToAutoPing.get(gameName);
+        AutoPing autoPing = autoPings.gameNameToAutoPing.get(gameName);
+        if (autoPing == null) {
+            autoPing = new AutoPing(System.currentTimeMillis(), 1);
+            autoPings.gameNameToAutoPing.put(gameName, autoPing);
+            persistFile(autoPings);
+        }
+        return autoPing;
     }
 
     private static AutoPings readFile() {
@@ -71,5 +78,5 @@ public class AutoPingMetadataManager {
 
     private record AutoPings(Map<String, AutoPing> gameNameToAutoPing) {}
 
-    public record AutoPing(Instant lastPingTime, int pingCount) {}
+    public record AutoPing(long lastPingTimeEpochMilliseconds, int pingCount) {}
 }

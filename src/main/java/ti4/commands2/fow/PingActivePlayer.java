@@ -31,7 +31,8 @@ class PingActivePlayer extends GameStateSubcommand {
         Player playerThatRanCommand = getPlayer();
         boolean samePlayer = playerThatRanCommand.getUserID().equalsIgnoreCase(player.getUserID());
 
-        long milliSinceLastPing = getMilliSinceLastPing(game.getName());
+        long latestAutoPingMilliseconds = AutoPingMetadataManager.getLatestAutoPing(game.getName()).lastPingTimeEpochMilliseconds();
+        long milliSinceLastPing = System.currentTimeMillis() - latestAutoPingMilliseconds;
         if (milliSinceLastPing < (1000 * 60 * 60 * 8) && !samePlayer) { //eight hours
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently. Try again later.");
         } else {
@@ -44,13 +45,5 @@ class PingActivePlayer extends GameStateSubcommand {
             }
             AutoPingMetadataManager.addPing(game.getName());
         }
-    }
-
-    private long getMilliSinceLastPing(String gameName) {
-        AutoPingMetadataManager.AutoPing latestAutoPing = AutoPingMetadataManager.getLatestAutoPing(gameName);
-        if (latestAutoPing == null) {
-            return Long.MAX_VALUE;
-        }
-        return System.currentTimeMillis() - latestAutoPing.lastPingTime().toEpochMilli();
     }
 }
