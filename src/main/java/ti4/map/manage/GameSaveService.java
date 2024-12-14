@@ -145,12 +145,6 @@ class GameSaveService {
         writer.write(Constants.ACTIVE_SYSTEM + " " + game.getActiveSystem());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.LAST_ACTIVE_PLAYER_PING + " " + game.getLastActivePlayerPing().getTime());
-        writer.write(System.lineSeparator());
-
-        writer.write(Constants.LAST_TIME_GAMES_CHECKED + " " + game.getLastTimeGamesChecked().getTime());
-        writer.write(System.lineSeparator());
-
         writer.write(Constants.AUTO_PING + " " + game.getAutoPingSpacer());
         writer.write(System.lineSeparator());
 

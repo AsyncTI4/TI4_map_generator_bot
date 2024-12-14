@@ -1,7 +1,6 @@
 package ti4.cron;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -16,6 +15,7 @@ import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.settings.users.UserSettingsManager;
 
 import static java.util.function.Predicate.not;
@@ -26,17 +26,28 @@ public class AutoPingCron {
     private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
     private static final long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
+    private static final int PING_NUMBER_TO_GIVE_UP_ON = 50;
 
     public static void register() {
         CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 5, 10, TimeUnit.MINUTES);
     }
 
     private static void autoPingGames() {
+        removeEndedGamesFromAutoPingMetadata();
+
         GameManager.getManagedGames().stream()
             .filter(not(ManagedGame::isHasEnded))
             .map(ManagedGame::getGame)
             .filter(game -> game.getAutoPingStatus() && !game.isTemporaryPingDisable())
             .forEach(AutoPingCron::autoPingGame);
+    }
+
+    private static void removeEndedGamesFromAutoPingMetadata() {
+        List<String> endedGames = GameManager.getManagedGames().stream()
+            .filter(ManagedGame::isHasEnded)
+            .map(ManagedGame::getName)
+            .toList();
+        AutoPingMetadataManager.remove(endedGames);
     }
 
     private static void autoPingGame(Game game) {
@@ -60,9 +71,9 @@ public class AutoPingCron {
         if (spacer == 0) {
             return;
         }
-        long milliSinceLastPing = System.currentTimeMillis() - game.getLastActivePlayerPing().getTime();
+        long milliSinceLastPing = getMilliSinceLastPing(game.getName());
         if (milliSinceLastPing <= ONE_HOUR_IN_MILLISECONDS * spacer &&
-            (!player.shouldPlayerBeTenMinReminded() || milliSinceLastPing <= TEN_MINUTES_IN_MILLISECONDS)) {
+                (!player.shouldPlayerBeTenMinReminded() || milliSinceLastPing <= TEN_MINUTES_IN_MILLISECONDS)) {
             return;
         }
         String realIdentity = player.getRepresentationUnfogged();
@@ -81,18 +92,17 @@ public class AutoPingCron {
         long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange().getTime();
         int pingNumber = (int) (milliSinceLastTurnChange / (ONE_HOUR_IN_MILLISECONDS * spacer));
         pingMessage = getPingMessage(milliSinceLastTurnChange, spacer, pingMessage, realIdentity, pingNumber);
-        pingPlayer(game, player, milliSinceLastTurnChange, spacer, pingMessage, pingNumber, realIdentity);
-        player.setWhetherPlayerShouldBeTenMinReminded(false);
-        game.setLastActivePlayerPing(new Date());
-        GameManager.save(game, "Auto Ping");
+        pingPlayer(game, player, pingMessage, pingNumber, realIdentity);
+        AutoPingMetadataManager.addPing(game.getName());
     }
 
-    private static void pingPlayer(Game game, Player player, long milliSinceLastTurnChange, int spacer, String pingMessage, int pingNumber, String realIdentity) {
-        if (milliSinceLastTurnChange > (ONE_HOUR_IN_MILLISECONDS * spacer * 45) && !game.isFowMode()) {
+    private static void pingPlayer(Game game, Player player, String pingMessage, int pingNumber, String realIdentity) {
+        if (pingNumber > PING_NUMBER_TO_GIVE_UP_ON) {
+            return;
+        }
+        if (PING_NUMBER_TO_GIVE_UP_ON == pingNumber) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                game.getPing() + " the game has stalled on a player, and autoping will now stop pinging them.");
-            game.setTemporaryPingDisable(true);
-            GameManager.save(game, "Disable Auto Ping");
+                "The game has stalled on a player, and autoping will now stop pinging them.");
             return;
         }
         if (game.isFowMode()) {
@@ -117,12 +127,19 @@ public class AutoPingCron {
     }
 
     private static void agendaPhasePing(Game game) {
-        long milliSinceLastPing = System.currentTimeMillis() - game.getLastActivePlayerPing().getTime();
+        long milliSinceLastPing = getMilliSinceLastPing(game.getName());
         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS * game.getAutoPingSpacer())) {
             AgendaHelper.pingMissingPlayers(game);
-            game.setLastActivePlayerPing(new Date());
-            GameManager.save(game, "Auto Ping");
+            AutoPingMetadataManager.addPing(game.getName());
         }
+    }
+
+    private long getMilliSinceLastPing(String gameName) {
+        AutoPingMetadataManager.AutoPing latestAutoPing = AutoPingMetadataManager.getLatestAutoPing(gameName);
+        if (latestAutoPing == null) {
+            return Long.MAX_VALUE;
+        }
+        return System.currentTimeMillis() - latestAutoPing.lastPingTime().toEpochMilli();
     }
 
     private static int getPingIntervalInHours(Game game, Player player) {

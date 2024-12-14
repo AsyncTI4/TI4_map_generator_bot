@@ -3,7 +3,6 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -57,6 +56,7 @@ import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -295,8 +295,6 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageAfters);
             }
         }
-        Date newTime = new Date();
-        game.setLastActivePlayerPing(newTime);
     }
 
     public static void exhaustPlanetsForVotingVersion2(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
@@ -2713,7 +2711,7 @@ public class AgendaHelper {
         if (action) {
             whensAftersMessage.append("\nYou may play afters during this agenda.");
         }
-        game.setLastActivePlayerPing(new Date());
+        AutoPingMetadataManager.addPing(game.getName());
         List<Button> whenButtons = getWhenButtons(game);
         List<Button> afterButtons = getAfterButtons(game);
 
@@ -3101,8 +3099,7 @@ public class AgendaHelper {
         UnfiledButtonHandlers.clearAllReactions(event);
         ReactionService.addReaction(event, game, player, true, true, "Playing When", "When Played");
         List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
-        Date newTime = new Date();
-        game.setLastActivePlayerPing(newTime);
+        AutoPingMetadataManager.addPing(game.getName());
         MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", game, whenButtons, "when");
         List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
         MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, "after");

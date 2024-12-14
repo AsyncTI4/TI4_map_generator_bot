@@ -1,13 +1,12 @@
 package ti4.commands2.fow;
 
-import java.util.Date;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.metadata.AutoPingMetadataManager;
 
 class PingActivePlayer extends GameStateSubcommand {
 
@@ -28,10 +27,11 @@ class PingActivePlayer extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
             return;
         }
-        Player playerOrig = getPlayer();
-        long milliSinceLastPing = System.currentTimeMillis() - game.getLastActivePlayerPing().getTime();
-        boolean samePlayer = playerOrig.getUserID().equalsIgnoreCase(player.getUserID());
 
+        Player playerThatRanCommand = getPlayer();
+        boolean samePlayer = playerThatRanCommand.getUserID().equalsIgnoreCase(player.getUserID());
+
+        long milliSinceLastPing = getMilliSinceLastPing(game.getName());
         if (milliSinceLastPing < (1000 * 60 * 60 * 8) && !samePlayer) { //eight hours
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently. Try again later.");
         } else {
@@ -42,7 +42,15 @@ class PingActivePlayer extends GameStateSubcommand {
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);
             }
-            game.setLastActivePlayerPing(new Date());
+            AutoPingMetadataManager.addPing(game.getName());
         }
+    }
+
+    private long getMilliSinceLastPing(String gameName) {
+        AutoPingMetadataManager.AutoPing latestAutoPing = AutoPingMetadataManager.getLatestAutoPing(gameName);
+        if (latestAutoPing == null) {
+            return Long.MAX_VALUE;
+        }
+        return System.currentTimeMillis() - latestAutoPing.lastPingTime().toEpochMilli();
     }
 }
