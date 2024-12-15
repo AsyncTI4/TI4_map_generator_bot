@@ -25,18 +25,21 @@ public class GameUndoNameService {
 
     private static final Pattern lastestCommandPattern = Pattern.compile("^(?>latest_command ).*$");
     private static final Pattern lastModifiedPattern = Pattern.compile("^(?>last_modified_date ).*$");
+    private static final Comparator<File> fileComparator = Comparator.comparingInt(file -> {
+        String number = StringUtils.substringBetween(file.getName(), "_", ".txt");
+        return StringUtils.isEmpty(number) ? 0 : Integer.parseInt(number);
+    });
 
     public static Map<String, String> getUndoNamesToCommandText(Game game, int limit) {
         Path undoPath = Storage.getGameUndoDirectory().toPath();
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(undoPath, game.getName() + "_*")) {
             return StreamSupport.stream(directoryStream.spliterator(), false)
                 .map(Path::toFile)
-                .sorted(Comparator.comparing(File::getName).reversed())
+                .sorted(fileComparator.reversed())
                 .limit(limit)
                 .collect(Collectors.toMap(
                     File::getName,
-                    GameUndoNameService::getLastModifiedDateAndLastCommandTextFromFile
-                ));
+                    GameUndoNameService::getLastModifiedDateAndLastCommandTextFromFile));
         } catch (IOException e) {
             BotLogger.log("Error listing files in directory: " + undoPath, e);
             return Collections.emptyMap();
