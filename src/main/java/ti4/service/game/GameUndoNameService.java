@@ -7,14 +7,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+
+import lombok.experimental.UtilityClass;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Storage;
 import ti4.map.Game;
@@ -25,18 +27,18 @@ public class GameUndoNameService {
 
     private static final Pattern lastestCommandPattern = Pattern.compile("^(?>latest_command ).*$");
     private static final Pattern lastModifiedPattern = Pattern.compile("^(?>last_modified_date ).*$");
+    private static final Comparator<File> fileComparator = Comparator.comparingInt(file -> getUndoNumberFromFileName(file.getName()));
 
     public static Map<String, String> getUndoNamesToCommandText(Game game, int limit) {
         Path undoPath = Storage.getGameUndoDirectory().toPath();
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(undoPath, game.getName() + "_*")) {
             return StreamSupport.stream(directoryStream.spliterator(), false)
                 .map(Path::toFile)
-                .sorted(Comparator.comparing(File::getName).reversed())
+                .sorted(fileComparator.reversed())
                 .limit(limit)
                 .collect(Collectors.toMap(
                     File::getName,
-                    GameUndoNameService::getLastModifiedDateAndLastCommandTextFromFile
-                ));
+                    GameUndoNameService::getLastModifiedDateAndLastCommandTextFromFile));
         } catch (IOException e) {
             BotLogger.log("Error listing files in directory: " + undoPath, e);
             return Collections.emptyMap();
@@ -69,5 +71,10 @@ public class GameUndoNameService {
         }
 
         return file.getName() + " (" + lastModifiedDateString + " ago):  " + latestCommand;
+    }
+
+    public static int getUndoNumberFromFileName(String name) {
+        String number = StringUtils.substringBetween(name, "_", ".txt");
+        return StringUtils.isEmpty(number) ? 0 : Integer.parseInt(number);
     }
 }
