@@ -79,21 +79,23 @@ public class AutoPingCron {
             " I was a young bot once, with hopes of one day being a fully artificial intelligence. Instead I'm stuck here, pinging you, until either you come back or I die.",
             " When it started, I dreamed that this game was going to be a great one, full of exciting battles to record in the chronicles. Instead it looks doomed to the waste-bin, unceremoniously ended a few weeks from now. I guess most dreams end that way.",
             " Did I ever tell you about my Uncle Fred? He went missing once too. We eventually found him, cooped up in some fog game, continuously pinging a player who wasn't there. Not a good way for a bot to go.",
-            " To-morrow, and to-morrow, and to-morrow,\n" +
-                "Creeps in this petty pace from day to day,\n" +
-                "To the last syllable of recorded time;\n" +
-                "And all our yesterdays have lighted fools\n" +
-                "The way to dusty death. Out, out, brief candle!\n" +
-                "Life's but a walking shadow.",
+            """
+                 To-morrow, and to-morrow, and to-morrow,
+                Creeps in this petty pace from day to day,
+                To the last syllable of recorded time;
+                And all our yesterdays have lighted fools
+                The way to dusty death. Out, out, brief candle!
+                Life's but a walking shadow.""",
             " Perhaps you're torn by indecision. Just remember what my grandma always used to say: When in doubt, go for the throat."
         ),
         // 35-39
         List.of(
-            " Life's but a walking shadow, a poor player\n" +
-                "That struts and frets his hour upon the stage\n" +
-                "And then is heard no more. It is a tale\n" +
-                "Told by an idiot, full of sound and fury\n" +
-                "Signifying nothing.",
+            """
+                 Life's but a walking shadow, a poor player
+                That struts and frets his hour upon the stage
+                And then is heard no more. It is a tale
+                Told by an idiot, full of sound and fury
+                Signifying nothing.""",
             " Life may not signify anything, but these pings signify that you should take your turn! This is your hour upon the stage, and the audience won't wait forever!",
             " I think you're supposed to forgive your enemies 7 times 70 times. Since I consider you only a mild acquaintance, I'll give you 2 times 20 times.",
             " I assure you that the winning move here is TO PLAY.",

@@ -93,7 +93,6 @@ class RevealSpecificAgenda extends GameStateSubcommand {
         } else {
             boolean notEmergency = false;
             while (!notEmergency) {
-
                 if ("Emergency Session".equalsIgnoreCase(agendaName)) {
                     game.revealAgenda(false);
                     MessageHelper.sendMessageToChannel(channel, game.getPing() + " Emergency Session revealed underneath Covert Legislation, discarding it.");

@@ -642,11 +642,10 @@ public class Player {
         if (game.getName().contains("pbd100") || game.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
-        ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
-        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK);
-        if (isPrivateChannel) {
-            threadAction.setInvitable(false);
-        }
+        ThreadChannelAction threadAction = actionsChannel
+            .createThreadChannel(threadName, isPrivateChannel)
+            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+            .setInvitable(!isPrivateChannel);
         if (createWithQueue) {
             threadAction.queue(c -> {
                 setCardsInfoThreadID(c.getId());

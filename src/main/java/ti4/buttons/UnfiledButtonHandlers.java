@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -22,7 +21,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -145,7 +143,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("requestAllFollow_")
     public static void requestAllFollow(ButtonInteractionEvent event, Game game) {
-        event.getMessage().reply(game.getPing() + " someone has requested that everyone resolve this SC before play continues. Please do so as soon as you can. The active player should not take an action until this is done").queue();
+        event.getMessage().reply(game.getPing() + " someone has requested that everyone resolve this SC before play continues." +
+            " Please do so as soon as you can. The active player should not take an action until this is done")
+            .queue();
     }
 
     @ButtonHandler("starChartsStep1_")
@@ -1498,13 +1498,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
             ButtonHelper.sendMessageToRightStratThread(player, game, editedMessage, buttonID);
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
-                MessageHistory mHistory = event.getChannel().getHistory();
-                RestAction<List<Message>> lis = mHistory.retrievePast(3);
-                Message previousM = lis.complete().get(1);
-                System.out.println(previousM.getContentRaw());
-                if (previousM.getContentRaw().contains("You have available to you")) {
-                    previousM.delete().queue();
-                }
+                event.getChannel().getHistory().retrievePast(2).queue(messageHistory -> {
+                    Message previousMessage = messageHistory.get(1);
+                    if (previousMessage.getContentRaw().contains("You have available to you")) {
+                        previousMessage.delete().queue();
+                    }
+                });
                 player.setTotalExpenses(
                     player.getTotalExpenses() + Helper.calculateCostOfProducedUnits(player, game, true));
                 String message2 = player.getRepresentationUnfogged() + " Click the names of the planets you wish to exhaust.";
