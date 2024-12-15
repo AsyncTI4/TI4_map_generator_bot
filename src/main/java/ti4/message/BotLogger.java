@@ -17,7 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.ThreadHelper;
-import ti4.selections.SelectionMenuProvider;
+import ti4.selections.SelectionMenuProcessor;
 import ti4.settings.GlobalSettings;
 
 public class BotLogger {
@@ -145,7 +145,7 @@ public class BotLogger {
                 String channelName = event.getChannel().getName();
                 String channelMention = event.getChannel().getAsMention();
 
-                String menuInfo = SelectionMenuProvider.getSelectionMenuDebugText(sEvent);
+                String menuInfo = SelectionMenuProcessor.getSelectionMenuDebugText(sEvent);
                 String logMsg = channelMention + "\n" + channelName + ". " + menuInfo + "\n" + msg;
                 if (e == null) {
                     botLogChannel.sendMessage(logMsg).queue();

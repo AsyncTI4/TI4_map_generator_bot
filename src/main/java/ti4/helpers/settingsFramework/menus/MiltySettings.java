@@ -64,6 +64,10 @@ public class MiltySettings extends SettingsMenu {
         //frankenSettings = new FrankenSettings(game, json, this);
         sliceSettings = new SliceGenerationSettings(game, json, this);
         playerSettings = new PlayerFactionSettings(game, json, this);
+
+        if (json != null && json.has("messageId")) {
+            this.setMessageId(json.get("messageId").asText(null));
+        }
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------

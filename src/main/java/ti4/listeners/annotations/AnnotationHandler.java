@@ -149,11 +149,16 @@ public class AnnotationHandler {
                 method.setAccessible(true);
                 method.invoke(null, args.toArray());
             } catch (InvocationTargetException e) {
-                BotLogger.log("Error within button handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName() + "\":", e.getCause());
+                BotLogger.log("Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName() + "\":", e.getCause());
                 for (Object arg : args) {
                     if (arg instanceof ButtonInteractionEvent buttonInteractionEvent) {
                         buttonInteractionEvent.getInteraction().getMessage()
                             .reply("The button failed. An exception has been logged for the developers.")
+                            .queue();
+                    }
+                    if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {
+                        selectInteractionEvent.getInteraction().getMessage()
+                            .reply("The selection failed. An exception has been logged for the developers.")
                             .queue();
                     }
                 }
@@ -226,7 +231,8 @@ public class AnnotationHandler {
                     for (H handler : handlers) {
                         String val = null;
                         if (handler instanceof ButtonHandler bh) val = bh.value();
-                        if (handler instanceof ModalHandler bh) val = bh.value();
+                        if (handler instanceof SelectionHandler sh) val = sh.value();
+                        if (handler instanceof ModalHandler mh) val = mh.value();
                         if (val == null) continue;
                         consumers.put(val, consumer);
                     }
@@ -237,6 +243,8 @@ public class AnnotationHandler {
         } catch (Exception e) {
             BotLogger.log(Constants.jazzPing() + " some other issue registering buttons.", e);
         }
+
+        BotLogger.logWithTimestamp("Registered " + consumers.size() + " handlers of type " + handlerClass.getName());
         return consumers;
     }
 

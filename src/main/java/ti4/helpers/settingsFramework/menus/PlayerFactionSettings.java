@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import ti4.image.Mapper;
@@ -22,6 +23,7 @@ import ti4.model.Source.ComponentSource;
 
 // This is a sub-menu
 @Getter
+@JsonIgnoreProperties({ "messageId" })
 public class PlayerFactionSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus

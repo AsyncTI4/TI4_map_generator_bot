@@ -166,6 +166,9 @@ public class Game extends GameProperties {
     private Map<String, Integer> tileDistances = new HashMap<>();
     private MiltyDraftManager miltyDraftManager;
     @Setter
+    @Getter
+    private String miltyDraftString;
+    @Setter
     private MiltySettings miltySettings;
     @Getter
     @Setter
@@ -303,11 +306,23 @@ public class Game extends GameProperties {
         return returnValue;
     }
 
+    @JsonIgnore
+    public MiltyDraftManager getMiltyDraftManagerUnsafe() {
+        return miltyDraftManager;
+    }
+
     @NotNull
     @JsonIgnore
     public MiltyDraftManager getMiltyDraftManager() {
         if (miltyDraftManager == null) {
             miltyDraftManager = new MiltyDraftManager();
+            if (StringUtils.isNotBlank(miltyDraftString)) {
+                try {
+                    miltyDraftManager.loadSuperSaveString(miltyDraftString);
+                } catch (Exception e) {
+                    miltyDraftManager = new MiltyDraftManager();
+                }
+            }
         }
         return miltyDraftManager;
     }
@@ -316,8 +331,8 @@ public class Game extends GameProperties {
         this.miltyDraftManager = miltyDraftManager;
     }
 
-    @JsonProperty("miltySettings")
     @Nullable
+    @JsonProperty("miltySettings")
     public MiltySettings getMiltySettingsUnsafe() {
         return miltySettings;
     }
@@ -329,8 +344,9 @@ public class Game extends GameProperties {
                     JsonNode json = ObjectMapperFactory.build().readTree(miltyJson);
                     miltySettings = new MiltySettings(this, json);
                 } catch (Exception e) {
-                    BotLogger.log("Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing());
-                    MessageHelper.sendMessageToChannel(getActionsChannel(), "Milty draft settings failed to load. ");
+                    BotLogger.log("Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing(), e);
+                    MessageHelper.sendMessageToChannel(getActionsChannel(), "Milty draft settings failed to load. Resetting to default.");
+                    miltySettings = new MiltySettings(this, null);
                 }
             } else {
                 miltySettings = new MiltySettings(this, null);
