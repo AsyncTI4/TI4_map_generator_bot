@@ -7,9 +7,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -21,14 +25,16 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.json.ObjectMapperFactory;
 import ti4.listeners.context.ListenerContext;
+import ti4.map.Game;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.game.GameNameService;
 
 /**
  * <h1>Jazzxhands Menu Framework</h1>
@@ -156,7 +162,7 @@ public abstract class SettingsMenu {
     public void postMessageAndButtons(GenericInteractionCreateEvent event) {
         String newSummary = menuSummaryString(null);
         List<Button> buttons = getPaginatedButtons(0);
-        MessageHelper.splitAndSentWithAction(newSummary, event.getMessageChannel(), buttons, this::setMessageID);
+        MessageHelper.splitAndSentWithAction(newSummary, event.getMessageChannel(), buttons, (message) -> this.setMessageID(message));
     }
 
     public void parseButtonInput(ButtonInteractionEvent event) {
@@ -319,7 +325,13 @@ public abstract class SettingsMenu {
         // Edit the existing message, if able
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             if (this.messageID == null) {
+                String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
+                ManagedGame managedGame = GameManager.getManagedGame(gameName);
+                Game game = managedGame.getGame();
                 this.setMessageID(buttonEvent.getMessage());
+                game.setStoredValue("MiltyIDForBansNSuch", buttonEvent.getMessage().getId());
+                game.increaseButtonPressCount();
+                GameManager.save(game, "MiltyNonsense");
             }
             buttonEvent.getHook().editOriginal(newSummary).setComponents(actionRows).queue();
         } else if (event instanceof ModalInteractionEvent modalEvent) {
@@ -327,6 +339,13 @@ public abstract class SettingsMenu {
                 modalEvent.getMessage().editMessage(newSummary).setComponents(actionRows).queue();
             }
         } else if (event instanceof StringSelectInteractionEvent selectEvent) {
+            if (this.messageID == null) {
+                String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
+                ManagedGame managedGame = GameManager.getManagedGame(gameName);
+                Game game = managedGame.getGame();
+                this.setMessageID(game.getStoredValue("MiltyIDForBansNSuch"));
+            }
+
             selectEvent.getGuildChannel()
                 .editMessageById(this.messageID, newSummary)
                 .setComponents(actionRows)
