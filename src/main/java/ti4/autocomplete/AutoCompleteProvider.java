@@ -582,10 +582,10 @@ public class AutoCompleteProvider {
                 }
 
                 List<Command.Choice> options = GameUndoNameService.getUndoNamesToCommandText(game, 25).entrySet().stream()
-                    .sorted(Map.Entry.<String, String>comparingByValue().reversed())
+                    .sorted(Map.Entry.comparingByValue(Comparator.comparing(GameUndoNameService::getUndoNumberFromFileName).reversed()))
                     .limit(25)
                     .map(entry -> new Command.Choice(StringUtils.left(entry.getValue(), 100), entry.getKey()))
-                    .collect(Collectors.toList());
+                    .toList();
                 event.replyChoices(options).queue();
             }
             case Constants.TILE_NAME, Constants.TILE_NAME_FROM, Constants.TILE_NAME_TO, Constants.HS_TILE_POSITION -> {
