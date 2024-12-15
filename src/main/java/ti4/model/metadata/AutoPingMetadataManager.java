@@ -21,7 +21,7 @@ public class AutoPingMetadataManager {
             autoPings = new AutoPings(new HashMap<>());
         }
 
-        autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), 0));
+        autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), 0, false));
 
         persistFile(autoPings);
     }
@@ -34,9 +34,9 @@ public class AutoPingMetadataManager {
 
         AutoPing autoPing = autoPings.gameNameToAutoPing.get(gameName);
         if (autoPing == null) {
-            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), 1));
+            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), 1, false));
         } else {
-            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount + 1));
+            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount + 1, false));
         }
 
         persistFile(autoPings);
@@ -53,7 +53,23 @@ public class AutoPingMetadataManager {
             return;
         }
 
-        autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount));
+        autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount, false));
+
+        persistFile(autoPings);
+    }
+
+    public static synchronized void setupQuickPing(String gameName) {
+        AutoPings autoPings = readFile();
+        if (autoPings == null) {
+            autoPings = new AutoPings(new HashMap<>());
+        }
+
+        AutoPing autoPing = autoPings.gameNameToAutoPing.get(gameName);
+        if (autoPing == null) {
+            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), 0, true));
+        } else {
+            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount + 1, true));
+        }
 
         persistFile(autoPings);
     }
@@ -99,5 +115,5 @@ public class AutoPingMetadataManager {
 
     private record AutoPings(Map<String, AutoPing> gameNameToAutoPing) {}
 
-    public record AutoPing(long lastPingTimeEpochMilliseconds, int pingCount) {}
+    public record AutoPing(long lastPingTimeEpochMilliseconds, int pingCount, boolean quickPing) {}
 }
