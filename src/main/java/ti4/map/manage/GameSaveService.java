@@ -142,7 +142,7 @@ class GameSaveService {
 
         writer.write(Constants.ACTIVE_PLAYER + " " + game.getActivePlayerID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.ACTIVE_SYSTEM + " " + game.getActiveSystem());
+        writer.write(Constants.ACTIVE_SYSTEM + " " + game.getCurrentActiveSystem());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.AUTO_PING + " " + game.getAutoPingSpacer());
