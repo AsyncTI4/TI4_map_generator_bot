@@ -76,7 +76,6 @@ public class EndTurnService {
         game.setStoredValue("lawsDisabled", "no");
         game.setStoredValue("endTurnWhenSCFinished", "");
         game.setStoredValue("fleetLogWhenSCFinished", "");
-        mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
         CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {

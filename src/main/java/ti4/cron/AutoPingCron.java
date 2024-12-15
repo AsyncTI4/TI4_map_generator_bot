@@ -1,5 +1,6 @@
 package ti4.cron;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -24,8 +25,8 @@ import static java.util.function.Predicate.not;
 @UtilityClass
 public class AutoPingCron {
 
-    private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
-    private static final long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
+    private static final long ONE_HOUR_IN_MILLISECONDS = Duration.ofHours(1).toMillis();
+    private static final long TEN_MINUTES_IN_MILLISECONDS = Duration.ofMinutes(10).toMillis();
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
     private static final int PING_NUMBER_TO_GIVE_UP_ON = 50;
     private static final List<List<String>> PING_MESSAGES = List.of(
@@ -141,7 +142,11 @@ public class AutoPingCron {
 
     private static void handleAutoPing(Game game) {
         AutoPingMetadataManager.AutoPing latestAutoPing = AutoPingMetadataManager.getLatestAutoPing(game.getName());
-        long milliSinceLastPing = getMilliSinceLastPing(latestAutoPing);
+        if (latestAutoPing == null) {
+            return;
+        }
+
+        long milliSinceLastPing = System.currentTimeMillis() - latestAutoPing.lastPingTimeEpochMilliseconds();
         if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
             agendaPhasePing(game, milliSinceLastPing);
             return;
@@ -162,11 +167,12 @@ public class AutoPingCron {
             return;
         }
 
-        if (milliSinceLastPing < ONE_HOUR_IN_MILLISECONDS * spacer && !shouldRemindPlayerAfterTenMinutes(player, pingNumber, milliSinceLastPing)) {
+        boolean quickPing = latestAutoPing.quickPing();
+        if (!hoursHavePassed(milliSinceLastPing, spacer) && !(quickPing && tenMinutesHavePassed(milliSinceLastPing))) {
             return;
         }
 
-        pingPlayer(game, player, pingNumber, milliSinceLastPing);
+        pingPlayer(game, player, pingNumber, milliSinceLastPing, quickPing);
         AutoPingMetadataManager.addPing(game.getName());
 
         String playersInCombat = game.getStoredValue("factionsInCombat");
@@ -179,18 +185,22 @@ public class AutoPingCron {
         }
     }
 
-    private static boolean shouldRemindPlayerAfterTenMinutes(Player player, int pingNumber, long milliSinceLastPing) {
-        return pingNumber == 1 && player.shouldPlayerBeTenMinReminded() && milliSinceLastPing >= TEN_MINUTES_IN_MILLISECONDS;
+    private static boolean hoursHavePassed(long milliSinceLastPing, int numberOfHours) {
+        return milliSinceLastPing >= ONE_HOUR_IN_MILLISECONDS * numberOfHours;
     }
 
-    private static void pingPlayer(Game game, Player player, int pingNumber, long milliSinceLastPing) {
+    private static boolean tenMinutesHavePassed(long milliSinceLastPing) {
+        return milliSinceLastPing >= TEN_MINUTES_IN_MILLISECONDS;
+    }
+
+    private static void pingPlayer(Game game, Player player, int pingNumber, long milliSinceLastPing, boolean quickPing) {
         if (pingNumber == PING_NUMBER_TO_GIVE_UP_ON) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 "The game has stalled on a player, and autoping will now stop pinging them.");
             return;
         }
         String realIdentity = player.getRepresentationUnfogged();
-        String pingMessage = getPingMessage(player, realIdentity, milliSinceLastPing, pingNumber);
+        String pingMessage = getPingMessage(realIdentity, milliSinceLastPing, pingNumber, quickPing);
         if (game.isFowMode()) {
             MessageHelper.sendPrivateMessageToPlayer(player, game, pingMessage);
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -212,8 +222,8 @@ public class AutoPingCron {
         }
     }
 
-    private static String getPingMessage(Player player, String playerPing, long milliSinceLastPing, int pingNumber) {
-        if (shouldRemindPlayerAfterTenMinutes(player, pingNumber, milliSinceLastPing)) {
+    private static String getPingMessage(String playerPing, long milliSinceLastPing, int pingNumber, boolean quickPing) {
+        if (quickPing && tenMinutesHavePassed(milliSinceLastPing)) {
             return playerPing + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinence.";
         }
         return getPingMessage(playerPing, pingNumber);
@@ -224,10 +234,6 @@ public class AutoPingCron {
             AgendaHelper.pingMissingPlayers(game);
             AutoPingMetadataManager.addPing(game.getName());
         }
-    }
-
-    private long getMilliSinceLastPing(AutoPingMetadataManager.AutoPing latestAutoPing) {
-        return System.currentTimeMillis() - latestAutoPing.lastPingTimeEpochMilliseconds();
     }
 
     private static int getPingIntervalInHours(Game game, Player player) {

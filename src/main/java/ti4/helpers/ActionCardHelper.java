@@ -792,7 +792,7 @@ public class ActionCardHelper {
             if (actionCardWindow.contains("After an agenda is revealed")) {
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, "after");
-                AutoPingMetadataManager.addPing(game.getName());
+                AutoPingMetadataManager.delayPing(game.getName());
 
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
@@ -808,7 +808,7 @@ public class ActionCardHelper {
 
             }
             if (actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto")) {
-                AutoPingMetadataManager.addPing(game.getName());
+                AutoPingMetadataManager.delayPing(game.getName());
                 List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", game, whenButtons, "when");
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(game);

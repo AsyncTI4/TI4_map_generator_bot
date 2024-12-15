@@ -510,7 +510,6 @@ public class ButtonHelperTacticalAction {
         game.setStoredValue("tnelisCommanderTracker", "");
         game.setStoredValue("planetsTakenThisRound", "");
         game.setStoredValue("fortuneSeekers", "");
-        player.setWhetherPlayerShouldBeTenMinReminded(false);
         game.resetCurrentMovedUnitsFrom1TacticalAction();
 
         boolean prefersDistanceBasedTacticalActions = UserSettingsManager.get(player.getUserID()).isPrefersDistanceBasedTacticalActions();

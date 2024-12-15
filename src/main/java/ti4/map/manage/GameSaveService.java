@@ -586,9 +586,6 @@ class GameSaveService {
             writer.write(Constants.READY_TO_PASS_BAG + " " + player.isReadyToPassBag());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.TEN_MIN_REMINDER + " " + player.shouldPlayerBeTenMinReminded());
-            writer.write(System.lineSeparator());
-
             writer.write(Constants.AUTO_PASS_WHENS_N_AFTERS + " " + player.doesPlayerAutoPassOnWhensAfters());
             writer.write(System.lineSeparator());
 
