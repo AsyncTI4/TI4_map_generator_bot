@@ -1,6 +1,5 @@
 package ti4.service.button;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -141,7 +140,6 @@ public class ReactionService {
                 matchingFactionReactions++;
             }
         }
-        List<String> userIds = game.getRealPlayers().stream().map(Player::getUserID).toList();
         int numberOfPlayers = game.getRealPlayers().size();
         if (matchingFactionReactions < numberOfPlayers) {
             return;
