@@ -141,7 +141,11 @@ public class AutoPingCron {
 
     private static void handleAutoPing(Game game) {
         AutoPingMetadataManager.AutoPing latestAutoPing = AutoPingMetadataManager.getLatestAutoPing(game.getName());
-        long milliSinceLastPing = getMilliSinceLastPing(latestAutoPing);
+        if (latestAutoPing == null) {
+            return;
+        }
+
+        long milliSinceLastPing = System.currentTimeMillis() - latestAutoPing.lastPingTimeEpochMilliseconds();
         if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
             agendaPhasePing(game, milliSinceLastPing);
             return;
@@ -224,10 +228,6 @@ public class AutoPingCron {
             AgendaHelper.pingMissingPlayers(game);
             AutoPingMetadataManager.addPing(game.getName());
         }
-    }
-
-    private long getMilliSinceLastPing(AutoPingMetadataManager.AutoPing latestAutoPing) {
-        return System.currentTimeMillis() - latestAutoPing.lastPingTimeEpochMilliseconds();
     }
 
     private static int getPingIntervalInHours(Game game, Player player) {
