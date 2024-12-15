@@ -54,8 +54,8 @@ public class ListSlashCommandsUsedService {
     }
 
     private static void listSlashCommandsUsed(Game game, boolean useOnlyLastMonth, Map<String, Integer> slashCommands, Map<String, Integer> actionCards,
-                                                Map<String, Integer> actionCardsPlayed, AtomicReference<String> largestGame, AtomicInteger largestAmountOfButtonsIn1Game,
-                                                AtomicInteger buttonsPressed, AtomicInteger slashCommandsUsed, AtomicInteger acsSabod) {
+        Map<String, Integer> actionCardsPlayed, AtomicReference<String> largestGame, AtomicInteger largestAmountOfButtonsIn1Game,
+        AtomicInteger buttonsPressed, AtomicInteger slashCommandsUsed, AtomicInteger acsSabod) {
         if (useOnlyLastMonth && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) > 30) {
             return;
         }
