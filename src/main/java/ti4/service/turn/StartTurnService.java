@@ -7,7 +7,6 @@ import java.util.Map;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.function.Consumers;
@@ -27,6 +26,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -40,7 +40,6 @@ import ti4.service.leader.CommanderUnlockCheckService;
 public class StartTurnService {
 
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
-        player.setWhetherPlayerShouldBeTenMinReminded(false);
         player.setInRoundTurnCount(player.getInRoundTurnCount() + 1);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         Map<String, String> maps = new HashMap<>(game.getMessagesThatICheckedForAllReacts());
@@ -337,7 +336,7 @@ public class StartTurnService {
                 startButtons.add(Buttons.gray(finChecker + "ministerOfWar", "Use Minister of War"));
             }
             if (!game.isJustPlayedComponentAC()) {
-                player.setWhetherPlayerShouldBeTenMinReminded(true);
+                AutoPingMetadataManager.setupQuickPing(game.getName());
             }
         } else {
             game.setJustPlayedComponentAC(false);

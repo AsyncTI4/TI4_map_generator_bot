@@ -938,7 +938,7 @@ public class Game extends GameProperties {
         // reset timers for ping and stats
         setActivePlayerID(player == null ? null : player.getUserID());
         setLastActivePlayerChange(newTime);
-        AutoPingMetadataManager.addPing(getName());
+        AutoPingMetadataManager.setupAutoPing(getName());
     }
 
     public void setAutoPing(boolean status) {

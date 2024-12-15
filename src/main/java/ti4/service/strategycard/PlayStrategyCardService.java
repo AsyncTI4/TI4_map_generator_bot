@@ -28,6 +28,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
+import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -149,7 +150,7 @@ public class PlayStrategyCardService {
 
         // set the action rows
         baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
-        player.setWhetherPlayerShouldBeTenMinReminded(true);
+        AutoPingMetadataManager.setupQuickPing(game.getName());
       
         sendAndHandleMessageResponse(baseMessageObject.build(), game, player, event, scToPlay, scModel, scButtons);
         

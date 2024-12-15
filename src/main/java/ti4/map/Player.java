@@ -83,7 +83,6 @@ public class Player {
     private String userName;
 
     private final Game game;
-    private boolean tenMinReminderPing;
 
     private boolean passed;
     private boolean readyToPassBag;
@@ -693,16 +692,8 @@ public class Player {
         autoPassOnWhensAfters = preference;
     }
 
-    public boolean shouldPlayerBeTenMinReminded() {
-        return tenMinReminderPing;
-    }
-
     public void setReadyToPassBag(boolean passed) {
         readyToPassBag = passed;
-    }
-
-    public void setWhetherPlayerShouldBeTenMinReminded(boolean tenMinReminderPing) {
-        this.tenMinReminderPing = tenMinReminderPing;
     }
 
     public Set<String> getAbilities() {
