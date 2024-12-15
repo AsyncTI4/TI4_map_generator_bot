@@ -146,16 +146,14 @@ public class AutoPingCron {
             agendaPhasePing(game, milliSinceLastPing);
             return;
         }
+
         Player player = game.getActivePlayer();
         if (player == null || player.isAFK()) {
             return;
         }
+
         int spacer = getPingIntervalInHours(game, player);
         if (spacer == 0) {
-            return;
-        }
-        if (milliSinceLastPing <= ONE_HOUR_IN_MILLISECONDS * spacer &&
-                (!player.shouldPlayerBeTenMinReminded() || milliSinceLastPing <= TEN_MINUTES_IN_MILLISECONDS)) {
             return;
         }
 
@@ -163,6 +161,11 @@ public class AutoPingCron {
         if (pingNumber > PING_NUMBER_TO_GIVE_UP_ON) {
             return;
         }
+
+        if (milliSinceLastPing < ONE_HOUR_IN_MILLISECONDS * spacer && !shouldRemindPlayerAfterTenMinutes(player, pingNumber, milliSinceLastPing)) {
+            return;
+        }
+
         pingPlayer(game, player, pingNumber, milliSinceLastPing);
         AutoPingMetadataManager.addPing(game.getName());
 
@@ -174,6 +177,10 @@ public class AutoPingCron {
                 }
             }
         }
+    }
+
+    private static boolean shouldRemindPlayerAfterTenMinutes(Player player, int pingNumber, long milliSinceLastPing) {
+        return pingNumber == 1 && player.shouldPlayerBeTenMinReminded() && milliSinceLastPing >= TEN_MINUTES_IN_MILLISECONDS;
     }
 
     private static void pingPlayer(Game game, Player player, int pingNumber, long milliSinceLastPing) {
@@ -195,20 +202,19 @@ public class AutoPingCron {
             return;
         }
         MessageHelper.sendMessageToChannel(gameChannel, pingMessage);
-        if (pingMessage.contains("courtesy notice")) {
+        if (pingNumber == 2) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.red("temporaryPingDisable",
-                "Disable Pings For Turn"));
+            buttons.add(Buttons.red("temporaryPingDisable", "Disable Pings For Turn"));
             buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
-            MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity
-                + " if the game is not waiting on you, you may disable the auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
+            MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity + " if the game is not waiting on you, you may disable the" +
+                    " auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
                 buttons);
         }
     }
 
     private static String getPingMessage(Player player, String playerPing, long milliSinceLastPing, int pingNumber) {
-        if (player.shouldPlayerBeTenMinReminded() && milliSinceLastPing > TEN_MINUTES_IN_MILLISECONDS) {
-            return playerPing + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinence";
+        if (shouldRemindPlayerAfterTenMinutes(player, pingNumber, milliSinceLastPing)) {
+            return playerPing + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinence.";
         }
         return getPingMessage(playerPing, pingNumber);
     }
