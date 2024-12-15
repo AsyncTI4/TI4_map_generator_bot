@@ -1,5 +1,6 @@
 package ti4.cron;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -24,8 +25,8 @@ import static java.util.function.Predicate.not;
 @UtilityClass
 public class AutoPingCron {
 
-    private static final long ONE_HOUR_IN_MILLISECONDS = 5 * 60 * 1000;
-    private static final long TEN_MINUTES_IN_MILLISECONDS = 2 * 60 * 1000;
+    private static final long ONE_HOUR_IN_MILLISECONDS = Duration.ofHours(1).toMillis();
+    private static final long TEN_MINUTES_IN_MILLISECONDS = Duration.ofMinutes(10).toMillis();
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
     private static final int PING_NUMBER_TO_GIVE_UP_ON = 50;
     private static final List<List<String>> PING_MESSAGES = List.of(
@@ -110,7 +111,7 @@ public class AutoPingCron {
     );
 
     public static void register() {
-        CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 1, 1, TimeUnit.MINUTES);
+        CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 5, 10, TimeUnit.MINUTES);
     }
 
     private static void autoPingGames() {
