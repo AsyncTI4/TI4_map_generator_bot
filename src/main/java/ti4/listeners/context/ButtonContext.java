@@ -1,9 +1,13 @@
 package ti4.listeners.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
+import ti4.map.Game;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 
 @Getter
 public class ButtonContext extends ListenerContext {
@@ -62,6 +66,14 @@ public class ButtonContext extends ListenerContext {
         if (game != null) {
             ButtonHelper.saveButtons(getEvent(), game, player);
         }
-        super.save();
+        if (componentID.contains("jmf")) {
+            ManagedGame managedGame = GameManager.getManagedGame(game.getName());
+            Game game2 = managedGame.getGame();
+            if (game2.getButtonPressCount() != game.getButtonPressCount()) {
+                super.save();
+            }
+        } else {
+            super.save();
+        }
     }
 }
