@@ -482,22 +482,23 @@ class GameSaveService {
         writer.write(Constants.GAME_TAGS + " " + String.join(",", game.getTags()));
         writer.write(System.lineSeparator());
 
-        if (game.getRound() == 1 && !game.isHasEnded()) {
-            MiltyDraftManager manager = game.getMiltyDraftManager();
-            if (!manager.isFinished()) {
-                writer.write(Constants.MILTY_DRAFT_MANAGER + " " + manager.superSaveMessage());
-                writer.write(System.lineSeparator());
+        MiltyDraftManager manager = game.getMiltyDraftManagerUnsafe();
+        if (manager != null) {
+            writer.write(Constants.MILTY_DRAFT_MANAGER + " " + manager.superSaveMessage());
+            writer.write(System.lineSeparator());
+        } else {
+            writer.write(Constants.MILTY_DRAFT_MANAGER + " " + game.getMiltyDraftString());
+            writer.write(System.lineSeparator());
+        }
 
-                MiltySettings miltySettings = game.getMiltySettingsUnsafe();
-                if (miltySettings != null) {
-                    writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + miltySettings.json());
-                    writer.write(System.lineSeparator());
-                } else if (game.getMiltyJson() != null) {
-                    // default to the already stored value, if we failed to read it previously
-                    writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + game.getMiltyJson());
-                    writer.write(System.lineSeparator());
-                }
-            }
+        MiltySettings miltySettings = game.getMiltySettingsUnsafe();
+        if (miltySettings != null) {
+            writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + miltySettings.json());
+            writer.write(System.lineSeparator());
+        } else if (game.getMiltyJson() != null) {
+            // default to the already stored value, if we failed to read it previously
+            writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + game.getMiltyJson());
+            writer.write(System.lineSeparator());
         }
 
         writer.write(Constants.STRATEGY_CARD_SET + " " + game.getScSetID());
