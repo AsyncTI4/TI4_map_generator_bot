@@ -461,6 +461,10 @@ public class Game extends GameProperties {
         return super.getActiveSystem();
     }
 
+    public String getCurrentActiveSystem() {
+        return super.getActiveSystem();
+    }
+
     public Map<String, String> getFowOptions() {
         return fowOptions;
     }
