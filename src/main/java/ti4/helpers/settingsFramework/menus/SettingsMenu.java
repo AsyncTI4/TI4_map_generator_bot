@@ -7,13 +7,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.function.Consumers;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -25,6 +21,8 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.json.ObjectMapperFactory;
@@ -162,7 +160,7 @@ public abstract class SettingsMenu {
     public void postMessageAndButtons(GenericInteractionCreateEvent event) {
         String newSummary = menuSummaryString(null);
         List<Button> buttons = getPaginatedButtons(0);
-        MessageHelper.splitAndSentWithAction(newSummary, event.getMessageChannel(), buttons, (message) -> this.setMessageID(message));
+        MessageHelper.splitAndSentWithAction(newSummary, event.getMessageChannel(), buttons, this::setMessageID);
     }
 
     public void parseButtonInput(ButtonInteractionEvent event) {
