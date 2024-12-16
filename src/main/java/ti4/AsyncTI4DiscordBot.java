@@ -57,7 +57,6 @@ import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.migration.DataMigrationManager;
-import ti4.processors.ButtonProcessor;
 import ti4.selections.SelectionManager;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
@@ -220,7 +219,6 @@ public class AsyncTI4DiscordBot {
         ImageIO.setUseCache(false);
         MapRenderPipeline.start();
         StatisticsPipeline.start();
-        ButtonProcessor.start();
 
         // START CRONS
         AutoPingCron.register();
@@ -252,11 +250,6 @@ public class AsyncTI4DiscordBot {
                     BotLogger.logWithTimestamp("FINISHED PROCESSING ASYNC THREADPOOL");
                 } else {
                     BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
-                }
-                if (ButtonProcessor.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.logWithTimestamp("FINISHED PROCESSING BUTTONS");
-                } else {
-                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING BUTTONS");
                 }
                 if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.logWithTimestamp("FINISHED RENDERING MAPS");

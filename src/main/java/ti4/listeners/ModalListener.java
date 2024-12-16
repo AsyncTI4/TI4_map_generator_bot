@@ -57,8 +57,13 @@ public class ModalListener extends ListenerAdapter {
     }
 
     private void handleModal(@Nonnull ModalInteractionEvent event, @Nonnull ModalContext context) {
-        resolveModalInteractionEvent(context);
-        context.save();
+        try {
+            resolveModalInteractionEvent(context);
+            context.save();
+        } catch (Exception e) {
+            String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
+            BotLogger.log(message, e);
+        }
     }
 
     private boolean handleKnownModals(ModalContext context) {

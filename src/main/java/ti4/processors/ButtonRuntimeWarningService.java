@@ -24,7 +24,7 @@ class ButtonRuntimeWarningService {
     @Getter
     private double averagePreprocessingTime;
 
-    void submitNewRuntime(ButtonInteractionEvent event, long startTime, long endTime, long contextTime, long resolveTime, long saveTime) {
+    void submitNewRuntime(ButtonInteractionEvent event, long startTime, long endTime, long contextRuntime, long resolveRuntime, long saveRuntime) {
         totalRuntimeSubmissionCount++;
         long processingTime = endTime - startTime;
         averageProcessingTime = ((averageProcessingTime * (totalRuntimeSubmissionCount - 1)) + processingTime) / totalRuntimeSubmissionCount;
@@ -47,7 +47,7 @@ class ButtonRuntimeWarningService {
                     DateTimeHelper.getTimestampFromMillisecondsEpoch(eventStartTime) + " button was pressed by user\n> " +
                     DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
                     DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventStartTime ? "😲" : "");
-                message += "\nContext time: " + (contextTime - startTime) + "ms\nResolve time: " + (resolveTime - contextTime) + "ms\nSave time: " + (saveTime - resolveTime) + "ms";
+                message += "\nContext time: " + contextRuntime + "ms\nResolve time: " + resolveRuntime + "ms\nSave time: " + saveRuntime + "ms";
                 BotLogger.log(message);
                 if (++runtimeWarningCount > 20) {
                     pauseWarningsUntil = now.plusMinutes(5);
