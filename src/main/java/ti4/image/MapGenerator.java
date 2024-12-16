@@ -126,7 +126,6 @@ public class MapGenerator implements AutoCloseable {
     private final int width;
     private final int height;
     private final int heightForGameInfo;
-    private final boolean extraRow;
     private final boolean allEyesOnMe;
 
     private final List<WebsiteOverlay> websiteOverlays = new ArrayList<>();
@@ -175,10 +174,6 @@ public class MapGenerator implements AutoCloseable {
 
         int mapHeight = getMapHeight(game);
         mapWidth = getMapWidth(game);
-        extraRow = (mapHeight - EXTRA_Y) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
-        if (extraRow) {
-            mapWidth += EXTRA_X;
-        }
         switch (this.displayType) {
             case stats:
                 heightForGameInfo = 40;
@@ -4084,18 +4079,40 @@ public class MapGenerator implements AutoCloseable {
         int x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
         int maxY = y;
 
-        List<Objective> objectives = Objective.retrieve(game);
+        // Objective 1
+        List<Objective> objectives = Objective.retrievePublic1(game);
         int maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
         int boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenWidth);
-        Objective.Type lastType = Objective.Type.Stage1;
 
         for (Objective objective : objectives) {
-            if (objective.type() != lastType) {
-                x += boxWidth + SPACING_BETWEEN_OBJECTIVE_TYPES;
-                maxY = Math.max(y, maxY);
-                y = top;
-                lastType = objective.type();
-            }
+            ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenWidth);
+            box.Display(game, graphics, this, objective);
+            y += ObjectiveBox.getVerticalSpacing();
+        }
+
+        // Objective 2
+        x += boxWidth + SPACING_BETWEEN_OBJECTIVE_TYPES;
+        maxY = Math.max(y, maxY);
+        y = top;
+
+        objectives = Objective.retrievePublic2(game);
+        maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
+        boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenWidth);
+        for (Objective objective : objectives) {
+            ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenWidth);
+            box.Display(game, graphics, this, objective);
+            y += ObjectiveBox.getVerticalSpacing();
+        }
+
+        // Custom
+        x += boxWidth + SPACING_BETWEEN_OBJECTIVE_TYPES;
+        maxY = Math.max(y, maxY);
+        y = top;
+
+        objectives = Objective.retrieveCustom(game);
+        maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
+        boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenWidth);
+        for (Objective objective : objectives) {
             ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenWidth);
             box.Display(game, graphics, this, objective);
             y += ObjectiveBox.getVerticalSpacing();
@@ -4690,7 +4707,7 @@ public class MapGenerator implements AutoCloseable {
         return game.getRealPlayers().size() + game.getDummies().size();
     }
 
-    private static boolean hasExtraRow(Game game) {
+    private static boolean hasExtraRow(Game game) { // TODO: explain why this exists
         return (getMapHeight(game) - EXTRA_Y) < (getMapPlayerCount(game) / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
     }
 
