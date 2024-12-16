@@ -26,6 +26,7 @@ public class ObjectiveBox {
 	private final int boxWidth;
 	private final int maxTextWidth;
 	private final int scoreTokenWidth;
+	private final int spaceForTokens;
 
 	ObjectiveBox(int x, int y, int boxWidth, int maxTextWidth, int scoreTokenWidth) {
 		this.x = x;
@@ -33,6 +34,7 @@ public class ObjectiveBox {
 		this.boxWidth = boxWidth;
 		this.maxTextWidth = maxTextWidth;
 		this.scoreTokenWidth = scoreTokenWidth;
+		this.spaceForTokens = boxWidth - (maxTextWidth + bufferBetweenTextAndTokens * 2);
 	}
 
 	public void Display(Game game, Graphics graphics, MapGenerator generator, Objective objective) {
@@ -69,7 +71,7 @@ public class ObjectiveBox {
 	}
 
 	private static Integer getMaxLengthOfTokens(Game game, Integer maxTextWidth, Integer scoreTokenWidth) {
-		return maxTextWidth + (bufferBetweenTextAndTokens * 2) + (game.getPlayers().size() * scoreTokenWidth);
+		return maxTextWidth + (bufferBetweenTextAndTokens * 2) + (game.getRealAndEliminatedAndDummyPlayers().size() * scoreTokenWidth);
 	}
 
 	private void displayScoreMarkers(Game game, Graphics graphics, MapGenerator generator, Objective objective) {
@@ -82,6 +84,9 @@ public class ObjectiveBox {
 			return;
 		}
 		try {
+			int minimumTokenSpacingToStayInsideBox =  spaceForTokens / game.getRealAndEliminatedAndDummyPlayers().size() + 1;
+			int controlTokenSpacing = Math.min(scoreTokenWidth, minimumTokenSpacingToStayInsideBox);
+
 			for (String playerID : playerIDs) {
 				Player player = game.getPlayer(playerID);
 				if (player == null) continue;
@@ -94,13 +99,12 @@ public class ObjectiveBox {
 				}
 
 				BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), controlTokenScale);
-
 				if (objective.isMultiScoring(game) || game.isFowMode()) {
 					DrawingUtil.drawControlToken(graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);
-					x += scoreTokenWidth;
+					x += controlTokenSpacing;
 
 				} else {
-					int xPosition = x + scoreTokenWidth * (game.getRealPlayers().indexOf(player));
+					int xPosition = x + controlTokenSpacing * (game.getRealPlayers().indexOf(player) + 1);
 					DrawingUtil.drawControlToken(graphics, controlTokenImage, player, xPosition, y, convertToGeneric, controlTokenScale);
 				}
 			}
