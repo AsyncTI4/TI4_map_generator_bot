@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
+import ti4.executors.ExecutorManager;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.manage.GameManager;
@@ -27,7 +28,7 @@ class CreateGameButtonHandler {
 
     @ButtonHandler("createGameChannels")
     public static void createGameChannelsButton(ButtonInteractionEvent event) {
-        AsyncTI4DiscordBot.runAsync("Create game channels button task", () -> createGameChannels(event));
+        ExecutorManager.runAsync("Create game channels button task", () -> createGameChannels(event));
     }
 
     private static void createGameChannels(ButtonInteractionEvent event) {
