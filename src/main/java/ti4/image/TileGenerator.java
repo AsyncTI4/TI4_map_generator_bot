@@ -67,7 +67,6 @@ public class TileGenerator {
     private final int context;
     private final String focusTile;
     private final DisplayType displayType;
-    private final boolean allEyesOnMe;
 
     public TileGenerator(@NotNull Game game, @NotNull GenericInteractionCreateEvent event, DisplayType displayType) {
         this(game, event, displayType, 0, "000", null);
@@ -85,7 +84,6 @@ public class TileGenerator {
         this.focusTile = focusTile;
         isFoWPrivate = isFowModeActive();
         this.fowPlayer = fowPlayer != null ? fowPlayer : CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
-        allEyesOnMe = displayType != null && displayType.equals(DisplayType.googly);
     }
 
     private boolean isFowModeActive() {

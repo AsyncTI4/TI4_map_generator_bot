@@ -1,17 +1,6 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -33,18 +22,17 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands2.CommandHelper;
@@ -93,6 +81,8 @@ import ti4.service.image.FileUploadService;
 import ti4.service.user.AFKService;
 import ti4.settings.GlobalSettings;
 import ti4.website.WebsiteOverlay;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class MapGenerator implements AutoCloseable {
 
@@ -3112,7 +3102,7 @@ public class MapGenerator implements AutoCloseable {
         boolean randomizeLocation = false;
         if (fow && player != fowPlayer) {
             if (FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer)) {
-                if (!FoWHelper.hasHomeSystemInView(game, player, fowPlayer)) {
+                if (!FoWHelper.hasHomeSystemInView(player, fowPlayer)) {
                     // if we can see a players stats, but we cannot see their home system - move their stats somewhere random
                     randomizeLocation = true;
                 }
@@ -3196,7 +3186,7 @@ public class MapGenerator implements AutoCloseable {
             // always build fowplayer's stat location first
             statOrder.add(fowPlayer);
             // then build the stats of players we can see home systems
-            players.stream().filter(player -> FoWHelper.hasHomeSystemInView(game, player, fowPlayer)).forEach(statOrder::add);
+            players.stream().filter(player -> FoWHelper.hasHomeSystemInView(player, fowPlayer)).forEach(statOrder::add);
             // then build the stats of everyone else
             players.stream().filter(player -> FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer)).forEach(statOrder::add);
         }
