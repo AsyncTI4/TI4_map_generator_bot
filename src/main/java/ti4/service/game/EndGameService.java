@@ -163,7 +163,7 @@ public class EndGameService {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
-        AsyncTI4DiscordBot.runAsync("EndGaveService writeChronicle task", () -> writeChronicle(game, event, publish));
+        writeChronicle(game, event, publish);
     }
 
     private static void writeChronicle(Game game, GenericInteractionCreateEvent event, boolean publish) {
