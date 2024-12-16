@@ -1,12 +1,11 @@
 package ti4.selections;
 
-import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-
 import java.util.Map;
 import java.util.function.Consumer;
 
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
-
+import ti4.executors.ExecutorManager;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.SelectionHandler;
 import ti4.listeners.context.SelectionMenuContext;
@@ -21,11 +20,21 @@ public class SelectionMenuProcessor {
         try {
             SelectionMenuContext context = new SelectionMenuContext(event);
             if (context.isValid()) {
-                resolveSelectionMenu(context);
-                context.save();
+                String gameName = context.getGame() == null ? null : context.getGame().getName();
+                ExecutorManager.runAsync("SelectionMenuProcessor task", gameName, () -> process(event, context));
             }
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with selection interaction", e);
+        }
+    }
+
+    private static void process(StringSelectInteractionEvent event, SelectionMenuContext context) {
+        try {
+            resolveSelectionMenu(context);
+            context.save();
+        } catch (Exception e) {
+            String message = "Selection Menu issue in event: " + event.getComponentId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
+            BotLogger.log(message, e);
         }
     }
 

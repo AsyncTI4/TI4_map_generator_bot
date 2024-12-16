@@ -1,7 +1,6 @@
 package ti4.listeners;
 
 import javax.annotation.Nonnull;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -14,6 +13,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
+import ti4.executors.ExecutorManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.async.RoundSummaryHelper;
@@ -45,7 +45,7 @@ public class MessageListener extends ListenerAdapter {
             return;
         }
 
-        AsyncTI4DiscordBot.runAsync("Message listener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, () -> processMessage(event, message));
+        ExecutorManager.runAsync("Message listener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, () -> processMessage(event, message));
     }
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {

@@ -35,7 +35,8 @@ public class ButtonListener extends ListenerAdapter {
                 event.deferEdit().queue();
             }
         }
-        ButtonProcessor.queue(event);
+
+        ButtonProcessor.process(event);
     }
 
     private static final List<String> buttonsToThinkAbout = List.of("showGameAgain");
