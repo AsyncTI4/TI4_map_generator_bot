@@ -159,6 +159,7 @@ public class StartPhaseService {
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg + "the second tech.", buttons);
                     p2.removeLeader("zealotshero");
                     game.setStoredValue("zealotsHeroTechs", "");
+                    game.setStoredValue("zealotsHeroPurged", "true");
                 }
             }
         }

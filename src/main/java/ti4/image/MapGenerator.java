@@ -1,6 +1,17 @@
 package ti4.image;
 
-import java.awt.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -22,17 +33,18 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands2.CommandHelper;
@@ -81,8 +93,6 @@ import ti4.service.image.FileUploadService;
 import ti4.service.user.AFKService;
 import ti4.settings.GlobalSettings;
 import ti4.website.WebsiteOverlay;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class MapGenerator implements AutoCloseable {
 
@@ -2351,6 +2361,8 @@ public class MapGenerator implements AutoCloseable {
         if (techs == null) {
             return deltaX;
         }
+        boolean zealotsHeroActive = !game.getStoredValue("zealotsHeroTechs").isEmpty();
+        List<String> zealotsTechs = Arrays.asList(game.getStoredValue("zealotsHeroTechs").split("-"));
         for (String tech : techs) {
             boolean isExhausted = exhaustedTechs.contains(tech);
             boolean isPurged = player.getPurgedTechs().contains(tech);
@@ -2360,15 +2372,22 @@ public class MapGenerator implements AutoCloseable {
 
             String techIcon = techModel.getImageFileModifier();
 
+            
             // Handle Homebrew techs with modded colours
             if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
                 techIcon = game.getStoredValue("colorChange" + tech);
             }
-
+            
             // Draw Background Colour
             if (!techIcon.isEmpty()) {
                 String techSpec = "pa_tech_techicons_" + techIcon + techStatus;
                 drawPAImage(x + deltaX, y, techSpec);
+            }
+
+            // Zealots Hero Active
+            if (zealotsHeroActive && zealotsTechs.contains(tech)) {
+                String path = "pa_tech_techicons_zealots.png";
+                drawPAImage(x + deltaX, y, path);
             }
 
             if (techModel.getSource() == ComponentSource.absol) {
@@ -2677,6 +2696,8 @@ public class MapGenerator implements AutoCloseable {
 
         // Add unit upgrade images
         if (techs != null) {
+            boolean zealotsHeroActive = !game.getStoredValue("zealotsHeroTechs").isEmpty();
+            List<String> zealotsTechs = Arrays.asList(game.getStoredValue("zealotsHeroTechs").split("-"));
             for (String tech : techs) {
                 TechnologyModel techInformation = Mapper.getTech(tech);
                 if (!techInformation.isUnitUpgrade()) {
@@ -2692,8 +2713,49 @@ public class MapGenerator implements AutoCloseable {
                 Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
+
+                if (zealotsHeroActive && zealotsTechs.contains(tech)) {
+                    String path = "pa_tech_unitsnew_zealots_" + tech + ".png";
+                    try {
+                        path = ResourceHelper.getInstance().getPAResource(path);
+                        BufferedImage img = ImageHelper.read(path);
+                        graphics.drawImage(img, deltaX + x + unitOffset.x, y + unitOffset.y, null);
+                    } catch (Exception e) {
+                        // Do Nothing
+                        BotLogger.log("Could not display active zealot tech", e);
+                    }
+                }
             }
         }
+
+        boolean zealotsHeroPurged = game.getStoredValue("zealotsHeroPurged").equals("true");
+        if (zealotsHeroPurged) {
+            for (String tech : player.getPurgedTechs()) {
+                TechnologyModel techInformation = Mapper.getTech(tech);
+                if (!techInformation.isUnitUpgrade()) {
+                    continue;
+                }
+
+                UnitModel unit = Mapper.getUnitModelByTechUpgrade(techInformation.getAlias());
+                if (unit == null) {
+                    BotLogger.log(game.getName() + " " + player.getUserName() + " Could not load unit associated with tech: " + techInformation.getAlias());
+                    continue;
+                }
+
+                Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
+                UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
+                String path = "pa_tech_unitsnew_zealotspurged_" + tech + ".png";
+                try {
+                    path = ResourceHelper.getInstance().getPAResource(path);
+                    BufferedImage img = ImageHelper.read(path);
+                    graphics.drawImage(img, deltaX + x + unitOffset.x, y + unitOffset.y, null);
+                } catch (Exception e) {
+                    // Do Nothing
+                    BotLogger.log("Could not display purged zealot tech", e);
+                }
+            }
+        }
+
         if (brokenWarSun) {
             UnitModel unit = Mapper.getUnitModelByTechUpgrade("ws");
             Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
