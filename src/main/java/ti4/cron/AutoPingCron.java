@@ -225,7 +225,7 @@ public class AutoPingCron {
     }
 
     private static String getPingMessage(String realIdentity, int pingNumber) {
-        if (pingNumber >= PING_MESSAGES.size()) {
+        if (pingNumber > PING_MESSAGES.size()) {
             return realIdentity + " Rumors of the bot running out of stamina are greatly exaggerated. The bot will win this stare-down," +
                 " it is simply a matter of time.";
         }
