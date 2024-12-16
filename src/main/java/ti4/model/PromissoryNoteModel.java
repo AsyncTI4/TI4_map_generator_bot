@@ -50,6 +50,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         pn.setFaction(this.faction);
         pn.setColor(newColor.getName());
         pn.setPlayArea(this.playArea);
+        pn.setPlayImmediately(this.playImmediately);
         pn.setAttachment(this.attachment);
         pn.setSource(this.source);
         String newText = getText().replaceAll("<color>", newColor.getName());
@@ -220,5 +221,9 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
     public String getAutoCompleteName() {
         return getName() + " (" + getFactionOrColor() + ") [" + getSource() + "]";
+    }
+
+    public boolean getPlayImmediately() {
+        return Optional.ofNullable(playImmediately).orElse(false);
     }
 }

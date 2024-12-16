@@ -1600,7 +1600,7 @@ public class MapGenerator implements AutoCloseable {
 
         for (String pnID : ownedPNs) {
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnID);
-            if (!game.isShowOwnedPNsInPlayerArea() && promissoryNote.getFaction().isEmpty()) {
+            if (!game.isShowOwnedPNsInPlayerArea() && promissoryNote.getFaction().isEmpty() && !promissoryNote.getPlayImmediately()) {
                 continue;
             }
 
@@ -1612,18 +1612,18 @@ public class MapGenerator implements AutoCloseable {
             if (game.isFrankenGame() && promissoryNote.getFaction().isPresent()) {
                 drawFactionIconImage(graphics, promissoryNote.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
             }
-            boolean greyed = false;
+            Player playerWhoHasIt = null;
             if (!game.isFowMode() && promissoryNote.getPlayArea()) {
                 found: for (Player player_ : game.getRealPlayers()) {
                     for (String pn_ : player_.getPromissoryNotesInPlayArea()) {
                         if (pn_.equals(pnID)) {
-                            greyed = true;
+                            playerWhoHasIt = player_;
                             break found;
                         }
                     }
                 }
             }
-            graphics.setColor(greyed ? Color.GRAY : Color.WHITE);
+            graphics.setColor(playerWhoHasIt != null ? Color.GRAY : Color.WHITE);
 
             if (pnID.equals("dspntnel")) { // for some reason "Plots Within Plots" gets cut off weirdly if handled normally
                 graphics.setFont(Storage.getFont16());
@@ -1636,6 +1636,7 @@ public class MapGenerator implements AutoCloseable {
                 drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName(), x + deltaX + 7, y + 144, 120);
             }
             drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, promissoryNote);
+            DrawingUtil.drawPlayerFactionIconImageOpaque(g2, playerWhoHasIt, x + deltaX - 1, y + 25, 42, 42, 0.5f);
 
             deltaX += 48;
             addedPNs = true;
@@ -2372,12 +2373,11 @@ public class MapGenerator implements AutoCloseable {
 
             String techIcon = techModel.getImageFileModifier();
 
-            
             // Handle Homebrew techs with modded colours
             if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
                 techIcon = game.getStoredValue("colorChange" + tech);
             }
-            
+
             // Draw Background Colour
             if (!techIcon.isEmpty()) {
                 String techSpec = "pa_tech_techicons_" + techIcon + techStatus;
