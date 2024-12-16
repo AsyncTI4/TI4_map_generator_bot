@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
-import ti4.helpers.DateTimeHelper;
+import ti4.executors.ExecutorManager;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.listeners.context.ModalContext;
@@ -40,32 +40,29 @@ public class ModalListener extends ListenerAdapter {
 
         event.deferEdit().queue();
 
-        AsyncTI4DiscordBot.runAsync("Modal listener task", () -> handleModal(event));
+        handleModal(event);
     }
 
     private void handleModal(@Nonnull ModalInteractionEvent event) {
-        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
-        long startTime = System.currentTimeMillis();
         try {
             ModalContext context = new ModalContext(event);
             if (context.isValid()) {
-                resolveModalInteractionEvent(context);
-                context.save();
+                String gameName = context.getGame() == null ? null : context.getGame().getName();
+                ExecutorManager.runAsync("Modal listener task", gameName, () -> handleModal(event, context));
             }
         } catch (Exception e) {
-            BotLogger.log(event, "Something went wrong with button interaction", e);
+            String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
+            BotLogger.log(message, e);
         }
+    }
 
-        long endTime = System.currentTimeMillis();
-        final int milliThreshold = 3000;
-        if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
-            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
-            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
-            String errorMessage = "Modal took over " + milliThreshold + "ms to process:\n> " +
-                DateTimeHelper.getTimestampFromMillisecondsEpoch(eventTime) + " message was sent\n> " +
-                DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime) + " `" + responseTime + "` to receive\n> " +
-                DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute";
-            BotLogger.log(errorMessage);
+    private void handleModal(@Nonnull ModalInteractionEvent event, @Nonnull ModalContext context) {
+        try {
+            resolveModalInteractionEvent(context);
+            context.save();
+        } catch (Exception e) {
+            String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
+            BotLogger.log(message, e);
         }
     }
 
