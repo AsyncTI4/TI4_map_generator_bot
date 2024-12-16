@@ -2781,7 +2781,9 @@ public class AgendaHelper {
                 for (String soID : p2.getSecretsScored().keySet()) {
                     SecretObjectiveModel so = Mapper.getSecretObjective(soID);
                     if (so != null) {
-                        summary.append("- ").append(CardEmojis.SecretObjective).append("__**").append(so.getName()).append("**__: ").append(so.getText()).append("\n");
+                        summary.append("- ");
+                        if (!game.isFowMode()) summary.append(p2.getFactionEmoji());
+                        summary.append(CardEmojis.SecretObjective).append("__**").append(so.getName()).append("**__: ").append(so.getText()).append("\n");
                     }
                 }
             }

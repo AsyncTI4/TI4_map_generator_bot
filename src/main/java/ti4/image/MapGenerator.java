@@ -2122,21 +2122,21 @@ public class MapGenerator implements AutoCloseable {
                 return planet1.compareToIgnoreCase(planet2);
             };
             realPlanets.sort(planetComparator);
+        }
 
-            for (String planet : realPlanets) {
+        for (String planet : realPlanets) {
+            deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
+        }
+        if (!nonTile.isEmpty()) {
+            deltaX += 30;
+            for (String planet : nonTile) {
                 deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
             }
-            if (!nonTile.isEmpty()) {
-                deltaX += 30;
-                for (String planet : nonTile) {
-                    deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
-                }
-            }
-            if (!fakePlanets.isEmpty()) {
-                deltaX += 30;
-                for (String planet : fakePlanets) {
-                    deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
-                }
+        }
+        if (!fakePlanets.isEmpty()) {
+            deltaX += 30;
+            for (String planet : fakePlanets) {
+                deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
             }
         }
 
@@ -2156,8 +2156,6 @@ public class MapGenerator implements AutoCloseable {
             graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
 
             String statusOfPlanet = isExhausted ? "_exh" : "_rdy";
-            String planetFileName = "pc_planetname_" + planetName + statusOfPlanet + ".png";
-
             graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
 
             // Display planet traits
