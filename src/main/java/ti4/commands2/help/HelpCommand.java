@@ -19,7 +19,8 @@ public class HelpCommand implements ParentCommand {
             new Absol(),
             new Monuments(),
             new DiscordantStars(),
-            new NewPlayerInfo()
+            new NewPlayerInfo(),
+            new HowToPlayTI4()
     ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
