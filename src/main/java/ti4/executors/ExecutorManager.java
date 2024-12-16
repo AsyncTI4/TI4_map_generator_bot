@@ -35,7 +35,7 @@ public class ExecutorManager {
     }
 
     public static void runAsync(String name, String gameName, Runnable runnable) {
-        if (GameManager.isValid(gameName)) {
+        if (!GameManager.isValid(gameName)) {
             runAsync(name, runnable);
             return;
         }
