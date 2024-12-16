@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.DisplayType;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
@@ -68,6 +69,14 @@ class GameSaveService {
             DiscordantStarsHelper.checkOlradinMech(game);
         } catch (Exception e) {
             BotLogger.log("Error adding transient attachment tokens for game " + game.getName(), e);
+        }
+
+        //Ugly fix to update seen tiles data for fog since doing it in 
+        //MapGenerator/TileGenerator won't save changes anymore
+        if (game.isFowMode()) {
+            for (Player player : game.getRealPlayers()) {
+                FoWHelper.updateFog(game, player);
+            }
         }
 
         File gameFile = Storage.getGameFile(game.getName() + Constants.TXT);
