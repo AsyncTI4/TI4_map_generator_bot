@@ -892,7 +892,7 @@ class GameLoadService {
                 case Constants.SHOW_MAP_SETUP -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setMiltyModMode(value);
+                        game.setShowMapSetup(value);
                     } catch (Exception e) {
                     }
                 }
