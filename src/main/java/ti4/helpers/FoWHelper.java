@@ -88,7 +88,7 @@ public class FoWHelper {
 			return true;
 		}
 
-		return game != null && (hasHomeSystemInView(game, player, viewingPlayer) || hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer) || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
+		return game != null && (hasHomeSystemInView(player, viewingPlayer) || hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer) || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
 	}
 
 	/**
@@ -179,8 +179,7 @@ public class FoWHelper {
 		}
 	}
 
-	public static boolean hasHomeSystemInView(@NotNull Game game, @NotNull Player player,
-		@NotNull Player viewingPlayer) {
+	public static boolean hasHomeSystemInView(@NotNull Player player, @NotNull Player viewingPlayer) {
 		Tile tile = player.getHomeSystemTile();
 		return tile != null && !tile.hasFog(viewingPlayer);
 	}
