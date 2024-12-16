@@ -35,6 +35,26 @@ public record Objective(
 		return objectives;
 	}
 
+	public static List<Objective> retrievePublic1(Game game) {
+		List<Objective> objectives = new ArrayList<>();
+		appendRevealedObjectives(game, objectives, Type.Stage1);
+		appendUnrevealedObjectives(game, objectives, Type.Stage1);
+		return objectives;
+	}
+
+	public static List<Objective> retrievePublic2(Game game) {
+		List<Objective> objectives = new ArrayList<>();
+		appendRevealedObjectives(game, objectives, Type.Stage2);
+		appendUnrevealedObjectives(game, objectives, Type.Stage2);
+		return objectives;
+	}
+
+	public static List<Objective> retrieveCustom(Game game) {
+		List<Objective> objectives = new ArrayList<>();
+		appendRevealedObjectives(game, objectives, Type.Custom);
+		return objectives;
+	}
+
 	public Integer getWorth(Game game) {
 		return switch (type) {
 			case Stage1 -> 1;

@@ -1,6 +1,17 @@
 package ti4.image;
 
-import java.awt.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -22,17 +33,18 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands2.CommandHelper;
@@ -82,8 +94,6 @@ import ti4.service.user.AFKService;
 import ti4.settings.GlobalSettings;
 import ti4.website.WebsiteOverlay;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 public class MapGenerator implements AutoCloseable {
 
     private static final int RING_MAX_COUNT = 8;
@@ -116,7 +126,6 @@ public class MapGenerator implements AutoCloseable {
     private final int width;
     private final int height;
     private final int heightForGameInfo;
-    private final boolean extraRow;
     private final boolean allEyesOnMe;
 
     private final List<WebsiteOverlay> websiteOverlays = new ArrayList<>();
@@ -165,10 +174,6 @@ public class MapGenerator implements AutoCloseable {
 
         int mapHeight = getMapHeight(game);
         mapWidth = getMapWidth(game);
-        extraRow = (mapHeight - EXTRA_Y) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
-        if (extraRow) {
-            mapWidth += EXTRA_X;
-        }
         switch (this.displayType) {
             case stats:
                 heightForGameInfo = 40;
@@ -1590,7 +1595,7 @@ public class MapGenerator implements AutoCloseable {
 
         for (String pnID : ownedPNs) {
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnID);
-            if (!game.isShowOwnedPNsInPlayerArea() && promissoryNote.getFaction().isEmpty()) {
+            if (!game.isShowOwnedPNsInPlayerArea() && promissoryNote.getFaction().isEmpty() && !promissoryNote.getPlayImmediately()) {
                 continue;
             }
 
@@ -1602,18 +1607,18 @@ public class MapGenerator implements AutoCloseable {
             if (game.isFrankenGame() && promissoryNote.getFaction().isPresent()) {
                 drawFactionIconImage(graphics, promissoryNote.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
             }
-            boolean greyed = false;
+            Player playerWhoHasIt = null;
             if (!game.isFowMode() && promissoryNote.getPlayArea()) {
                 found: for (Player player_ : game.getRealPlayers()) {
                     for (String pn_ : player_.getPromissoryNotesInPlayArea()) {
                         if (pn_.equals(pnID)) {
-                            greyed = true;
+                            playerWhoHasIt = player_;
                             break found;
                         }
                     }
                 }
             }
-            graphics.setColor(greyed ? Color.GRAY : Color.WHITE);
+            graphics.setColor(playerWhoHasIt != null ? Color.GRAY : Color.WHITE);
 
             if (pnID.equals("dspntnel")) { // for some reason "Plots Within Plots" gets cut off weirdly if handled normally
                 graphics.setFont(Storage.getFont16());
@@ -1626,6 +1631,7 @@ public class MapGenerator implements AutoCloseable {
                 drawOneOrTwoLinesOfTextVertically(graphics, promissoryNote.getShortName(), x + deltaX + 7, y + 144, 120);
             }
             drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, promissoryNote);
+            DrawingUtil.drawPlayerFactionIconImageOpaque(g2, playerWhoHasIt, x + deltaX - 1, y + 25, 42, 42, 0.5f);
 
             deltaX += 48;
             addedPNs = true;
@@ -2351,6 +2357,8 @@ public class MapGenerator implements AutoCloseable {
         if (techs == null) {
             return deltaX;
         }
+        boolean zealotsHeroActive = !game.getStoredValue("zealotsHeroTechs").isEmpty();
+        List<String> zealotsTechs = Arrays.asList(game.getStoredValue("zealotsHeroTechs").split("-"));
         for (String tech : techs) {
             boolean isExhausted = exhaustedTechs.contains(tech);
             boolean isPurged = player.getPurgedTechs().contains(tech);
@@ -2369,6 +2377,12 @@ public class MapGenerator implements AutoCloseable {
             if (!techIcon.isEmpty()) {
                 String techSpec = "pa_tech_techicons_" + techIcon + techStatus;
                 drawPAImage(x + deltaX, y, techSpec);
+            }
+
+            // Zealots Hero Active
+            if (zealotsHeroActive && zealotsTechs.contains(tech)) {
+                String path = "pa_tech_techicons_zealots.png";
+                drawPAImage(x + deltaX, y, path);
             }
 
             if (techModel.getSource() == ComponentSource.absol) {
@@ -2677,6 +2691,8 @@ public class MapGenerator implements AutoCloseable {
 
         // Add unit upgrade images
         if (techs != null) {
+            boolean zealotsHeroActive = !game.getStoredValue("zealotsHeroTechs").isEmpty();
+            List<String> zealotsTechs = Arrays.asList(game.getStoredValue("zealotsHeroTechs").split("-"));
             for (String tech : techs) {
                 TechnologyModel techInformation = Mapper.getTech(tech);
                 if (!techInformation.isUnitUpgrade()) {
@@ -2692,8 +2708,49 @@ public class MapGenerator implements AutoCloseable {
                 Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
+
+                if (zealotsHeroActive && zealotsTechs.contains(tech)) {
+                    String path = "pa_tech_unitsnew_zealots_" + tech + ".png";
+                    try {
+                        path = ResourceHelper.getInstance().getPAResource(path);
+                        BufferedImage img = ImageHelper.read(path);
+                        graphics.drawImage(img, deltaX + x + unitOffset.x, y + unitOffset.y, null);
+                    } catch (Exception e) {
+                        // Do Nothing
+                        BotLogger.log("Could not display active zealot tech", e);
+                    }
+                }
             }
         }
+
+        boolean zealotsHeroPurged = game.getStoredValue("zealotsHeroPurged").equals("true");
+        if (zealotsHeroPurged) {
+            for (String tech : player.getPurgedTechs()) {
+                TechnologyModel techInformation = Mapper.getTech(tech);
+                if (!techInformation.isUnitUpgrade()) {
+                    continue;
+                }
+
+                UnitModel unit = Mapper.getUnitModelByTechUpgrade(techInformation.getAlias());
+                if (unit == null) {
+                    BotLogger.log(game.getName() + " " + player.getUserName() + " Could not load unit associated with tech: " + techInformation.getAlias());
+                    continue;
+                }
+
+                Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
+                UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
+                String path = "pa_tech_unitsnew_zealotspurged_" + tech + ".png";
+                try {
+                    path = ResourceHelper.getInstance().getPAResource(path);
+                    BufferedImage img = ImageHelper.read(path);
+                    graphics.drawImage(img, deltaX + x + unitOffset.x, y + unitOffset.y, null);
+                } catch (Exception e) {
+                    // Do Nothing
+                    BotLogger.log("Could not display purged zealot tech", e);
+                }
+            }
+        }
+
         if (brokenWarSun) {
             UnitModel unit = Mapper.getUnitModelByTechUpgrade("ws");
             Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
@@ -4022,18 +4079,40 @@ public class MapGenerator implements AutoCloseable {
         int x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
         int maxY = y;
 
-        List<Objective> objectives = Objective.retrieve(game);
+        // Objective 1
+        List<Objective> objectives = Objective.retrievePublic1(game);
         int maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
         int boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenWidth);
-        Objective.Type lastType = Objective.Type.Stage1;
 
         for (Objective objective : objectives) {
-            if (objective.type() != lastType) {
-                x += boxWidth + SPACING_BETWEEN_OBJECTIVE_TYPES;
-                maxY = Math.max(y, maxY);
-                y = top;
-                lastType = objective.type();
-            }
+            ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenWidth);
+            box.Display(game, graphics, this, objective);
+            y += ObjectiveBox.getVerticalSpacing();
+        }
+
+        // Objective 2
+        x += boxWidth + SPACING_BETWEEN_OBJECTIVE_TYPES;
+        maxY = Math.max(y, maxY);
+        y = top;
+
+        objectives = Objective.retrievePublic2(game);
+        maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
+        boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenWidth);
+        for (Objective objective : objectives) {
+            ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenWidth);
+            box.Display(game, graphics, this, objective);
+            y += ObjectiveBox.getVerticalSpacing();
+        }
+
+        // Custom
+        x += boxWidth + SPACING_BETWEEN_OBJECTIVE_TYPES;
+        maxY = Math.max(y, maxY);
+        y = top;
+
+        objectives = Objective.retrieveCustom(game);
+        maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
+        boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenWidth);
+        for (Objective objective : objectives) {
             ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenWidth);
             box.Display(game, graphics, this, objective);
             y += ObjectiveBox.getVerticalSpacing();
@@ -4628,7 +4707,7 @@ public class MapGenerator implements AutoCloseable {
         return game.getRealPlayers().size() + game.getDummies().size();
     }
 
-    private static boolean hasExtraRow(Game game) {
+    private static boolean hasExtraRow(Game game) { // TODO: explain why this exists
         return (getMapHeight(game) - EXTRA_Y) < (getMapPlayerCount(game) / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
     }
 
