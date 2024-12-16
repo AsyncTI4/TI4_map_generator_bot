@@ -43,6 +43,9 @@ class MoveCreussWormhole extends GameStateSubcommand {
         String tokenName = event.getOption(Constants.CREUSS_TOKEN_NAME, null, OptionMapping::getAsString);
         tokenName = AliasHandler.resolveToken(tokenName);
         if (!isValidCreussWormhole(tokenName)) {
+            tokenName = "creuss" + tokenName;
+        }
+        if (!isValidCreussWormhole(tokenName)) {
             MessageHelper.sendMessageToEventChannel(event, "Token Name: " + tokenName + " is not a valid Creuss Wormhole Token.");
             return;
         }

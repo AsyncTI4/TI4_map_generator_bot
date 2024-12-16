@@ -80,6 +80,7 @@ class Info extends GameStateSubcommand {
         } else {
             sb.append("Map String: Cannot show map string for private games").append("\n");
         }
+        sb.append("Show Map Setup: `").append(game.isShowMapSetup()).append("`").append("\n");
         sb.append("Strategy Card Set: `").append(game.getScSetID()).append("`").append("\n");
         sb.append("Strategy Cards: `").append(game.getStrategyCardSet().getScIDs()).append("`").append("\n");
         sb.append("Decks: ").append("\n");

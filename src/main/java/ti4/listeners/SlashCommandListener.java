@@ -46,15 +46,17 @@ public class SlashCommandListener extends ListenerAdapter {
                 command.preExecute(event);
                 command.execute(event);
                 command.postExecute(event);
+                event.getHook().deleteOriginal().queue();
             } catch (Exception e) {
                 String messageText = "Error trying to execute command: " + command.getName();
                 String errorMessage = ExceptionUtils.getMessage(e);
                 event.getHook().editOriginal(errorMessage).queue();
                 BotLogger.log(event, messageText, e);
             }
+        } else {
+            event.getHook().deleteOriginal().queue();
         }
 
-        event.getHook().deleteOriginal().queue();
 
         long endTime = System.currentTimeMillis();
         final int milliThreshold = 2000;
