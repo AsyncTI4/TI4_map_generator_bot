@@ -48,7 +48,7 @@ public class UserJoinServerListener extends ListenerAdapter {
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
         if (!validateEvent(event)) return;
-        ExecutorManager.runAsync("Guild member remove task", () -> handleGuildMemberRemove(event));
+        handleGuildMemberRemove(event);
     }
 
     private void handleGuildMemberRemove(GuildMemberRemoveEvent event) {
