@@ -19,13 +19,13 @@ import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
-import ti4.listeners.UserJoinServerListener;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -433,7 +433,7 @@ public class StartPhaseService {
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Remember to click Ready for " + (custodiansTaken ? "Agenda" : "Strategy Phase") + " when done with homework!");
         }
-        UserJoinServerListener.checkIfCanCloseGameLaunchThread(game, false);
+        GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
     }
 
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game) {
@@ -549,6 +549,6 @@ public class StartPhaseService {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use Imperial Arbiter", buttons);
             }
         }
-        UserJoinServerListener.checkIfCanCloseGameLaunchThread(game, false);
+        GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
     }
 }

@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 class ShowMapSetup extends GameStateSubcommand {
 
     public ShowMapSetup() {
-        super("show_setup_positions", "Show the tile positions to aid in manually building the map.", false, false);
+        super("show_setup_positions", "Show the tile positions to aid in manually building the map.", true, false);
         addOption(OptionType.BOOLEAN, "show", "True = ON | False = OFF", true);
     }
 
