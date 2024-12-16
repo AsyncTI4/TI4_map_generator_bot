@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.experimental.UtilityClass;
 import ti4.helpers.TimedRunnable;
+import ti4.map.manage.GameManager;
 
 @UtilityClass
 public class ExecutorManager {
@@ -34,7 +35,7 @@ public class ExecutorManager {
     }
 
     public static void runAsync(String name, String gameName, Runnable runnable) {
-        if (gameName == null) {
+        if (GameManager.isValid(gameName)) {
             runAsync(name, runnable);
             return;
         }
