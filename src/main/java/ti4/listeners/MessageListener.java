@@ -193,7 +193,7 @@ public class MessageListener extends ListenerAdapter {
             WhisperService.sendWhisper(game, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
             message.delete().queue();
         }
-        GameManager.save(game, "Whisper between " + sender.getUserName() + " and " + receiver.getUserName());
+        GameManager.save(game, "Whisper");
         return true;
     }
 
