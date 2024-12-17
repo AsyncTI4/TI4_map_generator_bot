@@ -296,6 +296,16 @@
         "text": "At the start of an invasion: Choose 1 of your units in the active system, That unit gains PLANETARY SHIELD until the end of the invasion. At the end of the invasion, return this card to the Ul player."
     },
     {
+        "alias": "sigma_blood_pact",
+        "name": "Blood Pact",
+        "faction": "empyrean",
+        "color": "",
+        "playArea": true,
+        "source": "promises_promises",
+        "text": "ACTION: Place this card faceup in your play area. When you and the Empyrean player cast votes for or predict the same outcome of an agenda, 6 additional votes are cast for that outcome. If you activate a system that contains the Empyrean player's units, return this card to them.",
+        "homebrewReplacesID": "blood_pact"
+    },
+    {
         "alias": "sigma_night_pact",
         "name": "Night Pact",
         "faction": "empyrean",
@@ -320,7 +330,7 @@
         "color": "",
         "playArea": true,
         "source": "promises_promises",
-        "text": "ACTION: Place this card faceup in your play area. During combat against other players, you and the Empyrean player apply +1 to the result of each of your respective unit's combat rolls for each adjacent system that contains the other's units. If you activate a system that contains the Empyrean player's units, return this card to them."
+        "text": "ACTION: Place this card faceup in your play area. During the first round of combat against other players, you and the Empyrean player apply +1 to the result of each of your respective unit's combat rolls for each adjacent system that contains the other's units. If you activate a system that contains the Empyrean player's units, return this card to them."
     },
     {
         "alias": "sigma_excavation_experts",
@@ -348,7 +358,7 @@
         "playArea": true,
         "attachment": "sigma_senate_sanctuary",
         "source": "promises_promises",
-        "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player.",
+        "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 1 command token at any time to detach this card and return it to the Keleres player.",
         "shortName": "Sen. Sanct.",
         "shrinkName": false
     },
@@ -360,7 +370,7 @@
         "playArea": true,
         "attachment": "sigma_senate_sanctuary",
         "source": "promises_promises",
-        "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player.",
+        "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 1 command token at any time to detach this card and return it to the Keleres player.",
         "shortName": "Sen. Sanct.",
         "shrinkName": false
     },
@@ -372,7 +382,7 @@
         "playArea": true,
         "attachment": "sigma_senate_sanctuary",
         "source": "promises_promises",
-        "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player.",
+        "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 1 command token at any time to detach this card and return it to the Keleres player.",
         "shortName": "Sen. Sanct.",
         "shrinkName": false
     }

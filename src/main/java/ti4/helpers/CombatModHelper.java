@@ -207,7 +207,7 @@ public class CombatModHelper {
         switch (condition) {
             case Constants.MOD_OPPONENT_TEKKLAR_PLAYER_OWNER -> {
                 if (opponent != null
-                    && player.getPromissoryNotesOwned().stream().anyMatch("tekklar"::equals)) {
+                    && (player.getPromissoryNotesOwned().stream().anyMatch("tekklar"::equals) || player.getPromissoryNotesOwned().stream().anyMatch("sigma_tekklar_legion"::equals))) {
                     meetsCondition = opponent.getTempCombatModifiers().stream().anyMatch(
                         mod -> "tekklar".equals(mod.getRelatedID())
                             && mod.getRelatedType().equals(Constants.PROMISSORY_NOTES))
@@ -355,9 +355,21 @@ public class CombatModHelper {
                 }
             }
             case "naazFS" -> {
-                if (ButtonHelper.doesPlayerHaveFSHere("naaz_flagship", player,
-                    game.getTileByPosition(game.getActiveSystem()))) {
+                if (ButtonHelper.doesPlayerHaveFSHere("naaz_flagship", player, game.getTileByPosition(game.getActiveSystem()))
+                        || ButtonHelper.doesPlayerHaveFSHere("sigma_naazrokha_flagship_2", player, game.getTileByPosition(game.getActiveSystem()))) {
                     meetsCondition = true;
+                }
+            }
+            case "sigma_argent_flagship_1" ->
+            {
+                meetsCondition = ButtonHelper.doesPlayerHaveFSHere("sigma_argent_flagship_1", player, game.getTileByPosition(game.getActiveSystem()));
+            }
+            case "sigma_argent_flagship_2" ->
+            {
+                meetsCondition = ButtonHelper.doesPlayerHaveFSHere("sigma_argent_flagship_2", player, tile);
+                for (String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false))
+                {
+                    meetsCondition |= ButtonHelper.doesPlayerHaveFSHere("sigma_argent_flagship_2", player, game.getTileByPosition(adjPos));
                 }
             }
             default -> meetsCondition = true;
@@ -415,6 +427,9 @@ public class CombatModHelper {
                 }
                 case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP -> {
                     scalingCount += ButtonHelper.checkNumberNonFighterShips(opponent, activeSystem);
+                }
+                case Constants.MOD_OPPONENT_SHIP -> {
+                    scalingCount += ButtonHelper.checkNumberShips(opponent, activeSystem);
                 }
                 case "combat_round" -> {
                     int round;

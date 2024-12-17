@@ -407,6 +407,16 @@ public class CombatRollService {
                     }
                 }
             }
+            if (unitModel.getId().equalsIgnoreCase("sigma_jolnar_flagship_1") || unitModel.getId().equalsIgnoreCase("sigma_jolnar_flagship_2")) {
+                int additionalDice = hitRolls;
+                while (hitRolls < 100 && additionalDice > 0)
+                {
+                    List<DiceHelper.Die> additionalResultRolls = DiceHelper.rollDice(toHit - modifierToHit, additionalDice);
+                    additionalDice = DiceHelper.countSuccesses(additionalResultRolls);
+                    hitRolls += additionalDice;
+                    resultRolls.addAll(additionalResultRolls);
+                }
+            }
             if (rollType == CombatRollType.combatround && (player.hasAbility("valor") || opponent.hasAbility("valor")) && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
                 for (DiceHelper.Die die : resultRolls) {
                     if (die.getResult() > 9) {
@@ -638,7 +648,7 @@ public class CombatRollService {
             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         HashMap<UnitModel, Integer> output;
         if (unitHolder.getName().equals(Constants.SPACE)) {
-            if (unitsByAsyncId.containsKey("fs") && player.hasUnit("nekro_flagship")) {
+            if (unitsByAsyncId.containsKey("fs") && (player.hasUnit("nekro_flagship") || player.hasUnit("sigma_nekro_flagship_2"))) {
                 output = new HashMap<>(unitsInCombat.entrySet().stream()
                     .filter(entry -> entry.getKey() != null
                         && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()))

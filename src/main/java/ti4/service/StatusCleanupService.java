@@ -72,6 +72,20 @@ public class StatusCleanupService {
                     }
                 }
             }
+            if (player.getPromissoryNotesInPlayArea().contains("sigma_cyber"))
+            {        
+                for (String planet : game.getPlanets()) {
+                    game.getPlanetsInfo().get(planet).removeToken("attachment_sigma_cyber.png");
+                }
+                player.removePromissoryNote("sigma_cyber");
+                Player nonActivePlayer = game.getPNOwner("sigma_cyber");
+                nonActivePlayer.setPromissoryNote("sigma_cyber");
+                PromissoryNoteHelper.sendPromissoryNoteInfo(game, nonActivePlayer, false);
+                PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
+                PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get("sigma_cyber");
+                MessageHelper.sendMessageToChannel(game.getTableTalkChannel(),
+                    pnModel.getName() + " was returned");
+            }
         }
         for (int x = 0; x < 13; x++) {
             if (!game.getStoredValue("exhaustedSC" + x).isEmpty()) {
