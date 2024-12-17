@@ -241,6 +241,9 @@ public class PromissoryNoteHelper {
         if ("terraform".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerTerraformButtons(player, game, event);
         }
+        if ("sigma_cyber".equalsIgnoreCase(id)) {
+            ButtonHelperFactionSpecific.resolveSigmaLizixPN(player, game, event);
+        }
         if ("dspnrohd".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerAutomatonsButtons(player, game, event);
         }
@@ -280,6 +283,12 @@ public class PromissoryNoteHelper {
                 ButtonHelperFactionSpecific.getRaghsCallButtons(player, game,
                     game.getTileByPosition(game.getActiveSystem())));
         }
+        if ("sigma_raghs_call".equalsIgnoreCase(id)) {
+            String message = player.getRepresentationUnfogged() + " select planet to Ragh's Call on. You will need to ready the planet manually if applicable.";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
+                ButtonHelperFactionSpecific.getRaghsCallButtons(player, game,
+                    game.getTileByPosition(game.getActiveSystem())));
+        }
         if ("cavalry".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.resolveCavStep1(game, player);
         }
@@ -287,6 +296,11 @@ public class PromissoryNoteHelper {
             game.drawSecretObjective(player.getUserID());
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " drew an extra SO due to Tnelis PN. Please discard an extra SO");
+        }
+        if ("sigma_sycophancy".equalsIgnoreCase(id)) {
+            game.drawSecretObjective(player.getUserID());
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentation() + " drew an extra SO due to _Sycophancy_. Please discard an extra SO.");
         }
         if ("dspnvade".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
@@ -313,6 +327,17 @@ public class PromissoryNoteHelper {
                 game.getStoredValue("AssassinatedReps") + owner.getFaction());
         }
         if ("fires".equalsIgnoreCase(id)) {
+            player.addTech("ws");
+            CommanderUnlockCheckService.checkPlayer(player, "mirveda");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired War Sun tech");
+            String reducedMsg = owner.getRepresentationUnfogged() + ", you must spend 1 command token due to _Fires of the Gashlai_ being played.";
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannelWithButtons(owner.getPrivateChannel(), reducedMsg, ButtonHelper.getLoseCCButtons(owner));
+            } else {
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), reducedMsg, ButtonHelper.getLoseCCButtons(owner));
+            }
+        }
+        if ("sigma_fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired War Sun tech");
@@ -454,6 +479,11 @@ public class PromissoryNoteHelper {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
                     purgeFragButtons);
             }
+        }
+        if ("sigma_excavation_experts".equalsIgnoreCase(id)) {
+            List<Button> exploreButtons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                    player.getRepresentation() + ", explore each planet that contains your mechs.", exploreButtons);
         }
         if (pn.getText().toLowerCase().contains("action:") && !"acq".equalsIgnoreCase(id)) {
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);

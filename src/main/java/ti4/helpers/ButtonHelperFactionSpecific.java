@@ -683,6 +683,7 @@ public class ButtonHelperFactionSpecific {
     public static List<Button> getRaghsCallButtons(Player player, Game game, Tile tile) {
         List<Button> buttons = new ArrayList<>();
         Player saar = game.getPNOwner("ragh");
+        saar = saar == null ? game.getPNOwner("sigma_raghs_call") : saar;
         if (saar == player || tile == null) {
             return buttons;
         }
@@ -789,6 +790,7 @@ public class ButtonHelperFactionSpecific {
         PromissoryNoteHelper.resolvePNPlay("ragh", player, game, event);
         List<Button> buttons = new ArrayList<>();
         Player saar = game.getPNOwner("ragh");
+        saar = saar == null ? game.getPNOwner("sigma_raghs_call") : saar;
         for (String planet : saar.getPlanetsAllianceMode()) {
             if (!planet.equalsIgnoreCase(origPlanet)) {
                 buttons.add(Buttons.gray("raghsCallStepTwo_" + origPlanet + "_" + planet,
@@ -982,6 +984,7 @@ public class ButtonHelperFactionSpecific {
         String origPlanet = buttonID.split("_")[1];
         String newPlanet = buttonID.split("_")[2];
         Player saar = game.getPNOwner("ragh");
+        saar = saar == null ? game.getPNOwner("sigma_raghs_call") : saar;
         UnitHolder oriPlanet = ButtonHelper.getUnitHolderFromPlanetName(origPlanet, game);
         Map<UnitKey, Integer> units = new HashMap<>(oriPlanet.getUnits());
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -1626,13 +1629,13 @@ public class ButtonHelperFactionSpecific {
         }
         if (cabal == null) {
             for (Player p2 : game.getRealPlayers()) {
-                if (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile)) {
+                if (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", p2, tile)) {
                     cabal = p2;
                 }
             }
         }
         if (cabal != null && (!uH.getPlayersUnitListOnHolder(cabal).isEmpty()
-            || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))) {
+            || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", cabal, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", cabal, tile))) {
             cabalEatsUnit(player, game, cabal, amount, unit, event, false);
         }
     }
@@ -1858,6 +1861,27 @@ public class ButtonHelperFactionSpecific {
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + message, buttons);
+    }
+
+    public static void resolveSigmaLizixPN(Player player, Game game, GenericInteractionCreateEvent event) {
+        List<String> improvedPlanets = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            if (ButtonHelper.checkForTechSkips(game, planet))
+            {
+                game.getPlanetsInfo().get(planet).addToken("attachment_sigma_cyber.png");
+                improvedPlanets.add(planet);
+            }
+        }
+        if (improvedPlanets.size() == 0)
+        {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", applied _Cybernetic Enhancements_, but you have no technology specialty planets.\n"
+                + "-# If you gain some, you will need to add the attachment manually.");
+                return;
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getRepresentationUnfogged() + ", applied _Cybernetic Enhancements_, to " + String.join(", ", improvedPlanets) + ".\n"
+            + "-# If you gain some more or lose any, you will need to add or remove the attachment manually.");
     }
 
     public static void offerGledgeBaseButtons(Player player, Game game) {

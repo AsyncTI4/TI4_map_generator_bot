@@ -406,8 +406,12 @@ class AgendaResolveButtonHandler {
                             && uH.getUnitCount(Units.UnitType.Mech, cabalMechOwner.getColor()) > 0
                             && !game.getLaws().containsKey("articles_war");
                         Player cabalFSOwner = Helper.getPlayerFromUnit(game, "cabal_flagship");
-                        boolean cabalFS = cabalFSOwner != null && ButtonHelper.doesPlayerHaveFSHere("cabal_flagship",
-                            cabalFSOwner, game.getTileFromPlanet(winner));
+                        cabalFSOwner = cabalFSOwner == null ? Helper.getPlayerFromUnit(game, "sigma_vuilraith_flagship_1") : cabalFSOwner;
+                        cabalFSOwner = cabalFSOwner == null ? Helper.getPlayerFromUnit(game, "sigma_vuilraith_flagship_2") : cabalFSOwner;
+                        boolean cabalFS = cabalFSOwner != null
+                                && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabalFSOwner, game.getTileFromPlanet(winner))
+                                || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", cabalFSOwner, game.getTileFromPlanet(winner))
+                                || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", cabalFSOwner, game.getTileFromPlanet(winner)));
 
                         if (uH.getUnitCount(Units.UnitType.Mech, player.getColor()) > 0) {
                             if (player.hasTech("sar")) {
@@ -475,8 +479,12 @@ class AgendaResolveButtonHandler {
                             && uH.getUnitCount(Units.UnitType.Mech, cabalMechOwner.getColor()) > 0
                             && !game.getLaws().containsKey("articles_war");
                         Player cabalFSOwner = Helper.getPlayerFromUnit(game, "cabal_flagship");
-                        boolean cabalFS = cabalFSOwner != null && ButtonHelper.doesPlayerHaveFSHere("cabal_flagship",
-                            cabalFSOwner, game.getTileFromPlanet(winner));
+                        cabalFSOwner = cabalFSOwner == null ? Helper.getPlayerFromUnit(game, "sigma_vuilraith_flagship_1") : cabalFSOwner;
+                        cabalFSOwner = cabalFSOwner == null ? Helper.getPlayerFromUnit(game, "sigma_vuilraith_flagship_2") : cabalFSOwner;
+                        boolean cabalFS = cabalFSOwner != null
+                                && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabalFSOwner, game.getTileFromPlanet(winner))
+                                || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", cabalFSOwner, game.getTileFromPlanet(winner))
+                                || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", cabalFSOwner, game.getTileFromPlanet(winner)));
 
                         if (uH.getUnitCount(Units.UnitType.Mech, player.getColor()) > 0) {
                             if (player.hasTech("sar")) {

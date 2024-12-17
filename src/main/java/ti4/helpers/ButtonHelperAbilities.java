@@ -1061,6 +1061,9 @@ public class ButtonHelperAbilities {
         if (player.getPromissoryNotesInPlayArea().contains("pop")) {
             return false;
         }
+        if (player.getPromissoryNotesInPlayArea().contains("sigma_promise_of_protection")) {
+            return false;
+        }
         if (Helper.getPlayerFromAbility(game, "pillage") != null && !Helper
             .getPlayerFromAbility(game, "pillage").getFaction().equalsIgnoreCase(player.getFaction())) {
             Player pillager = Helper.getPlayerFromAbility(game, "pillage");
@@ -1224,7 +1227,7 @@ public class ButtonHelperAbilities {
             successMessage = "Produced 2 " + UnitEmojis.fighter + " in tile "
                 + tile.getRepresentationForButtons(game, player) + ".";
         }
-        if (player.ownsUnit("muaat_mech") && !ButtonHelper.isLawInPlay(game, "articles_war")) {
+        if ((player.ownsUnit("muaat_mech") || player.ownsUnit("sigma_muaat_mech")) && !ButtonHelper.isLawInPlay(game, "articles_war")) {
             successMessage = ButtonHelper.putInfWithMechsForStarforge(pos, successMessage, game, player, event);
         }
 

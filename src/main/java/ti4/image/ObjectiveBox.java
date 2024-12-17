@@ -84,7 +84,8 @@ public class ObjectiveBox {
 			return;
 		}
 		try {
-			int minimumTokenSpacingToStayInsideBox =  spaceForTokens / game.getRealAndEliminatedAndDummyPlayers().size() + 1;
+			int numberOfRealPlayers = game.getRealAndEliminatedAndDummyPlayers().size();
+			int minimumTokenSpacingToStayInsideBox = numberOfRealPlayers == 0 ? 1 : spaceForTokens / game.getRealAndEliminatedAndDummyPlayers().size() + 1;
 			int controlTokenSpacing = Math.min(scoreTokenWidth, minimumTokenSpacingToStayInsideBox);
 
 			for (String playerID : playerIDs) {
