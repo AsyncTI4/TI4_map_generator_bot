@@ -104,7 +104,7 @@ public class ObjectiveBox {
 					x += controlTokenSpacing;
 
 				} else {
-					int xPosition = x + controlTokenSpacing * (game.getRealPlayers().indexOf(player) + 1);
+					int xPosition = x + controlTokenSpacing * (game.getRealPlayers().indexOf(player)); //TODO: fix cabal at index 0 for pbd1000
 					DrawingUtil.drawControlToken(graphics, controlTokenImage, player, xPosition, y, convertToGeneric, controlTokenScale);
 				}
 			}
