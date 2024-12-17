@@ -509,7 +509,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Apply +1 to the result of each of your other ship's combat rolls in this system.",
-        "unlock": "UNLOCK: Produce 6 hits during 1 round of combat.",
+        "unlock": "UNLOCK: Produce 4 hits during 1 round of combat.",
         "homebrewReplacesID": "sardakk_flagship"
     },
     {
@@ -957,7 +957,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players apply -2 to the result of each dice roll when they use SPACE CANNON against your ships in this system.",
-        "unlock": "When you destroy a unit using a unit ability, place a control token on this card.\nUNLOCK: Have 8 control tokens on this card.",
+        "unlock": "When you destroy a unit using a unit ability, place a control token on this card.\nUNLOCK: Have 4 control tokens on this card.",
         "homebrewReplacesID": "argent_flagship"
     },
     {
@@ -968,15 +968,15 @@
         "source": "flagshipping",
         "faction": "Argent",
         "moveValue": 2,
-        "capacityValue": 2,
+        "capacityValue": 4,
         "cost": 8,
         "combatHitsOn": 7,
         "combatDieCount": 2,
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other players apply -2 to the result of each dice roll when they use SPACE CANNON against your ships in adjacent systems, and cannot use SPACE CANNON against your ships in this system. This ship may transport other ships when moving.",
-        "unlock": "When you destroy a unit using a unit ability, place a control token on this card.\nUNLOCK: Have 20 control tokens on this card."
+        "ability": "When using SPACE CANNON, other players apply -2 and you apply +2 to the result of each die roll against units in adjacent systems, and other players apply -3 and you apply +3 to the result of each die roll against units in this system.",
+        "unlock": "When you destroy a unit using a unit ability, place a control token on this card.\nUNLOCK: Have 12 control tokens on this card."
     },
     
     {
@@ -995,7 +995,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players must spend 2 influence to activate this system.",
-        "unlock": "UNLOCK: Give another player 4 commodities and/or trade goods when resolving a transaction.",
+        "unlock": "UNLOCK: Give another player 3 commodities and/or trade goods when resolving a transaction.",
         "homebrewReplacesID": "keleres_flagship"
     },
     {
@@ -1014,7 +1014,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players must spend 4 influence to activate this system. When they do, gain 1 command token from this system or your reinforcements.",
-        "unlock": "UNLOCK: With the Artemiris I unlocked, give another player 8 commodities and/or trade goods when resolving a transaction."
+        "unlock": "UNLOCK: With the Artemiris I unlocked, give another player 6 commodities and/or trade goods when resolving a transaction."
     },
     {
         "id": "sigma_keleresm_flagship_1",

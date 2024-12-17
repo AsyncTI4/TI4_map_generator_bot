@@ -238,6 +238,11 @@ public class TransactionHelper {
     }
 
     private static final List<String> nothingMessages = Arrays.asList(
+        "Nothing",
+        "Nothing",
+        "Nothing",
+        "Nothing",
+        "Nothing",
         "Nothing But Respect And Good Will",
         "Some Pocket Lint",
         "Sunshine and Rainbows",
@@ -254,7 +259,7 @@ public class TransactionHelper {
         "A Firm Handshake",
         "A Friendly Wave",
         "Well Wishes",
-        "A Home-cooked Meal",
+        "A Home-Cooked Meal",
         "$1000 In Monopoly Money",
         "Forgiveness For Past Mistakes",
         "A Lucky Rock",
@@ -359,14 +364,26 @@ public class TransactionHelper {
         "Just Deserts",
         "Surprise and Delight",
         "`//Could somebody get ChatGPT to generate a few more messages - Dev`",
-        "Some Free Candy, From My Windowless Van");
+        "Some Free Candy, From My Windowless Van",
+        "A Phial of Dihydrogen Monoxide",
+        "A Gizmo, a Doohickey, or Perhaps Even a Whatchamacallit",
+        "Nothing (Don't Spend It All At Once)",
+        "Industrial Quantities of Glitter",
+        "Potent Potables",
+        "A Succulent Chinese Meal?",
+        "The Cheap Plastic Imitation of the Amulet of Yendor",
+        "A Millstone",
+        "Behind Door #" + ThreadLocalRandom.current().nextInt(1, 3) + ": A Goat!",
+        "A Runcible Spoon",
+        "_Nullam Rem Natam_",
+        "A Jubba Cloak");
 
-    public static String getNothingMessage() {
+        public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
             return "The joy of sharing a one in a million empty transaction offer message";
         }
 
-        int result = ThreadLocalRandom.current().nextInt(0, nothingMessages.size() + 20);
+        int result = ThreadLocalRandom.current().nextInt(0, nothingMessages.size());
         try {
             return nothingMessages.get(result);
         } catch (Exception e) {
@@ -1071,6 +1088,7 @@ public class TransactionHelper {
         return player == player2 || !"action".equalsIgnoreCase(game.getPhaseOfGame())
             || player.hasAbility("guild_ships") || player.getPromissoryNotesInPlayArea().contains("convoys")
             || player2.getPromissoryNotesInPlayArea().contains("convoys") || player2.hasAbility("guild_ships")
+            || player.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys") || player2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
             || player2.getNeighbouringPlayers().contains(player)
             || player.getNeighbouringPlayers().contains(player2);
     }

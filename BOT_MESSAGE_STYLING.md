@@ -1,0 +1,32 @@
+# Bot Messages
+- Card names should be `_italicised_`;
+- Unit abilities should be `ALL CAPS`;
+- Strategy cards and faction abilities should be `**bolded**`;
+- Leaders should be written as `Name, the Faction Rank`;
+	- If the player has Ssruu, the leader should be written as `Clever, Clever Name, the Faction/Yssaril Rank`;
+- Flagships should be written as `the Name (the Faction flagship)`;
+	- Other faction units should be written as `a Name (Faction unittype)`
+- Emphasis and list item text headers should be `__underlined__`;
+- Reminder text should be `-# small text` on a new line;
+- Text should be in sentence case;
+- Text should read as a proper sentence (including period);
+  - Messages that ping a player should usually begin with "@player, [message...]", with the first word of message not being capitalised;
+- Abbreviations should be avoided;
+	- Use "command token from [their] tactic pool" etc.;
+- Bot commands should be ``` `teletext` ```;
+# Buttons
+- Text should be in Title Case;
+- Abbreviations should be used if required for text length reasons;
+	- Use "Tactic Token" instead of "Tactic CC" etc.;
+- Leader names should be written as `Faction Rank`;
+- No text formatting;
+- No period;
+# Vocabulary
+- Short faction names should be what appears on their promissory notes/unit upgrades;
+  - In particular, "N'orr", "Creuss", "Vuil'raith", "Ul";
+- "~~want~~ _wish_"
+- "~~person~~ _player_"
+- "~~refresh~~ _ready_ card"
+- "~~tech~~ _technology_";
+- "technology ~~skip~~ _specialty_";
+- "~~own~~ _control_ a planet";

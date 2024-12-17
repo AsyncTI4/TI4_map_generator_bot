@@ -241,17 +241,27 @@ public class FoWHelper {
 		Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player);
 		adjacentPositions.addAll(wormholeAdjacencies);
 
-    	if (player != null && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander")
-				&& player == game.getActivePlayer() && !game.getCurrentActiveSystem().isEmpty()
-				&& game.getTileByPosition(game.getCurrentActiveSystem()).getPlanetUnitHolders().isEmpty()) {
-			Collection<Tile> tileList = game.getTileMap().values();
-			List<String> frontierTileList = Mapper.getFrontierTileIds();
-			for (Tile tile : tileList) {
-				if (tile.getPlanetUnitHolders().isEmpty() && (tile.getUnitHolders().size() == 2 || frontierTileList.contains(tile.getTileID()))) {
-					adjacentPositions.add(tile.getPosition());
-				}
-			}
-		}
+    //If player has ghoti commander, is active player and has activated a system
+    if (player != null && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander")
+			&& player == game.getActivePlayer() && !game.getCurrentActiveSystem().isEmpty()) {
+        Set<Player> playersToCheck = new HashSet<>();
+        playersToCheck.add(player);
+        if (game.isAllianceMode()) {
+          playersToCheck.addAll(game.getRealPlayers().stream()
+              .filter(alliancePlayer -> player.getAllianceMembers().contains(alliancePlayer.getFaction())) 
+              .collect(Collectors.toSet()));
+        }
+
+        //Check that they or their alliance have units in any empty system to be able to see the other empties as adjacencies
+        Set<Tile> emptyTiles = getEmptyTiles(game);
+        boolean containsUnits = emptyTiles.stream().anyMatch(tile -> playersToCheck.stream().anyMatch(p -> tile.containsPlayersUnits(p)));
+        if (containsUnits) {
+            adjacentPositions.addAll(emptyTiles.stream()
+                .map(Tile::getPosition)
+                .collect(Collectors.toSet()));
+        }   		
+    }
+
 		if (includeTile) {
 			adjacentPositions.add(position);
 		} else {
@@ -259,6 +269,19 @@ public class FoWHelper {
 		}
 		return adjacentPositions;
 	}
+
+  private static Set<Tile> getEmptyTiles(Game game) {
+      Set<Tile> emptyTiles = new HashSet<>();
+      Collection<Tile> tileList = game.getTileMap().values();
+      List<String> frontierTileList = Mapper.getFrontierTileIds();
+      for (Tile tile : tileList) {
+        if (tile.getPlanetUnitHolders().isEmpty() && (tile.getUnitHolders().size() == 2 
+          || frontierTileList.contains(tile.getTileID()))) {
+            emptyTiles.add(tile);
+        }
+      }
+      return emptyTiles;
+  }
 
 	public static Set<String> getAdjacentTilesAndNotThisTile(Game game, String position, Player player, boolean toShow) {
 
@@ -371,7 +394,7 @@ public class FoWHelper {
 
 		String ghostFlagshipColor = null;
 		for (Player p : game.getPlayers().values()) {
-			if (p.ownsUnit("ghost_flagship")) {
+			if (p.ownsUnit("ghost_flagship") || p.ownsUnit("sigma_creuss_flagship_1") || p.ownsUnit("sigma_creuss_flagship_2")) {
 				ghostFlagshipColor = p.getColor();
 				break;
 			}
@@ -490,7 +513,7 @@ public class FoWHelper {
 
 		String ghostFlagshipColor = null;
 		for (Player p : game.getPlayers().values()) {
-			if (p.ownsUnit("ghost_flagship")) {
+			if (p.ownsUnit("ghost_flagship") || p.ownsUnit("sigma_creuss_flagship_1") || p.ownsUnit("sigma_creuss_flagship_2")) {
 				ghostFlagshipColor = p.getColor();
 				break;
 			}
@@ -620,6 +643,16 @@ public class FoWHelper {
 			return true;
 		}
 
+    if (game.isAllianceMode()) {
+      boolean allianceHasUnits = game.getRealPlayers().stream()
+          .filter(alliancePlayer -> alliancePlayer != player) 
+          .filter(alliancePlayer -> player.getAllianceMembers().contains(alliancePlayer.getFaction())) 
+          .anyMatch(alliancePlayer -> playerHasUnitsInSystem(alliancePlayer, tile));
+  
+      if (allianceHasUnits) {
+          return true;
+      }
+    }
 		return playerHasUnitsInSystem(player, tile);
 	}
 
