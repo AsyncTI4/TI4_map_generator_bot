@@ -4463,8 +4463,8 @@ public class ButtonHelper {
             Map<UnitKey, Integer> units = unitHolder.getUnits();
             if (unitHolder instanceof Planet) { // Ground
                 if ((type.equalsIgnoreCase("spacecombat") || type.equalsIgnoreCase("assaultcannoncombat"))
-                    && !(ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile) 
-                        || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile) 
+                    && !(ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)
+                        || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)
                         || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile))) {
                     continue;
                 }
@@ -5109,7 +5109,7 @@ public class ButtonHelper {
     }
 
     @ButtonHandler("startPlayerSetup")
-    public static void resolveSetupStep0(Player player, Game game, ButtonInteractionEvent event) {
+    public static void resolveSetupStep0(Player player, Game game) {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentation() + ", please tell the bot which user you are setting up.",
             getUserSetupButtons(game));
@@ -5915,7 +5915,7 @@ public class ButtonHelper {
                 youCanSpend.append(" You also have " + TechEmojis.CyberneticTech + "_Sarween Tools_.");
             }
             if (player.hasTechReady("aida")) {
-                youCanSpend.append(" You also have " + TechEmojis.WarfareTech + "_AI Development Algorithm_ for ")
+                youCanSpend.append(" You also have ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ")
                     .append(ButtonHelper.getNumberOfUnitUpgrades(player)).append(" resources.");
             }
         }

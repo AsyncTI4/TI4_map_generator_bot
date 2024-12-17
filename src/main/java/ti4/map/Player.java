@@ -83,7 +83,6 @@ public class Player {
     private String userName;
 
     private final Game game;
-    private boolean tenMinReminderPing;
 
     private boolean passed;
     private boolean readyToPassBag;
@@ -638,14 +637,16 @@ public class Player {
 
         // CREATE NEW THREAD
         // Make card info thread a public thread in community mode
-        boolean isPrivateChannel = (!game.isFowMode());
+        boolean isPrivateChannel = !game.isFowMode();
         if (game.getName().contains("pbd100") || game.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
         ThreadChannelAction threadAction = actionsChannel
             .createThreadChannel(threadName, isPrivateChannel)
-            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
-            .setInvitable(!isPrivateChannel);
+            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK);
+        if (isPrivateChannel) {
+            threadAction = threadAction.setInvitable(false);
+        }
         if (createWithQueue) {
             threadAction.queue(c -> {
                 setCardsInfoThreadID(c.getId());
@@ -691,16 +692,8 @@ public class Player {
         autoPassOnWhensAfters = preference;
     }
 
-    public boolean shouldPlayerBeTenMinReminded() {
-        return tenMinReminderPing;
-    }
-
     public void setReadyToPassBag(boolean passed) {
         readyToPassBag = passed;
-    }
-
-    public void setWhetherPlayerShouldBeTenMinReminded(boolean tenMinReminderPing) {
-        this.tenMinReminderPing = tenMinReminderPing;
     }
 
     public Set<String> getAbilities() {

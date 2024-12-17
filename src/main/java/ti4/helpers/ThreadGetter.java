@@ -48,7 +48,7 @@ public class ThreadGetter {
                                                 @Nonnull Consumer<ThreadChannel> consumer) {
         ThreadChannelAction threadAction = channel.createThreadChannel(threadName, createAsPrivate);
         if (createAsPrivate) {
-            threadAction.setInvitable(false);
+            threadAction = threadAction.setInvitable(false);
         }
         threadAction.queue(consumer);
     }

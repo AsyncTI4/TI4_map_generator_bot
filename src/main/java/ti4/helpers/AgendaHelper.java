@@ -2744,7 +2744,8 @@ public class AgendaHelper {
         if (action) {
             whensAftersMessage.append("\nYou may play afters during this agenda.");
         }
-        AutoPingMetadataManager.addPing(game.getName());
+
+        AutoPingMetadataManager.setupAutoPing(game.getName());
         List<Button> whenButtons = getWhenButtons(game);
         List<Button> afterButtons = getAfterButtons(game);
 
@@ -2811,7 +2812,9 @@ public class AgendaHelper {
                 for (String soID : p2.getSecretsScored().keySet()) {
                     SecretObjectiveModel so = Mapper.getSecretObjective(soID);
                     if (so != null) {
-                        summary.append("- ").append(CardEmojis.SecretObjective).append("__**").append(so.getName()).append("**__: ").append(so.getText()).append("\n");
+                        summary.append("- ");
+                        if (!game.isFowMode()) summary.append(p2.getFactionEmoji());
+                        summary.append(CardEmojis.SecretObjective).append("__**").append(so.getName()).append("**__: ").append(so.getText()).append("\n");
                     }
                 }
             }
@@ -3132,7 +3135,6 @@ public class AgendaHelper {
         UnfiledButtonHandlers.clearAllReactions(event);
         ReactionService.addReaction(event, game, player, true, true, "Playing When", "When Played");
         List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
-        AutoPingMetadataManager.addPing(game.getName());
         MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", game, whenButtons, "when");
         List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
         MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, "after");

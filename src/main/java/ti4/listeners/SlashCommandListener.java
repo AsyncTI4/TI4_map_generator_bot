@@ -9,9 +9,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.Command;
 import ti4.commands2.CommandManager;
+import ti4.executors.ExecutorManager;
 import ti4.helpers.DateTimeHelper;
 import ti4.message.BotLogger;
 import ti4.service.SusSlashCommandService;
+import ti4.service.game.GameNameService;
 
 public class SlashCommandListener extends ListenerAdapter {
 
@@ -24,11 +26,19 @@ public class SlashCommandListener extends ListenerAdapter {
 
         event.getInteraction().deferReply().queue();
 
-        AsyncTI4DiscordBot.runAsync("Slash command task: " + event.getFullCommandName(), () -> process(event));
+        process(event);
     }
 
     private static void process(SlashCommandInteractionEvent event) {
+        long startTime = System.currentTimeMillis();
         long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
+        long eventDelay = startTime - eventTime;
+
+        String gameName = GameNameService.getGameName(event);
+        ExecutorManager.runAsync("Slash command task: " + event.getFullCommandName(), gameName, () -> process(event, eventDelay));
+    }
+
+    private static void process(SlashCommandInteractionEvent event, long eventDelay) {
         long startTime = System.currentTimeMillis();
 
         Member member = event.getMember();
@@ -46,26 +56,29 @@ public class SlashCommandListener extends ListenerAdapter {
                 command.preExecute(event);
                 command.execute(event);
                 command.postExecute(event);
+                event.getHook().deleteOriginal().queue();
             } catch (Exception e) {
                 String messageText = "Error trying to execute command: " + command.getName();
                 String errorMessage = ExceptionUtils.getMessage(e);
                 event.getHook().editOriginal(errorMessage).queue();
                 BotLogger.log(event, messageText, e);
             }
+        } else {
+            event.getHook().deleteOriginal().queue();
         }
 
-        event.getHook().deleteOriginal().queue();
-
+        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
         long endTime = System.currentTimeMillis();
-        final int milliThreshold = 2000;
-        if (startTime - eventTime > milliThreshold || endTime - startTime > milliThreshold) {
-            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventTime);
-            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+        long processingRuntime = endTime - startTime;
+        int milliThreshold = 2000;
+        if (eventDelay > milliThreshold || processingRuntime > milliThreshold) {
+            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(eventDelay);
+            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingRuntime);
             String message = event.getChannel().getAsMention() + " " + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: " +
                 "This slash command took over " + milliThreshold + "ms to respond or execute\n> " +
                 DateTimeHelper.getTimestampFromMillisecondsEpoch(eventTime) + " command was issued by user\n> " +
                 DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
-                DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventTime ? "😲" : "");
+                DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (processingRuntime > eventDelay ? "😲" : "");
             BotLogger.log(message);
         }
     }

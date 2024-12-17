@@ -7,13 +7,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.function.Consumers;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -25,16 +20,14 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.json.ObjectMapperFactory;
 import ti4.listeners.context.ListenerContext;
-import ti4.map.Game;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.service.game.GameNameService;
 
 /**
  * <h1>Jazzxhands Menu Framework</h1>
@@ -48,17 +41,17 @@ import ti4.service.game.GameNameService;
  * <i>- *no buttons added if there are no settings in this menu</i>
  */
 @Getter
-@JsonIgnoreProperties({ "menuName", "menuNav", "menuAction", "description", "parent", "messageID" })
 public abstract class SettingsMenu {
     // Prefix "Jazz Menu Framework"
-    protected static final String menuNav = "jmfN";
-    protected static final String menuAction = "jmfA";
+    protected static final @JsonIgnore String menuNav = "jmfN";
+    protected static final @JsonIgnore String menuAction = "jmfA";
+
+    protected final @JsonIgnore String menuName;
+    protected final @JsonIgnore List<String> description = new ArrayList<>();
+    protected final @JsonIgnore SettingsMenu parent;
 
     protected final String menuId;
-    protected final String menuName;
-    protected final List<String> description = new ArrayList<>();
-    protected final SettingsMenu parent;
-    private String messageID = null;
+    protected String messageId = null;
 
     protected SettingsMenu(String menuId, String menuName, String description, SettingsMenu parent) {
         this.menuId = menuId;
@@ -162,7 +155,7 @@ public abstract class SettingsMenu {
     public void postMessageAndButtons(GenericInteractionCreateEvent event) {
         String newSummary = menuSummaryString(null);
         List<Button> buttons = getPaginatedButtons(0);
-        MessageHelper.splitAndSentWithAction(newSummary, event.getMessageChannel(), buttons, (message) -> this.setMessageID(message));
+        MessageHelper.splitAndSentWithAction(newSummary, event.getMessageChannel(), buttons, this::setMessageId);
     }
 
     public void parseButtonInput(ButtonInteractionEvent event) {
@@ -218,18 +211,28 @@ public abstract class SettingsMenu {
             stringEvent.getHook().sendMessage(userMsg).setEphemeral(true).queue();
     }
 
-    public void setMessageID(String messageID) {
-        this.messageID = messageID;
+    public String getMessageId() {
+        if (this.parent != null) {
+            return this.parent.getMessageId();
+        }
+        return this.messageId;
     }
 
-    @JsonIgnore
-    private void setMessageID(Message msg) {
-        if (Objects.equals(this.messageID, msg.getId())) return;
-        this.messageID = msg.getId();
-        for (SettingsMenu cat : categories())
-            cat.setMessageID(msg);
-        if (this.parent != null)
-            this.parent.setMessageID(msg);
+    public void setMessageId(String messageId) {
+        if (Objects.equals(this.messageId, messageId)) return;
+        this.messageId = messageId;
+        for (SettingsMenu cat : categories()) {
+            if (cat != null) {
+                cat.setMessageId(messageId);
+            }
+        }
+        if (parent != null) {
+            parent.setMessageId(messageId);
+        }
+    }
+
+    private void setMessageId(Message msg) {
+        setMessageId(msg.getId());
     }
 
     private boolean handleButtonPress(GenericInteractionCreateEvent event, String buttonType, String action, List<String> path) {
@@ -324,30 +327,15 @@ public abstract class SettingsMenu {
 
         // Edit the existing message, if able
         if (event instanceof ButtonInteractionEvent buttonEvent) {
-            if (this.messageID == null) {
-                String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-                ManagedGame managedGame = GameManager.getManagedGame(gameName);
-                Game game = managedGame.getGame();
-                this.setMessageID(buttonEvent.getMessage());
-                game.setStoredValue("MiltyIDForBansNSuch", buttonEvent.getMessage().getId());
-                game.increaseButtonPressCount();
-                GameManager.save(game, "MiltyNonsense");
-            }
+            setMessageId(buttonEvent.getMessage());
             buttonEvent.getHook().editOriginal(newSummary).setComponents(actionRows).queue();
         } else if (event instanceof ModalInteractionEvent modalEvent) {
             if (modalEvent.getMessage() != null) {
                 modalEvent.getMessage().editMessage(newSummary).setComponents(actionRows).queue();
             }
         } else if (event instanceof StringSelectInteractionEvent selectEvent) {
-            if (this.messageID == null) {
-                String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-                ManagedGame managedGame = GameManager.getManagedGame(gameName);
-                Game game = managedGame.getGame();
-                this.setMessageID(game.getStoredValue("MiltyIDForBansNSuch"));
-            }
-
             selectEvent.getGuildChannel()
-                .editMessageById(this.messageID, newSummary)
+                .editMessageById(getMessageId(), newSummary)
                 .setComponents(actionRows)
                 .queue(Consumers.nop(), BotLogger::catchRestError);
         }

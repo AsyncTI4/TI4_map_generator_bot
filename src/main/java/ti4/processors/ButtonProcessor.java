@@ -4,16 +4,14 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
+import ti4.executors.ExecutorManager;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
@@ -33,84 +31,62 @@ import ti4.service.button.ReactionService;
 
 public class ButtonProcessor {
 
-    private static final ButtonProcessor instance = new ButtonProcessor();
     private static final Map<String, Consumer<ButtonContext>> knownButtons = AnnotationHandler.findKnownHandlers(ButtonContext.class, ButtonHandler.class);
+    private static final Set<String> userButtonPressSet = ConcurrentHashMap.newKeySet();
+    private static final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
 
-    private final BlockingQueue<ButtonInteractionEvent> buttonInteractionQueue = new LinkedBlockingQueue<>();
-    private final Set<String> userButtonPressSet = ConcurrentHashMap.newKeySet();
-    private final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
-    private final Thread worker;
-    private boolean running = true;
-
-    private ButtonProcessor() {
-        worker = new Thread(() -> {
-            while (running || !buttonInteractionQueue.isEmpty()) {
-                try {
-                    ButtonInteractionEvent buttonInteractionEvent = buttonInteractionQueue.poll(2, TimeUnit.SECONDS);
-                    if (buttonInteractionEvent != null) {
-                        process(buttonInteractionEvent);
-                    }
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                } catch (Exception e) {
-                    BotLogger.log("ButtonProcessor worker threw an exception.", e);
-                }
-            }
-        });
-    }
-
-    public static void start() {
-        instance.worker.start();
-    }
-
-    public static boolean shutdown() {
-        instance.running = false;
-        try {
-            instance.worker.join(20000);
-            return !instance.worker.isAlive();
-        } catch (InterruptedException e) {
-            BotLogger.log("ButtonProcessor shutdown interrupted.");
-            Thread.currentThread().interrupt();
-            return false;
-        }
-    }
-
-    public static void queue(ButtonInteractionEvent event) {
-        String key = event.getUser().getId() + event.getButton().getId();
-        if (instance.userButtonPressSet.contains(key)) {
+    public static void process(ButtonInteractionEvent event) {
+        String eventKey = getEventKey(event);
+        if (userButtonPressSet.contains(eventKey)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "The bot hasn't processed this button press since you last pressed it. Please wait.");
             return;
         }
-        instance.userButtonPressSet.add(key);
-        instance.buttonInteractionQueue.add(event);
+
+        try {
+            userButtonPressSet.add(eventKey);
+            BotLogger.logButton(event);
+
+            long beforeContextTime = System.currentTimeMillis();
+            ButtonContext context = new ButtonContext(event);
+            long contextRuntime = System.currentTimeMillis() - beforeContextTime;
+
+            String gameName = context.getGame() != null ? context.getGame().getName() : null;
+            ExecutorManager.runAsync("Button processor task", gameName, () -> process(event, context, contextRuntime));
+        } catch (Exception e) {
+            BotLogger.log(event, "Something went wrong with button interaction", e);
+            userButtonPressSet.remove(eventKey);
+        }
     }
 
-    private void process(ButtonInteractionEvent event) {
+    private static String getEventKey(ButtonInteractionEvent event) {
+        return event.getUser().getId() + event.getButton().getId();
+    }
+
+    private static void process(ButtonInteractionEvent event, ButtonContext context, long contextRuntime) {
         long startTime = System.currentTimeMillis();
-        BotLogger.logButton(event);
-        long contextTime = 0;
-        long resolveTime = 0;
-        long saveTime = 0;
+        long resolveRuntime = 0;
+        long saveRuntime = 0;
         try {
-            ButtonContext context = new ButtonContext(event);
-            contextTime = System.currentTimeMillis();
             if (context.isValid()) {
+                long beforeResolveTime = System.currentTimeMillis();
                 resolveButtonInteractionEvent(context);
-                resolveTime = System.currentTimeMillis();
+                resolveRuntime = System.currentTimeMillis() - beforeResolveTime;
+
+                beforeResolveTime = System.currentTimeMillis();
                 context.save();
-                saveTime = System.currentTimeMillis();
+                saveRuntime = System.currentTimeMillis() - beforeResolveTime;
             }
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
 
-        runtimeWarningService.submitNewRuntime(event, startTime, System.currentTimeMillis(), contextTime, resolveTime, saveTime);
+        String eventKey = getEventKey(event);
+        userButtonPressSet.remove(eventKey);
 
-        instance.userButtonPressSet.remove(event.getUser().getId() + event.getButton().getId());
+        runtimeWarningService.submitNewRuntime(event, startTime, System.currentTimeMillis(), contextRuntime, resolveRuntime, saveRuntime);
     }
 
-    private boolean handleKnownButtons(ButtonContext context) {
+    private static boolean handleKnownButtons(ButtonContext context) {
         String buttonID = context.getButtonID();
         // Check for exact match first
         if (knownButtons.containsKey(buttonID)) {
@@ -135,7 +111,7 @@ public class ButtonProcessor {
         return false;
     }
 
-    public void resolveButtonInteractionEvent(ButtonContext context) {
+    public static void resolveButtonInteractionEvent(ButtonContext context) {
         // pull values from context for easier access
         ButtonInteractionEvent event = context.getEvent();
         Player player = context.getPlayer();
@@ -225,10 +201,9 @@ public class ButtonProcessor {
     public static String getButtonProcessingStatistics() {
         var decimalFormatter = new DecimalFormat("#.##");
         return "Button Processor Statistics: " + DateTimeHelper.getCurrentTimestamp() + "\n" +
-            "> Button queue size: " + instance.buttonInteractionQueue.size() + ".\n" +
-            "> Total button presses: " + instance.runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" +
-            "> Total threshold misses: " + instance.runtimeWarningService.getTotalRuntimeThresholdMissCount() + ".\n" +
-            "> Average preprocessing time: " + decimalFormatter.format(instance.runtimeWarningService.getAveragePreprocessingTime()) + "ms.\n" +
-            "> Average processing time: " + decimalFormatter.format(instance.runtimeWarningService.getAverageProcessingTime()) + "ms.";
+            "> Total button presses: " + runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" +
+            "> Total threshold misses: " + runtimeWarningService.getTotalRuntimeThresholdMissCount() + ".\n" +
+            "> Average preprocessing time: " + decimalFormatter.format(runtimeWarningService.getAveragePreprocessingTime()) + "ms.\n" +
+            "> Average processing time: " + decimalFormatter.format(runtimeWarningService.getAverageProcessingTime()) + "ms.";
     }
 }

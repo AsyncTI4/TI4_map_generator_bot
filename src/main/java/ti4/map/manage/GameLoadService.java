@@ -48,7 +48,6 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
-import ti4.service.milty.MiltyDraftManager;
 
 import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
 import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
@@ -893,7 +892,7 @@ class GameLoadService {
                 case Constants.SHOW_MAP_SETUP -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setMiltyModMode(value);
+                        game.setShowMapSetup(value);
                     } catch (Exception e) {
                     }
                 }
@@ -1003,16 +1002,7 @@ class GameLoadService {
                     } catch (Exception e) {
                     }
                 }
-                case Constants.MILTY_DRAFT_MANAGER -> {
-                    try {
-                        if (game.getRound() == 1 && !game.isHasEnded()) {
-                            MiltyDraftManager manager = game.getMiltyDraftManager();
-                            manager.init(game);
-                            manager.loadSuperSaveString(info);
-                        }
-                    } catch (Exception e) {
-                    }
-                }
+                case Constants.MILTY_DRAFT_MANAGER -> game.setMiltyDraftString(info); // We will parse this later
                 case Constants.MILTY_DRAFT_SETTINGS -> game.setMiltyJson(info); // We will parse this later
                 case Constants.GAME_TAGS -> game.setTags(getCardList(info));
                 case Constants.TIGL_RANK -> {
@@ -1298,7 +1288,6 @@ class GameLoadService {
                 }
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.READY_TO_PASS_BAG -> player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.TEN_MIN_REMINDER -> player.setWhetherPlayerShouldBeTenMinReminded(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.AUTO_PASS_WHENS_N_AFTERS -> player.setAutoPassWhensAfters(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));

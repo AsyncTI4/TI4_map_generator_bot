@@ -24,30 +24,30 @@ class ButtonRuntimeWarningService {
     @Getter
     private double averagePreprocessingTime;
 
-    void submitNewRuntime(ButtonInteractionEvent event, long startTime, long endTime, long contextTime, long resolveTime, long saveTime) {
+    void submitNewRuntime(ButtonInteractionEvent event, long startTime, long endTime, long contextRuntime, long resolveRuntime, long saveRuntime) {
         totalRuntimeSubmissionCount++;
         long processingTime = endTime - startTime;
         averageProcessingTime = ((averageProcessingTime * (totalRuntimeSubmissionCount - 1)) + processingTime) / totalRuntimeSubmissionCount;
 
-        long eventStartTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
-        long preprocessingTime = startTime - eventStartTime;
-        averagePreprocessingTime = ((averagePreprocessingTime * (totalRuntimeSubmissionCount - 1)) + preprocessingTime) / totalRuntimeSubmissionCount;
+        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
+        long eventDelay = startTime - eventTime;
+        averagePreprocessingTime = ((averagePreprocessingTime * (totalRuntimeSubmissionCount - 1)) + eventDelay) / totalRuntimeSubmissionCount;
 
         var now = LocalDateTime.now();
         if (now.minusMinutes(1).isAfter(lastWarningTime)) {
             runtimeWarningCount = 0;
         }
-        if (startTime - eventStartTime > warningThresholdMilliseconds || endTime - startTime > warningThresholdMilliseconds) {
+        if (eventDelay > warningThresholdMilliseconds || processingTime > warningThresholdMilliseconds) {
             totalRuntimeThresholdMissCount++;
             if (pauseWarningsUntil.isBefore(now)) {
-                String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(startTime - eventStartTime);
-                String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(endTime - startTime);
+                String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(eventDelay);
+                String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingTime);
                 String message = "[" + event.getChannel().getName() + "](" + event.getMessage().getJumpUrl() + ") " + event.getUser().getEffectiveName() + " pressed button: " + ButtonHelper.getButtonRepresentation(event.getButton()) +
                     "\n> Warning: This button took over " + warningThresholdMilliseconds + "ms to respond or execute\n> " +
-                    DateTimeHelper.getTimestampFromMillisecondsEpoch(eventStartTime) + " button was pressed by user\n> " +
+                    DateTimeHelper.getTimestampFromMillisecondsEpoch(eventTime) + " button was pressed by user\n> " +
                     DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
-                    DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (endTime - startTime > startTime - eventStartTime ? "😲" : "");
-                message += "\nContext time: " + (contextTime - startTime) + "ms\nResolve time: " + (resolveTime - contextTime) + "ms\nSave time: " + (saveTime - resolveTime) + "ms";
+                    DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (processingTime > eventDelay ? "😲" : "");
+                message += "\nContext time: " + contextRuntime + "ms\nResolve time: " + resolveRuntime + "ms\nSave time: " + saveRuntime + "ms";
                 BotLogger.log(message);
                 if (++runtimeWarningCount > 20) {
                     pauseWarningsUntil = now.plusMinutes(5);

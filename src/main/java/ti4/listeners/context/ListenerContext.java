@@ -81,7 +81,7 @@ public abstract class ListenerContext {
             }
 
             if (player != null && game.getActivePlayerID() != null && player.getUserID().equalsIgnoreCase(game.getActivePlayerID())) {
-                AutoPingMetadataManager.addPing(gameName);
+                AutoPingMetadataManager.delayPing(gameName);
             }
         }
 

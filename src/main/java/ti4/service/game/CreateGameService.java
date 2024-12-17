@@ -198,7 +198,7 @@ public class CreateGameService {
                 TIGLHelper.initializeTIGLGame(newGame);
             }
             if (missingMembers.isEmpty()) {
-                manager.setArchived(true);
+                manager = manager.setArchived(true);
             }
             manager.queue();
         }

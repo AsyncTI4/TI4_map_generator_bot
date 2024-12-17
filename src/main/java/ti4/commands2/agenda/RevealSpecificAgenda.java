@@ -151,7 +151,7 @@ class RevealSpecificAgenda extends GameStateSubcommand {
         String text = game.getPing()
             + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you may simply play it.";
 
-        AutoPingMetadataManager.addPing(game.getName());
+        AutoPingMetadataManager.setupAutoPing(game.getName());
         List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
         List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
 

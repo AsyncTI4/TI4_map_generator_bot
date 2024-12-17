@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.DisplayType;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
@@ -68,6 +69,14 @@ class GameSaveService {
             DiscordantStarsHelper.checkOlradinMech(game);
         } catch (Exception e) {
             BotLogger.log("Error adding transient attachment tokens for game " + game.getName(), e);
+        }
+
+        //Ugly fix to update seen tiles data for fog since doing it in 
+        //MapGenerator/TileGenerator won't save changes anymore
+        if (game.isFowMode()) {
+            for (Player player : game.getRealPlayers()) {
+                FoWHelper.updateFog(game, player);
+            }
         }
 
         File gameFile = Storage.getGameFile(game.getName() + Constants.TXT);
@@ -142,7 +151,7 @@ class GameSaveService {
 
         writer.write(Constants.ACTIVE_PLAYER + " " + game.getActivePlayerID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.ACTIVE_SYSTEM + " " + game.getActiveSystem());
+        writer.write(Constants.ACTIVE_SYSTEM + " " + game.getCurrentActiveSystem());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.AUTO_PING + " " + game.getAutoPingSpacer());
@@ -482,22 +491,23 @@ class GameSaveService {
         writer.write(Constants.GAME_TAGS + " " + String.join(",", game.getTags()));
         writer.write(System.lineSeparator());
 
-        if (game.getRound() == 1 && !game.isHasEnded()) {
-            MiltyDraftManager manager = game.getMiltyDraftManager();
-            if (!manager.isFinished()) {
-                writer.write(Constants.MILTY_DRAFT_MANAGER + " " + manager.superSaveMessage());
-                writer.write(System.lineSeparator());
+        MiltyDraftManager manager = game.getMiltyDraftManagerUnsafe();
+        if (manager != null) {
+            writer.write(Constants.MILTY_DRAFT_MANAGER + " " + manager.superSaveMessage());
+            writer.write(System.lineSeparator());
+        } else {
+            writer.write(Constants.MILTY_DRAFT_MANAGER + " " + game.getMiltyDraftString());
+            writer.write(System.lineSeparator());
+        }
 
-                MiltySettings miltySettings = game.getMiltySettingsUnsafe();
-                if (miltySettings != null) {
-                    writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + miltySettings.json());
-                    writer.write(System.lineSeparator());
-                } else if (game.getMiltyJson() != null) {
-                    // default to the already stored value, if we failed to read it previously
-                    writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + game.getMiltyJson());
-                    writer.write(System.lineSeparator());
-                }
-            }
+        MiltySettings miltySettings = game.getMiltySettingsUnsafe();
+        if (miltySettings != null) {
+            writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + miltySettings.json());
+            writer.write(System.lineSeparator());
+        } else if (game.getMiltyJson() != null) {
+            // default to the already stored value, if we failed to read it previously
+            writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + game.getMiltyJson());
+            writer.write(System.lineSeparator());
         }
 
         writer.write(Constants.STRATEGY_CARD_SET + " " + game.getScSetID());
@@ -584,9 +594,6 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.READY_TO_PASS_BAG + " " + player.isReadyToPassBag());
-            writer.write(System.lineSeparator());
-
-            writer.write(Constants.TEN_MIN_REMINDER + " " + player.shouldPlayerBeTenMinReminded());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.AUTO_PASS_WHENS_N_AFTERS + " " + player.doesPlayerAutoPassOnWhensAfters());
