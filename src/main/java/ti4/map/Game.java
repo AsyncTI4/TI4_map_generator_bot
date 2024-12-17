@@ -784,8 +784,7 @@ public class Game extends GameProperties {
         if (getTileMap().isEmpty()) {
             return 0;
         }
-        Map<String, Tile> tileMap = new HashMap<>(getTileMap());
-        String highestPosition = tileMap.keySet().stream()
+        String highestPosition = getTileMap().keySet().stream()
             .filter(Helper::isInteger)
             .max(Comparator.comparingInt(Integer::parseInt))
             .orElse(null);
