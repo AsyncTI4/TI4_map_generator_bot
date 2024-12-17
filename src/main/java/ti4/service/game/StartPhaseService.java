@@ -33,6 +33,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.DeckModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.StatusCleanupService;
 import ti4.service.emoji.CardEmojis;
@@ -63,6 +64,12 @@ public class StartPhaseService {
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
             case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(game);
             case "finFixSecrets" -> game.fixScrewedSOs();
+            case "cptiExplores" -> {
+                game.setCptiExploreMode(true);
+                DeckModel deckModel = Mapper.getDeck("explores_cpti");
+                game.setExploreDeck(new ArrayList<>(deckModel.getNewShuffledDeck()));
+                game.setExplorationDeckID(deckModel.getAlias());
+            }
             case "statusScoring" -> {
                 EndTurnService.showPublicObjectivesWhenAllPassed(event, game, game.getMainGameChannel());
                 game.updateActivePlayer(null);
