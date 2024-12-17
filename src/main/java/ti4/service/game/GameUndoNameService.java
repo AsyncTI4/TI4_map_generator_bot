@@ -7,16 +7,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Storage;
 import ti4.map.Game;
@@ -74,7 +72,8 @@ public class GameUndoNameService {
     }
 
     public static int getUndoNumberFromFileName(String name) {
-        String number = StringUtils.substringBetween(name, "_", ".txt");
+        String number = StringUtils.substringAfterLast(name, "_");
+        number = StringUtils.substringBefore(number, ".txt");
         return StringUtils.isEmpty(number) ? 0 : Integer.parseInt(number);
     }
 }
