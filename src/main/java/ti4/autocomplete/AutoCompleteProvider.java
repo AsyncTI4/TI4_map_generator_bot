@@ -581,7 +581,7 @@ public class AutoCompleteProvider {
                 }
 
                 List<Command.Choice> options = GameUndoNameService.getUndoNamesToCommandText(game, 25).entrySet().stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.comparing(GameUndoNameService::getUndoNumberFromFileName).reversed()))
+                    .sorted(Map.Entry.comparingByKey(Comparator.comparing(GameUndoNameService::getUndoNumberFromFileName).reversed()))
                     .limit(25)
                     .map(entry -> new Command.Choice(StringUtils.left(entry.getValue(), 100), entry.getKey()))
                     .toList();
