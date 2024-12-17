@@ -721,7 +721,7 @@ public class ButtonHelper {
         }
 
         if (isPlayerElected(game, player, "minister_policy") && !player.hasAbility("scheming")) {
-            message += " _Minister of Policy_ has been accounted for.\n-# If this action card is _Political Stability_, you cannot play it at this time. ");
+            message += " _Minister of Policy_ has been accounted for.\n-# If this action card is _Political Stability_, you cannot play it at this time. ";
             game.drawActionCard(player.getUserID());
             amount += 1;
         }
@@ -5908,7 +5908,7 @@ public class ButtonHelper {
             }
         }
         if (!game.getPhaseOfGame().contains("agenda")) {
-            youCanSpend.append("and ").append(player.getTg()).append(MiscEmojis.tg).append(" trade good").append(player.getTg() == 1 ? "" : "s") + ".";
+            youCanSpend.append("and ").append(player.getTg()).append(MiscEmojis.tg).append(" trade good").append(player.getTg() == 1 ? "" : "s").append(".");
         }
         if (production) {
             if (player.hasTech("st")) {
