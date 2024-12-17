@@ -305,6 +305,12 @@ public class ExploreService {
                 player.addFragment(cardID);
                 game.purgeExplore(ogID);
             }
+            case "Leader" -> {
+                String leader = cardID.replace("gain", "");
+                player.addLeader(leader);
+                MessageHelper.sendMessageToEventChannel(event, "Leader has been added to your party");
+                game.purgeExplore(ogID);
+            }
             case Constants.ATTACH -> {
                 String attachment = exploreModel.getAttachmentId().orElse("");
                 String attachmentFilename = Mapper.getAttachmentImagePath(attachment);
@@ -436,6 +442,35 @@ public class ExploreService {
                 ButtonHelper.checkACLimit(game, player);
                 CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             }
+            case "fiveac1", "fiveac2", "fiveac3" -> {
+                boolean hasSchemingAbility = player.hasAbility("scheming");
+                message = hasSchemingAbility
+                    ? "Drew 6 action cards (Scheming) - please discard 1 action card from your hand"
+                    : "Drew 5 action cards";
+                int count = hasSchemingAbility ? 6 : 5;
+                if (player.hasAbility("autonetic_memory")) {
+                    ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
+                    message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
+                } else {
+                    for (int i = 0; i < count; i++) {
+                        game.drawActionCard(player.getUserID());
+                    }
+
+                    if (game.isFowMode()) {
+                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 ACs");
+                    }
+                    ActionCardHelper.sendActionCardInfo(game, player, event);
+                }
+
+                if (hasSchemingAbility) {
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                        player.getRepresentationUnfogged() + " use buttons to discard",
+                        ActionCardHelper.getDiscardActionCardButtons(player, false));
+                }
+                MessageHelper.sendMessageToEventChannel(event, message);
+                ButtonHelper.checkACLimit(game, player);
+                CommanderUnlockCheckService.checkPlayer(player, "yssaril");
+            }
             case "dv1", "dv2" -> {
                 message = "Drew a " + CardEmojis.SecretObjective + "Secret Objective";
                 game.drawSecretObjective(player.getUserID());
@@ -508,6 +543,10 @@ public class ExploreService {
                 List<Button> buttons = List.of(getACButton, getCommButton);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
+            case "freetech1", "freetech2", "freetech3" -> {
+                game.setComponentAction(true);
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to research a tech", Buttons.GET_A_FREE_TECH);
+            }
             case "aw1", "aw2", "aw3", "aw4" -> {
                 if (player.getCommodities() > 0) {
                     message = "Resolve Abandoned Warehouses:\n-# You currently have " + player.getCommoditiesRepresentation() + MiscEmojis.comm;
@@ -576,7 +615,14 @@ public class ExploreService {
                 List<Button> buttons = List.of(getMechButton, getCommButton3);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
-            case "kel1", "kel2", "ent", "minent", "majent" -> {
+            case "fivetg1", "fivetg2", "fivetg3" -> {
+                message = "Gained 5" + MiscEmojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(5) + " ";
+                ButtonHelperAbilities.pillageCheck(player, game);
+                ButtonHelperAgents.resolveArtunoCheck(player, 5);
+                CommanderUnlockCheckService.checkPlayer(player, "hacan");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            }
+            case "kel1", "kel2", "kel3", "ent", "minent", "majent" -> {
                 int ccsToGain = 1;
                 switch (cardID.toLowerCase()) {
                     case "minent" -> {
@@ -594,7 +640,7 @@ public class ExploreService {
                         ButtonHelperAbilities.pillageCheck(player, game);
                         ButtonHelperAgents.resolveArtunoCheck(player, 3);
                     }
-                    case "kel1", "kel2" -> {
+                    case "kel1", "kel2", "kel3" -> {
                         ccsToGain = 2;
                         message = "";
                     }

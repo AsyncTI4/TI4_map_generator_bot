@@ -98,6 +98,7 @@ public class GameProperties {
     private @ExportableField boolean competitiveTIGLGame;
     private @ExportableField boolean fowMode;
     private @ExportableField boolean lightFogMode;
+    private @ExportableField boolean cptiExploreMode;
     private @ExportableField boolean absolMode;
     private @ExportableField boolean discordantStarsMode;
     private @ExportableField boolean miltyModMode;
