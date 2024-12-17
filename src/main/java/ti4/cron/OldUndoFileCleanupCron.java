@@ -32,7 +32,7 @@ public class OldUndoFileCleanupCron {
         long daysOld = 60;
         Instant cutoff = Instant.now().minus(daysOld, ChronoUnit.DAYS);
         int count = 0;
-        Path mapUndoDirectory = Storage.getGameUndoDirectory().toPath();
+        Path mapUndoDirectory = Storage.getGameUndoDirectory();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(mapUndoDirectory)) {
             for (Path path : stream) {
                 try {
