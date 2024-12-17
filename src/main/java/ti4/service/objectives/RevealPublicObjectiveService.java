@@ -25,9 +25,11 @@ public class RevealPublicObjectiveService {
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         MessageHelper.sendMessageToChannel(channel, game.getPing() + " **Stage 2 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
-        if (!"status".equalsIgnoreCase(game.getPhaseOfGame()) && !game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(channel,
-                ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
+        if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
+            if (!game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(channel,
+                    ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
+            }
             return;
         }
         // first do cleanup if necessary
@@ -85,8 +87,10 @@ public class RevealPublicObjectiveService {
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         MessageHelper.sendMessageToChannel(channel, game.getPing() + " **Stage 1 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
-        if (!"status".equalsIgnoreCase(game.getPhaseOfGame()) && !game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
+        if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
+            if (!game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
+            }
             return;
         }
         // first do cleanup if necessary

@@ -143,9 +143,10 @@ public class FOWCombatThreadMirroring {
     }
 
     private static boolean isAllowedBotMsg(String messageText) {
-        return isCombatRoll(messageText)
+        return !messageText.contains("said:") &&
+            (isCombatRoll(messageText)
             || isRetreat(messageText) 
-            || isAssignHit(messageText);
+            || isAssignHit(messageText));
     }
 
     private static boolean isCombatRoll(String messageText) {
