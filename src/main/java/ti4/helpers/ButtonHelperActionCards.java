@@ -1603,7 +1603,7 @@ public class ButtonHelperActionCards {
                 cabalMech = true;
             }
             if (p2.hasAbility("amalgamation")
-                && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || cabalMech)
+                && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", p2, tile) || cabalMech)
                 && FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, p2, amountToKill, "infantry", event);
             }
@@ -1690,7 +1690,7 @@ public class ButtonHelperActionCards {
                 cabalMech = true;
             }
             if (p2.hasAbility("amalgamation")
-                && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || cabalMech)
+                && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", p2, tile) || cabalMech)
                 && FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, p2, hits, "infantry", event);
             }
@@ -1739,7 +1739,7 @@ public class ButtonHelperActionCards {
             RemoveUnitService.removeUnit(event, tile, game, unitParsed);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
 
-            if (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile)) {
+            if (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", p2, tile)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, p2, hits, "fighter", event);
             }
         }

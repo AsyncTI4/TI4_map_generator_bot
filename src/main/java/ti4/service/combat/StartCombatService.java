@@ -498,7 +498,9 @@ public class StartCombatService {
         afbButtons.add(Buttons.gray("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll AFB (if applicable):", afbButtons);
         for (Player player : combatPlayers) {
-            if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !ButtonHelper.isLawInPlay(game, "articles_war")) {
+            if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !ButtonHelper.isLawInPlay(game, "articles_war") 
+                    || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_1", player, tile)
+                    || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_2", player, tile)) {
                 MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use AFB against " + player.getFactionEmojiOrColor() + " due to their mech power");
             }
         }
@@ -529,8 +531,8 @@ public class StartCombatService {
             return buttons;
 
         // Assault Cannon
-        if ((p1.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p1, tile) > 2 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p1, tile)))
-            || (p2.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p2, tile) > 2 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p2, tile)))) {
+        if ((p1.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p1, tile) >= 3 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p1, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_2", p1, tile)))
+            || (p2.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p2, tile) >= 3 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_2", p2, tile)))) {
             buttons.add(Buttons.blue("assCannonNDihmohn_asc_" + tile.getPosition(), "Use Assault Cannon", TechEmojis.WarfareTech));
         }
 
@@ -765,6 +767,26 @@ public class StartCombatService {
         if (isSpaceCombat && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p1, tile)) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "gain_1_comms_stay", "Psyclobea Qarnyx (Myko Flagship)", FactionEmojis.mykomentori));
+        }
+
+        if ((ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_1", p2, tile) | ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_2", p2, tile)) && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            String tp = tile.getPosition();
+            buttons.add(Buttons.gray(finChecker + "placeOneNDone_skipbuild_ff_" + tp, "Genesis (Sol Flagship) Fighter", FactionEmojis.Sol));
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                String pp = planet.getName();
+                Button inf2Button = Buttons.green(finChecker + "placeOneNDone_skipbuild_ff_2gf_" + pp, "Genesis (Sol Flagship) Fighter on" + Helper.getPlanetRepresentation(pp, game), FactionEmojis.Sol);
+                buttons.add(inf2Button);
+            }
+        }
+        if ((ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_1", p1, tile) | ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_2", p1, tile)) && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            String tp = tile.getPosition();
+            buttons.add(Buttons.gray(finChecker + "placeOneNDone_skipbuild_ff_" + tp, "Genesis (Sol Flagship) Fighter", FactionEmojis.Sol));
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                String pp = planet.getName();
+                buttons.add(Buttons.green(finChecker + "placeOneNDone_skipbuild_ff_2gf_" + pp, "Genesis (Sol Flagship) Fighter on" + Helper.getPlanetRepresentation(pp, game), FactionEmojis.Sol));
+            }
         }
 
         if (isSpaceCombat) {

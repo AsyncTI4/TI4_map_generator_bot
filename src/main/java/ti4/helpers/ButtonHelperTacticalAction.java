@@ -638,7 +638,7 @@ public class ButtonHelperTacticalAction {
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, game);
         if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn")) && !button2.isEmpty() && !game.isL1Hero()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", Please resolve Scanlink Drone Network.", button2);
-            if (player.hasAbility("awaken") || player.hasUnit("titans_flagship")) {
+            if (player.hasAbility("awaken") || player.hasUnit("titans_flagship") || player.hasUnit("sigma_ul_flagship_1") || player.hasUnit("sigma_ul_flagship_2")) {
                 ButtonHelper.resolveTitanShenanigansOnActivation(player, game, game.getTileByPosition(pos), event);
             }
         } else {

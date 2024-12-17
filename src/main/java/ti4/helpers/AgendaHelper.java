@@ -432,22 +432,22 @@ public class AgendaHelper {
                 }
             } else {
                 String identifier;
-                String outcome = game.getStoredValue("latestOutcomeVotedFor" + player.getFaction());
+                winner = game.getStoredValue("latestOutcomeVotedFor" + player.getFaction());
                 if (game.isFowMode()) {
                     identifier = player.getColor();
                 } else {
                     identifier = player.getFaction();
                 }
                 Map<String, String> outcomes = game.getCurrentAgendaVotes();
-                String existingData = outcomes.getOrDefault(outcome, "empty");
+                String existingData = outcomes.getOrDefault(winner, "empty");
                 int numV = Integer.parseInt(votes);
                 int numVOrig = Integer.parseInt(Helper.buildSpentThingsMessageForVoting(player, game, true));
                 if (numV > numVOrig) {
                     player.addSpentThing("specialVotes_" + (numV - numVOrig));
                 }
                 if ((game.getLaws() == null || (!game.getLaws().containsKey("rep_govt") && !game.getLaws().containsKey("absol_government"))) &&
-                    (player.ownsPromissoryNote("blood_pact") || player.getPromissoryNotesInPlayArea().contains("blood_pact"))) {
-                    for (Player p2 : getWinningVoters(outcome, game)) {
+                        (player.ownsPromissoryNote("blood_pact") || player.getPromissoryNotesInPlayArea().contains("blood_pact"))) {
+                    for (Player p2 : getWinningVoters(winner, game)) {
                         if (p2 == player) {
                             continue;
                         }
@@ -458,12 +458,40 @@ public class AgendaHelper {
                         }
                     }
                 }
+                if ((game.getLaws() == null || (!game.getLaws().containsKey("rep_govt") && !game.getLaws().containsKey("absol_government"))) &&
+                        (player.ownsPromissoryNote("sigma_blood_pact") || player.getPromissoryNotesInPlayArea().contains("sigma_blood_pact"))) {
+                    List<Player> winnners = new ArrayList<>();
+                    for (String outcome : outcomes.keySet()) {
+                        if (outcome.equalsIgnoreCase(winner)) {
+                            StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
+
+                            while (vote_info.hasMoreTokens()) {
+                                String specificVote = vote_info.nextToken();
+                                String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                                Player p = game.getPlayerFromColorOrFaction(faction.toLowerCase());
+                                if (p != null &&!winnners.contains(p)) {
+                                    winnners.add(p);
+                                }
+                            }
+                        }
+                    }
+                    for (Player p2 : winnners) {
+                        if (p2 == player) {
+                            continue;
+                        }
+                        if (p2.ownsPromissoryNote("sigma_blood_pact") || p2.getPromissoryNotesInPlayArea().contains("sigma_blood_pact")) {
+                            player.addSpentThing("bloodPact_" + 6);
+                            votes = (Integer.parseInt(votes) + 6) + "";
+                            break;
+                        }
+                    }
+                }
                 if ("empty".equalsIgnoreCase(existingData)) {
                     existingData = identifier + "_" + votes;
                 } else {
                     existingData = existingData + ";" + identifier + "_" + votes;
                 }
-                game.setCurrentAgendaVote(outcome, existingData);
+                game.setCurrentAgendaVote(winner, existingData);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
             }
 
@@ -2254,6 +2282,9 @@ public class AgendaHelper {
         if (player.getPromissoryNotesInPlayArea().contains("blood_pact")) {
             additionalVotesAndSources.put(FactionEmojis.Empyrean + " " + CardEmojis.PN + "Blood Pact", 4);
         }
+        if (player.getPromissoryNotesInPlayArea().contains("sigma_blood_pact")) {
+            additionalVotesAndSources.put(FactionEmojis.Empyrean + " " + CardEmojis.PN + "Blood Pact", 6);
+        }
 
         // Predictive Intelligence
         if (player.hasTechReady("pi") || player.hasTechReady("absol_pi")) {
@@ -2914,7 +2945,7 @@ public class AgendaHelper {
                             ButtonHelper.resolveInfantryDeath(player, numTG);
                         }
                         boolean cabalMech = player.hasAbility("amalgamation") && unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0 && player.hasUnit("cabal_mech") && !game.getLaws().containsKey("articles_war");
-                        if (player.hasAbility("amalgamation") && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", player, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(player, tile, unitHolder.getName())) {
+                        if (player.hasAbility("amalgamation") && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", player, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", player, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", player, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(player, tile, unitHolder.getName())) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, numTG, "infantry", event);
                         }
 
