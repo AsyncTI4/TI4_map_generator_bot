@@ -15,7 +15,7 @@ import ti4.service.fow.WhisperService;
 class Whisper extends GameStateSubcommand {
 
     public Whisper() {
-        super(Constants.WHISPER, "Send a private message to a player in fog mode", true, true);
+        super(Constants.WHISPER, "Send a private message to a player in fog mode", false, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to which you send the message").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.MSG, "Message to send").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ANON, "Send anonymously").setAutoComplete(true));
