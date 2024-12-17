@@ -1,5 +1,7 @@
 package ti4.map.manage;
 
+import static ti4.map.manage.GamePersistenceKeys.*;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -11,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -31,27 +34,6 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.milty.MiltyDraftManager;
-
-import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
-import static ti4.map.manage.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDTILE;
-import static ti4.map.manage.GamePersistenceKeys.ENDTOKENS;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITDAMAGE;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITS;
-import static ti4.map.manage.GamePersistenceKeys.GAMEINFO;
-import static ti4.map.manage.GamePersistenceKeys.MAPINFO;
-import static ti4.map.manage.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.map.manage.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.map.manage.GamePersistenceKeys.PLAYER;
-import static ti4.map.manage.GamePersistenceKeys.PLAYERINFO;
-import static ti4.map.manage.GamePersistenceKeys.TILE;
-import static ti4.map.manage.GamePersistenceKeys.TOKENS;
-import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
-import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
-import static ti4.map.manage.GamePersistenceKeys.UNITS;
 
 @UtilityClass
 class GameSaveService {
@@ -412,6 +394,8 @@ class GameSaveService {
         writer.write(Constants.BASE_GAME_MODE + " " + game.isBaseGameMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.LIGHT_FOG_MODE + " " + game.isLightFogMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.CPTI_EXPLORE_MODE + " " + game.isCptiExploreMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.RED_TAPE_MODE + " " + game.isRedTapeMode());
         writer.write(System.lineSeparator());
