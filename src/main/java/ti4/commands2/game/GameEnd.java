@@ -10,6 +10,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.service.game.EndGameService;
+import ti4.service.game.RematchService;
 
 class GameEnd extends GameStateSubcommand {
 
@@ -37,6 +38,10 @@ class GameEnd extends GameStateSubcommand {
         boolean publish = event.getOption(Constants.PUBLISH, true, OptionMapping::getAsBoolean);
         boolean archiveChannels = event.getOption(Constants.ARCHIVE_CHANNELS, true, OptionMapping::getAsBoolean);
         boolean rematch = event.getOption(Constants.REMATCH, false, OptionMapping::getAsBoolean);
-        EndGameService.secondHalfOfGameEnd(event, game, publish, archiveChannels, rematch);
+        if (rematch) {
+            RematchService.rematch(game, event);
+        } else {
+            EndGameService.secondHalfOfGameEnd(event, game, publish, archiveChannels);
+        }
     }
 }

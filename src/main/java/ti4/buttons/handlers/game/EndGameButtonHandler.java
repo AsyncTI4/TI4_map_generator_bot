@@ -12,7 +12,7 @@ public class EndGameButtonHandler {
 
     @ButtonHandler("gameEnd")
     public static void gameEnd(ButtonInteractionEvent event, Game game) {
-        EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
+        EndGameService.secondHalfOfGameEnd(event, game, true, true);
         ButtonHelper.deleteMessage(event);
     }
 }

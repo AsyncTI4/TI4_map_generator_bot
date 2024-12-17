@@ -591,17 +591,17 @@ public class AutoCompleteProvider {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                List<Command.Choice> options;
                 if (game.isFowMode()) {
-                    var options = mapTo25ChoicesThatContain(game.getTileMap().keySet(), enteredValue);
-                    event.replyChoices(options).queue();
+                    options = mapTo25ChoicesThatContain(game.getTileMap().keySet(), enteredValue);
                 } else {
-                    List<Command.Choice> options = game.getTileNameAutocompleteOptionsCache().stream()
+                    options = game.getTileNameAutocompleteOptionsCache().stream()
                         .filter(value -> value.getKey().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getKey(), value.getValue()))
                         .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
                 }
+                event.replyChoices(options).queue();
             }
             case Constants.PLANET, Constants.PLANET2, Constants.PLANET3, Constants.PLANET4, Constants.PLANET5, Constants.PLANET6 -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();

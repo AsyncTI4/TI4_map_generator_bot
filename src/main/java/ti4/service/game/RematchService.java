@@ -30,7 +30,7 @@ import ti4.message.MessageHelper;
 public class RematchService {
 
     public static void rematch(Game game, GenericInteractionCreateEvent event) {
-        EndGameService.gameEndStuff(game, event, true);
+        EndGameService.gameEndStuff(game, event, true, false);
         secondHalfOfRematch(event, game);
     }
 
