@@ -1,0 +1,146 @@
+[
+    {
+        "id": "fivetg1",
+        "name": "A Lost Merchant",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 5 trade goods.",
+        "source": "cpti"
+    },
+    {
+        "id": "fivetg2",
+        "name": "A Minor Noble's Hoard",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 5 trade goods.",
+        "source": "cpti"
+    },
+    {
+        "id": "fivetg3",
+        "name": "One Man's Junk",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 5 trade goods.",
+        "source": "cpti"
+    },
+    {
+        "id": "freetech1",
+        "name": "Remnants of JJ's Dream",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Research 1 Free Tech.",
+        "source": "cpti"
+    },
+    {
+        "id": "freetech2",
+        "name": "A Hylar Scientist Seeking Asylum",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Research 1 Free Tech.",
+        "source": "cpti"
+    },
+    {
+        "id": "freetech3",
+        "name": "A Thing-A-Ma-Bob",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Research 1 Free Tech.",
+        "source": "cpti"
+    },
+    {
+        "id": "fiveac1",
+        "name": "A Rogue Yssaril Segment",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Draw 5 Action Cards.",
+        "source": "cpti"
+    },
+    {
+        "id": "fiveac2",
+        "name": "Your Uncle George's Old Spaceship",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Draw 5 Action Cards.",
+        "source": "cpti"
+    },
+    {
+        "id": "fiveac3",
+        "name": "A MacGuffin",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Draw 5 Action Cards.",
+        "source": "cpti"
+    },
+    {
+        "id": "kel3",
+        "name": "Keleres Ship",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 2 command tokens.",
+        "source": "cpti"
+    },
+    {
+        "id": "gainsardakkagent",
+        "name": "Sardakk Agent",
+        "type": "Frontier",
+        "resolution": "Leader",
+        "text": "Gain Sardakk Agent (readied).",
+        "source": "cpti"
+    },
+    {
+        "id": "gaintitansagent",
+        "name": "Titans Agent",
+        "type": "Frontier",
+        "resolution": "Leader",
+        "text": "Gain Titans Agent (readied).",
+        "source": "cpti"
+    },
+    {
+        "id": "gainyinagent",
+        "name": "Yin Agent",
+        "type": "Frontier",
+        "resolution": "Leader",
+        "text": "Gain Yin Agent (readied).",
+        "source": "cpti"
+    },
+    {
+        "id": "gainwinnuagent",
+        "name": "Winnu Agent",
+        "type": "Frontier",
+        "resolution": "Leader",
+        "text": "Gain Winnu Agent (readied).",
+        "source": "cpti"
+    },
+    {
+        "id": "gainnaazagent",
+        "name": "NRA Agent",
+        "type": "Frontier",
+        "resolution": "Leader",
+        "text": "Gain NRA Agent (readied).",
+        "source": "cpti"
+    },
+    {
+        "id": "gainarborecagent",
+        "name": "Arborec Agent",
+        "type": "Frontier",
+        "resolution": "Leader",
+        "text": "Gain Arborec Agent (readied).",
+        "source": "cpti"
+    },
+    {
+        "id": "gainnekroagent",
+        "name": "Nekro Agent",
+        "type": "Frontier",
+        "resolution": "Leader",
+        "text": "Gain Nekro Agent (readied).",
+        "source": "cpti"
+    },
+    {
+        "id": "gainxxchaagent",
+        "name": "Xxcha Agent",
+        "type": "Frontier",
+        "resolution": "Leader",
+        "text": "Gain Xxcha Agent (readied).",
+        "source": "cpti"
+    }
+]
