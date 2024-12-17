@@ -5086,7 +5086,7 @@ public class ButtonHelper {
     }
 
     @ButtonHandler("startPlayerSetup")
-    public static void resolveSetupStep0(Player player, Game game, ButtonInteractionEvent event) {
+    public static void resolveSetupStep0(Player player, Game game) {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentation() + "Please tell the bot which user you are setting up",
             getUserSetupButtons(game));
@@ -5889,10 +5889,10 @@ public class ButtonHelper {
         }
         if (production) {
             if (player.hasTech("st")) {
-                youCanSpend.append(". You also have " + TechEmojis.CyberneticTech + "Sarween Tools");
+                youCanSpend.append(". You also have ").append(TechEmojis.CyberneticTech).append("Sarween Tools");
             }
             if (player.hasTechReady("aida")) {
-                youCanSpend.append(". You also have " + TechEmojis.WarfareTech + "AIDEV for ").append(ButtonHelper.getNumberOfUnitUpgrades(player)).append(" resources");
+                youCanSpend.append(". You also have ").append(TechEmojis.WarfareTech).append("AIDEV for ").append(ButtonHelper.getNumberOfUnitUpgrades(player)).append(" resources");
             }
         }
         return youCanSpend.toString();

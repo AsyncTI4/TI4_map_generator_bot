@@ -36,8 +36,6 @@ public class ButtonProcessor {
     private static final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
 
     public static void process(ButtonInteractionEvent event) {
-        long startTime = System.currentTimeMillis();
-
         String eventKey = getEventKey(event);
         if (userButtonPressSet.contains(eventKey)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "The bot hasn't processed this button press since you last pressed it. Please wait.");
@@ -53,7 +51,7 @@ public class ButtonProcessor {
             long contextRuntime = System.currentTimeMillis() - beforeContextTime;
 
             String gameName = context.getGame() != null ? context.getGame().getName() : null;
-            ExecutorManager.runAsync("Button processor task", gameName, () -> process(event, context, startTime, contextRuntime));
+            ExecutorManager.runAsync("Button processor task", gameName, () -> process(event, context, contextRuntime));
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
             userButtonPressSet.remove(eventKey);
@@ -64,7 +62,8 @@ public class ButtonProcessor {
         return event.getUser().getId() + event.getButton().getId();
     }
 
-    private static void process(ButtonInteractionEvent event, ButtonContext context, long startTime, long contextRuntime) {
+    private static void process(ButtonInteractionEvent event, ButtonContext context, long contextRuntime) {
+        long startTime = System.currentTimeMillis();
         long resolveRuntime = 0;
         long saveRuntime = 0;
         try {
