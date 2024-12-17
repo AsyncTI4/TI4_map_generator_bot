@@ -53,6 +53,23 @@ public class ButtonHelperModifyUnits {
             && unitHolder.getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
             return 0;
         }
+        mentakFS = Helper.getPlayerFromUnit(game, "sigma_mentak_flagship_2");
+        if (mentakFS != null && mentakFS != player)
+        {
+            if (unitHolder.getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
+                return 0;
+            }
+            Tile t = game.getTileFromPlanet(unitHolder.getName());
+            for (String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(game, t.getPosition(), player, false))
+            {
+                if (game.getTileByPosition(adjPos).getUnitHolders().get("space").getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0)
+                {
+                    return 0;
+                }
+            }
+        }
+        
+        
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             if (!player.unitBelongsToPlayer(unitEntry.getKey()))
                 continue;
@@ -374,7 +391,7 @@ public class ButtonHelperModifyUnits {
 
     private static boolean shouldProcessUnit(Player player, String unitType, UnitHolder units, int hits) {
         return switch (unitType) {
-            case "fighter" -> hits > 0 && player.hasUnit("naalu_flagship") && units.getUnitCount(UnitType.Fighter, player.getColor()) > 0;
+            case "fighter" -> hits > 0 && (player.hasUnit("naalu_flagship") || player.hasUnit("sigma_naalu_flagship_2")) && units.getUnitCount(UnitType.Fighter, player.getColor()) > 0;
             case "infantry" -> hits > 0;
             case "pds" -> hits > 0 && (player.hasUnit("titans_pds") || player.hasUnit("titans_pds2")) && units.getUnitCount(UnitType.Pds, player.getColor()) > 0;
             default -> false;
@@ -538,7 +555,7 @@ public class ButtonHelperModifyUnits {
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                if (unitModel == null || !unitModel.getSustainDamage() || ((!unitModel.getIsShip() && !ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)) && !isNomadMechApplicable(player, (noMechPowers || spaceCannonOffence), unitKey))) continue;
+                if (unitModel == null || !unitModel.getSustainDamage() || ((!unitModel.getIsShip() && !(ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile))) && !isNomadMechApplicable(player, (noMechPowers || spaceCannonOffence), unitKey))) continue;
                 if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics")) continue;
                 String unitName = unitKey.unitName();
 
@@ -674,7 +691,7 @@ public class ButtonHelperModifyUnits {
                 String unitName = unitKey.unitName();
 
                 if ((unitName.equalsIgnoreCase("mech") || unitName.equalsIgnoreCase("infantry")) &&
-                    !(ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile) ||
+                    !((ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile)) ||
                         unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
 
                     int min = unitEntry.getValue();

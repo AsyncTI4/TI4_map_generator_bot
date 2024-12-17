@@ -1062,6 +1062,7 @@ public class Constants {
     public static final String MOD_UNITS_TWO_MATCHING_NOT_FF = "units_two_matching_not_ff";
     public static final String MOD_ADJACENT_MECH = "adjacent_mech";
     public static final String MOD_OPPONENT_NON_FIGHTER_SHIP = "opponent_non_fighter_ship";
+    public static final String MOD_OPPONENT_SHIP = "opponent_ship";
 
     public static final String MIGRATION_NAME = "migration_name";
     public static final String RUN_MANUAL_DATA_MIGRATION = "run_manual_data_migration";

@@ -243,6 +243,11 @@ public class ComponentActionHelper {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Spend 1 strategy CC for 1 cruiser with The Inferno (Muaat Flagship)", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
+        if ((p1.getUnitsOwned().contains("sigma_muaat_flagship_1") || p1.getUnitsOwned().contains("sigma_muaat_flagship_1")) && p1.getStrategicCC() > 0
+            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFSsigma", "Spend 1 strategy token for The Inferno (Muaat Flagship)", FactionEmojis.Muaat);
+            compButtons.add(abilityButton);
+        }
 
         // Get Relic
         if (p1.enoughFragsForRelic()) {
@@ -346,6 +351,18 @@ public class ComponentActionHelper {
                     AddUnitService.addUnits(event, tile, game, p1.getColor(), "cruiser");
                     successMessage = successMessage + "Produced 1 " + UnitEmojis.cruiser + " in tile "
                         + tile.getRepresentationForButtons(game, p1) + ".";
+                    MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
+                    String message = "Use buttons to end turn or do another action";
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                    ButtonHelper.deleteMessage(event);
+                } else if ("muaatFSsigma".equalsIgnoreCase(buttonID)) {
+                    String successMessage = p1.getFactionEmoji() + " Spent 1 strategy token using " + FactionEmojis.Muaat
+                        + UnitEmojis.flagship + "The Inferno (" + (p1.getStrategicCC()) + "->"
+                        + (p1.getStrategicCC() - 1) + ") \n";
+                    p1.setStrategicCC(p1.getStrategicCC() - 1);
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, FactionEmojis.Muaat + " " + UnitEmojis.flagship + "The Inferno");
+                    List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
+                    successMessage = successMessage + "Please add units manually.";
                     MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
                     String message = "Use buttons to end turn or do another action";
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);

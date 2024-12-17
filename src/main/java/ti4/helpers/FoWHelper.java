@@ -394,7 +394,7 @@ public class FoWHelper {
 
 		String ghostFlagshipColor = null;
 		for (Player p : game.getPlayers().values()) {
-			if (p.ownsUnit("ghost_flagship")) {
+			if (p.ownsUnit("ghost_flagship") || p.ownsUnit("sigma_creuss_flagship_1") || p.ownsUnit("sigma_creuss_flagship_2")) {
 				ghostFlagshipColor = p.getColor();
 				break;
 			}
@@ -513,7 +513,7 @@ public class FoWHelper {
 
 		String ghostFlagshipColor = null;
 		for (Player p : game.getPlayers().values()) {
-			if (p.ownsUnit("ghost_flagship")) {
+			if (p.ownsUnit("ghost_flagship") || p.ownsUnit("sigma_creuss_flagship_1") || p.ownsUnit("sigma_creuss_flagship_2")) {
 				ghostFlagshipColor = p.getColor();
 				break;
 			}

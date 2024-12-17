@@ -94,8 +94,13 @@ public class CombatMessageHelper {
             resultRollsString = resultRollsString.replace(DiceEmojis.d10red_9.toString(), DiceEmojis.d10blue_9.toString());
             resultRollsString = resultRollsString.replace(DiceEmojis.d10red_0.toString(), DiceEmojis.d10blue_0.toString());
         }
+        
+        String winnu_sigma = "";
+        if ("sigma_winnu_flagship_2".equals(unitModel.getId())) {
+            winnu_sigma = "-# The number of dice may not be correct; if so, you will need to manually roll the extra.\n";
+        }
 
-        return String.format("> `%sx`%s %s %s - %s hit%s\n", unitQuantity, unitEmoji, optionalText, resultRollsString, numHit, hitsSuffix);
+        return String.format("> `%sx`%s %s %s - %s hit%s\n%s", unitQuantity, unitEmoji, optionalText, resultRollsString, numHit, hitsSuffix, winnu_sigma);
     }
 
     public static String displayModifiers(String prefixText, Map<UnitModel, Integer> units,

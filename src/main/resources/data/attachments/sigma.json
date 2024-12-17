@@ -64,5 +64,14 @@
         "imagePath": "attachment_sigma_palace_scientists.png",
         "token": "sigma_palace_scientists",
         "source": "sigma"
+    },
+    {
+        "id": "sigma_cyber",
+        "imagePath": "attachment_sigma_cyber.png",
+        "token": "sigma_cyber",
+        "resourcesModifier": 2,
+        "influenceModifier": 2,
+        "isFakeAttachment": true,
+        "source": "sigma"
     }
 ]
