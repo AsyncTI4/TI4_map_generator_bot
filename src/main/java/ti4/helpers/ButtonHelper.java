@@ -808,10 +808,8 @@ public class ButtonHelper {
         if (!game.isFowMode() && ghostPlayer != null && ghostPlayer != player
             && getNumberOfUnitsOnTheBoard(game, ghostPlayer, "mech", false) > 0
             && !ButtonHelper.isLawInPlay(game, "articles_war")) {
-            event.getHook().sendMessage(player.getRepresentation() + " This is a reminder that if you are moving via Creuss wormhole, you should " +
-                "first pause and check if the Creuss player wants to use their mech to move that wormhole.")
             event.getHook().sendMessage(player.getRepresentation() + ", this is a reminder that if you are moving via a Creuss wormhole, you should " +
-                    "first pause and check if the Creuss player wants to use their mech to move that wormhole.")
+                "first pause and check if the Creuss player wants to use their mech to move that wormhole.")
                 .setEphemeral(true).queue();
         }
         if (!game.isFowMode() && ButtonHelper.isLawInPlay(game, "minister_peace")) {
