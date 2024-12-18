@@ -270,9 +270,11 @@ public class MapGenerator implements AutoCloseable {
             return;
         }
         Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
+
+        // Show Grey Setup Tiles
         if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
             int ringCount = game.getRingCount();
-            ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
+            ringCount = Math.max(Math.min(ringCount, 11), RING_MIN_COUNT); //TODO: use RING_MAX_COUNT
             minX = 10000;
             minY = 10000;
             maxX = -1;
