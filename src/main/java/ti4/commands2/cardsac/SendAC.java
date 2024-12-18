@@ -18,8 +18,8 @@ import ti4.service.emoji.CardEmojis;
 class SendAC extends GameStateSubcommand {
 
     public SendAC() {
-        super(Constants.SEND_AC, "Send an action card to a player", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID to send").setRequired(true));
+        super(Constants.SEND_AC, "Send an Action Card to a player", true, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that to send").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to send to").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
@@ -37,7 +37,7 @@ class SendAC extends GameStateSubcommand {
         }
 
         if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
 

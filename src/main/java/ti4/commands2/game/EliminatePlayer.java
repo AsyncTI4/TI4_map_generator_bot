@@ -116,7 +116,7 @@ class EliminatePlayer extends GameStateSubcommand {
             Map<String, Integer> acs = new LinkedHashMap<>(player.getActionCards());
             for (Map.Entry<String, Integer> ac : acs.entrySet()) {
                 game.discardActionCard(player.getUserID(), ac.getValue());
-                String sb = "Player: " + player.getUserName() + " - " + "Discarded action card:" + "\n" + Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
+                String sb = "Player: " + player.getUserName() + " - " + "Discarded Action Card:" + "\n" + Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
                 MessageHelper.sendMessageToChannel(event.getChannel(), sb);
             }
             ActionCardHelper.serveReverseEngineerButtons(game, player, new ArrayList<>(acs.keySet()));

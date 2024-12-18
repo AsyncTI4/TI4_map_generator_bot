@@ -5001,16 +5001,16 @@ public class ButtonHelper {
         buttons.add(Buttons.green("setupHomebrew_absolRelicsNAgendas", "Absol Relics And Agendas", SourceEmojis.Absol));
         buttons.add(Buttons.green("setupHomebrew_absolTechsNMechs", "Absol Techs and Mechs", SourceEmojis.Absol));
         buttons.add(Buttons.green("setupHomebrew_dsfactions", "Discordant Stars Factions", SourceEmojis.DiscordantStars));
-        buttons.add(Buttons.green("setupHomebrew_dsexplores", "Uncharted Space Explores/Relics/Action Cards", SourceEmojis.UnchartedSpace));
+        buttons.add(Buttons.green("setupHomebrew_dsexplores", "US Explores/Relics/ACs", SourceEmojis.UnchartedSpace));
         buttons.add(Buttons.green("setupHomebrew_acDeck2", "Action Cards Deck 2", SourceEmojis.ActionDeck2));
-        buttons.add(Buttons.green("setupHomebrew_456", "5 Stage 1s, 6 Stage 2s, 4 Secrets, 14 VP"));
+        buttons.add(Buttons.green("setupHomebrew_456", "5 stage 1s, 6 stage 2s, 4 secrets, 14 VP"));
         buttons.add(Buttons.green("setupHomebrew_redTape", "Red Tape"));
         buttons.add(Buttons.green("setupHomebrew_removeSupports", "Remove Supports"));
-        buttons.add(Buttons.green("setupHomebrew_homebrewSCs", "Homebrew Strategy Cards"));
+        buttons.add(Buttons.green("setupHomebrew_homebrewSCs", "Homebrew SCs"));
         buttons.add(Buttons.red("deleteButtons", "Done With Buttons"));
         deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            "Game has been marked as homebrew; chose which homebrew you'd like in the game, or press \"Done With Buttons\".",
+            "Game has been marked as homebrew; chose which homebrew you'd like in the game, or press Done With Buttons.",
             buttons);
     }
 
@@ -5086,7 +5086,7 @@ public class ButtonHelper {
             }
             case "acDeck2" -> {
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_deck_2"));
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set the action card deck to Action Card Deck 2.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set the action card deck to AC Deck 2.");
             }
             case "dsfactions" -> {
                 game.setDiscordantStarsMode(true);

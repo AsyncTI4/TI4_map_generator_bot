@@ -17,8 +17,8 @@ import ti4.message.MessageHelper;
 class ShowAC extends GameStateSubcommand {
 
     public ShowAC() {
-        super(Constants.SHOW_AC, "Show an action card to one player", false, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, that is sent between ()").setRequired(true));
+        super(Constants.SHOW_AC, "Show an Action Card to one player", false, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
@@ -36,7 +36,7 @@ class ShowAC extends GameStateSubcommand {
         }
 
         if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
 
@@ -44,7 +44,7 @@ class ShowAC extends GameStateSubcommand {
         String sb = "---------\n" +
             "Game: " + game.getName() + "\n" +
             "Player: " + player.getUserName() + "\n" +
-            "Shown Action Cards:" + "\n" +
+            "Showed Action Cards:" + "\n" +
             Mapper.getActionCard(acID).getRepresentation() + "\n" +
             "---------\n";
         player.setActionCard(acID);

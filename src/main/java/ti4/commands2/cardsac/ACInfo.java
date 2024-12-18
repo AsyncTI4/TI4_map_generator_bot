@@ -9,12 +9,12 @@ import ti4.message.MessageHelper;
 class ACInfo extends GameStateSubcommand {
 
     public ACInfo() {
-        super(Constants.INFO, "Send action cards to your #cards-info thread", false, true);
+        super(Constants.INFO, "Send Action Cards to your Cards Info thread", false, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         ActionCardHelper.sendActionCardInfo(getGame(), getPlayer(), event);
-        MessageHelper.sendMessageToEventChannel(event, "Action card info sent.");
+        MessageHelper.sendMessageToEventChannel(event, "AC Info Sent");
     }
 }

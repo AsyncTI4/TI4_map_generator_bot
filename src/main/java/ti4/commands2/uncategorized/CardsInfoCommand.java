@@ -21,7 +21,7 @@ public class CardsInfoCommand extends GameStateCommand {
 
     @Override
     public String getDescription() {
-        return "Send to your `#cards-info` thread: scored & unscored secret objectives, action cards, and promissory notes both in hand and in your play area";
+        return "Send to your Cards Info thread: Scored & Unscored SOs, ACs, and PNs in both hand and Play Area";
     }
 
     @Override
