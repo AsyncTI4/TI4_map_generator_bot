@@ -45,7 +45,7 @@ public class MessageListener extends ListenerAdapter {
             return;
         }
 
-        ExecutorManager.runAsync("Message listener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, () -> processMessage(event, message));
+        ExecutorManager.runAsync("MessageListener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, () -> processMessage(event, message));
     }
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
