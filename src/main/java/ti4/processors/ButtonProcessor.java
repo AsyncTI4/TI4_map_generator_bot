@@ -28,6 +28,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.button.ReactionService;
+import ti4.service.game.GameNameService;
 
 public class ButtonProcessor {
 
@@ -35,46 +36,41 @@ public class ButtonProcessor {
     private static final Set<String> userButtonPressSet = ConcurrentHashMap.newKeySet();
     private static final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
 
-    public static void process(ButtonInteractionEvent event) {
+    public static void queue(ButtonInteractionEvent event) {
         String eventKey = getEventKey(event);
-        if (userButtonPressSet.contains(eventKey)) {
+        if (!userButtonPressSet.add(eventKey)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "The bot hasn't processed this button press since you last pressed it. Please wait.");
             return;
         }
 
-        try {
-            userButtonPressSet.add(eventKey);
-            BotLogger.logButton(event);
+        BotLogger.logButton(event);
 
-            long beforeContextTime = System.currentTimeMillis();
-            ButtonContext context = new ButtonContext(event);
-            long contextRuntime = System.currentTimeMillis() - beforeContextTime;
-
-            String gameName = context.getGame() != null ? context.getGame().getName() : null;
-            ExecutorManager.runAsync("Button processor task", gameName, () -> process(event, context, contextRuntime));
-        } catch (Exception e) {
-            BotLogger.log(event, "Something went wrong with button interaction", e);
-            userButtonPressSet.remove(eventKey);
-        }
+        String gameName = GameNameService.getGameNameFromChannel(event);
+        ExecutorManager.runAsync("ButtonProcessor task", gameName, () -> process(event));
     }
 
     private static String getEventKey(ButtonInteractionEvent event) {
         return event.getUser().getId() + event.getButton().getId();
     }
 
-    private static void process(ButtonInteractionEvent event, ButtonContext context, long contextRuntime) {
+    private static void process(ButtonInteractionEvent event) {
         long startTime = System.currentTimeMillis();
+        long contextRuntime = 0;
         long resolveRuntime = 0;
         long saveRuntime = 0;
         try {
-            if (context.isValid()) {
-                long beforeResolveTime = System.currentTimeMillis();
-                resolveButtonInteractionEvent(context);
-                resolveRuntime = System.currentTimeMillis() - beforeResolveTime;
+            long beforeTime = System.currentTimeMillis();
+            ButtonContext context = new ButtonContext(event);
+            contextRuntime = System.currentTimeMillis() - beforeTime;
 
-                beforeResolveTime = System.currentTimeMillis();
+            if (context.isValid()) {
+                beforeTime = System.currentTimeMillis();
+                resolveButtonInteractionEvent(context);
+                resolveRuntime = System.currentTimeMillis() - beforeTime;
+
+                beforeTime = System.currentTimeMillis();
                 context.save();
-                saveRuntime = System.currentTimeMillis() - beforeResolveTime;
+                saveRuntime = System.currentTimeMillis() - beforeTime;
             }
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
