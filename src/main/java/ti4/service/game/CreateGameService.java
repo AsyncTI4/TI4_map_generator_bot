@@ -36,7 +36,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper;
-import ti4.helpers.ThreadArchiveHelper;
+import ti4.helpers.ThreadHelper;
 import ti4.image.ImageHelper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -91,7 +91,7 @@ public class CreateGameService {
         Guild guild = categoryChannel.getGuild();
 
         // MAKE ROOM FOR MORE THREADS
-        ThreadArchiveHelper.checkThreadLimitAndArchive(guild);
+        ThreadHelper.checkThreadLimitAndArchive(guild);
 
         // CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {

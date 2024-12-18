@@ -14,7 +14,6 @@ import ti4.listeners.annotations.ModalHandler;
 import ti4.listeners.context.ModalContext;
 import ti4.map.Game;
 import ti4.message.BotLogger;
-import ti4.service.game.GameNameService;
 
 public class ModalListener extends ListenerAdapter {
 
@@ -41,17 +40,26 @@ public class ModalListener extends ListenerAdapter {
 
         event.deferEdit().queue();
 
-        String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorManager.runAsync("ModalListener task", gameName, () -> handleModal(event));
+        handleModal(event);
     }
 
     private void handleModal(@Nonnull ModalInteractionEvent event) {
         try {
             ModalContext context = new ModalContext(event);
             if (context.isValid()) {
-                resolveModalInteractionEvent(context);
-                context.save();
+                String gameName = context.getGame() == null ? null : context.getGame().getName();
+                ExecutorManager.runAsync("Modal listener task", gameName, () -> handleModal(event, context));
             }
+        } catch (Exception e) {
+            String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
+            BotLogger.log(message, e);
+        }
+    }
+
+    private void handleModal(@Nonnull ModalInteractionEvent event, @Nonnull ModalContext context) {
+        try {
+            resolveModalInteractionEvent(context);
+            context.save();
         } catch (Exception e) {
             String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
             BotLogger.log(message, e);

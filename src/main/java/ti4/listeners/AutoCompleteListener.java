@@ -18,8 +18,6 @@ public class AutoCompleteListener extends ListenerAdapter {
             event.replyChoice("Please try again in a moment. The bot is not ready to serve AutoComplete.", 0).queue();
             return;
         }
-
-        ExecutorManager.runAsync("AutoCompleteListener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS,
-            () -> AutoCompleteProvider.handleAutoCompleteEvent(event));
+        ExecutorManager.runAsync("AutoComplete task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, () -> AutoCompleteProvider.handleAutoCompleteEvent(event));
     }
 }

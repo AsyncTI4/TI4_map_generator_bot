@@ -1,6 +1,7 @@
 package ti4.listeners.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
@@ -26,6 +27,8 @@ public class ButtonContext extends ListenerContext {
     }
 
     public ButtonContext(ButtonInteractionEvent event) {
+        // Most of the generic checks happen inside `super` constructor
+        // If something fails in super, it will set the valid flag to false, and we will quit immediately
         super(event, event.getButton().getId());
         if (!isValid()) {
             return;

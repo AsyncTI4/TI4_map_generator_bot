@@ -15,8 +15,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
-import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.ThreadGetter;
+import ti4.helpers.ThreadHelper;
 import ti4.selections.SelectionMenuProcessor;
 import ti4.settings.GlobalSettings;
 
@@ -119,7 +119,7 @@ public class BotLogger {
                 if (e == null) {
                     botLogChannel.sendMessage(message).queue();
                 } else {
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
+                    ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
                     botLogChannel.sendMessage(message).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
@@ -134,7 +134,7 @@ public class BotLogger {
                 if (e == null) {
                     botLogChannel.sendMessage(message).queue();
                 } else {
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
+                    ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
                     botLogChannel.sendMessage(message).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
@@ -150,7 +150,7 @@ public class BotLogger {
                 if (e == null) {
                     botLogChannel.sendMessage(logMsg).queue();
                 } else {
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
+                    ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
                     botLogChannel.sendMessage(logMsg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
@@ -161,7 +161,7 @@ public class BotLogger {
                 if (e == null) {
                     botLogChannel.sendMessage("[unknown event]\n" + msg).queue();
                 } else {
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
+                    ThreadHelper.checkThreadLimitAndArchive(event.getGuild());
                     botLogChannel.sendMessage("[unknown event]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
                         MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
                         t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
