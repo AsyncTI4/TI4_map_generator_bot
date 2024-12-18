@@ -632,7 +632,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveSpyNetYssarilChooses(Player player, Game game, ButtonInteractionEvent event) {
         Player yssaril = findPNOwner("spynet", game);
         String buttonID = "transact_ACs_" + player.getFaction();
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Sent Yssaril buttons so that they can send you an action card.");
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Sent Yssaril buttons so that they can send you 1AC.");
         TransactionHelper.resolveSpecificTransButtonsOld(game, yssaril, buttonID, event);
         event.getMessage().delete().queue();
     }
@@ -640,7 +640,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("spyNetPlayerChooses")
     public static void resolveSpyNetPlayerChooses(Player player, Game game, ButtonInteractionEvent event) {
         Player yssaril = findPNOwner("spynet", game);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1 action card.", ActionCardHelper.getToBeStolenActionCardButtons(yssaril));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1 AC", ActionCardHelper.getToBeStolenActionCardButtons(yssaril));
         event.getMessage().delete().queue();
     }
 
@@ -1903,11 +1903,11 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("scourPlanet_")
     public static void resolveScour(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " used the **Scour** ability to discard 1 action card and ready "
-            + Helper.getPlanetRepresentation(planet, game) + ".";
+        String msg = player.getFactionEmoji() + " used the Scour ability to discard 1 AC and ready "
+            + Helper.getPlanetRepresentation(planet, game);
         player.refreshPlanet(planet);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-            player.getRepresentationUnfogged() + " use buttons to discard an action card.",
+            player.getRepresentationUnfogged() + " use buttons to discard",
             ActionCardHelper.getDiscardActionCardButtons(player, false));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -1926,14 +1926,14 @@ public class ButtonHelperFactionSpecific {
             }
         }
         String message = player.getRepresentationUnfogged()
-            + ", use buttons to select which planet you wish to attach the Branch Office to.";
+            + " Use buttons to select which planet to put the attachment on";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
             buttons);
     }
 
     public static List<Button> getButtonsToTakeSomeonesAC(Player thief, Player victim) {
         List<Button> takeACs = new ArrayList<>();
-        String secretScoreMsg = "_ _\nClick a button to take 1 action card";
+        String secretScoreMsg = "_ _\nClick a button to take 1 Action Card";
         List<Button> acButtons = ActionCardHelper.getToBeStolenActionCardButtons(victim);
         if (!acButtons.isEmpty()) {
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
@@ -1958,11 +1958,11 @@ public class ButtonHelperFactionSpecific {
             return;
         }
         if (!player2.getActionCards().containsValue(acNum)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that action, so no action card was added/lost.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that AC, no AC added/lost");
             return;
         }
         String ident2 = player2.getRepresentation();
-        String message2 = player.getRepresentationUnfogged() + " took action card #" + acNum + " from " + ident2 + ".";
+        String message2 = player.getRepresentationUnfogged() + " took AC #" + acNum + " from " + ident2;
         String acID = null;
         for (Map.Entry<String, Integer> so : player2.getActionCards().entrySet()) {
             if (so.getValue().equals(acNum)) {
@@ -1970,7 +1970,7 @@ public class ButtonHelperFactionSpecific {
             }
         }
         if (game.isFowMode()) {
-            message2 = "Someone took action card #" + acNum + " from " + player2.getColor() + ".";
+            message2 = "Someone took AC #" + acNum + " from " + player2.getColor();
             MessageHelper.sendMessageToChannel(player.getPrivateChannel(), message2);
             MessageHelper.sendMessageToChannel(player2.getPrivateChannel(), message2);
         } else {

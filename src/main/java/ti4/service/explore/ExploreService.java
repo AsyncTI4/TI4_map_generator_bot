@@ -429,7 +429,7 @@ public class ExploreService {
                     }
 
                     if (game.isFowMode()) {
-                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 action cards.");
+                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 ACs");
                     }
                     ActionCardHelper.sendActionCardInfo(game, player, event);
                 }
@@ -554,9 +554,9 @@ public class ExploreService {
             case "aw1", "aw2", "aw3", "aw4" -> {
                 int commod = player.getCommodities();
                 if (commod > 0) {
-                    message = "Resolve _Abandoned Warehouses_:\n-# You currently have " + player.getCommoditiesRepresentation() 
+                    message = "Resolve _Abandoned Warehouses_:\n-# You currently have " + player.getCommoditiesRepresentation()
                         + " commodit" + (commod == 1 ? "y" : "ies") + ".";
-                    Button convert = Buttons.green("convert_2_comms", "Convert " + commod + " Commodit" + (commod == 1 ? "y" : "ies") 
+                    Button convert = Buttons.green("convert_2_comms", "Convert " + commod + " Commodit" + (commod == 1 ? "y" : "ies")
                         + " Into " + (commod == 1 ? "a " : "") + "Trade Good" + (commod == 1 ? "" : "s"), MiscEmojis.Wash);
                     Button gain = Buttons.blue("gain_2_comms", "Gain 2 Commodities", MiscEmojis.comm);
                     List<Button> buttons = List.of(convert, gain);
@@ -709,7 +709,7 @@ public class ExploreService {
                             leaderM.getLeaderEmoji()));
                     }
                 }
-                buttons.add(Buttons.blue("seedySpace_AC_" + planetID, "Draw 1 Action Card by Removing 1 Infantry or Having Mech on" + planetName));
+                buttons.add(Buttons.blue("seedySpace_AC_" + planetID, "Draw AC by removing 1 infantry or have mech on" + planetName));
                 buttons.add(decline);
 
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
