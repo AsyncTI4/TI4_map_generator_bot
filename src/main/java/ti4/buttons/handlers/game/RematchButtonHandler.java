@@ -12,6 +12,6 @@ class RematchButtonHandler {
 
     @ButtonHandler("rematch")
     public static void rematch(Game game, GenericInteractionCreateEvent event) {
-        ExecutorManager.runAsync("Rematch button task", () -> RematchService.rematch(game, event));
+        ExecutorManager.runAsync("RematchButtonHandler.rematch task", game.getName(), () -> RematchService.rematch(game, event));
     }
 }
