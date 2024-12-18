@@ -41,18 +41,10 @@ public class SlashCommandListener extends ListenerAdapter {
     private static void process(SlashCommandInteractionEvent event, long eventDelay) {
         long startTime = System.currentTimeMillis();
 
-        Member member = event.getMember();
-        if (member != null) {
-            String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
-            event.getChannel().sendMessage(commandText).queue(m -> {
-                BotLogger.logSlashCommand(event, m);
-                SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, m.getJumpUrl());
-            }, BotLogger::catchRestError);
-        }
-
         Command command = CommandManager.getCommand(event.getName());
         if (command.accept(event)) {
             try {
+                logSlashCommand(event);
                 command.preExecute(event);
                 command.execute(event);
                 command.postExecute(event);
@@ -80,6 +72,17 @@ public class SlashCommandListener extends ListenerAdapter {
                 DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
                 DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (processingRuntime > eventDelay ? "😲" : "");
             BotLogger.log(message);
+        }
+    }
+
+    private static void logSlashCommand(SlashCommandInteractionEvent event) {
+        Member member = event.getMember();
+        if (member != null) {
+            String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
+            event.getChannel().sendMessage(commandText).queue(m -> {
+                BotLogger.logSlashCommand(event, m);
+                SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, m.getJumpUrl());
+            }, BotLogger::catchRestError);
         }
     }
 }
