@@ -27,7 +27,7 @@ public class UserJoinServerListener extends ListenerAdapter {
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
         if (!validateEvent(event)) return;
-        ExecutorManager.runAsync("UserJoinServerListener task", () -> handleGuildMemberJoin(event));
+        ExecutorManager.runAsync("Guild member join task", () -> handleGuildMemberJoin(event));
     }
 
     private static boolean validateEvent(GenericGuildEvent event) {
