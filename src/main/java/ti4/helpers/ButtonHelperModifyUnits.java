@@ -1262,7 +1262,7 @@ public class ButtonHelperModifyUnits {
             if (player.hasUnit("absol_saar_spacedock") || player.hasUnit("saar_spacedock") || player.hasTech("ffac2")
                 || player.hasTech("absol_ffac2")) {
                 AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)),
-                    game, player.getColor(), unitID + " " + planetName);
+                    game, player.getColor(), unitID);
                 successMessage = "Placed 1 space dock in the space area of the "
                     + Helper.getPlanetRepresentation(planetName, game) + " system.";
             } else {
