@@ -18,8 +18,8 @@ public class RefreshLeaderService {
             tg += tgCount;
             player.setTg(tg);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " you gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s")
-                    + " (" + (tg - tgCount) + "->" + tg + ") from " + playerLeader.getId() + " being readied");
+                player.getRepresentationUnfogged() + " you gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
+                    + " (" + (tg - tgCount) + "->" + tg + ") from " + playerLeader.getId() + " being readied.");
             ButtonHelperAbilities.pillageCheck(player, game);
             playerLeader.setTgCount(0);
         }

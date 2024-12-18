@@ -208,8 +208,8 @@ public class AddPlanetService {
             && player.hasAbility("scavenge") && !doubleCheck && !setup) {
             String fac = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), fac
-                + " gained 1TG from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
-                + "). Reminder that you do not legally have this TG prior to exploring, and that this was mandatory.");
+                + " gained 1 trade good from **Scavenge** (" + player.getTg() + "->" + (player.getTg() + 1)
+                + "). Reminder that you do not legally have this trade good prior to exploring, and that this was mandatory.");
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -280,7 +280,7 @@ public class AddPlanetService {
         if (ButtonHelper.isPlayerElected(game, player, "minister_exploration") && event != null) {
             String fac = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                fac + " gained 1TG from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1)
+                fac + " gained 1 trade good from _Minister of Exploration_ (" + player.getTg() + "->" + (player.getTg() + 1)
                     + ").");
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, game);
@@ -292,7 +292,7 @@ public class AddPlanetService {
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
             if (event != null && buttons != null && !buttons.isEmpty()) {
                 String message = player.getFactionEmoji() + " Click button to explore "
-                    + Helper.getPlanetRepresentation(planet, game);
+                    + Helper.getPlanetRepresentation(planet, game) + ".";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message, buttons);
             }
@@ -302,16 +302,16 @@ public class AddPlanetService {
             && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             List<Button> saarButton = new ArrayList<>();
             saarButton.add(Buttons.green("saarMechRes_" + planet,
-                "Pay 1TG for mech on " + Helper.getPlanetRepresentation(planet, game)));
+                "Pay 1 Trade Good for a Mech on " + Helper.getPlanetRepresentation(planet, game)));
             saarButton.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                    + " you may pay 1TG to place 1 mech here. Do not do this prior to exploring. It is an after, while exploring is a when.",
+                    + " you may pay 1 trade good to place 1 Scavenger mech here. Do not do this prior to exploring. It is an \"after\", while exploring is a \"when\".",
                 saarButton);
         }
         if (player.hasTech("ie") && unitHolder.getResources() > 0) {
-            String message = player.getRepresentation() + " Click the button to resolve an integrated build on "
-                + Helper.getPlanetRepresentation(planet, game);
+            String message = player.getRepresentation() + " Click the button to resolve an _Integrated Economy_ build on "
+                + Helper.getPlanetRepresentation(planet, game) + ".";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.blue("integratedBuild_" + planet,
                 "Integrated on " + Helper.getPlanetRepresentation(planet, game)));

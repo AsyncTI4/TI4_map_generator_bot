@@ -54,13 +54,13 @@ public class ButtonHelperStats {
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
             player.setTg(player.getTg() + amt);
-            message = "Converted " + amt + " Commodit" + (amt == 1 ? "y" : "ies") + " to " + amt + " TG" + (amt == 1 ? "" : "s");
+            message = "Converted " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " to " + amt + " trade good" + (amt == 1 ? "" : "s") + ".";
         } else if (player.getCommodities() == 1) {
-            message = "Converted their last remaining commodity (less than " + amt + ") into 1TG";
+            message = "Converted their last remaining commodity (less than " + amt + ") into 1 trade good.";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         } else {
-            message = "Converted their " + player.getCommodities() + " remaining commodities (less than " + amt + ") into TGs";
+            message = "Converted their " + player.getCommodities() + " remaining commodities (less than " + amt + ") into " + player.getCommodities() + " trade goods.";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         }

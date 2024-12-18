@@ -352,18 +352,36 @@ public class PromissoryNoteHelper {
         }
         if (id.endsWith("_ta")) {
             int comms = owner.getCommodities();
+            int oldTGs = player.getTg();
             owner.setCommodities(0);
-            String reducedMsg = owner.getRepresentationUnfogged() + " your TA was played.";
-            String reducedMsg2 = player.getRepresentationUnfogged()
-                + " you gained TGs equal to the number of comms the player had (your TGs went from "
-                + player.getTg() + "TG" + (player.getTg() == 1 ? "" : "s") + " to -> " + (player.getTg() + comms)
-                + "TG" + (player.getTg() + comms == 1 ? "" : "s")
-                + "). Please follow up with the player if this number seems off.";
-            player.setTg(player.getTg() + comms);
-            ButtonHelperFactionSpecific.resolveDarkPactCheck(game, owner, player, owner.getCommoditiesTotal());
-            ButtonHelperAbilities.pillageCheck(player, game);
-            MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), reducedMsg);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), reducedMsg2);
+            if (game.isFowMode())
+            {
+                String reducedMsg = owner.getRepresentationUnfogged() + " your _Trade Agreement_ was played.";
+                String reducedMsg2 = player.getRepresentationUnfogged()
+                    + " you gained trade goods equal to the number of commodities the player had (your trade goods went from "
+                    + oldTGs + " trade good" + (oldTGs == 1 ? "" : "s") + " to -> " + (oldTGs + comms)
+                    + " trade good" + (oldTGs + comms == 1 ? "" : "s")
+                    + "). Please follow up with the player if this number seems off.";
+                player.setTg(oldTGs + comms);
+                ButtonHelperFactionSpecific.resolveDarkPactCheck(game, owner, player, owner.getCommoditiesTotal());
+                ButtonHelperAbilities.pillageCheck(player, game);
+                MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), reducedMsg);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), reducedMsg2);
+            }
+            else
+            {
+                String reducedMsg = owner.getRepresentationUnfogged() + " your _Trade Agreement_ was played.";
+                String reducedMsg2 = player.getRepresentationUnfogged() + " played the _Trade Agreement_ belonging to "
+                    + owner.getRepresentationUnfogged() + ", taking their " + comms + " commodit" + (comms == 1 ? "y" : "ies")
+                    + " and so gaining " + comms + " trade good" + (comms == 1 ? "" : "s") + ". As such, they previous had "
+                    + oldTGs + " trade good" + (oldTGs == 1 ? "" : "s") + " and now have " + (oldTGs + comms) + " trade good" 
+                    + (oldTGs + comms == 1 ? "" : "s") + ". Please follow up with the other player if this number seems off.";
+                player.setTg(oldTGs + comms);
+                ButtonHelperFactionSpecific.resolveDarkPactCheck(game, owner, player, owner.getCommoditiesTotal());
+                ButtonHelperAbilities.pillageCheck(player, game);
+                MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), reducedMsg);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), reducedMsg2);
+            }
         }
         if (("favor".equalsIgnoreCase(id))) {
             if (owner.getStrategicCC() > 0) {

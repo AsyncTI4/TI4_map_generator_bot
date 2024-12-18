@@ -260,7 +260,7 @@ class AgendaResolveButtonHandler {
                                 game.getStoredValue("agendaRepGov") + playerWL.getFaction());
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Will exhaust cultural planets of all players who voted against at start of next strat phase");
+                            "Will exhaust cultural planets of all players who voted \"Against\" at start of next strategy phase.");
                     }
                 }
                 if ("articles_war".equalsIgnoreCase(agID)) {
@@ -273,7 +273,7 @@ class AgendaResolveButtonHandler {
                             ButtonHelperAgents.resolveArtunoCheck(playerWL, 3);
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Added 3TGs to those who voted for");
+                            "Given 3 trade goods to those who voted \"For\".");
                     }
                 }
                 if ("nexus".equalsIgnoreCase(agID)) {
@@ -282,7 +282,7 @@ class AgendaResolveButtonHandler {
                         if (tile != null) {
                             String tokenFilename = Mapper.getTokenID("gamma");
                             tile.addToken(tokenFilename, Constants.SPACE);
-                            MessageHelper.sendMessageToChannel(actionsChannel, "Added gamma wormhole to the Mecatol Rex system.");
+                            MessageHelper.sendMessageToChannel(actionsChannel, "Added a gamma wormhole to the Mecatol Rex system.");
                         }
                     }
                 }
@@ -419,9 +419,9 @@ class AgendaResolveButtonHandler {
                                     player.setTg(player.getTg() + 1);
                                     MessageHelper.sendMessageToChannel(
                                         player.getCorrectChannel(),
-                                        player.getRepresentation() + " you gained 1TG (" + (player.getTg() - 1)
+                                        player.getRepresentation() + " you gained 1 trade good (" + (player.getTg() - 1)
                                             + "->" + player.getTg()
-                                            + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
+                                            + ") from 1 of your mechs dying while you own Self-Assembly Routines.\n-# This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -492,9 +492,9 @@ class AgendaResolveButtonHandler {
                                     player.setTg(player.getTg() + 1);
                                     MessageHelper.sendMessageToChannel(
                                         player.getCorrectChannel(),
-                                        player.getRepresentation() + " you gained 1TG (" + (player.getTg() - 1)
+                                        player.getRepresentation() + " you gained 1 trade good (" + (player.getTg() - 1)
                                             + "->" + player.getTg()
-                                            + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
+                                            + ") from 1 of your mechs dying while you own Self-Assembly Routines.\n-# This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -535,7 +535,7 @@ class AgendaResolveButtonHandler {
                             ButtonHelperAbilities.pillageCheck(player, game);
                         }
                         MessageHelper.sendMessageToChannel(actionsChannel,
-                            "Removed all units and gave player appropriate amount of TGs");
+                            "Removed all units and gave player appropriate amount of trade goods.");
 
                     }
                 }
@@ -961,7 +961,7 @@ class AgendaResolveButtonHandler {
             String message;
             if (rid.hasAbility("future_sight")) {
                 message = rep
-                    + " you have a Rider to resolve or you voted for the correct outcome. Either way a " + MiscEmojis.tg + " has been added to your total due to your **Future Sight** ability. "
+                    + " you have a Rider to resolve or you voted for the correct outcome. Either way a trade good has been added to your total due to your **Future Sight** ability. "
                     + rid.gainTG(1, true);
                 ButtonHelperAgents.resolveArtunoCheck(rid, 1);
             } else {
