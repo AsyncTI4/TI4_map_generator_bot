@@ -514,7 +514,9 @@ public class TransactionHelper {
             case "ACs" -> {
                 if (requesting) {
                     message = message + player.getRepresentation(false, false)
-                        + " Click the number of ACs you'd like to request. Since ACs are private info, you will have to use messages to explain what ACs you want, these buttons will just make sure that the player is offered buttons to send.";
+                        + " Click the number of action cards you wish to request."
+                        + " Since action cards are private info, you will have to use messages to explain which action cards you want;"
+                        + " these buttons will just make sure that the player is offered buttons to send them.";
                     int limit = Math.min(7, p2.getAc());
                     for (int x = 1; x < limit + 1; x++) {
                         Button transact = Buttons.green(
@@ -524,7 +526,7 @@ public class TransactionHelper {
                     }
                 } else {
                     message = message + player.getRepresentation(false, false)
-                        + " Click the GREEN button that indicates the AC you would like to " + requestOrOffer;
+                        + " Click the __grenn_ button that indicates the action card you wish to " + requestOrOffer;
                     for (String acShortHand : p1.getActionCards().keySet()) {
                         Button transact = Buttons.green(
                             "offerToTransact_ACs_" + p1.getFaction() + "_" + p2.getFaction() + "_"
@@ -537,7 +539,10 @@ public class TransactionHelper {
             case "PNs" -> {
                 if (requesting) {
                     message = message + player.getRepresentation(false, false)
-                        + " Click the PN you'd like to request. Since PNs are private info, all of the player's starting PNs which are not in play areas are available, though the player may not currently hold all of these. Click TBD Note if you want someone else's PN, and it will give the player the option to send it.";
+                        + " Click the promissory note you'd like to request."
+                        + " Since promissory notes are private info, all of the player's starting promissory notes (which are not already in someone's play areas) are available,"
+                        +" though the player may not currently hold all of these. "
+                        + "Click the \"TBD Promissory Note\" button if you want someone else's promissory note, and it will give the player the option to send it.";
                     for (String pnShortHand : p1.getPromissoryNotesOwned()) {
                         if (ButtonHelper.anyoneHaveInPlayArea(game, pnShortHand)) {
                             continue;
@@ -553,11 +558,11 @@ public class TransactionHelper {
                     }
                     Button transact = Button
                         .primary("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_"
-                            + "generic1", "TBD PN");
+                            + "generic1", "TBD Promissory Note");
 
                     stuffToTransButtons.add(transact);
                 } else {
-                    message = message + p1.getRepresentation(true, false) + " Click the PN you would like to "
+                    message = message + p1.getRepresentation(true, false) + " Click the promissory note you would like to "
                         + requestOrOffer;
                     for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
                         if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)
@@ -566,37 +571,38 @@ public class TransactionHelper {
                         }
                         PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
                         Player owner = game.getPNOwner(pnShortHand);
-                        Button transact = Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+                        Button transact = Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), 
+                            promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
 
                         stuffToTransButtons.add(transact);
                     }
                 }
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    "Reminder that, unlike other things, you may only send a person 1 PN in a transaction.");
+                    "Reminder that, unlike other things, you may only send a player 1 promissory note in each transaction (and you may only perform one transaction with each other player on a turn).");
             }
             case "Frags" -> {
-                message = message + " Click the amount of fragments you would like to " + requestOrOffer;
-                for (int x = 1; x < p1.getCrf() + 1; x++) {
+                message = message + " Click the number of fragments you wish to " + requestOrOffer;
+                for (int x = 1; x <= p1.getCrf(); x++) {
                     Button transact = Buttons.blue(
                         "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_CRF" + x, "Cultural Fragments (x" + x + ")");
                     stuffToTransButtons.add(transact);
                 }
 
-                for (int x = 1; x < p1.getIrf() + 1; x++) {
+                for (int x = 1; x <= p1.getIrf(); x++) {
                     Button transact = Buttons.green(
                         "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_IRF" + x, "Industrial Fragments (x" + x + ")");
                     stuffToTransButtons.add(transact);
                 }
 
-                for (int x = 1; x < p1.getHrf() + 1; x++) {
+                for (int x = 1; x <= p1.getHrf(); x++) {
                     Button transact = Buttons.red(
                         "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_HRF" + x, "Hazardous Fragments (x" + x + ")");
                     stuffToTransButtons.add(transact);
                 }
 
-                for (int x = 1; x < p1.getUrf() + 1; x++) {
+                for (int x = 1; x <= p1.getUrf(); x++) {
                     Button transact = Buttons.gray(
-                        "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_URF" + x, "Frontier Fragments (x" + x + ")");
+                        "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_URF" + x, "Unknown Fragments (x" + x + ")");
                     stuffToTransButtons.add(transact);
                 }
 
@@ -965,11 +971,12 @@ public class TransactionHelper {
             }
             case "ACs" -> {
 
-                message2 = ident + " sent AC #" + amountToTrans + " to " + ident2;
+                message2 = ident + " sent action card #" + amountToTrans + " to " + ident2 + ".";
                 int acNum = Integer.parseInt(amountToTrans);
                 String acID = null;
                 if (!p1.getActionCards().containsValue(acNum)) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that AC, no AC sent");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        "Could not find that action card, and so no action card was sent.");
                     return;
                 }
                 for (Map.Entry<String, Integer> ac : p1.getActionCards().entrySet()) {

@@ -144,13 +144,13 @@ class ExploreButtonHandler {
             if (player.hasAbility("scheming")) {
                 game.drawActionCard(player.getUserID());
                 game.drawActionCard(player.getUserID());
-                message = player.getFactionEmoji() + " Drew 2 ACs with Scheming. Please discard 1 AC with the blue buttons.";
+                message = player.getFactionEmoji() + " drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " use buttons to discard",
                     ActionCardHelper.getDiscardActionCardButtons(player, false));
             } else {
                 game.drawActionCard(player.getUserID());
-                message = player.getFactionEmoji() + " Drew 1 AC";
+                message = player.getFactionEmoji() + " drew 1 action card.";
                 ActionCardHelper.sendActionCardInfo(game, player, event);
             }
             CommanderUnlockCheckService.checkPlayer(player, "yssaril");
