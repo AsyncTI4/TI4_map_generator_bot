@@ -801,7 +801,7 @@ public class AgendaHelper {
 
     public static List<Button> getAfterButtons(Game game) {
         List<Button> afterButtons = new ArrayList<>();
-        Button playAfter = Buttons.red("play_after_Non-AC Rider", "Play A Non-Action Card Rider");
+        Button playAfter = Buttons.red("play_after_Non-AC Rider", "Play A Non-AC Rider");
         if (game.isFowMode()) {
             afterButtons.add(playAfter);
         }

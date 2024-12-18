@@ -33,11 +33,9 @@ public class CryypterHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
             return;
         }
-        String message = player.getRepresentation() + " drew " + draw + " action card" + (draw == 1 ? "" : "s") + ".";
+        String message = player.getRepresentation() + " Drew " + draw + " AC";
         if (addScheming && player.hasAbility("scheming")) {
-            draw++;
-            message = player.getRepresentation() + " drew " + draw + " action card" + (draw == 1 ? "" : "s") 
-                + " (**Scheming** increases this from the normal " + (draw-1) + " action card" + (draw == 2 ? "" : "s") + ").";
+            message = "Drew [" + draw + "+1=" + ++draw + "] AC (Scheming)";
         }
 
         for (int i = 0; i < draw; i++) {
