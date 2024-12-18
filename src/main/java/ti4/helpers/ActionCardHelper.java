@@ -144,15 +144,15 @@ public class ActionCardHelper {
             }
         }
         if (ButtonHelper.isPlayerElected(game, player, "censure") || ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
-            acButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard an AC (You are politically censured)"));
+            acButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard an Action Card (You Are Politically Censured)"));
         } else {
-            acButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard an AC"));
+            acButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard an Action Card"));
         }
         if (actionCards != null && !actionCards.isEmpty()
             && !ButtonHelper.isPlayerElected(game, player, "censure")
             && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace") || actionCards.containsKey("special_session")
                 || actionCards.containsKey("investments") || actionCards.containsKey("last_minute_deliberation") || actionCards.containsKey("revolution") || actionCards.containsKey("deflection") || actionCards.containsKey("summit"))) {
-            acButtons.add(Buttons.gray("checkForAllACAssignments", "Pre assign ACs"));
+            acButtons.add(Buttons.gray("checkForAllACAssignments", "Pre-Assign Action Cards"));
         }
 
         return acButtons;
@@ -278,10 +278,10 @@ public class ActionCardHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
             return;
         }
-        String message = player.getRepresentation() + " Drew " + count + " AC";
+        String message = player.getRepresentation() + " drew " + count + " action card" + (count == 1 ? "" : "s") + ".";
         if (resolveAbilities && player.hasAbility("scheming")) {
-            message = player.getRepresentation() + " Drew [" + count + "+1=" + (count + 1) + "] AC (Scheming)";
             count++;
+            message = player.getRepresentation() + " drew " + count + " action card" + (count == 1 ? "" : "s") + " (including one extra because of **Scheming**).";
         }
         if (resolveAbilities && player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
@@ -306,15 +306,17 @@ public class ActionCardHelper {
         if (player.isPassed() && activePlayerID != null) {
             Player activePlayer = game.getPlayer(activePlayerID);
             if (activePlayer != null && activePlayer.hasTech("tp")) {
-                return "You are passed and the active player has researched Transparasteel Plating. AC Play command cancelled.";
+                return "You are passed and the active player owns the _Transparasteel Plating_ technology, preventing you from playing action cards. As such, the action card command has been cancelled.";
             }
         }
         if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) != player) {
-            return "You are trying to play a component action AC and the game does not think you are the active player. You may fix this with /player turn_start. Until then, you are #denied.";
+            return "You are trying to play an action card with a component action, and the game does not think you are the active player."
+            + " You may fix this with /player turn_start. Until then, you are #denied.";
         }
         if (ButtonHelper.isPlayerOverLimit(game, player)) {
             return player.getRepresentationUnfogged()
-                + " The bot thinks you are over the limit and thus will not allow you to play ACs at this time. You may discard the AC and manually resolve if you need to.";
+                + " The bot thinks you are over the limit and thus will not allow you to play action cards at this time."
+                + " You may discard the action cards and manually resolve if you need to.";
         }
 
         if (player.hasAbility("cybernetic_madness")) {
@@ -326,24 +328,24 @@ public class ActionCardHelper {
         StringBuilder sb = new StringBuilder();
         sb.append(game.getPing()).append(" ").append(game.getName()).append("\n");
         if (game.isFowMode()) {
-            sb.append("Someone played the Action Card ").append(actionCardTitle).append(":\n");
+            sb.append("Someone played the action card _").append(actionCardTitle).append("_:\n");
         } else {
-            sb.append(player.getRepresentation()).append(" played the Action Card ").append(actionCardTitle).append(":\n");
+            sb.append(player.getRepresentation()).append(" played the action card _").append(actionCardTitle).append("_:\n");
         }
 
         List<Button> buttons = new ArrayList<>();
-        Button sabotageButton = Buttons.red("sabotage_ac_" + actionCardTitle, "Cancel AC With Sabotage", MiscEmojis.Sabotage);
+        Button sabotageButton = Buttons.red("sabotage_ac_" + actionCardTitle, "Cancel Action Card With Sabotage", MiscEmojis.Sabotage);
         buttons.add(sabotageButton);
         Player empy = Helper.getPlayerFromUnit(game, "empyrean_mech");
         if (empy != null && ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy) && !ButtonHelper.isLawInPlay(game, "articles_war")) {
-            Button empyButton = Buttons.gray("sabotage_empy_" + actionCardTitle, "Cancel " + actionCardTitle + " With Empyrean Mech ", UnitEmojis.mech);
+            Button empyButton = Buttons.gray("sabotage_empy_" + actionCardTitle, "Cancel " + actionCardTitle + " With Watcher", UnitEmojis.mech);
             List<Button> empyButtons = new ArrayList<>();
             empyButtons.add(empyButton);
             Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
             empyButtons.add(refuse);
             MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(),
                 empy.getRepresentationUnfogged()
-                    + "You have mech(s) adjacent to the player who played the AC. Use buttons to decide whether to cancel.",
+                    + "You have one or more mechs adjacent to some units of the player who played _" + actionCardTitle + "_. Use buttons to decide whether to cancel the action card.",
                 empyButtons);
         }
         String instinctTrainingID = "it";
@@ -822,9 +824,9 @@ public class ActionCardHelper {
                 List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
-                    String message2 = player.getRepresentationUnfogged() + " you may unlock Suffi An, your commander, by paying 1TG (if the AC isn't Sabo'd).";
+                    String message2 = player.getRepresentationUnfogged() + " you may unleash Suffi An, your commander, by paying 1 trade good (if the action card isn't Sabo'd).";
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Buttons.green("pay1tgforKeleres", "Pay 1TG to Unlock Suffi An", LeaderEmojis.KeleresAgent));
+                    buttons2.add(Buttons.green("pay1tgforKeleres", "Pay 1 Trade Good to Unleash Suffi An", LeaderEmojis.KeleresAgent));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }
@@ -834,14 +836,15 @@ public class ActionCardHelper {
 
         // Fog of war ping
         if (game.isFowMode()) {
-            String fowMessage = player.getRepresentation() + " played an Action Card: " + actionCardTitle;
+            String fowMessage = player.getRepresentation() + " played an action card: _" + actionCardTitle + "_.";
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, fowMessage);
-            MessageHelper.sendPrivateMessageToPlayer(player, game, "Played action card: " + actionCardTitle);
+            MessageHelper.sendPrivateMessageToPlayer(player, game, "Played action card: _" + actionCardTitle + "_.");
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             Button cymiaeButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", FactionEmojis.cymiae);
-            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Skhot Unit X-12, the Cymiae" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw 1AC.", cymiaeButton);
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), player.getRepresentationUnfogged() 
+                + ", you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Skhot Unit X-12, the Cymiae" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw action card.", cymiaeButton);
         }
 
         sendActionCardInfo(game, player);
@@ -928,7 +931,7 @@ public class ActionCardHelper {
         Integer handIndex = player.getActionCards().get(acID);
         ButtonHelper.checkACLimit(game, p2);
         if (acID == null || handIndex == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find AC in your hand.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find action card in your hand.");
             return;
         }
         if (p2 == null) {
@@ -959,8 +962,8 @@ public class ActionCardHelper {
         sendActionCardInfo(game, player_);
         ButtonHelper.checkACLimit(game, player_);
         sendActionCardInfo(game, player);
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "# " + player.getRepresentation() + " you lost the AC " + Mapper.getActionCard(acID).getName());
-        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), "# " + player_.getRepresentation() + " you gained the AC " + Mapper.getActionCard(acID).getName());
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "# " + player.getRepresentation() + " you lost the action card _" + Mapper.getActionCard(acID).getName() + "_.");
+        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), "# " + player_.getRepresentation() + " you gained the action card _" + Mapper.getActionCard(acID).getName() +"_.");
     }
 
     public static void showAll(Player player, Player player_, Game game) {
@@ -1017,7 +1020,7 @@ public class ActionCardHelper {
         if (buttons.size() > 75) {
             buttons.add(75, Buttons.red("deleteButtons_3", "Delete These Buttons"));
         }
-        String msg = player.getRepresentationUnfogged() + " use buttons to grab an AC from the discard";
+        String msg = player.getRepresentationUnfogged() + ", use buttons to grab an action card from the discard pile.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -1034,7 +1037,8 @@ public class ActionCardHelper {
 
         ActionCardHelper.sendActionCardInfo(game, player, event);
         if (player.hasAbility("autonetic_memory")) {
-            String message = player.getRepresentationUnfogged() + " if you did not just use the Codex to get that AC, please discard 1 AC due to your Cybernetic Madness ability";
+            String message = player.getRepresentationUnfogged() + ", if you did not just use the Codex to get that action card, "
+                + "please discard 1 action card due to your **Cybernetic Madness** ability.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
         ButtonHelper.checkACLimit(game, player);

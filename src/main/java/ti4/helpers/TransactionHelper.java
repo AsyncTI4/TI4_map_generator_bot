@@ -514,7 +514,9 @@ public class TransactionHelper {
             case "ACs" -> {
                 if (requesting) {
                     message = message + player.getRepresentation(false, false)
-                        + " Click the number of ACs you'd like to request. Since ACs are private info, you will have to use messages to explain what ACs you want, these buttons will just make sure that the player is offered buttons to send.";
+                        + " Click the number of action cards you wish to request."
+                        + " Since action cards are private info, you will have to use messages to explain which action cards you want;"
+                        + " these buttons will just make sure that the player is offered buttons to send them.";
                     int limit = Math.min(7, p2.getAc());
                     for (int x = 1; x < limit + 1; x++) {
                         Button transact = Buttons.green(
@@ -556,7 +558,7 @@ public class TransactionHelper {
                     }
                     Button transact = Button
                         .primary("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_"
-                            + "generic1", "TBD PN");
+                            + "generic1", "TBD Promissory Note");
 
                     stuffToTransButtons.add(transact);
                 } else {
@@ -568,7 +570,8 @@ public class TransactionHelper {
                         }
                         PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
                         Player owner = game.getPNOwner(pnShortHand);
-                        Button transact = Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+                        Button transact = Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand),
+                            promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
 
                         stuffToTransButtons.add(transact);
                     }
@@ -584,21 +587,21 @@ public class TransactionHelper {
                     stuffToTransButtons.add(transact);
                 }
 
-                for (int x = 1; x < p1.getIrf() + 1; x++) {
+                for (int x = 1; x <= p1.getIrf(); x++) {
                     Button transact = Buttons.green(
                         "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_IRF" + x, "Industrial Fragments (x" + x + ")");
                     stuffToTransButtons.add(transact);
                 }
 
-                for (int x = 1; x < p1.getHrf() + 1; x++) {
+                for (int x = 1; x <= p1.getHrf(); x++) {
                     Button transact = Buttons.red(
                         "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_HRF" + x, "Hazardous Fragments (x" + x + ")");
                     stuffToTransButtons.add(transact);
                 }
 
-                for (int x = 1; x < p1.getUrf() + 1; x++) {
+                for (int x = 1; x <= p1.getUrf(); x++) {
                     Button transact = Buttons.gray(
-                        "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_URF" + x, "Frontier Fragments (x" + x + ")");
+                        "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_URF" + x, "Unknown Fragments (x" + x + ")");
                     stuffToTransButtons.add(transact);
                 }
 
@@ -971,11 +974,12 @@ public class TransactionHelper {
             }
             case "ACs" -> {
 
-                message2 = ident + " sent AC #" + amountToTrans + " to " + ident2;
+                message2 = ident + " sent action card #" + amountToTrans + " to " + ident2 + ".";
                 int acNum = Integer.parseInt(amountToTrans);
                 String acID = null;
                 if (!p1.getActionCards().containsValue(acNum)) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that AC, no AC sent");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        "Could not find that action card, and so no action card was sent.");
                     return;
                 }
                 for (Map.Entry<String, Integer> ac : p1.getActionCards().entrySet()) {

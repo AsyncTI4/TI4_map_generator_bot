@@ -429,7 +429,7 @@ public class ExploreService {
                     }
 
                     if (game.isFowMode()) {
-                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 ACs");
+                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 action cards.");
                     }
                     ActionCardHelper.sendActionCardInfo(game, player, event);
                 }
@@ -709,7 +709,7 @@ public class ExploreService {
                             leaderM.getLeaderEmoji()));
                     }
                 }
-                buttons.add(Buttons.blue("seedySpace_AC_" + planetID, "Draw AC by removing 1 infantry or have mech on" + planetName));
+                buttons.add(Buttons.blue("seedySpace_AC_" + planetID, "Draw 1 Action Card by Removing 1 Infantry or Having Mech on" + planetName));
                 buttons.add(decline);
 
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);

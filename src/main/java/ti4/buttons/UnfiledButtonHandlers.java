@@ -182,7 +182,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         Player victim = game.getPlayerFromColorOrFaction(faction);
         List<Button> buttons = ButtonHelperFactionSpecific.getButtonsToTakeSomeonesAC(player, victim);
         ActionCardHelper.showAll(victim, player, game);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged() + " Select which AC you would like to steal", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged() + ", select which action card you wish to steal.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -467,7 +467,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 MessageHelper
                     .sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                            + " use buttons to discard 1 AC and explore a readied planet",
+                            + ", use buttons to discard 1 action card and explore a readied planet.",
                         absolPAButtons);
             }
         }
@@ -580,7 +580,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String typeNName = buttonID.replace("sabotage_", "");
         String type = typeNName.substring(0, typeNName.indexOf("_"));
         String acName = typeNName.replace(type + "_", "");
-        String message = "Cancelling the AC \"" + acName + "\" using ";
+        String message = "Cancelling the action card _" + acName + "_ using ";
         Integer count = game.getAllActionCardsSabod().get(acName);
         if (count == null) {
             game.setSpecificActionCardSaboCount(acName, 1);
@@ -592,13 +592,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         boolean sendReact = true;
         if ("empy".equalsIgnoreCase(type)) {
-            message += "a Watcher mech! The Watcher should be removed now by the owner.";
+            message += "a Watcher (Empyrean mech)! The relevant Watcher should now be removed by the owner.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                "Remove the watcher",
+                "Remove the Watcher",
                 ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech"));
             ButtonHelper.deleteMessage(event);
         } else if ("xxcha".equalsIgnoreCase(type)) {
-            message += "the \"Instinct Training\" tech! The tech has been exhausted and a strategy CC removed.";
+            message += "the _Instinct Training_ technology! The technology has been exhausted and a command token removed from strategy pool.";
             if (player.hasTech(AliasHandler.resolveTech("Instinct Training"))) {
                 player.exhaustTech(AliasHandler.resolveTech("Instinct Training"));
                 if (player.getStrategicCC() > 0) {
@@ -609,10 +609,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             } else {
                 sendReact = false;
                 MessageHelper.sendMessageToChannel(event.getChannel(),
-                    "Someone clicked the Instinct Training button but did not have the tech.");
+                    "Someone clicked the _Instinct Training_ button but did not have the technology.");
             }
         } else if ("ac".equalsIgnoreCase(type)) {
-            message += "A Sabotage!";
+            message += "A _Sabotage_!";
             boolean hasSabo = false;
             String saboID = "3";
             for (String AC : player.getActionCards().keySet()) {
@@ -625,9 +625,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             if (hasSabo) {
                 ActionCardHelper.playAC(event, game, player, saboID, game.getActionsChannel());
             } else {
-                message = "Tried to play a Sabo but found none in hand.";
+                message = "Tried to play a _Sabotage_ but found none in hand.";
                 sendReact = false;
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " You clicked the AC Sabo button but did not have a Sabotage in hand.");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
+                    + " You clicked the _Sabotage_ action card button but did not have a _Sabotage_ in hand.");
             }
         }
 
@@ -1368,7 +1369,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                             + "Skhot Unit X-12, the Cymiae"
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                            + " agent, to make yourself draw 1AC.",
+                            + " agent, to make yourself draw 1 action card.",
                         buttons2);
                 }
                 ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
@@ -1386,7 +1387,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         MessageChannel channel = game.getMainGameChannel();
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                player.getRepresentation() + " please play Sabotage by clicking the Sabo button on the AC you wish to Sabo");
+                player.getRepresentation() + " please play Sabotage by clicking the Sabo button on the action card you wish to Sabo");
             return;
         }
         if (acID.contains("reverse_")) {
@@ -1416,7 +1417,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             } catch (Exception e) {
                 BotLogger.log(event, "Could not parse AC ID: " + acID, e);
                 event.getChannel().asThreadChannel()
-                    .sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
+                    .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.").queue();
             }
         } else {
             event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
@@ -2160,11 +2161,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             game.drawActionCard(player.getUserID());
             CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = "Drew 2 ACs With Scheming. Please Discard 1 AC.";
+            message = "Drew 2 action cards with **Scheming**. Please discard 1 action card.";
         }
         ReactionService.addReaction(event, game, player, true, false, message);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-            player.getRepresentationUnfogged() + " use buttons to discard",
+            player.getRepresentationUnfogged() + ", use buttons to discard an action card.",
             ActionCardHelper.getDiscardActionCardButtons(player, false));
 
         ButtonHelper.deleteMessage(event);
@@ -2176,12 +2177,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String message;
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-            message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
+            message = player.getFactionEmoji() + " triggered **Autonetic Memory Option**.";
         } else {
             game.drawActionCard(player.getUserID());
             CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = "Drew 1 AC";
+            message = "Drew 1 action card.";
         }
         ReactionService.addReaction(event, game, player, true, false, message);
         ButtonHelper.deleteMessage(event);
@@ -2193,12 +2194,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String message;
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-            message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
+            message = player.getFactionEmoji() + " triggered **Autonetic Memory Option**.";
         } else {
             game.drawActionCard(player.getUserID());
             CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = "Drew 1 AC";
+            message = "Drew 1 action card.";
         }
         ReactionService.addReaction(event, game, player, true, false, message);
         ButtonHelper.checkACLimit(game, player);
@@ -2383,18 +2384,18 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (player.hasAbility("scheming")) {
             game.drawActionCard(player.getUserID());
             game.drawActionCard(player.getUserID());
-            message = player.getFactionEmoji() + " Drew 2 ACs With Scheming. Please Discard 1 AC.";
+            message = player.getFactionEmoji() + " drew 2 action cards with **Scheming**. Please discard 1 action card.";
             ActionCardHelper.sendActionCardInfo(game, player, event);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
                 ActionCardHelper.getDiscardActionCardButtons(player, false));
         } else if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-            message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
+            message = player.getFactionEmoji() + " triggered **Autonetic Memory Option**.";
         } else {
             game.drawActionCard(player.getUserID());
             ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = player.getFactionEmoji() + " Drew 1 AC";
+            message = player.getFactionEmoji() + " drew 1 action card.";
         }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -2410,24 +2411,24 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("yssarilMinisterOfPolicy")
     public static void yssarilMinisterOfPolicy(ButtonInteractionEvent event, Player player, Game game) {
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is drawing Minister of Policy AC(s)");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is drawing their _Minister of Policy_ action card.");
         String message;
         if (player.hasAbility("scheming")) {
             game.drawActionCard(player.getUserID());
             game.drawActionCard(player.getUserID());
-            message = player.getFactionEmoji() + " Drew 2 ACs With Scheming. Please Discard 1 AC.";
+            message = player.getFactionEmoji() + " drew 2 action cards with **Scheming**. Please discard 1 action card.";
             ActionCardHelper.sendActionCardInfo(game, player, event);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + " use buttons to discard",
+                player.getRepresentationUnfogged() + ", please use buttons to discard.",
                 ActionCardHelper.getDiscardActionCardButtons(player, false));
 
         } else if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-            message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
+            message = player.getFactionEmoji() + " triggered **Autonetic Memory Option**.";
         } else {
             game.drawActionCard(player.getUserID());
             ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = player.getFactionEmoji() + " Drew 1 AC";
+            message = player.getFactionEmoji() + " drew 1 action card.";
         }
         player.checkCommanderUnlock("yssaril");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -2809,14 +2810,14 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             player.setTg(player.getTg() - 1);
             commOrTg = "trade good";
         } else {
-            ReactionService.addReaction(event, game, player, "Didn't have any comms/TGs to spend, no AC drawn");
+            ReactionService.addReaction(event, game, player, "Didn't have any commodities or trade goods to spend, so no action card was drawn.");
         }
         String message = hasSchemingAbility
-            ? "Spent 1 " + commOrTg + " to draw " + count2 + " Action Card (Scheming) - please discard 1 action card from your hand"
-            : "Spent 1 " + commOrTg + " to draw " + count2 + " AC";
+            ? "Spent 1 " + commOrTg + " to draw " + count2 + " action card (**Scheming** added 1 action card). Please discard 1 action card from your hand."
+            : "Spent 1 " + commOrTg + " to draw " + count2 + " action card.";
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, count2);
-            message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
+            message = player.getFactionEmoji() + " triggered **Autonetic Memory Option**.";
         } else {
             for (int i = 0; i < count2; i++) {
                 game.drawActionCard(player.getUserID());
@@ -2829,7 +2830,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
         if (hasSchemingAbility) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + " use buttons to discard",
+                player.getRepresentationUnfogged() + " use buttons to discard.",
                 ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
 
