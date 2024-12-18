@@ -140,11 +140,11 @@ public class ButtonHelperCommanders {
     @ButtonHandler("cymiaeCommanderRes_")
     public static void cymiaeCommanderRes(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " will discard 1 action card to move or place 1 " + UnitEmojis.mech + "mech on " + Helper.getPlanetRepresentation(planet, game) + ".";
+        String msg = player.getFactionEmoji() + " will discard 1 " + CardEmojis.ActionCard + " AC to move or place 1 " + UnitEmojis.mech + "mech on " + Helper.getPlanetRepresentation(planet, game);
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "mech " + planet);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-            player.getRepresentationUnfogged() + " use buttons to discard.",
+            player.getRepresentationUnfogged() + " use buttons to discard",
             ActionCardHelper.getDiscardActionCardButtons(player, false));
         event.getMessage().delete().queue();
     }
@@ -462,21 +462,15 @@ public class ButtonHelperCommanders {
                 || !player.hasAbility("technological_singularity")) {
                 List<Button> buttons = new ArrayList<>();
                 if (player.hasAbility("scheming")) {
-                    buttons.add(Buttons.green("draw_2_ACDelete", "Draw 2 Action Cards"));
-                    buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentationUnfogged()
-                            + ", you gained a technology while having Nekro Acidos, the Nekro commander."
-                            +" Use the buttons to draw 2 action cards (**Scheming** increases this from the normal 1 action card).",
-                        buttons);
+                    buttons.add(Buttons.green("draw_2_ACDelete", "Draw 2 ACs (With Scheming)"));
                 } else {
-                    buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
-                    buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentationUnfogged()
-                            + ", you gained a technology while having Nekro Acidos, the Nekro commander. Use the buttons to draw 1 action card.",
-                        buttons);
+                    buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 AC"));
                 }
+                buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                        + " You gained tech while having Nekro Acidos, the Nekro commander, use buttons to resolve. ",
+                    buttons);
             } else {
                 if (player.hasAbility("technological_singularity")) {
                     int count = 0;
@@ -491,12 +485,12 @@ public class ButtonHelperCommanders {
                     }
                     if (count > 2) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + ", heads up, that was your third faction technology, and so you may wish to lose one with `/tech remove`.");
+                            "# " + player.getRepresentationUnfogged()
+                                + " heads up, that was your 3rd faction tech, you may wanna lose one with /tech remove");
                     }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                            + ", you acquired access to a technology while having Nekro Acidos, the Nekro commander, but since it is a faction tech and so you used one of your Valefars,"
-                            +" the number of technologies you owned did not increase, and therefore you do not draw an action card.");
+                            + " You gained tech while having Nekro Acidos, the Nekro commander, but since it is a faction tech and you used one of your Valefars, you didn't technically \"gain\" a new tech and therefore you do not draw an AC.");
                 }
             }
         }
@@ -520,22 +514,22 @@ public class ButtonHelperCommanders {
         Player enemy = game.getPlayerFromColorOrFaction(enemyFaction);
         if (enemy == null)
             return;
-        String message = player.getFactionEmoji() + " used So Ata, the Yssaril commander, to look at the ";
+        String message = "";
         String type = buttonID.split("_")[0];
         if ("ac".equalsIgnoreCase(type)) {
             ActionCardHelper.showAll(enemy, player, game);
-            message += "action card";
+            message = " used So Ata, the Yssaril commander, to look at ACs";
         }
         if ("so".equalsIgnoreCase(type)) {
             SecretObjectiveHelper.showAll(enemy, player, game);
-            message += "secret objective";
+            message = " used So Ata, the Yssaril commander, to look at SOs";
         }
         if ("pn".equalsIgnoreCase(type)) {
             PromissoryNoteHelper.showAll(enemy, player, game);
-            message += "promissory note";
+            message = " used So Ata, the Yssaril commander, to look at PNs ";
         }
-        message += " hand of " + enemy.getRepresentation(false, false) + ".";
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        message = message + " of " + enemy.getRepresentation(false, false);
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + message);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(enemy.getPrivateChannel(), message);
         }
@@ -544,9 +538,9 @@ public class ButtonHelperCommanders {
 
     @ButtonHandler("pay1tgforKeleres")
     public static void pay1tgToUnlockKeleres(Player player, Game game, ButtonInteractionEvent event) {
+        boolean unleash = RandomHelper.isOneInX(20);
         CommanderUnlockCheckService.checkPlayer(player, "keleres");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " paid 1 trade good to unleash Suffi An, the Keleres commander "
-            + player.gainTG(-1) + ".");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " paid 1TG to " + (unleash ? "unleash" : "unlock") + " Suffi An, the Keleres commander " + player.gainTG(-1));
         event.getMessage().delete().queue();
     }
 
