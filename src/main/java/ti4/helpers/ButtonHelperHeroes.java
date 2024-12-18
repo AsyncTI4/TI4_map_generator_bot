@@ -1495,7 +1495,7 @@ public class ButtonHelperHeroes {
             buttons.add(Buttons.green("cymiaeHeroStep2_" + acID, Mapper.getActionCard(acID).getName()));
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation() + " use the buttons to give out ACs to players", buttons);
+            player.getRepresentation() + ", please use the buttons to give out action cards to players.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1897,7 +1897,7 @@ public class ButtonHelperHeroes {
         Player notYssaril = game.getPlayerFromColorOrFaction(playerFaction);
         if (notYssaril != null) {
             String message = notYssaril.getRepresentationUnfogged()
-                + " Kyver, Blade and Key, the Yssaril hero, has rejected your offering and is forcing you to discard 3 random ACs. The ACs have been automatically discarded.";
+                + " Kyver, Blade and Key, the Yssaril hero, has rejected your offering and so is forcing you to discard 3 random action cards. The action cards have been automatically discarded.";
             MessageHelper.sendMessageToChannel(notYssaril.getCardsInfoThread(), message);
             ActionCardHelper.discardRandomAC(event, game, notYssaril, 3);
             ButtonHelper.deleteMessage(event);
@@ -1997,12 +1997,11 @@ public class ButtonHelperHeroes {
                 offerName = player.getColor();
             }
             ButtonHelper.deleteMessage(event);
-            acButtons.add(Buttons.green("takeAC_" + acID + "_" + player.getFaction(), buttonLabel, CardEmojis.ActionCard));
+            acButtons.add(Buttons.green("takeAC_" + acID + "_" + player.getFaction(), "Take " + buttonLabel, CardEmojis.ActionCard));
             acButtons.add(Buttons.red("yssarilHeroRejection_" + player.getFaction(),
-                "Reject " + buttonLabel + " and force them to discard of 3 random ACs"));
-            String message = yssaril.getRepresentationUnfogged() + " " + offerName
-                + " has offered you the action card " + buttonLabel
-                + " for Kyver, Blade and Key, the Yssaril hero. Use buttons to accept or reject it";
+                "Reject " + buttonLabel + " and Force Discard"));
+            String message = yssaril.getRepresentationUnfogged() + " " + offerName + " has offered you the action card " + buttonLabel
+                + " for Kyver, Blade and Key, the Yssaril hero. Use buttons to accept it, or to reject it and force them to discard 3 random action cards.";
             MessageHelper.sendMessageToChannelWithButtons(yssaril.getCardsInfoThread(), message, acButtons);
             String acStringID = "";
             for (String acStrId : player.getActionCards().keySet()) {
@@ -2014,7 +2013,7 @@ public class ButtonHelperHeroes {
             ActionCardModel ac = Mapper.getActionCard(acStringID);
             if (ac != null) {
                 MessageHelper.sendMessageToChannelWithEmbed(
-                    yssaril.getCardsInfoThread(), "For your reference, the text of the AC offered reads as",
+                    yssaril.getCardsInfoThread(), "For your reference, the text of the action cards offered reads as:",
                     ac.getRepresentationEmbed());
 
             }

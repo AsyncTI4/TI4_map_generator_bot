@@ -97,14 +97,14 @@ public class PlayerPreferenceHelper {
             for (Player player : game.getRealPlayers()) {
                 String message = player.getRepresentationUnfogged()
                     + " you may choose to automatically pass on Sabos after a random amount of time if you don't have a Sabo/Instinct Training/Watcher mechs."
-                    + " How it works is you secretly set a median time (in hours) here, and then from now on when an AC is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below."
+                    + " How it works is you secretly set a median time (in hours) here, and then from now on when an action card is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below."
                     + " It's random so people can't derive much information from it. You are free to decline, no-one will ever know either way, but if necessary you may change your time later with /player stats.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             }
         } else {
             String message = player2.getRepresentationUnfogged()
                 + " you may choose to automatically pass on Sabos after a random amount of time if you don't have a Sabo/Instinct Training/Watcher mechs. "
-                + " How it works is you secretly set a median time (in hours) here, and then from now on when an AC is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below."
+                + " How it works is you secretly set a median time (in hours) here, and then from now on when an action card is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below."
                 + " It's random so people can't derive much information from it. You are free to decline, no-one will ever know either way, but if necessary you may change your time later with /player stats.";
             MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), message, buttons);
         }

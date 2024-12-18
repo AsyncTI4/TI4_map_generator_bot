@@ -428,7 +428,7 @@ public class ExploreService {
                     }
 
                     if (game.isFowMode()) {
-                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 ACs");
+                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 action cards.");
                     }
                     ActionCardHelper.sendActionCardInfo(game, player, event);
                 }
@@ -538,7 +538,7 @@ public class ExploreService {
             }
             case "fb1", "fb2", "fb3", "fb4" -> {
                 message = "Resolve Functioning Base:\n-# You currently have " + player.getTg() + MiscEmojis.tg + ", " + player.getCommoditiesRepresentation() + MiscEmojis.comm + ", and " + player.getActionCards().size() + CardEmojis.ActionCard;
-                Button getACButton = Buttons.green("comm_for_AC", "Spend 1TG or 1 Commodity For 1 AC", CardEmojis.ActionCard);
+                Button getACButton = Buttons.green("comm_for_AC", "Spend 1 Trade Good or 1 Commodity For 1 Action Card", CardEmojis.ActionCard);
                 Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
                 List<Button> buttons = List.of(getACButton, getCommButton);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -700,7 +700,7 @@ public class ExploreService {
                             leaderM.getLeaderEmoji()));
                     }
                 }
-                buttons.add(Buttons.blue("seedySpace_AC_" + planetID, "Draw AC by removing 1 infantry or have mech on" + planetName));
+                buttons.add(Buttons.blue("seedySpace_AC_" + planetID, "Draw 1 Action Card by Removing 1 Infantry or Having Mech on" + planetName));
                 buttons.add(decline);
 
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
