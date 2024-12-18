@@ -53,7 +53,7 @@ public class AutoPingMetadataManager {
             return;
         }
 
-        autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount, false));
+        autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount, autoPing.quickPing));
 
         persistFile(autoPings);
     }
