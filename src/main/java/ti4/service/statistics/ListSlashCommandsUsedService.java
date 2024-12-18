@@ -40,12 +40,12 @@ public class ListSlashCommandsUsedService {
             largestAmountOfButtonsIn1Game, buttonsPressed, slashCommandsUsed, acsSabod));
 
         StringBuilder longMsg = new StringBuilder("The number of button pressed so far recorded is " + buttonsPressed + ". The largest number of buttons pressed in a single game is " + largestAmountOfButtonsIn1Game + " in game " + largestGame + ". The number of slash commands used is " + slashCommandsUsed
-            + ". The number of ACs Sabo'd is " + acsSabod + ". The following is the recorded frequency of slash commands \n");
+            + ". The number of action cards Sabo'd is " + acsSabod + ". The following is the recorded frequency of slash commands \n");
         Map<String, Integer> sortedMapAsc = SortHelper.sortByValue(slashCommands, false);
         for (String command : sortedMapAsc.keySet()) {
             longMsg.append(command).append(": ").append(sortedMapAsc.get(command)).append(" \n");
         }
-        longMsg.append("\n The number of times an AC has been Sabo'd is also being tracked. The following is their recorded frequency \n");
+        longMsg.append("\n The number of times an action card has been Sabo'd is also being tracked. The following is their recorded frequency \n");
         Map<String, Integer> sortedMapAscACs = SortHelper.sortByValue(actionCards, false);
         for (String command : sortedMapAscACs.keySet()) {
             longMsg.append(command).append(": ").append(sortedMapAscACs.get(command)).append(" out of ").append(actionCardsPlayed.get(command)).append(" times played").append(" \n");

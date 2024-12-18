@@ -27,13 +27,13 @@ class ChangeToBaseGame extends GameStateSubcommand {
         if (codexOption != null) {
             codex = codexOption.getAsString();
             if ("y".equalsIgnoreCase(codex)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Codex ACs.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Codex action cards.");
             }
 
         }
         game.setBaseGameMode(true);
         Helper.removePoKComponents(game, codex);
         SetDeckService.setDeck(event, game, "agenda_deck", Mapper.getDecks().get("agendas_base_game"));
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Removed PoK components.");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Prophecy of Kings components.");
     }
 }
