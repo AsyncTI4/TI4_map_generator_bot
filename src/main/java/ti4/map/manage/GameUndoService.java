@@ -3,7 +3,6 @@ package ti4.map.manage;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -40,27 +38,10 @@ class GameUndoService {
     }
 
     private static int cleanUpExcessUndoFilesAndReturnLatestIndex(String gameName) {
-        String gameNameFileNamePrefix = gameName + "_";
-        var gameUndoPath = Storage.getGameUndoDirectory().toPath();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(gameUndoPath, gameNameFileNamePrefix + "*")) {
-            List<Integer> undoNumbers = new ArrayList<>();
-            for (Path path : stream) {
-                String fileName = path.getFileName().toString();
-                String undoNumberStr = StringUtils.substringBetween(fileName, gameNameFileNamePrefix, Constants.TXT);
-                if (undoNumberStr != null) {
-                    try {
-                        undoNumbers.add(Integer.parseInt(undoNumberStr));
-                    } catch (NumberFormatException e) {
-                        BotLogger.log("Could not parse undo number '" + undoNumberStr + "' for game " + gameName, e);
-                    }
-                }
-            }
-
-            if (undoNumbers.isEmpty()) {
-                return 0;
-            }
-
-            undoNumbers.sort(Integer::compareTo);
+        try {
+            List<Integer> undoNumbers = GameUndoNameService.getSortedUndoNumbersForGame(gameName);
+            if (undoNumbers.isEmpty()) return 0;
+            
             int maxUndoNumber = undoNumbers.getLast();
             int maxUndoFilesPerGame = GameManager.getManagedGame(gameName).isHasEnded() ? 10 : 100;
             int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;

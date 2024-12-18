@@ -25,7 +25,7 @@ public class MoveUndoToDirectory {
     }
 
     private static void moveUndoFilesToDirectory(String gameName) {
-        var gameUndoPath = Storage.getGameUndoDirectory().toPath();
+        var gameUndoPath = Storage.getBaseGameUndoDirectory();
         var currentGameUndoDirectoryPath = gameUndoPath.resolve(gameName);
         try {
             Files.createDirectories(currentGameUndoDirectoryPath);

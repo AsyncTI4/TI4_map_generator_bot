@@ -280,6 +280,14 @@ public class Storage {
     }
 
     @NotNull
+    @SneakyThrows
+    public static Path getBaseGameUndoDirectory() {
+        Path directory = Path.of(getStoragePath() + GAMES_UNDO);
+        Files.createDirectories(directory);
+        return directory;
+    }
+
+    @NotNull
     public static File getGameFile(String gameName) {
         return new File(getStoragePath() + GAMES_PATH + gameName);
     }
