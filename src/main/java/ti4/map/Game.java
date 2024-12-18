@@ -2235,7 +2235,7 @@ public class Game extends GameProperties {
         getActionCards().addAll(acsToShuffle);
         Collections.shuffle(getActionCards());
         acsToShuffle.forEach(ac -> discardActionCards.remove(ac)); //clear out the shuffled back cards
-        String msg = "#" + getPing() + " shuffling the discarded ACs into the action card deck because the action card deck ran out of cards";
+        String msg = "# " + getPing() + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck.";
         MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
     }
 
@@ -2960,13 +2960,13 @@ public class Game extends GameProperties {
         }
         if (!getDiscardActionCards().isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Since there were ACs in the discard pile, will just shuffle any new ACs into the existing deck");
+                "Since there were action cards in the discard pile, will just shuffle any new action cards into the existing deck.");
             shuffledExtrasIn = true;
         } else {
             for (Player player : getPlayers().values()) {
                 if (!player.getActionCards().isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Since there were ACs in players hands, will just shuffle any new ACs into the existing deck");
+                        "Since there were action cards in players hands, will just shuffle any new action cards into the existing deck.");
                     shuffledExtrasIn = true;
                     break;
                 }
