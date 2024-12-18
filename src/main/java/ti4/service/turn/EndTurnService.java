@@ -230,10 +230,11 @@ public class EndTurnService {
         if (vaden != null) {
             for (Player p2 : vaden.getNeighbouringPlayers()) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
-                    String msg = p2.getRepresentationUnfogged() + " you have the opportunity to pay off binding debts here. You may pay 1TG to get 2 debt tokens forgiven.";
+                    String msg = p2.getRepresentationUnfogged() + " you have the opportunity to pay off **Binding Debts** here."
+                        + " You may pay 1 trade good to get 2 debt tokens forgiven.";
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.green("bindingDebtsRes_" + vaden.getFaction(), "Pay 1TG"));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.green("bindingDebtsRes_" + vaden.getFaction(), "Pay 1 Trade Good"));
+                    buttons.add(Buttons.red("deleteButtons", "Stay Indebted"));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
@@ -277,7 +278,8 @@ public class EndTurnService {
                 }
                 player.setCommodities(player.getCommodities() + numScoredPos);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " you gained " + numScoredSOs + " TG" + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
+                    player.getRepresentationUnfogged() + " you gained " + numScoredSOs + " trade good" + (numScoredSOs == 1 ? "" : "s")
+                        + " and " + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
             }
         }
 
@@ -300,7 +302,7 @@ public class EndTurnService {
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " you may use the button to pay 3TGs and get a tech, using your Sentient Datapool technology.", List.of(Buttons.GET_A_TECH));
+                    player.getRepresentationUnfogged() + " you may use the button to pay 3 trade goods and get a technology, using your _Sentient Datapool_ technology.", List.of(Buttons.GET_A_TECH));
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
             if (player.hasLeader("kyrohero") && player.getLeaderByID("kyrohero").isPresent()

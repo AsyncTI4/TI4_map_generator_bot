@@ -411,11 +411,11 @@ public class ButtonHelperAgents {
             int oldTg = p2.getTg();
             p2.setTg(oldTg + 2);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                player.getFactionEmojiOrColor() + " gained 2TGs from " + ssruuClever + "Clodho, the Augers" + ssruuSlash + " agent, being used ("
+                player.getFactionEmojiOrColor() + " gained 2 trade goods from " + ssruuClever + "Clodho, the Augers" + ssruuSlash + " agent, being used ("
                     + oldTg + "->" + p2.getTg() + ").");
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    p2.getFactionEmojiOrColor() + " gained 2TGs due to agent usage.");
+                    p2.getFactionEmojiOrColor() + " gained 2 trade goods due to agent usage.");
             }
             ButtonHelperAbilities.pillageCheck(p2, game);
             resolveArtunoCheck(p2, 2);
@@ -911,9 +911,9 @@ public class ButtonHelperAgents {
             channel = p2.getCorrectChannel();
             ButtonHelperCommanders.resolveMuaatCommanderCheck(p2, game, event, FactionEmojis.mirveda + " Agent");
             String message0 = p2.getRepresentationUnfogged()
-                + "1 CC has been subtracted from your strat pool due to use of " + ssruuClever + "Logic Machina, the Mirveda" + ssruuSlash + " agent. You may add it back if you didn't agree to the agent.";
+                + "1 command token has been removed from your strategy pool due to use of " + ssruuClever + "Logic Machina, the Mirveda" + ssruuSlash + " agent. You may add it back if you didn't agree to the agent.";
             message = p2.getRepresentationUnfogged()
-                + " Use buttons to get a tech of a color which matches one of the unit upgrades prerequisites";
+                + " Use buttons to get a technology of a color which matches one of the unit upgrades prerequisites.";
             MessageHelper.sendMessageToChannel(channel, message0);
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
@@ -923,12 +923,12 @@ public class ButtonHelperAgents {
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("ghotiATG", "Use to get TG"));
-            buttons.add(Buttons.gray("ghotiAProd", "Use to produce +2 units"));
+            buttons.add(Buttons.green("ghotiATG", "Use Agent for 1 Trade Good"));
+            buttons.add(Buttons.gray("ghotiAProd", "Use Agent to Produce 2 Additional Units"));
             buttons.add(Buttons.red("deleteButtons", "Delete This"));
             channel = p2.getCorrectChannel();
             message = p2.getRepresentationUnfogged()
-                + " Use buttons to decide to get 1TG or to get to produce 2 more units";
+                + " Use buttons to decide how to use the agent.";
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
 
@@ -1448,7 +1448,8 @@ public class ButtonHelperAgents {
         player.setTg(fTG);
         ButtonHelperAbilities.pillageCheck(player, game);
         resolveArtunoCheck(player, 1);
-        String msg = "Used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece, the Ghoti" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to gain 1TG (" + cTG + "->" + fTG + "). ";
+        String msg = "Used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece, the Ghoti" 
+            + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to gain 1 trade good (" + cTG + "->" + fTG + "). ";
         player.addSpentThing(msg);
         ButtonHelper.deleteMessage(event);
     }
@@ -1676,7 +1677,7 @@ public class ButtonHelperAgents {
             player.setCommodities(player.getCommodities() - 2);
             msg += "\n" + player.getFactionEmoji() + " Paid 2 commodities";
         } else {
-            msg += "\n" + player.getFactionEmoji() + " Paid 2TGs " + player.gainTG(-2);
+            msg += "\n" + player.getFactionEmoji() + " Paid 2 trade goods " + player.gainTG(-2) + ".";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         CommanderUnlockCheckService.checkPlayer(player, "titans", "saar", "rohdhna", "cheiran", "celdauri");
@@ -1706,7 +1707,7 @@ public class ButtonHelperAgents {
         ButtonHelperStats.gainComms(event, game, player, commGain, false, true);
         ButtonHelperStats.gainTGs(event, game, player, tgGain, true);
 
-        String msg = player.getFactionEmojiOrColor() + " gained " + tgGain + "TG" + (tgGain == 1 ? "" : "s") + " (" + oldTg + "->"
+        String msg = player.getFactionEmojiOrColor() + " gained " + tgGain + " trade goods" + (tgGain == 1 ? "" : "s") + " (" + oldTg + "->"
             + player.getTg() + ") and " + commGain + " commodit" + (commGain == 1 ? "y" : "ies") + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "C.O.O. Mgur, the Bentor" + (bentor.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
 
@@ -1971,12 +1972,13 @@ public class ButtonHelperAgents {
         if (player.hasUnexhaustedLeader("nomadagentartuno")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("exhaustAgent_nomadagentartuno_" + tg,
-                "Exhaust Artuno the Betrayer With " + tg + " TG" + (tg == 1 ? "" : "s")));
+                "Exhaust Artuno the Betrayer With " + tg + " Trade Goods" + (tg == 1 ? "" : "s")));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
                     + " you have the opportunity to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Artuno the Betrayer the Betrayer, a Nomad" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, and place " + tg + " TG" + (tg == 1 ? "" : "s") + " on her.",
+                    + "Artuno the Betrayer the Betrayer, a Nomad" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") 
+                    + " agent, and place " + tg + " trade good" + (tg == 1 ? "" : "s") + " on her.",
                 buttons);
         }
     }

@@ -17,8 +17,8 @@ class TrapButtonHandler {
         int count = Math.min(p2.getTg(), 2);
         p2.setTg(p2.getTg() - count);
         player.setTg(player.getTg() + count);
-        String msg1 = p2.getRepresentationUnfogged() + " you had " + count + " TG" + (count == 1 ? "" : "s") + " stolen by a trap";
-        String msg2 = player.getRepresentationUnfogged() + " you stole " + count + " TG" + (count == 1 ? "" : "s") + " via a trap";
+        String msg1 = p2.getRepresentationUnfogged() + " you had " + count + " trade good" + (count == 1 ? "" : "s") + " stolen by a trap.";
+        String msg2 = player.getRepresentationUnfogged() + " you stole " + count + " trade good" + (count == 1 ? "" : "s") + " via a trap.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         ButtonHelper.deleteMessage(event);
@@ -30,8 +30,8 @@ class TrapButtonHandler {
         int count = Math.min(p2.getCommodities(), 3);
         p2.setCommodities(p2.getCommodities() - count);
         player.setTg(player.getTg() + count);
-        String msg1 = p2.getRepresentationUnfogged() + " you had " + count + " comm" + (count == 1 ? "" : "s") + " stolen by a trap";
-        String msg2 = player.getRepresentationUnfogged() + " you stole " + count + " comm" + (count == 1 ? "" : "s") + " via a trap";
+        String msg1 = p2.getRepresentationUnfogged() + " you had " + count + " commodit" + (count == 1 ? "y" : "ies") + " stolen by a trap.";
+        String msg2 = player.getRepresentationUnfogged() + " you stole " + count + " commodit" + (count == 1 ? "y" : "ies") + " via a trap.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         ButtonHelper.deleteMessage(event);

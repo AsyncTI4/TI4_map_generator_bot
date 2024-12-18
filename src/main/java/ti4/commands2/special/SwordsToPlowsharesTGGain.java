@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 class SwordsToPlowsharesTGGain extends GameStateSubcommand {
 
     public SwordsToPlowsharesTGGain() {
-        super(Constants.SWORDS_TO_PLOWSHARES, "Swords to Plowshares, kill half your infantry to get that many TGs", true, true);
+        super(Constants.SWORDS_TO_PLOWSHARES, "Swords to Plowshares: kill half your infantry to get that many trade goods", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }

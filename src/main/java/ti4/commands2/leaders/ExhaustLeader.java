@@ -18,7 +18,7 @@ class ExhaustLeader extends GameStateSubcommand {
 		super(Constants.EXHAUST_LEADER, "Exhaust leader", true, true);
 		addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action").setRequired(true).setAutoComplete(true));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
-		addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "TG count to add to leader"));
+		addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count to add to leader"));
 	}
 
 	@Override

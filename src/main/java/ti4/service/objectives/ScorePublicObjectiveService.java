@@ -58,9 +58,9 @@ public class ScorePublicObjectiveService {
             for (Player p2 : player.getNeighbouringPlayers()) {
                 if (p2.hasLeaderUnlocked("syndicatecommander")) {
                     p2.setTg(p2.getTg() + 1);
-                    String msg = p2.getRepresentationUnfogged()
-                        + " you gained 1TG due to your neighbor scoring a PO while you have Fillipo Rois, the Tnelis commander. Your TGs went from "
-                        + (p2.getTg() - 1) + " -> " + p2.getTg();
+                    String msg = p2.getRepresentationUnfogged() + " you gained 1 trade good"
+                        + " due to your neighbor scoring a public objective while you have Fillipo Rois, the Tnelis commander."
+                        + " Your trade goods went from " + (p2.getTg() - 1) + " -> " + p2.getTg() + ".";
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
                     ButtonHelperAbilities.pillageCheck(p2, game);
                     ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -125,11 +125,11 @@ public class ScorePublicObjectiveService {
             if (oldtg > 4) {
                 player.setTg(oldtg - 5);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentation() + " Automatically deducted 5TGs (" + oldtg + "->" + player.getTg()
-                        + ")");
+                    player.getRepresentation() + ", automatically deducted 5 trade goods (" + oldtg 
+                        + "->" + player.getTg() + ").");
             } else {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Didn't deduct 5TGs because you don't have 5TGs.");
+                    "Didn't deduct 5 trade goods because you don't have 5 trade goods.");
             }
         }
         if (poName.contains("Centralize Galactic Trade")) {
@@ -137,11 +137,11 @@ public class ScorePublicObjectiveService {
             if (oldtg > 9) {
                 player.setTg(oldtg - 10);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentation() + " Automatically deducted 10TGs (" + oldtg + "->" + player.getTg()
-                        + ")");
+                    player.getRepresentation() + " Automatically deducted 10 trade goods (" + oldtg
+                        + "->" + player.getTg() + ")");
             } else {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Didn't deduct 10TGs because you don't have that much");
+                    "Didn't deduct 10 trade goods because you don't have 10 trade goods.");
             }
         }
         if (poName.contains("Lead From the Front")) {

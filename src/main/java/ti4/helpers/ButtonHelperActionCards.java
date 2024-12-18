@@ -1745,7 +1745,7 @@ public class ButtonHelperActionCards {
         int oldTg = player.getTg();
         player.setTg(oldTg + resValue);
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " gained " + resValue + "TG" + (resValue == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ")");
+            player.getFactionEmoji() + " gained " + resValue + " trade good" + (resValue == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ").");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, resValue);
         if (game.isFowMode())

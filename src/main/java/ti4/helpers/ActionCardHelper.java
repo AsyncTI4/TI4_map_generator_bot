@@ -399,8 +399,9 @@ public class ActionCardHelper {
                     }
                     scButtons.add(button);
                 }
-                scButtons.add(Buttons.red("deleteButtons", "Done adding TG"));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, player.getRepresentation() + " Use buttons to increase TGs on SCs. Each press adds 1TG.", scButtons);
+                scButtons.add(Buttons.red("deleteButtons", "Done Adding Trade Goods"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, player.getRepresentation()
+                    + ", please use buttons to increase trade goods on strategy cards. Each button press adds 1 trade good.", scButtons);
             }
             if (actionCardTitle.contains("Deflection")) {
                 List<Button> scButtons = new ArrayList<>();

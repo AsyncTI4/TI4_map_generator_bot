@@ -221,9 +221,9 @@ public class ButtonHelperAbilities {
         player.setTg(player.getTg() - 1);
         int amount = Math.min(2, vaden.getDebtTokenCount(player.getColor()));
         vaden.clearDebt(player, amount);
-        String msg = player.getFactionEmojiOrColor() + " paid 1TG to "
+        String msg = player.getFactionEmojiOrColor() + " paid 1 trade good to "
             + vaden.getFactionEmojiOrColor()
-            + "to get 2 debt tokens cleared via the binding debts ability";
+            + "to clear 2 debt tokens via the **Binding Debts** ability.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(), msg);
@@ -599,27 +599,27 @@ public class ButtonHelperAbilities {
         }
         if (checkedStatus.contains("unchecked")) {
             List<Button> buttons = new ArrayList<>();
-            String message2 = "Please confirm this is a valid pillage opportunity and that you wish to pillage.";
-            buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "pillage_" + pillaged.getColor() + "_checked", "Pillage 1TG"));
+            String message2 = "Please confirm this is a valid **Pillage** opportunity and that you wish to pillage.";
+            buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "pillage_" + pillaged.getColor() + "_checked", "Pillage 1 Trade Good"));
             if (pillaged.getCommodities() > 0) {
-                buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "pillage_" + pillaged.getColor() + "_checkedcomm", "Pillage a Commodity"));
+                buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "pillage_" + pillaged.getColor() + "_checkedcomm", "Pillage 1 Commodity"));
             }
             buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete these buttons"));
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         } else {
             MessageChannel channel1 = pillaged.getCorrectChannel();
             MessageChannel channel2 = player.getCorrectChannel();
-            String pillagerMessage = player.getRepresentationUnfogged() + " you pillaged, your TGs have gone from "
+            String pillagerMessage = player.getRepresentationUnfogged() + " you **Pillage**'d, so your trade goods have gone from "
                 + player.getTg() + " to "
                 + (player.getTg() + 1) + ".";
-            String pillagedMessage = pillaged.getRepresentationUnfogged() + " you have been pillaged";
+            String pillagedMessage = pillaged.getRepresentationUnfogged() + " you have been **Pillage**'d";
 
             if (pillaged.getCommodities() > 0 && checkedStatus.contains("checkedcomm")) {
-                pillagedMessage = pillagedMessage + ", your comms have gone from " + pillaged.getCommodities() + " to "
+                pillagedMessage = pillagedMessage + ", so your commodities have gone from " + pillaged.getCommodities() + " to "
                     + (pillaged.getCommodities() - 1) + ".";
                 pillaged.setCommodities(pillaged.getCommodities() - 1);
             } else {
-                pillagedMessage = pillagedMessage + ", your TGs have gone from " + pillaged.getTg() + " to "
+                pillagedMessage = pillagedMessage + ", so your trade goods have gone from " + pillaged.getTg() + " to "
                     + (pillaged.getTg() - 1) + ".";
                 pillaged.setTg(pillaged.getTg() - 1);
             }
@@ -1111,8 +1111,8 @@ public class ButtonHelperAbilities {
         planet.addToken(Constants.GLEDGE_CORE_PNG);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmojiOrColor() + "cracked the mantle of "
-                + Helper.getPlanetRepresentation(planetName, game) + " and gained 4TGs (" + oldTg + "->"
-                + player.getTg() + "). This is technically an optional gain");
+                + Helper.getPlanetRepresentation(planetName, game) + " and gained 4 trade goods (" + oldTg + "->"
+                + player.getTg() + ").\n-# This is technically an optional gain.");
         pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 4);
         List<Button> buttons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
@@ -1327,10 +1327,12 @@ public class ButtonHelperAbilities {
     @ButtonHandler("munitionsReserves")
     public static void munitionsReserves(ButtonInteractionEvent event, Game game, Player player) {
         if (player.getTg() < 2) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " you only have " + player.getTg() + MiscEmojis.tg + " and thus can't use Munitions Reserve");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + ", you only have "
+                + player.getTg() + " trade goods and thus can't use **Munitions Reserve**.");
             return;
         }
-        String msg = player.getFactionEmoji() + " spent " + MiscEmojis.tg(2) + " " + player.gainTG(-2) + " to use Munitions Reserves.\nTheir next roll will automatically reroll misses. If they wish to instead reroll hits as a part of a deal, they should just ignore the rerolls.";
+        String msg = player.getFactionEmoji() + " spent 2 trade goods " + player.gainTG(-2) + " to use **Munitions Reserves**."
+            + "\nTheir next roll will automatically reroll misses. If they wish to instead reroll hits as a part of a deal, they should just ignore the rerolls.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         game.setStoredValue("munitionsReserves", player.getFaction());
     }
@@ -1434,12 +1436,12 @@ public class ButtonHelperAbilities {
         String[] info = bID.split("_");
         String message;
         if ("decline".equalsIgnoreCase(info[0])) {
-            message = player.getFactionEmoji() + " declined to use their Deep Mining ability";
+            message = player.getFactionEmoji() + " declined to use their **Deep Mining** ability.";
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
             ExploreService.explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, game, 1, false);
         } else {
-            message = player.getFactionEmoji() + " used their Deep Mining ability to gain 1TG " + player.gainTG(1);
+            message = player.getFactionEmoji() + " used their **Deep Mining** ability to gain 1 trade good " + player.gainTG(1) + ".";
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
             ButtonHelperAbilities.pillageCheck(player, game);
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
