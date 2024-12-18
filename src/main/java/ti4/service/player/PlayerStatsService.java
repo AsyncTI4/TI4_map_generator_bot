@@ -131,10 +131,11 @@ public class PlayerStatsService {
             int tg = player.getTg();
             tg += tgCount;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation() + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game));
+                player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
+                + " from picking " + Helper.getSCName(scNumber, game));
             if (game.isFowMode()) {
                 String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
-                    + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game);
+                    + " trade good" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game);
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);

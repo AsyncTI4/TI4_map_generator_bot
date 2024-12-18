@@ -316,19 +316,19 @@ public class ButtonHelper {
             buttons = new ArrayList<>();
         }
         if (player.getTg() > 0 || (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander") && !whatIsItFor.contains("inf"))) {
-            buttons.add(Buttons.red("reduceTG_1_" + whatIsItFor, "Spend 1TG"));
+            buttons.add(Buttons.red("reduceTG_1_" + whatIsItFor, "Spend 1 Trade Good"));
         }
         if (player.getTg() > 1) {
-            buttons.add(Buttons.red("reduceTG_2_" + whatIsItFor, "Spend 2TGs"));
+            buttons.add(Buttons.red("reduceTG_2_" + whatIsItFor, "Spend 2 Trade Goods"));
         }
         if (player.getTg() > 2) {
-            buttons.add(Buttons.red("reduceTG_3_" + whatIsItFor, "Spend 3TGs"));
+            buttons.add(Buttons.red("reduceTG_3_" + whatIsItFor, "Spend 3 Trade Goods"));
         }
         if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 0) {
-            buttons.add(Buttons.red("reduceComm_1_" + whatIsItFor, "Spend 1 commodity"));
+            buttons.add(Buttons.red("reduceComm_1_" + whatIsItFor, "Spend 1 Commodity"));
         }
         if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 1) {
-            buttons.add(Buttons.red("reduceComm_2_" + whatIsItFor, "Spend 2 commodities"));
+            buttons.add(Buttons.red("reduceComm_2_" + whatIsItFor, "Spend 2 Commodities"));
         }
         if (player.hasUnexhaustedLeader("olradinagent")) {
             buttons.add(Buttons.gray("exhaustAgent_olradinagent_" + player.getFaction(), "Use Olradin Agent", FactionEmojis.olradin));
@@ -343,7 +343,7 @@ public class ButtonHelper {
         if (player.hasAbility("diplomats") && !ButtonHelperAbilities.getDiplomatButtons(game, player).isEmpty()) {
             buttons.add(Buttons.gray("getDiplomatsButtons", "Use Diplomats Ability", FactionEmojis.freesystems));
         }
-        buttons.add(Buttons.gray("resetSpend_" + whatIsItFor, "Reset Spent Planets and TGs"));
+        buttons.add(Buttons.gray("resetSpend_" + whatIsItFor, "Reset Spent Planets and Trade Goods"));
         return buttons;
     }
 
@@ -863,7 +863,7 @@ public class ButtonHelper {
                     int cTG = nonActivePlayer.getTg();
                     nonActivePlayer.setTg(cTG + 4);
                     MessageHelper.sendMessageToChannel(channel,
-                        ident + " gained 4TGs (" + cTG + "->" + nonActivePlayer.getTg() + ")");
+                        ident + " gained 4 trade goods (" + cTG + "->" + nonActivePlayer.getTg() + ").");
                     ButtonHelperAgents.resolveArtunoCheck(nonActivePlayer, 4);
                     ButtonHelperAbilities.pillageCheck(nonActivePlayer, game);
                 }
@@ -5909,7 +5909,7 @@ public class ButtonHelper {
             }
         }
         if (!game.getPhaseOfGame().contains("agenda")) {
-            youCanSpend.append("and ").append(player.getTg()).append(MiscEmojis.tg).append(" trade good").append(player.getTg() == 1 ? "" : "s").append(".");
+            youCanSpend.append("and ").append(player.getTg().append(" trade good").append(player.getTg() == 1 ? "" : "s").append(".");
         }
         if (production) {
             if (player.hasTech("st")) {

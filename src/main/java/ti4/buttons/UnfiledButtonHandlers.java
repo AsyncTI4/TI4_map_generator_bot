@@ -104,26 +104,29 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void declareUse(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String msg = player.getFactionEmojiOrColor() + " is using " + buttonID.split("_")[1];
         if (msg.contains("Vaylerian")) {
-            msg = msg + " to add +2 capacity to a ship with capacity";
+            msg = player.getFactionEmojiOrColor() + " is using Pyndil Gonsuul, the Vaylerian commander, to add +2 capacity to a ship with capacity.";
         }
         if (msg.contains("Tnelis")) {
-            msg = msg
-                + " to apply 1 hit against their **non-fighter** ships in the system and give **1** of their ships a +1 boost. This ability may only be used once per activation.";
+            msg = player.getFactionEmojiOrColor() + " is using Fillipo Rois, the Tnelis commander,"
+                + " producing a hit against 1 of their __non-fighter__ ships in the system to give __one__ of their ships a +1 move boost."
+                + "\n-# This ability may only be used once per activation.";
             String pos = buttonID.split("_")[2];
             List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game,
                 game.getTileByPosition(pos));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                player.getRepresentationUnfogged() + " Use buttons to assign 1 hit", buttons);
+                player.getRepresentationUnfogged() + ", use buttons to assign 1 hit.", buttons);
             game.setStoredValue("tnelisCommanderTracker", player.getFaction());
         }
         if (msg.contains("Ghemina")) {
-            msg = msg + " to gain 1TG after winning the space combat";
+            msg = player.getFactionEmojiOrColor() + " is using Jarl Vel & Jarl Jotrun, the Ghemina commanders, to gain 1 trade good after winning the space combat.";
             player.setTg(player.getTg() + 1);
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
             ButtonHelperAbilities.pillageCheck(player, game);
         }
         if (msg.contains("Lightning")) {
-            msg = msg + " Drives to boost the move value of each unit not transporting fighters or infantry by 1";
+            msg = player.getFactionEmojiOrColor()
+                + " is using their Lightning Drives technology to give each ship not transporting fighters or infantry a +1 move boost.";
+                + "\n-# A ship transporting just mechs gets the boost.";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteTheOneButton(event);
@@ -330,7 +333,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
             }
         } else {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " TGs increased by 1 " + player.gainTG(1));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " trade goods increased by 1 " + player.gainTG(1) + ".");
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
         }
@@ -559,7 +562,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             whatIsItFor = buttonID.split("_")[2];
         }
         if (tgLoss > player.getTg()) {
-            String message = "You don't have " + tgLoss + " TG" + (tgLoss == 1 ? "" : "s") + ". No change made.";
+            String message = "You don't have " + tgLoss + " trade good" + (tgLoss == 1 ? "" : "s") + ". No change made.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         } else {
             player.setTg(player.getTg() - tgLoss);
@@ -832,8 +835,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         int tgCount = scTradeGoods.get(scNum);
         game.setScTradeGood(scNum, (tgCount + 1));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "Added 1TG to " + Helper.getSCName(scNum, game) + ". There are now " + (tgCount + 1) + " TG"
-                + (tgCount == 0 ? "" : "s") + " on it.");
+            "Added 1 trade good to " + Helper.getSCName(scNum, game) + ". There are now " 
+                + (tgCount + 1) + " trade goo"+ (tgCount == 0 ? "" : "s") + " on it.");
     }
 
     @ButtonHandler("autoAssignAFBHits_")
@@ -1203,7 +1206,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("getPsychoButtons")
     public static void offerPsychoButtons(Player player, Game game) {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " use buttons to gain " + MiscEmojis.tg + " per planet exhausted.",
+            player.getRepresentationUnfogged() + " use buttons to gain 1 trade good per planet exhausted.",
             ButtonHelper.getPsychoTechPlanets(game, player));
     }
 
@@ -1622,7 +1625,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                             + "George Nobin, the Celdauri"
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                            + " agent, to place 1 space dock for 2TGs or 2 commodities.",
+                            + " agent, to place 1 space dock for 2 trade goods or 2 commodities.",
                         buttons);
                 }
                 List<Button> systemButtons2 = new ArrayList<>();
@@ -1935,7 +1938,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("pay1tg") // TODO: delete this specific handler after Dec 2024
     @ButtonHandler("pay1tgToAnnounceARetreat")
     public static void pay1tgToAnnounceARetreat(ButtonInteractionEvent event, Player player) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " paid 1TG to announce a retreat " + player.gainTG(-1));
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor()
+            + " paid 1 trade good to announce a retreat " + player.gainTG(-1) +".");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1950,9 +1954,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             String combatName = "combatRoundTracker" + game.getActivePlayer().getFaction() + game.getActiveSystem() + "space";
             if (game.getStoredValue(combatName).isEmpty()) {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("pay1tgToAnnounceARetreat", "Pay 1TG"));
-                buttons.add(Buttons.red("deleteButtons", "I don't have to pay"));
-                String raiders = player.getRepresentation() + " reminder that your opponent has the cargo raiders ability, which means you might have to pay 1TG to announce a retreat if they choose.";
+                buttons.add(Buttons.green("pay1tgToAnnounceARetreat", "Pay 1 Trade Good"));
+                buttons.add(Buttons.red("deleteButtons", "I Don't Have to Pay"));
+                String raiders = player.getRepresentation() + " reminder that your opponent has the **Cargo Raiders** ability,"
+                    + " which means you might have to pay 1 trade good to announce a retreat if they choose.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), raiders, buttons);
             }
         }
@@ -2235,10 +2240,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("mallice_convert_comm")
     public static void malliceConvertComm(ButtonInteractionEvent event, Player player, Game game) {
         String playerRep = player.getFactionEmoji();
-
-        String message = playerRep + " exhausted Mallice ability and converted comms to TGs (TGs: "
-            + player.getTg() + "->" + (player.getTg() + player.getCommodities()) + ").";
-        player.setTg(player.getTg() + player.getCommodities());
+        int commod = player.getCommodities();
+        String message = playerRep + " exhausted Mallice ability to convert their " + commod
+            +  " commodit" + (commod == 1 ? "y" : "ies") + " to " 
+            + (commod == 1 ? "a trade good" : commod + " trade goods") + " (trade goods: "
+            + player.getTg() + "->" + (player.getTg() + commod) + ").";
+        player.setTg(player.getTg() + commod);
         player.setCommodities(0);
         if (!game.isFowMode() && event.getMessageChannel() != game.getMainGameChannel()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
@@ -2250,7 +2257,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("mallice_2_tg")
     public static void mallice2tg(ButtonInteractionEvent event, Player player, Game game) {
         String playerRep = player.getFactionEmoji();
-        String message = playerRep + " exhausted Mallice ability and gained 2TGs " + player.gainTG(2) + ".";
+        String message = playerRep + " exhausted Mallice ability and gained trade goods " + player.gainTG(2) + ".";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 2);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
@@ -2263,7 +2270,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @Deprecated
     public static void gain1tgFromCommander(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
-        String message = player.getRepresentation() + " Gained 1TG " + player.gainTG(1) + " from their commander";
+        String message = player.getRepresentation() + " Gained 1 trade good " + player.gainTG(1) + " from their commander.";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(mainGameChannel, message);
@@ -2271,7 +2278,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     public static void gain1tgFromMuaatCommander(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
-        String message = player.getRepresentation() + " Gained 1TG " + player.gainTG(1) + " from Magmus, the Muaat commander.";
+        String message = player.getRepresentation() + " Gained 1 trade good " + player.gainTG(1) + " from Magmus, the Muaat commander.";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(mainGameChannel, message);
@@ -2279,7 +2286,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     public static void gain1tgFromLetnevCommander(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
-        String message = player.getRepresentation() + " Gained 1TG " + player.gainTG(1) + " from Rear Admiral Farran, the Letnev commander.";
+        String message = player.getRepresentation() + " Gained 1 trade good " + player.gainTG(1) + " from Rear Admiral Farran, the Letnev commander.";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(mainGameChannel, message);
@@ -2296,7 +2303,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             failed = message.contains("Please try again.");
         }
         if (!failed) {
-            message += "Gained 1TG " + player.gainTG(1, true) + ".";
+            message += "Gained 1 trade good " + player.gainTG(1, true) + ".";
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
         }
         ReactionService.addReaction(event, game, player, message);

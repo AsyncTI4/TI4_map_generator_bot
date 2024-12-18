@@ -32,24 +32,28 @@ class ExploreButtonHandler {
     @ButtonHandler("resolveLocalFab_")
     public static void resolveLocalFabricators(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
         String planetName = buttonID.split("_")[1];
-        TI4Emoji commOrTg;
+        String commOrTg;
         if (player.getCommodities() > 0) {
             player.setCommodities(player.getCommodities() - 1);
-            commOrTg = MiscEmojis.comm;
+            commOrTg = "commodity";
+            if (player.getPromissoryNotesInPlayArea().contains("dark_pact")
+            {
+                commOrTg += " (though you may wish to manually spend a trade good instead because of _Dark Pact_)"
+            }
         } else if (player.getTg() > 0) {
             player.setTg(player.getTg() - 1);
-            commOrTg = MiscEmojis.tg;
+            commOrTg = "trade good";
         } else {
-            ReactionService.addReaction(event, game, player, "Didn't have any Comms/TGs to spend, no mech placed");
+            ReactionService.addReaction(event, game, player, "Didn't have any commodities or trade goods to spend, so no mech has been placed.");
             return;
         }
         AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), "mech " + planetName);
         planetName = Mapper.getPlanet(planetName) == null ? "`error?`" : Mapper.getPlanet(planetName).getName();
-        ReactionService.addReaction(event, game, player, "Spent a " + commOrTg + " for a Mech on " + planetName);
+        ReactionService.addReaction(event, game, player, "Spent a " + commOrTg + " for a mech on " + planetName + ".");
         ButtonHelper.deleteMessage(event);
         if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
             String pF = player.getFactionEmoji();
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pF + " Spent a " + commOrTg + " for a Mech on " + planetName);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pF + " Spent a " + commOrTg + " for a mech on " + planetName +".");
         }
     }
 
@@ -96,7 +100,7 @@ class ExploreButtonHandler {
         String message = ExploreHelper.checkForMechOrRemoveInf(planetName, game, player);
         boolean failed = message.contains("Please try again.");
         if (!failed) {
-            message += "Gained 1TG " + player.gainTG(1, true);
+            message += "Gained 1 trade good " + player.gainTG(1, true) + ".";
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
         }
         ReactionService.addReaction(event, game, player, message);
