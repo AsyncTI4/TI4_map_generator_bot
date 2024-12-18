@@ -16,7 +16,7 @@ public interface ParentCommand extends Command {
         if (!Command.super.accept(event)) return false;
         String subcommandName = event.getInteraction().getSubcommandName();
         Subcommand subcommand = getSubcommands().get(subcommandName);
-        return subcommand != null && subcommand.accept(event);
+        return subcommand == null || subcommand.accept(event);
     }
 
     default void execute(SlashCommandInteractionEvent event) {
