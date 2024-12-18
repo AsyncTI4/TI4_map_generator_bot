@@ -558,8 +558,8 @@ public class PlayerTechService {
             buttons.add(inheritanceSystemsButton);
         }
         if (player.hasRelicReady("prophetstears")) {
-            buttons.add(Buttons.red("prophetsTears_AC", "Exhaust Prophets Tears for AC"));
-            buttons.add(Buttons.red("prophetsTears_TechSkip", "Exhaust Prophets Tears for Tech Skip"));
+            buttons.add(Buttons.red("prophetsTears_AC", "Exhaust Prophets Tears for Action Card"));
+            buttons.add(Buttons.red("prophetsTears_TechSkip", "Exhaust Prophets Tears for Technology Prerequisite"));
         }
         if (player.hasExternalAccessToLeader("jolnaragent") || player.hasUnexhaustedLeader("jolnaragent")) {
             buttons.add(Buttons.gray("exhaustAgent_jolnaragent", "Use Jol-Nar Agent", FactionEmojis.Jolnar));

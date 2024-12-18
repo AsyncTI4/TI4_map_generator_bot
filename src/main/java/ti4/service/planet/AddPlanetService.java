@@ -223,7 +223,7 @@ public class AddPlanetService {
             String msg2 = player.getRepresentationUnfogged() + " you may use "
                 + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                + " agent, to draw 1AC";
+                + " agent, to draw 1 action card.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
         }
 
