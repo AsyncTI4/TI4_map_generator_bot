@@ -1284,7 +1284,7 @@ public class AgendaHelper {
                             } else {
                                 sb.append(" 1 action card");
                             }
-                            sb.append(" and 2 trade goods ").append(winningR.gainTG(2).append("."));
+                            sb.append(" and 2 trade goods ").append(winningR.gainTG(2)).append(".");
                             MessageHelper.sendMessageToChannel(channel, sb.toString());
                             ButtonHelperAbilities.pillageCheck(winningR, game);
                             ButtonHelperAgents.resolveArtunoCheck(winningR, 2);

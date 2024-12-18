@@ -5909,7 +5909,7 @@ public class ButtonHelper {
             }
         }
         if (!game.getPhaseOfGame().contains("agenda")) {
-            youCanSpend.append("and ").append(player.getTg().append(" trade good").append(player.getTg() == 1 ? "" : "s").append(".");
+            youCanSpend.append("and ").append(player.getTg()).append(" trade good").append(player.getTg() == 1 ? "" : "s").append(".");
         }
         if (production) {
             if (player.hasTech("st")) {

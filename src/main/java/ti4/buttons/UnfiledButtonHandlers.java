@@ -125,8 +125,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         if (msg.contains("Lightning")) {
             msg = player.getFactionEmojiOrColor()
-                + " is using their Lightning Drives technology to give each ship not transporting fighters or infantry a +1 move boost.";
-                + "\n-# A ship transporting just mechs gets the boost.";
+                + " is using their Lightning Drives technology to give each ship not transporting fighters or infantry a +1 move boost."
+                + "\n-# A ship transporting just mechs gets this boost.";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteTheOneButton(event);

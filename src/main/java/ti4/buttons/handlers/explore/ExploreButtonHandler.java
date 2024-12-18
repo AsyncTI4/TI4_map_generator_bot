@@ -36,9 +36,9 @@ class ExploreButtonHandler {
         if (player.getCommodities() > 0) {
             player.setCommodities(player.getCommodities() - 1);
             commOrTg = "commodity";
-            if (player.getPromissoryNotesInPlayArea().contains("dark_pact")
+            if (player.getPromissoryNotesInPlayArea().contains("dark_pact"))
             {
-                commOrTg += " (though you may wish to manually spend a trade good instead because of _Dark Pact_)"
+                commOrTg += " (though you may wish to manually spend a trade good instead because of _Dark Pact_)";
             }
         } else if (player.getTg() > 0) {
             player.setTg(player.getTg() - 1);

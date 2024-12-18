@@ -369,8 +369,8 @@ public class PromissoryNoteHelper {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), reducedMsg2);
             }
             else
-                {
-                String reducedMsg =  + " your _Trade Agreement_ was played.";
+            {
+                String reducedMsg = owner.getRepresentationUnfogged() + " your _Trade Agreement_ was played.";
                 String reducedMsg2 = player.getRepresentationUnfogged() + " played the _Trade Agreement_ belonging to "
                     + owner.getRepresentationUnfogged() + ", taking their " + comms + " commodit" + (comms == 1 ? "y" : "ies")
                     + " and so gaining " + comms + " trade good" + (comms == 1 ? "" : "s") + ". As such, they previous had "

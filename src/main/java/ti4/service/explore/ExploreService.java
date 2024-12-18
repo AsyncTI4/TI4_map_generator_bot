@@ -541,7 +541,7 @@ public class ExploreService {
             case "fb1", "fb2", "fb3", "fb4" -> {
                 message = "Resolve _Functioning Base_:\n-# You currently have " + player.getTg() + " trade good" + (player.getTg() == 1 ? "" : "s") + ", "
                     + player.getCommoditiesRepresentation() + " commodit" + (player.getCommodities() == 1 ? "y" : "ies") + ", and "
-                    + player.getActionCards().size() + " action card" + (player.player.getActionCards().size() == 1 ? "" : "s") + ".";
+                    + player.getActionCards().size() + " action card" + (player.getActionCards().size() == 1 ? "" : "s") + ".";
                 Button getACButton = Buttons.green("comm_for_AC", "Spend 1 Trade Good or 1 Commodity For 1 Action Card", CardEmojis.ActionCard);
                 Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
                 List<Button> buttons = List.of(getACButton, getCommButton);
