@@ -55,8 +55,6 @@ public class SlashCommandListener extends ListenerAdapter {
                 event.getHook().editOriginal(errorMessage).queue();
                 BotLogger.log(event, messageText, e);
             }
-        } else {
-            event.getHook().deleteOriginal().queue();
         }
 
         long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
