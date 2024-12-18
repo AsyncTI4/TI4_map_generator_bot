@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +15,11 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
@@ -33,10 +40,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands2.commandcounter.RemoveCommandCounterService;
@@ -94,8 +97,6 @@ import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelper {
 
@@ -1088,7 +1089,10 @@ public class ButtonHelper {
 
     public static boolean checkForTechSkips(Game game, String planetName) {
         Planet planet = game.getPlanetsInfo().get(planetName);
-        return !planet.getTechSpecialities().isEmpty();
+        if (!planet.getTechSpecialities().isEmpty()) {
+            return true;
+        }
+        return false;
     }
 
     public static String getTechSkipAttachments(Game game, String planetName) {
@@ -2289,7 +2293,7 @@ public class ButtonHelper {
 
     public static void findOrCreateThreadWithMessage(Game game, String threadName, String message) {
         TextChannel channel = game.getMainGameChannel();
-        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
+        ThreadHelper.checkThreadLimitAndArchive(game.getGuild());
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : channel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
@@ -4924,7 +4928,7 @@ public class ButtonHelper {
     }
 
     public static void offerPlayerSetupButtons(MessageChannel channel, Game game) {
-        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
+        ThreadHelper.checkThreadLimitAndArchive(game.getGuild());
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("startPlayerSetup", "Setup a Player"));

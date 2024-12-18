@@ -11,24 +11,27 @@ import ti4.listeners.annotations.SelectionHandler;
 import ti4.listeners.context.SelectionMenuContext;
 import ti4.map.Game;
 import ti4.message.BotLogger;
-import ti4.service.game.GameNameService;
 
 public class SelectionMenuProcessor {
 
     private static final Map<String, Consumer<SelectionMenuContext>> knownMenus = AnnotationHandler.findKnownHandlers(SelectionMenuContext.class, SelectionHandler.class);
 
-    public static void queue(StringSelectInteractionEvent event) {
-        String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorManager.runAsync("SelectionMenuProcessor task", gameName, () -> process(event));
-    }
-
-    private static void process(StringSelectInteractionEvent event) {
+    public static void process(StringSelectInteractionEvent event) {
         try {
             SelectionMenuContext context = new SelectionMenuContext(event);
             if (context.isValid()) {
-                resolveSelectionMenu(context);
-                context.save();
+                String gameName = context.getGame() == null ? null : context.getGame().getName();
+                ExecutorManager.runAsync("SelectionMenuProcessor task", gameName, () -> process(event, context));
             }
+        } catch (Exception e) {
+            BotLogger.log(event, "Something went wrong with selection interaction", e);
+        }
+    }
+
+    private static void process(StringSelectInteractionEvent event, SelectionMenuContext context) {
+        try {
+            resolveSelectionMenu(context);
+            context.save();
         } catch (Exception e) {
             String message = "Selection Menu issue in event: " + event.getComponentId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
             BotLogger.log(message, e);
