@@ -3,8 +3,10 @@ package ti4.message;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -53,6 +56,7 @@ import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.GameNameService;
+import ti4.service.game.GameUndoNameService;
 
 public class MessageHelper {
 
@@ -108,30 +112,32 @@ public class MessageHelper {
 				return buttons;
 			}
 		}
-		File mapUndoDirectory = Storage.getGameUndoDirectory();
-		if (!mapUndoDirectory.exists()) {
+
+		Path gameUndoDirectory = Storage.getGameUndoDirectory(gameName);
+		if (isDirectoryEmpty(gameUndoDirectory)) {
 			return buttons;
 		}
 
-		String gameNameForUndoStart = gameName + "_";
-		String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
-		if (mapUndoFiles == null || mapUndoFiles.length == 0) {
-			return buttons;
-		}
+		List<Integer> undoNumbers = GameUndoNameService.getSortedUndoNumbersForGame(gameName);
 
 		List<Button> newButtons = new ArrayList<>(buttons);
 		try {
-			List<Integer> numbers = Arrays.stream(mapUndoFiles)
-				.map(fileName -> fileName.replace(gameNameForUndoStart, ""))
-				.map(fileName -> fileName.replace(Constants.TXT, ""))
-				.map(Integer::parseInt).toList();
-			int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
+			int maxNumber = undoNumbers.isEmpty() ? 0 : undoNumbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
 			newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
 		} catch (Exception e) {
 			BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
 		}
 
 		return newButtons;
+	}
+
+	private static boolean isDirectoryEmpty(Path directory) {
+		try (Stream<Path> entries = Files.list(directory)) {
+			return entries.findAny().isEmpty();
+		} catch (IOException e) {
+			BotLogger.log("Error trying to list directory during undo button: " + directory, e);
+			return true;
+		}
 	}
 
 	private static void addFactionReactToMessage(Game game, Player player, Message message) {
