@@ -4523,10 +4523,6 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private void addTile(Tile tile, TileStep step) {
-        addTile(tile, step, false);
-    }
-
-    private void addTile(Tile tile, TileStep step, boolean setupCheck) {
         if (tile == null || tile.getTileID() == null) {
             return;
         }
@@ -4542,18 +4538,15 @@ public class MapGenerator implements AutoCloseable {
 
             int x = positionPoint.x;
             int y = positionPoint.y;
-            if (!setupCheck) {
-                if (!"tl".equalsIgnoreCase(position) &&
-                    !"tr".equalsIgnoreCase(position) &&
-                    !"bl".equalsIgnoreCase(position) &&
-                    !"br".equalsIgnoreCase(position)) {
-                    minX = Math.min(minX, x);
-                    minY = Math.min(minY, y);
-                    maxX = Math.max(maxX, x);
-                    maxY = Math.max(maxY, y);
-                }
-            } else if (x < minX || x > maxX || y < minY || y > maxY) {
-                return;
+
+            if (!"tl".equalsIgnoreCase(position) &&
+                !"tr".equalsIgnoreCase(position) &&
+                !"bl".equalsIgnoreCase(position) &&
+                !"br".equalsIgnoreCase(position)) {
+                minX = Math.min(minX, x);
+                minY = Math.min(minY, y);
+                maxX = Math.max(maxX, x);
+                maxY = Math.max(maxY, y);
             }
 
             positionPoint = getTilePosition(position, x, y);
@@ -4571,7 +4564,7 @@ public class MapGenerator implements AutoCloseable {
         int ringCount = game.getRingCount();
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
         if (ringCount == RING_MIN_COUNT) {
-            x += 520 / 2;
+            x += HORIZONTAL_TILE_SPACING;
         }
         if (ringCount < RING_MAX_COUNT) {
             int lower = RING_MAX_COUNT - ringCount;
