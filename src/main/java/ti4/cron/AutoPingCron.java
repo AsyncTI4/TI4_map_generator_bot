@@ -253,7 +253,6 @@ public class AutoPingCron {
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 "Sent reminder pings to players who have not yet reacted");
-
         } else {
             StringBuilder messageWhensBuilder = new StringBuilder(" please indicate no whens");
             for (Player player : missingPlayersWhens) {
