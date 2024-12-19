@@ -96,7 +96,7 @@ import ti4.website.WebsiteOverlay;
 
 public class MapGenerator implements AutoCloseable {
 
-    private static final int RING_MAX_COUNT = 8;
+    private static final int RING_MAX_COUNT = 21;
     private static final int RING_MIN_COUNT = 3;
     private static final int PLAYER_STATS_HEIGHT = 650; // + 34 per teammate + 34 if line is long
     private static final int TILE_PADDING = 100;
@@ -274,7 +274,7 @@ public class MapGenerator implements AutoCloseable {
         // Show Grey Setup Tiles
         if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
             int ringCount = game.getRingCount();
-            ringCount = Math.max(Math.min(ringCount, 11), RING_MIN_COUNT); //TODO: use RING_MAX_COUNT
+            ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
             minX = 10000;
             minY = 10000;
             maxX = -1;
@@ -3248,8 +3248,7 @@ public class MapGenerator implements AutoCloseable {
             players.stream().filter(player -> FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer)).forEach(statOrder::add);
         }
 
-        int ringCount = game.getRingCount();
-        ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
+        int ringCount = Math.max(Math.min(game.getRingCount(), RING_MAX_COUNT), RING_MIN_COUNT);
 
         // highlightValidStatTiles(game);
         boolean useNewSystem = true;
