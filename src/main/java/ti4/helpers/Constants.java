@@ -1193,4 +1193,5 @@ public class Constants {
     public static final String MODIFY_UNITS = "modify_units";
     public static final String SHOW_OWNED_PNS_IN_PLAYER_AREA = "show_owned_pns_in_player_area";
     public static final String SECONDS = "seconds";
+    public static final String MOVE_TILE = "move_tile";
 }

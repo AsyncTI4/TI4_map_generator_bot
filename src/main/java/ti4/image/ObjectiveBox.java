@@ -25,15 +25,15 @@ public class ObjectiveBox {
 	private final int y;
 	private final int boxWidth;
 	private final int maxTextWidth;
-	private final int scoreTokenWidth;
+	private final int scoreTokenSpacing;
 	private final int spaceForTokens;
 
-	ObjectiveBox(int x, int y, int boxWidth, int maxTextWidth, int scoreTokenWidth) {
+	ObjectiveBox(int x, int y, int boxWidth, int maxTextWidth, int scoreTokenSpacing) {
 		this.x = x;
 		this.y = y;
 		this.boxWidth = boxWidth;
 		this.maxTextWidth = maxTextWidth;
-		this.scoreTokenWidth = scoreTokenWidth;
+		this.scoreTokenSpacing = scoreTokenSpacing;
 		this.spaceForTokens = boxWidth - (maxTextWidth + bufferBetweenTextAndTokens * 2);
 	}
 
@@ -62,16 +62,16 @@ public class ObjectiveBox {
 		return game.isRedTapeMode() ? 800 : 400;
 	}
 
-	public static Integer getBoxWidth(Game game, Integer maxTextWidth, Integer scoreTokenWidth) {
-		return Math.max(getMinimumBoxWidth(game), Math.min(MapGenerator.getMaxObjectWidth(game), getMaxLengthOfTokens(game, maxTextWidth, scoreTokenWidth)));
+	public static Integer getBoxWidth(Game game, Integer maxTextWidth, Integer scoreTokenSpacing) {
+		return Math.max(getMinimumBoxWidth(game), Math.min(MapGenerator.getMaxObjectiveWidth(game), getMaxLengthOfTokens(game, maxTextWidth, scoreTokenSpacing)));
 	}
 
 	public static Integer getVerticalSpacing() {
 		return objectiveBoxHeight + spacingBetweenBoxes;
 	}
 
-	private static Integer getMaxLengthOfTokens(Game game, Integer maxTextWidth, Integer scoreTokenWidth) {
-		return maxTextWidth + (bufferBetweenTextAndTokens * 2) + (game.getRealAndEliminatedAndDummyPlayers().size() * scoreTokenWidth);
+	private static Integer getMaxLengthOfTokens(Game game, Integer maxTextWidth, Integer scoreTokenSpacing) {
+		return maxTextWidth + (bufferBetweenTextAndTokens * 2) + (game.getRealAndEliminatedAndDummyPlayers().size() * scoreTokenSpacing);
 	}
 
 	private void displayScoreMarkers(Game game, Graphics graphics, MapGenerator generator, Objective objective) {
@@ -86,7 +86,7 @@ public class ObjectiveBox {
 		try {
 			int numberOfRealPlayers = game.getRealAndEliminatedAndDummyPlayers().size();
 			int minimumTokenSpacingToStayInsideBox = numberOfRealPlayers == 0 ? 1 : spaceForTokens / game.getRealAndEliminatedAndDummyPlayers().size() + 1;
-			int controlTokenSpacing = Math.min(scoreTokenWidth, minimumTokenSpacingToStayInsideBox);
+			int controlTokenSpacing = Math.min(scoreTokenSpacing, minimumTokenSpacingToStayInsideBox);
 
 			for (String playerID : playerIDs) {
 				Player player = game.getPlayer(playerID);

@@ -365,4 +365,44 @@ public class PositionMapper {
     public static String getTileIDAtCornerPositionOfRing(int ring, int cornerNumber) {
         return ring + String.format("%02d", 1 + ring * (cornerNumber - 1));
     }
+
+    public static int getLeftMostTileOffsetInGame(Game game) {
+        return game.getTileMap().keySet().stream()
+            .mapToInt(pos -> {
+                if (!Helper.isInteger(pos)) return 2080;
+                return (int) PositionMapper.getTilePosition(pos).getX();
+            })
+            .min()
+            .orElse(0);
+    }
+
+    public static int getRightMostTileOffsetInGame(Game game) {
+        return game.getTileMap().keySet().stream()
+            .mapToInt(pos -> {
+                if (!Helper.isInteger(pos)) return 2080;
+                return (int) PositionMapper.getTilePosition(pos).getX();
+            })
+            .max()
+            .orElse(0);
+    }
+
+    public static int getTopMostTileOffsetInGame(Game game) {
+        return game.getTileMap().keySet().stream()
+            .mapToInt(pos -> {
+                if (!Helper.isInteger(pos)) return 2550;
+                return (int) PositionMapper.getTilePosition(pos).getY();
+            })
+            .min()
+            .orElse(0);
+    }
+
+    public static int getBottomMostTileOffsetInGame(Game game) {
+        return game.getTileMap().keySet().stream()
+            .mapToInt(pos -> {
+                if (!Helper.isInteger(pos)) return 2550;
+                return (int) PositionMapper.getTilePosition(pos).getY();
+            })
+            .max()
+            .orElse(0);
+    }
 }
