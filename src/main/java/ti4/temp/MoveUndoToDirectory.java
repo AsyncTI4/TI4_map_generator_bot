@@ -21,28 +21,36 @@ public class MoveUndoToDirectory {
             String gameName = managedGame.getName();
             moveUndoFilesToDirectory(gameName);
         }
+
+        var gameUndoPath = Storage.getBaseGameUndoDirectory();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(gameUndoPath, Files::isRegularFile)) {
+            Path targetPath = gameUndoPath.resolve("undo_archive_for_deletion");
+            for (Path path : stream) {
+                try {
+                    Files.move(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    BotLogger.log("Error moving file: " + path + " to " + targetPath, e);
+                }
+            }
+        } catch (Exception e) {
+            BotLogger.log("Error trying to move undo files for orphaned game undos.", e);
+        }
+
         BotLogger.logWithTimestamp(" Finished moving undo files.");
     }
 
     private static void moveUndoFilesToDirectory(String gameName) {
         var gameUndoPath = Storage.getBaseGameUndoDirectory();
-        var currentGameUndoDirectoryPath = gameUndoPath.resolve(gameName);
-        try {
-            Files.createDirectories(currentGameUndoDirectoryPath);
-        } catch (IOException e) {
-            BotLogger.log("Error creating directory: " + currentGameUndoDirectoryPath, e);
-            return;
-        }
-
         String gameNameFileNamePrefix = gameName + "_";
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(gameUndoPath, gameNameFileNamePrefix + "*")) {
+            Path currentGameUndoDirectoryPath = null;
             for (Path path : stream) {
-                try {
-                    Path targetPath = currentGameUndoDirectoryPath.resolve(path.getFileName());
-                    Files.move(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    BotLogger.log("Error moving file: " + path + " to " + currentGameUndoDirectoryPath, e);
+                if (currentGameUndoDirectoryPath == null) {
+                    currentGameUndoDirectoryPath = gameUndoPath.resolve(gameName);
+                    Files.createDirectories(currentGameUndoDirectoryPath);
                 }
+                Path targetPath = currentGameUndoDirectoryPath.resolve(path.getFileName());
+                Files.move(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (Exception e) {
             BotLogger.log("Error trying to move undo files for: " + gameName, e);
