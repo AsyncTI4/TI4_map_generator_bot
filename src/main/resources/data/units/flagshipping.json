@@ -737,7 +737,7 @@
         "capacityValue": 2,
         "cost": 8,
         "combatHitsOn": 9,
-        "combatDieCount": 2,
+        "combatDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,

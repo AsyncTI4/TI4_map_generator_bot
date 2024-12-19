@@ -1,7 +1,7 @@
 package ti4.service.franken;
 
 public enum FrankenDraftMode {
-      POWERED("powered", "Adds 1 extra faction tech/ability to pick from."), 
+      POWERED("powered", "Adds 1 extra faction technology/ability to pick from."), 
       ONEPICK("onepick", "Draft 1 item a time.");
 
       private final String name;

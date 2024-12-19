@@ -434,8 +434,9 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, acbuttons);
             }
 
-            String codedMessage = player.getRepresentation() + " After checking for Sabos, use buttons to resolve. Reminder that all card targets (besides tech RESEARCH) should be declared now, before people decide on sabos. Resolve ";
-            String codedMsg = codedMessage + actionCardTitle;
+            String codedMsg = player.getRepresentation() + " After checking for Sabos, use buttons to resolve."
+                + " Reminder that all card targets (besides technology research) should be declared now, before people decide on Sabos."
+                + " Resolve " + actionCardTitle + ".";
 
             List<Button> codedButtons = new ArrayList<>();
             if (actionCardTitle.contains("Plagiarize")) {
@@ -789,7 +790,7 @@ public class ActionCardHelper {
             TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(Constants.AC, actionCard.getAlias(), player.getNumberTurns());
             if (combatModAC != null) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "applytempcombatmod__" + Constants.AC + "__" + actionCard.getAlias(), "Resolve " + actionCard.getName()));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + actionCard.getName(), codedButtons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMsg, codedButtons);
             }
 
             if (actionCardWindow.contains("After an agenda is revealed")) {

@@ -2,11 +2,13 @@
 - Card names should be `_italicised_`;
 - Unit abilities should be `ALL CAPS`;
 - Strategy cards and faction abilities should be `**bolded**`;
-- Leaders should be written as `Name, the Faction Rank`;
-	- If the player has Ssruu, the leader should be written as `Clever, Clever Name, the Faction/Yssaril Rank`;
+- Leaders should be written as `Name, the Faction rank`;
+	- If the player has Ssruu, the leader should be written as `Clever, Clever Name, the Faction/Yssaril rank`;
+	- Nomad agents are `Name, a Nomad agent` (indefinite) and Naaz-Rokha leaders are `Name, the Naaz-Rokha Ranks` (plural);
 - Flagships should be written as `the Name (the Faction flagship)`;
 	- Other faction units should be written as `a Name (Faction unittype)`
 - Emphasis and list item text headers should be `__underlined__`;
+- Agenda outcomes should be `"For"` and `"Against"`;
 - Reminder text should be `-# small text` on a new line;
 - Text should be in sentence case;
 - Text should read as a proper sentence (including period);
@@ -14,8 +16,11 @@
 - Abbreviations should be avoided;
 	- Use "command token from [their] tactic pool" etc.;
 - Bot commands should be ``` `teletext` ```;
+- Reference to the cards info thread should be ``` `#cards-info` thread```
 # Buttons
 - Text should be in Title Case;
+- Ability use should be `Use AbilitySource`;
+	- Any clarifications (e.g. faction, source type, effect) should be in the message e.g. `you may use the Faction AbilitySource technology to do whatever.`;
 - Abbreviations should be used if required for text length reasons;
 	- Use "Tactic Token" instead of "Tactic CC" etc.;
 - Leader names should be written as `Faction Rank`;

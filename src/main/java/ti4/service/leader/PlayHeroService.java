@@ -68,13 +68,13 @@ public class PlayHeroService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
             if ("zealotshero".equals(playerLeader.getId())) {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
-                    player.getRepresentation() + " Use the button to get your first non-faction tech",
+                    player.getRepresentation() + ", please use the button to get your first non-faction technology.",
                     Buttons.GET_A_FREE_TECH);
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
-                    player.getRepresentation() + " Use the button to get your second non-faction tech",
+                    player.getRepresentation() + ", please use the button to get your second non-faction technology.",
                     Buttons.GET_A_FREE_TECH);
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
-                    player.getRepresentation() + " Use the button to get your third non-faction tech",
+                    player.getRepresentation() + ", please use the button to get your third non-faction technology.",
                     Buttons.GET_A_FREE_TECH);
             }
         } else {
@@ -281,14 +281,26 @@ public class PlayHeroService {
             case "vadenhero" -> ButtonHelperHeroes.startVadenHero(game, player);
             case "veldyrhero" -> {
                 game.setComponentAction(true);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
+                                + ", for each planet with a Branch Office, you may copy 1 unit upgrade technology from the player that controls that planet.");
                 for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)) {
-                    for (int x = 0; x < ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2); x++) {
-                        if (!ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game).isEmpty()) {
-                            String msg = player.getRepresentationUnfogged()
-                                + " you may retrieve a unit upgrade tech from players with branch offices, one for each branch office. Here is the possible techs from "
-                                + p2.getFactionEmojiOrColor();
-                            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg,
-                                ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
+                    if (ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2) == 1)
+                    {
+                        String msg = p2.getFactionEmojiOrColor() + " owns 1 Branch Office. You may copy 1 of these unit upgrade technologies.";
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg,
+                            ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
+                    }
+                    else
+                    {
+                        String msg = p2.getFactionEmojiOrColor() + " owns " + ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2)
+                            + " Branch Offices. You may copy " + ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2) + " of these unit upgrade technologies.";
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg,
+                            ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
+                        for (int x = 1; x < ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2); x++) {
+                            if (!ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game).isEmpty()) {
+                                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "",
+                                    ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
+                            }
                         }
                     }
                 }

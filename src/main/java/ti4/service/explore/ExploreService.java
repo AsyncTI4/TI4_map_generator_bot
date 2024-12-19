@@ -549,7 +549,7 @@ public class ExploreService {
             }
             case "freetech1", "freetech2", "freetech3" -> {
                 game.setComponentAction(true);
-                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to research a tech", Buttons.GET_A_FREE_TECH);
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + ", please use the button to research a technology.", Buttons.GET_A_FREE_TECH);
             }
             case "aw1", "aw2", "aw3", "aw4" -> {
                 int commod = player.getCommodities();

@@ -59,7 +59,7 @@ public class ComponentActionHelper {
             }
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
-            Button tButton = Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Starcharts ");
+            Button tButton = Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts ");
             compButtons.add(tButton);
         }
 
@@ -445,7 +445,7 @@ public class ComponentActionHelper {
                     }
                 } else if ("mantlecracking".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = ButtonHelperAbilities.getMantleCrackingButtons(p1, game);
-                    String message = "Select the planet you would like to mantle crack";
+                    String message = "Select the planet you wish to Mantle Crack.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("meditation".equalsIgnoreCase(buttonID)) {
                     if (p1.getStrategicCC() > 0) {
@@ -459,10 +459,10 @@ public class ComponentActionHelper {
                         p1.addExhaustedRelic("emelpar");
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     }
-                    String message = "Select the tech you would like to ready";
+                    String message = "Select the technology you wish to ready.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelper.getAllTechsToReady(p1));
                     List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
-                    String message2 = "Use buttons to end turn or do another action";
+                    String message2 = "Use buttons to end turn or do another action.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 }
             }
@@ -568,17 +568,17 @@ public class ComponentActionHelper {
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "Exhausted";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                "Use buttons to decide who to use JR on", buttons2);
+                "Use buttons to decide who to use JR-XS455-O on.", buttons2);
 
             // OFFER TCS
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
                     List<Button> buttons3 = new ArrayList<>();
                     buttons3.add(Buttons.green("exhaustTCS_" + relicID + "_" + player.getFaction(),
-                        "Exhaust TCS to Ready " + relicID));
+                        "Exhaust Temporal Command Suite to Ready " + relicID));
                     buttons3.add(Buttons.red("deleteButtons", "Decline"));
                     String msg = p2.getRepresentationUnfogged()
-                        + " you have the opportunity to exhaust your TCS tech to ready " + relicID
+                        + " you have the opportunity to exhaust your _Temporal Command Suite_ technology to ready " + relicID
                         + " and potentially resolve a transaction.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons3);
                 }

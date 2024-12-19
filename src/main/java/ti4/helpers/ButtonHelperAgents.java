@@ -1013,10 +1013,10 @@ public class ButtonHelperAgents {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
                 List<Button> buttons2 = new ArrayList<>();
-                buttons2.add(Buttons.green("exhaustTCS_" + agent + "_" + player.getFaction(), "Exhaust TCS to Ready " + agent));
+                buttons2.add(Buttons.green("exhaustTCS_" + agent + "_" + player.getFaction(), "Exhaust Temporal Command Suite to Ready " + agent));
                 buttons2.add(Buttons.red("deleteButtons", "Decline"));
                 String msg = p2.getRepresentationUnfogged()
-                    + " you have the opportunity to exhaust your TCS tech to ready " + agent
+                    + " you have the opportunity to exhaust your _ Temporal Command Suite_ technology to ready " + agent
                     + " and potentially resolve a transaction.";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons2);
             }
@@ -1481,8 +1481,8 @@ public class ButtonHelperAgents {
         int finalComm = player.getCommodities();
         int commGain = finalComm - initComm;
 
-        String msg = player.getFactionEmojiOrColor() + " max influence planet had " + maxInfluence
-            + " influence, so they gained " + commGain + " comms (" + initComm + "->"
+        String msg = player.getFactionEmojiOrColor() + " max influence planet has " + maxInfluence
+            + " influence, so they gained " + commGain + " commodit" + (commGain == 1 ? "y" : "ies") + " (" + initComm + "->"
             + player.getCommodities() + ") due to " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Yudri Sukhov, the Vaden" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
 
@@ -1535,7 +1535,7 @@ public class ButtonHelperAgents {
             }
         }
         String msg = player.getFactionEmojiOrColor()
-            + " may produce a unit in their HS or in a system with a tech skip planet due to " + (zealots.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + " may produce a unit in their home system or in a system with a technology specialty planet due to " + (zealots.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Priestess Tuh, the Zealots" + (zealots.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         if (game.isFowMode() && zealots != player) {

@@ -409,8 +409,8 @@ public class StartCombatService {
                     buttons);
             }
             if (player.hasAbility("technological_singularity")) {
-                Button steal = Buttons.gray(player.finChecker() + "nekroStealTech_" + otherPlayer.getFaction(), "Steal Tech", FactionEmojis.Nekro);
-                String message = msg + " this is a reminder that when you first kill an opponent unit this combat, you may use the button to steal a tech.";
+                Button steal = Buttons.gray(player.finChecker() + "nekroStealTech_" + otherPlayer.getFaction(), "Copy a Technology", FactionEmojis.Nekro);
+                String message = msg + " this is a reminder that when you first kill an opponent's unit this combat, you may use the button to copy a technology.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
             }
             if (player.hasUnit("ghemina_mech") && type.equalsIgnoreCase("ground") && ButtonHelper.getUnitHolderFromPlanetName(unitHolderName, game).getUnitCount(Units.UnitType.Mech, player) == 2) {

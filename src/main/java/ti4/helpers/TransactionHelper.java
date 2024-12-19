@@ -1167,7 +1167,7 @@ public class TransactionHelper {
         if (p1 == player && !game.isFowMode() && (p1.getCommodities() > 0 || p2.getCommodities() > 0)
             && !p1.hasAbility("military_industrial_complex")
             && !p1.getAllianceMembers().contains(p2.getFaction())) {
-            stuffToTransButtons.add(Buttons.gray("offerToTransact_washComms_" + player.getFaction() + "_" + p2.getFaction() + "_0", "Wash Both Players Comms"));
+            stuffToTransButtons.add(Buttons.gray("offerToTransact_washComms_" + player.getFaction() + "_" + p2.getFaction() + "_0", "Wash Both Players' Commodities"));
         }
         if (!ButtonHelper.getPlayersShipOrders(p1).isEmpty()) {
             stuffToTransButtons.add(Buttons.gray("newTransact_shipOrders_" + p1.getFaction() + "_" + p2.getFaction(), "Axis Orders"));
@@ -1232,7 +1232,7 @@ public class TransactionHelper {
         if (!game.isFowMode() && (p1.getCommodities() > 0 || p2.getCommodities() > 0)
             && !p1.hasAbility("military_industrial_complex")
             && !p1.getAllianceMembers().contains(p2.getFaction())) {
-            stuffToTransButtons.add(Buttons.gray(finChecker + "send_WashComms_" + p2.getFaction() + "_0", "Wash Both Players Comms"));
+            stuffToTransButtons.add(Buttons.gray(finChecker + "send_WashComms_" + p2.getFaction() + "_0", "Wash Both Players' Commodities"));
         }
         if (!ButtonHelper.getPlayersShipOrders(p1).isEmpty()) {
             stuffToTransButtons.add(Buttons.gray(finChecker + "transact_shipOrders_" + p2.getFaction(), "Axis Orders"));

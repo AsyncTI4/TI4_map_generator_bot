@@ -62,15 +62,15 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("gloryTech")
     public static void getTechFromGlory(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.gray("getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Tech"));
+        buttons.add(Buttons.gray("getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Technology"));
         buttons.add(Buttons.red("deleteButtons", "Delete This"));
         player.setStrategicCC(player.getStrategicCC() - 1);
         MessageChannel channel = player.getCorrectChannel();
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Glory");
         String message0 = player.getRepresentationUnfogged()
-            + "1 CC has been subtracted from your strat pool due to use of glory to acquire the tech of one of the participating units.";
+            + "1 command token has been subtracted from your strategy pool due to use of **Glory** to acquire the unit upgrade technology of one of the participating units.";
         String message = player.getRepresentationUnfogged()
-            + " Use buttons to get a unit upgrade";
+            + " Use buttons to get a unit upgrade technology.";
         MessageHelper.sendMessageToChannel(channel, message0);
         MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         ButtonHelper.deleteTheOneButton(event);
@@ -405,13 +405,13 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = ButtonHelperAbilities.getButtonsForPossibleTechForNekro(player, potentialTech, game);
         if (p2.getPromissoryNotesInPlayArea().contains("antivirus")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                trueIdentity + " the other player has antivirus, so you cannot gain tech from this combat.");
+                trueIdentity + " the other player has _Antivirus_, so you cannot gain a technology from this combat.");
         } else if (!buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                trueIdentity + " get enemy tech using the buttons", buttons);
+                trueIdentity + " copy a technology from your opponent using the buttons.", buttons);
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                trueIdentity + " there are no techs available to gain.");
+                trueIdentity + " there are no technologies available to copy <sad Nekro noises>.");
         }
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -589,10 +589,10 @@ public class ButtonHelperFactionSpecific {
         }
         List<Button> techs2 = new ArrayList<>(techs);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " use the buttons to get one of the 3 starting argent tech",
+            player.getRepresentationUnfogged() + " use the buttons to choose one of the 3 starting Argent technologies.",
             techs);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " use the buttons to the second of the 3 starting argent tech",
+            player.getRepresentationUnfogged() + " use the buttons to choose another of the 3 starting argent technologies.",
             techs2);
     }
 
@@ -615,7 +615,7 @@ public class ButtonHelperFactionSpecific {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " use the buttons to get a tech", techs);
+            player.getRepresentationUnfogged() + " use the buttons to get a technology.", techs);
     }
 
     public static void offerSpyNetOptions(Player player) {
@@ -1202,9 +1202,9 @@ public class ButtonHelperFactionSpecific {
                 if (game.getStoredValue("Genetic Recombination " + p2.getFaction())
                     .contains(voter.getFaction())) {
                     p2.exhaustTech("gr");
-                    String msg = p2.getRepresentation(false, true) + " is using Genetic Recombination to force "
+                    String msg = p2.getRepresentation(false, true) + " is using _Genetic Recombination_ to force "
                         + voter.getRepresentation(false, true)
-                        + " to vote a particular way. Tech has been exhausted, the owner should elaborate on which way to vote.";
+                        + " to vote a particular way. The technology has been exhausted, the owner should elaborate on which way to vote.";
                     MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), msg);
                     if (voter.getFleetCC() > 0) {
                         msg = voter.getRepresentation(false, true) +
@@ -1372,7 +1372,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void offerHoldingCompanyButtons(Player player, Game game) {
         String message = player.getRepresentationUnfogged()
-            + " Resolve Holding Company comm gain using the buttons. Remember you get 1 comm per attachment you've given out. ";
+            + ", please resolve **Holding Company** commodity gain using the buttons. Remember you get 1 commodity per attachment you've given out. ";
         List<Button> buttons = gainOrConvertCommButtons(player, false);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
@@ -1428,8 +1428,8 @@ public class ButtonHelperFactionSpecific {
             if (p2.hasTech("iihq")) {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(p2);
                 String trueIdentity = p2.getRepresentationUnfogged();
-                String message = trueIdentity + " Due to your IIHQ tech, you get to gain 2 commmand counters when someone scores an imperial point.";
-                String message2 = trueIdentity + "! Your current CCs are " + p2.getCCRepresentation() + ". Use buttons to gain CCs";
+                String message = trueIdentity + " Due to the Custodia Vigilia legendary ability, you gain 2 command tokens when someone scores an **Imperial** (Mecatol Rex) point.";
+                String message2 = trueIdentity + "! Your current command tokens are " + p2.getCCRepresentation() + ". Use buttons to gain command tokens.";
                 game.setStoredValue("originalCCsFor" + p2.getFaction(), p2.getCCRepresentation());
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message);
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);
@@ -1447,9 +1447,10 @@ public class ButtonHelperFactionSpecific {
             if (p2 == player || !p2.getPromissoryNotes().containsKey("ra") || p2.getTechs().contains(tech)) {
                 continue;
             }
-            String msg = p2.getRepresentationUnfogged() + " the RA owner has researched the tech "
+            String owner = game.getPNOwner("ra").getFaction().equalsIgnoreCase("jolnar") ? "Jol-Nar player" : "_Research Agreement_ owner";
+            String msg = p2.getRepresentationUnfogged() + " the " + owner + " has researched the technology _"
                 + Mapper.getTech(AliasHandler.resolveTech(tech)).getRepresentation(false)
-                + "\nUse the below button if you want to play RA to get it.";
+                + "_.\nUse the below button if you want to play _Research Agreement_ to gain it.";
             Button transact = Buttons.green("resolvePNPlay_ra_" + AliasHandler.resolveTech(tech),
                 "Acquire " + Mapper.getTech(AliasHandler.resolveTech(tech)).getName());
             List<Button> buttons = new ArrayList<>();
@@ -2342,24 +2343,24 @@ public class ButtonHelperFactionSpecific {
             if (agent.contains("titanprototype")) {
                 p2.removeExhaustedRelic("titanprototype");
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getFactionEmoji() + " exhausted TCS tech to ready " + agent + ", owned by "
-                        + p2.getColor());
+                    player.getFactionEmoji() + " exhausted _ Temporal Command Suite_ technology to ready " + agent + ", owned by "
+                        + p2.getColor() + ".");
                 if (p2 != player) {
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                        p2.getRepresentationUnfogged() + " the TCS tech was exhausted by " + player.getColor()
-                            + " to ready your " + agent);
+                        p2.getRepresentationUnfogged() + " the _ Temporal Command Suite_ technology was exhausted by " + player.getColor()
+                            + " to ready your " + agent + ".");
                 }
                 event.getMessage().delete().queue();
             }
             if (agent.contains("absol")) {
                 p2.removeExhaustedRelic("absol_jr");
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getFactionEmoji() + " exhausted TCS tech to ready " + agent + ", owned by "
-                        + p2.getColor());
+                    player.getFactionEmoji() + " exhausted _ Temporal Command Suite_ technology to ready " + agent + ", owned by "
+                        + p2.getColor() + ".");
                 if (p2 != player) {
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                        p2.getRepresentationUnfogged() + " the TCS tech was exhausted by " + player.getColor()
-                            + " to ready your " + agent);
+                        p2.getRepresentationUnfogged() + " the _Temporal Command Suite_ technology was exhausted by " + player.getColor()
+                            + " to ready your " + agent + ".");
                 }
                 event.getMessage().delete().queue();
             }
@@ -2368,13 +2369,13 @@ public class ButtonHelperFactionSpecific {
         RefreshLeaderService.refreshLeader(p2, playerLeader, game);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " exhausted TCS tech to ready " + agent + ", owned by "
-                + p2.getColor());
+            player.getFactionEmoji() + " exhausted _Temporal Command Suite_ technology to ready " + agent + ", owned by "
+                + p2.getColor() + ".");
 
         if (p2 != player) {
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                p2.getRepresentationUnfogged() + " the TCS tech was exhausted by " + player.getColor()
-                    + " to ready your " + agent);
+                p2.getRepresentationUnfogged() + " the _Temporal Command Suite_ technology was exhausted by " + player.getColor()
+                    + " to ready your " + agent + ".");
         }
         event.getMessage().delete().queue();
     }

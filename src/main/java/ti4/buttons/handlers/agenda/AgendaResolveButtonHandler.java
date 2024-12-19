@@ -387,7 +387,7 @@ class AgendaResolveButtonHandler {
                 if ("grant_reallocation".equalsIgnoreCase(agID)) {
                     MessageHelper.sendMessageToChannelWithButtons(player2.getCorrectChannel(),
                         player2.getRepresentation()
-                            + " Use the button to get a tech. You will need to lose any fleet CC manually",
+                            + " Use the button to get a technology. You will need to remove any command tokens from your fleet pool manually.",
                         List.of(Buttons.GET_A_TECH));
                 }
 
@@ -588,11 +588,11 @@ class AgendaResolveButtonHandler {
                         }
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "Sent buttons for each person to remove excess dreadnoughts/cruisers");
+                        "Sent buttons for each person to remove excess dreadnoughts and cruisers.");
                 } else {
                     game.setStoredValue("agendaArmsReduction", "true");
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "# Will exhaust all tech skip planets at the start of next Strategy phase");
+                        "# Will exhaust all planets with a technology specialty  at the start of next strategy phase.");
 
                 }
             }
@@ -600,7 +600,7 @@ class AgendaResolveButtonHandler {
                 if ("for".equalsIgnoreCase(winner)) {
                     for (Player player : game.getRealPlayers()) {
                         String message = player.getRepresentation()
-                            + " Use buttons to drop 1 mech on a Home System Planet";
+                            + " Use buttons to drop 1 mech on a home system planet.";
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
                             Helper.getHSPlanetPlaceUnitButtons(player, game, "mech",
                                 "placeOneNDone_skipbuild"));
@@ -620,7 +620,7 @@ class AgendaResolveButtonHandler {
                             }
                         }
                     }
-                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Removed all mechs");
+                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Removed all mechs.");
                 }
 
             }
@@ -946,9 +946,9 @@ class AgendaResolveButtonHandler {
         List<Player> voters = AgendaHelper.getWinningVoters(winner, game);
         for (Player voter : voters) {
             if (voter.hasTech("dskyrog")) {
-                MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), voter.getFactionEmoji() + " gets to drop 2 infantry on a planet due to Kyro green tech");
+                MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), voter.getFactionEmoji() + " gets to drop 2 infantry on a planet due to _Indoctrination Team_.");
                 List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(voter, game, "2gf", "placeOneNDone_skipbuild"));
-                MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), "Use buttons to drop 2 infantry on a planet", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), "Use buttons to drop 2 infantry on a planet.", buttons);
             }
         }
         voters.addAll(riders);
