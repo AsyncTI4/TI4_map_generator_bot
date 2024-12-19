@@ -109,6 +109,7 @@ public class MapGenerator implements AutoCloseable {
     private static final int TILE_HEIGHT = 299; // typical height of a tile image
     private static final int SPACE_FOR_TILE_WIDTH = 350; // space to calculate tile image width with
     private static final int TILE_WIDTH = 345; // typical width of a tile image
+    private static final int MINIMUM_WIDTH_OF_PLAYER_AREA = 1000;
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke3 = new BasicStroke(3.0f);
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
@@ -164,26 +165,26 @@ public class MapGenerator implements AutoCloseable {
         else
             scoreTokenWidth = 30;
 
-        int stage1 = game.getRevealedPublicObjectives().keySet().stream()
+        int stage1PublicObjCount = game.getRevealedPublicObjectives().keySet().stream()
             .filter(Mapper.getPublicObjectivesStage1()::containsKey).toList().size();
-        int stage2 = game.getRevealedPublicObjectives().keySet().stream()
+        int stage2PublicObjCount = game.getRevealedPublicObjectives().keySet().stream()
             .filter(Mapper.getPublicObjectivesStage2()::containsKey).toList().size();
-        int other = game.getRevealedPublicObjectives().size() - stage1 - stage2;
-        stage1 = game.getPublicObjectives1Peakable().size() + stage1;
-        stage2 = game.getPublicObjectives2Peakable().size() + stage2;
+        int otherObjCount = game.getRevealedPublicObjectives().size() - stage1PublicObjCount - stage2PublicObjCount;
+        stage1PublicObjCount = game.getPublicObjectives1Peakable().size() + stage1PublicObjCount;
+        stage2PublicObjCount = game.getPublicObjectives2Peakable().size() + stage2PublicObjCount;
 
-        int mostObjs = Math.max(Math.max(stage1, stage2), other);
-        int objectivesY = Math.max((mostObjs - 5) * 43, 0);
+        int mostObjectivesInAColumn = Math.max(Math.max(stage1PublicObjCount, stage2PublicObjCount), otherObjCount);
+        int heightOfObjectivesSection = Math.max((mostObjectivesInAColumn - 5) * 43, 0);
 
         int playerCountForMap = game.getRealPlayers().size() + game.getDummies().size();
-        int heightStats = getHeightOfPlayerAreasSection(game, playerCountForMap, objectivesY);
+        int heightOfPlayerAreasSection = getHeightOfPlayerAreasSection(game, playerCountForMap, heightOfObjectivesSection);
 
         int mapHeight = getMapHeight(game);
-        mapWidth = getMapWidth(game);
+        mapWidth = Math.max(MINIMUM_WIDTH_OF_PLAYER_AREA, getMapWidth(game));
         switch (this.displayType) {
             case stats:
                 heightForGameInfo = 40;
-                height = heightStats;
+                height = heightOfPlayerAreasSection;
                 displayTypeBasic = DisplayType.stats;
                 width = mapWidth;
                 break;
@@ -205,14 +206,14 @@ public class MapGenerator implements AutoCloseable {
                 break;
             case landscape:
                 heightForGameInfo = 40;
-                height = Math.max(heightStats, mapHeight);
+                height = Math.max(heightOfPlayerAreasSection, mapHeight);
                 displayTypeBasic = DisplayType.all;
                 width = mapWidth + 4 * 520 + EXTRA_X * 2;
                 break;
             case googly:
             default:
                 heightForGameInfo = mapHeight;
-                height = mapHeight + heightStats;
+                height = mapHeight + heightOfPlayerAreasSection;
                 displayTypeBasic = DisplayType.all;
                 width = mapWidth;
         }
