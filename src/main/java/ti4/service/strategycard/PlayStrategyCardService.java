@@ -524,7 +524,7 @@ public class PlayStrategyCardService {
     private static List<Button> getTechnologyButtons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-        Button getTech = Buttons.green("acquireATechWithSC", "Get a Tech");
+        Button getTech = Buttons.green("acquireATechWithSC", "Get a Technology");
         return List.of(followButton, getTech, noFollowButton);
     }
 

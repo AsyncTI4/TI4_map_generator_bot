@@ -210,11 +210,11 @@ public class AgendaHelper {
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
             MessageHelper.sendMessageToChannelWithButton(game.getMainGameChannel(),
-                "You may use the button to get your tech.", Buttons.GET_A_TECH);
+                "You may use the button to get your technology.", Buttons.GET_A_TECH);
         } else if (!d1.isSuccess() && !game.isFowMode()) {
             Button modify = Buttons.gray("getModifyTiles", "Modify Units");
             MessageHelper.sendMessageToChannelWithButton(game.getMainGameChannel(),
-                "Remove units on or adjacent to Mecatol Rex, please.", modify);
+                "Please remove units on or adjacent to Mecatol Rex.", modify);
         }
     }
 
@@ -857,7 +857,7 @@ public class AgendaHelper {
         for (Player p1 : game.getRealPlayers()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             if (p1.hasTechReady("dsedyng")) {
-                afterButtons.add(Buttons.gray(finChecker + "play_after_Edyn Unity Algorithm", "Use Edyn Unity Algorithm Tech", FactionEmojis.edyn));
+                afterButtons.add(Buttons.gray(finChecker + "play_after_Edyn Unity Algorithm", "Use Edyn Unity Algorithm Technology", FactionEmojis.edyn));
             }
             if (game.getCurrentAgendaInfo().contains("Player") && ButtonHelper.isPlayerElected(game, p1, "committee")) {
                 afterButtons.add(Buttons.gray(finChecker + "autoresolve_manualcommittee", "Use Committee Formation", CardEmojis.Agenda));
@@ -1866,7 +1866,7 @@ public class AgendaHelper {
         // Ghoti Wayfarer Tech
         if (player.hasTechReady("dsghotg")) {
             int fleetCC = player.getFleetCC();
-            planetButtons.add(Buttons.gray("exhaustForVotes_dsghotg_" + fleetCC, "Use Ghoti Tech Votes (" + fleetCC + ")", FactionEmojis.ghoti));
+            planetButtons.add(Buttons.gray("exhaustForVotes_dsghotg_" + fleetCC, "Use Networked Command Votes (" + fleetCC + ")", FactionEmojis.ghoti));
         }
         planetButtons.add(Buttons.gray("exhaustForVotes_allPlanets_" + totalPlanetVotes, "Exhaust All Voting Planets (" + totalPlanetVotes + ")"));
         planetButtons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "proceedToFinalizingVote", "Done exhausting planets."));
@@ -2909,8 +2909,9 @@ public class AgendaHelper {
         for (Player p2 : game.getRealPlayers()) {
             ButtonHelper.checkFleetInEveryTile(p2, game, event);
         }
-        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Removed all ships from alphas/betas\nYou may use the button to get your tech.", List.of(Buttons.GET_A_TECH));
-        StringBuilder msg = new StringBuilder(" may research tech due to Wormhole Research.");
+        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
+            "Removed all ships from systems with alphas or betas wormholes. \nYou may use the button to get your technology.", List.of(Buttons.GET_A_TECH));
+        StringBuilder msg = new StringBuilder(" may research a technology due to _Wormhole Research_.");
         if (game.isFowMode()) {
             for (Player p2 : players) {
                 MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), p2.getRepresentation() + msg);

@@ -847,7 +847,7 @@ public class ButtonHelperAbilities {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2
                     .getRepresentationUnfogged()
                     + " a player has resolved an Axis Order (" + Mapper.getRelic(order).getName()
-                    + ") and you may use the button to gain the corresponding unit upgrade tech if you pay 6 resources.",
+                    + ") and you may use the button to gain the corresponding unit upgrade technology if you pay 6 resources.",
                     buttons2);
             }
         }
@@ -885,58 +885,26 @@ public class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         int maxCost = player.getCommodities();
 
-        String relicName = "axisorderdd";
-        String extra = "duplicate";
-        int orderCost = 1;
-        if (orderCost < maxCost + 1) {
-            if (!ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName)) {
-                buttons.add(Buttons.gray("buyAxisOrder_" + relicName + "_" + orderCost,
-                    "Buy an " + Mapper.getRelic(relicName).getName() + " for " + orderCost + " comms"));
+        Map<String, Integer> orderDeck = Map.of(
+            "axisorderdd", 1,
+            "axisorderddduplicate", 1,
+            "axisordercr", 1,
+            "axisordercrduplicate", 1,
+            "axisordercv", 2,
+            "axisordercvduplicate", 2,
+            "axisorderdn", 3,
+            "axisorderdnduplicate", 3
+        );
+        for (Map.Entry<String, Integer> order : orderDeck.entrySet()) {
+            String orderName = order.getKey();
+            int orderCost = order.getValue();
+            if (orderCost <= maxCost) {
+                if (!ButtonHelperFactionSpecific.somebodyHasThisRelic(game, orderName)) {
+                    buttons.add(Buttons.gray("buyAxisOrder_" + orderName + "_" + orderCost,
+                        "Buy an " + Mapper.getRelic(orderName).getName() + " for " + orderCost + " commodit" + (orderCost == 1 ? "y" : "ies")));
+                }
             }
-            relicName = relicName + extra;
-            if (!ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName)) {
-                buttons.add(Buttons.gray("buyAxisOrder_" + relicName + "_" + orderCost,
-                    "Buy an " + Mapper.getRelic(relicName).getName() + " for " + orderCost + " comms"));
-            }
-        }
-        relicName = "axisordercr";
-        orderCost = 1;
-        if (orderCost < maxCost + 1) {
-            if (!ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName)) {
-                buttons.add(Buttons.gray("buyAxisOrder_" + relicName + "_" + orderCost,
-                    "Buy an " + Mapper.getRelic(relicName).getName() + " for " + orderCost + " comms"));
-            }
-            relicName = relicName + extra;
-            if (!ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName)) {
-                buttons.add(Buttons.gray("buyAxisOrder_" + relicName + "_" + orderCost,
-                    "Buy an " + Mapper.getRelic(relicName).getName() + " for " + orderCost + " comms"));
-            }
-        }
-        relicName = "axisordercv";
-        orderCost = 2;
-        if (orderCost < maxCost + 1) {
-            if (!ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName)) {
-                buttons.add(Buttons.gray("buyAxisOrder_" + relicName + "_" + orderCost,
-                    "Buy an " + Mapper.getRelic(relicName).getName() + " for " + orderCost + " comms"));
-            }
-            relicName = relicName + extra;
-            if (!ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName)) {
-                buttons.add(Buttons.gray("buyAxisOrder_" + relicName + "_" + orderCost,
-                    "Buy an " + Mapper.getRelic(relicName).getName() + " for " + orderCost + " comms"));
-            }
-        }
-        relicName = "axisorderdn";
-        orderCost = 3;
-        if (orderCost < maxCost + 1) {
-            if (!ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName)) {
-                buttons.add(Buttons.gray("buyAxisOrder_" + relicName + "_" + orderCost,
-                    "Buy an " + Mapper.getRelic(relicName).getName() + " for " + orderCost + " comms"));
-            }
-            relicName = relicName + extra;
-            if (!ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName)) {
-                buttons.add(Buttons.gray("buyAxisOrder_" + relicName + "_" + orderCost,
-                    "Buy an " + Mapper.getRelic(relicName).getName() + " for " + orderCost + " comms"));
-            }
+            
         }
         buttons.add(Buttons.red("deleteButtons", "Delete these buttons"));
 
@@ -951,15 +919,16 @@ public class ButtonHelperAbilities {
         int oldComms = player.getCommodities();
         if (lostComms > oldComms) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " you don't have that many comms");
+                player.getRepresentationUnfogged() + " you don't have " + lostComms + " commodit" + (lostComms == 1 ? "y" : "ies")
+                + " (you only have " + oldComms + " commodit" + (oldComms == 1 ? "y" : "ies") + ".");
             return;
         }
         player.addRelic(relicName);
         player.setCommodities(oldComms - lostComms);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " acquired " + Mapper.getRelic(relicName).getName()
-                + " and paid " + lostComms + " commodities (" + oldComms + "->" + player.getCommodities()
-                + ")");
+                + " and paid " + lostComms + " commodit" + (lostComms == 1 ? "y" : "ies") + " (" + oldComms + "->" + player.getCommodities()
+                + ").");
         CommanderUnlockCheckService.checkPlayer(player, "axis");
         ButtonHelper.deleteTheOneButton(event);
     }

@@ -329,8 +329,8 @@ public class PromissoryNoteHelper {
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired War Sun tech");
-            String reducedMsg = owner.getRepresentationUnfogged() + ", you must spend 1 command token due to _Fires of the Gashlai_ being played.";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired the War Sun technology.");
+            String reducedMsg = owner.getRepresentationUnfogged() + " reduced your fleet CC by 1 due to fires being played";
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(owner.getPrivateChannel(), reducedMsg, ButtonHelper.getLoseCCButtons(owner));
             } else {
@@ -340,10 +340,10 @@ public class PromissoryNoteHelper {
         if ("sigma_fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired War Sun tech");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired the War Sun technology.");
             owner.setFleetCC(owner.getFleetCC() - 1);
             ButtonHelper.checkFleetInEveryTile(owner, game, event);
-            String reducedMsg = owner.getRepresentationUnfogged() + " reduced your fleet CC by 1 due to fires being played";
+            String reducedMsg = owner.getRepresentationUnfogged() + ", you must spend 1 command token due to _Fires of the Gashlai_ being played.";
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(owner.getPrivateChannel(), reducedMsg);
             } else {
