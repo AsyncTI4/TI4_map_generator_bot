@@ -96,7 +96,7 @@ import ti4.website.WebsiteOverlay;
 
 public class MapGenerator implements AutoCloseable {
 
-    private static final int RING_MAX_COUNT = 21;
+    private static final int RING_MAX_COUNT = 8;
     private static final int RING_MIN_COUNT = 3;
     private static final int PLAYER_STATS_HEIGHT = 650; // + 34 per teammate + 34 if line is long
     private static final int TILE_PADDING = 100;
@@ -199,7 +199,7 @@ public class MapGenerator implements AutoCloseable {
             case attachments:
             case shipless:
                 heightForGameInfo = mapHeight;
-                height = mapHeight + 600;
+                height = mapHeight + SPACE_FOR_TILE_HEIGHT * 2;
                 displayTypeBasic = DisplayType.map;
                 width = mapWidth;
                 break;
@@ -4707,6 +4707,10 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static int getMapHeight(Game game) {
+        int topMost = PositionMapper.getTopMostTileOffsetInGame(game);
+        int bottomMost = PositionMapper.getBottomMostTileOffsetInGame(game);
+        int topToBottomDistance = bottomMost - topMost;
+        // return topToBottomDistance + SPACE_FOR_TILE_HEIGHT * 2 + EXTRA_Y * 2;
         return (getRingCount(game) + 1) * SPACE_FOR_TILE_HEIGHT * 2 + EXTRA_Y * 2;
     }
 
@@ -4714,13 +4718,17 @@ public class MapGenerator implements AutoCloseable {
         return game.getRealPlayers().size() + game.getDummies().size();
     }
 
-    private static boolean hasExtraRow(Game game) { // TODO: explain why this exists
+    private static boolean hasExtraRow(Game game) { // TODO: explain why this exists. Can we get rid of it?
         return (getMapHeight(game) - EXTRA_Y) < (getMapPlayerCount(game) / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
     }
 
     private static int getMapWidth(Game game) {
         float ringCount = getRingCount(game);
-        ringCount += ringCount == RING_MIN_COUNT ? 1.5f : 1;
+        ringCount += ringCount == RING_MIN_COUNT ? 1.5f : 1; //make it thick if it's a 3-ring? why? player areas?
+        int leftMost = PositionMapper.getLeftMostTileOffsetInGame(game);
+        int rightMost = PositionMapper.getRightMostTileOffsetInGame(game);
+        int leftToRightDistance = rightMost - leftMost;
+        // int mapWidth = (int) (leftToRightDistance + EXTRA_X * 2);
         int mapWidth = (int) (ringCount * 520 + EXTRA_X * 2);
         mapWidth += hasExtraRow(game) ? EXTRA_X : 0;
         return mapWidth;

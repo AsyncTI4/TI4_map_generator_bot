@@ -369,7 +369,7 @@ public class PositionMapper {
     public static int getLeftMostTileOffsetInGame(Game game) {
         return game.getTileMap().keySet().stream()
             .mapToInt(pos -> {
-                if (!Helper.isInteger(pos)) return 0;
+                if (!Helper.isInteger(pos)) return 2080;
                 return (int) PositionMapper.getTilePosition(pos).getX();
             })
             .min()
@@ -379,7 +379,7 @@ public class PositionMapper {
     public static int getRightMostTileOffsetInGame(Game game) {
         return game.getTileMap().keySet().stream()
             .mapToInt(pos -> {
-                if (!Helper.isInteger(pos)) return 0;
+                if (!Helper.isInteger(pos)) return 2080;
                 return (int) PositionMapper.getTilePosition(pos).getX();
             })
             .max()
@@ -389,7 +389,7 @@ public class PositionMapper {
     public static int getTopMostTileOffsetInGame(Game game) {
         return game.getTileMap().keySet().stream()
             .mapToInt(pos -> {
-                if (!Helper.isInteger(pos)) return 0;
+                if (!Helper.isInteger(pos)) return 2550;
                 return (int) PositionMapper.getTilePosition(pos).getY();
             })
             .min()
@@ -399,7 +399,7 @@ public class PositionMapper {
     public static int getBottomMostTileOffsetInGame(Game game) {
         return game.getTileMap().keySet().stream()
             .mapToInt(pos -> {
-                if (!Helper.isInteger(pos)) return 0;
+                if (!Helper.isInteger(pos)) return 2550;
                 return (int) PositionMapper.getTilePosition(pos).getY();
             })
             .max()
