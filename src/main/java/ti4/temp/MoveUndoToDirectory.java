@@ -24,12 +24,14 @@ public class MoveUndoToDirectory {
 
         var gameUndoPath = Storage.getBaseGameUndoDirectory();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(gameUndoPath, Files::isRegularFile)) {
-            Path targetPath = gameUndoPath.resolve("undo_archive_for_deletion");
+            Path undoArchivePath = gameUndoPath.resolve("undo_archive_for_deletion");
+            Files.createDirectories(undoArchivePath);
             for (Path path : stream) {
                 try {
+                    Path targetPath = undoArchivePath.resolve(path.getFileName());
                     Files.move(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
-                    BotLogger.log("Error moving file: " + path + " to " + targetPath, e);
+                    BotLogger.log("Error moving file: " + path + " to " + undoArchivePath, e);
                 }
             }
         } catch (Exception e) {
