@@ -18,14 +18,14 @@ class GameStatistics extends Subcommand {
 
     public GameStatistics() {
         super(Constants.GAMES, "Game Statistics");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_STATISTIC, "Choose a stat to show").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_STATISTIC, "Choose a statistic to show").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
         addOptions(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
-        addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
+        addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, PoK, Absol, DS, action_deck_2, little_omega"));
         addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog game"));
         addOptions(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter by if the game has any homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Filter by if the game has a winner"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction That You Want Tech History Of").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you want the history of").setAutoComplete(true));
     }
 
     @Override

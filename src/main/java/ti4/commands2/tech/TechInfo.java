@@ -8,7 +8,7 @@ import ti4.service.info.TechInfoService;
 class TechInfo extends GameStateSubcommand {
 
     public TechInfo() {
-        super(Constants.INFO, "Send tech information to your Cards Info channel", true, true);
+        super(Constants.INFO, "Send technology information to your #cards-info thread", true, true);
     }
 
     @Override

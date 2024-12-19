@@ -49,9 +49,9 @@ public class PlayerTechService {
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
         player.addTech(techID);
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
-        String message = player.getRepresentation() + " added tech: " + Mapper.getTech(techID).getRepresentation(false);
+        String message = player.getRepresentation() + " added technology: _" + Mapper.getTech(techID).getRepresentation(false) + "_.";
         if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
-            message = message + "\n Automatically added the Custodia Vigilia planet";
+            message = message + "\nAutomatically added the Custodia Vigilia planet.";
         }
         CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn");
         MessageHelper.sendMessageToEventChannel(event, message);
@@ -59,17 +59,17 @@ public class PlayerTechService {
 
     public static void removeTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.removeTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " removed tech: " + Mapper.getTech(techID).getRepresentation(false));
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " removed technology: _" + Mapper.getTech(techID).getRepresentation(false) + "_.");
     }
 
     public static void purgeTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.purgeTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " purged tech: " + Mapper.getTech(techID).getRepresentation(false));
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " purged technology: _" + Mapper.getTech(techID).getRepresentation(false) + "_.");
     }
 
     public static void refreshTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.refreshTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " readied tech: " + Mapper.getTech(techID).getRepresentation(false));
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " readied technology: _" + Mapper.getTech(techID).getRepresentation(false) + "_.");
     }
 
     public static void exhaustTechAndResolve(GenericInteractionCreateEvent event, Game game, Player player, String tech) {
@@ -79,7 +79,7 @@ public class PlayerTechService {
             tech = "dskortg";
         }
         TechnologyModel techModel = Mapper.getTech(tech);
-        String exhaustMessage = player.getRepresentation() + " exhausted tech " + techModel.getRepresentation(false);
+        String exhaustMessage = player.getRepresentation() + " exhausted technology _" + techModel.getRepresentation(false) + "_.";
         if (game.isShowFullComponentTextEmbeds()) {
             MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), exhaustMessage, techModel.getRepresentationEmbed());
         } else {
@@ -248,14 +248,14 @@ public class PlayerTechService {
             }
             case "dskolug" -> {
                 deleteIfButtonEvent(event);
-                String message = player.getRepresentationUnfogged() + " stalled using the Applied Biothermics tech.";
+                String message = player.getRepresentationUnfogged() + " stalled using the _Applied Biothermics_ technology.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "vtx", "absol_vtx" -> { // Vortex
                 deleteIfButtonEvent(event);
                 List<Button> buttons = ButtonHelperFactionSpecific.getUnitButtonsForVortex(player, game, event);
-                String message = player.getRepresentationUnfogged() + " Select what unit you would like to capture";
+                String message = player.getRepresentationUnfogged() + ", please select which unit you would like to capture.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -339,7 +339,7 @@ public class PlayerTechService {
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "> This tech is not automated. Please resolve manually.");
+                "> This technology is not automated. Please resolve manually.");
         }
     }
 
@@ -398,7 +398,8 @@ public class PlayerTechService {
                 buttons.add(Buttons.gray("exhaustAgent_mirvedaagent_" + player.getFaction(), "Use Mirveda Agent", FactionEmojis.mirveda));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged()
                     + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Logic Machina, the Mirveda"
-                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to spend 1 CC and research a tech of the same color as a prerequisite of the tech you just got.",
+                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, by spending 1 command token from your strategy pool"
+                    + " to research a technology of the same color as a prerequisite of the unit upgrade you just got.",
                     buttons);
             }
             if (player.hasAbility("obsessive_designs") && paymentRequired
@@ -443,7 +444,8 @@ public class PlayerTechService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged()
                     + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh, the Rhodun"
-                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to produce 1 ship at home or in a system where you have a tech skip planet.",
+                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") 
+                    + " agent, to produce 1 ship at home or in a system where you have a technology specialty planet.",
                 buttons);
         }
 
@@ -495,8 +497,8 @@ public class PlayerTechService {
         }
         if (player.hasUnit("augers_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getFactionEmoji() + " has the opportunity to deploy an Augur mech on a legendary planet or planet with a tech skip");
-            String message2 = player.getRepresentationUnfogged() + " Use buttons to drop 1 mech on a legendary planet or planet with a tech skip";
+                player.getFactionEmoji() + " has the opportunity to deploy an Iledrith (Augur mech) on a legendary planet or planet with a technology specialty.");
+            String message2 = player.getRepresentationUnfogged() + ", please use buttons to drop 1 mech on a legendary planet or planet with a technology specialty.";
             List<Button> buttons2 = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
         }
@@ -576,7 +578,7 @@ public class PlayerTechService {
         }
         if (ButtonHelper.isLawInPlay(game, "revolution")) {
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(),
-                player.getRepresentation() + " Due to the Anti-Intellectual Revolution law, you now have to kill a non-fighter ship if you researched the tech you just acquired",
+                player.getRepresentation() + " Due to the _Anti-Intellectual Revolution_ law, you now have to kill a non-fighter ship if you researched the technology you just acquired.",
                 Buttons.gray("getModifyTiles", "Modify Units"));
         }
     }

@@ -42,7 +42,7 @@ public class AddUnits extends GameStateCommand {
                 .setAutoComplete(true),
             new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                 .setAutoComplete(true),
-            new OptionData(OptionType.BOOLEAN, Constants.SLING_RELAY, "Declare use of and exhaust Sling Relay Tech"),
+            new OptionData(OptionType.BOOLEAN, Constants.SLING_RELAY, "Declare use of and exhaust Sling Relay technology"),
             new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")
         );
     }

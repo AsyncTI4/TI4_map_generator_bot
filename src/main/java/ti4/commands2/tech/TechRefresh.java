@@ -8,7 +8,7 @@ import ti4.service.tech.PlayerTechService;
 class TechRefresh extends TechAddRemove {
 
     public TechRefresh() {
-        super(Constants.TECH_REFRESH, "Ready Tech");
+        super(Constants.TECH_REFRESH, "Ready a technology");
     }
 
     @Override

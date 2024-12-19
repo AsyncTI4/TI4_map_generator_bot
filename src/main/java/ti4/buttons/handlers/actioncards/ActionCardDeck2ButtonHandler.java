@@ -191,13 +191,13 @@ class ActionCardDeck2ButtonHandler {
                 buttons.add(button);
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Don't give comms"));
+        buttons.add(Buttons.red("deleteButtons", "Don't Give Commodities"));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " tell the bot who you want to give 2 comms to",
+            player.getRepresentationUnfogged() + " tell the bot which player you wish to give 2 commodities to.",
             buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " tell the bot who else you want to give 2 comms to (different from the first time)",
+            player.getRepresentationUnfogged() + " tell the bot which __different__ player you wish to give 2 commodities to.",
             buttons);
     }
 
@@ -283,7 +283,7 @@ class ActionCardDeck2ButtonHandler {
                 player.refreshPlanet(planet);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " readied every tech skip planet");
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " readied every planet with a technology specialty.");
         event.getMessage().delete().queue();
     }
 
@@ -292,7 +292,7 @@ class ActionCardDeck2ButtonHandler {
         List<Button> buttons = getStrandedShipButtons(game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " tell the bot which tile you wish to place a Ghost Ship in",
+            player.getRepresentationUnfogged() + " tell the bot which tile you wish to place the _Ghost Ship_ in.",
             buttons);
     }
 
@@ -304,7 +304,7 @@ class ActionCardDeck2ButtonHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "cruiser");
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " put 1 cruiser in " + tile.getRepresentation());
+            player.getFactionEmoji() + " put 1 cruiser in " + tile.getRepresentation() + ".");
 
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");

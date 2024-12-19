@@ -30,7 +30,7 @@ public class FactionRecordOfTechService {
 
     private void getFactionRecordOfTech(SlashCommandInteractionEvent event) {
         String text = getTechResearched(event);
-        MessageHelper.sendMessageToThread(event.getChannel(), "Tech Acquisition Record", text);
+        MessageHelper.sendMessageToThread(event.getChannel(), "Technology Acquisition Record", text);
     }
 
     private String getTechResearched(SlashCommandInteractionEvent event) {
@@ -50,7 +50,7 @@ public class FactionRecordOfTechService {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("## __**Techs Researched By ").append(factionModel.getFactionName()).append(" (From ").append(gamesThatHadThem).append(" Games)**__\n");
+        sb.append("## __**Technologies Researched By ").append(factionModel.getFactionName()).append(" (From ").append(gamesThatHadThem).append(" Games)**__\n");
 
         boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
         Comparator<Map.Entry<String, Integer>> comparator = (o1, o2) -> {

@@ -19,10 +19,10 @@ abstract class FactionTechAddRemove extends GameStateSubcommand {
     
     public FactionTechAddRemove(String name, String description) {
         super(name, description, true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Tech Name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "Tech Name").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "Tech Name").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "Tech Name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology Name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "Technology Name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "Technology Name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "Technology Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
@@ -38,7 +38,7 @@ abstract class FactionTechAddRemove extends GameStateSubcommand {
         techIDs.removeIf(id -> !Mapper.isValidTech(id));
 
         if (techIDs.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No valid techs were provided. Please see `/search techs` for available choices.");
+            MessageHelper.sendMessageToEventChannel(event, "No valid technologies were provided. Please see `/search techs` for available choices.");
             return;
         }
 

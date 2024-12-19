@@ -568,8 +568,9 @@ public class MiltyService {
 
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             if (player.getFaction().contains("keleres")) {
-                Button getTech = Buttons.green("getKeleresTechOptions", "Get Keleres Tech Options");
-                String msg = player.getRepresentationUnfogged() + " after every other faction gets their tech, press this button to resolve Keleres tech";
+                Button getTech = Buttons.green("getKeleresTechOptions", "Get Keleres Technology Options");
+                String msg = player.getRepresentationUnfogged() + " after every other faction gets their starting technologies,"
+                    + " press this button to for Keleres to get their starting technologies.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, getTech);
             } else {
                 // STARTING TECH OPTIONS

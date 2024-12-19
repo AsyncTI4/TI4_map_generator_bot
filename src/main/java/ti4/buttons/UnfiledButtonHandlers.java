@@ -344,7 +344,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void daxcive(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String planet = buttonID.replace("dacxive_", "");
         AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planet)), game, player.getColor(), "infantry " + planet);
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game) + " via the tech Dacxive Animators");
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " placed 1 infantry on "
+            + Helper.getPlanetRepresentation(planet, game) + " via the _Dacxive Animators_ technology.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -432,7 +433,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String tech = buttonID.replace("useTech_", "");
         TechnologyModel techModel = Mapper.getTech(tech);
         if (!tech.equalsIgnoreCase("st")) {
-            String useMessage = player.getRepresentation() + " used tech: " + techModel.getRepresentation(false);
+            String useMessage = player.getRepresentation() + " used technology: _" + techModel.getRepresentation(false) + "_.";
             if (game.isShowFullComponentTextEmbeds()) {
                 MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), useMessage,
                     techModel.getRepresentationEmbed());
@@ -531,11 +532,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (buttonID.split("_").length > 2) {
             whatIsItFor = buttonID.split("_")[2];
         }
-        String message = player.getFactionEmojiOrColor() + " reduced comms by " + tgLoss + " (" + player.getCommodities() + "->"
+        String message = player.getFactionEmojiOrColor() + " reduced commodities by " + tgLoss + " (" + player.getCommodities() + "->"
             + (player.getCommodities() - tgLoss) + ")";
 
         if (tgLoss > player.getCommodities()) {
-            message = "You don't have " + tgLoss + " comm" + (tgLoss == 1 ? "" : "s") + ". No change made.";
+            message = "You don't have " + tgLoss + " commodit" + (tgLoss == 1 ? "y" : "ies") + ". No change made.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         } else {
             player.setCommodities(player.getCommodities() - tgLoss);
@@ -665,15 +666,15 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 && !Mapper.getPlanet(planetName).getTechSpecialties().isEmpty())
                 || ButtonHelper.checkForTechSkips(game, planetName)) {
                 String msg = player.getRepresentation()
-                    + " due to your ancient knowledge ability, you may be eligible to receive a tech here if you exhausted this planet ("
+                    + " due to your **Ancient Knowledge** ability, you may be eligible to receive a commodity here if you exhausted this planet ("
                     + planetName
-                    + ") for its tech skip";
+                    + ") for its technology speciality.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm));
-                buttons.add(Buttons.red("deleteButtons", "Didn't use it for tech speciality"));
+                buttons.add(Buttons.red("deleteButtons", "Didn't Use its Technology Speciality"));
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getFactionEmoji()
-                        + " may have the opportunity to gain a comm from their ancient knowledge ability due to exhausting a tech skip planet");
+                        + " may have the opportunity to gain a commodity from their **Ancient Knowledge** ability due to exhausting a technology speciality planet.");
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
         }
@@ -711,12 +712,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
 
         if (game.isComponentAction()) {
-            buttons.add(Buttons.gray("acquireATech", "Get Tech of a Different Type"));
+            buttons.add(Buttons.gray("acquireATech", "Get Technology of a Different Type"));
         } else {
-            buttons.add(Buttons.gray("acquireATechWithSC", "Get Tech of a Different Type"));
+            buttons.add(Buttons.gray("acquireATechWithSC", "Get Technology of a Different Type"));
         }
 
-        String message = player.getRepresentation() + " Use the buttons to get the tech you want";
+        String message = player.getRepresentation() + " Use the buttons to get the technology you want.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -836,7 +837,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         game.setScTradeGood(scNum, (tgCount + 1));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             "Added 1 trade good to " + Helper.getSCName(scNum, game) + ". There are now " 
-                + (tgCount + 1) + " trade goo"+ (tgCount == 0 ? "" : "s") + " on it.");
+                + (tgCount + 1) + " trade good"+ (tgCount == 0 ? "" : "s") + " on it.");
     }
 
     @ButtonHandler("autoAssignAFBHits_")
@@ -2676,12 +2677,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         List<Button> buttons = new ArrayList<>();
         String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
         game.setComponentAction(true);
-        buttons.add(Buttons.blue(finsFactionCheckerPrefix + "getAllTechOfType_propulsion_noPay", "Get a Blue Tech", TechEmojis.PropulsionTech));
-        buttons.add(Buttons.green(finsFactionCheckerPrefix + "getAllTechOfType_biotic_noPay", "Get a Green Tech", TechEmojis.BioticTech));
-        buttons.add(Buttons.gray(finsFactionCheckerPrefix + "getAllTechOfType_cybernetic_noPay", "Get a Yellow Tech", TechEmojis.CyberneticTech));
-        buttons.add(Buttons.red(finsFactionCheckerPrefix + "getAllTechOfType_warfare_noPay", "Get a Red Tech", TechEmojis.WarfareTech));
-        buttons.add(Buttons.gray(finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Tech", TechEmojis.UnitUpgradeTech));
-        String message = player.getRepresentation() + " What type of tech would you want?";
+        buttons.add(Buttons.blue(finsFactionCheckerPrefix + "getAllTechOfType_propulsion_noPay", "Get a Propulsion Technology", TechEmojis.PropulsionTech));
+        buttons.add(Buttons.green(finsFactionCheckerPrefix + "getAllTechOfType_biotic_noPay", "Get a Biotic Technology", TechEmojis.BioticTech));
+        buttons.add(Buttons.gray(finsFactionCheckerPrefix + "getAllTechOfType_cybernetic_noPay", "Get a Cybernetic Technology", TechEmojis.CyberneticTech));
+        buttons.add(Buttons.red(finsFactionCheckerPrefix + "getAllTechOfType_warfare_noPay", "Get a Warfare Technology", TechEmojis.WarfareTech));
+        buttons.add(Buttons.gray(finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Technology", TechEmojis.UnitUpgradeTech));
+        String message = player.getRepresentation() + " What type of technology would you want?";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }

@@ -161,9 +161,9 @@ public class StartPhaseService {
                     for (String techID : list.split("-")) {
                         buttons.add(Buttons.green("purgeTech_" + techID, "Purge " + Mapper.getTech(techID).getName()));
                     }
-                    String msg = p2.getRepresentationUnfogged() + " due to Saint Binal, the Rhodun hero, you have to purge 2 techs. Use buttons to purge ";
-                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg + "the first tech.", buttons);
-                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg + "the second tech.", buttons);
+                    String msg = p2.getRepresentationUnfogged() + " due to Saint Binal, the Rhodun hero, you have to purge 2 technologies. Use buttons to purge ";
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg + "the first technology.", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg + "the second technology.", buttons);
                     p2.removeLeader("zealotshero");
                     game.setStoredValue("zealotsHeroTechs", "");
                     game.setStoredValue("zealotsHeroPurged", "true");
@@ -197,12 +197,12 @@ public class StartPhaseService {
                     }
                 }
             }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Exhausted all tech skip planets due to that one agenda.");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Exhausted all planets with technology specialties due to the _Arms Reduction_ agenda.");
         }
         if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
             game.setStoredValue("agendaChecksNBalancesAgainst", "");
             for (Player p2 : game.getRealPlayers()) {
-                String message = p2.getRepresentation() + " Click the names of up to 3 planets you wish to ready after Checks and Balances resolved against.";
+                String message = p2.getRepresentation() + ", please choose up to 3 planets you wish to ready because of _Checks and Balances_ resolving \"against\".";
                 List<Button> buttons = Helper.getPlanetRefreshButtons(p2, game);
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, buttons);
@@ -213,13 +213,15 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaRevolution").isEmpty()) {
             game.setStoredValue("agendaRevolution", "");
             for (Player p2 : game.getRealPlayers()) {
-                String message = p2.getRepresentation() + " Exhaust 1 planet for each tech you own (" + p2.getTechs().size() + ")";
+                String message = p2.getRepresentation() + ", please exhaust " + p2.getTechs().size() + " planet" + (p2.getTechs().size() == 1 ? "" : "s")
+                    + " (1 for each technology you own) because of _Anti-Intellectual Revolution_ resolving \"against\".";
 
                 List<Button> buttons = Helper.getPlanetExhaustButtons(p2, game);
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting")); // spitItOut
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, buttons);
             }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Sent buttons to exhaust 1 planet for each tech due to Anti-Intellectual Revolution resolving against.");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Each player must exhaust 1 planet for each technology they own due to"
+                + " _Anti-Intellectual Revolution_ resolving \"against\". Buttons for this have been sent to each player's `#card-info` thread.");
         }
         if (!game.getStoredValue("agendaRepGov").isEmpty()) {
             for (Player p2 : game.getRealPlayers()) {

@@ -174,10 +174,11 @@ public class DiscordantStarsHelper {
     private static void resolveEconomyEmpowerAbility(Player player, PlanetModel planetModel) {
         if (!player.getHasUsedEconomyEmpowerAbility() && player.hasAbility("policy_the_economy_empower")) {
             player.setHasUsedEconomyEmpowerAbility(true);
-            String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName() + " you may resolve the following ability: **The Economy - Empower (+)**: You gain 1 " + MiscEmojis.comm + "commodity.\n";
+            String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName() + " you may resolve the following ability:"
+            + " **The Economy - Empower (+)**: You gain 1 " + MiscEmojis.comm + "commodity.\n";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
-            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "Resolve ability", getCommButton);
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "Resolve ability.", getCommButton);
         }
     }
 
@@ -343,9 +344,9 @@ public class DiscordantStarsHelper {
                             }
                             if (p2.getPlanets().contains(planet)) {
                                 List<Button> buttons = new ArrayList<>();
-                                buttons.add(Buttons.green("steal2tg_" + p2.getFaction(), "Steal 2TGs from " + p2.getFactionEmojiOrColor()));
-                                buttons.add(Buttons.blue("steal3comm_" + p2.getFaction(), "Steal 3 comms from " + p2.getFactionEmojiOrColor()));
-                                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " use buttons to resolve",
+                                buttons.add(Buttons.green("steal2tg_" + p2.getFaction(), "Steal 2 Trade Goods From " + p2.getFactionEmojiOrColor()));
+                                buttons.add(Buttons.blue("steal3comm_" + p2.getFaction(), "Steal 3 Commodities From " + p2.getFactionEmojiOrColor()));
+                                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + ", use buttons to resolve.",
                                     buttons);
                             }
                         }

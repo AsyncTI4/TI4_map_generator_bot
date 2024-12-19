@@ -20,11 +20,11 @@ abstract class TechAddRemove extends GameStateSubcommand {
 
     public TechAddRemove(String id, String description) {
         super(id, description, true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Tech").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2nd Tech").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd Tech").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th Tech").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2nd technology").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd technology").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th technology").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color with the technology").setAutoComplete(true));
 
     }
 
@@ -50,10 +50,10 @@ abstract class TechAddRemove extends GameStateSubcommand {
                 List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().getName().toLowerCase().contains(techID))
                     .map(Map.Entry::getKey).toList();
                 if (possibleTechs.isEmpty()) {
-                    MessageHelper.sendMessageToEventChannel(event, "No matching Tech found");
+                    MessageHelper.sendMessageToEventChannel(event, "No matching technology found.");
                     return;
                 } else if (possibleTechs.size() > 1) {
-                    MessageHelper.sendMessageToEventChannel(event, "More that one matching Tech found");
+                    MessageHelper.sendMessageToEventChannel(event, "More that one matching technology found.");
                     return;
                 }
                 doAction(player, possibleTechs.getFirst(), event);

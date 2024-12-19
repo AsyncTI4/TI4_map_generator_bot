@@ -69,7 +69,7 @@ public class TechSummaryCron {
                     msg.append(" ").append(Mapper.getTech(tech).getNameRepresentation());
                 }
             } else {
-                msg.append(" Did not follow for tech");
+                msg.append(" Did not resolve **Technology** ability");
             }
             msg.append("\n");
         }

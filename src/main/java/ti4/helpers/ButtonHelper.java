@@ -603,11 +603,11 @@ public class ButtonHelper {
         buttons.add(Buttons.red("showDeck_hazardous", "Hazardous", ExploreEmojis.Hazardous));
         buttons.add(Buttons.green("showDeck_industrial", "Industrial", ExploreEmojis.Industrial));
         buttons.add(Buttons.gray("showDeck_all", "All Explores"));
-        buttons.add(Buttons.blue("showDeck_propulsion", "Propulsion Techs", TechEmojis.PropulsionTech));
-        buttons.add(Buttons.red("showDeck_warfare", "Warfare Techs", TechEmojis.WarfareTech));
-        buttons.add(Buttons.gray("showDeck_cybernetic", "Cybernetic Techs", TechEmojis.CyberneticTech));
-        buttons.add(Buttons.green("showDeck_biotic", "Biotic Techs", TechEmojis.BioticTech));
-        buttons.add(Buttons.green("showDeck_unitupgrade", "Unit Upgrade Techs", TechEmojis.UnitUpgradeTech));
+        buttons.add(Buttons.blue("showDeck_propulsion", "Propulsion Technologies", TechEmojis.PropulsionTech));
+        buttons.add(Buttons.red("showDeck_warfare", "Warfare Technologies", TechEmojis.WarfareTech));
+        buttons.add(Buttons.gray("showDeck_cybernetic", "Cybernetic Technologies", TechEmojis.CyberneticTech));
+        buttons.add(Buttons.green("showDeck_biotic", "Biotic Technologies", TechEmojis.BioticTech));
+        buttons.add(Buttons.green("showDeck_unitupgrade", "Unit Upgrade Technologies", TechEmojis.UnitUpgradeTech));
         buttons.add(Buttons.gray("showDeck_ac", "Action Card Discards", CardEmojis.ActionCard));
         buttons.add(Buttons.gray("showDeck_unplayedAC", "Unplayed Action Cards", CardEmojis.ActionCard));
         buttons.add(Buttons.gray("showDeck_agenda", "Agenda Discards", CardEmojis.Agenda));
@@ -1155,7 +1155,7 @@ public class ButtonHelper {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            "Use buttons to select a planet or tech to ready.", buttons);
+            "Use buttons to select a planet or technology to ready.", buttons);
     }
 
     public static void celdauriRedTech(Player player, Game game, GenericInteractionCreateEvent event) {
@@ -1208,7 +1208,7 @@ public class ButtonHelper {
         String planet = buttonID.split("_")[1];
         player.exhaustPlanet(planet);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " exhausted " + Helper.getPlanetRepresentation(planet, game)
-            + " and gained 1 trade good (" + oldTg + "->" + player.getTg() + ") using the _Psychoarcheology_ tech.");
+            + " and gained 1 trade good (" + oldTg + "->" + player.getTg() + ") using the _Psychoarcheology_ technology.");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
         deleteTheOneButton(event);
@@ -1221,7 +1221,7 @@ public class ButtonHelper {
         if (buttonID.contains("tech_")) {
             last = buttonID.replace("tech_", "");
             player.refreshTech(last);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied tech: _" + Mapper.getTech(last).getRepresentation(false) + "_.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied technology: _" + Mapper.getTech(last).getRepresentation(false) + "_.");
             CommanderUnlockCheckService.checkPlayer(player, "kolume");
         } else {
             player.refreshPlanet(last);
@@ -6033,7 +6033,7 @@ public class ButtonHelper {
                 player.addFollowedSC(scNum, event);
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
                 if (player.getStrategicCC() > 0) {
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Tech");
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Technology");
                 }
                 String message = ButtonHelperSCs.deductCC(player);
                 ReactionService.addReaction(event, game, player, message);

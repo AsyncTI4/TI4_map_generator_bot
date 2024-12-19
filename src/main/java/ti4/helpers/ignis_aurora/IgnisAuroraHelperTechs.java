@@ -39,7 +39,7 @@ public class IgnisAuroraHelperTechs {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to resolve:", buttons);
             }
             case "stellarcorridors" -> postStellarCorridors(event, game, player);
-            default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "> This tech is not automated. Please resolve manually.");
+            default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "> This technology is not automated. Please resolve manually.");
         }
         if (deleteMsg) {
             ButtonHelper.deleteMessage(event);

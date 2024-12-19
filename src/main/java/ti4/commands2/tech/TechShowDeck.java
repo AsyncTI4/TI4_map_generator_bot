@@ -10,7 +10,7 @@ import ti4.service.tech.ShowTechDeckService;
 class TechShowDeck extends GameStateSubcommand {
 
     public TechShowDeck() {
-        super("show_deck", "Look at available non-faction techs", false, false);
+        super("show_deck", "Look at the available non-faction technology", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TECH_TYPE, "The deck type you want to see")
             .setRequired(true).setAutoComplete(true));
     }

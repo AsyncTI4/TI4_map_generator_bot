@@ -10,8 +10,8 @@ import ti4.service.statistics.FactionRecordOfTechService;
 class FactionRecordOfTech extends Subcommand {
 
     public FactionRecordOfTech() {
-        super(Constants.FACTION_RECORD_OF_TECH, "# of times a tech has been acquired by a faction");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction That You Want Tech History Of").setRequired(true).setAutoComplete(true));
+        super(Constants.FACTION_RECORD_OF_TECH, "Number of times a technology has been acquired by a faction");
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you want the technology history Of").setRequired(true).setAutoComplete(true));
         addOptions(GameStatisticsFilterer.gameStatsFilters());
     }
 

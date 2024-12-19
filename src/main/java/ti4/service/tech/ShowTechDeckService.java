@@ -28,7 +28,7 @@ public class ShowTechDeckService {
             .filter(t -> !t.isFactionTech())
             .map(t -> t.getRepresentationEmbed(false, true))
             .toList();
-        String message = StringUtils.capitalize(deck) + " Tech Deck:";
+        String message = StringUtils.capitalize(deck) + " Technology Deck:";
         MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), message, embeds);
     }
 }

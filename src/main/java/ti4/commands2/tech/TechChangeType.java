@@ -18,14 +18,14 @@ import ti4.model.TechnologyModel;
 class TechChangeType extends GameStateSubcommand {
 
     public TechChangeType() {
-        super(Constants.CHANGE_TYPE, "Change what color a tech displays as", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Tech")
+        super(Constants.CHANGE_TYPE, "Change what color a technology displays as", true, false);
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology")
             .setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH_TYPE, "The type you're setting the tech to")
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH_TYPE, "The type you're setting the technology to")
             .setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2nd Tech").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd Tech").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th Tech").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2nd technology").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd technology").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th technology").setAutoComplete(true));
     }
 
     @Override
@@ -52,11 +52,11 @@ class TechChangeType extends GameStateSubcommand {
         List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().getName().toLowerCase().contains(techID))
             .map(Map.Entry::getKey).toList();
         if (possibleTechs.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No matching Tech found");
+            MessageHelper.sendMessageToEventChannel(event, "No matching technology found.");
             return;
         }
         if (possibleTechs.size() > 1) {
-            MessageHelper.sendMessageToEventChannel(event, "More that one matching Tech found");
+            MessageHelper.sendMessageToEventChannel(event, "More that one matching technology found.");
             return;
         }
         game.setStoredValue("colorChange" + techID, techType.getAsString());

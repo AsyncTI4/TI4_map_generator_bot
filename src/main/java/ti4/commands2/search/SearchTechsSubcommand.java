@@ -13,7 +13,7 @@ import ti4.model.TechnologyModel;
 class SearchTechsSubcommand extends SearchComponentModelSubcommand {
 
     public SearchTechsSubcommand() {
-        super(Constants.SEARCH_TECHS, "List all techs the bot can use");
+        super(Constants.SEARCH_TECHS, "List all technologies the bot can use");
     }
 
     @Override

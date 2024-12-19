@@ -8,7 +8,7 @@ import ti4.service.tech.PlayerTechService;
 class TechAdd extends TechAddRemove {
 
     public TechAdd() {
-        super(Constants.TECH_ADD, "Add Tech");
+        super(Constants.TECH_ADD, "Add a technology");
     }
 
     @Override

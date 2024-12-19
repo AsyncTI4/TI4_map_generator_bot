@@ -194,7 +194,7 @@
         "color": "",
         "playArea": false,
         "source": "promises_promises",
-        "text": "When you would resolve the secondary ability of the \"Technology\" strategy card: Instead, gain 1 command token and 4 trade goods. At the end of the strategic action, return this card to the N'orr player."
+        "text": "When you would resolve the secondary ability of the \"Technology\" strategy card, if you are not prevented from research technology: Instead, gain 1 command token and 4 trade goods. At the end of the strategic action, return this card to the N'orr player."
     },
     {
         "alias": "sigma_political_favor",
