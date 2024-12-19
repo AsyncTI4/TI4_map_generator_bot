@@ -40,10 +40,11 @@ public class MoveTile extends GameStateSubcommand {
             return;
         }
 
+        MessageHelper.sendMessageToEventChannel(event, "Moved tile " + movingTile.getRepresentation() + " from " + movingTile.getPosition() + " to " + tileToPosition);
+        
         movingTile.setPosition(tileToPosition);
         game.setTile(movingTile);
 
-        MessageHelper.sendMessageToEventChannel(event, "Moved tile " + movingTile.getRepresentation() + " from " + movingTile.getPosition() + " to " + tileToPosition);
 
         game.rebuildTilePositionAutoCompleteList();
     }
