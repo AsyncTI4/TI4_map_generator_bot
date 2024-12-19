@@ -125,7 +125,7 @@ public class MapGenerator implements AutoCloseable {
     private final Graphics graphics;
     private final BufferedImage mainImage;
     private final GenericInteractionCreateEvent event;
-    private final int scoreTokenWidth;
+    private final int scoreTokenSpacing;
     private final Game game;
     private final DisplayType displayType;
     private final DisplayType displayTypeBasic;
@@ -161,9 +161,9 @@ public class MapGenerator implements AutoCloseable {
         String controlID = Mapper.getControlID("red");
         BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), 0.45f);
         if (bufferedImage != null)
-            scoreTokenWidth = bufferedImage.getWidth() + 6;
+            scoreTokenSpacing = bufferedImage.getWidth() + 6;
         else
-            scoreTokenWidth = 30;
+            scoreTokenSpacing = 30;
 
         int stage1PublicObjCount = game.getRevealedPublicObjectives().keySet().stream()
             .filter(Mapper.getPublicObjectivesStage1()::containsKey).toList().size();
@@ -4093,10 +4093,10 @@ public class MapGenerator implements AutoCloseable {
         // Objective 1
         List<Objective> objectives = Objective.retrievePublic1(game);
         int maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
-        int boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenWidth);
+        int boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenSpacing);
 
         for (Objective objective : objectives) {
-            ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenWidth);
+            ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenSpacing);
             box.Display(game, graphics, this, objective);
             y += ObjectiveBox.getVerticalSpacing();
         }
@@ -4108,9 +4108,9 @@ public class MapGenerator implements AutoCloseable {
 
         objectives = Objective.retrievePublic2(game);
         maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
-        boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenWidth);
+        boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenSpacing);
         for (Objective objective : objectives) {
-            ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenWidth);
+            ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenSpacing);
             box.Display(game, graphics, this, objective);
             y += ObjectiveBox.getVerticalSpacing();
         }
@@ -4122,9 +4122,9 @@ public class MapGenerator implements AutoCloseable {
 
         objectives = Objective.retrieveCustom(game);
         maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
-        boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenWidth);
+        boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenSpacing);
         for (Objective objective : objectives) {
-            ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenWidth);
+            ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenSpacing);
             box.Display(game, graphics, this, objective);
             y += ObjectiveBox.getVerticalSpacing();
         }
@@ -4435,14 +4435,14 @@ public class MapGenerator implements AutoCloseable {
                         int frequency = Collections.frequency(scoredPlayerID, userID);
                         for (int i = 0; i < frequency; i++) {
                             DrawingUtil.drawControlToken(graphics, controlTokenImage, player, x + tempX, y, convertToGeneric, scale);
-                            tempX += scoreTokenWidth;
+                            tempX += scoreTokenSpacing;
                         }
                     } else {
                         DrawingUtil.drawControlToken(graphics, controlTokenImage, player, x + tempX, y, convertToGeneric, scale);
                     }
                 }
                 if (!multiScoring && !fixedColumn) {
-                    tempX += scoreTokenWidth;
+                    tempX += scoreTokenSpacing;
                 }
             }
         } catch (Exception e) {
