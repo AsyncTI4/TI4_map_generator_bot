@@ -385,4 +385,24 @@ public class PositionMapper {
             .max()
             .orElse(0);
     }
+
+    public static int getTopMostTileOffsetInGame(Game game) {
+        return game.getTileMap().keySet().stream()
+            .mapToInt(pos -> {
+                if (!Helper.isInteger(pos)) return 0;
+                return (int) PositionMapper.getTilePosition(pos).getY();
+            })
+            .min()
+            .orElse(0);
+    }
+
+    public static int getBottomMostTileOffsetInGame(Game game) {
+        return game.getTileMap().keySet().stream()
+            .mapToInt(pos -> {
+                if (!Helper.isInteger(pos)) return 0;
+                return (int) PositionMapper.getTilePosition(pos).getY();
+            })
+            .max()
+            .orElse(0);
+    }
 }
