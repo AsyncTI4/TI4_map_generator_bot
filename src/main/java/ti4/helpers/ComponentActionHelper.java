@@ -259,7 +259,7 @@ public class ComponentActionHelper {
         }
 
         // ACs
-        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play \"ACTION:\" AC");
+        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play Action Card with Component Action");
         compButtons.add(acButton);
 
         // absol
@@ -616,14 +616,14 @@ public class ComponentActionHelper {
                 } else {
                     player.setTg(oldTg + player.getCommoditiesTotal() + 2);
                 }
-                message = player.getRepresentationUnfogged() + " Your TGs increased from " + oldTg + " -> "
-                    + player.getTg();
+                message = player.getRepresentationUnfogged() + " Your trade goods increased from " + oldTg + " -> "
+                    + player.getTg() + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, player.getTg() - oldTg);
             }
             case "stellarconverter" -> {
-                message = player.getRepresentationUnfogged() + " Select the planet you want to destroy";
+                message = player.getRepresentationUnfogged() + " Select the planet you wish to annihilate.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
                     ButtonHelper.getButtonsForStellar(player, game));
             }
@@ -632,7 +632,7 @@ public class ComponentActionHelper {
                 // handled above
             }
             default -> MessageHelper.sendMessageToChannel(event.getChannel(),
-                "This Relic is not tied to any automation. Please resolve manually.");
+                "This relic is not tied to any automation. Please resolve manually.");
         }
     }
 

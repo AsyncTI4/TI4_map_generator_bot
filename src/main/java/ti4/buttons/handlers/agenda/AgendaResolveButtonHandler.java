@@ -170,7 +170,7 @@ class AgendaResolveButtonHandler {
                             }
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Discarded the ACs of those with war sun tech");
+                            "Discarded the action cards of those that own the war sun technology.");
                     }
                 }
                 if ("defense_act".equalsIgnoreCase(agID)) {
@@ -248,7 +248,7 @@ class AgendaResolveButtonHandler {
                             ActionCardHelper.discardRandomAC(event, game, playerWL, playerWL.getAc());
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Discarded the ACs of those who voted against");
+                            "Discarded the action cards of those who voted \"Against\".");
                     }
                 }
                 if ("rep_govt".equalsIgnoreCase(agID)) {
@@ -260,7 +260,7 @@ class AgendaResolveButtonHandler {
                                 game.getStoredValue("agendaRepGov") + playerWL.getFaction());
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Will exhaust cultural planets of all players who voted against at start of next strat phase");
+                            "Will exhaust cultural planets of all players who voted \"Against\" at start of next strategy phase.");
                     }
                 }
                 if ("articles_war".equalsIgnoreCase(agID)) {
@@ -273,7 +273,7 @@ class AgendaResolveButtonHandler {
                             ButtonHelperAgents.resolveArtunoCheck(playerWL, 3);
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Added 3TGs to those who voted for");
+                            "Given 3 trade goods to those who voted \"For\".");
                     }
                 }
                 if ("nexus".equalsIgnoreCase(agID)) {
@@ -282,7 +282,7 @@ class AgendaResolveButtonHandler {
                         if (tile != null) {
                             String tokenFilename = Mapper.getTokenID("gamma");
                             tile.addToken(tokenFilename, Constants.SPACE);
-                            MessageHelper.sendMessageToChannel(actionsChannel, "Added gamma wormhole to the Mecatol Rex system.");
+                            MessageHelper.sendMessageToChannel(actionsChannel, "Added a gamma wormhole to the Mecatol Rex system.");
                         }
                     }
                 }
@@ -292,7 +292,7 @@ class AgendaResolveButtonHandler {
                             ActionCardHelper.discardRandomAC(event, game, playerWL, 1);
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Discarded 1 random AC of each player");
+                            "Discarded 1 random action card from each player's hand.");
                     } else {
                         for (Player playerWL : game.getRealPlayers()) {
                             ButtonHelper.checkACLimit(game, playerWL);
@@ -366,15 +366,15 @@ class AgendaResolveButtonHandler {
                         "Drew relic for " + player2.getFactionEmojiOrColor());
                 }
                 if ("execution".equalsIgnoreCase(agID)) {
-                    String message = "Discarded elected player's ACs and marked them as unable to vote on the next agenda.";
+                    String message = "Discarded the elected player's action cards and marked them as unable to vote on the next agenda.";
                     ActionCardHelper.discardRandomAC(event, game, player2, player2.getAc());
                     game.setStoredValue("PublicExecution", player2.getFaction());
                     if (game.getSpeakerUserID().equalsIgnoreCase(player2.getUserID())) {
-                        message = message + " Also passed the speaker token.";
                         boolean foundSpeaker = false;
                         for (Player p4 : game.getRealPlayers()) {
                             if (foundSpeaker) {
                                 game.setSpeakerUserID(p4.getUserID());
+                                message += " Also passed the Speaker token to " + p4.getRepresentation() + ".";
                                 break;
                             }
                             if (p4 == player2) {
@@ -419,9 +419,9 @@ class AgendaResolveButtonHandler {
                                     player.setTg(player.getTg() + 1);
                                     MessageHelper.sendMessageToChannel(
                                         player.getCorrectChannel(),
-                                        player.getRepresentation() + " you gained 1TG (" + (player.getTg() - 1)
+                                        player.getRepresentation() + " you gained 1 trade good (" + (player.getTg() - 1)
                                             + "->" + player.getTg()
-                                            + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
+                                            + ") from 1 of your mechs dying while you own Self-Assembly Routines.\n-# This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -492,9 +492,9 @@ class AgendaResolveButtonHandler {
                                     player.setTg(player.getTg() + 1);
                                     MessageHelper.sendMessageToChannel(
                                         player.getCorrectChannel(),
-                                        player.getRepresentation() + " you gained 1TG (" + (player.getTg() - 1)
+                                        player.getRepresentation() + " you gained 1 trade good (" + (player.getTg() - 1)
                                             + "->" + player.getTg()
-                                            + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
+                                            + ") from 1 of your mechs dying while you own Self-Assembly Routines.\n-# This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -535,7 +535,7 @@ class AgendaResolveButtonHandler {
                             ButtonHelperAbilities.pillageCheck(player, game);
                         }
                         MessageHelper.sendMessageToChannel(actionsChannel,
-                            "Removed all units and gave player appropriate amount of TGs");
+                            "Removed all units and gave player appropriate amount of trade goods.");
 
                     }
                 }
@@ -798,7 +798,7 @@ class AgendaResolveButtonHandler {
                         playerWL.setFleetCC(playerWL.getFleetCC() + 1);
                         playerWL.setTacticalCC(playerWL.getTacticalCC() + 1);
                         playerWL.setStrategicCC(playerWL.getStrategicCC() + 1);
-                        message.append(playerWL.getRepresentation()).append(" drew some ACs and was given a CC for each pool\n");
+                        message.append(playerWL.getRepresentation()).append(" drew some action cards and has had a command token placed in each command pool.\n");
 
                     }
 
@@ -831,7 +831,7 @@ class AgendaResolveButtonHandler {
                         ActionCardHelper.discardRandomAC(event, game, playerWL, playerWL.getAc());
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "Discarded the ACs of those who voted for");
+                        "Discarded the action cards of those who voted \"for\".");
                 } else {
                     winOrLose = AgendaHelper.getWinningVoters(winner, game);
                     for (Player playerWL : winOrLose) {
@@ -854,7 +854,7 @@ class AgendaResolveButtonHandler {
                         ButtonHelper.checkACLimit(game, playerWL);
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "Drew 2 ACs for each of the players who voted for");
+                        "Drew 2 action cards for each of the players who voted \"for\".");
                 }
             }
             if ("absol_measures".equalsIgnoreCase(agID)) {
@@ -885,7 +885,8 @@ class AgendaResolveButtonHandler {
                         p2.setStrategicCC(p2.getStrategicCC());
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "Drew 2 ACs for each of the players who voted for and gave 1 strat CC to those who voted against");
+                        "Drew 2 action cards for each of the players who voted \"for\""
+                        +" and placed 1 command token in the strategy pool of each player that voted \"against\".");
                 }
             }
             if ("economic_equality".equalsIgnoreCase(agID)) {
@@ -960,7 +961,7 @@ class AgendaResolveButtonHandler {
             String message;
             if (rid.hasAbility("future_sight")) {
                 message = rep
-                    + " you have a Rider to resolve or you voted for the correct outcome. Either way a " + MiscEmojis.tg + " has been added to your total due to your **Future Sight** ability. "
+                    + " you have a Rider to resolve or you voted for the correct outcome. Either way a trade good has been added to your total due to your **Future Sight** ability. "
                     + rid.gainTG(1, true);
                 ButtonHelperAgents.resolveArtunoCheck(rid, 1);
             } else {

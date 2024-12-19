@@ -297,24 +297,25 @@ public class PlayHeroService {
                 List<Button> buttons = ButtonHelperHeroes.getNekroHeroButtons(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
-                    + " use the button to pick which planet you'd like to get a tech and TGs from (and kill any opponent units)",
+                    + " use the button to pick which planet you'd like to get a technology and trade goods from (and kill any opponent units).",
                     buttons);
             }
             case "bentorhero" -> {
                 ButtonHelperHeroes.resolveBentorHero(game, player);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    player.getFactionEmoji() + " offered buttons to explore all planets");
+                    player.getFactionEmoji() + " offered buttons to explore all planets.");
             }
             case "nivynhero" -> {
                 ButtonHelperHeroes.resolveNivynHeroSustainEverything(game, player);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    player.getFactionEmoji() + " sustained all units except their mechs");
+                    player.getFactionEmoji() + " sustained all units except their mechs.");
             }
             case "jolnarhero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getJolNarHeroSwapOutOptions(player);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
-                    + " use the buttons to pick what tech you would like to swap out. Reminder that since all swap are simultenous, you cannot swap out a tech and then swap it back in.",
+                    + " use the buttons to pick what technology you would like to swap out."
+                    + "\n-# Reminder that since all swap are simultaneous, you cannot swap out a technology and then swap it back in.",
                     buttons);
             }
             case "yinhero" -> {
@@ -332,7 +333,7 @@ public class PlayHeroService {
                 List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
-                    + " use the button to do TWO of the available secondaries. (note, all are presented for convenience, but two is the limit).",
+                    + " use the button to do __two__ of the available secondaries.\n-# All are presented for convenience, but two is the limit.",
                     buttons);
             }
             case "mahacthero" -> {

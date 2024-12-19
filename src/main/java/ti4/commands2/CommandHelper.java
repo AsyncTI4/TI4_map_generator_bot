@@ -25,7 +25,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.manage.GameManager;
-import ti4.message.MessageHelper;
 import ti4.service.game.GameNameService;
 
 @UtilityClass
@@ -43,16 +42,17 @@ public class CommandHelper {
         var gameName = GameNameService.getGameName(event);
         var managedGame = GameManager.getManagedGame(gameName);
         if (managedGame == null) {
-            MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' command canceled. Game name '" + gameName + "' is not valid. " +
-                "Execute command in correctly named channel that starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`");
+            event.getHook().editOriginal("'" + event.getFullCommandName() + "' command canceled. Game name '" + gameName + "' is not valid. " +
+                "Execute command in correctly named channel that starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`")
+                .queue();
             return false;
         }
         if (checkChannel && !event.getChannel().getName().startsWith(managedGame.getName() + "-")) {
-            MessageHelper.replyToMessage(event, "'" + event.getFullCommandName() + "' can only be executed in a game channel.");
+            event.getHook().editOriginal("'" + event.getFullCommandName() + "' can only be executed in a game channel.").queue();
             return false;
         }
         if (checkPlayer && getPlayerFromEvent(managedGame.getGame(), event) == null) {
-            MessageHelper.replyToMessage(event, "Command must be ran by a player in the game, please use `/game join gameName` or `/special2 setup_neutral_player`.");
+            event.getHook().editOriginal("Command must be ran by a player in the game, please use `/game join gameName` or `/special2 setup_neutral_player`.").queue();
             return false;
         }
         return true;
@@ -125,7 +125,7 @@ public class CommandHelper {
             return true;
         }
         var acceptRolesStr = acceptedRoles.stream().map(Role::getName).distinct().collect(Collectors.joining(", "));
-        MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have one of the following roles: " + acceptRolesStr);
+        event.getHook().editOriginal("You are not authorized to use this command. You must have one of the following roles: " + acceptRolesStr).queue();
         return false;
     }
 

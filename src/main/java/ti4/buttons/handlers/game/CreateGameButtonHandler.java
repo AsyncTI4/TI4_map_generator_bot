@@ -28,7 +28,7 @@ class CreateGameButtonHandler {
 
     @ButtonHandler("createGameChannels")
     public static void createGameChannelsButton(ButtonInteractionEvent event) {
-        ExecutorManager.runAsync("Create game channels button task", () -> createGameChannels(event));
+        ExecutorManager.runAsync("CreateGameButtonHandler.createGameChannelsButton task", () -> createGameChannels(event));
     }
 
     private static void createGameChannels(ButtonInteractionEvent event) {

@@ -78,37 +78,37 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveVadenTgForSpeed(Player player, GenericInteractionCreateEvent event) {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation() + " is paying TGs to boost their non-fighter ships.");
+            player.getRepresentation() + " is paying trade goods to boost their non-fighter ships.");
         List<Button> buttons = new ArrayList<>();
         player.resetSpentThings();
         String whatIsItFor = "both";
-        if (player.getTg() > 0) {
-            Button lost1TG = Buttons.red("reduceTG_1_" + whatIsItFor, "Spend 1TG");
+        if (player.getTg() >= 1) {
+            Button lost1TG = Buttons.red("reduceTG_1_" + whatIsItFor, "Spend 1 Trade Good");
             buttons.add(lost1TG);
         }
-        if (player.getTg() > 1) {
-            Button lost2TG = Buttons.red("reduceTG_2_" + whatIsItFor, "Spend 2TGs");
+        if (player.getTg() >= 2) {
+            Button lost2TG = Buttons.red("reduceTG_2_" + whatIsItFor, "Spend 2 Trade Goods");
             buttons.add(lost2TG);
         }
-        if (player.getTg() > 2) {
-            Button lost3TG = Buttons.red("reduceTG_3_" + whatIsItFor, "Spend 3TGs");
+        if (player.getTg() >= 3) {
+            Button lost3TG = Buttons.red("reduceTG_3_" + whatIsItFor, "Spend 3 Trade Goods");
             buttons.add(lost3TG);
         }
-        if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 0) {
-            Button lost1C = Buttons.red("reduceComm_1_" + whatIsItFor, "Spend 1 commodity");
+        if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() >= 1) {
+            Button lost1C = Buttons.red("reduceComm_1_" + whatIsItFor, "Spend 1 Commodity");
             buttons.add(lost1C);
         }
 
-        if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 1) {
-            Button lost2C = Buttons.red("reduceComm_2_" + whatIsItFor, "Spend 2 commodities");
+        if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() >= 2) {
+            Button lost2C = Buttons.red("reduceComm_2_" + whatIsItFor, "Spend 2 Commodities");
             buttons.add(lost2C);
         }
 
-        buttons.add(Buttons.gray("resetSpend_" + whatIsItFor, "Reset Spent Planets and TGs"));
+        buttons.add(Buttons.gray("resetSpend_" + whatIsItFor, "Reset Spent Planets and Trade Goods"));
         Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
         buttons.add(doneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            "Click how many TGs you want to spend", buttons);
+            "Click how many trade goods you wish to spend.", buttons);
         PlayerTechService.deleteTheOneButtonIfButtonEvent(event);
     }
 
@@ -543,7 +543,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("saarMechRes_")
     public static void placeSaarMech(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " paid 1TG " + player.gainTG(-1) + " to place 1 mech on " + Helper.getPlanetRepresentation(planet, game);
+        String msg = player.getFactionEmoji() + " paid 1 trade good " + player.gainTG(-1) + " to place 1 mech on " + Helper.getPlanetRepresentation(planet, game) + ".";
         delete(event);
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "mech " + planet);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -632,7 +632,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveSpyNetYssarilChooses(Player player, Game game, ButtonInteractionEvent event) {
         Player yssaril = findPNOwner("spynet", game);
         String buttonID = "transact_ACs_" + player.getFaction();
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Sent Yssaril buttons so that they can send you 1AC.");
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Sent Yssaril buttons so that they can send you an action card.");
         TransactionHelper.resolveSpecificTransButtonsOld(game, yssaril, buttonID, event);
         event.getMessage().delete().queue();
     }
@@ -640,7 +640,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("spyNetPlayerChooses")
     public static void resolveSpyNetPlayerChooses(Player player, Game game, ButtonInteractionEvent event) {
         Player yssaril = findPNOwner("spynet", game);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1 AC", ActionCardHelper.getToBeStolenActionCardButtons(yssaril));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1 action card.", ActionCardHelper.getToBeStolenActionCardButtons(yssaril));
         event.getMessage().delete().queue();
     }
 
@@ -830,8 +830,8 @@ public class ButtonHelperFactionSpecific {
         }
         int oldTg = player.getTg();
         player.setTg(oldTg + 2);
-        String message = player.getFactionEmojiOrColor() + " gained " + MiscEmojis.tg(2) + " due to " + FactionEmojis.Hacan
-            + TechEmojis.BioticTech + "Production Biomes (" + oldTg + "->" + player.getTg() + ")";
+        String message = player.getFactionEmojiOrColor() + " gained 2 trade goods due to " + FactionEmojis.Hacan
+            + "_Production Biomes_ (" + oldTg + "->" + player.getTg() + ").";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), message);
@@ -846,7 +846,7 @@ public class ButtonHelperFactionSpecific {
         int oldStratCC = hacan.getStrategicCC();
         if (oldStratCC < 1) {
             MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(),
-                hacan.getFactionEmoji() + " did not have enough strategy CCs. #rejected");
+                hacan.getFactionEmoji() + " did not have any command tokens in their strategy pool. #rejected");
             return;
         }
 
@@ -855,7 +855,7 @@ public class ButtonHelperFactionSpecific {
         hacan.setStrategicCC(oldStratCC - 1);
         ButtonHelperCommanders.resolveMuaatCommanderCheck(hacan, game, event);
         MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), hacan.getFactionEmoji()
-            + " spent a strategy CC and gained " + MiscEmojis.tg(4) + " (" + oldTg + "->" + hacan.getTg() + ")");
+            + " spent a command token from their strategy pool to gain 4 trade goods (" + oldTg + "->" + hacan.getTg() + ").");
         ButtonHelperAbilities.pillageCheck(hacan, game);
         ButtonHelperAgents.resolveArtunoCheck(hacan, 4);
 
@@ -874,7 +874,7 @@ public class ButtonHelperFactionSpecific {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(hacan.getCorrectChannel(),
-            hacan.getRepresentationUnfogged() + " choose who should get 2TGs", buttons);
+            hacan.getRepresentationUnfogged() + " choose who should get the two trade goods.", buttons);
     }
 
     @ButtonHandler("startQDN")
@@ -891,11 +891,12 @@ public class ButtonHelperFactionSpecific {
         ButtonHelperCommanders.resolveMuaatCommanderCheck(hacan, game, event);
 
         MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(),
-            hacan.getFactionEmoji() + " lost a strategy CC and 3TGs " + hacan.gainTG(-3));
+            hacan.getFactionEmoji() + " spent 3 trade goods and a command token from their strategy pool"
+            + hacan.gainTG(-3) + ".");
 
         List<Button> buttons = getSwapSCButtons(game, "qdn", hacan);
         MessageHelper.sendMessageToChannelWithButtons(hacan.getCorrectChannel(),
-            hacan.getRepresentationUnfogged() + " choose who you want to swap SCs with", buttons);
+            hacan.getRepresentationUnfogged() + " choose who you wish to swap strategy cards with.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -961,8 +962,8 @@ public class ButtonHelperFactionSpecific {
 
         if ("qdn".equalsIgnoreCase(type)) {
             ButtonHelperAbilities.pillageCheck(player2, game);
-            MessageHelper.sendMessageToChannel(player2.getCorrectChannel(),
-                player2.getFactionEmoji() + " gained " + MiscEmojis.tg(3) + " from QDN " + player2.gainTG(3));
+            MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), player2.getFactionEmoji()
+                + " gained 3 consolation trade goods from having their strategy card stolen via _Quantumn Datahub Nodes_ " + player2.gainTG(3) + ".");
         }
 
         int player1SC = Integer.parseInt(buttonID.split("_")[4]);
@@ -1388,13 +1389,13 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         String ffcc = player.getFinsFactionCheckerPrefix();
         if (deleteAfter) {
-            buttons.add(Buttons.green(ffcc + "convertComms_1", "Convert 1 comm to TG", MiscEmojis.Wash));
-            buttons.add(Buttons.blue(ffcc + "gainComms_1", "Gain 1 comm", MiscEmojis.comm));
+            buttons.add(Buttons.green(ffcc + "convertComms_1", "Convert 1 Commodity to Trade Good", MiscEmojis.Wash));
+            buttons.add(Buttons.blue(ffcc + "gainComms_1", "Gain 1 Commodity", MiscEmojis.comm));
         } else {
-            buttons.add(Buttons.green(ffcc + "convertComms_1_stay", "Convert 1 comm to TG", MiscEmojis.Wash));
-            buttons.add(Buttons.blue(ffcc + "gainComms_1_stay", "Gain 1 comm", MiscEmojis.comm));
+            buttons.add(Buttons.green(ffcc + "convertComms_1_stay", "Convert 1 Commodity to Trade Good", MiscEmojis.Wash));
+            buttons.add(Buttons.blue(ffcc + "gainComms_1_stay", "Gain 1 Commodity", MiscEmojis.comm));
         }
-        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
+        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
         return buttons;
     }
 
@@ -1692,7 +1693,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " replaced 1 of their infantry with 1 " + unit + " on "
-                + Helper.getPlanetRepresentation(planet, game) + " using the mech's deploy ability");
+                + Helper.getPlanetRepresentation(planet, game) + " using the mech's DEPLOY ability.");
         options.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
             player.getRepresentationUnfogged() + " pay 2r for it please", options);
@@ -1709,13 +1710,13 @@ public class ButtonHelperFactionSpecific {
                         channel = sender.getPrivateChannel();
                     }
                     String message = sender.getRepresentationUnfogged()
-                        + " Dark Pact triggered, your TGs have increased by 1 (" + sender.getTg() + "->"
-                        + (sender.getTg() + 1) + ")";
+                        + " _Dark Pact_ triggered, your trade goods have increased by 1 (" + sender.getTg() + "->"
+                        + (sender.getTg() + 1) + ").";
                     sender.setTg(sender.getTg() + 1);
                     MessageHelper.sendMessageToChannel(channel, message);
                     message = receiver.getRepresentationUnfogged()
-                        + " Dark Pact triggered, your TGs have increased by 1 (" + receiver.getTg() + "->"
-                        + (receiver.getTg() + 1) + ")";
+                        + " _Dark Pact_ triggered, your trade goods have increased by 1 (" + receiver.getTg() + "->"
+                        + (receiver.getTg() + 1) + ").";
                     receiver.setTg(receiver.getTg() + 1);
                     if (game.isFowMode()) {
                         channel = receiver.getPrivateChannel();
@@ -1902,11 +1903,11 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("scourPlanet_")
     public static void resolveScour(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " used the Scour ability to discard 1 AC and ready "
-            + Helper.getPlanetRepresentation(planet, game);
+        String msg = player.getFactionEmoji() + " used the **Scour** ability to discard 1 action card and ready "
+            + Helper.getPlanetRepresentation(planet, game) + ".";
         player.refreshPlanet(planet);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-            player.getRepresentationUnfogged() + " use buttons to discard",
+            player.getRepresentationUnfogged() + " use buttons to discard an action card.",
             ActionCardHelper.getDiscardActionCardButtons(player, false));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -1925,14 +1926,14 @@ public class ButtonHelperFactionSpecific {
             }
         }
         String message = player.getRepresentationUnfogged()
-            + " Use buttons to select which planet to put the attachment on";
+            + ", use buttons to select which planet you wish to attach the Branch Office to.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
             buttons);
     }
 
     public static List<Button> getButtonsToTakeSomeonesAC(Player thief, Player victim) {
         List<Button> takeACs = new ArrayList<>();
-        String secretScoreMsg = "_ _\nClick a button to take 1 Action Card";
+        String secretScoreMsg = "_ _\nClick a button to take 1 action card";
         List<Button> acButtons = ActionCardHelper.getToBeStolenActionCardButtons(victim);
         if (!acButtons.isEmpty()) {
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
@@ -1957,11 +1958,11 @@ public class ButtonHelperFactionSpecific {
             return;
         }
         if (!player2.getActionCards().containsValue(acNum)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that AC, no AC added/lost");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that action, so no action card was added/lost.");
             return;
         }
         String ident2 = player2.getRepresentation();
-        String message2 = player.getRepresentationUnfogged() + " took AC #" + acNum + " from " + ident2;
+        String message2 = player.getRepresentationUnfogged() + " took action card #" + acNum + " from " + ident2 + ".";
         String acID = null;
         for (Map.Entry<String, Integer> so : player2.getActionCards().entrySet()) {
             if (so.getValue().equals(acNum)) {
@@ -1969,7 +1970,7 @@ public class ButtonHelperFactionSpecific {
             }
         }
         if (game.isFowMode()) {
-            message2 = "Someone took AC #" + acNum + " from " + player2.getColor();
+            message2 = "Someone took action card #" + acNum + " from " + player2.getColor() + ".";
             MessageHelper.sendMessageToChannel(player.getPrivateChannel(), message2);
             MessageHelper.sendMessageToChannel(player2.getPrivateChannel(), message2);
         } else {
@@ -2429,8 +2430,8 @@ public class ButtonHelperFactionSpecific {
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
-        String msg = player.getRepresentation() + " used Salvage Ops to get 1TG (you currently have " + player.getTg()
-            + "TG" + (player.getTg() == 1 ? "" : "s") + ")";
+        String msg = player.getRepresentation() + " used _Salvage Operations_ to gain 1 trade good (you currently have " + player.getTg()
+            + "trade good" + (player.getTg() == 1 ? "" : "s") + ").";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -2507,7 +2508,7 @@ public class ButtonHelperFactionSpecific {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getRepresentationUnfoggedNoPing() + " recycled " + unit.getUnitEmoji() + " " + unit.getName()
-                + " for " + toGain + " TG" + (toGain == 1 ? "" : "s") + " " + player.gainTG(toGain));
+                + " for " + toGain + " trade good" + (toGain == 1 ? "" : "s") + " " + player.gainTG(toGain) + ".");
 
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, toGain);

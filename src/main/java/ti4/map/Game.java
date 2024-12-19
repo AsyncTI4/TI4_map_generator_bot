@@ -1054,8 +1054,8 @@ public class Game extends GameProperties {
                 ButtonHelperAbilities.pillageCheck(player, this);
                 ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
                 tradeGoodCount = 0;
-                MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + tradeGoodCount + "TGs"
-                    + " that would be placed on the SC " + sc + " have instead been given to the Kyro Hero player, as per Kyro Hero text");
+                MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + tradeGoodCount + " trade good" + (tradeGoodCount == 1 ? "" : "s")
+                    + " that would be placed on the SC " + sc + " have instead been given to the Kyro Hero player, as per Kyro Hero text.");
             }
         }
         scTradeGoods.put(sc, tradeGoodCount);
@@ -2235,7 +2235,7 @@ public class Game extends GameProperties {
         getActionCards().addAll(acsToShuffle);
         Collections.shuffle(getActionCards());
         acsToShuffle.forEach(ac -> discardActionCards.remove(ac)); //clear out the shuffled back cards
-        String msg = "#" + getPing() + " shuffling the discarded ACs into the action card deck because the action card deck ran out of cards";
+        String msg = "# " + getPing() + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck.";
         MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
     }
 
@@ -2960,13 +2960,13 @@ public class Game extends GameProperties {
         }
         if (!getDiscardActionCards().isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Since there were ACs in the discard pile, will just shuffle any new ACs into the existing deck");
+                "Since there were action cards in the discard pile, will just shuffle any new action cards into the existing deck.");
             shuffledExtrasIn = true;
         } else {
             for (Player player : getPlayers().values()) {
                 if (!player.getActionCards().isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Since there were ACs in players hands, will just shuffle any new ACs into the existing deck");
+                        "Since there were action cards in players hands, will just shuffle any new action cards into the existing deck.");
                     shuffledExtrasIn = true;
                     break;
                 }

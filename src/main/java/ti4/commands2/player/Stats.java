@@ -24,12 +24,12 @@ import ti4.settings.users.UserSettingsManager;
 class Stats extends GameStateSubcommand {
 
     public Stats() {
-        super(Constants.STATS, "Player Stats: CC,TG,Commodities", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.CC, "CC's Example: 3/3/2 or +1/-1/+0"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactical command counter count - can use +1/-1 etc. to add/subtract"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet command counter count - can use +1/-1 etc. to add/subtract"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy command counter count - can use +1/-1 etc. to add/subtract"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade goods count - can use +1/-1 etc. to add/subtract"))
+        super(Constants.STATS, "Player Stats: Command tokens, trade goods, commodities", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.CC, "Command token example: 3/3/2 or +1/-1/+0"))
+            .addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactic pool command token count - can use +1/-1 etc. to add/subtract"))
+            .addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet pool command token count - can use +1/-1 etc. to add/subtract"))
+            .addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy pool command token count - can use +1/-1 etc. to add/subtract"))
+            .addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade good count - can use +1/-1 etc. to add/subtract"))
             .addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count - can use +1/-1 etc. to add/subtract"))
             .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
             .addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number"))
