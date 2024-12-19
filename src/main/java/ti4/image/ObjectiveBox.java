@@ -63,7 +63,7 @@ public class ObjectiveBox {
 	}
 
 	public static Integer getBoxWidth(Game game, Integer maxTextWidth, Integer scoreTokenWidth) {
-		return Math.max(getMinimumBoxWidth(game), Math.min(MapGenerator.getMaxObjectWidth(game), getMaxLengthOfTokens(game, maxTextWidth, scoreTokenWidth)));
+		return Math.max(getMinimumBoxWidth(game), Math.min(MapGenerator.getMaxObjectiveWidth(game), getMaxLengthOfTokens(game, maxTextWidth, scoreTokenWidth)));
 	}
 
 	public static Integer getVerticalSpacing() {

@@ -100,9 +100,15 @@ public class MapGenerator implements AutoCloseable {
     private static final int RING_MIN_COUNT = 3;
     private static final int PLAYER_STATS_HEIGHT = 650; // + 34 per teammate + 34 if line is long
     private static final int TILE_PADDING = 100;
-    private static final int EXTRA_X = 300;
-    private static final int EXTRA_Y = 200;
+    private static final int EXTRA_X = 300; // padding at left/right of map
+    private static final int EXTRA_Y = 200; // padding at top/bottom of map
     private static final int SPACING_BETWEEN_OBJECTIVE_TYPES = 10;
+    private static final int HORIZONTAL_TILE_SPACING = 260;
+    private static final int VERTICAL_TILE_SPACING = 160;
+    private static final int SPACE_FOR_TILE_HEIGHT = 300; // space to calculate tile image height with
+    private static final int TILE_HEIGHT = 299; // typical height of a tile image
+    private static final int SPACE_FOR_TILE_WIDTH = 350; // space to calculate tile image width with
+    private static final int TILE_WIDTH = 345; // typical width of a tile image
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke3 = new BasicStroke(3.0f);
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
@@ -170,7 +176,7 @@ public class MapGenerator implements AutoCloseable {
         int objectivesY = Math.max((mostObjs - 5) * 43, 0);
 
         int playerCountForMap = game.getRealPlayers().size() + game.getDummies().size();
-        int heightStats = getHeightStats(game, playerCountForMap, objectivesY);
+        int heightStats = getHeightOfPlayerAreasSection(game, playerCountForMap, objectivesY);
 
         int mapHeight = getMapHeight(game);
         mapWidth = getMapWidth(game);
@@ -215,7 +221,7 @@ public class MapGenerator implements AutoCloseable {
         graphics = mainImage.getGraphics();
     }
 
-    private static int getHeightStats(Game game, int playerCountForMap, int objectivesY) {
+    private static int getHeightOfPlayerAreasSection(Game game, int playerCountForMap, int objectivesY) {
         int playerY = playerCountForMap * 340;
         int unrealPlayers = game.getNotRealPlayers().size();
         playerY += unrealPlayers * 36;
@@ -3481,14 +3487,14 @@ public class MapGenerator implements AutoCloseable {
                     bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / (offBoardHighlighting + (hasNanoForge ? 1 : 0)) / bufferedImage.getWidth() / bufferedImage.getHeight()));
                     for (int i = 0; i < offBoardHighlighting; i++) {
                         graphics.drawImage(bufferedImage,
-                            miscTile.x + (345 - bufferedImage.getWidth()) / 2 - 30 + i * 60 / (offBoardHighlighting + (hasNanoForge ? 1 : 0) - 1),
-                            miscTile.y + (300 - bufferedImage.getHeight()) / 2 - 30 + i * 60 / (offBoardHighlighting + (hasNanoForge ? 1 : 0) - 1) + (player.isSpeaker() ? 30 : 0),
+                            miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2 - 30 + i * 60 / (offBoardHighlighting + (hasNanoForge ? 1 : 0) - 1),
+                            miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 - 30 + i * 60 / (offBoardHighlighting + (hasNanoForge ? 1 : 0) - 1) + (player.isSpeaker() ? 30 : 0),
                             null);
                     }
                 } else {
                     graphics.drawImage(bufferedImage,
-                        miscTile.x + (345 - bufferedImage.getWidth()) / 2,
-                        miscTile.y + (300 - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
+                        miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                        miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
                         null);
                 }
             }
@@ -3498,13 +3504,13 @@ public class MapGenerator implements AutoCloseable {
                 if (offBoardHighlighting >= 1) {
                     bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / (offBoardHighlighting + 1) / bufferedImage.getWidth() / bufferedImage.getHeight()));
                     graphics.drawImage(bufferedImage,
-                        miscTile.x + (345 - bufferedImage.getWidth()) / 2 + 30,
-                        miscTile.y + (300 - bufferedImage.getHeight()) / 2 + 30 + (player.isSpeaker() ? 30 : 0),
+                        miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2 + 30,
+                        miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 + 30 + (player.isSpeaker() ? 30 : 0),
                         null);
                 } else {
                     graphics.drawImage(bufferedImage,
-                        miscTile.x + (345 - bufferedImage.getWidth()) / 2,
-                        miscTile.y + (300 - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
+                        miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                        miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
                         null);
                 }
                 offBoardHighlighting++;
@@ -3522,30 +3528,30 @@ public class MapGenerator implements AutoCloseable {
                 bufferedImage = ImageHelper.read(relicFile);
                 bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(17000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                 graphics.drawImage(bufferedImage,
-                    miscTile.x + (345 - bufferedImage.getWidth()) / 2 - 30,
-                    miscTile.y + (300 - bufferedImage.getHeight()) / 2 - 30 + (player.isSpeaker() ? 30 : 0),
+                    miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2 - 30,
+                    miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 - 30 + (player.isSpeaker() ? 30 : 0),
                     null);
                 bufferedImage = ImageHelper.read(heroFile);
                 bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(17000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                 graphics.drawImage(bufferedImage,
-                    miscTile.x + (345 - bufferedImage.getWidth()) / 2 + 30,
-                    miscTile.y + (300 - bufferedImage.getHeight()) / 2 + 30 + (player.isSpeaker() ? 30 : 0),
+                    miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2 + 30,
+                    miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 + 30 + (player.isSpeaker() ? 30 : 0),
                     null);
                 offBoardHighlighting += 2;
             } else if (hasStellar) {
                 bufferedImage = ImageHelper.read(relicFile);
                 bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                 graphics.drawImage(bufferedImage,
-                    miscTile.x + (345 - bufferedImage.getWidth()) / 2,
-                    miscTile.y + (300 - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
+                    miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                    miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
                     null);
                 offBoardHighlighting++;
             } else if (hasHero) {
                 bufferedImage = ImageHelper.read(heroFile);
                 bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                 graphics.drawImage(bufferedImage,
-                    miscTile.x + (345 - bufferedImage.getWidth()) / 2,
-                    miscTile.y + (300 - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
+                    miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                    miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
                     null);
                 offBoardHighlighting++;
             }
@@ -3564,9 +3570,9 @@ public class MapGenerator implements AutoCloseable {
             }
 
             offBoardHighlighting = (alphaOnMap ? 0 : 1) + (betaOnMap ? 0 : 1) + (gammaOnMap ? 0 : 1);
-            int x = miscTile.x + (345 - 80) / 2;
+            int x = miscTile.x + (TILE_WIDTH - 80) / 2;
             x += (offBoardHighlighting == 3 ? 40 : 0) + (offBoardHighlighting == 2 ? 30 : 0);
-            int y = miscTile.y + (300 - 80) / 2 + (player.isSpeaker() ? 30 : 0);
+            int y = miscTile.y + (SPACE_FOR_TILE_HEIGHT - 80) / 2 + (player.isSpeaker() ? 30 : 0);
             boolean reconstruction = (ButtonHelper.isLawInPlay(game, "wormhole_recon") || ButtonHelper.isLawInPlay(game, "absol_recon"));
             boolean travelBan = ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban");
 
@@ -3616,9 +3622,9 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
             if (unitNum > 0) {
-                int x = miscTile.x + (345 - 95) / 2;
+                int x = miscTile.x + (TILE_WIDTH - 95) / 2;
                 x += (unitNum == 3 ? 40 : 0) + (unitNum == 2 ? 30 : 0);
-                int y = miscTile.y + (300 - 95) / 2 + (player.isSpeaker() ? 30 : 0);
+                int y = miscTile.y + (SPACE_FOR_TILE_HEIGHT - 95) / 2 + (player.isSpeaker() ? 30 : 0);
                 String tokenFile = Mapper.getTokenPath("token_gravityrift.png");
                 BufferedImage bufferedImage = ImageHelper.read(tokenFile);
                 for (int i = 0; i < unitNum; i++) {
@@ -3665,16 +3671,16 @@ public class MapGenerator implements AutoCloseable {
                     BufferedImage bufferedImage = ImageHelper.read(traitFiles.get(i));
                     bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / offBoardHighlighting / bufferedImage.getWidth() / bufferedImage.getHeight()));
                     graphics.drawImage(bufferedImage,
-                        miscTile.x + (345 - bufferedImage.getWidth()) / 2 - 30 + i * 60 / (offBoardHighlighting - 1),
-                        miscTile.y + (300 - bufferedImage.getHeight()) / 2 - 30 + i * 60 / (offBoardHighlighting - 1) + (player.isSpeaker() ? 30 : 0),
+                        miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2 - 30 + i * 60 / (offBoardHighlighting - 1),
+                        miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 - 30 + i * 60 / (offBoardHighlighting - 1) + (player.isSpeaker() ? 30 : 0),
                         null);
                 }
             } else if (offBoardHighlighting == 1) {
                 BufferedImage bufferedImage = ImageHelper.read(traitFiles.getFirst());
                 bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                 graphics.drawImage(bufferedImage,
-                    miscTile.x + (345 - bufferedImage.getWidth()) / 2,
-                    miscTile.y + (300 - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
+                    miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                    miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
                     null);
             }
         } else if (displayType == DisplayType.techskips) {
@@ -3715,7 +3721,7 @@ public class MapGenerator implements AutoCloseable {
                     bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / offBoardHighlighting / bufferedImage.getWidth() / bufferedImage.getHeight()));
                     graphics.drawImage(bufferedImage,
                         miscTile.x + (345 - bufferedImage.getWidth()) / 2 - 30 + i * 60 / (offBoardHighlighting - 1),
-                        miscTile.y + (300 - bufferedImage.getHeight()) / 2 - 30 + i * 60 / (offBoardHighlighting - 1) + (player.isSpeaker() ? 30 : 0),
+                        miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 - 30 + i * 60 / (offBoardHighlighting - 1) + (player.isSpeaker() ? 30 : 0),
                         null);
                 }
             } else if (offBoardHighlighting == 1) {
@@ -3723,7 +3729,7 @@ public class MapGenerator implements AutoCloseable {
                 bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                 graphics.drawImage(bufferedImage,
                     miscTile.x + (345 - bufferedImage.getWidth()) / 2,
-                    miscTile.y + (300 - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
+                    miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
                     null);
             }
         } else if (displayType == DisplayType.attachments) {
@@ -3752,24 +3758,24 @@ public class MapGenerator implements AutoCloseable {
                     bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / offBoardHighlighting / bufferedImage.getWidth() / bufferedImage.getHeight()));
                     graphics.drawImage(bufferedImage,
                         miscTile.x + (345 - bufferedImage.getWidth()) / 2 - 30,
-                        miscTile.y + (300 - bufferedImage.getHeight()) / 2 - 30 + (player.isSpeaker() ? 30 : 0),
+                        miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 - 30 + (player.isSpeaker() ? 30 : 0),
                         null);
                     if (attachCount.get(planet) > 1) {
                         graphics.setColor(Color.WHITE);
                         graphics.fillOval(
                             miscTile.x + (345 - 80) / 2 - 30,
-                            miscTile.y + (300 - 16) / 2 - 30 + (player.isSpeaker() ? 30 : 0),
+                            miscTile.y + (SPACE_FOR_TILE_HEIGHT - 16) / 2 - 30 + (player.isSpeaker() ? 30 : 0),
                             80, 80);
                         graphics.setColor(Color.BLACK);
                         graphics.fillOval(
                             miscTile.x + (345 - 72) / 2 - 30,
-                            miscTile.y + (300 - 16) / 2 - 30 + (player.isSpeaker() ? 30 : 0) + 4,
+                            miscTile.y + (SPACE_FOR_TILE_HEIGHT - 16) / 2 - 30 + (player.isSpeaker() ? 30 : 0) + 4,
                             72, 72);
                         graphics.setColor(Color.WHITE);
                         DrawingUtil.drawCenteredString(graphics, "" + attachCount.get(planet),
                             new Rectangle(
                                 miscTile.x + (345 - 80) / 2 - 30,
-                                miscTile.y + (300 - 16) / 2 - 30 + (player.isSpeaker() ? 30 : 0),
+                                miscTile.y + (SPACE_FOR_TILE_HEIGHT - 16) / 2 - 30 + (player.isSpeaker() ? 30 : 0),
                                 80, 80),
                             Storage.getFont48());
                     }
@@ -3781,24 +3787,24 @@ public class MapGenerator implements AutoCloseable {
                 bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                 graphics.drawImage(bufferedImage,
                     miscTile.x + (345 - bufferedImage.getWidth()) / 2,
-                    miscTile.y + (300 - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
+                    miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2 + (player.isSpeaker() ? 30 : 0),
                     null);
                 if (attachCount.get(planet) > 1) {
                     graphics.setColor(Color.WHITE);
                     graphics.fillOval(
                         miscTile.x + (345 - 80) / 2,
-                        miscTile.y + (300 - 16) / 2 + (player.isSpeaker() ? 30 : 0),
+                        miscTile.y + (SPACE_FOR_TILE_HEIGHT - 16) / 2 + (player.isSpeaker() ? 30 : 0),
                         80, 80);
                     graphics.setColor(Color.BLACK);
                     graphics.fillOval(
                         miscTile.x + (345 - 72) / 2,
-                        miscTile.y + (300 - 16) / 2 + (player.isSpeaker() ? 30 : 0) + 4,
+                        miscTile.y + (SPACE_FOR_TILE_HEIGHT - 16) / 2 + (player.isSpeaker() ? 30 : 0) + 4,
                         72, 72);
                     graphics.setColor(Color.WHITE);
                     DrawingUtil.drawCenteredString(graphics, "" + attachCount.get(planet),
                         new Rectangle(
                             miscTile.x + (345 - 80) / 2,
-                            miscTile.y + (300 - 16) / 2 + (player.isSpeaker() ? 30 : 0),
+                            miscTile.y + (SPACE_FOR_TILE_HEIGHT - 16) / 2 + (player.isSpeaker() ? 30 : 0),
                             80, 80),
                         Storage.getFont48());
                 }
@@ -3857,7 +3863,7 @@ public class MapGenerator implements AutoCloseable {
                     deltaY = playerStatsAnchorPoint.y - 80;
                     deltaSplitX = 200;
                 } else if (anchorLocationIndex == 0) { // North East
-                    deltaX = playerStatsAnchorPoint.x + EXTRA_X + 300;
+                    deltaX = playerStatsAnchorPoint.x + EXTRA_X + SPACE_FOR_TILE_HEIGHT;
                     deltaY = playerStatsAnchorPoint.y;
                     deltaSplitX = 200;
                 } else if (anchorLocationIndex == 1) { // East
@@ -4569,16 +4575,16 @@ public class MapGenerator implements AutoCloseable {
             if ("tl".equalsIgnoreCase(position)) {
                 y -= 150;
             } else if ("bl".equalsIgnoreCase(position)) {
-                y -= lower * 600 - 150;
+                y -= lower * SPACE_FOR_TILE_HEIGHT * 2 - 150;
             } else if ("tr".equalsIgnoreCase(position)) {
-                x -= lower * 520;
+                x -= lower * HORIZONTAL_TILE_SPACING * 2;
                 y -= 150;
             } else if ("br".equalsIgnoreCase(position)) {
-                x -= lower * 520;
-                y -= lower * 600 - 150;
+                x -= lower * HORIZONTAL_TILE_SPACING * 2;
+                y -= lower * SPACE_FOR_TILE_HEIGHT * 2 - 150;
             } else {
-                x -= lower * 260;
-                y -= lower * 300;
+                x -= lower * HORIZONTAL_TILE_SPACING;
+                y -= lower * SPACE_FOR_TILE_HEIGHT;
             }
             return new Point(x, y);
         }
@@ -4701,7 +4707,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static int getMapHeight(Game game) {
-        return (getRingCount(game) + 1) * 600 + EXTRA_Y * 2;
+        return (getRingCount(game) + 1) * SPACE_FOR_TILE_HEIGHT * 2 + EXTRA_Y * 2;
     }
 
     private static int getMapPlayerCount(Game game) {
@@ -4720,7 +4726,7 @@ public class MapGenerator implements AutoCloseable {
         return mapWidth;
     }
 
-    protected static int getMaxObjectWidth(Game game) {
+    protected static int getMaxObjectiveWidth(Game game) {
         return (MapGenerator.getMapWidth(game) - MapGenerator.SPACING_BETWEEN_OBJECTIVE_TYPES * 4) / 3;
     }
 
