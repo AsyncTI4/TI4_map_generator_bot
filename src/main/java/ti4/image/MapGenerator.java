@@ -222,9 +222,11 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static int getHeightOfPlayerAreasSection(Game game, int playerCountForMap, int objectivesY) {
-        int playerY = playerCountForMap * 340;
+        final int typicalPlayerAreaHeight = 340;
+        final int unrealPlayerHeight = 35;
+        int playerY = playerCountForMap * typicalPlayerAreaHeight;
         int unrealPlayers = game.getNotRealPlayers().size();
-        playerY += unrealPlayers * 36;
+        playerY += unrealPlayers * unrealPlayerHeight;
         for (Player player : game.getPlayers().values()) {
             if (player.isEliminated()) {
                 playerY -= 190;
@@ -233,11 +235,12 @@ public class MapGenerator implements AutoCloseable {
             } else if (player.getSecretsScored().size() > 4) {
                 playerY += (player.getSecretsScored().size() - 4) * 43 + 23;
             }
-            playerY += (player.getTeamMateIDs().size() - 1) * 35;
+            playerY += (player.getTeamMateIDs().size() - 1) * unrealPlayerHeight;
         }
-
-        int lawsY = (game.getLaws().size() / 2 + 1) * 115;
-        return playerY + lawsY + objectivesY + 600;
+        final int columnsOfLaws = 2;
+        final int lawHeight = 115;
+        int lawsY = (game.getLaws().size() / columnsOfLaws + 1) * lawHeight;
+        return playerY + lawsY + objectivesY + EXTRA_Y * 3;
     }
 
     private DisplayType defaultIfNull(DisplayType displayType) {
