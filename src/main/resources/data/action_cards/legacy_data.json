@@ -843,7 +843,7 @@
         "window": "Before the \"Ready Planets\" step of the agenda phase",
         "text": "Ready up to 3 planets you control. Then, reveal the top card of the agenda deck; players vote on this agenda.",
         "flavorText": "The rules for such an occasion were dubious. However, dubious had always been Elder Junn's specialty.",
-        "source": "action_deck_2"
+        "source": "action_deck_2_old"
     },
     {
         "alias": "promissory_rider",
@@ -852,6 +852,15 @@
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each other player that did not vote for that outcome must give you 1 promissory note from their hand.",
         "flavorText": "Gil's career at the Civita Planetar was prolific, with friends in hundreds of bureaucracies and favors owed in many more.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "military_treatise",
+        "name": "Military Treatise",
+        "phase": "Action",
+        "window": "At the start of your turn",
+        "text": "Either redistribute your command tokens or place 1 command token from your reinforcements in your fleet pool.",
+        "flavorText": "Unlenn massaged his brow and shut off his holoscreen. The magnum opus on Lazax war theory at his fingertips, and yet... it was the most boring piece of literature he'd ever had the displeasure to read.",
         "source": "action_deck_2_old"
     }
 ]
