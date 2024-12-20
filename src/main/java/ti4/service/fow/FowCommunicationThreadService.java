@@ -21,6 +21,7 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.ColorEmojis;
 
 public class FowCommunicationThreadService {
 
@@ -51,7 +52,8 @@ public class FowCommunicationThreadService {
         String threadName = StringUtils.capitalize(inviteePlayer.getColor()) + " " + VS_CHAR + " " + StringUtils.capitalize(player.getColor());
         game.getMainGameChannel().createThreadChannel(threadName, true).queue(t -> {
             MessageHelper.sendMessageToChannel(t, "## Private communications thread opened\n"
-                + "Players: " + inviteePlayer.getRepresentationUnfogged() + " and " + player.getRepresentationUnfogged() + "\n"
+                + "Players: " + ColorEmojis.getColorEmojiWithName(inviteePlayer.getColor()) + " " + inviteePlayer.getPing() 
+                + " " + ColorEmojis.getColorEmojiWithName(player.getColor()) + " " + player.getPing() + "\n"
                 + "GM ping: " + game.getPlayersWithGMRole().stream().map(gm -> gm.getPing()).collect(Collectors.joining(" ")));
         });
 
