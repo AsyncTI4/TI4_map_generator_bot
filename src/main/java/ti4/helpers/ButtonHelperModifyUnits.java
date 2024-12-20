@@ -54,22 +54,18 @@ public class ButtonHelperModifyUnits {
             return 0;
         }
         mentakFS = Helper.getPlayerFromUnit(game, "sigma_mentak_flagship_2");
-        if (mentakFS != null && mentakFS != player)
-        {
+        if (mentakFS != null && mentakFS != player) {
             if (unitHolder.getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
                 return 0;
             }
             Tile t = game.getTileFromPlanet(unitHolder.getName());
-            for (String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(game, t.getPosition(), player, false))
-            {
-                if (game.getTileByPosition(adjPos).getUnitHolders().get("space").getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0)
-                {
+            for (String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(game, t.getPosition(), player, false)) {
+                if (game.getTileByPosition(adjPos).getUnitHolders().get("space").getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
                     return 0;
                 }
             }
         }
-        
-        
+
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             if (!player.unitBelongsToPlayer(unitEntry.getKey()))
                 continue;
@@ -1399,7 +1395,7 @@ public class ButtonHelperModifyUnits {
 
             }
         }
-        if (("sd".equalsIgnoreCase(unitID) || "pds".equalsIgnoreCase(unitLong) || "monument".equalsIgnoreCase(unitLong)) && event.getMessage().getContentRaw().contains("for construction")) {
+        if (("sd".equalsIgnoreCase(unitID) || "pds".equalsIgnoreCase(unitLong) || "monument".equalsIgnoreCase(unitLong)) && event.getMessage().getContentRaw().toLowerCase().contains("construction")) {
             if (game.isFowMode() || (!"action".equalsIgnoreCase(game.getPhaseOfGame()) && !"statusScoring".equalsIgnoreCase(game.getPhaseOfGame()))) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), playerRep + " " + successMessage);
             } else {

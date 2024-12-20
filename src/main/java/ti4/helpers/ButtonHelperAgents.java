@@ -492,7 +492,7 @@ public class ButtonHelperAgents {
         if ("mykomentoriagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Lactarius Indigo, the Myko-Mentori" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-            ButtonHelperAbilities.offerOmenDiceButtons(game, player, "yes");
+            ButtonHelperAbilities.offerOmenDiceButtons2(game, player, "yes");
         }
         if ("gledgeagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Durran, the Gledge" + ssruuSlash + " agent.";
