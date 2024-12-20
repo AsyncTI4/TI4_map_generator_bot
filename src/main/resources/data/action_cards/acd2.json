@@ -21,7 +21,7 @@
     "alias": "anomalous_conditions",
     "name": "Anomalous Conditions",
     "phase": "Action",
-    "window": "At the start of a round of combat",
+    "window": "At the start of a round of combat that you are participating in",
     "text": "Choose 1 unit type. Units of that type cannot make combat rolls during this combat round.",
     "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift's horizon. His crew clung to their stations, eyes wide, as the enemy's munitions vanished into the void like pebbles dropped into a well.",
     "source": "action_deck_2"
@@ -580,7 +580,7 @@
     "name": "Overtime",
     "phase": "Action",
     "window": "At the end of your turn",
-    "text": "Spend 1 or 2 trade goods to ready an equal number of non-home planets you control.",
+    "text": "Spend up to 2 trade goods to ready an equal number of non-home planets you control.",
     "flavorText": "Captain Agerro sighed. The work was not what he had expected, not what he had wanted, but it had to be done. Fighting would come later.",
     "source": "action_deck_2"
   },
