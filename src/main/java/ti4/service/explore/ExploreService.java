@@ -306,7 +306,7 @@ public class ExploreService {
                 player.addFragment(cardID);
                 game.purgeExplore(ogID);
             }
-            case "Leader" -> {
+            case "leader" -> {
                 String leader = cardID.replace("gain", "");
                 player.addLeader(leader);
                 MessageHelper.sendMessageToEventChannel(event, "Leader has been added to your party");
@@ -519,7 +519,7 @@ public class ExploreService {
                     saarButton.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + " you may pay 1 trade good to place one "
-                        + UnitEmojis.mech + " mech here.\n-# Do not do this prior to exploring; it is an \"after\", while exploring is a \"when\".",
+                            + UnitEmojis.mech + " mech here.\n-# Do not do this prior to exploring; it is an \"after\", while exploring is a \"when\".",
                         saarButton);
                 }
 
