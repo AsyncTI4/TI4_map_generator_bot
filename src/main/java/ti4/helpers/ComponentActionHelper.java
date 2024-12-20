@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
-import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -23,10 +22,8 @@ import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
-import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
-import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.ExhaustLeaderService;
@@ -241,12 +238,12 @@ public class ComponentActionHelper {
         // Other "abilities"
         if (p1.getUnitsOwned().contains("muaat_flagship") && p1.getStrategicCC() > 0
             && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Spend 1 command token from your strategy pool for 1 cruiser with _The Inferno_ (Muaat Flagship)", FactionEmojis.Muaat);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Spend 1 Strat CC for Cruiser With FS", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
         if ((p1.getUnitsOwned().contains("sigma_muaat_flagship_1") || p1.getUnitsOwned().contains("sigma_muaat_flagship_1")) && p1.getStrategicCC() > 0
             && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFSsigma", "Spend 1 strategy token for _The Inferno_ (Muaat Flagship)", FactionEmojis.Muaat);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFSsigma", "Spend 1 Strat CC for Cruiser With FS", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
 
