@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -181,5 +182,17 @@ public class RelicHelper {
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), text.toString());
         }
+    }
+    
+    public static String sillySpelling()
+    {
+        StringBuilder empelar = new StringBuilder("Scepter of E");
+        List<Character> letters = Arrays.asList('m', 'e', 'l', 'p', 'a');
+        Collections.shuffle(letters);
+        for (Character c : letters) {
+            empelar.append(c);
+        }
+        empelar.append("r");
+        return empelar.toString();
     }
 }

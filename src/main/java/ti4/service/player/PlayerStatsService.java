@@ -40,7 +40,7 @@ public class PlayerStatsService {
 
         sb.append("\n");
 
-        sb.append("> CC: `").append(player.getCCRepresentation()).append("`\n");
+        sb.append("> Command Tokens: `").append(player.getCCRepresentation()).append("`\n");
         sb.append("> Strategy Cards: `").append(player.getSCs()).append("`\n");
         sb.append("> Unfollowed Strategy Cards: `").append(player.getUnfollowedSCs()).append("`\n");
         sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
@@ -62,9 +62,9 @@ public class PlayerStatsService {
         sb.append("> Faction Technologies: `").append(player.getFactionTechs()).append("`\n");
         sb.append("> Fragments: `").append(player.getFragments()).append("`\n");
         sb.append("> Relics: `").append(player.getRelics()).append("`\n");
-        sb.append("> Mahact CC: `").append(player.getMahactCC()).append("`\n");
+        sb.append("> Imperia Command Tokens: `").append(player.getMahactCC()).append("`\n");
         sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
-        sb.append("> Owned PNs: `").append(player.getPromissoryNotesOwned()).append("`\n");
+        sb.append("> Owned Promissory Notes: `").append(player.getPromissoryNotesOwned()).append("`\n");
         sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
         sb.append("> Alliance Members: ").append(player.getAllianceMembers().replace(player.getFaction(), "")).append("\n");
         sb.append("> Followed SCs: `").append(player.getFollowedSCs().toString()).append("`\n");

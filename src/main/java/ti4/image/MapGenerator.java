@@ -59,6 +59,7 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
@@ -1266,15 +1267,11 @@ public class MapGenerator implements AutoCloseable {
             }
 
             if (relicID.equals("emelpar") || relicModel.getHomebrewReplacesID().orElse("").equals("emelpar")) {
-                StringBuilder empelar = new StringBuilder();
-                List<Character> letters = Arrays.asList('m', 'e', 'l', 'p', 'a');
-                Collections.shuffle(letters);
-                for (Character c : letters) {
-                    empelar.append(c);
-                }
-                empelar = new StringBuilder("Scepter of\nE" + empelar + "r");
+                String empelar = RelicHelper.sillySpelling();
+                int spaceIndex = empelar.lastIndexOf(' ');
+                empelar = empelar.substring(0,spaceIndex) + "\n" + empelar.substring(spaceIndex);
                 graphics.setFont(Storage.getFont18());
-                drawOneOrTwoLinesOfTextVertically(g2, empelar.toString(), x + deltaX + 7, y + 30, 120, true);
+                drawOneOrTwoLinesOfTextVertically(g2, empelar, x + deltaX + 7, y + 30, 120, true);
             } else if (relicModel.getShrinkName()) {
                 graphics.setFont(Storage.getFont16());
                 drawOneOrTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 9, y + 30, 120, true);

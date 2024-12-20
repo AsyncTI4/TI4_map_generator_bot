@@ -179,7 +179,7 @@ public class ButtonHelperCommanders {
             return;
         }
         StringBuilder summary = new StringBuilder(player.getRepresentation() + " you could potentially use the Veldyr Commander,"
-            +" to ignore one pre-req for these technologies (the bot did not check if you have the prerequisites otherwise):\n");
+            +" to ignore one prerequisite for these technologies (the bot did not check if you have the prerequisites otherwise):\n");
         List<String> techsSummed = new ArrayList<>();
         for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)) {
             for (String tech : p2.getTechs()) {

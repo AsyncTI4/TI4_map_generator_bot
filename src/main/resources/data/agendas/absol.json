@@ -239,7 +239,7 @@
         "type": "Law",
         "target": "Elect Player",
         "text1": "The elected player gains this card and gives each other player who voted for them 1 promissory note from their hand (from most votes to least), if able.\nAt the end of the strategy phase, the owner of this card may spend 1 command token from their strategy pool and up to 8 influence to swap 1 of their strategy cards with a strategy card that has an initiative value equal to or less than the influence spent.",
-        "mapText": "Owner of this card may spend 1 strat CC and up to 8 influence to swap 1 of their strategy cards with a strategy card with an initiative value equal to the influence spent.",
+        "mapText": "Owner of this card may spend 1 command token from strategy pool and up to 8 influence to swap 1 of their strategy cards with a strategy card with an initiative value equal to the influence spent.",
         "source": "absol"
     },
     {
@@ -310,7 +310,7 @@
         "type": "Law",
         "target": "Elect Player",
         "text1": "The elected player gains this card. The owner of this card may resolve the secondary ability of the Diplomacy strategy card without spending a command token.\nAfter a player activates a system that contains 1 or more of another player's units, the owner of this card may spend 1 command token from their strategy pool and give the active player 1 promissory note from their hand to immediately end that player's turn.",
-        "mapText": "Follow Diplomacy without spending a command token. After a player activates a system that contains 1 or more of another player's units, the owner of this card may spend a strat CC and give the active player a promissory note from their hand to immediately end the active player's turn.",
+        "mapText": "Follow Diplomacy without spending a command token. After a player activates a system that contains 1 or more of another player's units, the owner of this card may spend a command token from your strategy pool and give the active player a promissory note from their hand to immediately end the active player's turn.",
         "source": "absol"
     },
     {
@@ -337,7 +337,7 @@
         "type": "Law",
         "target": "Elect Player",
         "text1": "The elected player gains this card. The owner of this card may resolve the secondary ability of the Warfare strategy card without spending a command token. The owner of this card may use the following component action:\nACTION: Exhaust this card and spend 1 command token from your strategy pool to remove 1 of your command tokens from the game board.",
-        "mapText": "Follow Warfare without spending a command token. ACTION: Exhaust this card and spend 1 strat CC to remove 1 CC from game board",
+        "mapText": "Follow Warfare without spending a command token. ACTION: Exhaust this card and spend 1 command token from your strategy pool to remove 1 command token from game board",
         "source": "absol"
     },
     {
@@ -411,7 +411,7 @@
         "type": "Law",
         "target": "Elect Player",
         "text1": "The elected player gains this card. The owner of this card may ignore the prerequisites on fighter unit upgrade technologies and applies +1 to the results of their fighter's combat rolls. Hits produced by their fighters must be applied to non-fighter ships, if possible. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
-        "mapText": "Can ignore pre-req on Fighter 2 tech. Fighters get +1 combat. Hits from fighters must be applied to non-fighter ships first. When use production, discard this card unless produce 2 or more fighters.",
+        "mapText": "Can ignore prerequisite of Fighter 2 unit upgrade technology. Fighters get +1 combat. Hits from fighters must be applied to non-fighter ships first. When use production, discard this card unless produce 2 or more fighters.",
         "source": "absol"
     },
     {
@@ -483,7 +483,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: The player with the most victory points (speaker breaks ties) gains the speaker token and 1 victory point, then gives 1 promissory note to each other player who voted \"For\" (in order of most to least votes), if able.",
-        "text2": "Against: The player with the least victory points (speaker breaks ties) gains 1 victory point, draws 3 action cards, and adds 1 command token from their reinforcements to each of their tactics, fleet, and strategy pools.",
+        "text2": "Against: The player with the least victory points (speaker breaks ties) gains 1 victory point, draws 3 action cards, and adds 1 command token from their reinforcements to each of their tactic, fleet, and strategy pools.",
         "source": "absol"
     },
     {

@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.DiceHelper.Die;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -253,11 +254,11 @@ public class ButtonHelperAbilities {
 
     @ButtonHandler("resolveGrace_")
     public static void resolveGrace(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        String msg = player.getFactionEmoji() + " is resolving the Grace ability";
+        String msg = player.getFactionEmoji() + " is resolving the **Grace** ability.";
         int scPlayed = Integer.parseInt(buttonID.split("_")[1]);
         if (!player.hasAbility("grace")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "To " + player.getFactionEmoji() + ": This button ain't for you ");
+                "To " + player.getFactionEmoji() + ": This button ain't for you.");
             return;
         }
         player.addExhaustedAbility("grace");
@@ -265,15 +266,16 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentationUnfogged()
-                + " use buttons to resolve Grace, reminder you have to spend a strat CC if applicable, and that you may only do one of these.",
+                + " use buttons to resolve **Grace**.\n"
+                + "-# Reminder that you have to spend a command token from your strategy pool if applicable, and that you may only do one of these.",
             getGraceButtons(game, player, scPlayed));
     }
 
     public static List<Button> getGraceButtons(Game game, Player edyn, int scPlayed) {
         List<Button> scButtons = new ArrayList<>();
-        scButtons.add(Buttons.gray("spendAStratCC", "Spend a Strategy CC"));
+        scButtons.add(Buttons.gray("spendAStratCC", "Spend a Strategy Token"));
         if (scPlayed > 1 && (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1))) {
-            scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain CCs"));
+            scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
             // scButtons.add(Buttons.red("leadershipExhaust", "Exhaust Planets"));
         }
         if (scPlayed > 2 && (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2))) {
@@ -283,7 +285,7 @@ public class ButtonHelperAbilities {
             scButtons.add(Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", CardEmojis.ActionCard));
         }
         if (scPlayed > 4 && (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4))) {
-            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
+            scButtons.add(Buttons.green("construction_spacedock", "Place 1 Space Dock", UnitEmojis.spacedock));
             scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
         }
         if (scPlayed > 5 && (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5))) {
@@ -298,7 +300,7 @@ public class ButtonHelperAbilities {
         if (scPlayed > 8 && (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8))) {
             scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.red("deleteButtons", "Done Resolving"));
 
         return scButtons;
     }
@@ -818,22 +820,22 @@ public class ButtonHelperAbilities {
         String techName = "";
         if (Mapper.getRelic(order).getName().contains("Dreadnought")) {
             buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "dreadnought", "placeOneNDone_skipbuild", event));
-            message = "Use buttons to put 1 dreadnought in a system with your ships and CC";
+            message = "Use buttons to place 1 dreadnought in a system your command token and your other ships.";
             techName = "dn2";
         }
         if (Mapper.getRelic(order).getName().contains("Carrier")) {
             buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "carrier", "placeOneNDone_skipbuild", event));
-            message = "Use buttons to put 1 carrier in a system with your ships and CC";
+            message = "Use buttons to put 1 carrier in a system your command token and your other ships.";
             techName = "cv2";
         }
         if (Mapper.getRelic(order).getName().contains("Cruiser")) {
             buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild", event));
-            message = "Use buttons to put 1 cruiser in a system with your ships and CC";
+            message = "Use buttons to put 1 cruiser in a system your command token and your other ships.";
             techName = "cr2";
         }
         if (Mapper.getRelic(order).getName().contains("Destroyer")) {
             buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "2destroyer", "placeOneNDone_skipbuild", event));
-            message = "Use buttons to put 2 destroyers in a system with your ships and CC";
+            message = "Use buttons to put 2 destroyers in a system your command token and your other ships.";
             techName = "dd2";
         }
         message = player.getRepresentationUnfogged() + " " + message;
@@ -1176,12 +1178,12 @@ public class ButtonHelperAbilities {
         Tile tile = game.getTileByPosition(pos);
         String successMessage;
         if (player.getStrategicCC() > 0) {
-            successMessage = player.getFactionEmoji() + " Spent 1 strategy token (" + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ")";
+            successMessage = player.getRepresentationUnfogged() + " spent 1 strategy token (" + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ")";
             player.setStrategicCC(player.getStrategicCC() - 1);
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, FactionEmojis.Muaat + "Starforge");
         } else {
             player.addExhaustedRelic("emelpar");
-            successMessage = "Exhausted Scepter of Emelpar";
+            successMessage = player.getRepresentationUnfogged() + " exhausted the _" + RelicHelper.sillySpelling() + "_.";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
 

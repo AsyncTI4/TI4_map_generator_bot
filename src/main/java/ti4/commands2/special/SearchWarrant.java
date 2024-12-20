@@ -10,7 +10,7 @@ class SearchWarrant extends GameStateSubcommand {
 
     public SearchWarrant() {
         super(Constants.SEARCH_WARRANT, "Search Warrant set on/off.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Color/Faction for which we set CC's"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Color/Faction getting searched"));
     }
 
     @Override

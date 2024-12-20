@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -107,14 +108,14 @@ public class ButtonHelperSCs {
             String message = deductCC(player);
             ReactionService.addReaction(event, game, player, message);
         }
-        Button getTactic = Buttons.green("increase_tactic_cc", "Gain 1 Tactic CC");
-        Button getFleet = Buttons.green("increase_fleet_cc", "Gain 1 Fleet CC");
-        Button getStrat = Buttons.green("increase_strategy_cc", "Gain 1 Strategy CC");
+        Button getTactic = Buttons.green("increase_tactic_cc", "Gain 1 Tactic Token");
+        Button getFleet = Buttons.green("increase_fleet_cc", "Gain 1 Fleet Token");
+        Button getStrat = Buttons.green("increase_strategy_cc", "Gain 1 Strategy Token");
         Button exhaust = Buttons.red("nekroTechExhaust", "Exhaust Planets");
-        Button doneGainingCC = Buttons.red("deleteButtons_technology", "Done Gaining CCs");
+        Button doneGainingCC = Buttons.red("deleteButtons_technology", "Done Gaining Command Tokens");
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
-        String message = player.getRepresentationUnfogged() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
-        Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset CCs");
+        String message = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
+        Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset Command Tokens");
         List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
         List<Button> buttons2 = Collections.singletonList(exhaust);
         if (!game.isFowMode()) {
@@ -424,8 +425,8 @@ public class ButtonHelperSCs {
         ReactionService.addReaction(event, game, player);
         String unit = buttonID.replace("construction_", "");
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
-        String message = player.getRepresentationUnfogged() + " Click the name of the planet you wish to put your "
-            + unitKey.unitEmoji() + " on for construction. If you are resolving the secondary, it will place a command counter in the system as well.";
+        String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
+            + unitKey.unitName() + " on for **Construction**. If you are resolving the secondary, it will place a command token in the system as well.";
         List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
@@ -461,20 +462,20 @@ public class ButtonHelperSCs {
         if (!game.getStoredValue("ccLimit").isEmpty()) {
             limit = Integer.parseInt(game.getStoredValue("ccLimit"));
         }
-        message = message + "\nYou have " + (limit - ccCount) + " CCs remaining that you could gain";
+        message = message + "\nYou have " + (limit - ccCount) + " command tokens in your reinforcements that you could gain.";
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         } else {
             MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
         }
         ReactionService.addReaction(event, game, player);
-        message = player.getRepresentationUnfogged() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+        message = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
-        Button getTactic = Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_tactic_cc", "Gain 1 Tactic CC");
-        Button getFleet = Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_fleet_cc", "Gain 1 Fleet CC");
-        Button getStrat = Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_strategy_cc", "Gain 1 Strategy CC");
-        Button doneGainingCC = Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons_leadership", "Done Gaining CCs");
-        Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset CCs");
+        Button getTactic = Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_tactic_cc", "Gain 1 Tactic Token");
+        Button getFleet = Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_fleet_cc", "Gain 1 Fleet Token");
+        Button getStrat = Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_strategy_cc", "Gain 1 Strategy Token");
+        Button doneGainingCC = Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons_leadership", "Done Gaining Command Tokens");
+        Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset Command Tokens");
         List<Button> buttons2 = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons2);
@@ -530,21 +531,14 @@ public class ButtonHelperSCs {
                                     tile.getRepresentationForButtons(game, player)));
                             }
                             MessageHelper.sendMessageToChannelWithButtons(channel,
-                                player.getRepresentationUnfogged() + " Use buttons to remove a CC", buttonsToRemoveCC);
+                                player.getRepresentationUnfogged() + " Use buttons to remove a command token.", buttonsToRemoveCC);
                         }
                     }
                 }
             }
         } else {
-            StringBuilder empelar = new StringBuilder();
-            List<Character> letters = Arrays.asList('m', 'e', 'l', 'p', 'a');
-            Collections.shuffle(letters);
-            for (Character c : letters) {
-                empelar.append(c);
-            }
-            empelar = new StringBuilder("E" + empelar + "r");
             MessageHelper.sendMessageToChannel(channel,
-                player.getRepresentationUnfogged() + " exhausted Scepter of " + empelar + " to follow " + Helper.getSCName(scNum, game) + ".");
+                player.getRepresentationUnfogged() + " exhausted the _" + RelicHelper.sillySpelling() + "_ to follow " + Helper.getSCName(scNum, game) + ".");
             player.addExhaustedRelic("emelpar");
         }
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
@@ -618,7 +612,7 @@ public class ButtonHelperSCs {
             }
         }
         if (player != null && player.getSCs().contains(scNum)) {
-            String message = player.getRepresentation() + " you currently hold this strategy card and therefore should not be spending a CC here." +
+            String message = player.getRepresentation() + " you currently hold this strategy card and therefore should not be spending a command token here." +
                 "\nYou may override this protection by running `/player stats strategy_cc:-1`.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             return;

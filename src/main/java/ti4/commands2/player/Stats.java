@@ -25,7 +25,7 @@ class Stats extends GameStateSubcommand {
 
     public Stats() {
         super(Constants.STATS, "Player Stats: Command tokens, trade goods, commodities", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.CC, "Command token example: 3/3/2 or +1/-1/+0"))
+        addOptions(new OptionData(OptionType.STRING, Constants.CC, "Command token - example: 3/3/2 or +1/-1/+0"))
             .addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactic pool command token count - can use +1/-1 etc. to add/subtract"))
             .addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet pool command token count - can use +1/-1 etc. to add/subtract"))
             .addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy pool command token count - can use +1/-1 etc. to add/subtract"))
@@ -75,17 +75,17 @@ class Stats extends GameStateSubcommand {
                 String cc = AliasHandler.resolveFaction(optionCC.getAsString().toLowerCase());
                 StringTokenizer tokenizer = new StringTokenizer(cc, "/");
                 if (tokenizer.countTokens() != 3) {
-                    MessageHelper.sendMessageToEventChannel(event, "Wrong format for tokens count. Must be 3/3/3");
+                    MessageHelper.sendMessageToEventChannel(event, "Wrong format for tokens count. Must be 3/3/3.");
                 } else {
                     try {
-                        PlayerStatsService.setValue(event, game, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC,
+                        PlayerStatsService.setValue(event, game, player, "Tactic Token", player::setTacticalCC, player::getTacticalCC,
                             tokenizer.nextToken(), true);
-                        PlayerStatsService.setValue(event, game, player, "Fleet CC", player::setFleetCC, player::getFleetCC,
+                        PlayerStatsService.setValue(event, game, player, "Fleet Token", player::setFleetCC, player::getFleetCC,
                             tokenizer.nextToken(), true);
-                        PlayerStatsService.setValue(event, game, player, "Strategy CC", player::setStrategicCC,
+                        PlayerStatsService.setValue(event, game, player, "Strategy Token", player::setStrategicCC,
                             player::getStrategicCC, tokenizer.nextToken(), true);
                     } catch (Exception e) {
-                        MessageHelper.sendMessageToEventChannel(event, "Not number entered, check CC count again");
+                        MessageHelper.sendMessageToEventChannel(event, "Not number entered, check command token count again.");
                     }
                 }
                 Helper.isCCCountCorrect(event, game, player.getColor());
@@ -101,7 +101,7 @@ class Stats extends GameStateSubcommand {
             }
             if (optionT != null || optionF != null || optionS != null || optionCC != null) {
                 String newCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
-                MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " updated CCs: " + originalCCString + " -> " + newCCString);
+                MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " updated command tokens: " + originalCCString + " -> " + newCCString + ".");
             }
             if (optionT != null || optionF != null || optionS != null) {
                 Helper.isCCCountCorrect(event, game, player.getColor());

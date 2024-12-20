@@ -203,8 +203,8 @@ public class AgendaHelper {
             if (Helper.getPlayerFromAbility(game, "propagation") != null) {
                 Player player = Helper.getPlayerFromAbility(game, "propagation");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
-                    + ". Use buttons to gain CCs";
+                String message2 = player.getRepresentation() + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
+                    + " Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message2, buttons);
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
@@ -1204,7 +1204,7 @@ public class AgendaHelper {
                             p2.setFleetCC(p2.getFleetCC() - 1);
                             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                                 p2.getRepresentation()
-                                    + " you lost 1 fleet CC due to voting the same way as a Sanction");
+                                    + ", you lost 1 command token from your fleet pool due to voting the same way as a _Sanction_.");
                             ButtonHelper.checkFleetInEveryTile(p2, game, event);
                         }
                     }

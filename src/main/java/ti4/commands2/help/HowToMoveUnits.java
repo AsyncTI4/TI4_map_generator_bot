@@ -61,7 +61,7 @@ class HowToMoveUnits extends Subcommand {
 
             "## There are also four optional arguments that can sometimes be useful:\n" +
             "### 5. __faction_or_color__\n> By default, /move_units moves your own plastic. You can move other people's plastic (with their permission!) using this argument.\n" +
-            "### 6. __cc_use__\n> By default, /move_units places a token from your tactical pool in the “to” tile.\n" +
+            "### 6. __cc_use__\n> By default, /move_units places a token from your tactic pool in the “to” tile.\n" +
             "> - If you do not want that to happen for any reason, you can use other options:\n" +
             ">  - “r” uses from your reinforcements (e.g., if you are retreating)\n" +
             ">  - “No” doesn't place a token (e.g., for Transit Diodes)\n" +

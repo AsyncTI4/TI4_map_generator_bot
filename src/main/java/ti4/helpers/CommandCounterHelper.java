@@ -34,7 +34,7 @@ public class CommandCounterHelper {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.isFowMode() && ping) {
             String colorMention = ColorEmojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(managedGame.getGame(), event, tile.getPosition(), colorMention + " has placed a token in the system");
+            FoWHelper.pingSystem(managedGame.getGame(), event, tile.getPosition(), colorMention + " has placed a command token in the system.");
         }
         tile.addCC(ccID);
     }
@@ -47,7 +47,7 @@ public class CommandCounterHelper {
         }
         if (game.isFowMode() && ping) {
             String colorMention = ColorEmojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has placed a token in the system");
+            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has placed a command token in the system.");
         }
         tile.addCC(ccID);
     }
