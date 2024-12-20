@@ -334,6 +334,7 @@ public class PromissoryNoteHelper {
             owner.setFleetCC(owner.getFleetCC() - 1);
             String reducedMsg = owner.getRepresentationUnfogged()
                 + ", 1 command token has been removed from your fleet pool because _Fires of the Gashlai_ was played.";
+            MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), reducedMsg);
         }
         if ("sigma_fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
@@ -341,18 +342,14 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired the War Sun technology.");
             ButtonHelper.checkFleetInEveryTile(owner, game, event);
             String reducedMsg = owner.getRepresentationUnfogged() + ", you must spend 1 command token due to _Fires of the Gashlai_ being played.";
-            if (game.isFowMode()) {
-                MessageHelper.sendMessageToChannelWithButtons(owner.getPrivateChannel(), reducedMsg, ButtonHelper.getLoseCCButtons(owner));
-            } else {
-                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), reducedMsg, ButtonHelper.getLoseCCButtons(owner));
-            }
+            MessageHelper.sendMessageToChannelWithButtons(owner.getCorrectChannel(), reducedMsg, ButtonHelper.getLoseCCButtons(owner));
+
         }
         if (id.endsWith("_ta")) {
             int comms = owner.getCommodities();
             int oldTGs = player.getTg();
             owner.setCommodities(0);
-            if (game.isFowMode())
-            {
+            if (game.isFowMode()) {
                 String reducedMsg = owner.getRepresentationUnfogged() + " your _Trade Agreement_ was played.";
                 String reducedMsg2 = player.getRepresentationUnfogged()
                     + " you gained trade goods equal to the number of commodities the player had (your trade goods went from "
@@ -364,9 +361,7 @@ public class PromissoryNoteHelper {
                 ButtonHelperAbilities.pillageCheck(player, game);
                 MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), reducedMsg);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), reducedMsg2);
-            }
-            else
-            {
+            } else {
                 String reducedMsg = owner.getRepresentationUnfogged() + " your _Trade Agreement_ was played.";
                 String reducedMsg2 = player.getRepresentationUnfogged() + " played the _Trade Agreement_ belonging to "
                     + owner.getRepresentationUnfogged() + ", taking their " + comms + " commodit" + (comms == 1 ? "y" : "ies")
@@ -396,11 +391,11 @@ public class PromissoryNoteHelper {
             } else if (owner.getFaction().equalsIgnoreCase("xxcha")) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Xxcha does not have any command tokens in their strategy pool."
-                    + " As such, _Political Favor_ cannot be resolved and the current agenda remains.");
+                        + " As such, _Political Favor_ cannot be resolved and the current agenda remains.");
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "The owner of _Political Favor_ does not have any command tokens in their strategy pool."
-                    + " As such, _Political Favor_ cannot be resolved and the current agenda remains.");
+                        + " As such, _Political Favor_ cannot be resolved and the current agenda remains.");
             }
         }
         if (("scepter".equalsIgnoreCase(id))) {
@@ -503,15 +498,16 @@ public class PromissoryNoteHelper {
         if ("sigma_excavation_experts".equalsIgnoreCase(id)) {
             List<Button> exploreButtons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation() + ", explore each planet that contains your mechs.", exploreButtons);
+                player.getRepresentation() + ", explore each planet that contains your mechs.", exploreButtons);
         }
         if ("sigma_primitivism".equalsIgnoreCase(id)) {
             Button transact2 = Buttons.green("gain_CC", "Gain 1 Command Token");
             int oldTgs = player.getTg();
             player.setTg(oldTgs + 4);
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(),
-                    player.getRepresentation() + ", you have gained 1 command token and 4 trade goods (" + oldTgs
-                    + " -> " + (oldTgs + 4) + ") from playing _Primitivism_. Please use the button to gain your command token.", transact2);
+                player.getRepresentation() + ", you have gained 1 command token and 4 trade goods (" + oldTgs
+                    + " -> " + (oldTgs + 4) + ") from playing _Primitivism_. Please use the button to gain your command token.",
+                transact2);
         }
         if (pn.getText().toLowerCase().contains("action:") && !"acq".equalsIgnoreCase(id)) {
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
