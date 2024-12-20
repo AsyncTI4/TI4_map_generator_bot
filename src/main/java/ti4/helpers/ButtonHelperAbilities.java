@@ -554,10 +554,11 @@ public class ButtonHelperAbilities {
 
     @ButtonHandler("getOmenDice")
     public static void offerOmenDiceButtons(Game game, Player player) {
-        offerOmenDiceButtons(game, player, "no");
+        offerOmenDiceButtons2(game, player, "no");
     }
 
-    public static void offerOmenDiceButtons(Game game, Player player, String agent) {
+    @ButtonHandler("getOmenDice2")
+    public static void offerOmenDiceButtons2(Game game, Player player, String agent) {
         String msg = player.getRepresentationUnfogged() + " you may play an Omen die with the following buttons. Duplicate dice are not shown.";
         List<Button> buttons = new ArrayList<>();
         List<Integer> dice = new ArrayList<>();
