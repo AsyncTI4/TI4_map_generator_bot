@@ -552,7 +552,7 @@ public class ExploreService {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + ", please use the button to research a technology.", Buttons.GET_A_FREE_TECH);
             }
             case "aw1", "aw2", "aw3", "aw4" -> {
-                int commod = player.getCommodities();
+                int commod = Math.min(player.getCommodities(), 2);
                 if (commod > 0) {
                     message = "Resolve _Abandoned Warehouses_:\n-# You currently have " + player.getCommoditiesRepresentation()
                         + " commodit" + (commod == 1 ? "y" : "ies") + ".";
