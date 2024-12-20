@@ -7,4 +7,5 @@ public class FowConstants {
 
     public static final String HIDE_NAMES = "hide_player_names";
     public static final String HIDE_TOTAL_VOTES = "hide_total_votes";
+    public static final String MANAGED_COMMS = "managed_comms";
 }

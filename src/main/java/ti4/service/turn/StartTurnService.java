@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -32,6 +34,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -387,8 +390,14 @@ public class StartTurnService {
                 .queue(Consumers.nop(), BotLogger::catchRestError);
             game.setLatestTransactionMsg("");
         }
-        if (!doneActionThisTurn && game.isFowMode()) {
+        if (game.isFowMode()) {
             startButtons.add(Buttons.gray("showGameAgain", "Show Game"));
+            if (FowCommunicationThreadService.isActive(game)) {
+                Set<Player> newNeighbors = FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(game, player);
+                if (!newNeighbors.isEmpty()) {
+                    startButtons.add(Buttons.blue("fowComms_" + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")), "Open new comms"));
+                }
+            }
         }
 
         startButtons.add(Buttons.gray("showMap", "Show Map"));
