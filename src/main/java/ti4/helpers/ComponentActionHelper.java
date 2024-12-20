@@ -231,19 +231,19 @@ public class ComponentActionHelper {
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("fabrication") && !p1.getFragments().isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 Command Token", FactionEmojis.Naaz);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 CC", FactionEmojis.Naaz);
             compButtons.add(abilityButton);
         }
 
         // Other "abilities"
         if (p1.getUnitsOwned().contains("muaat_flagship") && p1.getStrategicCC() > 0
             && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Spend 1 Strat CC for Cruiser With FS", FactionEmojis.Muaat);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Use Flagship Ability", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
         if ((p1.getUnitsOwned().contains("sigma_muaat_flagship_1") || p1.getUnitsOwned().contains("sigma_muaat_flagship_1")) && p1.getStrategicCC() > 0
             && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFSsigma", "Spend 1 Strat CC for Cruiser With FS", FactionEmojis.Muaat);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFSsigma", "Use Flagship Ability", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
 
@@ -257,7 +257,7 @@ public class ComponentActionHelper {
         }
 
         // ACs
-        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play Action Card with Component Action");
+        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play Component Action AC");
         compButtons.add(acButton);
 
         // absol

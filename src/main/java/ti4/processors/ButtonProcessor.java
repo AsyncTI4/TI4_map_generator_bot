@@ -162,7 +162,7 @@ public class ButtonProcessor {
                 case "gain_3_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 3, false);
                 case "gain_4_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 4, false);
                 case "convert_1_comms" -> ButtonHelperStats.convertComms(event, game, player, 1);
-                case "convert_2_comms" -> ButtonHelperStats.convertComms(event, game, player, 2);
+                case "convert_2_comms" -> ButtonHelperStats.convertComms(event, game, player, 2, true);
                 case "convert_3_comms" -> ButtonHelperStats.convertComms(event, game, player, 3);
                 case "convert_4_comms" -> ButtonHelperStats.convertComms(event, game, player, 4);
                 case "convert_2_comms_stay" -> ButtonHelperStats.convertComms(event, game, player, 2, false);
