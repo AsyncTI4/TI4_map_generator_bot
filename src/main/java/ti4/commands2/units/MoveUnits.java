@@ -48,7 +48,7 @@ public class MoveUnits extends GameStateCommand {
                 .setRequired(true),
             new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                 .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.CC_USE, "Type t or tactics to add a CC from tactics, r or retreat to add a CC without taking it from tactics")
+            new OptionData(OptionType.STRING, Constants.CC_USE, "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements")
                 .setAutoComplete(true),
             new OptionData(OptionType.BOOLEAN, Constants.PRIORITIZE_DAMAGED, "Prioritize moving damaged units. Default false."),
             new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")

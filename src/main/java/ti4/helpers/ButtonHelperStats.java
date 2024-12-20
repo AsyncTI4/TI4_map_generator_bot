@@ -140,8 +140,8 @@ public class ButtonHelperStats {
         if (!redistribute) buttons = ButtonHelper.getGainCCButtons(player);
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation()); // redundant
 
-        String message = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". ";
-        message += "Use the buttons to gain" + (redistribute ? " and redistribute" : "") + " CCs";
+        String message = player.getRepresentation() + ", your current command tokens are " + player.getCCRepresentation() + ". ";
+        message += "Use the buttons to gain" + (redistribute ? " and redistribute" : "") + " command tokens.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 

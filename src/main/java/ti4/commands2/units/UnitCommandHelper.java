@@ -34,7 +34,7 @@ class UnitCommandHelper {
         }
         String value = ccUseOption.getAsString().toLowerCase();
         switch (value) {
-            case "t/tactics", "t", "tactics", "tac", "tact" -> {
+            case "t/tactic", "t", "tactic", "tac", "tact" -> {
                 RemoveCommandCounterService.fromTacticsPool(event, color, tile, game);
                 CommandCounterHelper.addCC(event, color, tile);
                 Helper.isCCCountCorrect(event, game, color);

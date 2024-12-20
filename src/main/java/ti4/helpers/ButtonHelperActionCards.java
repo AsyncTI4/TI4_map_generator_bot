@@ -1028,7 +1028,7 @@ public class ButtonHelperActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         p2.setTacticalCC(p2.getTacticalCC() - 1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " you subtracted 1 tactical CC from " + p2.getFactionEmojiOrColor());
+            player.getRepresentationUnfogged() + " you removed 1 command from the tactic pool of " + p2.getFactionEmojiOrColor() + ".");
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
             p2.getRepresentationUnfogged() + ", you lost a command token from your tactic pool due to _Insubordination_ ("
             + (p2.getTacticalCC() + 1) + "->" + p2.getTacticalCC() + ").");

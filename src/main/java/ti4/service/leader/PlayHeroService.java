@@ -106,11 +106,11 @@ public class PlayHeroService {
                 Tile t = player.getHomeSystemTile();
                 if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
                     t.addToken("attachment_titanshero.png", "elysium");
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attachment added to Elysium and it has been readied");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Elysium has had Ul The Progenitor attached, and been readied.");
                     PlanetService.refreshPlanet(player, "elysium");
                 } else {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "`Use the following command to add the attachment: /add_token token:titanshero`");
+                        "Use the following command to add the attachment: `/add_token token:titanshero`");
                 }
             }
             case "florzenhero" -> {
@@ -131,7 +131,8 @@ public class PlayHeroService {
                 int dieResult = player.getLowestSC();
                 game.setStoredValue("kyroHeroSC", dieResult + "");
                 game.setStoredValue("kyroHeroPlayer", player.getFaction());
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getSCName(dieResult, game) + " has been marked with Speygh, the Kyro hero, and the faction that played the hero as " + player.getFaction());
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getSCName(dieResult, game) 
+                    + " has been marked with Speygh, the Kyro hero, and the faction that played the hero as " + player.getFaction());
                 ListTurnOrderService.turnOrder(event, game);
             }
             case "ghotihero" -> MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -164,7 +165,7 @@ public class PlayHeroService {
                 Buttons.green("lizhoHeroFighterResolution", "Distribute 12 Fighters"));
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    player.getRepresentationUnfogged() + " removed all of your CCs from the board");
+                    player.getRepresentationUnfogged() + ", all of your command tokens on the game have been returned to your reinforcements.");
                 for (Tile t : game.getTileMap().values()) {
                     if (CommandCounterHelper.hasCC(event, player.getColor(), t)) {
                         RemoveCommandCounterService.fromTile(event, player.getColor(), t, game);
@@ -182,7 +183,7 @@ public class PlayHeroService {
             case "l1z1xhero" -> {
                 String message = player.getRepresentation()
                     + " Resolving The Helmsman, the L1Z1X Hero. At the moment, this is implemented as a sort of tactical action, relying on the player to follow the rules."
-                    + " The game will know not to take a tactical CC from you, and will allow you to move out of locked systems."
+                    + " The game will know not to take a command token from your tactic pool, and will allow you to move out of locked systems."
                     + " Reminder that you may carry ground forces and fighters with your dreadnoughts/flagship, and that they can't move into supernovae (or asteroid fields if you don't have Antimass Deflectors).";
                 List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
                 game.setL1Hero(true);
@@ -193,7 +194,8 @@ public class PlayHeroService {
                 List<Button> buttons = ButtonHelperHeroes.getWinnuHeroSCButtons(game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
-                    + " use the button to pick which strategy card you'd like to do the primary of. Reminder you may allow others to do the secondary, but they should still pay 1 CC for resolving it.",
+                    + " use the button to pick which strategy card you'd like to do the primary of."
+                    + " Reminder you may allow others to do the secondary, but they should still spend 1 command token from their strategy pool to resolving it (unless it's **Leadership**).",
                     buttons);
             }
             case "gheminaherolady" -> {
@@ -242,17 +244,17 @@ public class PlayHeroService {
                         "kjalHero_" + tile.getPosition());
                     if (!buttons.isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                            "Use buttons to remove token from "
-                                + tile.getRepresentationForButtons(game, player) + " or an adjacent tile",
+                            "Use buttons to remove a command token from "
+                                + tile.getRepresentationForButtons(game, player) + " or an adjacent tile.",
                             buttons);
                     }
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getFactionEmoji() + " may gain " + size + " CC" + (size == 1 ? "" : "s") + ".");
+                    player.getFactionEmoji() + " may gain " + size + " command token" + (size == 1 ? "" : "s") + ".");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String trueIdentity = player.getRepresentationUnfogged();
-                String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
-                    + ". Use buttons to gain CCs";
+                String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain command tokens.";
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
@@ -269,11 +271,11 @@ public class PlayHeroService {
                     }
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getFactionEmoji() + " may gain 1 CC.");
+                    player.getFactionEmoji() + " may gain 1 command token.");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String trueIdentity = player.getRepresentationUnfogged();
-                String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
-                    + ". Use buttons to gain CCs";
+                String message2 = trueIdentity + "! Your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain command tokens.";
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }

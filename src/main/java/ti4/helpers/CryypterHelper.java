@@ -17,7 +17,7 @@ import ti4.service.leader.UnlockLeaderService;
 public class CryypterHelper {
 
     public static List<Button> getCryypterSC3Buttons(int sc) {
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         Button drawCards = Buttons.gray("cryypterSC3Draw", "Draw Action Cards", CardEmojis.ActionCard);
         return List.of(drawCards, followButton, noFollowButton);

@@ -169,7 +169,7 @@ public class AutoCompleteProvider {
             }
             case Constants.CC_USE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<String> values = Arrays.asList("t/tactics", "r/retreat/reinforcements", "no");
+                List<String> values = Arrays.asList("t/tactic", "r/retreat/reinforcements", "no");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
                 event.replyChoices(options).queue();
             }

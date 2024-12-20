@@ -657,8 +657,8 @@ public class ExploreService {
                 }
                 CommanderUnlockCheckService.checkPlayer(player, "hacan");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                message += "\n" + player.getRepresentationUnfogged() + " your current CCs are " + player.getCCRepresentation()
-                    + ". Use buttons to gain " + ccsToGain + " CC" + (ccsToGain > 1 ? "s" : "");
+                message += "\n" + player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain " + ccsToGain + " command token" + (ccsToGain > 1 ? "s" : "") + ".";
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
@@ -683,17 +683,17 @@ public class ExploreService {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
             case "vfs1", "vfs2", "vfs3" -> {
-                message = player.getRepresentation() + " please resolve Volatile Fuel Source:\n-# Your current CCs are " + player.getCCRepresentation();
+                message = player.getRepresentation() + " please resolve Volatile Fuel Source:\n-# Your current command tokens are " + player.getCCRepresentation() + ".";
                 message += " and you have " + ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID);
-                Button gainCC = Buttons.green("resolveVolatile_" + planetID, "Gain a CC by removing 1 Infantry or by having a Mech on " + planetName);
+                Button gainCC = Buttons.green("resolveVolatile_" + planetID, "Remove 1 Infantry or Have a mech on " + planetName + " to Gain a Command Token");
                 List<Button> buttons = List.of(gainCC, decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
             case "warforgeruins" -> {
                 message = player.getRepresentation() + " please resolve War Forge Ruins:\n-# You have ";
                 message += ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID);
-                Button ruinsInf = Buttons.green("ruins_" + planetID + "_2inf", "Remove 1 infantry or have mech on planet to place 2 infantry on " + planetName);
-                Button ruinsMech = Buttons.green("ruins_" + planetID + "_mech", "Remove 1 infantry or have mech on planet to place mech on " + planetName);
+                Button ruinsInf = Buttons.green("ruins_" + planetID + "_2inf", "Remove 1 Infantry or Have a Mech on " + planetName + " to Place 2 Infantry Here");
+                Button ruinsMech = Buttons.green("ruins_" + planetID + "_mech", "Remove 1 Infantry or Have a Mech on " + planetName + " to Place Mech Here");
                 List<Button> buttons = List.of(ruinsInf, ruinsMech, decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
@@ -705,11 +705,11 @@ public class ExploreService {
                         LeaderModel leaderM = Mapper.getLeader(leader.getId());
                         buttons.add(Buttons.green(
                             "seedySpace_" + leader.getId() + "_" + planetID,
-                            "Remove 1 infantry or have mech on planet to refresh " + leaderM.getName(),
+                            "Remove 1 Infantry or Have a Mech on " + planetName + " to Refresh " + leaderM.getName(),
                             leaderM.getLeaderEmoji()));
                     }
                 }
-                buttons.add(Buttons.blue("seedySpace_AC_" + planetID, "Draw 1 Action Card by Removing 1 Infantry or Having Mech on" + planetName));
+                buttons.add(Buttons.blue("seedySpace_AC_" + planetID, "Remove 1 Infantry or Have a Mech on " + planetName + " to Draw 1 Action Card"));
                 buttons.add(decline);
 
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);

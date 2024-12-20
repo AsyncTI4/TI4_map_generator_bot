@@ -29,7 +29,7 @@ public class RemoveAllCC extends GameStateCommand {
 
     @Override
     public String getDescription() {
-        return "Remove all CCs.";
+        return "Remove all command tokens";
     }
 
     @Override

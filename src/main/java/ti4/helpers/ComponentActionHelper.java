@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -233,19 +234,19 @@ public class ComponentActionHelper {
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("fabrication") && !p1.getFragments().isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 CC", FactionEmojis.Naaz);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 Command Token", FactionEmojis.Naaz);
             compButtons.add(abilityButton);
         }
 
         // Other "abilities"
         if (p1.getUnitsOwned().contains("muaat_flagship") && p1.getStrategicCC() > 0
             && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Spend 1 strategy CC for 1 cruiser with The Inferno (Muaat Flagship)", FactionEmojis.Muaat);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Spend 1 command token from your strategy pool for 1 cruiser with _The Inferno_ (Muaat Flagship)", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
         if ((p1.getUnitsOwned().contains("sigma_muaat_flagship_1") || p1.getUnitsOwned().contains("sigma_muaat_flagship_1")) && p1.getStrategicCC() > 0
             && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFSsigma", "Spend 1 strategy token for The Inferno (Muaat Flagship)", FactionEmojis.Muaat);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFSsigma", "Spend 1 strategy token for _The Inferno_ (Muaat Flagship)", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
 
@@ -422,7 +423,7 @@ public class ComponentActionHelper {
                             "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    Button transact2 = Buttons.green(finChecker + "gain_CC", "Gain CC");
+                    Button transact2 = Buttons.green(finChecker + "gain_CC", "Gain 1 Command Token");
                     purgeFragButtons.add(transact2);
                     Button transact3 = Buttons.red(finChecker + "finishComponentAction",
                         "Done Resolving Fabrication");
@@ -434,7 +435,7 @@ public class ComponentActionHelper {
                         + " Click a button below to discard an Action Card";
                     List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
-                        p1.getRepresentation() + " is resolving their Stall Tactics ability");
+                        p1.getRepresentation() + " is doing nothing with their **Stall Tactics** ability.");
                     if (!acButtons.isEmpty()) {
                         List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg,
                             acButtons);
@@ -449,13 +450,13 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("meditation".equalsIgnoreCase(buttonID)) {
                     if (p1.getStrategicCC() > 0) {
-                        String successMessage = p1.getFactionEmoji() + " Reduced strategy pool CCs by 1 ("
+                        String successMessage = p1.getRepresentationUnfogged() + " spent 1 command token from their strategy pool ("
                             + (p1.getStrategicCC()) + "->" + (p1.getStrategicCC() - 1) + ")";
                         p1.setStrategicCC(p1.getStrategicCC() - 1);
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, FactionEmojis.kolume + "Meditation");
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     } else {
-                        String successMessage = p1.getFactionEmoji() + " Exhausted Scepter";
+                        String successMessage = p1.getRepresentationUnfogged() + " exhausted the _" + RelicHelper.sillySpelling() + "_.";
                         p1.addExhaustedRelic("emelpar");
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     }
@@ -520,10 +521,12 @@ public class ComponentActionHelper {
             case "generic" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Doing unspecified component action.");
             case "absolMOW" -> {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji() + " is exhausting the " + CardEmojis.Agenda + "Minister of War" + SourceEmojis.Absol + " and spending a strategy CC to remove 1 CC from the board");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji()
+                    + " is exhausting the _Minister of War_ agenda and spending a command token from their strategy pool to remove 1 command token from the game board.");
                 if (p1.getStrategicCC() > 0) {
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji() + " strategy CC went from " + (p1.getStrategicCC() + 1) + " to " + p1.getStrategicCC());
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji()
+                        + ", you previously had " + (p1.getStrategicCC() + 1) + " command tokens in your strategy pool and now you have " + p1.getStrategicCC() + ".");
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event);
                 }
                 List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(p1, game, event, "absol");

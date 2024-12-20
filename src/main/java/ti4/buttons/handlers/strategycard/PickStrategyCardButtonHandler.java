@@ -60,12 +60,14 @@ class PickStrategyCardButtonHandler {
         }
         if (game.getStoredValue("deflectedSC").equalsIgnoreCase(num)) {
             if (player.getStrategicCC() < 1) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " You cant pick this SC because it has the deflection ability on it and you have no strat CC to spend");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+                    + ", you can't pick this SC because it has been targeted by _Deflection_, and you don't have a command token in your strategy pool to spend.");
                 return;
             } else {
                 player.setStrategicCC(player.getStrategicCC() - 1);
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " spent 1 strat CC due to deflection");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+                    + " spent 1 command token from their strategy pool to pick this strategy card due to _Deflection_.");
             }
         }
 

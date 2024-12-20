@@ -24,7 +24,7 @@ public class AddCCCommand extends AddRemoveTokenCommand {
                 usedTactics = true;
                 String value = option.getAsString().toLowerCase();
                 switch (value) {
-                    case "t/tactics", "t", "tactics", "tac", "tact" -> RemoveCommandCounterService.fromTacticsPool(event, color, tile, game);
+                    case "t/tactic", "t", "tactic", "tac", "tact" -> RemoveCommandCounterService.fromTacticsPool(event, color, tile, game);
                 }
             }
             CommandCounterHelper.addCC(event, color, tile);
@@ -34,7 +34,7 @@ public class AddCCCommand extends AddRemoveTokenCommand {
 
     @Override
     public String getDescription() {
-        return "Add CCs to tile/system";
+        return "Add command tokens to tile/system";
     }
 
     @Override
@@ -48,7 +48,7 @@ public class AddCCCommand extends AddRemoveTokenCommand {
                 new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                         .setRequired(true)
                         .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.CC_USE, "Type tactics or t, retreat, reinforcements or r")
+                new OptionData(OptionType.STRING, Constants.CC_USE, "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements")
                         .setAutoComplete(true),
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
                         .setAutoComplete(true));

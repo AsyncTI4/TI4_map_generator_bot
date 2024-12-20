@@ -100,14 +100,14 @@ public class OtherHeroButtonHandler {
                 "vaylerianhero");
             if (!buttons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    "Use buttons to remove a token from the board", buttons);
+                    "Use buttons to remove a command token from the game board.", buttons);
             }
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " may gain 1 CC");
+            player.getFactionEmoji() + " may gain 1 command token.");
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-        String message2 = player.getRepresentationUnfogged() + "! Your current CCs are " + player.getCCRepresentation()
-            + ". Use buttons to gain CCs";
+        String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
+            + ". Use buttons to gain 1 command token.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         ButtonHelper.deleteTheOneButton(event);
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());

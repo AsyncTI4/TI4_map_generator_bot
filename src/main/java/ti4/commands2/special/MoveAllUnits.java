@@ -24,7 +24,7 @@ class MoveAllUnits extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to move from").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to move to").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type t or tactics to add a CC from tactics, r or retreat to add a CC without taking it from tactics").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements").setAutoComplete(true));
     }
 
     @Override
@@ -62,7 +62,7 @@ class MoveAllUnits extends GameStateSubcommand {
         OptionMapping optionCC = event.getOption(Constants.CC_USE);
         if (optionCC != null) {
           String value = optionCC.getAsString().toLowerCase();
-            if ("t".equals(value) || "tactics".equals(value) || "t/tactics".equals(value)) {
+            if ("t".equals(value) || "tactic".equals(value) || "t/tactic".equals(value)) {
                 RemoveCommandCounterService.fromTacticsPool(event, player.getColor(), tileTo, game);
             }
             if (!"no".equals(value)) {

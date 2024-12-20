@@ -345,7 +345,7 @@ public class ActionCardHelper {
             empyButtons.add(refuse);
             MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(),
                 empy.getRepresentationUnfogged()
-                    + "You have one or more mechs adjacent to some units of the player who played _" + actionCardTitle + "_. Use buttons to decide whether to cancel the action card.",
+                    + "You have one or more mechs adjacent to some units of the player who played _" + actionCardTitle + "_. Use buttons to decide whether to Sabo this action card.",
                 empyButtons);
         }
         String instinctTrainingID = "it";
@@ -354,7 +354,9 @@ public class ActionCardHelper {
                 List<Button> xxchaButtons = new ArrayList<>();
                 xxchaButtons.add(Buttons.gray("sabotage_xxcha_" + actionCardTitle, "Cancel " + actionCardTitle + " With Instinct Training", FactionEmojis.Xxcha));
                 xxchaButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), player2.getRepresentationUnfogged() + "You have Instinct Training unexhausted and a CC available. Use Buttons to decide whether to cancel", xxchaButtons);
+                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), player2.getRepresentationUnfogged()
+                    + ", you have _Instinct Training_ readied and a command token available in your strategy pool."
+                    + " Use buttons to decide whether to Sabo _" + actionCardTitle + "_.", xxchaButtons);
             }
 
         }

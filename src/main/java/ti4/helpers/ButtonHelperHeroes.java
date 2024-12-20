@@ -346,11 +346,11 @@ public class ButtonHelperHeroes {
         }
         int size = revealedRelics.size();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " may gain " + size + " CC" + (size == 1 ? "" : "s") + ".");
+            player.getFactionEmoji() + " may gain " + size + " command token" + (size == 1 ? "" : "s") + ".");
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         String trueIdentity = player.getRepresentationUnfogged();
-        String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
-            + ". Use buttons to gain CCs";
+        String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
+            + ". Use buttons to gain command tokens.";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         MessageHelper.sendMessageToChannelWithButtons(
             player.getCorrectChannel(), message2, buttons);
@@ -1865,8 +1865,14 @@ public class ButtonHelperHeroes {
     public static void resolveWinnuHeroSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Integer sc = Integer.parseInt(buttonID.split("_")[1]);
         PlayStrategyCardService.playSC(event, sc, game, game.getMainGameChannel(), player, true);
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing()
-            + " reminder that the Winnu player has to allow you to follow this, and that when you do follow, you must pay strategy CCs like normal. ");
+        if ("leadership".equalsIgnoreCase(Helper.getSCName(sc, game))) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing()
+                + " reminder that the you must get the Winnu player's permission before you follow this.");
+        } else {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing()
+                + " reminder that the you must get the Winnu player's permission before you follow this,"
+                + " and that if you do follow, you must spend command tokens from your strategy pool like normal.");
+        }
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1955,7 +1961,7 @@ public class ButtonHelperHeroes {
     public static List<Button> getNRAHeroButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
         if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
-            scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain CCs"));
+            scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
             //scButtons.add(Buttons.red("leadershipExhaust", "Exhaust Planets"));
         }
         if (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2)) {

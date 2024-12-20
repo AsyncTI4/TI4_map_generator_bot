@@ -17,6 +17,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -392,11 +393,11 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveSideProject(Player player, Game game, ButtonInteractionEvent event) {
         String successMessage;
         if (player.getStrategicCC() > 0) {
-            successMessage = player.getFactionEmoji() + " Reduced strategy pool CCs by 1 (" + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ")";
+            successMessage = player.getFactionEmoji() + ", 1 command token has been removed from your strategy pool (" + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ").";
             player.setStrategicCC(player.getStrategicCC() - 1);
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, CardEmojis.ActionCard + "Side Project");
         } else {
-            successMessage = player.getFactionEmoji() + " Exhausted Scepter of Emelpar";
+            successMessage = player.getFactionEmoji() + " exhausted the _" + RelicHelper.sillySpelling() + "_.";
             player.addExhaustedRelic("emelpar");
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);

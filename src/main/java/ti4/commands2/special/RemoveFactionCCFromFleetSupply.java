@@ -10,7 +10,7 @@ import ti4.map.Player;
 class RemoveFactionCCFromFleetSupply extends AddRemoveFactionCCToFromFleet {
 
     public RemoveFactionCCFromFleetSupply() {
-        super(Constants.REMOVE_CC_FROM_FS, "Remove Faction CC from Fleet Supply");
+        super(Constants.REMOVE_CC_FROM_FS, "Remove faction command token from fleet pool");
     }
 
     @Override

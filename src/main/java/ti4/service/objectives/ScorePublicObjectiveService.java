@@ -147,13 +147,14 @@ public class ScorePublicObjectiveService {
         if (poName.contains("Lead From the Front")) {
             int currentStrat = player.getStrategicCC();
             int currentTact = player.getTacticalCC();
-            if (currentStrat + currentTact > 2) {
-                if (currentStrat > 2) {
+            if (currentStrat + currentTact >= 3) {
+                if (currentStrat >= 3) {
                     for (int x = 0; x < 3; x++) {
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public1 + " Lead from the Front");
                     }
                     player.setStrategicCC(currentStrat - 3);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Automatically deducted 3 strategy CCs (" + currentStrat + "->" + player.getStrategicCC() + ")");
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                        + ", 3 command tokens have automatically been deducted from your strategy pool (" + currentStrat + "->" + player.getStrategicCC() + ").");
                 } else {
                     String currentCC = player.getCCRepresentation();
                     int subtract = 3 - currentStrat;
@@ -162,23 +163,35 @@ public class ScorePublicObjectiveService {
                     }
                     player.setStrategicCC(0);
                     player.setTacticalCC(currentTact - subtract);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Automatically deducted 3 strategy/tactic CCs (" + currentCC + "->" + player.getCCRepresentation() + ")");
+                    if (currentStrat == 0)
+                    {
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                            + ", 3 command tokens have automatically been deducted from your tactic pool ("
+                            + currentCC + "->" + player.getCCRepresentation() + ")");
+                    }
+                    else
+                    {
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                            + ", " + subtract + " and " + currentStrat + " command tokens (3 total) have automatically been deducted from your tactic and/or strategy pools respectively ("
+                            + currentCC + "->" + player.getCCRepresentation() + ")");
+                    }
                 }
             } else {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Did not deduct 3 CCs because you didn't have that");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                    + ", you do not have 3 command tokens in your tactic and/or strategy pools. No command tokens have been removed.");
             }
         }
         if (poName.contains("Galvanize the People")) {
             int currentStrat = player.getStrategicCC();
             int currentTact = player.getTacticalCC();
-            if (currentStrat + currentTact > 5) {
-                if (currentStrat > 5) {
+            if (currentStrat + currentTact >= 6) {
+                if (currentStrat >= 6) {
                     for (int x = 0; x < 6; x++) {
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public2 + " Galvanize the People");
                     }
                     player.setStrategicCC(currentStrat - 6);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Automatically deducted 6 strategy CCs (" + currentStrat + "->" + player.getStrategicCC() + ")");
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() 
+                        + ", 6 command tokens have automatically been deducted from your strategy pool (" + currentStrat + "->" + player.getStrategicCC() + ")");
                 } else {
                     String currentCC = player.getCCRepresentation();
                     int subtract = 6 - currentStrat;
@@ -187,11 +200,22 @@ public class ScorePublicObjectiveService {
                     }
                     player.setStrategicCC(0);
                     player.setTacticalCC(currentTact - subtract);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Automatically deducted 6 strategy/tactic CCs (" + currentCC + "->" + player.getCCRepresentation() + ")");
+                    if (currentStrat == 0)
+                    {
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                            + ", 6 command tokens have automatically been deducted from your tactic pool ("
+                            + currentCC + "->" + player.getCCRepresentation() + ")");
+                    }
+                    else
+                    {
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                            + ", " + subtract + " and " + currentStrat + " command tokens (6 total) have automatically been deducted from your tactic and/or strategy pools respectively ("
+                            + currentCC + "->" + player.getCCRepresentation() + ")");
+                    }
                 }
             } else {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Did not deduct 6 CCs because you didn't have that");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                    + ", you do not have 6 command tokens in your tactic and/or strategy pools. No command tokens have been removed.");
             }
         }
     }

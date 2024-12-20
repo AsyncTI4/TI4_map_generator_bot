@@ -95,7 +95,7 @@ public class FastScFollowCron {
             sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
         }
         sb.append("You currently have ").append(player.getStrategicCC())
-            .append(" CC in your strategy pool.");
+            .append(" command tokens in your strategy pool.");
         if (!player.hasFollowedSC(sc)) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 sb.toString());

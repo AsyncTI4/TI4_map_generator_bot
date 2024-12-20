@@ -990,10 +990,13 @@ public class ButtonHelper {
                     }
                     numberOfAbilities++;
                 } else {
-                    Button gainTG = Buttons.green(fincheckerForNonActive + "mahactMechHit_" + activeSystem.getPosition() + "_" + player.getColor(), "Return " + player.getColor() + " CC and end their turn");
+                    Button gainTG = Buttons.green(fincheckerForNonActive + "mahactMechHit_" + activeSystem.getPosition() + "_" + player.getColor(),
+                        "Return " + player.getColor() + " Token and End Their Turn");
                     Button decline = Buttons.red(fincheckerForNonActive + "deleteButtons", "Decline To Use Mech");
                     List<Button> buttons = List.of(gainTG, decline);
-                    MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCorrectChannel(), ident + " use buttons to resolve Mahact Starlancer mech ability.", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCorrectChannel(), ident
+                        + ", you may use the buttons to remove the " + player.getColor() 
+                        + " command token from your fleet pool to end their turn by using the Starlancer in the active system.", buttons);
                 }
             }
             if (nonActivePlayer.hasUnit("sigma_naalu_mech") && nonActivePlayer.hasMechInSystem(activeSystem)
@@ -1908,7 +1911,7 @@ public class ButtonHelper {
         Tile tile = game.getTileByPosition(pos);
         String tileRep = tile.getRepresentationForButtons(game, player);
         String ident = player.getFactionEmojiOrColor();
-        String msg = ident + " removed CC from " + tileRep;
+        String msg = ident + " removed command token from " + tileRep + ".";
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -1965,7 +1968,7 @@ public class ButtonHelper {
 
         MessageHelper.sendMessageToChannel(mahact.getCorrectChannel(),
             mahact.getRepresentationUnfogged() + " the " + target.getColor()
-                + " CC has been removed from your fleet pool");
+                + " command token has been removed from your fleet pool");
         ButtonHelper.checkFleetInEveryTile(mahact, game, event);
         List<Button> conclusionButtons = new ArrayList<>();
         Button endTurn = Buttons.red(target.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
@@ -1976,7 +1979,7 @@ public class ButtonHelper {
         }
         List<Button> buttons = getGainCCButtons(target);
         String trueIdentity = target.getRepresentationUnfogged();
-        String message2 = trueIdentity + "! Your current command tokens are " + target.getCCRepresentation()
+        String message2 = trueIdentity + ", your current command tokens are " + target.getCCRepresentation()
             + ". Use buttons to gain command tokens.";
         game.setStoredValue("originalCCsFor" + target.getFaction(), target.getCCRepresentation());
         MessageHelper.sendMessageToChannelWithButtons(target.getCorrectChannel(), message2, buttons);
@@ -2658,9 +2661,13 @@ public class ButtonHelper {
         }
         String message = player.getRepresentationUnfogged();
         if (fleetSupplyViolated) {
-            message += " You are violating fleet supply in tile " + tile.getRepresentation()
-                + ". Specifically, you have " + fleetCap / 2
-                + " fleet supply in this system, and you currently are filling "
+            message += " You are violating fleet pool limits in tile " + tile.getRepresentation()
+                + ". Specifically, you have " + (player.getFleetCC() + player.getMahactCC().size())
+                + " command tokens in your fleet pool,"
+                + (fleetCap / 2 - player.getFleetCC() - player.getMahactCC().size() > 0 ?
+                    "plus the ability to hold" + (fleetCap / 2 - player.getFleetCC() - player.getMahactCC().size())
+                    + "additional ships, for a total of " + (fleetCap / 2) : "")
+                + " and you currently are filling "
                 + (numFighter2sFleet + numOfCapitalShips + 1) / 2
                 + " of that. ";
         }

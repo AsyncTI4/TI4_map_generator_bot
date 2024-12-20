@@ -23,7 +23,7 @@ public class RemoveCommandCounterService {
         }
         if (game.isFowMode()) {
             String colorMention = ColorEmojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a token in the system");
+            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a command token in the system.");
         }
         tile.removeCC(ccID);
     }
@@ -33,7 +33,7 @@ public class RemoveCommandCounterService {
             if (color.equals(player.getColor())) {
                 int cc = player.getTacticalCC();
                 if (cc == 0) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have CC in Tactics");
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have a command token in your tactic pool.");
                     break;
                 } else if (!CommandCounterHelper.hasCC(event, color, tile)) {
                     cc -= 1;

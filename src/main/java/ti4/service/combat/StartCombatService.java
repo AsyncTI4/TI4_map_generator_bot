@@ -396,16 +396,16 @@ public class StartCombatService {
                 && !player.getMahactCC().contains(otherPlayer.getColor())) {
                 buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + player.getFaction() + "_";
-                buttons.add(Buttons.gray(finChecker + "mahactStealCC_" + otherPlayer.getColor(), "Add Opponent CC to Fleet", FactionEmojis.Mahact));
+                buttons.add(Buttons.gray(finChecker + "mahactStealCC_" + otherPlayer.getColor(), "Add Opponent Command Token to Fleet Pool", FactionEmojis.Mahact));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you win this combat, you may add the opponents CC to your fleet pool.",
+                    + " this is a reminder that if you win this combat, you may add the opponents command token to your fleet pool.",
                     buttons);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray("exhaustTech_dskortg_" + tile.getPosition(), "Tempest Drive", FactionEmojis.kortali));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you win the combat, you may use this button to remove a CC from the system.",
+                    + " this is a reminder that if you win the combat, you may use this button to remove a command token from the system.",
                     buttons);
             }
             if (player.hasAbility("technological_singularity")) {
