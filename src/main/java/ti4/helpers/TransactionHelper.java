@@ -6,12 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -378,7 +379,7 @@ public class TransactionHelper {
         "_Nullam Rem Natam_",
         "A Jubba Cloak");
 
-        public static String getNothingMessage() {
+    public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
             return "The joy of sharing a one in a million empty transaction offer message";
         }
@@ -664,7 +665,7 @@ public class TransactionHelper {
             + "\n## Click something else that you wish to __request from__ " + p1.getRepresentation(false, false);
         if (p1 == player) {
             message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
-                + "\n## Click something else that you wish to __offer to__ " + p1.getRepresentation(false, false);
+                + "\n## Click something else that you wish to __offer to__ " + p2.getRepresentation(false, false);
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
