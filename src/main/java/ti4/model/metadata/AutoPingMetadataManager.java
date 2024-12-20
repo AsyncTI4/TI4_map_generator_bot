@@ -53,7 +53,7 @@ public class AutoPingMetadataManager {
             return;
         }
 
-        autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount, false));
+        autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount, autoPing.quickPing));
 
         persistFile(autoPings);
     }
@@ -68,7 +68,7 @@ public class AutoPingMetadataManager {
         if (autoPing == null) {
             autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), 0, true));
         } else {
-            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount + 1, true));
+            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount, true));
         }
 
         persistFile(autoPings);

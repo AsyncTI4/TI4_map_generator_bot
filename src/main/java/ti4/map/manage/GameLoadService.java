@@ -1,7 +1,6 @@
 package ti4.map.manage;
 
-import static ti4.map.manage.GamePersistenceKeys.*;
-
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -25,16 +24,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nullable;
-
-import org.jetbrains.annotations.NotNull;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -53,6 +48,27 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
+
+import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
+import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
+import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
+import static ti4.map.manage.GamePersistenceKeys.ENDPLAYERINFO;
+import static ti4.map.manage.GamePersistenceKeys.ENDTILE;
+import static ti4.map.manage.GamePersistenceKeys.ENDTOKENS;
+import static ti4.map.manage.GamePersistenceKeys.ENDUNITDAMAGE;
+import static ti4.map.manage.GamePersistenceKeys.ENDUNITHOLDER;
+import static ti4.map.manage.GamePersistenceKeys.ENDUNITS;
+import static ti4.map.manage.GamePersistenceKeys.GAMEINFO;
+import static ti4.map.manage.GamePersistenceKeys.MAPINFO;
+import static ti4.map.manage.GamePersistenceKeys.PLANET_ENDTOKENS;
+import static ti4.map.manage.GamePersistenceKeys.PLANET_TOKENS;
+import static ti4.map.manage.GamePersistenceKeys.PLAYER;
+import static ti4.map.manage.GamePersistenceKeys.PLAYERINFO;
+import static ti4.map.manage.GamePersistenceKeys.TILE;
+import static ti4.map.manage.GamePersistenceKeys.TOKENS;
+import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
+import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
+import static ti4.map.manage.GamePersistenceKeys.UNITS;
 
 @UtilityClass
 class GameLoadService {
@@ -1365,7 +1381,7 @@ class GameLoadService {
 
         while (matcher.find()) {
             String po = matcher.group(1);
-            List<String> playerIDs = Arrays.asList(matcher.group(2).split(","));
+            List<String> playerIDs = new ArrayList<>(Arrays.asList(matcher.group(2).split(",")));
             peekedPublicObjectives.put(po, playerIDs);
         }
 

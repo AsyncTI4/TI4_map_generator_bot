@@ -836,7 +836,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         int tgCount = scTradeGoods.get(scNum);
         game.setScTradeGood(scNum, (tgCount + 1));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "Added 1 trade good to " + Helper.getSCName(scNum, game) + ". There "+ (tgCount == 0 ? "is" : "are") + " now " 
+            "Added 1 trade good to " + Helper.getSCName(scNum, game) + ". There "+ (tgCount == 0 ? "is" : "are") + " now "
                 + (tgCount + 1) + " trade good"+ (tgCount == 0 ? "" : "s") + " on it.");
     }
 
@@ -2249,7 +2249,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String playerRep = player.getFactionEmoji();
         int commod = player.getCommodities();
         String message = playerRep + " exhausted Mallice ability to convert their " + commod
-            +  " commodit" + (commod == 1 ? "y" : "ies") + " to " 
+            +  " commodit" + (commod == 1 ? "y" : "ies") + " to "
             + (commod == 1 ? "a trade good" : commod + " trade goods") + " (trade goods: "
             + player.getTg() + "->" + (player.getTg() + commod) + ").";
         player.setTg(player.getTg() + commod);

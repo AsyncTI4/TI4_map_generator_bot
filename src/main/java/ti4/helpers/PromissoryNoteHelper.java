@@ -371,7 +371,7 @@ public class PromissoryNoteHelper {
                 String reducedMsg2 = player.getRepresentationUnfogged() + " played the _Trade Agreement_ belonging to "
                     + owner.getRepresentationUnfogged() + ", taking their " + comms + " commodit" + (comms == 1 ? "y" : "ies")
                     + " and so gaining " + comms + " trade good" + (comms == 1 ? "" : "s") + ". As such, they previous had "
-                    + oldTGs + " trade good" + (oldTGs == 1 ? "" : "s") + " and now have " + (oldTGs + comms) + " trade good" 
+                    + oldTGs + " trade good" + (oldTGs == 1 ? "" : "s") + " and now have " + (oldTGs + comms) + " trade good"
                     + (oldTGs + comms == 1 ? "" : "s") + ". Please follow up with the other player if this number seems off.";
                 player.setTg(oldTGs + comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, owner, player, owner.getCommoditiesTotal());
