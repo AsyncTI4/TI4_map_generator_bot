@@ -146,13 +146,13 @@ class AgendaResolveButtonHandler {
                         }
 
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            game.getPing() + " Reduced people's fleets to 4 if they had more than that");
+                            game.getPing() + ", all player that had more than 4 command tokens in their fleet pools have had the excess removed.");
                     } else {
                         for (Player playerB : game.getRealPlayers()) {
                             playerB.setFleetCC(playerB.getFleetCC() + 1);
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            game.getPing() + " Gave everyone 1 extra fleet CC");
+                            game.getPing() + ", all players have had 1 command token added to their respective fleet pools.");
 
                     }
                 }
@@ -183,7 +183,7 @@ class AgendaResolveButtonHandler {
                             }
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Sent buttons for each person to remove 1 PDS");
+                            "Sent buttons for each player to remove 1 PDS.");
                     }
                 }
                 if ("wormhole_recon".equalsIgnoreCase(agID)) {
@@ -196,7 +196,7 @@ class AgendaResolveButtonHandler {
                             }
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Added CCs to all tiles with wormholes and players ships");
+                            "Each system with a wormhole and a player's ships have had 1 of that player's command tokens placed in that system.");
                     }
                 }
                 if ("travel_ban".equalsIgnoreCase(agID)) {
@@ -237,7 +237,7 @@ class AgendaResolveButtonHandler {
                             }
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Added player's CCs to their HS");
+                            "A command token from each player has been placed in their home system.");
                     }
                 }
                 if ("conventions".equalsIgnoreCase(agID)) {
@@ -357,7 +357,7 @@ class AgendaResolveButtonHandler {
                     player2.setStrategicCC(2);
                     player2.setFleetCC(3);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "Set " + player2.getFactionEmojiOrColor() + " CCs to 3/3/2");
+                        "Set " + player2.getFactionEmojiOrColor() + " command sheet to 3/3/2.");
                     ButtonHelper.checkFleetInEveryTile(player2, game, event);
                 }
                 if ("minister_antiquities".equalsIgnoreCase(agID)) {
@@ -550,23 +550,23 @@ class AgendaResolveButtonHandler {
                     for (Player player : game.getRealPlayers()) {
                         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
                         Button loseTactic = Buttons.red(finsFactionCheckerPrefix + "decrease_tactic_cc",
-                            "Lose 1 Tactic CC");
+                            "Lose 1 Tactic Token");
                         Button loseFleet = Buttons.red(finsFactionCheckerPrefix + "decrease_fleet_cc",
-                            "Lose 1 Fleet CC");
+                            "Lose 1 Fleet Token");
                         Button loseStrat = Buttons.red(finsFactionCheckerPrefix + "decrease_strategy_cc",
-                            "Lose 1 Strategy CC");
+                            "Lose 1 Strategy Token");
                         Button DoneGainingCC = Buttons.red(finsFactionCheckerPrefix + "deleteButtons",
-                            "Done Losing CCs");
+                            "Done Losing Command Tokens");
                         List<Button> buttons = List.of(loseTactic, loseFleet, loseStrat, DoneGainingCC);
-                        String message2 = player.getRepresentationUnfogged() + "! Your current CCs are "
-                            + player.getCCRepresentation() + ". Use buttons to lose CCs";
+                        String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
+                            + player.getCCRepresentation() + ". Use buttons to lose command tokens.";
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
                         game.setStoredValue("originalCCsFor" + player.getFaction(),
                             player.getCCRepresentation());
                     }
                 } else {
                     for (Player player : game.getRealPlayers()) {
-                        String message = player.getRepresentation() + " you lose a fleet CC";
+                        String message = player.getRepresentation() + ", you've lost a command token from your fleet pool.";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                         player.setFleetCC(player.getFleetCC() - 1);
                         ButtonHelper.checkFleetInEveryTile(player, game, event);
@@ -632,16 +632,16 @@ class AgendaResolveButtonHandler {
                     for (Player player : players) {
                         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
                         Button loseTactic = Buttons.red(finsFactionCheckerPrefix + "decrease_tactic_cc",
-                            "Lose 1 Tactic CC");
+                            "Lose 1 Tactic Token");
                         Button loseFleet = Buttons.red(finsFactionCheckerPrefix + "decrease_fleet_cc",
-                            "Lose 1 Fleet CC");
+                            "Lose 1 Fleet Token");
                         Button loseStrat = Buttons.red(finsFactionCheckerPrefix + "decrease_strategy_cc",
-                            "Lose 1 Strategy CC");
+                            "Lose 1 Strategy Token");
                         Button DoneGainingCC = Buttons.red(finsFactionCheckerPrefix + "deleteButtons",
-                            "Done Losing CCs");
+                            "Done Losing Command Tokens");
                         List<Button> buttons = List.of(loseTactic, loseFleet, loseStrat, DoneGainingCC);
-                        String message2 = player.getRepresentationUnfogged() + "! Your current CCs are "
-                            + player.getCCRepresentation() + ". Use buttons to lose CCs";
+                        String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
+                            + player.getCCRepresentation() + ". Use buttons to lose command tokens.";
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
                         game.setStoredValue("originalCCsFor" + player.getFaction(),
                             player.getCCRepresentation());
@@ -913,7 +913,8 @@ class AgendaResolveButtonHandler {
                     TextChannel watchParty = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).getFirst();
                     for (Player playerB : comrades) {
                         MessageHelper.sendMessageToChannel(watchParty,
-                            "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate " + maxLoss + " trade goods to the less economically fortunate citizens of the galaxy.");
+                            "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate "
+                            + maxLoss + " trade goods to the less economically fortunate citizens of the galaxy.");
                     }
                     MessageHelper.sendMessageToChannel(watchParty, MiscEmojis.tg(maxLoss));
                 }
@@ -922,7 +923,7 @@ class AgendaResolveButtonHandler {
                 if (!game.isHomebrewSCMode()) {
                     List<Button> scButtons = new ArrayList<>();
                     switch (winner) {
-                        case "1" -> scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain CCs"));
+                        case "1" -> scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
                         case "2" -> scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
                         case "3" -> scButtons.add(Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", CardEmojis.ActionCard));
                         case "4" -> {

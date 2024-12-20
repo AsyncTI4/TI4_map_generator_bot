@@ -30,13 +30,13 @@ public class ExploreHelper {
         }
         if (numMechs > 0 || numInf > 0) {
             if (numMechs > 0) {
-                message = "Planet had a mech. ";
+                message = planetName + " has a mech. ";
             } else {
-                message = "Planet did not have a mech. Removed 1 infantry (" + numInf + "->" + (numInf - 1) + "). ";
+                message = planetName + " does not have a mech, so 1 infantry is being removed (" + numInf + "->" + (numInf - 1) + "). ";
                 tile.removeUnit(planetName, infKey, 1);
             }
         } else {
-            message = "Planet did not have a mech or an infantry. Please try again.";
+            message = planetName + " did not have a mech or an infantry. Please try again.";
         }
         return message;
     }

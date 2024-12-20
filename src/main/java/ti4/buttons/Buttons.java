@@ -20,7 +20,7 @@ public class Buttons {
     public static final Button GET_A_TECH = green("acquireATech", "Get a Technology");
     public static final Button GET_A_UNIT_TECH_WITH_INF = green("acquireAUnitTechWithInf", "Get a Unit Upgrade Technology");
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Technology");
-    public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute CCs");
+    public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute Command Tokens");
     public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
     public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
 

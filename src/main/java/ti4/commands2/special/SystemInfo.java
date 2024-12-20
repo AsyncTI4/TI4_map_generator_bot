@@ -95,7 +95,7 @@ class SystemInfo extends GameStateSubcommand {
                 boolean hasCC = false;
                 for (String cc : unitHolder.getCCList()) {
                     if (!hasCC) {
-                        sb.append("Command Counters: ");
+                        sb.append("Command Tokens: ");
                         hasCC = true;
                     }
                     appendFactionIcon(game, sb, cc, privateGame);

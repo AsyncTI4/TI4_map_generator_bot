@@ -38,7 +38,7 @@ public class AddUnits extends GameStateCommand {
                 .setAutoComplete(true),
             new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri")
                 .setRequired(true),
-            new OptionData(OptionType.STRING, Constants.CC_USE, "Type tactics or t, retreat, reinforcements or r - default is 'no'")
+            new OptionData(OptionType.STRING, Constants.CC_USE, "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements")
                 .setAutoComplete(true),
             new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                 .setAutoComplete(true),

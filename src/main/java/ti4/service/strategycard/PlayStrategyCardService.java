@@ -21,6 +21,7 @@ import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -140,7 +141,7 @@ public class PlayStrategyCardService {
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero));
         if (scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
-            scButtons.add(Buttons.gray("nekroFollowTech", "Get CCs", FactionEmojis.Nekro));
+            scButtons.add(Buttons.gray("nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
         }
 
         if (scModel.usesAutomationForSCID("pok4construction") && !game.isFowMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
@@ -224,7 +225,7 @@ public class PlayStrategyCardService {
         }
 
         if (!scModel.usesAutomationForSCID("pok1leadership")) {
-            Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust Scepter of Emelpar");
+            Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + RelicHelper.sillySpelling());
             for (Player player3 : playersToFollow) {
                 if (player3 == player) {
                     continue;
@@ -235,7 +236,7 @@ public class PlayStrategyCardService {
                 if (player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")) {
                     empNMahButtons.addFirst(emelpar);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
-                        player3.getRepresentationUnfogged() + " You may follow " + Helper.getSCName(scToPlay, game) + " with the Scepter of Emelpar.",
+                        player3.getRepresentationUnfogged() + ", you may follow " + Helper.getSCName(scToPlay, game) + " with the " + RelicHelper.sillySpelling() + ".",
                         empNMahButtons);
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent") && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty() && !winnuHero) {
@@ -269,7 +270,7 @@ public class PlayStrategyCardService {
             graceButtons.add(Buttons.green("resolveGrace_" + scToPlay, "Resolve Grace Ability"));
             graceButtons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " you may resolve Grace with the buttons.",
+                player.getRepresentationUnfogged() + " you may resolve **Grace** with the buttons.",
                 graceButtons);
         }
         if (player.ownsPromissoryNote("acq") && !scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
@@ -306,7 +307,10 @@ public class PlayStrategyCardService {
                 if (p2 == player) {
                     continue;
                 }
-                if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1) && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8)) && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar") && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
+                if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1)
+                        && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8))
+                        && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar")
+                        && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
                     Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                     if (reactionEmoji2 != null) {
                         message.addReaction(reactionEmoji2).queue();
@@ -320,7 +324,7 @@ public class PlayStrategyCardService {
                             String key = "factionsThatAreNotDiscardingSOs";
                             game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
                         }
-                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following SC #" + scToPlay + " because the bot believes you can't follow");
+                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following SC #" + scToPlay + " because the bot believes you can't follow.");
                     }
                 }
             }
@@ -452,14 +456,14 @@ public class PlayStrategyCardService {
     }
 
     private static List<Button> getLeadershipButtons(int sc) {
-        Button leadershipGenerateCCButtons = Buttons.green("leadershipGenerateCCButtons", "Spend & Gain CCs");
+        Button leadershipGenerateCCButtons = Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens");
         //Button exhaust = Buttons.red("leadershipExhaust", "Spend");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(leadershipGenerateCCButtons, noFollowButton);
     }
 
     private static List<Button> getDiplomacyButtons(int sc) {
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button diploSystemButton = Buttons.blue("diploSystem", "Diplo a System");
         Button refreshButton = Buttons.green("diploRefresh2", "Ready 2 Planets");
 
@@ -468,7 +472,7 @@ public class PlayStrategyCardService {
     }
 
     private static List<Button> getPoliticsButtons(int sc) {
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         Button draw2AC = Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", CardEmojis.ActionCard);
         return List.of(followButton, noFollowButton, draw2AC);
@@ -497,7 +501,7 @@ public class PlayStrategyCardService {
      * @return buttons which hit {@link ButtonHelperSCs#construction}
      */
     private static List<Button> getConstructionButtons(int sc) {
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock);
         Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
@@ -506,7 +510,7 @@ public class PlayStrategyCardService {
 
     private static List<Button> getTradeButtons(int sc) {
         // Button tradePrimary = Buttons.green("trade_primary", "Resolve Primary");
-        Button followButton = Buttons.green("sc_trade_follow", "Spend A Strategy CC");
+        Button followButton = Buttons.green("sc_trade_follow", "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         Button refreshAndWash = Buttons.gray("sc_refresh_and_wash", "Replenish and Wash", MiscEmojis.Wash);
         Button refresh = Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm);
@@ -515,21 +519,21 @@ public class PlayStrategyCardService {
 
     private static List<Button> getWarfareButtons(int sc) {
         Button warfarePrimary = Buttons.blue("primaryOfWarfare", "Do Warfare Primary");
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button homeBuild = Buttons.green("warfareBuild", "Build At Home");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(warfarePrimary, followButton, homeBuild, noFollowButton);
     }
 
     private static List<Button> getTechnologyButtons(int sc) {
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         Button getTech = Buttons.green("acquireATechWithSC", "Get a Technology");
         return List.of(followButton, getTech, noFollowButton);
     }
 
     private static List<Button> getImperialButtons(int sc) {
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         Button drawSo = Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective);
         Button scoreImperial = Buttons.gray("score_imperial", "Score Imperial", PlanetEmojis.Mecatol);
@@ -538,14 +542,14 @@ public class PlayStrategyCardService {
     }
 
     private static List<Button> getGenericButtons(int sc) {
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, noFollowButton);
     }
 
     private static List<Button> getIgnisAuroraSC8Buttons(int sc) {
         Button primary = Buttons.blue("ignisAuroraSC8Primary", "[Primary] Gain Relic & Reveal Event");
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button secondary = Buttons.green("ignisAuroraSC8Secondary", "Draw Unknown Relic Fragment", ExploreEmojis.UFrag);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(primary, followButton, secondary, noFollowButton);
@@ -555,7 +559,7 @@ public class PlayStrategyCardService {
      * @return buttons which hit {@link ButtonHelperSCs#construction}
      */
     private static List<Button> getMonumentsConstructionButtons(int sc) {
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock);
         Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
         Button monumentButton = Buttons.red("construction_monument", "Place 1 Monument", UnitEmojis.Monument);

@@ -154,7 +154,7 @@ public class PlayerTechService {
                 if (tile != null) {
                     String tileRep = tile.getRepresentationForButtons(game, player);
                     String ident = player.getFactionEmoji();
-                    String msg = ident + " removed CC from " + tileRep;
+                    String msg = ident + " removed command token from " + tileRep + ".";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
                 }
@@ -162,13 +162,13 @@ public class PlayerTechService {
             case "td", "absol_td" -> // Transit Diodes
                 ButtonHelper.resolveTransitDiodesStep1(game, player);
             case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
-                Button gainCC = Buttons.green(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC");
+                Button gainCC = Buttons.green(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain Command Tokens");
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                    player.getFactionEmojiOrColor() + " use button to gain 1 CC:", List.of(gainCC));
+                    player.getFactionEmojiOrColor() + " use button to gain 1 command token.", List.of(gainCC));
             }
             case "absol_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC"));
+                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain Command Tokens"));
                 if (player.getStrategicCC() > 0) {
                     for (Leader leader : player.getLeaders()) {
                         if (leader.isExhausted() && leader.getId().contains("agent")) {
@@ -186,7 +186,7 @@ public class PlayerTechService {
                     }
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getFactionEmojiOrColor()
-                    + " use button to gain 1 CC or spend 1 strat CC to ready your agent", buttons);
+                    + " use button to gain 1 command token, or spend 1 command token from your strategy pool to ready your agent.", buttons);
             }
             case "aida", "sar", "htp", "absol_aida" -> {
                 if (event instanceof ButtonInteractionEvent buttonEvent) {

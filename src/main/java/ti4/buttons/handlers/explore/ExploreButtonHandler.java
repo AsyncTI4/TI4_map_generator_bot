@@ -64,7 +64,7 @@ class ExploreButtonHandler {
         boolean failed = mechOrInfCheckMessage.contains("Please try again.");
 
         if (!failed) {
-            String message = player.getRepresentation() + " the " + mechOrInfCheckMessage + " Please gain one CC. Your current CCs are " + player.getCCRepresentation();
+            String message = player.getRepresentation() + ", " + mechOrInfCheckMessage + "Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation();
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -89,7 +89,7 @@ class ExploreButtonHandler {
         }
         PlanetService.refreshPlanet(player, planetName);
         planetName = Mapper.getPlanet(planetName) == null ? planetName : Mapper.getPlanet(planetName).getName();
-        message += "Readied " + planetName;
+        message = player.getRepresentation() + ", " + message + "Readied " + planetName + ".";
         ReactionService.addReaction(event, game, player, message);
         ButtonHelper.deleteMessage(event);
     }
@@ -100,7 +100,7 @@ class ExploreButtonHandler {
         String message = ExploreHelper.checkForMechOrRemoveInf(planetName, game, player);
         boolean failed = message.contains("Please try again.");
         if (!failed) {
-            message += "Gained 1 trade good " + player.gainTG(1, true) + ".";
+            message = player.getRepresentation() + ", " + message + "Gained 1 trade good " + player.gainTG(1, true) + ".";
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
         }
         ReactionService.addReaction(event, game, player, message);
@@ -125,10 +125,10 @@ class ExploreButtonHandler {
         }
         if ("mech".equalsIgnoreCase(mech)) {
             AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "mech " + planet);
-            message += "Placed mech on" + Mapper.getPlanet(planet).getName();
+            message = player.getRepresentation() + ", " + message + "Placed mech on" + Mapper.getPlanet(planet).getName();
         } else {
             AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "2 infantry " + planet);
-            message += "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
+            message = player.getRepresentation() + ", " + message + "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
         }
         ReactionService.addReaction(event, game, player, message);
         ButtonHelper.deleteMessage(event);
@@ -148,13 +148,13 @@ class ExploreButtonHandler {
             if (player.hasAbility("scheming")) {
                 game.drawActionCard(player.getUserID());
                 game.drawActionCard(player.getUserID());
-                message = player.getFactionEmoji() + " drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
+                message = player.getRepresentation() + ", " + message + "Drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + " use buttons to discard",
+                    player.getRepresentationUnfogged() + " use buttons to discard.",
                     ActionCardHelper.getDiscardActionCardButtons(player, false));
             } else {
                 game.drawActionCard(player.getUserID());
-                message = player.getFactionEmoji() + " drew 1 action card.";
+                message = player.getRepresentation() + ", " + message + "Drew 1 action card.";
                 ActionCardHelper.sendActionCardInfo(game, player, event);
             }
             CommanderUnlockCheckService.checkPlayer(player, "yssaril");
@@ -164,7 +164,7 @@ class ExploreButtonHandler {
                 return;
             }
             RefreshLeaderService.refreshLeader(player, playerLeader, game);
-            message += " Refreshed " + Mapper.getLeader(acOrAgent).getName();
+            message = player.getRepresentation() + ", " + message + "Readied " + Mapper.getLeader(acOrAgent).getName();
         }
         ReactionService.addReaction(event, game, player, message);
         ButtonHelper.deleteMessage(event);

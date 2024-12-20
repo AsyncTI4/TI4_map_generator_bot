@@ -76,6 +76,6 @@ public class IgnisAuroraHelperTechs {
         };
         String action = "removeCCFromBoard_stellarcorridors";
         List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, action, pred, false);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to remove one of your CCs:", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to remove one of your command tokens.", buttons);
     }
 }
