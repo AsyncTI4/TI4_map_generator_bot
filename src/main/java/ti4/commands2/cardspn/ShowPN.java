@@ -20,7 +20,7 @@ import ti4.message.MessageHelper;
 class ShowPN extends GameStateSubcommand {
 
     public ShowPN() {
-        super(Constants.SHOW_PN, "Show Promissory Note to player", false, true);
+        super(Constants.SHOW_PN, "Show Promissory Note to player", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
