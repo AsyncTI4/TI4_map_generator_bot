@@ -1008,7 +1008,9 @@ public class TransactionHelper {
                 try {
                     pnIndex = Integer.parseInt(amountToTrans);
                 } catch (NumberFormatException e) {
-                    MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "# " + p1.getRepresentation() + " heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
+                    MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "# " + p1.getRepresentation() 
+                        + " heads up, a promissory note failed to send. This is likely due to you not having the promissory note to send."
+                        + " Maybe you already gave it to someone else and forgot?");
                     return;
                 }
                 for (Map.Entry<String, Integer> pn : p1.getPromissoryNotes().entrySet()) {
@@ -1018,7 +1020,7 @@ public class TransactionHelper {
                     }
                 }
                 if (id == null) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that PN, no PN sent");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that promissory note, so no promissory note was sent.");
                     return;
                 }
                 p1.removePromissoryNote(id);
@@ -1046,8 +1048,15 @@ public class TransactionHelper {
                 CardsInfoService.sendVariousAdditionalButtons(game, p1);
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
                 CardsInfoService.sendVariousAdditionalButtons(game, p2);
-                String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-                message2 = p1.getRepresentation() + " sent " + CardEmojis.PN + text + "PN to " + ident2;
+                if (sendSftT || sendAlliance)
+                {
+                    String text = sendSftT ? "**Support for the Throne** " : "**Alliance** ";
+                    message2 = p1.getRepresentation() + " sent " + text + " directly to the play area of " + ident2;
+                }
+                else
+                {
+                    message2 = p1.getRepresentation() + " sent a promissory note to the hand of " + ident2;
+                }
                 Helper.checkEndGame(game, p2);
             }
             case "Frags" -> {

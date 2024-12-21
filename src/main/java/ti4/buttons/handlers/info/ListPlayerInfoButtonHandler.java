@@ -36,7 +36,7 @@ class ListPlayerInfoButtonHandler {
         buttons.add(Buttons.green("offerInfoButtonStep2_relic", "Relic Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_planet", "Planet Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_units", "Special Units"));
-        buttons.add(Buttons.green("offerInfoButtonStep2_pn", "Faction PN"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_pn", "Faction Promissory Note"));
         buttons.add(Buttons.green("offerInfoButtonStep2_tech", "Researched Technologies"));
         buttons.add(Buttons.green("offerInfoButtonStep2_ftech", "Faction Technologies"));
         buttons.add(Buttons.REFRESH_INFO);

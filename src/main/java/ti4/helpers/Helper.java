@@ -491,7 +491,7 @@ public class Helper {
         if (Optional.ofNullable(game.getScSetID()).isPresent() && !"null".equals(game.getScSetID())) {
             return game.getStrategyCardSet().getSCName(sc);
         }
-        return "**SC" + sc + "**";
+        return "SC#" + sc;
     }
 
     public static Integer getSCNumber(String sc) {

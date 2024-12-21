@@ -12,9 +12,9 @@ import ti4.message.MessageHelper;
 class PutDiscardBackIntoDeckEvents extends GameStateSubcommand {
 
     public PutDiscardBackIntoDeckEvents() {
-        super(Constants.PUT_DISCARD_BACK_INTO_DECK, "Put Event back into deck from discard", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHUFFLE_EVENTS, "Enter True to shuffle, otherwise False to put on top (Defualt is True)"));
+        super(Constants.PUT_DISCARD_BACK_INTO_DECK, "Put event back into deck from discard", true, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID, which is found between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHUFFLE_EVENTS, "Enter True to shuffle, otherwise False to put on top (default is True)"));
     }
 
     @Override
@@ -24,14 +24,14 @@ class PutDiscardBackIntoDeckEvents extends GameStateSubcommand {
         boolean success;
         if (shuffleEvents) {
             success = game.shuffleEventBackIntoDeck(event.getOption(Constants.EVENT_ID).getAsInt());
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Event shuffled into deck.");
         } else {
             success = game.putEventBackIntoDeckOnTop(event.getOption(Constants.EVENT_ID).getAsInt());
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Event placed on top of deck.");
         }
 
-        if (success) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Event put back into deck");
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No Event found");
+        if (!success) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No event found.");
         }
     }
 }

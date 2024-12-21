@@ -548,8 +548,8 @@ public class ButtonHelper {
     @ButtonHandler("forceARefresh_")
     public static void forceARefresh(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String msg = player.getFactionEmoji() + " forced " + p2.getFactionEmojiOrColor() + " to refresh.";
-        String msg2 = p2.getRepresentationUnfogged() + " the Trade holder has forced you to refresh.";
+        String msg = player.getFactionEmoji() + " forced " + p2.getFactionEmojiOrColor() + " to replenish your commodities.";
+        String msg2 = p2.getRepresentationUnfogged() + " the **Trade** holder has forced you to replenish your commodities.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         deleteTheOneButton(event);
@@ -589,7 +589,7 @@ public class ButtonHelper {
                 buttons.add(Buttons.green("useTA_" + player.getColor(), "Use Trade Agreement"));
                 buttons.add(Buttons.red("deleteButtons", "Decline to Use Trade Agreement"));
                 String message = p2.getRepresentationUnfogged()
-                    + " a player whose _Trade Agreement_ you hold has refreshed their commodities; would you like to play the _Trade Agreement_?";
+                    + " a player whose _Trade Agreement_ you hold has replenished their commodities; would you like to play the _Trade Agreement_?";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, buttons);
             }
         }
@@ -2911,7 +2911,7 @@ public class ButtonHelper {
 
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation() + ", choose the tile you want to add to the board.", buttons);
+            player.getRepresentation() + ", choose the tile you wish to add to the game board.", buttons);
     }
 
     public static void detTileAdditionStep1(Player player, String newTileID) {
@@ -5675,7 +5675,7 @@ public class ButtonHelper {
                     player.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                         .getRepresentation()
-                        + ", you had infantry II to be revived, but the bot couldn't find planets you own in your home system to place them, so per the rules they now disappear into the ether");
+                        + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether");
 
                 }
             }
@@ -5697,7 +5697,7 @@ public class ButtonHelper {
                         player.setStasisInfantry(0);
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                             .getRepresentation()
-                            + ", you had infantry II to be revived, but the bot couldn't find planets you own in your home system to place them, so per the rules they now disappear into the ether.");
+                            + ", you had infantry II to be revived, but the bot couldn't any planets you control own in your home system to place them on, so per the rules they now disappear into the ether.");
 
                     }
                 }
@@ -6042,7 +6042,7 @@ public class ButtonHelper {
                 if (player.getStrategicCC() > 0) {
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Technology");
                 }
-                String message = ButtonHelperSCs.deductCC(player);
+                String message = ButtonHelperSCs.deductCC(game, player, scNum);
                 ReactionService.addReaction(event, game, player, message);
             }
         }

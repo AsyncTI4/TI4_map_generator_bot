@@ -208,7 +208,7 @@ public class StartPhaseService {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, buttons);
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                "# Sent buttons to refresh 3 planets due to Checks and Balances.");
+                "# Sent buttons to ready 3 planets due to _Checks and Balances_.");
         }
         if (!game.getStoredValue("agendaRevolution").isEmpty()) {
             game.setStoredValue("agendaRevolution", "");
@@ -271,7 +271,7 @@ public class StartPhaseService {
         }
         for (Player player2 : game.getRealPlayers()) {
             if (player2.getActionCards() != null && player2.getActionCards().containsKey("summit")) {
-                MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentationUnfogged() + "Reminder this is the window to play Summit.");
+                MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentationUnfogged() + "Reminder this is the window to play _Summit_.");
             }
             for (String pn : player2.getPromissoryNotes().keySet()) {
                 if (!player2.ownsPromissoryNote("scepter") && "scepter".equalsIgnoreCase(pn)) {
@@ -281,16 +281,16 @@ public class StartPhaseService {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(transact);
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    String cyberMessage = player2.getRepresentationUnfogged() + " reminder this is the window to play Mahact PN if you want (button should work)";
+                    String cyberMessage = player2.getRepresentationUnfogged() + ", reminder this is the window to play _Scepter of Dominion_ if you want (button should work).";
                     MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), cyberMessage, buttons);
                     if (!game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "You should all pause for a potential mahact PN play here if you think it relevant");
+                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "You should all pause for a potential _Scepter of Dominion_ play here if you think it relevant.");
                     }
                 }
             }
         }
         if (game.getTile("SIG02") != null && !game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Please destroy all units in the pulsar.");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Please destroy all units in the Pulsar.");
         }
         if ("action_deck_2".equals(game.getAcDeckID()) && game.getRound() > 1) {
             handleStartOfStrategyForAcd2(game);
@@ -382,7 +382,8 @@ public class StartPhaseService {
                 List<Button> playerButtons = new ArrayList<>();
                 playerButtons.add(Buttons.green("resolveTwilightMirror", "Purge Twilight Mirror", ExploreEmojis.Relic));
                 playerButtons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You may use these buttons to resolve Twilight Mirror.", playerButtons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation()
+                    + " You may use these buttons to resolve _Twilight Mirror_.", playerButtons);
             }
             if (player.getRelics() != null && player.hasRelic("emphidia")) {
                 for (String pl : player.getPlanets()) {
@@ -392,23 +393,25 @@ public class StartPhaseService {
                     }
                     UnitHolder unitHolder = tile.getUnitHolders().get(pl);
                     if (unitHolder != null && unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
-                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to purge Crown of Emphidia if you want to.");
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You may use these buttons to resolve Crown of Emphidia.", ButtonHelper.getCrownButtons());
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
+                            + "Reminder this is the window to purge the _Crown of Emphidia_ if you want to.");
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation()
+                            + " You may use these buttons to resolve the _Crown of Emphidia_.", ButtonHelper.getCrownButtons());
                     }
                 }
             }
 
             if (player.getActionCards() != null && player.getActionCards().containsKey("stability")) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to play Political Stability.");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to play _Political Stability_.");
             }
 
             if (player.getActionCards() != null && player.getActionCards().containsKey("abs") && game.isCustodiansScored()) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to play Ancient Burial Sites.");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to play _Ancient Burial Sites_.");
             }
 
             for (String pn : player.getPromissoryNotes().keySet()) {
                 if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
-                    String cyberMessage = "# " + player.getRepresentationUnfogged() + " reminder to use cybernetic enhancements!";
+                    String cyberMessage = "# " + player.getRepresentationUnfogged() + " reminder to use _Cybernetic Enhancements_.";
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
                 }
             }
@@ -427,10 +430,12 @@ public class StartPhaseService {
         Button passOnAbilities;
         if (custodiansTaken) {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Agenda");
-            message2 = message2 + "This is the moment when you should resolve: \n- Political Stability \n- Ancient Burial Sites\n- Maw of Worlds \n- The Oracle, the Naalu hero\n- Crown of Emphidia";
+            message2 = message2 + "This is the moment when you should resolve: \n- _Political Stability_ \n- _Ancient Burial Sites_ \n- _Maw of Worlds_ \n- The Oracle, the Naalu hero\n- The _Crown of Emphidia_\n"
+                + "Please click the \"Ready For Agenda\" button once you are done resolving these or if you decline to do so.";
         } else {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Strategy Phase");
-            message2 = message2 + "Ready For Strategy Phase means you are done playing/passing on: \n- Political Stability \n- Summit \n- Manipulate Investments ";
+            message2 = message2 + "This is the moment when you should resolve: \n-_ Political Stability_ \n- _Summit_ \n- _Manipulate Investments_\n"
+                + "Please click the \"Ready For Strategy Phase\" button once you are done resolving these or if you decline to do so.";
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(draw1AC);
@@ -517,10 +522,13 @@ public class StartPhaseService {
 
                 if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
-                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(), "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
+                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
+                            "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
+                            ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                     } else {
                         privatePlayer.setStasisInfantry(0);
-                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation() + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
+                            + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
                     }
                 }
             }
@@ -537,10 +545,13 @@ public class StartPhaseService {
 
                 if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
-                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(), "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
+                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
+                            "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
+                            ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                     } else {
                         privatePlayer.setStasisInfantry(0);
-                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation() + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
+                            + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
                     }
                 }
             }
@@ -550,13 +561,13 @@ public class StartPhaseService {
             if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                 buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node", TechEmojis.CyberneticTech));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use QDN", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use _Quantum Datahub Node_", buttons);
             }
             buttons = new ArrayList<>();
             if (ButtonHelper.isPlayerElected(game, p2, "arbiter")) {
                 buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter", CardEmojis.Agenda));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use Imperial Arbiter", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use _Imperial Arbiter_", buttons);
             }
         }
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);

@@ -153,7 +153,7 @@ public class ComponentActionHelper {
         for (String relic : p1.getRelics()) {
             RelicModel relicData = Mapper.getRelic(relic);
             if (relicData == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that PN, no PN sent");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that relic.");
                 continue;
             }
 
@@ -199,7 +199,7 @@ public class ComponentActionHelper {
             }
             if (prom == null) {
                 MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentationUnfogged()
-                    + " you have a null PN. Please use /pn purge after reporting it " + pn);
+                    + " you have a null promissory note " + pn + ". Please use `/pn purge` after reporting it.");
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
             }
         }
@@ -241,12 +241,12 @@ public class ComponentActionHelper {
         // Other "abilities"
         if (p1.getUnitsOwned().contains("muaat_flagship") && p1.getStrategicCC() > 0
             && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Spend 1 command token from your strategy pool for 1 cruiser with _The Inferno_ (Muaat Flagship)", FactionEmojis.Muaat);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Spend 1 Strategy Token to Place A Cruiser", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
         if ((p1.getUnitsOwned().contains("sigma_muaat_flagship_1") || p1.getUnitsOwned().contains("sigma_muaat_flagship_1")) && p1.getStrategicCC() > 0
             && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFSsigma", "Spend 1 strategy token for _The Inferno_ (Muaat Flagship)", FactionEmojis.Muaat);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFSsigma", "Spend 1 Strategy Token to Place Ships", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
 
