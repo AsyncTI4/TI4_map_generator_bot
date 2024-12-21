@@ -104,24 +104,23 @@ public class ActionCardHelper {
         int index = 1;
 
         Map<String, Integer> actionCards = player.getActionCards();
-        if (actionCards != null) {
-            if (actionCards.isEmpty()) {
-                sb.append("> None");
+        if (actionCards == null || actionCards.isEmpty()) {
+            sb.append("> None");
+            return sb.toString();
+        }
+
+        for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            Integer value = ac.getValue();
+            ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
+
+            sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
+            if (actionCard == null) {
+                sb.append("Something broke here");
             } else {
-                for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
-                    Integer value = ac.getValue();
-                    ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
-
-                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
-                    if (actionCard == null) {
-                        sb.append("Something broke here");
-                    } else {
-                        sb.append(actionCard.getRepresentation());
-                    }
-
-                    index++;
-                }
+                sb.append(actionCard.getRepresentation());
             }
+
+            index++;
         }
 
         return sb.toString();
@@ -132,8 +131,8 @@ public class ActionCardHelper {
         Map<String, Integer> actionCards = player.getActionCards();
 
         if (actionCards != null && !actionCards.isEmpty()
-            && !ButtonHelper.isPlayerElected(game, player, "censure")
-            && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+                && !ButtonHelper.isPlayerElected(game, player, "censure")
+                && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
@@ -148,10 +147,10 @@ public class ActionCardHelper {
         } else {
             acButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard an Action Card"));
         }
-        if (actionCards != null && !actionCards.isEmpty()
-            && !ButtonHelper.isPlayerElected(game, player, "censure")
-            && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace") || actionCards.containsKey("special_session")
-                || actionCards.containsKey("investments") || actionCards.containsKey("last_minute_deliberation") || actionCards.containsKey("revolution") || actionCards.containsKey("deflection") || actionCards.containsKey("summit"))) {
+        if (actionCards != null && !actionCards.isEmpty() && !ButtonHelper.isPlayerElected(game, player, "censure")
+                && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace") || actionCards.containsKey("special_session")
+                    || actionCards.containsKey("investments") || actionCards.containsKey("last_minute_deliberation") || actionCards.containsKey("revolution")
+                    || actionCards.containsKey("deflection") || actionCards.containsKey("summit"))) {
             acButtons.add(Buttons.gray("checkForAllACAssignments", "Pre-Assign Action Cards"));
         }
 

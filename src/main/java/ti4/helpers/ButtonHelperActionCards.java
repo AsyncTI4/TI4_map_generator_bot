@@ -9,7 +9,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
@@ -1202,34 +1201,18 @@ public class ButtonHelperActionCards {
             player.getFactionEmojiOrColor()
                 + " successfully assassinated all the representatives of "
                 + p2.getFactionEmojiOrColor() + ".");
-        String message;
-        switch (ThreadLocalRandom.current().nextInt(7))
-        {
-            case 1:
-                message = ", your representatives (all of them) fell out of some windows.";
-                break;
-            case 2:
-                message = ", your representatives got the Rasputin treatment. Unfortunately, they were not Rasputin.";
-                break;
-            case 3:
-                message = ", your representatives were \"invited\" to \"experienced\" the \"sight-seeing\" Sea of Desolation \"tour\".";
-                break;
-            case 4:
-                message = ", your representatives have died of natural causes (assassination is considered a perfectly natural cause of death on Mecatol Rex).";
-                break;
-            case 5:
-                message = ", your representatives have followed in a great tradition, and so have been stabbed 23 times.";
-                break;
-            case 6:
-                message = ", your representatives weren't paying their bodyguards enough, judging by empirical evidence.";
-                break;
-            default:
-                message = ", your representatives got sent to the headsman.";
-        }
+        String message = switch (ThreadLocalRandom.current().nextInt(7)) {
+            case 1 -> ", your representatives (all of them) fell out of some windows.";
+            case 2 -> ", your representatives got the Rasputin treatment. Unfortunately, they were not Rasputin.";
+            case 3 -> ", your representatives were \"invited\" to \"experienced\" the \"sight-seeing\" Sea of Desolation \"tour\".";
+            case 4 -> ", your representatives have died of natural causes (assassination is considered a perfectly natural cause of death on Mecatol Rex).";
+            case 5 -> ", your representatives have followed in a great tradition, and so have been stabbed 23 times.";
+            case 6 -> ", your representatives weren't paying their bodyguards enough, judging by empirical evidence.";
+            default -> ", your representatives got sent to the headsman.";
+        };
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
             p2.getRepresentationUnfogged() + message);
-        game.setStoredValue("AssassinatedReps",
-            game.getStoredValue("AssassinatedReps") + p2.getFaction());
+        game.setStoredValue("AssassinatedReps", game.getStoredValue("AssassinatedReps") + p2.getFaction());
     }
 
     @ButtonHandler("signalJammingStep2_")
