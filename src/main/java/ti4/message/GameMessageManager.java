@@ -1,7 +1,6 @@
 package ti4.message;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,16 +14,41 @@ public class GameMessageManager {
 
     private static final String GAME_MESSAGES_FILE = "GameMessages.json";
 
-    public static synchronized void addMessage(String gameName, String messageId, GameMessageType type, Instant sendTime) {
+    public static synchronized void add(String gameName, String messageId, GameMessageType type, long gameSaveTime) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             allGameMessages = new GameMessages(new HashMap<>());
         }
 
         List<GameMessage> messages = allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
-        messages.add(new GameMessage(messageId, type, sendTime));
+        messages.add(new GameMessage(messageId, type, gameSaveTime));
 
         persistFile(allGameMessages);
+    }
+
+    public static synchronized String replace(String gameName, String messageId, GameMessageType type, long gameSaveTime) {
+        GameMessages allGameMessages = readFile();
+        if (allGameMessages == null) {
+            allGameMessages = new GameMessages(new HashMap<>());
+        }
+
+        List<GameMessage> messages = allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+
+        String replacedMessageId = null;
+        if (!messages.isEmpty()) {
+            for (int i = 0; i < messages.size(); i++) {
+                GameMessage message = messages.get(i);
+                if (message.type == type) {
+                    replacedMessageId = messages.remove(i).messageId();
+                }
+            }
+        }
+
+        messages.add(new GameMessage(messageId, type, gameSaveTime));
+
+        persistFile(allGameMessages);
+
+        return replacedMessageId;
     }
 
     public static synchronized void remove(List<String> gameNames) {
@@ -58,5 +82,5 @@ public class GameMessageManager {
 
     private record GameMessages(Map<String, List<GameMessage>> gameNameToMessages) {}
 
-    public record GameMessage(String messageId, GameMessageType type, Instant sendTime) {}
+    public record GameMessage(String messageId, GameMessageType type, long gameSaveTime) {}
 }

@@ -182,22 +182,21 @@ public class MessageHelper {
 		MessageFunction addFactionReact = (msg) -> {
 			StringTokenizer players = switch (messageType) {
 				case AGENDA_WHEN -> {
-					GameMessageManager.addMessage(game.getName(), msg.getId(), GameMessageType.AGENDA_WHEN, game.getLastModifiedDate());
-					if (game.getLatestWhenMsg() != null && !game.getLatestWhenMsg().isEmpty()) {
-						game.getMainGameChannel().deleteMessageById(game.getLatestWhenMsg()).queue();
+					String oldWhenMessageId = GameMessageManager.replace(game.getName(), msg.getId(), GameMessageType.AGENDA_WHEN, game.getLastModifiedDate());
+					if (oldWhenMessageId != null) {
+						game.getMainGameChannel().deleteMessageById(oldWhenMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
 					}
 					yield new StringTokenizer(game.getPlayersWhoHitPersistentNoWhen(), "_");
 				}
 				case AGENDA_AFTER -> {
-					GameMessageManager.addMessage(game.getName(), msg.getId(), GameMessageType.AGENDA_AFTER, game.getLastModifiedDate());
-					if (game.getLatestAfterMsg() != null && !game.getLatestAfterMsg().isEmpty()) {
-						game.getMainGameChannel().deleteMessageById(game.getLatestAfterMsg()).queue(Consumers.nop(), BotLogger::catchRestError);
+					String oldAfterMessageId = GameMessageManager.replace(game.getName(), msg.getId(), GameMessageType.AGENDA_AFTER, game.getLastModifiedDate());
+					if (oldAfterMessageId != null) {
+						game.getMainGameChannel().deleteMessageById(oldAfterMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
 					}
-					game.setLatestAfterMsg(msg.getId());
 					yield new StringTokenizer(game.getPlayersWhoHitPersistentNoAfter(), "_");
 				}
-				case SHENANIGANS_PASS -> {
-					GameMessageManager.addMessage(game.getName(), msg.getId(), GameMessageType.SHENANIGANS_PASS, game.getLastModifiedDate());
+				case SHENANIGANS_PASS -> {//TODO
+					GameMessageManager.add(game.getName(), msg.getId(), GameMessageType.SHENANIGANS_PASS, game.getLastModifiedDate());
 					if (game.getStoredValue("Pass On Shenanigans") == null) {
 						game.setStoredValue("Pass On Shenanigans", "");
 					}
