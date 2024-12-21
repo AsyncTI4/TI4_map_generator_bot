@@ -1,19 +1,21 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.DiceHelper.Die;
-import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -39,8 +41,6 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperAbilities {
 
@@ -554,12 +554,17 @@ public class ButtonHelperAbilities {
 
     @ButtonHandler("getOmenDice")
     public static void offerOmenDiceButtons(Game game, Player player) {
+        offerOmenDiceButtons2(game, player, "no");
+    }
+
+    @ButtonHandler("getOmenDice2")
+    public static void offerOmenDiceButtons2(Game game, Player player, String agent) {
         String msg = player.getRepresentationUnfogged() + " you may play an Omen die with the following buttons. Duplicate dice are not shown.";
         List<Button> buttons = new ArrayList<>();
         List<Integer> dice = new ArrayList<>();
         for (int die : getAllOmenDie(game)) {
             if (!dice.contains(die)) {
-                buttons.add(Buttons.green("useOmenDie_" + die, "Use Result: " + die));
+                buttons.add(Buttons.green("useOmenDie_" + die + "_" + agent, "Use Result: " + die));
                 dice.add(die);
             }
         }
@@ -570,7 +575,9 @@ public class ButtonHelperAbilities {
     @ButtonHandler("useOmenDie_")
     public static void useOmenDie(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         int die = Integer.parseInt(buttonID.split("_")[1]);
-        removeOmenDie(game, die);
+        if (buttonID.split("_")[2].equalsIgnoreCase("no")) {
+            removeOmenDie(game, die);
+        }
         String msg = player.getRepresentationUnfogged() + " used an Omen die with the number " + die;
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue();
@@ -895,8 +902,7 @@ public class ButtonHelperAbilities {
             "axisordercv", 2,
             "axisordercvduplicate", 2,
             "axisorderdn", 3,
-            "axisorderdnduplicate", 3
-        );
+            "axisorderdnduplicate", 3);
         for (Map.Entry<String, Integer> order : orderDeck.entrySet()) {
             String orderName = order.getKey();
             int orderCost = order.getValue();
@@ -906,7 +912,7 @@ public class ButtonHelperAbilities {
                         "Buy an " + Mapper.getRelic(orderName).getName() + " for " + orderCost + " commodit" + (orderCost == 1 ? "y" : "ies")));
                 }
             }
-            
+
         }
         buttons.add(Buttons.red("deleteButtons", "Delete these buttons"));
 
@@ -922,7 +928,7 @@ public class ButtonHelperAbilities {
         if (lostComms > oldComms) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " you don't have " + lostComms + " commodit" + (lostComms == 1 ? "y" : "ies")
-                + " (you only have " + oldComms + " commodit" + (oldComms == 1 ? "y" : "ies") + ".");
+                    + " (you only have " + oldComms + " commodit" + (oldComms == 1 ? "y" : "ies") + ".");
             return;
         }
         player.addRelic(relicName);

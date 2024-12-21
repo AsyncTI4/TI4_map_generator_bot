@@ -671,7 +671,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     + ") for its technology speciality.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm));
-                buttons.add(Buttons.red("deleteButtons", "Didn't Use its Technology Speciality"));
+                buttons.add(Buttons.red("deleteButtons", "N/A"));
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getFactionEmoji()
                         + " may have the opportunity to gain a commodity from their **Ancient Knowledge** ability due to exhausting a technology speciality planet.");
@@ -736,7 +736,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         List<Button> buttons = new ArrayList<>();
         String msg2 = player.getFactionEmoji() + " is choosing to resolve their Autonetic Memory ability";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
-        buttons.add(Buttons.green("autoneticMemoryStep3a", "Pick A Card From the Discard"));
+        buttons.add(Buttons.green("autoneticMemoryStep3a", "Pick AC From the Discard"));
         buttons.add(Buttons.blue("autoneticMemoryStep3b", "Drop 1 infantry"));
         String msg = player.getRepresentationUnfogged()
             + " you have the ability to either draw a card from the discard (and then discard a card) or place 1 infantry on a planet you control";
@@ -836,8 +836,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         int tgCount = scTradeGoods.get(scNum);
         game.setScTradeGood(scNum, (tgCount + 1));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "Added 1 trade good to " + Helper.getSCName(scNum, game) + ". There "+ (tgCount == 0 ? "is" : "are") + " now "
-                + (tgCount + 1) + " trade good"+ (tgCount == 0 ? "" : "s") + " on it.");
+            "Added 1 trade good to " + Helper.getSCName(scNum, game) + ". There " + (tgCount == 0 ? "is" : "are") + " now "
+                + (tgCount + 1) + " trade good" + (tgCount == 0 ? "" : "s") + " on it.");
     }
 
     @ButtonHandler("autoAssignAFBHits_")
@@ -1537,7 +1537,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (ButtonHelper.getNumberOfUnitUpgrades(player) > 0 && player.hasTechReady("aida")
                     && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                     && !buttonID.contains("integrated")) {
-                    buttons.add(Buttons.red("exhaustTech_aida", "Exhaust AI Development Algorithm (" + ButtonHelper.getNumberOfUnitUpgrades(player) + "r)", TechEmojis.WarfareTech));
+                    buttons.add(Buttons.red("exhaustTech_aida", "Exhaust AI DEV (" + ButtonHelper.getNumberOfUnitUpgrades(player) + "r)", TechEmojis.WarfareTech));
                 }
                 if (player.hasTechReady("st") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
@@ -1821,16 +1821,16 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     List<Button> buttons = List.of(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                         "This message was triggered by the last person pressing \"Redistribute Command Tokens\"."
-                        + " Please press the \"Flip Agenda\" button after they have finished redistributing tokens.",
+                            + " Please press the \"Flip Agenda\" button after they have finished redistributing tokens.",
                         buttons);
                 } else {
                     Button flipAgenda = Buttons.blue("startStrategyPhase", "Start Strategy Phase");
                     List<Button> buttons = List.of(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                         "This message was triggered by the last person pressing \"Redistribute Command Tokens\"."
-                        + " As the Custodians token is still on Mecatol Rex, there will be no agenda phase this round."
-                        + " Please press the \"Start Strategy Phase\" button after they have finished redistributing tokens."
-                    , buttons);
+                            + " As the Custodians token is still on Mecatol Rex, there will be no agenda phase this round."
+                            + " Please press the \"Start Strategy Phase\" button after they have finished redistributing tokens.",
+                        buttons);
                 }
             }
         }
@@ -1948,7 +1948,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("pay1tgToAnnounceARetreat")
     public static void pay1tgToAnnounceARetreat(ButtonInteractionEvent event, Player player) {
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor()
-            + " paid 1 trade good to announce a retreat " + player.gainTG(-1) +".");
+            + " paid 1 trade good to announce a retreat " + player.gainTG(-1) + ".");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -2251,7 +2251,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String playerRep = player.getFactionEmoji();
         int commod = player.getCommodities();
         String message = playerRep + " exhausted Mallice ability to convert their " + commod
-            +  " commodit" + (commod == 1 ? "y" : "ies") + " to "
+            + " commodit" + (commod == 1 ? "y" : "ies") + " to "
             + (commod == 1 ? "a trade good" : commod + " trade goods") + " (trade goods: "
             + player.getTg() + "->" + (player.getTg() + commod) + ").";
         player.setTg(player.getTg() + commod);
@@ -2367,7 +2367,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         event.getMessage().editMessage(editedMessage).queue();
         if (ButtonHelper.isLawInPlay(game, "regulations") && player.getFleetCC() > 4) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
-            + " reminder that under the _Fleet Regulations_ law, fleet pools are limited to 4 command tokens.");
+                + " reminder that under the _Fleet Regulations_ law, fleet pools are limited to 4 command tokens.");
         }
     }
 
@@ -2471,7 +2471,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 "Did not automatically ready planets due to _Checks and Balances_ resolving \"against\"."
-                + " Players have been sent buttons to ready up to 3 planets.");
+                    + " Players have been sent buttons to ready up to 3 planets.");
         }
         StartPhaseService.startStrategyPhase(event, game);
         ButtonHelper.deleteMessage(event);
@@ -2577,7 +2577,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 }
                 if (properGain > 2) {
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Heads up " + player.getRepresentationUnfogged()
-                         + ", the bot thinks you should gain " + properGain + " command token" + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
+                        + ", the bot thinks you should gain " + properGain + " command token" + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
                 }
             }
             if (game.isCcNPlasticLimit()) {

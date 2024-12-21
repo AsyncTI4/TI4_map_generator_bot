@@ -210,7 +210,7 @@
     "alias": "decisive_victory",
     "name": "Decisive Victory",
     "phase": "Action",
-    "window": "When only you have ships in the space area of the active system at the end of the first round of a space combat",
+    "window": "When only you have ships in the the active system at the end of the first round of a space combat",
     "text": "Remove your command token from that system.",
     "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
     "source": "action_deck_2"
@@ -531,6 +531,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "lost_treatise",
+    "name": "Lost Treatise",
+    "phase": "Action",
+    "window": "At the start of your turn",
+    "text": "Either redistribute your command tokens or place 1 command token from your reinforcements in your fleet pool.",
+    "flavorText": "Unlenn massaged his brow and shut off his holoscreen. The magnum opus on Lazax war theory at his fingertips, and yet... it was the most boring piece of literature he'd ever had the displeasure to read.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "mercenary_contract",
     "name": "Mercenary Contract",
     "phase": "Action",
@@ -546,15 +555,6 @@
     "window": "Action",
     "text": "Choose 1 system that contains another player's fighters. Roll 1 die for each fighter in that system. For each result of 7 or greater, destroy 1 of those units.",
     "flavorText": "The disaster investigation unit could not determine whether it was an act of providence or the beginning stages of an incursion.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "military_treatise",
-    "name": "Military Treatise",
-    "phase": "Action",
-    "window": "At the start of your turn",
-    "text": "Either redistribute your command tokens or place 1 command token from your reinforcements in your fleet pool.",
-    "flavorText": "Unlenn massaged his brow and shut off his holoscreen. The magnum opus on Lazax war theory at his fingertips, and yet... it was the most boring piece of literature he'd ever had the displeasure to read.",
     "source": "action_deck_2"
   },
   {

@@ -209,7 +209,6 @@ public class AnnotationHandler {
                 BotLogger.log("Unknown context class `" + contextClass.getName() + "`. Please fix " + Constants.jazzPing());
                 return consumers;
             }
-
             for (Class<?> klass : AsyncTI4DiscordBot.getAllClasses()) {
                 for (Method method : klass.getDeclaredMethods()) {
                     method.setAccessible(true);

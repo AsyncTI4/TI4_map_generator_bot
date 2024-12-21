@@ -20,8 +20,8 @@ import ti4.message.MessageHelper;
 class ShowPN extends GameStateSubcommand {
 
     public ShowPN() {
-        super(Constants.SHOW_PN, "Show Promissory Note to player", false, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory note ID, which is found between ()").setRequired(true));
+        super(Constants.SHOW_PN, "Show Promissory Note to player", true, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID which is found between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, \"y\" or \"yes\" to enable"));
@@ -59,14 +59,14 @@ class ShowPN extends GameStateSubcommand {
         MessageEmbed pnEmbed = Mapper.getPromissoryNote(pnID).getRepresentationEmbed(!longPNDisplay, false, false);
         player.setPromissoryNote(pnID);
 
-        
+
         if (game.isFowMode())
         {
             MessageHelper.sendMessageToEventChannel(event, "Promissory note has been shown.");
         }
         else
         {
-            MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() 
+            MessageHelper.sendMessageToEventChannel(event, player.getRepresentation()
                 + " has shown a promissory note to " + targetPlayer.getRepresentation() + ".");
         }
         String message = player.getRepresentation(false, false) + " has shown you a promissory note:";

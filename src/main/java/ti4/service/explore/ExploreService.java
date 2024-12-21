@@ -308,7 +308,7 @@ public class ExploreService {
                 player.addFragment(cardID);
                 game.purgeExplore(ogID);
             }
-            case "Leader" -> {
+            case "leader" -> {
                 String leader = cardID.replace("gain", "");
                 player.addLeader(leader);
                 MessageHelper.sendMessageToEventChannel(event, "Leader has been added to your party");
@@ -521,7 +521,7 @@ public class ExploreService {
                     saarButton.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + " you may pay 1 trade good to place one "
-                        + UnitEmojis.mech + " mech here.\n-# Do not do this prior to exploring; it is an \"after\", while exploring is a \"when\".",
+                            + UnitEmojis.mech + " mech here.\n-# Do not do this prior to exploring; it is an \"after\", while exploring is a \"when\".",
                         saarButton);
                 }
 
@@ -554,7 +554,7 @@ public class ExploreService {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + ", please use the button to research a technology.", Buttons.GET_A_FREE_TECH);
             }
             case "aw1", "aw2", "aw3", "aw4" -> {
-                int commod = player.getCommodities();
+                int commod = Math.min(player.getCommodities(), 2);
                 if (commod > 0) {
                     message = "Resolve _Abandoned Warehouses_:\n-# You currently have " + player.getCommoditiesRepresentation()
                         + " commodit" + (commod == 1 ? "y" : "ies") + ".";
