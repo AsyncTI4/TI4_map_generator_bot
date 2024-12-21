@@ -42,7 +42,7 @@ public class PromissoryNoteHelper {
         checkAndAddPNs(game, player);
         game.checkPromissoryNotes();
         String headerText = player.getRepresentationUnfogged() + " Heads up, someone used some command";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendPromissoryNoteInfo(game, player, longFormat);
     }
 
@@ -188,7 +188,7 @@ public class PromissoryNoteHelper {
             if (id.contains("Checked")) {
                 id = "dspnflor";
             } else {
-                MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, player.getRepresentationUnfogged()
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, player.getRepresentationUnfogged()
                     + " this PN will be applied automatically the next time you draw a relic. It will not work if you play it before then, so I am stopping you here");
                 return;
             }
@@ -532,7 +532,7 @@ public class PromissoryNoteHelper {
             index++;
         }
 
-        MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, game, sb.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "All PNs shown to player");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, "All PNs shown to player");
     }
 }

@@ -7,8 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.experimental.UtilityClass;
 import ti4.json.PersistenceManager;
 
+@UtilityClass
 public class GameMessageManager {
 
     private static final String GAME_MESSAGES_FILE = "GameMessages.json";
@@ -57,11 +59,4 @@ public class GameMessageManager {
     private record GameMessages(Map<String, List<GameMessage>> gameNameToMessages) {}
 
     public record GameMessage(String messageId, GameMessageType type, Instant sendTime) {}
-
-    public enum GameMessageType {
-        GENERIC,
-        AGENDA_WHEN,
-        AGENDA_AFTER,
-        ACTION_CARD
-    }
 }
