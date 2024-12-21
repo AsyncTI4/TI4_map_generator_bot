@@ -18,7 +18,7 @@ class CheckNextPingTime extends Subcommand {
 
     public CheckNextPingTime() {
         super("check_next_ping_time", "Check the next time the bot will ping this game");
-        addOption(OptionType.STRING, Constants.GAME_NAME, "Game to check", true, true);
+        addOption(OptionType.STRING, Constants.GAME_NAME, "Game to check", false, true);
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -34,6 +34,6 @@ class CheckNextPingTime extends Subcommand {
                 .add("Auto ping active", game.getAutoPingStatus())
                 .add("Ping interval", game.getAutoPingSpacer())
                 .toString();
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), pingInfo);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "```" + pingInfo + "```");
     }
 }
