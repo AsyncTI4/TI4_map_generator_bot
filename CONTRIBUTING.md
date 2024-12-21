@@ -85,9 +85,9 @@ In VSCode, to check your current formatter, you can use prompt `Java: Open Java 
 
 ![image](https://github.com/AsyncTI4/TI4_map_generator_bot/assets/39609802/f036b3ff-a1b1-40ba-8d64-e3fed493ae76)
 
-## Run Docker Container
+## Run Container
 
-### Windows 10, VS Code, Docker Desktop
+### Windows 10, VS Code, Docker/Podman Desktop
 
 Run the following commands in the root project folder: `.\TI4_map_generator_bot`
 
@@ -113,6 +113,22 @@ docker rm $(docker ps --filter status=exited -q)
 docker rmi $(docker images --filter "dangling=true" -q)
 docker build -t tibot .
 docker run -v ${PWD}/storage:/opt/STORAGE tibot $discordBotKey $discordUserID $discordServerID
+```
+
+You can also use Podman instead of Docker in which case replace previous docker commands with
+```powershell
+$exitedContainers = podman ps --filter status=exited -q
+if ($exitedContainers) {
+    podman rm $exitedContainers
+}
+
+$danglingImages = podman images --filter "dangling=true" -q
+if ($danglingImages) {
+    podman rmi $danglingImages
+}
+
+podman build -t tibot .
+podman run -v ${PWD}/storage:/opt/STORAGE tibot $discordBotKey $discordUserID $discordServerID
 ```
 
 Bot should now be running and able to receive commands on your test server!
