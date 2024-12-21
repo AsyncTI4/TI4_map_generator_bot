@@ -25,9 +25,9 @@ import ti4.service.emoji.ColorEmojis;
 
 public class FowCommunicationThreadService {
 
-    private static final String VS_CHAR = " ↔ ";
-    private static final String NO_CHAR = " X ";
-    private static final Pattern THREAD_NAME_PATTERN = Pattern.compile("^(\\w+)\\s*" + VS_CHAR + "\\s*(\\w+)");
+    private static final String YES_CHAR = "↔";
+    private static final String NO_CHAR = "X";
+    private static final Pattern THREAD_NAME_PATTERN = Pattern.compile("^(\\w+)\\s*(?:"+YES_CHAR+"|"+NO_CHAR+")\\s*(\\w+)");
 
     public static boolean isActive(Game game) {
         return game.isFowMode() && Boolean.parseBoolean(game.getFowOption(FowConstants.MANAGED_COMMS));
@@ -47,7 +47,7 @@ public class FowCommunicationThreadService {
         //Check if can find neighbors without a comm thread
         Set<Player> newNeighbors = checkNewNeighbors(player, neighbors, commThreads);
         
-        if (!neighbors.isEmpty()) {
+        if (!newNeighbors.isEmpty()) {
             startButtons.add(Buttons.blue("fowComms_" + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")), "Open Comms"));
         }
     }
@@ -59,7 +59,7 @@ public class FowCommunicationThreadService {
             if (matcher.find()) {
                 Player p1 = game.getPlayerFromColorOrFaction(matcher.group(1));
                 Player p2 = game.getPlayerFromColorOrFaction(matcher.group(2));
-                if (player.equals(p1) || player.equals(p2)) {
+                if (p1 != null && p2 != null && (player.equals(p1) || player.equals(p2))) {
                     threads.put(threadChannel, player.equals(p1) ? p2 : p1);
                 }
             }
@@ -79,13 +79,15 @@ public class FowCommunicationThreadService {
             String notice = "Attention! " + player.getRepresentationNoPing() + " and " + otherPlayer.getRepresentationNoPing();
             if (areNeighbors && threadLocked) {
                 //Allow talking
-                threadChannel.getManager().setName(threadName.replace(NO_CHAR, VS_CHAR)).queue();
-                MessageHelper.sendMessageToChannel(threadChannel,  notice + " are neighbors again and **may** communicate.");
+                threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR)).queue(success -> {
+                    MessageHelper.sendMessageToChannel(threadChannel,  notice + " are neighbors again and **may** communicate.");
+                });;
 
             } else if (!areNeighbors && !threadLocked) {
                 //Deny talking
-                threadChannel.getManager().setName(threadName.replace(VS_CHAR, NO_CHAR)).queue();
-                MessageHelper.sendMessageToChannel(threadChannel, notice + " are no longer neighbors and should **not** communicate.");
+                threadChannel.getManager().setName(threadName.replace(YES_CHAR, NO_CHAR)).queue(success -> {
+                    MessageHelper.sendMessageToChannel(threadChannel, notice + " are no longer neighbors and should **not** communicate.");
+                });
             }
         }
     }
@@ -118,7 +120,7 @@ public class FowCommunicationThreadService {
         String color = buttonID.replace("fowCommsAccept_", "");
         Player inviteePlayer = game.getPlayerFromColorOrFaction(color);
 
-        String threadName = StringUtils.capitalize(inviteePlayer.getColor()) + " " + VS_CHAR + " " + StringUtils.capitalize(player.getColor());
+        String threadName = StringUtils.capitalize(inviteePlayer.getColor()) + " " + YES_CHAR + " " + StringUtils.capitalize(player.getColor());
         game.getMainGameChannel().createThreadChannel(threadName, true).queue(t -> {
             MessageHelper.sendMessageToChannel(t, "## Private communications thread opened\n"
                 + "Players: " + ColorEmojis.getColorEmojiWithName(inviteePlayer.getColor()) + " " + inviteePlayer.getPing() 
