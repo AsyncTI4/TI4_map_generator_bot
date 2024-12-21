@@ -13,8 +13,8 @@ import ti4.service.emoji.ExploreEmojis;
 class RelicReady extends GameStateSubcommand {
 
     public RelicReady() {
-        super(Constants.RELIC_REFRESH, "Ready a Relic", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to ready").setAutoComplete(true).setRequired(true));
+        super(Constants.RELIC_REFRESH, "Ready a relic", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to be readied").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
@@ -25,9 +25,9 @@ class RelicReady extends GameStateSubcommand {
         if (player.hasRelic(relicId)) {
             player.removeExhaustedRelic(relicId);
             String relicName = Mapper.getRelic(relicId).getName();
-            MessageHelper.sendMessageToEventChannel(event, "Refreshed " + ExploreEmojis.Relic + "Relic: " + relicName);
+            MessageHelper.sendMessageToEventChannel(event, "Readied _" + relicName + "_.");
         } else {
-            MessageHelper.sendMessageToEventChannel(event, "Invalid Relic or player does not have specified Relic");
+            MessageHelper.sendMessageToEventChannel(event, "Invalid relic or player does not have specified relic.");
         }
     }
 }

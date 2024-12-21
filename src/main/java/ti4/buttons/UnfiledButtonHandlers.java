@@ -1010,7 +1010,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (player.getStrategicCC() > 0) {
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
         }
-        String message = ButtonHelperSCs.deductCC(player);
+        String message = ButtonHelperSCs.deductCC(game, player, -1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -1588,7 +1588,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     && player.getHomeSystemTile() == tile
                     && !ButtonHelperAbilities.getTilesToRallyToTheCause(game, player).isEmpty()) {
                     String msg = player.getRepresentation()
-                        + " due to your Rally to the Cause ability, if you just produced a ship in your HS, you may produce up to 2 ships in a system that contains a planet with a trait but no legendary planets and no opponent units. Press button to resolve";
+                        + " due to your **Rally to the Cause** ability, if you just produced a ship in your home system,"
+                        + " you may produce up to 2 ships in a system that contains a planet with a trait,"
+                        + " but does not contain a legendary planet or another player's units. Press button to resolve";
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green("startRallyToTheCause", "Rally To The Cause"));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
@@ -2563,15 +2565,15 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 String reasons = "";
                 if (player.hasAbility("versatile")) {
                     properGain = properGain + 1;
-                    reasons = "Versatile ";
+                    reasons = "**Versatile** ";
                 }
                 if (player.hasTech("hm")) {
                     properGain = properGain + 1;
-                    reasons = reasons + "Hypermetabolism ";
+                    reasons = reasons + "_Hypermetabolism_ ";
                 }
                 if (cyber) {
                     properGain = properGain + 1;
-                    reasons = reasons + "Cybernetic Enhancements (L1Z1X PN) ";
+                    reasons = reasons + "_Cybernetic Enhancements_ ";
                 }
                 if (properGain > 2) {
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Heads up " + player.getRepresentationUnfogged()

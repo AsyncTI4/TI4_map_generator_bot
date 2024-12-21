@@ -267,7 +267,8 @@ public class PlayHeroService {
                 List<Button> removeCCs = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
                 if (!removeCCs.isEmpty()) {
                     for (int x = 0; x < ButtonHelperAgents.getGloryTokenTiles(game).size(); x++) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to remove a token from the board", removeCCs);
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                        "Use buttons to remove 1 of your command tokens from the game board.", removeCCs);
                     }
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),

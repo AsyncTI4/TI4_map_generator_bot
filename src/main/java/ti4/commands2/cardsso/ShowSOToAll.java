@@ -15,9 +15,9 @@ import ti4.service.info.SecretObjectiveInfoService;
 class ShowSOToAll extends GameStateSubcommand {
 
     public ShowSOToAll() {
-        super(Constants.SHOW_TO_ALL, "Show a Secret Objective to all players", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ONLY_PHASE, "Show only the phase of the SO (action/agenda/status). Default false"));
+        super(Constants.SHOW_TO_ALL, "Show a secret objective to all players", true, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID, which is found between ()").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ONLY_PHASE, "Show only the phase of the secret objective (action/agenda/status). Default false"));
     }
 
     @Override
@@ -43,7 +43,7 @@ class ShowSOToAll extends GameStateSubcommand {
         }
         boolean onlyPhase = event.getOption(Constants.ONLY_PHASE) != null && event.getOption(Constants.ONLY_PHASE).getAsBoolean();
         if (soID == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such secret objective ID found, please retry.");
             return;
         }
 

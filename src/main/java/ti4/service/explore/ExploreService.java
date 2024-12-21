@@ -109,7 +109,8 @@ public class ExploreService {
                 if (!NRACheck) {
                     if (player.hasTech("pfa")) { //Pre-Fab Arcologies
                         PlanetService.refreshPlanet(player, planetName);
-                        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab Arcologies.");
+                        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+                            planetName + " has been automatically readied because you have _Pre-Fab Arcologies_.");
                     }
                     String message = "Please decide whether or not to use your " + FactionEmojis.Naaz + "**Distant Suns** (explore twice) ability.";
                     Button resolveExplore1 = Buttons.green("distant_suns_accept_" + planetName + "_" + drawColor, "Choose to Explore Twice");
@@ -121,14 +122,15 @@ public class ExploreService {
                     String cardID1 = game.drawExplore(drawColor);
                     String cardID2 = game.drawExplore(drawColor);
                     if (cardID1 == null) {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet cannot be explored");
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet cannot be explored.");
                         return;
                     }
                     ExploreModel exploreModel1 = Mapper.getExplore(cardID1);
                     ExploreModel exploreModel2 = Mapper.getExplore(cardID2);
 
                     // Report to common channel
-                    String reportMessage = player.getFactionEmoji() + " used their " + FactionEmojis.Naaz + "**Distant Suns** ability and found a **" + exploreModel1.getName() + "** and a **" + exploreModel2.getName() + "** on " + Helper.getPlanetRepresentationPlusEmoji(planetName);
+                    String reportMessage = player.getFactionEmoji() + " used their " + FactionEmojis.Naaz + "**Distant Suns** ability and found a **"
+                        + exploreModel1.getName() + "** and a **" + exploreModel2.getName() + "** on " + Helper.getPlanetRepresentationPlusEmoji(planetName);
                     if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(), reportMessage);
                     } else {
@@ -139,7 +141,7 @@ public class ExploreService {
                     Button resolveExplore2 = Buttons.green("resolve_explore_" + cardID2 + "_" + planetName + "_distantSuns", exploreModel2.getName());
                     List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                     List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed(), exploreModel2.getRepresentationEmbed());
-                    String message = player.getRepresentation() + " please choose 1 Explore card to resolve.";
+                    String message = player.getRepresentation() + " please choose 1 exploration card to resolve.";
                     MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
                     return;
                 }
@@ -207,7 +209,7 @@ public class ExploreService {
         ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
         if (player.hasTech("pfa")) { //Pre-Fab Arcologies
             PlanetService.refreshPlanet(player, planetName);
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab Arcologies.");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), planetName + " has been automatically readied because you have _Pre-Fab Arcologies_.");
         }
         if (ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord", player, tile)) {
             AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planetName);
@@ -215,7 +217,7 @@ public class ExploreService {
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && game.getPhaseOfGame().contains("agenda")) {
             PlanetService.refreshPlanet(player, planetName);
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), planetName + " has been readied because of Quaxdol Junitas, the Florzen Commander.");
             AgendaHelper.listVoteCount(game, game.getMainGameChannel());
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
@@ -226,7 +228,7 @@ public class ExploreService {
                 return;
             }
             tileWithPlanet.getUnitHolders().get(planetName).addUnit(infKey, 1);
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added infantry to planet because of Master Halbert, the Lanefir Commander.");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added infantry to " + planetName + " because of Master Halbert, the Lanefir Commander.");
         }
         if (player.hasTech("dslaner")) {
             player.setAtsCount(player.getAtsCount() + numExplores);
@@ -556,6 +558,7 @@ public class ExploreService {
                 if (commod > 0) {
                     message = "Resolve _Abandoned Warehouses_:\n-# You currently have " + player.getCommoditiesRepresentation()
                         + " commodit" + (commod == 1 ? "y" : "ies") + ".";
+                    commod = commod > 2 ? 2 : commod;
                     Button convert = Buttons.green("convert_2_comms", "Convert " + commod + " Commodit" + (commod == 1 ? "y" : "ies")
                         + " Into " + (commod == 1 ? "a " : "") + "Trade Good" + (commod == 1 ? "" : "s"), MiscEmojis.Wash);
                     Button gain = Buttons.blue("gain_2_comms", "Gain 2 Commodities", MiscEmojis.comm);
@@ -705,7 +708,7 @@ public class ExploreService {
                         LeaderModel leaderM = Mapper.getLeader(leader.getId());
                         buttons.add(Buttons.green(
                             "seedySpace_" + leader.getId() + "_" + planetID,
-                            "Remove 1 Infantry or Have a Mech on " + planetName + " to Refresh " + leaderM.getName(),
+                            "Remove 1 Infantry or Have a Mech on " + planetName + " to Ready " + leaderM.getName(),
                             leaderM.getLeaderEmoji()));
                     }
                 }

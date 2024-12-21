@@ -778,7 +778,7 @@ class AgendaResolveButtonHandler {
                     winOrLose = AgendaHelper.getPlayersWithLeastPoints(game);
 
                 }
-                message.append("Custom PO 'Seed' has been added.\n");
+                message.append("Custom public objective \"Seed\" has been added.\n");
                 if (winOrLose.size() == 1) {
                     Player playerWL = winOrLose.getFirst();
                     game.scorePublicObjective(playerWL.getUserID(), poIndex);
@@ -786,11 +786,11 @@ class AgendaResolveButtonHandler {
                     Helper.checkEndGame(game, playerWL);
                     if ("for".equalsIgnoreCase(winner)) {
                         game.setSpeakerUserID(playerWL.getUserID());
-                        message.append(playerWL.getRepresentation()).append(" was made speaker and owes everyone who voted for them a PN\n");
+                        message.append(playerWL.getRepresentation()).append(" was made speaker and so must give each other player that voted \"for\" a promissory note.\n");
                         for (Player p2 : AgendaHelper.getWinningVoters(winner, game)) {
                             if (p2 != playerWL) {
                                 MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(), "You owe " + p2.getRepresentation() +
-                                    "a PN", ButtonHelper.getForcedPNSendButtons(game, p2, playerWL));
+                                    "a promissory note.", ButtonHelper.getForcedPNSendButtons(game, p2, playerWL));
                             }
                         }
                     } else {

@@ -109,7 +109,7 @@ public class StartTurnService {
                 } else {
                     player.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+                        + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
 
                 }
             }
@@ -141,7 +141,7 @@ public class StartTurnService {
                 } else {
                     player.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+                        + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
 
                 }
             }
@@ -185,9 +185,8 @@ public class StartTurnService {
                         List.of(Buttons.GET_A_TECH));
                 } else {
                     List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
-                    String message2 = player.getRepresentation() + "! Your current command tokens are "
-                        + player.getCCRepresentation()
-                        + ". Use buttons to gain command tokens.";
+                        String message2 = player.getRepresentation() + ", you would research a unit upgrade technology, but because of **Propagation**, you instead gain 3 command tokens."
+                            + " Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         message2, buttons2);
                     game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());

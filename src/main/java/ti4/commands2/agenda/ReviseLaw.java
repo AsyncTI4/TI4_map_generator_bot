@@ -16,8 +16,8 @@ class ReviseLaw extends GameStateSubcommand {
 
     public ReviseLaw() {
         super(Constants.REVISE_LAW, "Revise a law", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected PO or anything other than Faction"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected non-player game object (e.g. secret objective, planet, etc.)"));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Elected Faction").setAutoComplete(true));
     }
 
@@ -25,7 +25,7 @@ class ReviseLaw extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping agendaIdOption = event.getOption(Constants.AGENDA_ID);
         if (agendaIdOption == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No agenda ID defined.");
             return;
         }
 
@@ -37,7 +37,7 @@ class ReviseLaw extends GameStateSubcommand {
         String message = "Law revised";
         if (playerWasElected && player != null) {
             optionText = player.getFaction();
-            message = message + " with " + player.getColor() + " as the elected color";
+            message = message + " with " + player.getColor() + " as the elected color.";
         } else {
             optionText = event.getOption(Constants.ELECTED, null, OptionMapping::getAsString);
         }
@@ -50,7 +50,7 @@ class ReviseLaw extends GameStateSubcommand {
         if (success) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found.");
         }
     }
 }

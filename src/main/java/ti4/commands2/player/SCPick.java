@@ -36,13 +36,13 @@ import ti4.service.turn.StartTurnService;
 class SCPick extends GameStateSubcommand {
 
     public SCPick() {
-        super(Constants.SC_PICK, "Pick a Strategy Card", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card #").setRequired(true));
+        super(Constants.SC_PICK, "Pick a strategy card", true, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number").setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC2, "2nd choice"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC3, "3rd"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC4, "4th"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC5, "5th"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC6, "6th"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC3, "3rd choice"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC4, "4th choice"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC5, "5th choice"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC6, "6th choice"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
 
     }
@@ -53,7 +53,7 @@ class SCPick extends GameStateSubcommand {
 
         Collection<Player> activePlayers = game.getRealPlayers();
         if (activePlayers.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No active players found");
+            MessageHelper.sendMessageToEventChannel(event, "No active players found.");
             return;
         }
 
@@ -151,7 +151,7 @@ class SCPick extends GameStateSubcommand {
                 }
             }
 
-            msgExtra += "\nAll players picked strategy cards.";
+            msgExtra += "\nAll players have picked strategy cards.";
             Set<Integer> scPickedList = new HashSet<>();
             for (Player player_ : activePlayers) {
                 scPickedList.addAll(player_.getSCs());
@@ -226,7 +226,7 @@ class SCPick extends GameStateSubcommand {
                     } else {
                         privatePlayer.setStasisInfantry(0);
                         MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                            + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+                            + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
 
                     }
                 }
@@ -257,7 +257,7 @@ class SCPick extends GameStateSubcommand {
                     } else {
                         privatePlayer.setStasisInfantry(0);
                         MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                            + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+                            + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
 
                     }
                 }
@@ -270,14 +270,14 @@ class SCPick extends GameStateSubcommand {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                     buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node"));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use QDN", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use _Quantum Datahub Node_.", buttons);
                 }
                 buttons = new ArrayList<>();
                 if (game.getLaws().containsKey("arbiter") && game.getLawsInfo().get("arbiter").equalsIgnoreCase(p2.getFaction())) {
                     buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter"));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(),
-                        p2.getRepresentationUnfogged() + " you have the opportunity to use Imperial Arbiter", buttons);
+                        p2.getRepresentationUnfogged() + " you have the opportunity to use _Imperial Arbiter_.", buttons);
                 }
             }
         }
