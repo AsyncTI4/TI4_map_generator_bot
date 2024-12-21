@@ -397,12 +397,12 @@ public class PlayHeroService {
                         getYssarilHeroActionCardButtons(player, p2));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                         p2.getRepresentationUnfogged()
-                            + " Kyver, Blade and Key, the Yssaril hero, has been played.  Use buttons to select which AC you will offer to them.",
+                            + " Kyver, Blade and Key, the Yssaril hero, has been played. Please buttons to select which action card you will offer to them.",
                         buttons);
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText)
-                        + " sent everyone a ping in their private threads with buttons to send you 1 AC");
+                        + " sent everyone a ping in their `#cards-info` thread with buttons to choose an action card to offer you.");
             }
             case "keleresheroharka" -> resolveKeleresHeroMentak(game, player, event);
         }
