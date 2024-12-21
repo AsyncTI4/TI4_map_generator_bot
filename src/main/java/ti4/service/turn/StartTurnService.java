@@ -392,12 +392,7 @@ public class StartTurnService {
         }
         if (game.isFowMode()) {
             startButtons.add(Buttons.gray("showGameAgain", "Show Game"));
-            if (FowCommunicationThreadService.isActive(game)) {
-                Set<Player> newNeighbors = FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(game, player);
-                if (!newNeighbors.isEmpty()) {
-                    startButtons.add(Buttons.blue("fowComms_" + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")), "Open new comms"));
-                }
-            }
+            FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(game, player, startButtons);
         }
 
         startButtons.add(Buttons.gray("showMap", "Show Map"));

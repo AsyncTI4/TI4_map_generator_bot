@@ -25,14 +25,83 @@ import ti4.service.emoji.ColorEmojis;
 
 public class FowCommunicationThreadService {
 
-    private static final String VS_CHAR = "↔";
-    private static final String NO_CHAR = "⛔";
+    private static final String VS_CHAR = " ↔ ";
+    private static final String NO_CHAR = " X ";
     private static final Pattern THREAD_NAME_PATTERN = Pattern.compile("^(\\w+)\\s*" + VS_CHAR + "\\s*(\\w+)");
 
     public static boolean isActive(Game game) {
         return game.isFowMode() && Boolean.parseBoolean(game.getFowOption(FowConstants.MANAGED_COMMS));
     }
 
+    public static void checkCommThreadsAndNewNeighbors(Game game, Player player, List<Button> startButtons) {
+        if (!isActive(game)) {
+            return;
+        }
+
+        Set<Player> neighbors = player.getNeighbouringPlayers();
+        Map<ThreadChannel, Player> commThreads = findCommThreads(game, player);
+        
+        //Check existing threads
+        validateNeighbors(player, neighbors, commThreads);
+
+        //Check if can find neighbors without a comm thread
+        Set<Player> newNeighbors = checkNewNeighbors(player, neighbors, commThreads);
+        
+        if (!neighbors.isEmpty()) {
+            startButtons.add(Buttons.blue("fowComms_" + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")), "Open Comms"));
+        }
+    }
+
+    private static Map<ThreadChannel, Player> findCommThreads(Game game, Player player) {
+        Map<ThreadChannel, Player> threads = new HashMap<>();
+        for (ThreadChannel threadChannel : game.getMainGameChannel().getThreadChannels()) {
+            Matcher matcher = THREAD_NAME_PATTERN.matcher(threadChannel.getName());
+            if (matcher.find()) {
+                Player p1 = game.getPlayerFromColorOrFaction(matcher.group(1));
+                Player p2 = game.getPlayerFromColorOrFaction(matcher.group(2));
+                if (player.equals(p1) || player.equals(p2)) {
+                    threads.put(threadChannel, player.equals(p1) ? p2 : p1);
+                }
+            }
+        }
+        return threads;
+    }
+
+    private static void validateNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads) {
+        for (Entry<ThreadChannel, Player> thread : commThreads.entrySet()) {
+            ThreadChannel threadChannel = thread.getKey();
+            String threadName = thread.getKey().getName();
+            Player otherPlayer = thread.getValue();
+
+            boolean areNeighbors = neighbors.contains(otherPlayer);
+            boolean threadLocked = threadName.contains(NO_CHAR);
+
+            String notice = "Attention! " + player.getRepresentationNoPing() + " and " + otherPlayer.getRepresentationNoPing();
+            if (areNeighbors && threadLocked) {
+                //Allow talking
+                threadChannel.getManager().setName(threadName.replace(NO_CHAR, VS_CHAR)).queue();
+                MessageHelper.sendMessageToChannel(threadChannel,  notice + " are neighbors again and **may** communicate.");
+
+            } else if (!areNeighbors && !threadLocked) {
+                //Deny talking
+                threadChannel.getManager().setName(threadName.replace(VS_CHAR, NO_CHAR)).queue();
+                MessageHelper.sendMessageToChannel(threadChannel, notice + " are no longer neighbors and should **not** communicate.");
+            }
+        }
+    }
+
+    private static Set<Player> checkNewNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads) {
+        Set<Player> newNeighbors = new HashSet<>();
+        for (Player neighbor : neighbors) {
+            boolean hasExistingThread = commThreads.values().stream().anyMatch(p -> p.equals(neighbor));
+            if (!hasExistingThread) {
+                newNeighbors.add(neighbor);
+            }
+        }
+
+        return newNeighbors;
+    }
+    
     @ButtonHandler("fowComms_")
     public static void showComms(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         List<Button> buttons = new ArrayList<>();
@@ -40,7 +109,7 @@ public class FowCommunicationThreadService {
             buttons.add(Buttons.blue("fowCommsSuggest_" + color, StringUtils.capitalize(color)));
         }
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
-        String msg = "Press a button to suggest opening a private communications thread to: ";
+        String msg = "Suggest opening a private communications thread to: ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
@@ -78,70 +147,4 @@ public class FowCommunicationThreadService {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player '" + color + "' was not found.");
         }
     }
-
-    public static Set<Player> checkCommThreadsAndNewNeighbors(Game game, Player player) {
-        Set<Player> neighbors = player.getNeighbouringPlayers();
-        Map<ThreadChannel, Player> commThreads = findCommThreads(game, player);
-        
-        //Check existing threads
-        validateNeighborshipStatus(player, neighbors, commThreads);
-
-        //Check if can find neighbors without a comm thread
-        Set<Player> newNeighbors = new HashSet<>();
-        if (neighbors.size() > commThreads.size()) {
-            newNeighbors = checkNewNeighbors(player, neighbors, commThreads);
-        }
-        return newNeighbors;
-    }
-
-    private static Map<ThreadChannel, Player> findCommThreads(Game game, Player player) {
-        Map<ThreadChannel, Player> threads = new HashMap<>();
-        for (ThreadChannel threadChannel : game.getMainGameChannel().getThreadChannels()) {
-            Matcher matcher = THREAD_NAME_PATTERN.matcher(threadChannel.getName());
-            if (matcher.find()) {
-                Player p1 = game.getPlayerFromColorOrFaction(matcher.group(1));
-                Player p2 = game.getPlayerFromColorOrFaction(matcher.group(2));
-                if (player.equals(p1) || player.equals(p2)) {
-                    threads.put(threadChannel, player.equals(p1) ? p2 : p1);
-                }
-            }
-        }
-        return threads;
-    }
-
-    private static void validateNeighborshipStatus(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads) {
-        for (Entry<ThreadChannel, Player> thread : commThreads.entrySet()) {
-            ThreadChannel threadChannel = thread.getKey();
-            String threadName = thread.getKey().getName();
-            Player otherPlayer = thread.getValue();
-
-            boolean areNeighbors = neighbors.contains(otherPlayer);
-            boolean threadLocked = threadName.endsWith(NO_CHAR);
-
-            String notice = "### " + player.getRepresentationNoPing() + " and " + otherPlayer.getRepresentationNoPing();
-            if (areNeighbors && threadLocked) {
-                //Allow talking
-                threadChannel.getManager().setName(threadName.replace(NO_CHAR, "").trim()).queue();
-                MessageHelper.sendMessageToChannel(threadChannel,  notice + " are neighbors. Talking allowed.");
-
-            } else if (!areNeighbors && !threadLocked) {
-                //Deny talking
-                threadChannel.getManager().setName(threadName + " " + NO_CHAR).queue();
-                MessageHelper.sendMessageToChannel(threadChannel, notice + " are not neighbors. Talking denied.");
-            }
-        }
-    }
-
-    private static Set<Player> checkNewNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads) {
-        Set<Player> newNeighbors = new HashSet<>();
-        for (Player neighbor : neighbors) {
-            boolean hasExistingThread = commThreads.values().stream().anyMatch(p -> p.equals(neighbor));
-            if (!hasExistingThread) {
-                newNeighbors.add(neighbor);
-            }
-        }
-
-        return newNeighbors;
-    }
-
 }
