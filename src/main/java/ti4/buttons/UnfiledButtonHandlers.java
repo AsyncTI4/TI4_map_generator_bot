@@ -958,7 +958,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
             ExploreModel exp = Mapper.getExplore(deck.getFirst());
             sb.append(exp.textRepresentation());
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
         }
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Top of Cultural, Industrial, and Hazardous explore decks has been set to " + player.getFactionEmoji() + " Cards info thread.");
@@ -1838,13 +1838,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void relicLookTop(ButtonInteractionEvent event, Game game, Player player) {
         List<String> relicDeck = game.getAllRelics();
         if (relicDeck.isEmpty()) {
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "Relic deck is empty");
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, "Relic deck is empty");
             return;
         }
         String relicID = relicDeck.getFirst();
         RelicModel relicModel = Mapper.getRelic(relicID);
         String rsb = "**Relic - Look at Top**\n" + player.getRepresentation() + "\n" + relicModel.getSimpleRepresentation();
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, rsb);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, rsb);
         ReactionService.addReaction(event, game, player, true, false, "Looked at top of the Relic deck.");
         ButtonHelper.deleteMessage(event);
     }

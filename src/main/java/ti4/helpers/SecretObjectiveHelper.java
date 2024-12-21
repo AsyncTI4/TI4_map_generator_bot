@@ -109,7 +109,7 @@ public class SecretObjectiveHelper {
             MessageHelper.sendMessageToChannel(channel, "All players notified");
         }
         String headerText = player.getRepresentation();
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
         CommanderUnlockCheckService.checkPlayer(player, "nomad");
@@ -126,8 +126,8 @@ public class SecretObjectiveHelper {
         for (String id : secrets) {
             sb.append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id)).append("\n");
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "All SOs shown to player");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, "All SOs shown to player");
     }
 
     public static List<Button> getUnscoredSecretObjectiveButtons(Player player) {

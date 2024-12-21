@@ -56,6 +56,6 @@ class ShowAC extends GameStateSubcommand {
         }
 
         ActionCardHelper.sendActionCardInfo(game, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(playerToShowTo, game, sb);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(playerToShowTo, sb);
     }
 }

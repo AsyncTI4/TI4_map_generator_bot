@@ -20,7 +20,7 @@ public class UnitInfoService {
 
     public static void sendUnitInfo(Game game, Player player, GenericInteractionCreateEvent event, boolean showAllUnits) {
         String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendUnitInfo(player, showAllUnits);
     }
 
