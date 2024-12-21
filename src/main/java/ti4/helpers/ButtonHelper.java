@@ -4518,7 +4518,8 @@ public class ButtonHelper {
                     String unitName = key.unitName();
                     int totalUnits = unitEntry.getValue();
                     int damagedUnits = 0;
-                    if (type.equalsIgnoreCase("assaultcannoncombat") && key.getUnitType() == UnitType.Fighter) {
+                    if (type.equalsIgnoreCase("assaultcannoncombat")
+                        && (key.getUnitType() == UnitType.Fighter || key.getUnitType() == UnitType.Spacedock)) {
                         continue;
                     }
                     if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
