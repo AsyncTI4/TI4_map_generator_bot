@@ -1,6 +1,6 @@
 [
     {
-      "alias": "6pStandard",
+      "alias": "beMyNeighbor6p",
       "playerCount": 6,
       "templateTiles": [
         { "pos": "000", "staticTileId": "18", "custodians": true },
@@ -46,7 +46,7 @@
       ]
     },
     {
-      "alias": "8pHyperlanes",
+      "alias": "beMyNeighbor8pHyperlanes",
       "playerCount": 8,
       "templateTiles": [
         { "pos": "000", "staticTileId": "18", "custodians": true },
