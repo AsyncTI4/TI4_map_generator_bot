@@ -79,7 +79,7 @@ public class GameUndoNameService {
         return StringUtils.isEmpty(number) ? 0 : Integer.parseInt(number);
     }
 
-    public static List<Integer> getSortedUndoNumbersForGame(String gameName) {
+    public static List<Integer> getSortedUndoNumbers(String gameName) {
         String gameNameFileNamePrefix = gameName + "_";
         var gameUndoPath = Storage.getGameUndoDirectory(gameName);
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(gameUndoPath, gameNameFileNamePrefix + "*")) {
@@ -101,5 +101,11 @@ public class GameUndoNameService {
             BotLogger.log("Failed to get undo numbers for game " + gameName, e);
             return Collections.emptyList();
         }
+    }
+
+    public static int getLatestUndoNumber(String gameName) {
+        return getSortedUndoNumbers(gameName).stream()
+            .max(Integer::compareTo)
+            .orElse(-1);
     }
 }

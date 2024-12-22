@@ -39,7 +39,7 @@ class GameUndoService {
 
     private static int cleanUpExcessUndoFilesAndReturnLatestIndex(String gameName) {
         try {
-            List<Integer> undoNumbers = GameUndoNameService.getSortedUndoNumbersForGame(gameName);
+            List<Integer> undoNumbers = GameUndoNameService.getSortedUndoNumbers(gameName);
             if (undoNumbers.isEmpty()) return 0;
             
             int maxUndoNumber = undoNumbers.getLast();

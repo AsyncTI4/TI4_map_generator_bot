@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +47,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
-import ti4.helpers.Storage;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -113,22 +111,18 @@ public class MessageHelper {
 			}
 		}
 
-		Path gameUndoDirectory = Storage.getGameUndoDirectory(gameName);
-		if (isDirectoryEmpty(gameUndoDirectory)) {
-			return buttons;
-		}
-
-		List<Integer> undoNumbers = GameUndoNameService.getSortedUndoNumbersForGame(gameName);
-
-		List<Button> newButtons = new ArrayList<>(buttons);
 		try {
-			int maxNumber = undoNumbers.isEmpty() ? 0 : undoNumbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
+			int maxNumber = GameUndoNameService.getLatestUndoNumber(gameName);
+			if (maxNumber == -1) {
+				return buttons;
+			}
+			List<Button> newButtons = new ArrayList<>(buttons);
 			newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
+			return newButtons;
 		} catch (Exception e) {
 			BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
+			return buttons;
 		}
-
-		return newButtons;
 	}
 
 	private static boolean isDirectoryEmpty(Path directory) {
