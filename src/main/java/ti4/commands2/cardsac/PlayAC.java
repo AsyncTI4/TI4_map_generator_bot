@@ -12,7 +12,7 @@ class PlayAC extends GameStateSubcommand {
 
     public PlayAC() {
         super(Constants.PLAY_AC, "Play an Action Card", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.ACTION_CARD_ID, "Action Card ID that is sent between () or Name/Part of Name").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ACTION_CARD_ID, "Action card ID, which is found between (), or name/part of name").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 

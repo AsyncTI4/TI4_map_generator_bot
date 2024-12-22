@@ -53,7 +53,7 @@ public class ButtonHelperSCs {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event,
                     "followed diplomacy");
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
         }
         if (scModel != null && !player.getFollowedSCs().contains(scModel.getInitiative())) {
@@ -105,7 +105,7 @@ public class ButtonHelperSCs {
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed tech");
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
         }
         Button getTactic = Buttons.green("increase_tactic_cc", "Gain 1 Tactic Token");
@@ -157,16 +157,16 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("trade").orElse(null);
         }
-        int tradeInitiative = scModel.getInitiative();
+        int scNum = scModel.getInitiative();
 
         if (player.getStrategicCC() > 0) {
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Trade");
         }
-        String message = deductCC(player);
-        if (!player.getFollowedSCs().contains(tradeInitiative)) {
-            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, tradeInitiative, game, event);
+        String message = deductCC(game, player, scNum);
+        if (!player.getFollowedSCs().contains(scNum)) {
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
         }
-        player.addFollowedSC(tradeInitiative, event);
+        player.addFollowedSC(scNum, event);
         ButtonHelperStats.replenishComms(event, game, player, true);
 
         ReactionService.addReaction(event, game, player, message);
@@ -197,7 +197,7 @@ public class ButtonHelperSCs {
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Imperial");
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
         }
         boolean used2 = addUsedSCPlayer(messageID + "so", game, player);
@@ -368,7 +368,7 @@ public class ButtonHelperSCs {
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed warfare");
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
         }
         Tile tile = player.getHomeSystemTile();
@@ -411,15 +411,16 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("construction").orElse(null);
         }
+        int scNum = scModel.getInitiative();
         boolean automationExists = scModel != null && scModel.usesAutomationForSCID("pok4construction");
-        if (!used && scModel != null && !player.getFollowedSCs().contains(scModel.getInitiative())
-            && automationExists && game.getPlayedSCs().contains(scModel.getInitiative())) {
-            player.addFollowedSC(scModel.getInitiative(), event);
-            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
+        if (!used && scModel != null && !player.getFollowedSCs().contains(scNum)
+            && automationExists && game.getPlayedSCs().contains(scNum)) {
+            player.addFollowedSC(scNum, event);
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed construction");
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
         }
         ReactionService.addReaction(event, game, player);
@@ -622,7 +623,7 @@ public class ButtonHelperSCs {
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed " + Helper.getSCName(scNum, game));
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
 
             if (setStatus) {
                 if (!player.getFollowedSCs().contains(scNum)) {
@@ -636,17 +637,22 @@ public class ButtonHelperSCs {
     }
 
     @NotNull
-    public static String deductCC(Player player) {
+    public static String deductCC(Game game, Player player, int scNum) {
         int strategicCC = player.getStrategicCC();
-        String message;
         if (strategicCC == 0) {
-            message = " have 0 command tokens in strategy pool, can't follow.";
-        } else {
-            strategicCC--;
-            player.setStrategicCC(strategicCC);
-            message = " following strategy card, deducted 1 command tokens from strategy pool.";
+            return " have 0 command tokens in strategy pool, can't follow.";
         }
-        return message;
+        
+        strategicCC--;
+        player.setStrategicCC(strategicCC);
+        if (scNum == -1)
+        {
+            return " performing the secondary ability of a strategy card with **Grace**."
+                + "1 command token has been spent from strategy pool.";
+        }
+        String stratCardName = Helper.getSCName(scNum, game);
+        return " following to perform the secondary ability of **" + stratCardName + "**."
+            + "1 command token has been spent from strategy pool.";
     }
 
     @ButtonHandler("sc_ac_draw")
@@ -675,7 +681,7 @@ public class ButtonHelperSCs {
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Politics");
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
         }
         boolean hasSchemingAbility = player.hasAbility("scheming");

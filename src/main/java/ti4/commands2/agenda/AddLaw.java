@@ -15,16 +15,16 @@ class AddLaw extends GameStateSubcommand {
 
     public AddLaw() {
         super(Constants.ADD_LAW, "Add Agenda as Law", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected PO or anything other than Faction"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Elected Faction").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between the ()").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected non-player game object (e.g. secret objective, planet, etc.)"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Elected faction").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.AGENDA_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No agenda ID defined.");
             return;
         }
 
@@ -45,9 +45,9 @@ class AddLaw extends GameStateSubcommand {
 
         boolean success = game.addLaw(option.getAsInt(), optionText);
         if (success) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Law added");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Law added.");
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found.");
         }
     }
 }
