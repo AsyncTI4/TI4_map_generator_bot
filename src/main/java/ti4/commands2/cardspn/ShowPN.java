@@ -21,10 +21,10 @@ class ShowPN extends GameStateSubcommand {
 
     public ShowPN() {
         super(Constants.SHOW_PN, "Show Promissory Note to player", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID which is found between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable"));
+        addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, \"y\" or \"yes\" to enable"));
     }
 
     @Override
@@ -39,7 +39,7 @@ class ShowPN extends GameStateSubcommand {
         }
 
         if (pnID == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such promissory note ID found, please retry.");
             return;
         }
 
@@ -59,9 +59,17 @@ class ShowPN extends GameStateSubcommand {
         MessageEmbed pnEmbed = Mapper.getPromissoryNote(pnID).getRepresentationEmbed(!longPNDisplay, false, false);
         player.setPromissoryNote(pnID);
 
-        String message = player.getRepresentation(false, false) + " showed you a promissory note:";
 
-        MessageHelper.sendMessageToEventChannel(event, "PN shown");
+        if (game.isFowMode())
+        {
+            MessageHelper.sendMessageToEventChannel(event, "Promissory note has been shown.");
+        }
+        else
+        {
+            MessageHelper.sendMessageToEventChannel(event, player.getRepresentation()
+                + " has shown a promissory note to " + targetPlayer.getRepresentation() + ".");
+        }
+        String message = player.getRepresentation(false, false) + " has shown you a promissory note:";
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, longPNDisplay);
         MessageHelper.sendMessageEmbedsToCardsInfoThread(targetPlayer, message, List.of(pnEmbed));
     }

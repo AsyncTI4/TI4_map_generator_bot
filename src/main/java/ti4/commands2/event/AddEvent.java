@@ -12,8 +12,8 @@ import ti4.message.MessageHelper;
 class AddEvent extends GameStateSubcommand {
 
     public AddEvent() {
-        super(Constants.ADD_EVENT, "Add Event as if it were a Law (Permanent/Temporary)", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Agenda ID that is sent between ()").setRequired(true));
+        super(Constants.ADD_EVENT, "Add event as if it were a law (permanent/temporary)", true, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID, which is found between ()").setRequired(true));
     }
 
     @Override
@@ -22,9 +22,9 @@ class AddEvent extends GameStateSubcommand {
         Integer eventID = event.getOption(Constants.EVENT_ID, null, OptionMapping::getAsInt);
         boolean success = game.addEventInEffect(eventID);
         if (success) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Event added");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Event added.");
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Event ID not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Event ID not found.");
         }
     }
 }

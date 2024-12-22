@@ -180,7 +180,7 @@ public class ListPlayerInfoService {
     }
 
     public static String representSupports(Game game) {
-        StringBuilder representation = new StringBuilder("__**Support VPs**__\n> ");
+        StringBuilder representation = new StringBuilder("__**Support Victory Points**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ").append(player.getSupportForTheThroneVictoryPoints()).append("/1  ");
@@ -190,7 +190,7 @@ public class ListPlayerInfoService {
     }
 
     public static String representTotalVPs(Game game) {
-        StringBuilder representation = new StringBuilder("__**Total VPs**__\n> ");
+        StringBuilder representation = new StringBuilder("__**Total Victory Points**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ").append(player.getTotalVictoryPoints()).append("/").append(game.getVp()).append("  ");

@@ -396,10 +396,10 @@ public class ButtonHelperTacticalAction {
                         }
                         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, nonActivePlayer, player);
                         String message2 = player.getRepresentationUnfogged()
-                            + " You have triggered void watch. Please select the PN you would like to send";
+                            + " You have triggered _Voidwatch_. Please select the promissory note you will send.";
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2,
                             stuffToTransButtons);
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you owe the defender one PN");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + ", you owe the defender a promissory note.");
                     }
                 }
             }
