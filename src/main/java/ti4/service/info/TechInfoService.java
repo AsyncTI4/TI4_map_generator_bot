@@ -20,7 +20,7 @@ public class TechInfoService {
 
     public static void sendTechInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendTechInfo(player);
     }
 

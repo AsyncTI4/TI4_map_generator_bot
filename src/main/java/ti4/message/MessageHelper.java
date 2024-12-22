@@ -500,10 +500,9 @@ public class MessageHelper {
 
 	/**
 	 * @param player Player to send the messageText
-	 * @param game Map/Game the player is in
 	 * @param messageText messageText - handles large text ()>1500 chars)
 	 */
-	public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, @NotNull Game game, String messageText) {
+	public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, String messageText) {
 		if (messageText == null || messageText.isEmpty()) {
 			return;
 		}

@@ -8,14 +8,13 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands2.commandcounter.RemoveCommandCounterService;
 import ti4.commands2.planet.PlanetExhaustAbility;
@@ -682,7 +681,7 @@ public class ButtonHelperAgents {
                 headerText2 += ", then drew another action card for **Scheming**. Please now discard 1 action card";
             }
             headerText2 += ". ";
-            MessageHelper.sendMessageToPlayerCardsInfoThread(p2, game, headerText2);
+            MessageHelper.sendMessageToPlayerCardsInfoThread(p2, headerText2);
             ActionCardHelper.sendActionCardInfo(game, p2);
             if (p2.hasAbility("scheming")) {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
@@ -734,12 +733,12 @@ public class ButtonHelperAgents {
             String headerText = player.getRepresentationUnfogged() + " you got 1 action card from "
                 + ssruuClever + "Suffi An, the Mentak" + ssruuSlash + " agent";
             headerText += player.hasAbility("scheming") ? ", then drew another action card for **Scheming**. Please now discard 1 action card." : ".";
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
             ActionCardHelper.sendActionCardInfo(game, player);
             String headerText2 = p2.getRepresentationUnfogged() + " you got 1 action card from "
                 + ssruuClever + "Suffi An, the Mentak" + ssruuSlash + " agent";
             headerText2 += p2.hasAbility("scheming") ? ", then drew another action card for **Scheming**. Please now discard 1 action card." : ".";
-            MessageHelper.sendMessageToPlayerCardsInfoThread(p2, game, headerText2);
+            MessageHelper.sendMessageToPlayerCardsInfoThread(p2, headerText2);
             ActionCardHelper.sendActionCardInfo(game, p2);
             if (player.hasAbility("scheming")) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),

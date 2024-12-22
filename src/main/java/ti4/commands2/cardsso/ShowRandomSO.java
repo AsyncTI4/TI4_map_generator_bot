@@ -51,6 +51,6 @@ class ShowRandomSO extends GameStateSubcommand {
 
         MessageHelper.sendMessageToEventChannel(event, "SO shown to player");
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer, game, sb);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer, sb);
     }
 }

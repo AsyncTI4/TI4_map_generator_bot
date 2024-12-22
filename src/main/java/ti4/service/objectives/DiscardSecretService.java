@@ -26,10 +26,10 @@ public class DiscardSecretService {
         }
         boolean removed = game.discardSecretObjective(player.getUserID(), SOID);
         if (!removed) {
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, "No such Secret Objective ID found, please retry");
             return;
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "SO Discarded");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, "SO Discarded");
 
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         if (!soIDString.isEmpty()) {

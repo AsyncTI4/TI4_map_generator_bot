@@ -43,7 +43,7 @@ public class ActionCardHelper {
 
     public static void sendActionCardInfo(Game game, Player player) {
         // AC INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getActionCardInfo(game, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, getActionCardInfo(game, player));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nClick a button below to play an Action Card", getPlayActionCardButtons(game, player));
 
         sendTrapCardInfo(game, player);
@@ -51,7 +51,7 @@ public class ActionCardHelper {
 
     private static void sendTrapCardInfo(Game game, Player player) {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { // Lih-zo trap abilities
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getTrapCardInfo(player));
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, getTrapCardInfo(player));
         }
     }
 
@@ -227,7 +227,7 @@ public class ActionCardHelper {
     @ButtonHandler("refreshACInfo")
     public static void sendActionCardInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendActionCardInfo(game, player);
     }
 
@@ -984,8 +984,8 @@ public class ActionCardHelper {
             sb.append(index).append(". ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
             index++;
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sa.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, sa.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, sb.toString());
     }
 
     public static String actionCardListCondensedNoIds(List<String> discards, String title) {

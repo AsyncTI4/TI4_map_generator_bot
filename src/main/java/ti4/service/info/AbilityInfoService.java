@@ -19,7 +19,7 @@ public class AbilityInfoService {
 
     public static void sendAbilityInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendAbilityInfo(game, player);
     }
 

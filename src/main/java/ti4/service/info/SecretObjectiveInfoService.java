@@ -25,25 +25,25 @@ public class SecretObjectiveInfoService {
 
     public static void sendSecretObjectiveInfo(Game game, Player player, ButtonInteractionEvent event) {
         String headerText = player.getRepresentationUnfogged() + " pressed button: " + event.getButton().getLabel();
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendSecretObjectiveInfo(game, player);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player, SlashCommandInteractionEvent event) {
         String headerText = player.getRepresentationUnfogged() + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendSecretObjectiveInfo(game, player);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentationUnfogged() + " used something";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendSecretObjectiveInfo(game, player);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player) {
         //SO INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getSecretObjectiveCardInfo(game, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, getSecretObjectiveCardInfo(game, player));
 
         if (player.getSecretsUnscored().isEmpty()) return;
 
