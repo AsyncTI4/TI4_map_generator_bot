@@ -24,6 +24,7 @@ import ti4.helpers.DiceHelper;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
 import ti4.image.Mapper;
@@ -40,6 +41,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 
@@ -470,7 +472,16 @@ public class PlayerTechService {
                     // Block of code to handle errors
                 }
             }
-            String text = player.getRepresentationUnfogged() + " UP NEXT";
+            String text = player.getRepresentationUnfogged() + ", it is now your turn (your " 
+                + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
+            Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
+            if (nextPlayer != null && !game.isFowMode()) {
+                if (nextPlayer == player) {
+                    text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
+                } else {
+                    text += "\n-# " + nextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
+                }
+            }
             String buttonText = "Use buttons to do your turn. ";
             if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
                 buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];

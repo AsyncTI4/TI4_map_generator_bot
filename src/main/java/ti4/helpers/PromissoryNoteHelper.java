@@ -188,7 +188,7 @@ public class PromissoryNoteHelper {
             if (id.contains("Checked")) {
                 id = "dspnflor";
             } else {
-                MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, player.getRepresentationUnfogged()
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, player.getRepresentationUnfogged()
                     + " this promissory note will be applied automatically the next time you draw a relic."
                     + " It will not work if you play it before then, so I am stopping you here.");
                 return;
