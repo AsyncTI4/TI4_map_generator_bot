@@ -3,8 +3,6 @@ package ti4.processors;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -33,24 +31,13 @@ import ti4.service.game.GameNameService;
 public class ButtonProcessor {
 
     private static final Map<String, Consumer<ButtonContext>> knownButtons = AnnotationHandler.findKnownHandlers(ButtonContext.class, ButtonHandler.class);
-    private static final Set<String> userButtonPressSet = ConcurrentHashMap.newKeySet();
     private static final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
 
     public static void queue(ButtonInteractionEvent event) {
-        String eventKey = getEventKey(event);
-        if (!userButtonPressSet.add(eventKey)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "The bot hasn't processed this button press since you last pressed it. Please wait.");
-            return;
-        }
-
         BotLogger.logButton(event);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
         ExecutorManager.runAsync("ButtonProcessor task", gameName, event.getMessageChannel(), () -> process(event));
-    }
-
-    private static String getEventKey(ButtonInteractionEvent event) {
-        return event.getUser().getId() + event.getButton().getId();
     }
 
     private static void process(ButtonInteractionEvent event) {
@@ -75,9 +62,6 @@ public class ButtonProcessor {
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
-
-        String eventKey = getEventKey(event);
-        userButtonPressSet.remove(eventKey);
 
         runtimeWarningService.submitNewRuntime(event, startTime, System.currentTimeMillis(), contextRuntime, resolveRuntime, saveRuntime);
     }
