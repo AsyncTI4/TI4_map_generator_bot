@@ -380,18 +380,6 @@ public class MessageHelper {
 							Game game = managedGame.getGame();
 							game.setLatestTransactionMsg(complete.getId());
 						}
-
-						if (message.toLowerCase().contains("up next")) {
-							Game game = managedGame.getGame();
-							if (game.getLatestUpNextMsg() != null && !"".equalsIgnoreCase(game.getLatestUpNextMsg())) {
-								String id = game.getLatestUpNextMsg().split("_")[0];
-								String msg = game.getLatestUpNextMsg().substring(game.getLatestUpNextMsg().indexOf("_") + 1);
-								msg = msg.replace("UP NEXT", "started their turn");
-								game.getActionsChannel().editMessageById(id, msg).queue(null,
-									error -> BotLogger.log(getRestActionFailureMessage(channel, "Error editing message", messageCreateData, error)));
-							}
-							game.setLatestUpNextMsg(complete.getId() + "_" + message);
-						}
 					}
 
 					// RUN SUPPLIED ACTION
