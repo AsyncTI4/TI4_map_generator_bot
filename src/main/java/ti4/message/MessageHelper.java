@@ -381,7 +381,7 @@ public class MessageHelper {
 							game.setLatestTransactionMsg(complete.getId());
 						}
 
-						if (message.toLowerCase().contains("up next")) {
+						if (false && message.toLowerCase().contains("up next")) { // disabled due to change in start-of-turn message
 							Game game = managedGame.getGame();
 							if (game.getLatestUpNextMsg() != null && !"".equalsIgnoreCase(game.getLatestUpNextMsg())) {
 								String id = game.getLatestUpNextMsg().split("_")[0];

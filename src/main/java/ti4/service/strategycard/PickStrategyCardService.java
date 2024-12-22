@@ -19,11 +19,13 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.StringHelper;
 import ti4.image.BannerGenerator;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 
 @UtilityClass
@@ -114,7 +116,7 @@ public class PickStrategyCardService {
 
             //INFORM FIRST PLAYER IS UP FOR ACTION
             if (nextPlayer != null) {
-                msgExtra += " " + nextPlayer.getRepresentation() + " is up for an action";
+                msgExtra += "\n" + nextPlayer.getRepresentation() + " is first in initiative order.";
                 privatePlayer = nextPlayer;
                 game.updateActivePlayer(nextPlayer);
                 ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, game);
@@ -134,7 +136,8 @@ public class PickStrategyCardService {
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
             if (allPicked) {
-                msgExtra = privatePlayer.getRepresentationUnfogged() + " UP NEXT";
+                msgExtra = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
+                    + StringHelper.ordinal(privatePlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
@@ -167,21 +170,31 @@ public class PickStrategyCardService {
             }
 
         } else {
-            if (allPicked) {
-                ListTurnOrderService.turnOrder(event, game);
-            }
             if (!allPicked) {
                 game.updateActivePlayer(privatePlayer);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra + "\nUse buttons to pick your strategy card.", Helper.getRemainingSCButtons(game, privatePlayer));
                 game.setPhaseOfGame("strategy");
             } else {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
+                if (game.isShowBanners()) {
+                    BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
+                }
+                game.setPhaseOfGame("action");
+                ListTurnOrderService.turnOrder(event, game);
                 privatePlayer.setInRoundTurnCount(privatePlayer.getInRoundTurnCount() + 1);
                 if (game.isShowBanners()) {
                     BannerGenerator.drawFactionBanner(privatePlayer);
                 }
-                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.",
-                    StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
+                String text = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
+                    + StringHelper.ordinal(privatePlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
+                Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, privatePlayer);
+                if (nextPlayer == null) {
+                } else if (nextPlayer == privatePlayer) {
+                    text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
+                } else {
+                    text += "\n-# " + nextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
+                }
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), text);
                 if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
@@ -194,7 +207,8 @@ public class PickStrategyCardService {
 
                     }
                 }
-                game.setPhaseOfGame("action");
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Use buttons to do turn.",
+                    StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
             }
         }
         if (allPicked) {
