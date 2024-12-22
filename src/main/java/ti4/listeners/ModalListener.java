@@ -42,7 +42,7 @@ public class ModalListener extends ListenerAdapter {
         event.deferEdit().queue();
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorManager.runAsync("ModalListener task", gameName, () -> handleModal(event));
+        ExecutorManager.runAsync("ModalListener task", gameName, event.getMessageChannel(), () -> handleModal(event));
     }
 
     private void handleModal(@Nonnull ModalInteractionEvent event) {
