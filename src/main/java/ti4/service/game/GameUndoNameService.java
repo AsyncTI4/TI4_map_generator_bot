@@ -104,8 +104,10 @@ public class GameUndoNameService {
     }
 
     public static int getLatestUndoNumber(String gameName) {
-        return getSortedUndoNumbers(gameName).stream()
-            .max(Integer::compareTo)
-            .orElse(-1);
+        var sortedUndoNumbers = getSortedUndoNumbers(gameName);
+        if (sortedUndoNumbers.isEmpty()) {
+            return -1;
+        }
+        return sortedUndoNumbers.getLast();
     }
 }
