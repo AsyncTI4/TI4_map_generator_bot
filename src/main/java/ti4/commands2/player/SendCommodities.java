@@ -32,7 +32,8 @@ class SendCommodities extends GameStateSubcommand {
         Player player = getPlayer();
         if (player.hasAbility("military_industrial_complex")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
-                + " since you cannot send players commodities due to your faction ability, sending comms here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
+                + ", since you cannot send players commodities due to your **Military Industrial Complex** faction ability, sending commodities here seems likely an error."
+                + " Nothing has been processed as a result. Try a different route if this correction is wrong.");
             return;
         }
 
@@ -62,8 +63,8 @@ class SendCommodities extends GameStateSubcommand {
 
         String p1 = player.getRepresentation();
         String p2 = targetPlayer.getRepresentation();
-        String commString = sendCommodities + " " + MiscEmojis.comm + " commodities";
-        String message = p1 + " sent " + commString + " to " + p2;
+        String commString = sendCommodities + " commodit" + (sendCommodities == 1 ? "y" : "ies");
+        String message = p1 + " sent " + commString + " to " + p2 + ".";
         MessageHelper.sendMessageToEventChannel(event, message);
         ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, targetPlayer, sendCommodities);
         ButtonHelperAbilities.pillageCheck(targetPlayer, game);
@@ -71,12 +72,13 @@ class SendCommodities extends GameStateSubcommand {
 
         if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
             targetPlayer.clearDebt(player, sendCommodities);
-            MessageHelper.sendMessageToEventChannel(event, targetPlayer.getRepresentation() + " cleared " + sendCommodities + " debt tokens owned by " + player.getRepresentation());
+            MessageHelper.sendMessageToEventChannel(event, targetPlayer.getRepresentation() + " cleared "
+                + sendCommodities + " debt tokens owned by " + player.getRepresentation() + ".");
         }
 
         if (game.isFowMode()) {
             String fail = "Could not notify receiving player.";
-            String success = "The other player has been notified";
+            String success = "The other player has been notified.";
             MessageHelper.sendPrivateMessageToPlayer(targetPlayer, game, event.getChannel(), message, fail, success);
 
             // Add extra message for transaction visibility

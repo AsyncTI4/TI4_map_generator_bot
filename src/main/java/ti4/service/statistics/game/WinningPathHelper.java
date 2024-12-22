@@ -47,7 +47,9 @@ public class WinningPathHelper {
             ));
 
         return otherVictoryPoints.entrySet().stream()
-            .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()))
+            .sorted(
+                Map.Entry.<String, Integer>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey())
+            )
             .map(entry -> entry.getValue() + " " + entry.getKey())
             .collect(Collectors.joining(", "));
     }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -32,6 +34,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -106,7 +109,7 @@ public class StartTurnService {
                 } else {
                     player.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+                        + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
 
                 }
             }
@@ -138,7 +141,7 @@ public class StartTurnService {
                 } else {
                     player.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+                        + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
 
                 }
             }
@@ -174,29 +177,28 @@ public class StartTurnService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text2);
             if (player.hasTech("absol_aida")) {
                 String msg = player.getRepresentation()
-                    + " since you have AI Development Algorithm, you may research 1 Unit Upgrade now for 6 influence.";
+                    + " since you have _AI Development Algorithm_, you may research 1 unit upgrade technology now for 6 influence.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 if (!player.hasAbility("propagation")) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + " you may use the button to get your tech.",
+                        player.getRepresentationUnfogged() + " you may use the button to get your technology.",
                         List.of(Buttons.GET_A_TECH));
                 } else {
                     List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
-                    String message2 = player.getRepresentation() + "! Your current CCs are "
-                        + player.getCCRepresentation()
-                        + ". Use buttons to gain CCs";
+                        String message2 = player.getRepresentation() + ", you would research a unit upgrade technology, but because of **Propagation**, you instead gain 3 command tokens."
+                            + " Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         message2, buttons2);
                     game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                 }
             }
             if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
-                String msg = player.getRepresentation()
-                    + " since you have deliberate action ability and passed while one of your pools was at 0, you may gain 1 CC to that pool.";
+                String msg = player.getRepresentation() + " since you have the **Deliberate Action** ability,"
+                    + " and passed while one of your command pools contained no tokens, you may gain 1 command token to that pool.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
-                String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
-                    + ". Use buttons to gain CCs";
+                String message2 = player.getRepresentation() + "! Your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain command tokens.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons2);
             }
             EndTurnService.pingNextPlayer(event, game, player, true);
@@ -232,7 +234,7 @@ public class StartTurnService {
                 sendReminder = true;
             }
         }
-        sb.append("You currently have ").append(player.getStrategicCC()).append(" CC in your strategy pool.");
+        sb.append("You currently have ").append(player.getStrategicCC()).append(" command tokens in your strategy pool.");
         return sendReminder ? sb.toString() : null;
     }
 
@@ -387,8 +389,9 @@ public class StartTurnService {
                 .queue(Consumers.nop(), BotLogger::catchRestError);
             game.setLatestTransactionMsg("");
         }
-        if (!doneActionThisTurn && game.isFowMode()) {
+        if (game.isFowMode()) {
             startButtons.add(Buttons.gray("showGameAgain", "Show Game"));
+            FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(game, player, startButtons);
         }
 
         startButtons.add(Buttons.gray("showMap", "Show Map"));
@@ -404,7 +407,7 @@ public class StartTurnService {
             sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
         }
         sb.append("You currently have ").append(player.getStrategicCC())
-            .append(" CC in your strategy pool.");
+            .append(" command tokens in your strategy pool.");
         if (!player.hasFollowedSC(sc)) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 sb.toString());

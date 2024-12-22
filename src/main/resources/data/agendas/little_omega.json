@@ -139,7 +139,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Trade\" strategy card, they gain 4 trade goods. When the owner of this card ends their turn, they may discard this card to replenish their commodities or to convert their commodities to trade goods.",
         "text2": "",
-        "mapText": "After you resolve Trade, gain 4 TGs. When you end your turn, you may discard this card to replenish or convert your commodities.",
+        "mapText": "After you resolve Trade, gain 4 trade goods. When you end your turn, you may discard this card to replenish or convert your commodities.",
         "source": "little_omega"
     },
     {
@@ -149,7 +149,7 @@
         "target": "Elect Player",
         "text1": "After the owner of this card gains command tokens while resolving the primary or secondary ability of the \"Leadership\" strategy card, they explore 1 of their planets. When the owner of this card explores, they may discard this card to draw 3 additional cards; they choose 1 to resolve and discard the rest.",
         "text2": "",
-        "mapText": "After gaining CCs from Leadership, explore a planet. Before you draw from exploration, you may discard this to draw 3 additional cards and resolve 1.",
+        "mapText": "After gaining command tokens from Leadership, explore a planet. Before you draw from exploration, you may discard this to draw 3 additional cards and resolve 1.",
         "source": "little_omega"
     },
     {
@@ -199,7 +199,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Warfare\" strategy card, they gain 1 command token. The owner of this card may discard this card after they perform an action to remove 1 of their command tokens from the game board and perform a tactical action.",
         "text2": "",
-        "mapText": "After you resolve Warfare, gain 1 CC. You may discard this card after performing an action to remove 1 CC from the game board and perform a tactical action.",
+        "mapText": "After you resolve Warfare, gain 1 command token. You may discard this card after performing an action to remove 1 command token from the game board and perform a tactical action.",
         "source": "little_omega"
     },
     {

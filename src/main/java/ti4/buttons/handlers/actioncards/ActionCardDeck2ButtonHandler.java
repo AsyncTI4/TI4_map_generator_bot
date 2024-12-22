@@ -17,6 +17,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -191,13 +192,13 @@ class ActionCardDeck2ButtonHandler {
                 buttons.add(button);
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Don't give comms"));
+        buttons.add(Buttons.red("deleteButtons", "Don't Give Commodities"));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " tell the bot who you want to give 2 comms to",
+            player.getRepresentationUnfogged() + " tell the bot which player you wish to give 2 commodities to.",
             buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " tell the bot who else you want to give 2 comms to (different from the first time)",
+            player.getRepresentationUnfogged() + " tell the bot which __different__ player you wish to give 2 commodities to.",
             buttons);
     }
 
@@ -283,7 +284,7 @@ class ActionCardDeck2ButtonHandler {
                 player.refreshPlanet(planet);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " readied every tech skip planet");
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " readied every planet with a technology specialty.");
         event.getMessage().delete().queue();
     }
 
@@ -292,7 +293,7 @@ class ActionCardDeck2ButtonHandler {
         List<Button> buttons = getStrandedShipButtons(game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " tell the bot which tile you wish to place a Ghost Ship in",
+            player.getRepresentationUnfogged() + " tell the bot which tile you wish to place the _Ghost Ship_ in.",
             buttons);
     }
 
@@ -304,7 +305,7 @@ class ActionCardDeck2ButtonHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "cruiser");
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " put 1 cruiser in " + tile.getRepresentation());
+            player.getFactionEmoji() + " put 1 cruiser in " + tile.getRepresentation() + ".");
 
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
@@ -392,11 +393,11 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveSideProject(Player player, Game game, ButtonInteractionEvent event) {
         String successMessage;
         if (player.getStrategicCC() > 0) {
-            successMessage = player.getFactionEmoji() + " Reduced strategy pool CCs by 1 (" + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ")";
+            successMessage = player.getFactionEmoji() + ", 1 command token has been removed from your strategy pool (" + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ").";
             player.setStrategicCC(player.getStrategicCC() - 1);
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, CardEmojis.ActionCard + "Side Project");
         } else {
-            successMessage = player.getFactionEmoji() + " Exhausted Scepter of Emelpar";
+            successMessage = player.getFactionEmoji() + " exhausted the _" + RelicHelper.sillySpelling() + "_.";
             player.addExhaustedRelic("emelpar");
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
@@ -423,7 +424,7 @@ class ActionCardDeck2ButtonHandler {
             ButtonHelper.resolveCombatRoll(player, game, event,
                 "combatRoll_" + buttonID.split("_")[1] + "_space_afb");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`.");
         }
         game.setStoredValue("ShrapnelTurretsFaction", "");
         event.getMessage().delete().queue();
@@ -436,13 +437,14 @@ class ActionCardDeck2ButtonHandler {
         player.refreshPlanet(planet);
         List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
         if (!buttons.isEmpty()) {
-            String message = player.getFactionEmoji() + " Click button to explore "
-                + Helper.getPlanetRepresentation(planet, game);
+            String message = player.getFactionEmoji() + ", please press the button to explore "
+                + Helper.getPlanetRepresentation(planet, game) + ".";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 message, buttons);
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " refreshed and explored " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game));
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+            + " readied and explored " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game) + ".");
     }
 
 }

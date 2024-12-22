@@ -96,7 +96,7 @@ public class PromissoryNoteHelper {
     public static String getPromissoryNoteRepresentation(Game game, String pnID, boolean longFormat) {
         PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pnID);
         if (pnModel == null) {
-            String error = "Could not find representation for PN ID: " + pnID;
+            String error = "Could not find representation for promissory note with ID `" + pnID + "`";
             BotLogger.log(error);
             return error;
         }
@@ -189,7 +189,8 @@ public class PromissoryNoteHelper {
                 id = "dspnflor";
             } else {
                 MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, player.getRepresentationUnfogged()
-                    + " this PN will be applied automatically the next time you draw a relic. It will not work if you play it before then, so I am stopping you here");
+                    + " this promissory note will be applied automatically the next time you draw a relic."
+                    + " It will not work if you play it before then, so I am stopping you here.");
                 return;
             }
         }
@@ -295,12 +296,12 @@ public class PromissoryNoteHelper {
         if ("dspntnel".equalsIgnoreCase(id)) {
             game.drawSecretObjective(player.getUserID());
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation() + " drew an extra SO due to Tnelis PN. Please discard an extra SO");
+                player.getRepresentation() + " drew an extra secret objective due to _Plots Within Plots_. Please discard an extra secret objective.");
         }
         if ("sigma_sycophancy".equalsIgnoreCase(id)) {
             game.drawSecretObjective(player.getUserID());
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation() + " drew an extra SO due to _Sycophancy_. Please discard an extra SO.");
+                player.getRepresentation() + " drew an extra secret objective due to _Sycophancy_. Please discard an extra secret objective.");
         }
         if ("dspnvade".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
@@ -315,47 +316,41 @@ public class PromissoryNoteHelper {
                 owner.setStrategicCC(owner.getStrategicCC() - 1);
                 MessageHelper.sendMessageToChannel(owner.getCorrectChannel(),
                     owner.getRepresentationUnfogged()
-                        + " lost a command counter from strategy pool due to a Military Support play");
+                        + " lost a command token from strategy pool due to a _Military Support_ play.");
             }
             String message = player.getRepresentationUnfogged() + " Use buttons to drop 2 infantry on a planet";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if (!"agendas_absol".equals(game.getAgendaDeckID()) && id.endsWith("_ps")) {
             MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), owner.getRepresentationUnfogged()
-                + " due to a play of your Political Secret, you will be unable to vote in agenda (unless you have Xxcha alliance). The bot doesn't enforce the other restrictions regarding no abilities, but you should abide by them.");
+                + " due to a play of your Political Secret, you will be unable to vote in agenda (unless you have Xxcha alliance)."
+                + " The bot doesn't enforce the other restrictions regarding no abilities, but you should abide by them.");
             game.setStoredValue("AssassinatedReps",
                 game.getStoredValue("AssassinatedReps") + owner.getFaction());
         }
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired War Sun tech");
-            String reducedMsg = owner.getRepresentationUnfogged() + ", you must spend 1 command token due to _Fires of the Gashlai_ being played.";
-            if (game.isFowMode()) {
-                MessageHelper.sendMessageToChannelWithButtons(owner.getPrivateChannel(), reducedMsg, ButtonHelper.getLoseCCButtons(owner));
-            } else {
-                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), reducedMsg, ButtonHelper.getLoseCCButtons(owner));
-            }
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired the War Sun technology.");
+            owner.setFleetCC(owner.getFleetCC() - 1);
+            String reducedMsg = owner.getRepresentationUnfogged()
+                + ", 1 command token has been removed from your fleet pool because _Fires of the Gashlai_ was played.";
+            MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), reducedMsg);
         }
         if ("sigma_fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired War Sun tech");
-            owner.setFleetCC(owner.getFleetCC() - 1);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired the War Sun technology.");
             ButtonHelper.checkFleetInEveryTile(owner, game, event);
-            String reducedMsg = owner.getRepresentationUnfogged() + " reduced your fleet CC by 1 due to fires being played";
-            if (game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(owner.getPrivateChannel(), reducedMsg);
-            } else {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), reducedMsg);
-            }
+            String reducedMsg = owner.getRepresentationUnfogged() + ", you must spend 1 command token due to _Fires of the Gashlai_ being played.";
+            MessageHelper.sendMessageToChannelWithButtons(owner.getCorrectChannel(), reducedMsg, ButtonHelper.getLoseCCButtons(owner));
+
         }
         if (id.endsWith("_ta")) {
             int comms = owner.getCommodities();
             int oldTGs = player.getTg();
             owner.setCommodities(0);
-            if (game.isFowMode())
-            {
+            if (game.isFowMode()) {
                 String reducedMsg = owner.getRepresentationUnfogged() + " your _Trade Agreement_ was played.";
                 String reducedMsg2 = player.getRepresentationUnfogged()
                     + " you gained trade goods equal to the number of commodities the player had (your trade goods went from "
@@ -367,14 +362,12 @@ public class PromissoryNoteHelper {
                 ButtonHelperAbilities.pillageCheck(player, game);
                 MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), reducedMsg);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), reducedMsg2);
-            }
-            else
-            {
+            } else {
                 String reducedMsg = owner.getRepresentationUnfogged() + " your _Trade Agreement_ was played.";
                 String reducedMsg2 = player.getRepresentationUnfogged() + " played the _Trade Agreement_ belonging to "
                     + owner.getRepresentationUnfogged() + ", taking their " + comms + " commodit" + (comms == 1 ? "y" : "ies")
                     + " and so gaining " + comms + " trade good" + (comms == 1 ? "" : "s") + ". As such, they previous had "
-                    + oldTGs + " trade good" + (oldTGs == 1 ? "" : "s") + " and now have " + (oldTGs + comms) + " trade good" 
+                    + oldTGs + " trade good" + (oldTGs == 1 ? "" : "s") + " and now have " + (oldTGs + comms) + " trade good"
                     + (oldTGs + comms == 1 ? "" : "s") + ". Please follow up with the other player if this number seems off.";
                 player.setTg(oldTGs + comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, owner, player, owner.getCommoditiesTotal());
@@ -387,7 +380,7 @@ public class PromissoryNoteHelper {
             if (owner.getStrategicCC() > 0) {
                 owner.setStrategicCC(owner.getStrategicCC() - 1);
                 String reducedMsg = owner.getRepresentationUnfogged()
-                    + " reduced your strategy CC by 1 due to your PN getting played";
+                    + ", 1 command token has been removed from your strategy pool because _Political Favor_ was played.";
                 if (game.isFowMode()) {
                     MessageHelper.sendMessageToChannel(owner.getPrivateChannel(), reducedMsg);
                 } else {
@@ -395,10 +388,15 @@ public class PromissoryNoteHelper {
                 }
                 AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                    "Political Favor (xxcha PN) was played");
+                    "_Political Favor_ has been played to discard the current agenda.");
+            } else if (owner.getFaction().equalsIgnoreCase("xxcha")) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Xxcha does not have any command tokens in their strategy pool."
+                        + " As such, _Political Favor_ cannot be resolved and the current agenda remains.");
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "PN owner did not have a strategy CC, agenda not vetod");
+                    "The owner of _Political Favor_ does not have any command tokens in their strategy pool."
+                        + " As such, _Political Favor_ cannot be resolved and the current agenda remains.");
             }
         }
         if (("scepter".equalsIgnoreCase(id))) {
@@ -501,7 +499,16 @@ public class PromissoryNoteHelper {
         if ("sigma_excavation_experts".equalsIgnoreCase(id)) {
             List<Button> exploreButtons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation() + ", explore each planet that contains your mechs.", exploreButtons);
+                player.getRepresentation() + ", explore each planet that contains your mechs.", exploreButtons);
+        }
+        if ("sigma_primitivism".equalsIgnoreCase(id)) {
+            Button transact2 = Buttons.green("gain_CC", "Gain 1 Command Token");
+            int oldTgs = player.getTg();
+            player.setTg(oldTgs + 4);
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(),
+                player.getRepresentation() + ", you have gained 1 command token and 4 trade goods (" + oldTgs
+                    + " -> " + (oldTgs + 4) + ") from playing _Primitivism_. Please use the button to gain your command token.",
+                transact2);
         }
         if (pn.getText().toLowerCase().contains("action:") && !"acq".equalsIgnoreCase(id)) {
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);

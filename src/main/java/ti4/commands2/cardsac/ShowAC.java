@@ -17,8 +17,8 @@ import ti4.message.MessageHelper;
 class ShowAC extends GameStateSubcommand {
 
     public ShowAC() {
-        super(Constants.SHOW_AC, "Show an action card to one player", false, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, that is sent between ()").setRequired(true));
+        super(Constants.SHOW_AC, "Show an action card to one player", true, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }

@@ -104,24 +104,23 @@ public class ActionCardHelper {
         int index = 1;
 
         Map<String, Integer> actionCards = player.getActionCards();
-        if (actionCards != null) {
-            if (actionCards.isEmpty()) {
-                sb.append("> None");
+        if (actionCards == null || actionCards.isEmpty()) {
+            sb.append("> None");
+            return sb.toString();
+        }
+
+        for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            Integer value = ac.getValue();
+            ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
+
+            sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
+            if (actionCard == null) {
+                sb.append("Something broke here");
             } else {
-                for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
-                    Integer value = ac.getValue();
-                    ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
-
-                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
-                    if (actionCard == null) {
-                        sb.append("Something broke here");
-                    } else {
-                        sb.append(actionCard.getRepresentation());
-                    }
-
-                    index++;
-                }
+                sb.append(actionCard.getRepresentation());
             }
+
+            index++;
         }
 
         return sb.toString();
@@ -132,8 +131,8 @@ public class ActionCardHelper {
         Map<String, Integer> actionCards = player.getActionCards();
 
         if (actionCards != null && !actionCards.isEmpty()
-            && !ButtonHelper.isPlayerElected(game, player, "censure")
-            && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+                && !ButtonHelper.isPlayerElected(game, player, "censure")
+                && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
@@ -148,10 +147,10 @@ public class ActionCardHelper {
         } else {
             acButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard an Action Card"));
         }
-        if (actionCards != null && !actionCards.isEmpty()
-            && !ButtonHelper.isPlayerElected(game, player, "censure")
-            && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace") || actionCards.containsKey("special_session")
-                || actionCards.containsKey("investments") || actionCards.containsKey("last_minute_deliberation") || actionCards.containsKey("revolution") || actionCards.containsKey("deflection") || actionCards.containsKey("summit"))) {
+        if (actionCards != null && !actionCards.isEmpty() && !ButtonHelper.isPlayerElected(game, player, "censure")
+                && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace") || actionCards.containsKey("special_session")
+                    || actionCards.containsKey("investments") || actionCards.containsKey("last_minute_deliberation") || actionCards.containsKey("revolution")
+                    || actionCards.containsKey("deflection") || actionCards.containsKey("summit"))) {
             acButtons.add(Buttons.gray("checkForAllACAssignments", "Pre-Assign Action Cards"));
         }
 
@@ -345,7 +344,7 @@ public class ActionCardHelper {
             empyButtons.add(refuse);
             MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(),
                 empy.getRepresentationUnfogged()
-                    + "You have one or more mechs adjacent to some units of the player who played _" + actionCardTitle + "_. Use buttons to decide whether to cancel the action card.",
+                    + "You have one or more mechs adjacent to some units of the player who played _" + actionCardTitle + "_. Use buttons to decide whether to Sabo this action card.",
                 empyButtons);
         }
         String instinctTrainingID = "it";
@@ -354,7 +353,9 @@ public class ActionCardHelper {
                 List<Button> xxchaButtons = new ArrayList<>();
                 xxchaButtons.add(Buttons.gray("sabotage_xxcha_" + actionCardTitle, "Cancel " + actionCardTitle + " With Instinct Training", FactionEmojis.Xxcha));
                 xxchaButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), player2.getRepresentationUnfogged() + "You have Instinct Training unexhausted and a CC available. Use Buttons to decide whether to cancel", xxchaButtons);
+                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), player2.getRepresentationUnfogged()
+                    + ", you have _Instinct Training_ readied and a command token available in your strategy pool."
+                    + " Use buttons to decide whether to Sabo _" + actionCardTitle + "_.", xxchaButtons);
             }
 
         }
@@ -434,8 +435,9 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, acbuttons);
             }
 
-            String codedMessage = player.getRepresentation() + " After checking for Sabos, use buttons to resolve. Reminder that all card targets (besides tech RESEARCH) should be declared now, before people decide on sabos. Resolve ";
-            String codedMsg = codedMessage + actionCardTitle;
+            String codedMsg = player.getRepresentation() + " After checking for Sabos, use buttons to resolve."
+                + " Reminder that all card targets (besides technology research) should be declared now, before people decide on Sabos."
+                + " Resolve " + actionCardTitle + ".";
 
             List<Button> codedButtons = new ArrayList<>();
             if (actionCardTitle.contains("Plagiarize")) {
@@ -789,7 +791,7 @@ public class ActionCardHelper {
             TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(Constants.AC, actionCard.getAlias(), player.getNumberTurns());
             if (combatModAC != null) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "applytempcombatmod__" + Constants.AC + "__" + actionCard.getAlias(), "Resolve " + actionCard.getName()));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + actionCard.getName(), codedButtons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMsg, codedButtons);
             }
 
             if (actionCardWindow.contains("After an agenda is revealed")) {

@@ -400,7 +400,8 @@
             "vfs1",
             "vfs2",
             "vfs3",
-            "warfare"
+            "warfare",
+            "gamma"
         ],
         "source": "pok"
     },

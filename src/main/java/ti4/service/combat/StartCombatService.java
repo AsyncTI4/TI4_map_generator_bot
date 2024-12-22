@@ -396,21 +396,21 @@ public class StartCombatService {
                 && !player.getMahactCC().contains(otherPlayer.getColor())) {
                 buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + player.getFaction() + "_";
-                buttons.add(Buttons.gray(finChecker + "mahactStealCC_" + otherPlayer.getColor(), "Add Opponent CC to Fleet", FactionEmojis.Mahact));
+                buttons.add(Buttons.gray(finChecker + "mahactStealCC_" + otherPlayer.getColor(), "Add Opponent Command Token to Fleet Pool", FactionEmojis.Mahact));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you win this combat, you may add the opponents CC to your fleet pool.",
+                    + " this is a reminder that if you win this combat, you may add the opponents command token to your fleet pool.",
                     buttons);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray("exhaustTech_dskortg_" + tile.getPosition(), "Tempest Drive", FactionEmojis.kortali));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you win the combat, you may use this button to remove a CC from the system.",
+                    + " this is a reminder that if you win the combat, you may use this button to remove a command token from the system.",
                     buttons);
             }
             if (player.hasAbility("technological_singularity")) {
-                Button steal = Buttons.gray(player.finChecker() + "nekroStealTech_" + otherPlayer.getFaction(), "Steal Tech", FactionEmojis.Nekro);
-                String message = msg + " this is a reminder that when you first kill an opponent unit this combat, you may use the button to steal a tech.";
+                Button steal = Buttons.gray(player.finChecker() + "nekroStealTech_" + otherPlayer.getFaction(), "Copy a Technology", FactionEmojis.Nekro);
+                String message = msg + " this is a reminder that when you first kill an opponent's unit this combat, you may use the button to copy a technology.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
             }
             if (player.hasUnit("ghemina_mech") && type.equalsIgnoreCase("ground") && ButtonHelper.getUnitHolderFromPlanetName(unitHolderName, game).getUnitCount(Units.UnitType.Mech, player) == 2) {
@@ -450,9 +450,9 @@ public class StartCombatService {
                 && "space".equalsIgnoreCase(type)) {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(finChecker + "startFacsimile_" + tile.getPosition(), "Play Mortheus PN", FactionEmojis.cheiran));
+                buttons.add(Buttons.gray(finChecker + "startFacsimile_" + tile.getPosition(), "Play Secrets of the Weave", FactionEmojis.mortheus));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that you may play Morpheus PN here to spend influence equal to the cost of 1 of the opponent ships to " +
+                    + " this is a reminder that you may play _Secrets of the Weave_ here to spend influence equal to the cost of 1 of the opponent ships to " +
                     "place 1 of that type of ship in the system.",
                     buttons);
             }

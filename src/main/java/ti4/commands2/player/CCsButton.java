@@ -8,7 +8,7 @@ import ti4.message.MessageHelper;
 class CCsButton extends Subcommand {
 
     public CCsButton() {
-        super("cc", "Adjust Command Counters");
+        super("cc", "Adjust Command Tokens");
     }
 
     @Override

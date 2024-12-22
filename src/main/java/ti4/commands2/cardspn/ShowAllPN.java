@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 class ShowAllPN extends GameStateSubcommand {
 
     public ShowAllPN() {
-        super(Constants.SHOW_ALL, "Show Promissory Note to player", false, true);
+        super(Constants.SHOW_ALL, "Show Promissory Note to player", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }

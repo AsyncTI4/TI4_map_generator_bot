@@ -10,6 +10,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper.TIGLRank;
+import ti4.image.PositionMapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -45,7 +46,7 @@ class Info extends GameStateSubcommand {
         sb.append("Game Completed: `").append(game.getWinner().isPresent()).append("`").append("\n");
 
         sb.append("### Setup: ").append("\n");
-        sb.append("VP Count: ").append(game.getVp()).append("\n");
+        sb.append("Victory Point Count: ").append(game.getVp()).append("\n");
         sb.append("SO Count: ").append(game.getMaxSOCountPerPlayer()).append("\n");
         sb.append("Private Game: ").append(privateGame).append("\n");
         sb.append("Game Modes: ").append(game.getGameModesText()).append("\n");
@@ -154,6 +155,10 @@ class Info extends GameStateSubcommand {
         sb.append("Game Real Player Count: ").append(game.getRealPlayers().size()).append("\n");
         sb.append("GMIDs: `").append(game.getFogOfWarGMIDs()).append("`\n");
         sb.append("SCs per player: ").append(game.getStrategyCardsPerPlayer()).append("\n");
+        sb.append("TopMostTileOffset: `").append(PositionMapper.getTopMostTileOffsetInGame(game)).append("`\n");
+        sb.append("BottomMostTileOffset: `").append(PositionMapper.getBottomMostTileOffsetInGame(game)).append("`\n");
+        sb.append("LeftMostTileOffset: `").append(PositionMapper.getLeftMostTileOffsetInGame(game)).append("`\n");
+        sb.append("RightMostTileOffset: `").append(PositionMapper.getRightMostTileOffsetInGame(game)).append("`\n");
         sb.append("Map Images Generated: ").append(game.getMapImageGenerationCount()).append("\n");
         sb.append("SC Trade Goods: `").append(game.getScTradeGoods()).append("`").append("\n");
         sb.append("Public Objectives: `").append(game.getRevealedPublicObjectives()).append("`").append("\n");
