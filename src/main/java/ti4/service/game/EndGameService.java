@@ -320,7 +320,7 @@ public class EndGameService {
         if (winner.isPresent() && !game.hasHomebrew()) {
             String winningPath = WinningPathHelper.buildWinningPath(game, winner.get());
             sb.append("**Winning Path:** ").append(winningPath).append("\n");
-            sb.append(GameStatisticsService.getWinningPathComparison(winningPath, game.getRealPlayers().size(), vpCount));
+            sb.append(GameStatisticsService.getWinningPathComparison(winningPath, game.getRealAndEliminatedPlayers().size(), vpCount));
         }
 
         return sb.toString();
