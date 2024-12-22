@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -54,22 +55,18 @@ public class ButtonHelperModifyUnits {
             return 0;
         }
         mentakFS = Helper.getPlayerFromUnit(game, "sigma_mentak_flagship_2");
-        if (mentakFS != null && mentakFS != player)
-        {
+        if (mentakFS != null && mentakFS != player) {
             if (unitHolder.getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
                 return 0;
             }
             Tile t = game.getTileFromPlanet(unitHolder.getName());
-            for (String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(game, t.getPosition(), player, false))
-            {
-                if (game.getTileByPosition(adjPos).getUnitHolders().get("space").getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0)
-                {
+            for (String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(game, t.getPosition(), player, false)) {
+                if (game.getTileByPosition(adjPos).getUnitHolders().get("space").getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
                     return 0;
                 }
             }
         }
-        
-        
+
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             if (!player.unitBelongsToPlayer(unitEntry.getKey()))
                 continue;
@@ -1167,7 +1164,7 @@ public class ButtonHelperModifyUnits {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "kollecccommander") && !buttonID.contains("skilled")
             && !CommandCounterHelper.hasCC(event, player.getColor(), tile1)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()
-                + " did not place a CC in the retreat system due to Kado S'mah-Qar, the Kollecc commander.");
+                + " did not place a command token in system they retreated to due to Kado S'mah-Qar, the Kollecc commander.");
         } else {
             CommandCounterHelper.addCC(event, player.getColor(), tile2, true);
         }
@@ -1262,7 +1259,7 @@ public class ButtonHelperModifyUnits {
             if (player.hasUnit("absol_saar_spacedock") || player.hasUnit("saar_spacedock") || player.hasTech("ffac2")
                 || player.hasTech("absol_ffac2")) {
                 AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)),
-                    game, player.getColor(), unitID + " " + planetName);
+                    game, player.getColor(), unitID);
                 successMessage = "Placed 1 space dock in the space area of the "
                     + Helper.getPlanetRepresentation(planetName, game) + " system.";
             } else {
@@ -1399,7 +1396,7 @@ public class ButtonHelperModifyUnits {
 
             }
         }
-        if (("sd".equalsIgnoreCase(unitID) || "pds".equalsIgnoreCase(unitLong) || "monument".equalsIgnoreCase(unitLong)) && event.getMessage().getContentRaw().contains("for construction")) {
+        if (("sd".equalsIgnoreCase(unitID) || "pds".equalsIgnoreCase(unitLong) || "monument".equalsIgnoreCase(unitLong)) && event.getMessage().getContentRaw().toLowerCase().contains("construction")) {
             if (game.isFowMode() || (!"action".equalsIgnoreCase(game.getPhaseOfGame()) && !"statusScoring".equalsIgnoreCase(game.getPhaseOfGame()))) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), playerRep + " " + successMessage);
             } else {
@@ -1407,10 +1404,11 @@ public class ButtonHelperModifyUnits {
             }
 
             if (player.hasLeader("mahactagent") || player.hasExternalAccessToLeader("mahactagent")) {
-                String message = playerRep + " Please tell the bot if you used Mahact's agent and should place the active player's (Construction holder) CC or if you followed normally and should place your own CC from reinforcements.";
-                Button placeCCInSystem = Buttons.green(player.getFinsFactionCheckerPrefix() + "reinforcements_cc_placement_" + planetName, "Place 1 CC from reinforcements");
-                Button placeConstructionCCInSystem = Buttons.gray(player.getFinsFactionCheckerPrefix() + "placeHolderOfConInSystem_" + planetName, "Place 1 CC of the active player");
-                Button NoDontWantTo = Buttons.blue(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Don't Place A CC");
+                String message = playerRep + ", please tell the bot if you used Mahact's agent and thus should place the active player's (**Construction** holder) command token"
+                    + " or if you followed normally and should place your own command token from reinforcements.";
+                Button placeCCInSystem = Buttons.green(player.getFinsFactionCheckerPrefix() + "reinforcements_cc_placement_" + planetName, "Place Token from Reinforcements");
+                Button placeConstructionCCInSystem = Buttons.gray(player.getFinsFactionCheckerPrefix() + "placeHolderOfConInSystem_" + planetName, "Place 1 Token of the Active Player");
+                Button NoDontWantTo = Buttons.blue(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Don't Place A Command Token");
                 List<Button> buttons = List.of(placeCCInSystem, placeConstructionCCInSystem, NoDontWantTo);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             } else {
@@ -1431,15 +1429,15 @@ public class ButtonHelperModifyUnits {
                     if (tile == null) {
                         tile = game.getTileByPosition(tileID);
                     }
-                    String msg = playerRep + " Placed 1 CC From Reinforcements In The "
-                        + Helper.getPlanetRepresentation(planetName, game) + " system";
+                    String msg = playerRep + " placed 1 command token from reinforcements in the "
+                        + Helper.getPlanetRepresentation(planetName, game) + " system.";
                     if (!game.playerHasLeaderUnlockedOrAlliance(player, "rohdhnacommander")) {
                         if (Mapper.isValidColor(color)) {
                             CommandCounterHelper.addCC(event, color, tile);
                         }
                     } else {
                         msg = playerRep
-                            + " has B-Unit 205643a, the Roh'Dhna Commander and is thus doing the Primary which does not place a CC.";
+                            + " has B-Unit 205643a, the Roh'Dhna Commander, and is thus doing the primary ability of **Construction**, which does not place a command token.";
                     }
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), msg);
@@ -1624,8 +1622,9 @@ public class ButtonHelperModifyUnits {
                         && player.getHomeSystemTile() == tile2
                         && !ButtonHelperAbilities.getTilesToRallyToTheCause(game, player).isEmpty()) {
                         String msg = player.getRepresentation()
-                            + " due to your Rally to the Cause ability, if you just produced a ship in your HS, you may produce up to 2 ships in a system that contains a planet with a trait but no legendary planets and no opponent units."
-                            + " Press button to resolve.";
+                            + " due to your **Rally to the Cause** ability, if you just produced a ship in your home system,"
+                            + " you may produce up to 2 ships in a system that contains a planet with a trait,"
+                            + " but does not contain a legendary planet or another player's units. Press button to resolve";
                         List<Button> buttons2 = new ArrayList<>();
                         buttons2.add(Buttons.green("startRallyToTheCause", "Rally To The Cause"));
                         buttons2.add(Buttons.red("deleteButtons", "Decline"));
@@ -2306,4 +2305,44 @@ public class ButtonHelperModifyUnits {
             && player.hasUnit("nomad_mech")
             && !noMechPowers;
     }
+
+    public static List<Button> getContractualObligationsButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p : game.getRealPlayers()) {
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray("resolveContractual_" + p.getFaction(), p.getColor()));
+            } else {
+                Button button = Buttons.gray("resolveContractual_" + p.getFaction(), " ");
+                buttons.add(button.withEmoji(Emoji.fromFormatted(p.getFactionEmoji())));
+            }
+        }
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
+        return buttons;
+    }
+
+    @ButtonHandler("resolveContractual_")
+    public static void resolveContractualObligations(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String targetFaction = buttonID.replace("resolveContractual_", "");
+        Player targetPlayer = game.getPlayerFromColorOrFaction(targetFaction);
+
+        List<Button> buttons = new ArrayList<>();
+        List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(game, targetPlayer,
+                    Units.UnitType.Spacedock, Units.UnitType.CabalSpacedock, Units.UnitType.PlenaryOrbital, Units.UnitType.Warsun));
+        for (Tile tile : tiles) {
+            Button tileButton = Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_sling",
+                tile.getRepresentationForButtons(game, targetPlayer));
+            buttons.add(tileButton);
+        }
+        MessageHelper.sendMessageToChannelWithButtons(targetPlayer.getCorrectChannel(), targetPlayer.getRepresentationUnfogged()
+            + " " + (game.isFowMode() ? "Someone" : player.getRepresentationNoPing())
+            + " is using Contractual Obligations to force you to produce 1 ship in a system that contains 1 or more of your space docks or war suns.\n"
+            + "Select which tile you would like to produce 1 ship in.", buttons);
+
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Used Contractual Obligations to force " 
+                + targetPlayer.getRepresentationNoPing() + " to produce 1 ship.");
+        }
+        event.getMessage().delete().queue();
+    }
+
 }

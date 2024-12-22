@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +30,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
             && name != null
             && type != null
             && resolution != null
-            && List.of("Fragment", "Attach", "Instant", "Token").contains(resolution)
+            && List.of("Fragment", "Attach", "Instant", "Token", "Leader").contains(resolution)
             && text != null
             && source != null;
     }

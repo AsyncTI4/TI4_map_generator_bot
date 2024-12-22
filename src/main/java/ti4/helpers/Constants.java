@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -85,6 +85,7 @@ public class Constants {
     public static final String FOW_OPTIONS = "fow_options";
     public static final String BASE_GAME_MODE = "base_game_mode";
     public static final String LIGHT_FOG_MODE = "light_fog_mode";
+    public static final String CPTI_EXPLORE_MODE = "cpti_explore_mode";
     public static final String RED_TAPE_MODE = "red_tape_mode";
     public static final String HOMEBREW_SC_MODE = "homebrew_sc_mode";
     public static final String SPIN_MODE = "spin_mode";
@@ -1192,4 +1193,5 @@ public class Constants {
     public static final String MODIFY_UNITS = "modify_units";
     public static final String SHOW_OWNED_PNS_IN_PLAYER_AREA = "show_owned_pns_in_player_area";
     public static final String SECONDS = "seconds";
+    public static final String MOVE_TILE = "move_tile";
 }

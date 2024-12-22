@@ -95,7 +95,7 @@ class SystemInfo extends GameStateSubcommand {
                 boolean hasCC = false;
                 for (String cc : unitHolder.getCCList()) {
                     if (!hasCC) {
-                        sb.append("Command Counters: ");
+                        sb.append("Command Tokens: ");
                         hasCC = true;
                     }
                     appendFactionIcon(game, sb, cc, privateGame);
@@ -144,7 +144,8 @@ class SystemInfo extends GameStateSubcommand {
                     sb.append(player.getFactionEmojiOrColor()).append(ColorEmojis.getColorEmojiWithName(color));
                     sb.append(" `").append(unitEntry.getValue()).append("x` ");
                     if (unitModel != null) {
-                        sb.append(unitModel.getUnitEmoji()).append(" ").append(unitModel.getName()).append("\n");
+                        sb.append(unitModel.getUnitEmoji()).append(" ");
+                        sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName()).append("\n");
                     } else {
                         sb.append(unitKey).append("\n");
                     }

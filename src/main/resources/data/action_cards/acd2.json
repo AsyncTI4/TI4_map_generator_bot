@@ -21,7 +21,7 @@
     "alias": "anomalous_conditions",
     "name": "Anomalous Conditions",
     "phase": "Action",
-    "window": "At the start of a round of combat",
+    "window": "At the start of a round of combat that you are participating in",
     "text": "Choose 1 unit type. Units of that type cannot make combat rolls during this combat round.",
     "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift's horizon. His crew clung to their stations, eyes wide, as the enemy's munitions vanished into the void like pebbles dropped into a well.",
     "source": "action_deck_2"
@@ -210,7 +210,7 @@
     "alias": "decisive_victory",
     "name": "Decisive Victory",
     "phase": "Action",
-    "window": "When only you have ships in the space area of the active system at the end of the first round of a space combat",
+    "window": "When only you have ships in the the active system at the end of the first round of a space combat",
     "text": "Remove your command token from that system.",
     "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
     "source": "action_deck_2"
@@ -531,6 +531,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "lost_treatise",
+    "name": "Lost Treatise",
+    "phase": "Action",
+    "window": "At the start of your turn",
+    "text": "Either redistribute your command tokens or place 1 command token from your reinforcements in your fleet pool.",
+    "flavorText": "Unlenn massaged his brow and shut off his holoscreen. The magnum opus on Lazax war theory at his fingertips, and yet... it was the most boring piece of literature he'd ever had the displeasure to read.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "mercenary_contract",
     "name": "Mercenary Contract",
     "phase": "Action",
@@ -546,15 +555,6 @@
     "window": "Action",
     "text": "Choose 1 system that contains another player's fighters. Roll 1 die for each fighter in that system. For each result of 7 or greater, destroy 1 of those units.",
     "flavorText": "The disaster investigation unit could not determine whether it was an act of providence or the beginning stages of an incursion.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "military_treatise",
-    "name": "Military Treatise",
-    "phase": "Action",
-    "window": "At the start of your turn",
-    "text": "Either redistribute your command tokens or place 1 command token from your reinforcements in your fleet pool.",
-    "flavorText": "Unlenn massaged his brow and shut off his holoscreen. The magnum opus on Lazax war theory at his fingertips, and yet... it was the most boring piece of literature he'd ever had the displeasure to read.",
     "source": "action_deck_2"
   },
   {
@@ -580,7 +580,7 @@
     "name": "Overtime",
     "phase": "Action",
     "window": "At the end of your turn",
-    "text": "Spend 1 or 2 trade goods to ready an equal number of non-home planets you control.",
+    "text": "Spend up to 2 trade goods to ready an equal number of non-home planets you control.",
     "flavorText": "Captain Agerro sighed. The work was not what he had expected, not what he had wanted, but it had to be done. Fighting would come later.",
     "source": "action_deck_2"
   },

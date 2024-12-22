@@ -18,6 +18,6 @@ public class SelectionMenuListener extends ListenerAdapter {
 
         event.deferEdit().queue();
 
-        SelectionMenuProcessor.process(event);
+        SelectionMenuProcessor.queue(event);
     }
 }

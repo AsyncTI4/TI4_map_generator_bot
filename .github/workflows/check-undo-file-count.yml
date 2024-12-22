@@ -14,10 +14,9 @@ jobs:
           AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
         with:
           host: ${{ secrets.SSH_HOST }}
-          username: root
+          username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
-          port: 22
-          script_stop: true
+          port: ${{ secrets.SSH_PORT }}
           envs: AWS_KEY, AWS_SECRET
           script: |
             cd ~/ti4bot/ti4bot_saves/maps/undo

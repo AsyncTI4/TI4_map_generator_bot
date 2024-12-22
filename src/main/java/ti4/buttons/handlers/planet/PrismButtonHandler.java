@@ -25,8 +25,9 @@ class PrismButtonHandler {
         String techOut = buttonID.split("@")[1];
         player.purgeTech(techOut);
         TechnologyModel techM1 = Mapper.getTech(techOut);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " purged the tech " + techM1.getName());
-        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech with the same number of prerequisites: " + techM1.getRequirements().orElse("None"), Buttons.GET_A_FREE_TECH);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " purged the technology _" + techM1.getName() + "_.");
+        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation()
+            + ", use the button to get a technology that also has " + techM1.getRequirements().orElse("").length() + " prerequisites.", Buttons.GET_A_FREE_TECH);
         event.getMessage().delete().queue();
         String message2 = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
@@ -38,14 +39,14 @@ class PrismButtonHandler {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
 
-        buttons.add(Buttons.gray("prismStep3_" + player.getFaction() + "_AC", "Send AC"));
-        buttons.add(Buttons.gray("prismStep3_" + player.getFaction() + "_PN", "Send PN"));
+        buttons.add(Buttons.gray("prismStep3_" + player.getFaction() + "_AC", "Send Action Card"));
+        buttons.add(Buttons.gray("prismStep3_" + player.getFaction() + "_PN", "Send Promissory Notes"));
 
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " chose " + p2.getFactionEmojiOrColor() + " as the target of the prism ability. The target has been sent buttons to resolve.");
+            player.getFactionEmoji() + " chose " + p2.getFactionEmojiOrColor() + " as the target of the Prism ability. The target has been sent buttons to resolve.");
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
-            p2.getRepresentationUnfogged() + " you have had the Prism ability hit you. Please tell the bot if you wish to send an AC or a PN", buttons);
+            p2.getRepresentationUnfogged() + ", you have had the Prism ability hit you. Please tell the bot if you wish to send an action card or a promissory note.", buttons);
     }
 
     @ButtonHandler("prismStep3_")
@@ -54,10 +55,10 @@ class PrismButtonHandler {
         List<Button> buttons;
         String pnOrAC = buttonID.split("_")[2];
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " chose to send a " + pnOrAC);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " chose to send a " + pnOrAC + ".");
         if ("pn".equalsIgnoreCase(pnOrAC)) {
             buttons = ButtonHelper.getForcedPNSendButtons(game, p2, player);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged() + " resolve", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged() + ", choose which promissory note to send.", buttons);
         } else {
             String buttonID2 = "transact_ACs_" + p2.getFaction();
             TransactionHelper.resolveSpecificTransButtonsOld(game, player, buttonID2, event);

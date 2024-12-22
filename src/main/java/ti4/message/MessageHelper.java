@@ -46,7 +46,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
-import ti4.helpers.ThreadHelper;
+import ti4.helpers.ThreadArchiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
@@ -380,18 +380,6 @@ public class MessageHelper {
 							Game game = managedGame.getGame();
 							game.setLatestTransactionMsg(complete.getId());
 						}
-
-						if (message.toLowerCase().contains("up next")) {
-							Game game = managedGame.getGame();
-							if (game.getLatestUpNextMsg() != null && !"".equalsIgnoreCase(game.getLatestUpNextMsg())) {
-								String id = game.getLatestUpNextMsg().split("_")[0];
-								String msg = game.getLatestUpNextMsg().substring(game.getLatestUpNextMsg().indexOf("_") + 1);
-								msg = msg.replace("UP NEXT", "started their turn");
-								game.getActionsChannel().editMessageById(id, msg).queue(null,
-									error -> BotLogger.log(getRestActionFailureMessage(channel, "Error editing message", messageCreateData, error)));
-							}
-							game.setLatestUpNextMsg(complete.getId() + "_" + message);
-						}
 					}
 
 					// RUN SUPPLIED ACTION
@@ -512,10 +500,9 @@ public class MessageHelper {
 
 	/**
 	 * @param player Player to send the messageText
-	 * @param game Map/Game the player is in
 	 * @param messageText messageText - handles large text ()>1500 chars)
 	 */
-	public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, @NotNull Game game, String messageText) {
+	public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, String messageText) {
 		if (messageText == null || messageText.isEmpty()) {
 			return;
 		}
@@ -697,7 +684,7 @@ public class MessageHelper {
 		if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty() || messageToSend.isEmpty())
 			return;
 		if (channel instanceof TextChannel) {
-			ThreadHelper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
+			ThreadArchiveHelper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
 			channel.asTextChannel().createThreadChannel(threadName)
 				.setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queueAfter(500, TimeUnit.MILLISECONDS,
 					t -> sendMessageToChannel(t, messageToSend));
@@ -711,7 +698,7 @@ public class MessageHelper {
 			return;
 		}
 		if (channel instanceof TextChannel) {
-			ThreadHelper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
+			ThreadArchiveHelper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
 			channel.asTextChannel().createThreadChannel(threadName)
 				.setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
 				.queueAfter(500, TimeUnit.MILLISECONDS,

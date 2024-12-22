@@ -27,7 +27,7 @@ public class CardsInfoService {
         if (player == null)
             return;
         String headerText = player.getRepresentationUnfogged() + CommandHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendCardsInfo(game, player);
     }
 
@@ -36,7 +36,7 @@ public class CardsInfoService {
         ActionCardHelper.sendActionCardInfo(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game,
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player,
             """
                 You may whisper to people from here by starting a message with to[color] or to[faction].\
 
@@ -125,10 +125,10 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAgentSelection_ghotiagent", "Use Ghoti Agent", FactionEmojis.ghoti));
         }
         if (!player.getNomboxTile().getUnitHolders().get("space").getUnits().isEmpty()) {
-            buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.Cabal));
+            buttons.add(Buttons.gray("getReleaseButtons", "Release Captured Units", FactionEmojis.Cabal));
         }
         if (player.hasRelicReady("e6-g0_network")) {
-            buttons.add(Buttons.green("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
+            buttons.add(Buttons.green("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw Action Card"));
         }
         if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
             buttons.add(Buttons.green("getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));

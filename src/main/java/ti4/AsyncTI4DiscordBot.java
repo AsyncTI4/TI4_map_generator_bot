@@ -188,7 +188,7 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 11) {
             guildSeptenary = jda.getGuildById(args[10]);
             startBot(guildSeptenary);
-            // serversToCreateNewGamesOn.add(guildsSeptenary); // TODO: enable this server for new games
+            serversToCreateNewGamesOn.add(guildSeptenary);
         }
 
         // LOAD DATA

@@ -89,11 +89,12 @@ class WinningPathsStatisticsService {
         Map<String, Integer> winningPathCounts = getNormalGameWinningPaths(playerCount, victoryPointTotal);
         int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
         if (gamesWithWinnerCount >= 100) {
-            int winningPathCount = winningPathCounts.get(winningPath);
+            // TODO: Previously this was never null, but after loadless it is? Need investigation, but for now defaulting to 1.
+            int winningPathCount = winningPathCounts.getOrDefault(winningPath, 1);
             double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
             String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
-            sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games (").append(victoryPointTotal).append("VP, ")
-                .append(playerCount).append("P)")
+            sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games (").append(victoryPointTotal).append(" victory points, ")
+                .append(playerCount).append(" player)")
                 .append(", this path has been seen ")
                 .append(winningPathCount - 1)
                 .append(" times before. It's the ").append(winningPathCommonality).append(" most common path (out of ")

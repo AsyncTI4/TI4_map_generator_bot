@@ -19,7 +19,8 @@ public class MapCommand implements ParentCommand {
         new Preset(),
         new ShowMapSetup(),
         new ShowMapString(),
-        new SetMapTemplate()
+        new SetMapTemplate(),
+        new MoveTile()
     ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
 

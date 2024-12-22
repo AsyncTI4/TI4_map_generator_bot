@@ -22,7 +22,7 @@ public class NaaluCommanderService {
 
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentationUnfogged()).append(" you are using the M'aban, the Naalu Commander:");
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
 
         // Top Agenda
         AgendaHelper.sendTopAgendaToCardsInfoSkipCovert(game, player);
@@ -57,6 +57,6 @@ public class NaaluCommanderService {
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), player.getRepresentation() + " is using M'aban, the Naalu Commander, to look at the top & bottom agenda, and their neighbour's promissory notes.");
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
     }
 }

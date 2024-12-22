@@ -474,7 +474,7 @@ public class FoWHelper {
 			}
 		}
 
-		return wormholeIDs.contains(Constants.BETA);
+		return wormholeIDs.stream().anyMatch(id -> id.contains(Constants.BETA));
 	}
 
 	public static boolean doesTileHaveAlpha(Game game, String position) {
@@ -497,7 +497,7 @@ public class FoWHelper {
 			}
 		}
 
-		return (wormholeIDs.contains(Constants.ALPHA));
+		return wormholeIDs.stream().anyMatch(id -> id.contains(Constants.ALPHA));
 	}
 
 	/**
@@ -810,7 +810,7 @@ public class FoWHelper {
 					+ message;
 				success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
 				MessageChannel channel = player_.getPrivateChannel();
-				MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
+				MessageHelper.sendMessageToChannelWithButtons(channel, "Use button to refresh view of system.",
 					StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
 			}
 			successfulCount += success ? 1 : 0;

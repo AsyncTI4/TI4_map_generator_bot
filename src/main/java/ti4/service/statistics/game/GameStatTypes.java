@@ -4,7 +4,7 @@ public enum GameStatTypes {
     // Add your new statistic here
     UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"),
     AVERAGE_TURNS("Average Turn Amount", "Show the average turns for a faction in a game"),
-    HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on CCs/plastics that bot has"),
+    HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on command tokens/plastics that bot has"),
     GAME_LENGTH("Game Length", "Show game lengths"),
     GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"),
     FACTIONS_PLAYED("Plays per Faction", "Show faction play count"),

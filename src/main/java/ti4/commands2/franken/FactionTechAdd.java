@@ -10,7 +10,7 @@ import ti4.service.franken.FrankenFactionTechService;
 class FactionTechAdd extends FactionTechAddRemove {
 
     public FactionTechAdd() {
-        super(Constants.FACTION_TECH_ADD, "Add a faction tech to your faction");
+        super(Constants.FACTION_TECH_ADD, "Add a faction technology to your faction");
     }
 
     @Override

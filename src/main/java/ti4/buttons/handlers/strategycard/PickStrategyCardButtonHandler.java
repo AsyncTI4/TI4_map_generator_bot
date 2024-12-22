@@ -60,12 +60,14 @@ class PickStrategyCardButtonHandler {
         }
         if (game.getStoredValue("deflectedSC").equalsIgnoreCase(num)) {
             if (player.getStrategicCC() < 1) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " You cant pick this SC because it has the deflection ability on it and you have no strat CC to spend");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+                    + ", you can't pick this SC because it has been targeted by _Deflection_, and you don't have a command token in your strategy pool to spend.");
                 return;
             } else {
                 player.setStrategicCC(player.getStrategicCC() - 1);
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " spent 1 strat CC due to deflection");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+                    + " spent 1 command token from their strategy pool to pick this strategy card due to _Deflection_.");
             }
         }
 
@@ -192,9 +194,11 @@ class PickStrategyCardButtonHandler {
         if (tgCount != null && tgCount != 0) {
             int tg = player.getTg();
             tg += tgCount;
-            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scPicked, game));
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
+                + " from picking " + Helper.getSCName(scPicked, game) + ".");
             if (game.isFowMode()) {
-                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scPicked, game);
+                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
+                    + " from picking " + Helper.getSCName(scPicked, game) + ".";
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);
@@ -207,7 +211,8 @@ class PickStrategyCardButtonHandler {
                 }
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " chose which player to give this stratgy card to.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged()
+            + " chose which player to give this strategy card to.", buttons);
         event.getMessage().delete().queue();
     }
 }

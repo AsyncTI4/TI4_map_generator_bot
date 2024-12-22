@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.StringHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -20,8 +21,8 @@ class SCUnpick extends GameStateSubcommand {
 
     public SCUnpick() {
         super(Constants.SC_UNPICK, "Unpick a Strategy Card", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card #").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card imitative number").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color returning strategy card").setAutoComplete(true));
     }
 
     @Override
@@ -104,7 +105,8 @@ class SCUnpick extends GameStateSubcommand {
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
             if (allPicked) {
-                msgExtra = privatePlayer.getRepresentationUnfogged() + " UP NEXT";
+                msgExtra = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
+                    + StringHelper.ordinal(privatePlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";

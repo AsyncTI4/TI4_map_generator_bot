@@ -17,7 +17,7 @@ class PurgeAC extends GameStateSubcommand {
 
     public PurgeAC() {
         super(Constants.PURGE_AC, "Purge an Action Card", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID, which is found between ()").setRequired(true));
     }
 
     @Override
@@ -33,14 +33,14 @@ class PurgeAC extends GameStateSubcommand {
         }
 
         if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
             return;
         }
 
         Game game = getGame();
         boolean removed = game.purgedActionCard(player.getUserID(), acIndex);
         if (!removed) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
             return;
         }
 

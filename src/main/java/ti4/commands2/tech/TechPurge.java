@@ -8,7 +8,7 @@ import ti4.service.tech.PlayerTechService;
 class TechPurge extends TechAddRemove {
 
     public TechPurge() {
-        super(Constants.TECH_PURGE, "Purge Tech (Can't research/gain it again)");
+        super(Constants.TECH_PURGE, "Purge a technology (permanently removing it from the game)");
     }
 
     @Override

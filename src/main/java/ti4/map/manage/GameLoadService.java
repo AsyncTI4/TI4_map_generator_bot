@@ -799,6 +799,13 @@ class GameLoadService {
                     } catch (Exception e) {
                     }
                 }
+                case Constants.CPTI_EXPLORE_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        game.setCptiExploreMode(value);
+                    } catch (Exception e) {
+                    }
+                }
                 case Constants.RED_TAPE_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -1374,7 +1381,7 @@ class GameLoadService {
 
         while (matcher.find()) {
             String po = matcher.group(1);
-            List<String> playerIDs = Arrays.asList(matcher.group(2).split(","));
+            List<String> playerIDs = new ArrayList<>(Arrays.asList(matcher.group(2).split(",")));
             peekedPublicObjectives.put(po, playerIDs);
         }
 
