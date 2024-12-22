@@ -17,8 +17,8 @@ import ti4.service.info.SecretObjectiveInfoService;
 class MakeSecretIntoPO extends GameStateSubcommand {
 
     public MakeSecretIntoPO() {
-        super(Constants.MAKE_SO_INTO_PO, "Make Secret Objective a Public Objective", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
+        super(Constants.MAKE_SO_INTO_PO, "Make a secret objective into a public objective", true, false);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID, which is found between ()").setRequired(true));
     }
 
     @Override
@@ -41,11 +41,11 @@ class MakeSecretIntoPO extends GameStateSubcommand {
         }
 
         if (playerWithSO == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found.");
             return;
         }
         if (soName.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Can make just Scored SO to Public");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Only a scored secret objective may be made into a public objective.");
             return;
         }
         game.addToSoToPoList(soName);

@@ -737,7 +737,7 @@ public class TransactionHelper {
 
         switch (thingToTrans) {
             case "TGs" -> {
-                String message = "Click the amount of trade goods you wish to send.";
+                String message = "Click the number of trade goods you wish to send.";
                 for (int x = 1; x < p1.getTg() + 1; x++) {
                     Button transact = Buttons.green(finChecker + "send_TGs_" + p2.getFaction() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
@@ -745,7 +745,7 @@ public class TransactionHelper {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
             }
             case "Comms" -> {
-                String message = "Click the amount of commodities you wish to send.";
+                String message = "Click the number of commodities you wish to send.";
                 for (int x = 1; x < p1.getCommodities() + 1; x++) {
                     Button transact = Buttons.green(finChecker + "send_Comms_" + p2.getFaction() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
@@ -770,7 +770,7 @@ public class TransactionHelper {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
             }
             case "shipOrders" -> {
-                String message = "Click the Axis Order you wish to send.";
+                String message = "Click the _Axis Order_ you wish to send.";
                 for (String shipOrder : ButtonHelper.getPlayersShipOrders(p1)) {
                     Button transact = Buttons.green(
                         finChecker + "send_shipOrders_" + p2.getFaction() + "_" + shipOrder,
@@ -780,7 +780,7 @@ public class TransactionHelper {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
             }
             case "starCharts" -> {
-                String message = "Click the Star Chart you wish to send.";
+                String message = "Click the _Star Chart_ you wish to send.";
                 for (String shipOrder : ButtonHelper.getPlayersStarCharts(p1)) {
                     Button transact = Buttons.green(
                         finChecker + "send_starCharts_" + p2.getFaction() + "_" + shipOrder,
@@ -894,11 +894,11 @@ public class TransactionHelper {
                 p1.setTg(p1.getTg() - tgAmount);
                 p2.setTg(p2.getTg() + tgAmount);
                 CommanderUnlockCheckService.checkPlayer(p2, "hacan");
-                message2 = ident + " sent " + tgAmount + " TGs to " + ident2;
+                message2 = ident + " sent " + tgAmount + " trade good" + (tgAmount == 1 ? "" : "s") + " to " + ident2 + ".";
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
                     p2.clearDebt(p1, amount);
-                    message2 = message2 + "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident;
+                    message2 = message2 + "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident + ".";
                 }
             }
             case "Comms" -> {
@@ -1009,7 +1009,9 @@ public class TransactionHelper {
                 try {
                     pnIndex = Integer.parseInt(amountToTrans);
                 } catch (NumberFormatException e) {
-                    MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "# " + p1.getRepresentation() + " heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
+                    MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "# " + p1.getRepresentation() 
+                        + " heads up, a promissory note failed to send. This is likely due to you not having the promissory note to send."
+                        + " Maybe you already gave it to someone else and forgot?");
                     return;
                 }
                 for (Map.Entry<String, Integer> pn : p1.getPromissoryNotes().entrySet()) {
@@ -1019,7 +1021,7 @@ public class TransactionHelper {
                     }
                 }
                 if (id == null) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that PN, no PN sent");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that promissory note, so no promissory note was sent.");
                     return;
                 }
                 p1.removePromissoryNote(id);
@@ -1047,8 +1049,15 @@ public class TransactionHelper {
                 CardsInfoService.sendVariousAdditionalButtons(game, p1);
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
                 CardsInfoService.sendVariousAdditionalButtons(game, p2);
-                String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-                message2 = p1.getRepresentation() + " sent " + CardEmojis.PN + text + "PN to " + ident2;
+                if (sendSftT || sendAlliance)
+                {
+                    String text = sendSftT ? "**Support for the Throne** " : "**Alliance** ";
+                    message2 = p1.getRepresentation() + " sent " + text + " directly to the play area of " + ident2;
+                }
+                else
+                {
+                    message2 = p1.getRepresentation() + " sent a promissory note to the hand of " + ident2;
+                }
                 Helper.checkEndGame(game, p2);
             }
             case "Frags" -> {
@@ -1071,7 +1080,7 @@ public class TransactionHelper {
         Button done = Buttons.gray("finishTransaction_" + p2.getColor(), "Done With This Transaction");
 
         goAgainButtons.add(button);
-        goAgainButtons.add(Buttons.green("demandSomething_" + p2.getColor(), "Expect something in return"));
+        goAgainButtons.add(Buttons.green("demandSomething_" + p2.getColor(), "Expect Something in Return"));
         goAgainButtons.add(done);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
@@ -1155,7 +1164,7 @@ public class TransactionHelper {
     public static List<Button> getStuffToTransButtonsNew(Game game, Player player, Player p1, Player p2) {
         List<Button> stuffToTransButtons = new ArrayList<>();
         if (p1.getTg() > 0) {
-            stuffToTransButtons.add(Buttons.green("newTransact_TGs_" + p1.getFaction() + "_" + p2.getFaction(), "TGs"));
+            stuffToTransButtons.add(Buttons.green("newTransact_TGs_" + p1.getFaction() + "_" + p2.getFaction(), "Trade Goods"));
         }
         if (p1.getDebtTokenCount(p2.getColor()) > 0) {
             stuffToTransButtons.add(Buttons.blue("newTransact_ClearDebt_" + p1.getFaction() + "_" + p2.getFaction(), "Clear Debt"));
@@ -1220,7 +1229,7 @@ public class TransactionHelper {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
         List<Button> stuffToTransButtons = new ArrayList<>();
         if (p1.getTg() > 0) {
-            stuffToTransButtons.add(Buttons.green(finChecker + "transact_TGs_" + p2.getFaction(), "TGs"));
+            stuffToTransButtons.add(Buttons.green(finChecker + "transact_TGs_" + p2.getFaction(), "Trade Goods"));
         }
         if (p1.getDebtTokenCount(p2.getColor()) > 0) {
             stuffToTransButtons.add(Buttons.blue(finChecker + "transact_ClearDebt_" + p2.getFaction(), "Clear Debt"));

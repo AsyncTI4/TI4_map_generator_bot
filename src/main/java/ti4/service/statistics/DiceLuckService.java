@@ -62,9 +62,10 @@ public class DiceLuckService {
         AtomicInteger index = new AtomicInteger(1);
         sb.append("## __**Dice Luck**__\n");
         for (User user : users) {
-            Map.Entry<Double, Integer> userTurnCountTotalTime = playerDiceLucks.get(user.getId());
-            double expectedHits = userTurnCountTotalTime.getKey();
-            int actualHits = userTurnCountTotalTime.getValue();
+            Map.Entry<Double, Integer> expectedHitsToActualHits = playerDiceLucks.get(user.getId());
+            if (expectedHitsToActualHits == null) continue;
+            double expectedHits = expectedHitsToActualHits.getKey();
+            int actualHits = expectedHitsToActualHits.getValue();
             if (expectedHits != 0 && actualHits != 0) {
                 appendDiceLuck(sb, index, user.getEffectiveName(), expectedHits, actualHits);
             }

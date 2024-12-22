@@ -9,7 +9,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.helpers.AgendaHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
@@ -204,8 +204,8 @@ public class AutoPingCron {
     }
 
     private static void agendaPhasePing(Game game, long milliSinceLastPing) {
-        if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS * game.getAutoPingSpacer())) {
-            AgendaHelper.pingMissingPlayers(game);
+        if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 3 * game.getAutoPingSpacer())) {
+            pingMissingAgendaPlayers(game);
             AutoPingMetadataManager.addPing(game.getName());
         }
     }
@@ -231,5 +231,46 @@ public class AutoPingCron {
         }
 
         return realIdentity + PING_MESSAGES.get(pingNumber - 1);
+    }
+
+    private static void pingMissingAgendaPlayers(Game game) {
+        List<Player> missingPlayersWhens = ButtonHelper.getPlayersWhoHaventReacted(game.getLatestWhenMsg(), game);
+        List<Player> missingPlayersAfters = ButtonHelper.getPlayersWhoHaventReacted(game.getLatestAfterMsg(), game);
+        if (missingPlayersAfters.isEmpty() && missingPlayersWhens.isEmpty()) {
+            return;
+        }
+
+        String messageWhens = " please indicate no whens";
+        String messageAfters = " please indicate no afters";
+        if (game.isFowMode()) {
+            for (Player player : missingPlayersWhens) {
+                MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
+                    player.getRepresentationUnfogged() + messageWhens);
+            }
+            for (Player player : missingPlayersAfters) {
+                MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
+                    player.getRepresentationUnfogged() + messageAfters);
+            }
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                "Sent reminder pings to players who have not yet reacted");
+        } else {
+            StringBuilder messageWhensBuilder = new StringBuilder(" please indicate no whens");
+            for (Player player : missingPlayersWhens) {
+                messageWhensBuilder.insert(0, player.getRepresentationUnfogged());
+            }
+            messageWhens = messageWhensBuilder.toString();
+            if (!missingPlayersWhens.isEmpty()) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageWhens);
+            }
+
+            StringBuilder messageAftersBuilder = new StringBuilder(" please indicate no afters");
+            for (Player player : missingPlayersAfters) {
+                messageAftersBuilder.insert(0, player.getRepresentationUnfogged());
+            }
+            messageAfters = messageAftersBuilder.toString();
+            if (!missingPlayersAfters.isEmpty()) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageAfters);
+            }
+        }
     }
 }

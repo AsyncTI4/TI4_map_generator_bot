@@ -12,9 +12,9 @@ import ti4.message.MessageHelper;
 class AddCustomPO extends GameStateSubcommand {
     
     public AddCustomPO() {
-        super(Constants.ADD_CUSTOM, "Add custom Public Objective", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.PO_NAME, "Public Objective name").setRequired(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PO_VP_WORTH, "Public Objective worth in VP").setRequired(true));
+        super(Constants.ADD_CUSTOM, "Add a custom public objective (as a arbitrary source of victory points)", true, false);
+        addOptions(new OptionData(OptionType.STRING, Constants.PO_NAME, "Public objective name").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PO_VP_WORTH, "Victory points the public objective is worth").setRequired(true));
     }
 
     @Override
@@ -23,23 +23,25 @@ class AddCustomPO extends GameStateSubcommand {
 
         OptionMapping poNameOption = event.getOption(Constants.PO_NAME);
         if (poNameOption == null || poNameOption.getName().trim().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Public Objective Name");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify a name for the custom public objective");
             return;
         }
 
         if (poNameOption.getName().contains(",") || poNameOption.getName().contains(";")) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Symbol ; or , is not allowed");
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                "The characters `;` and `,` are not allowed in the custom public objective name because reasons.");
             return;
         }
         OptionMapping vpOption = event.getOption(Constants.PO_VP_WORTH);
         if (vpOption == null || vpOption.getName().trim().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Public Objective Name");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify a name for the custom public objective");
             return;
 
         }
         String poName = poNameOption.getAsString();
         if (poName.contains(",")) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Objective must not contain comma ,");
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                "The characters `;` and `,` are not allowed in the custom public objective name because reasons.");
             return;
         }
         int vp = vpOption.getAsInt();
