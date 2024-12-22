@@ -11,7 +11,7 @@ class RemoveLaw extends GameStateSubcommand {
 
     public RemoveLaw() {
         super(Constants.REMOVE_LAW, "Remove Law", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -19,9 +19,9 @@ class RemoveLaw extends GameStateSubcommand {
         int agendaId = event.getOption(Constants.AGENDA_ID).getAsInt();
         boolean success = getGame().removeLaw(agendaId);
         if (success) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Law removed");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Law removed.");
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found.");
         }
     }
 }

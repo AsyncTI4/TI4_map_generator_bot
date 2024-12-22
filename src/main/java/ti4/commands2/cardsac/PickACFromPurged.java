@@ -17,7 +17,7 @@ class PickACFromPurged extends GameStateSubcommand {
 
     public PickACFromPurged() {
         super(Constants.PICK_AC_FROM_PURGED, "Pick an Action Card from the purged pile into your hand", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()").setRequired(true));
     }
 
     @Override
@@ -33,13 +33,13 @@ class PickACFromPurged extends GameStateSubcommand {
             }
         }
         if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry.");
             return;
         }
 
         boolean picked = game.pickActionCardFromPurged(player.getUserID(), acIndex);
         if (!picked) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry.");
             return;
         }
 

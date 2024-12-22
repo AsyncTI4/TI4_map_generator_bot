@@ -20,6 +20,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -72,7 +73,17 @@ public class StartTurnService {
                 goingToPass = true;
             }
         }
-        String text = player.getRepresentationUnfogged() + " UP NEXT (Turn #" + player.getInRoundTurnCount() + ")";
+        String text = player.getRepresentationUnfogged() + ", it is now your turn (your " 
+            + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
+        Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
+        if (nextPlayer != null && !game.isFowMode()) {
+            if (nextPlayer == player) {
+                text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
+            } else {
+                text += "\n-# " + nextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
+            }
+        }
+        
         String buttonText = "Use buttons to do your turn. ";
         if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
             buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];
@@ -109,7 +120,7 @@ public class StartTurnService {
                 } else {
                     player.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+                        + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
 
                 }
             }
@@ -126,9 +137,6 @@ public class StartTurnService {
                 BannerGenerator.drawFactionBanner(player);
             }
             MessageHelper.sendMessageToChannel(gameChannel, text);
-            if (!goingToPass) {
-                MessageHelper.sendMessageToChannelWithButtons(gameChannel, buttonText, buttons);
-            }
             if (getMissedSCFollowsText(game, player) != null
                 && !"".equalsIgnoreCase(getMissedSCFollowsText(game, player))) {
                 MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(game, player));
@@ -141,9 +149,12 @@ public class StartTurnService {
                 } else {
                     player.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+                        + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
 
                 }
+            }
+            if (!goingToPass) {
+                MessageHelper.sendMessageToChannelWithButtons(gameChannel, buttonText, buttons);
             }
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, game);
             ButtonHelperFactionSpecific.resolveKolleccAbilities(player, game);
@@ -185,9 +196,8 @@ public class StartTurnService {
                         List.of(Buttons.GET_A_TECH));
                 } else {
                     List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
-                    String message2 = player.getRepresentation() + "! Your current command tokens are "
-                        + player.getCCRepresentation()
-                        + ". Use buttons to gain command tokens.";
+                        String message2 = player.getRepresentation() + ", you would research a unit upgrade technology, but because of **Propagation**, you instead gain 3 command tokens."
+                            + " Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         message2, buttons2);
                     game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
