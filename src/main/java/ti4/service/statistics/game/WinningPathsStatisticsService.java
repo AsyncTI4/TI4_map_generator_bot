@@ -88,7 +88,7 @@ class WinningPathsStatisticsService {
         StringBuilder sb = new StringBuilder();
         Map<String, Integer> winningPathCounts = getNormalGameWinningPaths(playerCount, victoryPointTotal);
         int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
-        if (gamesWithWinnerCount >= 100) {
+        if (gamesWithWinnerCount >= 100 && winningPathCounts.get(winningPath) != null) {
             int winningPathCount = winningPathCounts.get(winningPath);
             double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
             String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
