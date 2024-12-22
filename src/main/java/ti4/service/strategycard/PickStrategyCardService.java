@@ -188,10 +188,9 @@ public class PickStrategyCardService {
                 String text = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
                     + StringHelper.ordinal(privatePlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
                 Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, privatePlayer);
-                if (nextPlayer == null) {
-                } else if (nextPlayer == privatePlayer) {
+                if (nextPlayer == privatePlayer) {
                     text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
-                } else {
+                } else if (nextPlayer != null) {
                     text += "\n-# " + nextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), text);

@@ -5687,10 +5687,9 @@ public class ButtonHelper {
             String msgExtra = player.getRepresentationUnfogged() + ", it is now your turn (your " 
                     + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
-            if (nextPlayer == null) {
-            } else if (nextPlayer == player) {
+            if (nextPlayer == player) {
                 msgExtra += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
-            } else {
+            } else if (nextPlayer != null) {
                 msgExtra += "\n-# " + nextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);

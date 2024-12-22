@@ -532,10 +532,9 @@ public class StartPhaseService {
             String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
                 + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             Player nextNextPlayer = EndTurnService.findNextUnpassedPlayer(game, nextPlayer);
-            if (nextNextPlayer == null) {
-            } else if (nextNextPlayer == nextPlayer) {
+            if (nextNextPlayer == nextPlayer) {
                 msgExtra += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
-            } else {
+            } else if (nextNextPlayer != null) {
                 msgExtra += "\n-# " + nextNextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
