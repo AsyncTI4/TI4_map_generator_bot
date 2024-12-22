@@ -89,7 +89,7 @@ class WinningPathsStatisticsService {
         Map<String, Integer> winningPathCounts = getNormalGameWinningPaths(playerCount, victoryPointTotal);
         int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
         if (gamesWithWinnerCount >= 100) {
-            int winningPathCount = winningPathCounts.getOrDefault(winningPath, 1);
+            int winningPathCount = winningPathCounts.get(winningPath);
             double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
             String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
             sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games (").append(victoryPointTotal).append("VP, ")
