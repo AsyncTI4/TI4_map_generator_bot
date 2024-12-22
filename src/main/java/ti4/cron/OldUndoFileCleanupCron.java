@@ -56,6 +56,9 @@ public class OldUndoFileCleanupCron {
         } catch (IOException e) {
             BotLogger.log("Error accessing directory: " + directory, e);
         }
+
+        deleteEmptyDirectory(directory);
+
         return count;
     }
 
@@ -70,5 +73,15 @@ public class OldUndoFileCleanupCron {
             BotLogger.log("Failed to delete undo file: " + file, e);
         }
         return false;
+    }
+
+    private static void deleteEmptyDirectory(Path directory) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory)) {
+            if (!stream.iterator().hasNext()) {
+                Files.delete(directory);
+            }
+        } catch (IOException e) {
+            BotLogger.log("Error deleting empty directory: " + directory, e);
+        }
     }
 }
