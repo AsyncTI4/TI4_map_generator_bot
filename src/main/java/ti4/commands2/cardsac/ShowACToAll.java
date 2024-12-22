@@ -15,8 +15,8 @@ import ti4.message.MessageHelper;
 class ShowACToAll extends GameStateSubcommand {
 
     public ShowACToAll() {
-        super(Constants.SHOW_TO_ALL, "Show an Action Card to all players", false, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
+        super(Constants.SHOW_TO_ALL, "Show an action card to all players", true, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID, which is found between ()").setRequired(true));
     }
 
     @Override
@@ -33,14 +33,14 @@ class ShowACToAll extends GameStateSubcommand {
         }
 
         if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action CardID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
             return;
         }
 
         Game game = getGame();
         String sb = "Game: " + game.getName() + "\n" +
             "Player: " + player.getUserName() + "\n" +
-            "Showed Action Card:" + "\n" +
+            "Shown Action Card:" + "\n" +
             Mapper.getActionCard(acID).getRepresentation() + "\n";
         player.setActionCard(acID);
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);

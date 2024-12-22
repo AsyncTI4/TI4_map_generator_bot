@@ -810,7 +810,7 @@ public class FoWHelper {
 					+ message;
 				success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
 				MessageChannel channel = player_.getPrivateChannel();
-				MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
+				MessageHelper.sendMessageToChannelWithButtons(channel, "Use button to refresh view of system.",
 					StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
 			}
 			successfulCount += success ? 1 : 0;

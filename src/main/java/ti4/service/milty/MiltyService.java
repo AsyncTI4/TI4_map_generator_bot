@@ -568,8 +568,9 @@ public class MiltyService {
 
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             if (player.getFaction().contains("keleres")) {
-                Button getTech = Buttons.green("getKeleresTechOptions", "Get Keleres Tech Options");
-                String msg = player.getRepresentationUnfogged() + " after every other faction gets their tech, press this button to resolve Keleres tech";
+                Button getTech = Buttons.green("getKeleresTechOptions", "Get Keleres Technology Options");
+                String msg = player.getRepresentationUnfogged() + " after every other faction gets their starting technologies,"
+                    + " press this button to for Keleres to get their starting technologies.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, getTech);
             } else {
                 // STARTING TECH OPTIONS
@@ -643,7 +644,8 @@ public class MiltyService {
         if (player.hasAbility("oracle_ai")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                    + " you may peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN. Don't do this until after secrets are dealt and discarded.");
+                    + " you may peek at the next objective in your cards info (by your promissory note). "
+                    + "This holds true for anyone with _Read the Fates_. Don't do this until after secrets are dealt and discarded.");
         }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 

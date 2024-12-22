@@ -63,7 +63,7 @@ class ZelianHero extends GameStateSubcommand {
         for (Planet p : planetsInSystem) {
             resourcesSum += p.getResources();
         }
-        String tgGainMsg = player.getFactionEmoji() + " gained " + resourcesSum + "TG" + (resourcesSum == 1 ? "" : "s") + " from Celestial Impact (" +
+        String tgGainMsg = player.getFactionEmoji() + " gained " + resourcesSum + " trade goods" + (resourcesSum == 1 ? "" : "s") + " from Celestial Impact (" +
                 player.getTg() + "->" + (player.getTg() + resourcesSum) + ").";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), tgGainMsg);
         player.gainTG(resourcesSum);

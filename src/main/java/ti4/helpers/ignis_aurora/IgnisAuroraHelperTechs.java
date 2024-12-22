@@ -39,7 +39,7 @@ public class IgnisAuroraHelperTechs {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to resolve:", buttons);
             }
             case "stellarcorridors" -> postStellarCorridors(event, game, player);
-            default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "> This tech is not automated. Please resolve manually.");
+            default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "> This technology is not automated. Please resolve manually.");
         }
         if (deleteMsg) {
             ButtonHelper.deleteMessage(event);
@@ -76,6 +76,6 @@ public class IgnisAuroraHelperTechs {
         };
         String action = "removeCCFromBoard_stellarcorridors";
         List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, action, pred, false);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to remove one of your CCs:", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to remove one of your command tokens.", buttons);
     }
 }

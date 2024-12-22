@@ -17,7 +17,7 @@ import ti4.service.leader.UnlockLeaderService;
 public class CryypterHelper {
 
     public static List<Button> getCryypterSC3Buttons(int sc) {
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         Button drawCards = Buttons.gray("cryypterSC3Draw", "Draw Action Cards", CardEmojis.ActionCard);
         return List.of(drawCards, followButton, noFollowButton);
@@ -33,9 +33,11 @@ public class CryypterHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
             return;
         }
-        String message = player.getRepresentation() + " Drew " + draw + " AC";
+        String message = player.getRepresentation() + " drew " + draw + " action card" + (draw == 1 ? "" : "s") + ".";
         if (addScheming && player.hasAbility("scheming")) {
-            message = "Drew [" + draw + "+1=" + ++draw + "] AC (Scheming)";
+            draw++;
+            message = player.getRepresentation() + " drew " + draw + " action card" + (draw == 1 ? "" : "s") 
+                + " (**Scheming** increases this from the normal " + (draw-1) + " action card" + (draw == 2 ? "" : "s") + ").";
         }
 
         for (int i = 0; i < draw; i++) {

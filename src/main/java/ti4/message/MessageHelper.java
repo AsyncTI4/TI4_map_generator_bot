@@ -49,7 +49,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
-import ti4.helpers.ThreadHelper;
+import ti4.helpers.ThreadArchiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
@@ -703,7 +703,7 @@ public class MessageHelper {
 		if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty() || messageToSend.isEmpty())
 			return;
 		if (channel instanceof TextChannel) {
-			ThreadHelper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
+			ThreadArchiveHelper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
 			channel.asTextChannel().createThreadChannel(threadName)
 				.setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queueAfter(500, TimeUnit.MILLISECONDS,
 					t -> sendMessageToChannel(t, messageToSend));
@@ -717,7 +717,7 @@ public class MessageHelper {
 			return;
 		}
 		if (channel instanceof TextChannel) {
-			ThreadHelper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
+			ThreadArchiveHelper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
 			channel.asTextChannel().createThreadChannel(threadName)
 				.setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
 				.queueAfter(500, TimeUnit.MILLISECONDS,

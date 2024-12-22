@@ -16,8 +16,8 @@ import ti4.message.MessageHelper;
 class ShowPNToAll extends GameStateSubcommand {
 
     public ShowPNToAll() {
-        super(Constants.SHOW_TO_ALL, "Show Promissory Note to table", false, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "PN ID that is sent between ()").setRequired(true));
+        super(Constants.SHOW_TO_ALL, "Show Promissory Note to table", true, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory note ID, which is found between ()").setRequired(true));
     }
 
     @Override
@@ -33,7 +33,7 @@ class ShowPNToAll extends GameStateSubcommand {
         }
 
         if (pnID == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such promissory note ID found, please retry.");
             return;
         }
 

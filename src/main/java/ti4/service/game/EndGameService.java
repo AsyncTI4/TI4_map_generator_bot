@@ -25,8 +25,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
 import ti4.helpers.TIGLHelper;
+import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.ThreadGetter;
-import ti4.helpers.ThreadHelper;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
@@ -249,10 +249,10 @@ public class EndGameService {
     private static TextChannel getGameSummaryChannel(Game game) {
         List<TextChannel> textChannels;
         if (game.isFowMode() && AsyncTI4DiscordBot.guildFogOfWar != null) {
-            ThreadHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildFogOfWar);
+            ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildFogOfWar);
             textChannels = AsyncTI4DiscordBot.guildFogOfWar.getTextChannelsByName("fow-war-stories", true);
         } else {
-            ThreadHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
+            ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
             textChannels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true);
         }
         return textChannels.isEmpty() ? null : textChannels.getFirst();
@@ -320,7 +320,7 @@ public class EndGameService {
         if (winner.isPresent() && !game.hasHomebrew()) {
             String winningPath = WinningPathHelper.buildWinningPath(game, winner.get());
             sb.append("**Winning Path:** ").append(winningPath).append("\n");
-            sb.append(GameStatisticsService.getWinningPathComparison(winningPath, game.getRealPlayers().size(), vpCount));
+            sb.append(GameStatisticsService.getWinningPathComparison(winningPath, game.getRealAndEliminatedPlayers().size(), vpCount));
         }
 
         return sb.toString();

@@ -9,12 +9,12 @@ import ti4.message.MessageHelper;
 class PNInfo extends GameStateSubcommand {
 
     public PNInfo() {
-        super(Constants.INFO, "Send your Promissory Notes to your Cards Info thread", false, true);
+        super(Constants.INFO, "Send details on your promissory notes to your #cards-info thread", false, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         PromissoryNoteHelper.sendPromissoryNoteInfo(getGame(), getPlayer(), true, event);
-        MessageHelper.sendMessageToEventChannel(event, "PN Info Sent");
+        MessageHelper.sendMessageToEventChannel(event, "Promissory note info sent.");
     }
 }

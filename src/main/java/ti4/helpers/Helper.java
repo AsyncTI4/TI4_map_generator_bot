@@ -491,7 +491,7 @@ public class Helper {
         if (Optional.ofNullable(game.getScSetID()).isPresent() && !"null".equals(game.getScSetID())) {
             return game.getStrategyCardSet().getSCName(sc);
         }
-        return "**SC" + sc + "**";
+        return "SC#" + sc;
     }
 
     public static Integer getSCNumber(String sc) {
@@ -1020,7 +1020,7 @@ public class Helper {
                         res = res + ButtonHelper.getNumberOfUnitUpgrades(player);
                         msg.append(" for ").append(ButtonHelper.getNumberOfUnitUpgrades(player)).append(" resources ");
                     } else {
-                        msg.append(" for a technology skip on a unit upgrade ");
+                        msg.append(" to ignore a prerequisite on a unit upgrade technology ");
                     }
                     msg.append(TechEmojis.WarfareTech).append(".\n");
                 }

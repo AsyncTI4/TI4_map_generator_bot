@@ -22,10 +22,8 @@ import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
-import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
-import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.ExhaustLeaderService;
@@ -59,7 +57,7 @@ public class ComponentActionHelper {
             }
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
-            Button tButton = Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Starcharts ");
+            Button tButton = Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts ");
             compButtons.add(tButton);
         }
 
@@ -152,7 +150,7 @@ public class ComponentActionHelper {
         for (String relic : p1.getRelics()) {
             RelicModel relicData = Mapper.getRelic(relic);
             if (relicData == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that PN, no PN sent");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that relic.");
                 continue;
             }
 
@@ -198,7 +196,7 @@ public class ComponentActionHelper {
             }
             if (prom == null) {
                 MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentationUnfogged()
-                    + " you have a null PN. Please use /pn purge after reporting it " + pn);
+                    + " you have a null promissory note " + pn + ". Please use `/pn purge` after reporting it.");
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
             }
         }
@@ -233,19 +231,19 @@ public class ComponentActionHelper {
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("fabrication") && !p1.getFragments().isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 CC", FactionEmojis.Naaz);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 Token", FactionEmojis.Naaz);
             compButtons.add(abilityButton);
         }
 
         // Other "abilities"
         if (p1.getUnitsOwned().contains("muaat_flagship") && p1.getStrategicCC() > 0
             && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Spend 1 strategy CC for 1 cruiser with The Inferno (Muaat Flagship)", FactionEmojis.Muaat);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Use Flagship Ability", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
         if ((p1.getUnitsOwned().contains("sigma_muaat_flagship_1") || p1.getUnitsOwned().contains("sigma_muaat_flagship_1")) && p1.getStrategicCC() > 0
             && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFSsigma", "Spend 1 strategy token for The Inferno (Muaat Flagship)", FactionEmojis.Muaat);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFSsigma", "Use Flagship Ability", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
 
@@ -259,7 +257,7 @@ public class ComponentActionHelper {
         }
 
         // ACs
-        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play \"ACTION:\" AC");
+        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play Component Action AC");
         compButtons.add(acButton);
 
         // absol
@@ -422,7 +420,7 @@ public class ComponentActionHelper {
                             "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    Button transact2 = Buttons.green(finChecker + "gain_CC", "Gain CC");
+                    Button transact2 = Buttons.green(finChecker + "gain_CC", "Gain 1 Command Token");
                     purgeFragButtons.add(transact2);
                     Button transact3 = Buttons.red(finChecker + "finishComponentAction",
                         "Done Resolving Fabrication");
@@ -434,7 +432,7 @@ public class ComponentActionHelper {
                         + " Click a button below to discard an Action Card";
                     List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
-                        p1.getRepresentation() + " is resolving their Stall Tactics ability");
+                        p1.getRepresentation() + " is doing nothing with their **Stall Tactics** ability.");
                     if (!acButtons.isEmpty()) {
                         List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg,
                             acButtons);
@@ -445,24 +443,24 @@ public class ComponentActionHelper {
                     }
                 } else if ("mantlecracking".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = ButtonHelperAbilities.getMantleCrackingButtons(p1, game);
-                    String message = "Select the planet you would like to mantle crack";
+                    String message = "Select the planet you wish to Mantle Crack.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("meditation".equalsIgnoreCase(buttonID)) {
                     if (p1.getStrategicCC() > 0) {
-                        String successMessage = p1.getFactionEmoji() + " Reduced strategy pool CCs by 1 ("
+                        String successMessage = p1.getRepresentationUnfogged() + " spent 1 command token from their strategy pool ("
                             + (p1.getStrategicCC()) + "->" + (p1.getStrategicCC() - 1) + ")";
                         p1.setStrategicCC(p1.getStrategicCC() - 1);
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, FactionEmojis.kolume + "Meditation");
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     } else {
-                        String successMessage = p1.getFactionEmoji() + " Exhausted Scepter";
+                        String successMessage = p1.getRepresentationUnfogged() + " exhausted the _" + RelicHelper.sillySpelling() + "_.";
                         p1.addExhaustedRelic("emelpar");
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     }
-                    String message = "Select the tech you would like to ready";
+                    String message = "Select the technology you wish to ready.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelper.getAllTechsToReady(p1));
                     List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
-                    String message2 = "Use buttons to end turn or do another action";
+                    String message2 = "Use buttons to end turn or do another action.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 }
             }
@@ -520,10 +518,12 @@ public class ComponentActionHelper {
             case "generic" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Doing unspecified component action.");
             case "absolMOW" -> {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji() + " is exhausting the " + CardEmojis.Agenda + "Minister of War" + SourceEmojis.Absol + " and spending a strategy CC to remove 1 CC from the board");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji()
+                    + " is exhausting the _Minister of War_ agenda and spending a command token from their strategy pool to remove 1 command token from the game board.");
                 if (p1.getStrategicCC() > 0) {
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji() + " strategy CC went from " + (p1.getStrategicCC() + 1) + " to " + p1.getStrategicCC());
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji()
+                        + ", you previously had " + (p1.getStrategicCC() + 1) + " command tokens in your strategy pool and now you have " + p1.getStrategicCC() + ".");
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event);
                 }
                 List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(p1, game, event, "absol");
@@ -568,17 +568,17 @@ public class ComponentActionHelper {
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "Exhausted";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                "Use buttons to decide who to use JR on", buttons2);
+                "Use buttons to decide who to use JR-XS455-O on.", buttons2);
 
             // OFFER TCS
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
                     List<Button> buttons3 = new ArrayList<>();
                     buttons3.add(Buttons.green("exhaustTCS_" + relicID + "_" + player.getFaction(),
-                        "Exhaust TCS to Ready " + relicID));
+                        "Exhaust Temporal Command Suite to Ready " + relicID));
                     buttons3.add(Buttons.red("deleteButtons", "Decline"));
                     String msg = p2.getRepresentationUnfogged()
-                        + " you have the opportunity to exhaust your TCS tech to ready " + relicID
+                        + " you have the opportunity to exhaust your _Temporal Command Suite_ technology to ready " + relicID
                         + " and potentially resolve a transaction.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons3);
                 }
@@ -616,14 +616,14 @@ public class ComponentActionHelper {
                 } else {
                     player.setTg(oldTg + player.getCommoditiesTotal() + 2);
                 }
-                message = player.getRepresentationUnfogged() + " Your TGs increased from " + oldTg + " -> "
-                    + player.getTg();
+                message = player.getRepresentationUnfogged() + " Your trade goods increased from " + oldTg + " -> "
+                    + player.getTg() + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, player.getTg() - oldTg);
             }
             case "stellarconverter" -> {
-                message = player.getRepresentationUnfogged() + " Select the planet you want to destroy";
+                message = player.getRepresentationUnfogged() + " Select the planet you wish to annihilate.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
                     ButtonHelper.getButtonsForStellar(player, game));
             }
@@ -632,7 +632,7 @@ public class ComponentActionHelper {
                 // handled above
             }
             default -> MessageHelper.sendMessageToChannel(event.getChannel(),
-                "This Relic is not tied to any automation. Please resolve manually.");
+                "This relic is not tied to any automation. Please resolve manually.");
         }
     }
 

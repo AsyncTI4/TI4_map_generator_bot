@@ -12,7 +12,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
 
     public AddFactionCCToFleetSupply() {
-        super(Constants.ADD_CC_TO_FS, "Add Faction CC to Fleet Supply");
+        super(Constants.ADD_CC_TO_FS, "Add Faction Command Token to Fleet Pool");
     }
 
     @Override

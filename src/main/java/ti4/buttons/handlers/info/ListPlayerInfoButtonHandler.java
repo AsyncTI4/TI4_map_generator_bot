@@ -36,11 +36,11 @@ class ListPlayerInfoButtonHandler {
         buttons.add(Buttons.green("offerInfoButtonStep2_relic", "Relic Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_planet", "Planet Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_units", "Special Units"));
-        buttons.add(Buttons.green("offerInfoButtonStep2_pn", "Faction PN"));
-        buttons.add(Buttons.green("offerInfoButtonStep2_tech", "Researched Tech"));
-        buttons.add(Buttons.green("offerInfoButtonStep2_ftech", "Faction Tech"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_pn", "Faction Promissory Note"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_tech", "Researched Technologies"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_ftech", "Faction Technologies"));
         buttons.add(Buttons.REFRESH_INFO);
-        String msg = "Select the category you'd like more info on. You will then be able to select either a specific faction's info you want, or every factions";
+        String msg = "Select the category you'd like more info on. You will then be able to select either a specific faction's info you want, or every faction's.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
 
