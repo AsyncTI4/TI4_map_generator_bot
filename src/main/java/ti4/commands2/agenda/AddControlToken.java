@@ -11,7 +11,7 @@ class AddControlToken extends GameStateSubcommand {
 
     public AddControlToken() {
         super(Constants.ADD_CONTROL_TOKEN, "Add or remove a faction control token to a law", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction that owns the token, default you").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO, "True to remove instead of add tokens"));
     }
@@ -21,7 +21,7 @@ class AddControlToken extends GameStateSubcommand {
         var game = getGame();
         int lawId = event.getOption(Constants.AGENDA_ID).getAsInt();
         if (!game.getLaws().containsValue(lawId)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Law with id " + lawId + " does not exist");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Law with id " + lawId + " does not exist.");
             return;
         }
         String msg = game.getStoredValue("controlTokensOnAgenda" + lawId);
@@ -38,12 +38,12 @@ class AddControlToken extends GameStateSubcommand {
             } else {
                 msg += "_" + player.getColor();
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Added control token to law #" + lawId);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Added control token to law #" + lawId + ".");
         } else {
             if (!msg.isEmpty()) {
                 msg = msg.replaceFirst(player.getColor() + "_", "");
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Removed control token to law #" + lawId);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Removed control token to law #" + lawId + ".");
 
         }
 

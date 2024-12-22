@@ -430,7 +430,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         String shipOrder = buttonID.split("_")[1];
         String message = player.getRepresentation()
-            + " Click the player you would like to give the order to and force them to give you a PN";
+            + ", please choose which player you would like to give the Axis Order to, and so force them to give you a promissory note.";
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
                 continue;
@@ -456,11 +456,12 @@ public class ButtonHelperHeroes {
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         String message = player.getRepresentation() + " sent " + Mapper.getRelic(shipOrder).getName() + " to "
             + p2.getFactionEmojiOrColor()
-            + " who now owes a PN. Buttons have been sent to the players cards info thread to resolve";
+            + ", who now owes a promissory note in return. Buttons have been sent to the players cards info thread to resolve.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
         String message2 = p2.getRepresentationUnfogged()
-            + " You have been given an axis order by Demi-Queen Mdcksssk, the Axis hero, and now must send a PN. Please select the PN you would like to send.";
+            + " You have been given an Axis Order by Demi-Queen Mdcksssk, the Axis hero, and now must send a promissory note in return."
+            + " Please select the promissory note you would like to send.";
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message2, stuffToTransButtons);
         ButtonHelper.deleteMessage(event);
     }
@@ -492,10 +493,10 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
         p2.refreshPlanet(planet);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " you refreshed " + planetRep);
+            player.getRepresentationUnfogged() + " you readied " + planetRep + ".");
         if (p2 != player) {
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                p2.getRepresentationUnfogged() + " your planet " + planetRep + " was refreshed.");
+                p2.getRepresentationUnfogged() + " your planet " + planetRep + " was readied.");
             if (player.hasLeader("xxchaagent")) {
                 UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                 if (uH != null && uH.getUnitCount(UnitType.Infantry, p2) > 0) {
@@ -507,7 +508,7 @@ public class ButtonHelperHeroes {
                             buttons.add(Buttons.red("xxchaAgentRemoveInfantry_" + p2.getFaction() + "_" + planet, "Remove Infantry"));
                             buttons.add(Buttons.gray("deleteButtons", "Decline"));
                             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() +
-                                " you have the opportunity to remove 1 of the infantry on the refreshed planet if you want", buttons);
+                                " you have the opportunity to remove 1 of the infantry on the readied planet if you wish.", buttons);
 
                             return;
                         }
@@ -648,7 +649,7 @@ public class ButtonHelperHeroes {
                 Helper.getPlanetRepresentation(planet2, game)));
         }
 
-        String msg = player.getRepresentationUnfogged() + " choose the HS planet you wish to put the attachment on";
+        String msg = player.getRepresentationUnfogged() + " choose which of your home system planets you wish to attach" + attachment + "to.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -1193,7 +1194,7 @@ public class ButtonHelperHeroes {
             }
         }
         if (id == null) {
-            MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "Could not resolve PN, PN not sent.");
+            MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "Could not resolve promissory note, so no promissory note was sent.");
             return;
         }
         p1.removePromissoryNote(id);
@@ -1219,8 +1220,15 @@ public class ButtonHelperHeroes {
         }
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
-        String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-        message2 = p1.getRepresentation() + " sent " + CardEmojis.PN + text + "PN to " + ident2;
+        if (sendSftT || sendAlliance)
+        {
+            String text = sendSftT ? "**Support for the Throne** " : "**Alliance** ";
+            message2 = p1.getRepresentation() + " sent " + text + " directly to the play area of " + ident2;
+        }
+        else
+        {
+            message2 = p1.getRepresentation() + " sent a promissory note to the hand of " + ident2;
+        }
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message2);
@@ -1375,7 +1383,7 @@ public class ButtonHelperHeroes {
             }
             List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p1);
             String message = p1.getRepresentationUnfogged()
-                + " The Oracle, the Naalu hero, has been played and you must send a PN. Please select the PN you would like to send.";
+                + " The Oracle, the Naalu hero, has been played and you must send a promissory note. Please select the promissory note you would like to send.";
             MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
         }
         ButtonHelper.deleteMessage(event);

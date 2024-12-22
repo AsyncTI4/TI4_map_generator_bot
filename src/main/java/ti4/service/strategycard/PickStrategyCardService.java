@@ -159,7 +159,7 @@ public class PickStrategyCardService {
                     } else {
                         privatePlayer.setStasisInfantry(0);
                         MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                            + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+                            + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
 
                     }
                 }
@@ -190,7 +190,7 @@ public class PickStrategyCardService {
                     } else {
                         privatePlayer.setStasisInfantry(0);
                         MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                            + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+                            + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
 
                     }
                 }
@@ -203,14 +203,14 @@ public class PickStrategyCardService {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                     buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node"));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use QDN", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use _Quantum Datahub Node_.", buttons);
                 }
                 buttons = new ArrayList<>();
                 if (game.getLaws().containsKey("arbiter") && game.getLawsInfo().get("arbiter").equalsIgnoreCase(p2.getFaction())) {
                     buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter"));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(),
-                        p2.getRepresentationUnfogged() + " you have the opportunity to use Imperial Arbiter", buttons);
+                        p2.getRepresentationUnfogged() + " you have the opportunity to use _Imperial Arbiter_.", buttons);
                 }
             }
         }

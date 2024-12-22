@@ -98,7 +98,7 @@ public class ButtonHelperCommanders {
             String message = p2.getRepresentationUnfogged()
                 + " You've been hit by"
                 + (RandomHelper.isOneInX(1000) ? ", you've been struck by" : "")
-                + " S'ula Mentarion, the Mentak commander. Please select the PN you would like to send.";
+                + " S'ula Mentarion, the Mentak commander. Please select the promissory note you would most like to send and/or least like to keep.";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "Sent " + color + " the buttons for resolving S'ula Mentarion.");

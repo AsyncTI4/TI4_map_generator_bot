@@ -46,7 +46,7 @@ class Info extends GameStateSubcommand {
         sb.append("Game Completed: `").append(game.getWinner().isPresent()).append("`").append("\n");
 
         sb.append("### Setup: ").append("\n");
-        sb.append("VP Count: ").append(game.getVp()).append("\n");
+        sb.append("Victory Point Count: ").append(game.getVp()).append("\n");
         sb.append("SO Count: ").append(game.getMaxSOCountPerPlayer()).append("\n");
         sb.append("Private Game: ").append(privateGame).append("\n");
         sb.append("Game Modes: ").append(game.getGameModesText()).append("\n");

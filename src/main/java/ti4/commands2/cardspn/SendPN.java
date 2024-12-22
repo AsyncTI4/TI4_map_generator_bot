@@ -21,8 +21,8 @@ import ti4.service.emoji.CardEmojis;
 class SendPN extends GameStateSubcommand {
 
 	public SendPN() {
-		super(Constants.SEND_PN, "Send Promissory Note to player", true, true);
-		addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
+		super(Constants.SEND_PN, "Send a promissory note to a player", true, true);
+		addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory note ID, which is found between (), or name/part of name").setRequired(true));
 		addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
 	}
@@ -49,7 +49,7 @@ class SendPN extends GameStateSubcommand {
 					pnName = pnName.toLowerCase();
 					if (pnName.contains(value) || pn.getKey().contains(value)) {
 						if (foundSimilarName && !cardName.equals(pnName)) {
-							MessageHelper.sendMessageToEventChannel(event, "Multiple cards with similar name founds, please use ID");
+							MessageHelper.sendMessageToEventChannel(event, "Multiple cards with similar name founds, please use ID.");
 							return;
 						}
 						id = pn.getKey();
@@ -61,12 +61,12 @@ class SendPN extends GameStateSubcommand {
 		}
 
 		if (id == null) {
-			MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
+			MessageHelper.sendMessageToEventChannel(event, "No such promissory note ID found, please retry.");
 			return;
 		}
 		PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(id);
 		if (pnModel == null) {
-			MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note found, please retry");
+			MessageHelper.sendMessageToEventChannel(event, "No such promissory note found, please retry.");
 			return;
 		}
 
@@ -80,7 +80,7 @@ class SendPN extends GameStateSubcommand {
 		Player pnOwner = game.getPNOwner(id);
 		if (player.getPromissoryNotesInPlayArea().contains(id)) {
 			if (!targetPlayer.equals(pnOwner)) {
-				MessageHelper.sendMessageToEventChannel(event, "Promissory Notes in Play Area may only be sent to the owner of the PN.");
+				MessageHelper.sendMessageToEventChannel(event, "Promissory notes in play area may only be sent to the owner of the promissory note.");
 				return;
 			}
 		}
@@ -101,13 +101,14 @@ class SendPN extends GameStateSubcommand {
 		PromissoryNoteHelper.sendPromissoryNoteInfo(game, targetPlayer, false);
 		PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
 
-		String extraText = placeDirectlyInPlayArea ? "**" + pnModel.getName() + "**" : "";
-		String message = player.getRepresentation() + " sent " + CardEmojis.PN + extraText + " to " + targetPlayer.getRepresentation();
+		String conditionalPNName = placeDirectlyInPlayArea ? "__" + pnModel.getName() + "__" : "";
+        String preposition = placeDirectlyInPlayArea ? " directly to the play area of " : " to the hand of";
+		String message = player.getRepresentation() + " sent " + CardEmojis.PN + conditionalPNName + preposition + targetPlayer.getRepresentation();
 		if (game.isFowMode()) {
-			String fail = "User for faction not found. Report to ADMIN";
-			String success = message + "\nThe other player has been notified";
+			String fail = "User for faction not found. Report to ADMIN.";
+			String success = message + "\nThe other player has been notified.";
 			MessageHelper.sendPrivateMessageToPlayer(targetPlayer, game, event, message, fail, success);
-			MessageHelper.sendMessageToEventChannel(event, "PN sent");
+			MessageHelper.sendMessageToEventChannel(event, "Promissory note sent.");
 		} else {
 			MessageHelper.sendMessageToEventChannel(event, message);
 		}
@@ -116,7 +117,7 @@ class SendPN extends GameStateSubcommand {
 		if (game.isFowMode()) {
 			String extra = null;
 			if (id.endsWith("_sftt")) extra = "Scores changed.";
-			FoWHelper.pingPlayersTransaction(game, event, player, targetPlayer, CardEmojis.PN + extraText + "PN", extra);
+			FoWHelper.pingPlayersTransaction(game, event, player, targetPlayer, CardEmojis.PN + conditionalPNName + " promissory note", extra);
 		}
 	}
 }

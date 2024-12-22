@@ -34,7 +34,8 @@ public class PassService {
                     Collections.singletonList(Buttons.GET_A_UNIT_TECH_WITH_INF));
             } else {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                String message2 = player.getRepresentation() + "! Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
+                String message2 = player.getRepresentation() + ", you would research a unit upgrade technology, but because of **Propagation**, you instead gain 3 command tokens."
+                    + " Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }

@@ -18,7 +18,7 @@ class SCUnplay extends GameStateSubcommand {
 
     public SCUnplay() {
         super(Constants.SC_UNPLAY, "Unplay a Strategy Card", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card #"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 

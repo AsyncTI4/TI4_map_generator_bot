@@ -13,8 +13,8 @@ import ti4.message.MessageHelper;
 class PutEventTop extends GameStateSubcommand {
 
     public PutEventTop() {
-        super(Constants.PUT_TOP, "Put Event on top", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID that is sent between ()").setRequired(true));
+        super(Constants.PUT_TOP, "Put event on top of the deck", true, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID, which is found between ()").setRequired(true));
     }
 
     @Override
@@ -28,9 +28,9 @@ class PutEventTop extends GameStateSubcommand {
     public void putTop(int eventID, Game game, Player player) {
         boolean success = game.putEventTop(eventID, player);
         if (success) {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Event put on top");
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Event put on top of deck.");
         } else {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Event ID found");
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No event ID found.");
         }
     }
 }

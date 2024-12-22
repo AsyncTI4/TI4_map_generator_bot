@@ -150,7 +150,7 @@ public class ComponentActionHelper {
         for (String relic : p1.getRelics()) {
             RelicModel relicData = Mapper.getRelic(relic);
             if (relicData == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that PN, no PN sent");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that relic.");
                 continue;
             }
 
@@ -196,7 +196,7 @@ public class ComponentActionHelper {
             }
             if (prom == null) {
                 MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentationUnfogged()
-                    + " you have a null PN. Please use /pn purge after reporting it " + pn);
+                    + " you have a null promissory note " + pn + ". Please use `/pn purge` after reporting it.");
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
             }
         }
@@ -231,7 +231,7 @@ public class ComponentActionHelper {
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("fabrication") && !p1.getFragments().isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 CC", FactionEmojis.Naaz);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 Token", FactionEmojis.Naaz);
             compButtons.add(abilityButton);
         }
 

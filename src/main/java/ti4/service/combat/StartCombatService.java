@@ -450,9 +450,9 @@ public class StartCombatService {
                 && "space".equalsIgnoreCase(type)) {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(finChecker + "startFacsimile_" + tile.getPosition(), "Play Mortheus PN", FactionEmojis.cheiran));
+                buttons.add(Buttons.gray(finChecker + "startFacsimile_" + tile.getPosition(), "Play Secrets of the Weave", FactionEmojis.mortheus));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that you may play Morpheus PN here to spend influence equal to the cost of 1 of the opponent ships to " +
+                    + " this is a reminder that you may play _Secrets of the Weave_ here to spend influence equal to the cost of 1 of the opponent ships to " +
                     "place 1 of that type of ship in the system.",
                     buttons);
             }

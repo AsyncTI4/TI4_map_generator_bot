@@ -352,15 +352,16 @@ public class ButtonHelperFactionSpecific {
         String messageID = event.getMessageId();
         boolean used = ButtonHelperSCs.addUsedSCPlayer(messageID, game, player);
         StrategyCardModel scModel = game.getStrategyCardModelByName("construction").orElse(null);
+        int scNum = scModel.getInitiative();
         boolean construction = scModel != null && scModel.usesAutomationForSCID("pok4construction");
-        if (!used && scModel != null && construction && !player.getFollowedSCs().contains(scModel.getInitiative())
-                && game.getPlayedSCs().contains(scModel.getInitiative())) {
-            player.addFollowedSC(scModel.getInitiative(), event);
-            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
+        if (!used && scModel != null && construction && !player.getFollowedSCs().contains(scNum)
+                && game.getPlayedSCs().contains(scNum)) {
+            player.addFollowedSC(scNum, event);
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed construction");
             }
-            String message = ButtonHelperSCs.deductCC(player);
+            String message = ButtonHelperSCs.deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
         }
         List<Button> buttons = new ArrayList<>();
@@ -769,9 +770,11 @@ public class ButtonHelperFactionSpecific {
             }
             if (naalu) {
                 String msg = player.getRepresentation()
-                    + " you have the option to pre-play Naalu PN. Naalu PN is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it.";
+                    + " you have the option to pre-play _Gift of Prescience_."
+                    + " _Gift of Prescience_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + "Feel free to ignore this message if you don't intend to play it any time soon.";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("resolvePreassignment_Play Naalu PN", "Pre-play Naalu PN"));
+                buttons.add(Buttons.green("resolvePreassignment_Play Naalu PN", "Pre-play Gift of Prescience"));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
@@ -1581,7 +1584,7 @@ public class ButtonHelperFactionSpecific {
         buttons.add(transact1);
         buttons.add(transact2);
         buttons.add(Buttons.red("deleteButtons", "Decline"));
-        String message = "Use buttons to select how to use the Kollecc AI Survey PN";
+        String message = "Use buttons to select how to use _AI Survey_.";
         // System.out.println(player.getFaction() + " is playing PN KOLLEC");
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }

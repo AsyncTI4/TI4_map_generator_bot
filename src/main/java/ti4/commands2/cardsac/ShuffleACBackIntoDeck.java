@@ -14,8 +14,8 @@ import ti4.message.MessageHelper;
 class ShuffleACBackIntoDeck extends GameStateSubcommand {
 
     public ShuffleACBackIntoDeck() {
-        super(Constants.SHUFFLE_AC_BACK_INTO_DECK, "Shuffle Action Card back into deck from the discard pile.", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
+        super(Constants.SHUFFLE_AC_BACK_INTO_DECK, "Shuffle action card back into deck from the discard pile.", true, false);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()").setRequired(true));
     }
 
     @Override
@@ -29,12 +29,12 @@ class ShuffleACBackIntoDeck extends GameStateSubcommand {
             }
         }
         if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
             return;
         }
         boolean picked = game.shuffleActionCardBackIntoDeck(acIndex);
         if (!picked) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
             return;
         }
         String sb = "Game: " + game.getName() + " " +

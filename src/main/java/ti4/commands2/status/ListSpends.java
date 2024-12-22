@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 class ListSpends extends GameStateSubcommand {
 
     public ListSpends() {
-        super(Constants.SPENDS, "List value of plastic and CCs gained by players this game", false, false);
+        super(Constants.SPENDS, "List value of plastic and tokens gained by players this game", false, false);
     }
 
     @Override
@@ -39,6 +39,6 @@ class ListSpends extends GameStateSubcommand {
     }
 
     private String playerSpends(Player player) {
-        return "> " + player.getUserName() + ": " + player.getTotalExpenses() + " total i/r value of plastic built and CCs gained";
+        return "> " + player.getUserName() + ": " + player.getTotalExpenses() + " total combined influence and resources spend collectively on units built and command tokens gained.";
     }
 }

@@ -24,7 +24,7 @@ public class FrankenPromissoryService {
             }
 
             if (player.ownsPromissoryNote(pnID)) {
-                sb.append(pnID).append(" (player already owned this PN)");
+                sb.append(pnID).append(" (player already owned this promissory note)");
                 sb.append("\n");
                 continue;
             }
@@ -40,7 +40,7 @@ public class FrankenPromissoryService {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed PNs:\n");
         for (String pnID : pnIDs) {
             if (!player.ownsPromissoryNote(pnID)) {
-                sb.append("> ").append(pnID).append(" (player did not own this PN)");
+                sb.append("> ").append(pnID).append(" (player did not own this promissory note)");
             } else {
                 sb.append("> ").append(pnID);
             }

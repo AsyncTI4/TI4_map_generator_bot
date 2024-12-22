@@ -424,7 +424,7 @@ class ActionCardDeck2ButtonHandler {
             ButtonHelper.resolveCombatRoll(player, game, event,
                 "combatRoll_" + buttonID.split("_")[1] + "_space_afb");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`.");
         }
         game.setStoredValue("ShrapnelTurretsFaction", "");
         event.getMessage().delete().queue();
@@ -437,13 +437,14 @@ class ActionCardDeck2ButtonHandler {
         player.refreshPlanet(planet);
         List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
         if (!buttons.isEmpty()) {
-            String message = player.getFactionEmoji() + " Click button to explore "
-                + Helper.getPlanetRepresentation(planet, game);
+            String message = player.getFactionEmoji() + ", please press the button to explore "
+                + Helper.getPlanetRepresentation(planet, game) + ".";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 message, buttons);
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " refreshed and explored " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game));
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+            + " readied and explored " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game) + ".");
     }
 
 }

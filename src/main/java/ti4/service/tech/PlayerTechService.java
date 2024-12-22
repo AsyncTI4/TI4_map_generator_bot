@@ -100,13 +100,15 @@ public class PlayerTechService {
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "gls" -> { // Graviton
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " exhausted Graviton Laser System. The auto assign hit buttons for PDS fire will now kill fighters last");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+                    + " exhausted _Graviton Laser System_. The auto-assign hits button for SPACE CANNON OFFENSE fire will now kill fighters last.");
                 game.setStoredValue(player.getFaction() + "graviton", "true");
                 deleteTheOneButtonIfButtonEvent(event);
             }
 
             case "dsbenty" -> {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " exhausted Merged Replicators to increase the production value of one of their units by 2, or to match the largest value on the board");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                    + " exhausted _Merged Replicators_ to increase the PRODUCTION value of one of their units by 2, or to match the largest PRODUCTION value on the game board.");
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "dsceldr" -> {
@@ -181,7 +183,7 @@ public class PlayerTechService {
                         if ("titanprototype".equalsIgnoreCase(relic) || "absol_jr".equalsIgnoreCase(relic)) {
                             buttons.add(Buttons.blue(
                                 player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_" + relic,
-                                "Ready JR"));
+                                "Ready JR-SX455-O"));
                         }
                     }
                 }
@@ -405,9 +407,10 @@ public class PlayerTechService {
             if (player.hasAbility("obsessive_designs") && paymentRequired
                 && "action".equalsIgnoreCase(game.getPhaseOfGame())) {
                 String msg = player.getRepresentation()
-                    + " due to your obsessive designs ability, you may use your space dock at home PRODUCTION ability to build units of the type you just upgraded, reducing the total cost by 2.";
+                    + " due to your **Obsessive Designs** ability, you may use the PRODUCTION ability of a space dock in your home system"
+                    + " to build units of the type you just upgraded, reducing the total cost by 2.";
                 String generalMsg = player.getFactionEmojiOrColor()
-                    + " has an opportunity to use their obsessive designs ability to build " + techM.getName()
+                    + " has an opportunity to use their **Obsessive Designs** ability to build " + techM.getName()
                     + " at home";
                 List<Button> buttons;
                 Tile tile = game.getTile(AliasHandler.resolveTile(player.getFaction()));
@@ -419,21 +422,22 @@ public class PlayerTechService {
                     tile = player.getHomeSystemTile();
                 }
                 if (tile == null) {
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Could not find a HS, sorry bro");
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Could not find your home system, sorry bro.");
                 }
                 buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "obsessivedesigns", "place");
                 int val = Helper.getProductionValue(player, game, tile, true);
                 String message2 = msg + ButtonHelper.getListOfStuffAvailableToSpend(player, game) + "\n"
-                    + "You have " + val + " PRODUCTION value in this system";
+                    + "You have " + val + " PRODUCTION value in this system.";
                 if (val > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
                     message2 = message2
-                        + ". You also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards production limit";
+                        + ". You also have the That Which Molds Flesh, the Vuil'raith commander,"
+                        + " which allows you to produce 2 fighters/infantry that don't count towards the PRODUCTION limit";
                 }
                 if (val > 0 && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
-                    message2 = message2 + "Reminder that you have Prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated";
+                    message2 = message2 + ". And reminder that you have _Prophecy of Ixth_ and should produce 2 fighters if you want to keep it. Its removal is not automated";
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), generalMsg);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2 + ".");
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Produce Units", buttons);
             }
         }
@@ -570,7 +574,7 @@ public class PlayerTechService {
             buttons.add(Buttons.red("exhaustAgent_veldyragent_" + player.getFaction(), "Use Veldyr Agent", FactionEmojis.veldyr));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
-            buttons.add(Buttons.gray("yinCommanderStep1_", "Remove infantry via Yin Commander", FactionEmojis.Yin));
+            buttons.add(Buttons.gray("yinCommanderStep1_", "Remove Infantry via Yin Commander", FactionEmojis.Yin));
         }
         buttons.add(Buttons.red("deleteButtons_technology", "Done Exhausting Planets"));
         if (!player.hasAbility("propagation")) {
