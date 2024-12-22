@@ -1789,15 +1789,17 @@ public class ButtonHelperActionCards {
             }
         }
         String adjective = "";
-        if (amount > 3) {
+        if (amount >= 5) {
             if (hits == 0) {
                 adjective = "n inconsequential";
             } else if (hits == amount) {
                 adjective = " catastrophic";
             } else if (hits <= amount / 3) {
                 adjective = " minor";
-            } else if (hits <= 2 * amount / 3) {
+            } else if (hits >= 2 * (amount+1) / 3) {
                 adjective = " major";
+            } else if (hits * 2 == amount) {
+                adjective = " typical";
             }
         }
         if (game.isFowMode())
