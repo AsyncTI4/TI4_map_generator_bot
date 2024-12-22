@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands2.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -49,7 +49,7 @@ class LookAtBottomEvent extends GameStateSubcommand {
             if (game.isCommunityMode() && player.getPrivateChannel() != null) {
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(), sb.toString());
             } else {
-                MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
             }
         } else {
             MessageHelper.sendMessageToUser(sb.toString(), event);

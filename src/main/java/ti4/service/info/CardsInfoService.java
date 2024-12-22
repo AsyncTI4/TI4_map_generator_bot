@@ -27,7 +27,7 @@ public class CardsInfoService {
         if (player == null)
             return;
         String headerText = player.getRepresentationUnfogged() + CommandHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendCardsInfo(game, player);
     }
 
@@ -36,7 +36,7 @@ public class CardsInfoService {
         ActionCardHelper.sendActionCardInfo(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game,
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player,
             """
                 You may whisper to people from here by starting a message with to[color] or to[faction].\
 

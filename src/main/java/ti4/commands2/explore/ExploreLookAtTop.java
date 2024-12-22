@@ -46,7 +46,7 @@ class ExploreLookAtTop extends GameStateSubcommand {
         ExploreModel explore = Mapper.getExplore(topCard);
         sb.append(explore.textRepresentation());
 
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
             + " Cards info thread.");
 
