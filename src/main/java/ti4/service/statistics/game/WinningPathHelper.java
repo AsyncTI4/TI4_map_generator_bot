@@ -2,7 +2,6 @@ package ti4.service.statistics.game;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
@@ -44,8 +43,7 @@ public class WinningPathHelper {
             .collect(Collectors.toMap(
                 WinningPathHelper::normalizeVictoryPointKey,
                 key -> Collections.frequency(game.getScoredPublicObjectives().get(key), userId),
-                Integer::sum,
-                TreeMap::new
+                Integer::sum
             ));
 
         return otherVictoryPoints.entrySet().stream()
