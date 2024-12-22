@@ -361,14 +361,14 @@ public class ButtonHelper {
     }
 
     public static List<Player> getPlayersWhoHaventReacted(String messageId, Game game) {
-        List<Player> playersWhoAreMissed = new ArrayList<>();
         if (messageId == null || "".equalsIgnoreCase(messageId)) {
-            return playersWhoAreMissed;
+            return Collections.emptyList();
         }
         TextChannel mainGameChannel = game.getMainGameChannel();
         if (mainGameChannel == null) {
-            return playersWhoAreMissed;
+            return Collections.emptyList();
         }
+        List<Player> playersWhoAreMissed = new ArrayList<>();
         try {
             Message mainMessage = mainGameChannel.retrieveMessageById(messageId).completeAfter(100, TimeUnit.MILLISECONDS);
             for (Player player : game.getPlayers().values()) {

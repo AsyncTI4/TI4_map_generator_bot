@@ -255,48 +255,6 @@ public class AgendaHelper {
         }
     }
 
-    public static void pingMissingPlayers(Game game) {
-        List<Player> missingPlayersWhens = ButtonHelper.getPlayersWhoHaventReacted(game.getLatestWhenMsg(), game);
-        List<Player> missingPlayersAfters = ButtonHelper.getPlayersWhoHaventReacted(game.getLatestAfterMsg(), game);
-        if (missingPlayersAfters.isEmpty() && missingPlayersWhens.isEmpty()) {
-            return;
-        }
-
-        String messageWhens = " please indicate no whens";
-        String messageAfters = " please indicate no afters";
-        if (game.isFowMode()) {
-            for (Player player : missingPlayersWhens) {
-                MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
-                    player.getRepresentationUnfogged() + messageWhens);
-            }
-            for (Player player : missingPlayersAfters) {
-                MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
-                    player.getRepresentationUnfogged() + messageAfters);
-            }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                "Sent reminder pings to players who have not yet reacted");
-
-        } else {
-            StringBuilder messageWhensBuilder = new StringBuilder(" please indicate no whens");
-            for (Player player : missingPlayersWhens) {
-                messageWhensBuilder.insert(0, player.getRepresentationUnfogged());
-            }
-            messageWhens = messageWhensBuilder.toString();
-            if (!missingPlayersWhens.isEmpty()) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageWhens);
-            }
-
-            StringBuilder messageAftersBuilder = new StringBuilder(" please indicate no afters");
-            for (Player player : missingPlayersAfters) {
-                messageAftersBuilder.insert(0, player.getRepresentationUnfogged());
-            }
-            messageAfters = messageAftersBuilder.toString();
-            if (!missingPlayersAfters.isEmpty()) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageAfters);
-            }
-        }
-    }
-
     public static void exhaustPlanetsForVotingVersion2(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String outcome = buttonID.substring(buttonID.indexOf("_") + 1);
         String voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome)
