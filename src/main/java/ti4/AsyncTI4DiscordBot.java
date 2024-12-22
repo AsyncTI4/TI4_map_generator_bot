@@ -210,6 +210,7 @@ public class AsyncTI4DiscordBot {
         // LOAD GAMES NAMES
         BotLogger.logWithTimestamp(" LOADING GAMES");
         GameManager.initialize();
+        // TODO: Remove this once all games have been migrated to the directories
         MoveUndoToDirectory.moveUndoFilesToDirectories();
 
         // RUN DATA MIGRATIONS

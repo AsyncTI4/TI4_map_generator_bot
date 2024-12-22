@@ -30,7 +30,7 @@ class GameUndoService {
         File gameFile = Storage.getGameFile(gameName + Constants.TXT);
         if (!gameFile.exists()) return;
         try {
-            Path mapUndoStorage = Storage.getGameUndoStoragePath(gameName, getUndoFileName(gameName, latestIndex + 1));
+            Path mapUndoStorage = Storage.getGameUndo(gameName, getUndoFileName(gameName, latestIndex + 1));
             Files.copy(gameFile.toPath(), mapUndoStorage, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             BotLogger.log("Error copying undo file for " + gameName, e);
@@ -49,7 +49,7 @@ class GameUndoService {
             undoNumbers.stream()
                 .filter(undoIndex -> undoIndex < oldestUndoNumberThatShouldExist)
                 .map(undoIndex -> getUndoFileName(gameName, undoIndex))
-                .forEach(fileName -> deleteFile(Storage.getGameUndoStoragePath(gameName, fileName)));
+                .forEach(fileName -> deleteFile(Storage.getGameUndo(gameName, fileName)));
 
             return maxUndoNumber;
         } catch (Exception e) {
@@ -109,7 +109,7 @@ class GameUndoService {
     }
 
     private static void replaceGameFileWithUndo(String gameName, int undoIndex, Path gameFilePath) throws IOException {
-        Path undoFilePath = Storage.getGameUndoStoragePath(gameName, getUndoFileName(gameName, undoIndex));
+        Path undoFilePath = Storage.getGameUndo(gameName, getUndoFileName(gameName, undoIndex));
         Files.copy(undoFilePath, gameFilePath, StandardCopyOption.REPLACE_EXISTING);
     }
 
@@ -126,7 +126,7 @@ class GameUndoService {
         for (int i = latestUndoIndex; i > undoIndex; i--) {
             String fileName = getUndoFileName(gameToUndo.getName(), i);
             undoCommands.add(undoNamesToCommandText.get(fileName));
-            Path currentUndo = Storage.getGameUndoStoragePath(gameToUndo.getName(), fileName);
+            Path currentUndo = Storage.getGameUndo(gameToUndo.getName(), fileName);
             if (!currentUndo.toFile().delete()) {
                 BotLogger.log("Failed to delete undo file: " + currentUndo);
             }

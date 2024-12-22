@@ -265,7 +265,7 @@ public class Storage {
 
     @NotNull
     @SneakyThrows
-    public static Path getGameUndoStoragePath(String gameName, String fileName) {
+    public static Path getGameUndo(String gameName, String fileName) {
         var path = Path.of(getStoragePath() + GAMES_UNDO + gameName + File.separator + fileName);
         Files.createDirectories(path.getParent());
         return path;
