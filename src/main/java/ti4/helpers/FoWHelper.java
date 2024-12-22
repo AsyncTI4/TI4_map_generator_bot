@@ -474,7 +474,7 @@ public class FoWHelper {
 			}
 		}
 
-		return wormholeIDs.contains(Constants.BETA);
+		return wormholeIDs.stream().anyMatch(id -> id.contains(Constants.BETA));
 	}
 
 	public static boolean doesTileHaveAlpha(Game game, String position) {
@@ -497,7 +497,7 @@ public class FoWHelper {
 			}
 		}
 
-		return (wormholeIDs.contains(Constants.ALPHA));
+		return wormholeIDs.stream().anyMatch(id -> id.contains(Constants.ALPHA));
 	}
 
 	/**

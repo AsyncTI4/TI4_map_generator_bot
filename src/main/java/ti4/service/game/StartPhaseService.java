@@ -257,16 +257,8 @@ public class StartPhaseService {
         }
         ButtonHelperAbilities.giveKeleresCommsNTg(game, event);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", System.currentTimeMillis() + "");
-        if (game.isFowMode()) {
-            if (!game.isHomebrewSCMode()) {
-                MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(), message + pickSCMsg, Helper.getRemainingSCButtons(game, speaker));
-            } else {
-                MessageHelper.sendPrivateMessageToPlayer(speaker, game, message);
-            }
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message + pickSCMsg,
-                Helper.getRemainingSCButtons(game, speaker));
-        }
+        MessageHelper.sendMessageToChannelWithButtons(speaker.getCorrectChannel(), message + pickSCMsg, Helper.getRemainingSCButtons(game, speaker));
+
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "Start of Strategy Phase For Round #" + game.getRound());
         }

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -2304,4 +2305,44 @@ public class ButtonHelperModifyUnits {
             && player.hasUnit("nomad_mech")
             && !noMechPowers;
     }
+
+    public static List<Button> getContractualObligationsButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p : game.getRealPlayers()) {
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray("resolveContractual_" + p.getFaction(), p.getColor()));
+            } else {
+                Button button = Buttons.gray("resolveContractual_" + p.getFaction(), " ");
+                buttons.add(button.withEmoji(Emoji.fromFormatted(p.getFactionEmoji())));
+            }
+        }
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
+        return buttons;
+    }
+
+    @ButtonHandler("resolveContractual_")
+    public static void resolveContractualObligations(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String targetFaction = buttonID.replace("resolveContractual_", "");
+        Player targetPlayer = game.getPlayerFromColorOrFaction(targetFaction);
+
+        List<Button> buttons = new ArrayList<>();
+        List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(game, targetPlayer,
+                    Units.UnitType.Spacedock, Units.UnitType.CabalSpacedock, Units.UnitType.PlenaryOrbital, Units.UnitType.Warsun));
+        for (Tile tile : tiles) {
+            Button tileButton = Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_sling",
+                tile.getRepresentationForButtons(game, targetPlayer));
+            buttons.add(tileButton);
+        }
+        MessageHelper.sendMessageToChannelWithButtons(targetPlayer.getCorrectChannel(), targetPlayer.getRepresentationUnfogged()
+            + " " + (game.isFowMode() ? "Someone" : player.getRepresentationNoPing())
+            + " is using Contractual Obligations to force you to produce 1 ship in a system that contains 1 or more of your space docks or war suns.\n"
+            + "Select which tile you would like to produce 1 ship in.", buttons);
+
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Used Contractual Obligations to force " 
+                + targetPlayer.getRepresentationNoPing() + " to produce 1 ship.");
+        }
+        event.getMessage().delete().queue();
+    }
+
 }
