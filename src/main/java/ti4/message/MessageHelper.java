@@ -3,9 +3,6 @@ package ti4.message;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -14,7 +11,6 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -122,15 +118,6 @@ public class MessageHelper {
 		} catch (Exception e) {
 			BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
 			return buttons;
-		}
-	}
-
-	private static boolean isDirectoryEmpty(Path directory) {
-		try (Stream<Path> entries = Files.list(directory)) {
-			return entries.findAny().isEmpty();
-		} catch (IOException e) {
-			BotLogger.log("Error trying to list directory during undo button: " + directory, e);
-			return true;
 		}
 	}
 
