@@ -20,5 +20,9 @@ jobs:
           envs: AWS_KEY, AWS_SECRET
           script: |
             cd ~/ti4bot/ti4bot_saves/maps/undo
-            echo "Number of files in the undo directory:"
+            
+            echo "Total number of files in 'undo' (including subdirectories):"
             find . -type f | wc -l
+            
+            echo "Total number of directories in 'undo' (including subdirectories):"
+            find . -type d | wc -l
