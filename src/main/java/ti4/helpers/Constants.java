@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -937,7 +937,6 @@ public class Constants {
     public static final String LATEST_AFTER_MSG = "latest_after_msg";
     public static final String LATEST_WHEN_MSG = "latest_when_msg";
     public static final String LATEST_TRANSACTION_MSG = "latest_transaction_msg";
-    public static final String LATEST_UPNEXT_MSG = "latest_upnext_msg";
     public static final String PHASE_OF_GAME = "phase_of_game";
     public static final String ALL_SLASH_COMMANDS = "all_slash_commands";
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER = "players_who_hit_persistent_no_after";
