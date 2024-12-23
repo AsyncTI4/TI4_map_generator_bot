@@ -109,7 +109,6 @@ class SampleDecals extends Subcommand {
 
             n += 1;
             if (n >= PERROW) {
-                //MessageHelper.sendMessageToEventChannel(event, d + ": " + x + ", " + y + "\n" + "sample/" + d + "_dn_wht.png");
                 n = 0;
                 x = left;
                 y += DREADTEXHIGHT;
@@ -118,8 +117,7 @@ class SampleDecals extends Subcommand {
             }
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        FileUpload fileUpload = FileUploadService.createFileUpload(coloursImage, 1.0f,
-                        "decal_sample_" + top + "_" + left)
+        FileUpload fileUpload = FileUploadService.createFileUpload(coloursImage, "decal_sample_" + top + "_" + left)
             .setDescription("Decal samples for units.");
         MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
     }
