@@ -311,7 +311,7 @@ public class CreateGameService {
                     }
                     MessageHelper.sendMessageToChannel(introThread, message);
                     BufferedImage colorsImage = ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile("Compiled_Async_colors.png"), 731, 593);
-                    FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, 1.0f, "colors");
+                    FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, "colors");
                     MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                 } catch (Exception e) {
                     BotLogger.log("newPlayerIntro", e);
