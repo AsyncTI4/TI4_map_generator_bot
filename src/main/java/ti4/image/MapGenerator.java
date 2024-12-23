@@ -1,17 +1,6 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -33,18 +22,17 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands2.CommandHelper;
@@ -95,6 +83,8 @@ import ti4.service.user.AFKService;
 import ti4.settings.GlobalSettings;
 import ti4.website.WebsiteOverlay;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class MapGenerator implements AutoCloseable {
 
     private static final int RING_MAX_COUNT = 8;
@@ -125,6 +115,7 @@ public class MapGenerator implements AutoCloseable {
 
     private final Graphics graphics;
     private final BufferedImage mainImage;
+    private byte[] mainImageBytes;
     private final GenericInteractionCreateEvent event;
     private final int scoreTokenSpacing;
     private final Game game;
@@ -137,7 +128,7 @@ public class MapGenerator implements AutoCloseable {
     private final boolean allEyesOnMe;
 
     private final List<WebsiteOverlay> websiteOverlays = new ArrayList<>();
-    private int mapWidth;
+    private final int mapWidth;
     private int minX = -1;
     private int minY = -1;
     private int maxX = -1;
@@ -259,7 +250,7 @@ public class MapGenerator implements AutoCloseable {
         if (debug) debugDiscordTime = StopWatch.createStarted();
         AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(game.getName()));
         game.incrementMapImageGenerationCount();
-        FileUpload fileUpload = FileUploadService.createFileUpload(mainImage, 0.25f, game.getName());
+        FileUpload fileUpload = FileUploadService.createFileUpload(mainImageBytes, game.getName());
         if (debug) debugDiscordTime.stop();
         return fileUpload;
     }
@@ -413,12 +404,12 @@ public class MapGenerator implements AutoCloseable {
     private void sendToWebsite() {
         String testing = System.getenv("TESTING");
         if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
-            WebHelper.putMap(game.getName(), mainImage);
+            WebHelper.putMap(game.getName(), mainImageBytes, false, null);
             WebHelper.putData(game.getName(), game);
             WebHelper.putOverlays(game.getID(), websiteOverlays);
         } else if (isFoWPrivate) {
             Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
-            WebHelper.putMap(game.getName(), mainImage, true, player);
+            WebHelper.putMap(game.getName(), mainImageBytes, true, player);
         }
     }
 
@@ -432,6 +423,7 @@ public class MapGenerator implements AutoCloseable {
 
         if (debug) debugImageGraphicsTime = StopWatch.createStarted();
         drawImage();
+        mainImageBytes = ImageHelper.writeJpg(mainImage);
         if (debug) debugImageGraphicsTime.stop();
     }
 
