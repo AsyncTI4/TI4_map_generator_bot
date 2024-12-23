@@ -42,6 +42,7 @@ import ti4.model.BorderAnomalyModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.UnitModel;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
+import ti4.service.image.FileUploadService;
 
 public class TileGenerator {
 
@@ -135,9 +136,7 @@ public class TileGenerator {
             BotLogger.log(game.getName() + ": Could not save generated system info image");
         }
 
-        byte[] imageBytes = ImageHelper.writeJpg(mainImage);
-        String imageName = game.getName() + "_" + getTimeStamp() + ".jpg";
-        return FileUpload.fromData(imageBytes, imageName);
+        return FileUploadService.createFileUpload(mainImage, game.getName());
     }
 
     private static Set<String> getTilesToShow(Game game, int context, String focusTile) {
