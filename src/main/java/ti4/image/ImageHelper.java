@@ -22,6 +22,11 @@ import ti4.message.BotLogger;
 public class ImageHelper {
 
     private static final JpegWriter JPG_WRITER = JpegWriter.Default;
+    private static final Color transparencyReplacementColor;
+    static {
+        float[] hsb = Color.RGBtoHSB(34, 34, 34, new float[3]);
+        transparencyReplacementColor = Color.getHSBColor(hsb[0], hsb[1], hsb[2]);
+    }
 
     @Nullable
     public static BufferedImage read(String filePath) {
@@ -141,7 +146,7 @@ public class ImageHelper {
 
     @SneakyThrows
     public static byte[] writeJpg(BufferedImage image) {
-        var immutableImage = ImmutableImage.fromAwt(image).removeTransparency(Color.BLACK);
+        var immutableImage = ImmutableImage.fromAwt(image).removeTransparency(transparencyReplacementColor);
         return immutableImage.bytes(JPG_WRITER);
     }
 }
