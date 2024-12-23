@@ -280,9 +280,7 @@ public class PlayStrategyCardService {
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.green("winnuPNPlay_" + scToPlay, "Use Acquiescence"));
                             buttons.add(Buttons.red("deleteButtons", "Decline"));
-                            MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), acqMessage,
-                                buttons);
-
+                            MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), acqMessage, buttons);
                         }
                     }
                 }

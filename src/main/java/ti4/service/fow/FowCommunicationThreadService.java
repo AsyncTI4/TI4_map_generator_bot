@@ -11,11 +11,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -81,7 +80,7 @@ public class FowCommunicationThreadService {
                 //Allow talking
                 threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR)).queue(success -> {
                     MessageHelper.sendMessageToChannel(threadChannel,  notice + " are neighbors again and **may** communicate.");
-                });;
+                });
 
             } else if (!areNeighbors && !threadLocked) {
                 //Deny talking
