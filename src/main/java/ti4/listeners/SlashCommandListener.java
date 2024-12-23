@@ -17,7 +17,7 @@ import ti4.service.game.GameNameService;
 
 public class SlashCommandListener extends ListenerAdapter {
 
-    private static final long DELAY_THRESHOLD_MILLISECONDS = 1000;
+    private static final long DELAY_THRESHOLD_MILLISECONDS = 1500;
 
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
