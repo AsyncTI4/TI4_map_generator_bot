@@ -66,6 +66,6 @@ public class JimboImageHelper {
             g2.drawImage(img, x * size + xoff, y * size, null);
             i++;
         }
-        return FileUploadService.createFileUpload(newImage, 1.0f, "jimboStuff");
+        return FileUploadService.createFileUpload(newImage, "jimboStuff");
     }
 }

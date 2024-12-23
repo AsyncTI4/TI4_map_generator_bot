@@ -28,7 +28,7 @@ class EventInfo extends GameStateSubcommand {
 
     public static void sendEventInfo(Game game, Player player, SlashCommandInteractionEvent event) {
         String headerText = player.getRepresentationUnfogged() + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendEventInfo(game, player);
     }
 

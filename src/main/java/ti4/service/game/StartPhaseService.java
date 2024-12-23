@@ -23,6 +23,7 @@ import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.StringHelper;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
@@ -256,16 +257,8 @@ public class StartPhaseService {
         }
         ButtonHelperAbilities.giveKeleresCommsNTg(game, event);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", System.currentTimeMillis() + "");
-        if (game.isFowMode()) {
-            if (!game.isHomebrewSCMode()) {
-                MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(), message + pickSCMsg, Helper.getRemainingSCButtons(game, speaker));
-            } else {
-                MessageHelper.sendPrivateMessageToPlayer(speaker, game, message);
-            }
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message + pickSCMsg,
-                Helper.getRemainingSCButtons(game, speaker));
-        }
+        MessageHelper.sendMessageToChannelWithButtons(speaker.getCorrectChannel(), message + pickSCMsg, Helper.getRemainingSCButtons(game, speaker));
+
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "Start of Strategy Phase For Round #" + game.getRound());
         }
@@ -456,9 +449,6 @@ public class StartPhaseService {
         String msg;
         game.setStoredValue("willRevolution", "");
         game.setPhaseOfGame("action");
-        String msgExtra = "";
-        boolean allPicked = true;
-        Player privatePlayer = null;
         Collection<Player> activePlayers = game.getPlayers().values().stream()
             .filter(Player::isRealPlayer)
             .toList();
@@ -488,73 +478,72 @@ public class StartPhaseService {
             }
         }
 
-        // INFORM FIRST PLAYER IS UP FOR ACTION
-        if (nextPlayer != null) {
-            msgExtra += " " + nextPlayer.getRepresentation() + " is up for an action";
-            privatePlayer = nextPlayer;
-            game.updateActivePlayer(nextPlayer);
-            if (game.isFowMode()) {
-                FoWHelper.pingAllPlayersWithFullStats(game, event, nextPlayer, "started turn");
-            }
-            ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, game);
-
-            game.setPhaseOfGame("action");
+        game.setPhaseOfGame("action");
+        if (nextPlayer == null) {
+            return;
         }
+        game.updateActivePlayer(nextPlayer);
+        if (game.isFowMode()) {
+            FoWHelper.pingAllPlayersWithFullStats(game, event, nextPlayer, "started turn");
+        }
+        ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, game);
 
-        msg = "";
-        MessageHelper.sendMessageToChannel(nextPlayer.getCorrectChannel(), msg);
         if (isFowPrivateGame) {
-            msgExtra = "Start phase command run";
+            String msgExtra = "Start phase command run";
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
-            MessageHelper.sendPrivateMessageToPlayer(privatePlayer, game, event, msgExtra, fail, success);
-            if (privatePlayer == null)
-                return;
-            msgExtra = privatePlayer.getRepresentationUnfogged() + " UP NEXT";
-            game.updateActivePlayer(privatePlayer);
+            MessageHelper.sendPrivateMessageToPlayer(nextPlayer, game, event, msgExtra, fail, success);
+            msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
+                + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
+            game.updateActivePlayer(nextPlayer);
 
-            if (!allPicked) {
-                game.setPhaseOfGame("strategy");
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick a strategy card.", Helper.getRemainingSCButtons(game, privatePlayer));
-            } else {
+            MessageHelper.sendMessageToChannelWithButtons(nextPlayer.getPrivateChannel(), msgExtra + "\n Use buttons to do turn.", StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
 
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.", StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
-
-                if (privatePlayer.getGenSynthesisInfantry() > 0) {
-                    if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
-                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                            "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
-                            ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
-                    } else {
-                        privatePlayer.setStasisInfantry(0);
-                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                            + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
-                    }
+            if (nextPlayer.getGenSynthesisInfantry() > 0) {
+                if (!ButtonHelper.getPlaceStatusInfButtons(game, nextPlayer).isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithButtons(nextPlayer.getCorrectChannel(),
+                        "Use buttons to revive infantry. You have " + nextPlayer.getGenSynthesisInfantry() + " infantry left to revive.",
+                        ButtonHelper.getPlaceStatusInfButtons(game, nextPlayer));
+                } else {
+                    nextPlayer.setStasisInfantry(0);
+                    MessageHelper.sendMessageToChannel(nextPlayer.getCorrectChannel(), nextPlayer.getRepresentation()
+                        + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
                 }
             }
 
         } else {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have picked a strategy card.");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have picked a strategy card.\n"
+                + nextPlayer.getRepresentation() + " is first in initiative order.");
             if (game.isShowBanners()) {
                 BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
             }
             ListTurnOrderService.turnOrder(event, game);
-            if (!msgExtra.isEmpty()) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
-                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.", StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
+            if (game.isShowBanners()) {
+                BannerGenerator.drawFactionBanner(nextPlayer);
+            }
+            String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
+                + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
+            Player nextNextPlayer = EndTurnService.findNextUnpassedPlayer(game, nextPlayer);
+            if (nextNextPlayer == nextPlayer) {
+                msgExtra += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
+            } else if (nextNextPlayer != null) {
+                msgExtra += "\n-# " + nextNextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
+            }
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
 
-                if (privatePlayer.getGenSynthesisInfantry() > 0) {
-                    if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
-                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                            "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
-                            ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
-                    } else {
-                        privatePlayer.setStasisInfantry(0);
-                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                            + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
-                    }
+            if (nextPlayer.getGenSynthesisInfantry() > 0) {
+                if (!ButtonHelper.getPlaceStatusInfButtons(game, nextPlayer).isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithButtons(nextPlayer.getCorrectChannel(),
+                        "Use buttons to revive infantry. You have " + nextPlayer.getGenSynthesisInfantry() + " infantry left to revive.",
+                        ButtonHelper.getPlaceStatusInfButtons(game, nextPlayer));
+                } else {
+                    nextPlayer.setStasisInfantry(0);
+                    MessageHelper.sendMessageToChannel(nextPlayer.getCorrectChannel(), nextPlayer.getRepresentation()
+                        + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
                 }
             }
+            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Use buttons to do turn.",
+                StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
         }
         for (Player p2 : game.getRealPlayers()) {
             List<Button> buttons = new ArrayList<>();

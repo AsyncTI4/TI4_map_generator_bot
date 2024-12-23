@@ -2515,7 +2515,7 @@ public class AgendaHelper {
         if (game == null) return;
         String sb = player.getRepresentationUnfogged() + " here " + (count == 1 ? "is" : "are") + " the agenda" + (count == 1 ? "" : "s") + " you have drawn:";
 
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
         for (int i = 0; i < count; i++) {
             Map.Entry<String, Integer> entry = fromBottom ? game.drawBottomAgenda() : game.drawAgenda();
             if (entry != null) {
@@ -2526,14 +2526,14 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null, agendaEmbed, buttons);
             }
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "__Note: if you put both agendas on top, the second one you put will be revealed first!__");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, "__Note: if you put both agendas on top, the second one you put will be revealed first!__");
     }
 
     public static void drawSpecificAgenda(String agendaID, Game game, @NotNull Player player) {
         String sb = player.getRepresentationUnfogged() + " here is the agenda you have drawn:";
         if (game == null) return;
 
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
 
         Map.Entry<String, Integer> entry = game.drawSpecificAgenda(agendaID);
         if (entry != null) {
@@ -2771,6 +2771,18 @@ public class AgendaHelper {
                     player.getRepresentationUnfogged()
                         + " you have Quaxdol Junitas, the Florzen commander, and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
+            }
+            if (!action && aCount == 1 && player.hasTech("dsrohdy")) {
+                TechnologyModel dsrohdy = Mapper.getTech("dsrohdy");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged() 
+                    + " you have " + dsrohdy.getRepresentation(false) + " and may choose a player.\n"
+                    + "They must produce 1 ship in a system that contains 1 or more of their space docks or war suns.");
+                for (String tech : player.getTechs()) {
+                    if (Mapper.getTech(tech).isUnitUpgrade()) {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "", 
+                            ButtonHelperModifyUnits.getContractualObligationsButtons(game, player));
+                    }
+                }
             }
         }
         if (!game.isFowMode() && !action) {
