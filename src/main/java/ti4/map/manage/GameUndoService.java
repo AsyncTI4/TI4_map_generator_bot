@@ -3,7 +3,6 @@ package ti4.map.manage;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -32,35 +30,18 @@ class GameUndoService {
         File gameFile = Storage.getGameFile(gameName + Constants.TXT);
         if (!gameFile.exists()) return;
         try {
-            File mapUndoStorage = Storage.getGameUndoStorage(getUndoFileName(gameName, latestIndex + 1));
-            Files.copy(gameFile.toPath(), mapUndoStorage.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Path mapUndoStorage = Storage.getGameUndo(gameName, getUndoFileName(gameName, latestIndex + 1));
+            Files.copy(gameFile.toPath(), mapUndoStorage, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             BotLogger.log("Error copying undo file for " + gameName, e);
         }
     }
 
     private static int cleanUpExcessUndoFilesAndReturnLatestIndex(String gameName) {
-        String gameNameFileNamePrefix = gameName + "_";
-        var gameUndoPath = Storage.getGameUndoDirectory().toPath();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(gameUndoPath, gameNameFileNamePrefix + "*")) {
-            List<Integer> undoNumbers = new ArrayList<>();
-            for (Path path : stream) {
-                String fileName = path.getFileName().toString();
-                String undoNumberStr = StringUtils.substringBetween(fileName, gameNameFileNamePrefix, Constants.TXT);
-                if (undoNumberStr != null) {
-                    try {
-                        undoNumbers.add(Integer.parseInt(undoNumberStr));
-                    } catch (NumberFormatException e) {
-                        BotLogger.log("Could not parse undo number '" + undoNumberStr + "' for game " + gameName, e);
-                    }
-                }
-            }
-
-            if (undoNumbers.isEmpty()) {
-                return 0;
-            }
-
-            undoNumbers.sort(Integer::compareTo);
+        try {
+            List<Integer> undoNumbers = GameUndoNameService.getSortedUndoNumbers(gameName);
+            if (undoNumbers.isEmpty()) return 0;
+            
             int maxUndoNumber = undoNumbers.getLast();
             int maxUndoFilesPerGame = GameManager.getManagedGame(gameName).isHasEnded() ? 10 : 100;
             int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;
@@ -68,7 +49,7 @@ class GameUndoService {
             undoNumbers.stream()
                 .filter(undoIndex -> undoIndex < oldestUndoNumberThatShouldExist)
                 .map(undoIndex -> getUndoFileName(gameName, undoIndex))
-                .forEach(fileName -> deleteFile(Storage.getGameUndoStoragePath(fileName)));
+                .forEach(fileName -> deleteFile(Storage.getGameUndo(gameName, fileName)));
 
             return maxUndoNumber;
         } catch (Exception e) {
@@ -128,8 +109,8 @@ class GameUndoService {
     }
 
     private static void replaceGameFileWithUndo(String gameName, int undoIndex, Path gameFilePath) throws IOException {
-        File undoFile = Storage.getGameUndoStorage(getUndoFileName(gameName, undoIndex));
-        Files.copy(undoFile.toPath(), gameFilePath, StandardCopyOption.REPLACE_EXISTING);
+        Path undoFilePath = Storage.getGameUndo(gameName, getUndoFileName(gameName, undoIndex));
+        Files.copy(undoFilePath, gameFilePath, StandardCopyOption.REPLACE_EXISTING);
     }
 
     private static String getUndoFileName(String gameName, int undoIndex) {
@@ -144,11 +125,10 @@ class GameUndoService {
         List<String> undoCommands = new ArrayList<>();
         for (int i = latestUndoIndex; i > undoIndex; i--) {
             String fileName = getUndoFileName(gameToUndo.getName(), i);
-            File currentUndo = Storage.getGameUndoStorage(fileName);
-            if (!currentUndo.delete()) {
-                BotLogger.log("Failed to delete undo file: " + currentUndo.getAbsolutePath());
-            } else {
-                undoCommands.add(undoNamesToCommandText.get(fileName));
+            undoCommands.add(undoNamesToCommandText.get(fileName));
+            Path currentUndo = Storage.getGameUndo(gameToUndo.getName(), fileName);
+            if (!currentUndo.toFile().delete()) {
+                BotLogger.log("Failed to delete undo file: " + currentUndo);
             }
         }
 

@@ -4,11 +4,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
@@ -45,7 +43,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
-import ti4.helpers.Storage;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -53,6 +50,7 @@ import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.GameNameService;
+import ti4.service.game.GameUndoNameService;
 
 public class MessageHelper {
 
@@ -108,30 +106,19 @@ public class MessageHelper {
 				return buttons;
 			}
 		}
-		File mapUndoDirectory = Storage.getGameUndoDirectory();
-		if (!mapUndoDirectory.exists()) {
-			return buttons;
-		}
 
-		String gameNameForUndoStart = gameName + "_";
-		String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
-		if (mapUndoFiles == null || mapUndoFiles.length == 0) {
-			return buttons;
-		}
-
-		List<Button> newButtons = new ArrayList<>(buttons);
 		try {
-			List<Integer> numbers = Arrays.stream(mapUndoFiles)
-				.map(fileName -> fileName.replace(gameNameForUndoStart, ""))
-				.map(fileName -> fileName.replace(Constants.TXT, ""))
-				.map(Integer::parseInt).toList();
-			int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
+			int maxNumber = GameUndoNameService.getLatestUndoNumber(gameName);
+			if (maxNumber == -1) {
+				return buttons;
+			}
+			List<Button> newButtons = new ArrayList<>(buttons);
 			newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
+			return newButtons;
 		} catch (Exception e) {
 			BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
+			return buttons;
 		}
-
-		return newButtons;
 	}
 
 	private static void addFactionReactToMessage(Game game, Player player, Message message) {

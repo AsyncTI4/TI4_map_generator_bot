@@ -285,7 +285,6 @@ class GameLoadService {
                 case Constants.LATEST_WHEN_MSG -> game.setLatestWhenMsg(info);
                 case Constants.LATEST_TRANSACTION_MSG -> game.setLatestTransactionMsg(info);
                 case Constants.PHASE_OF_GAME -> game.setPhaseOfGame(info);
-                case Constants.LATEST_UPNEXT_MSG -> game.setLatestUpNextMsg(info);
                 case Constants.SO -> game.setSecretObjectives(getCardList(info));
                 case Constants.MESSAGEID_FOR_SABOS -> game.setMessageIDForSabo(getCardList(info));
                 case Constants.AC -> game.setActionCards(getCardList(info));

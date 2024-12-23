@@ -1,16 +1,8 @@
 package ti4.image;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,12 +17,11 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.ButtonHelper;
@@ -51,6 +42,7 @@ import ti4.model.BorderAnomalyModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.UnitModel;
 import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
+import ti4.service.image.FileUploadService;
 
 public class TileGenerator {
 
@@ -144,15 +136,7 @@ public class TileGenerator {
             BotLogger.log(game.getName() + ": Could not save generated system info image");
         }
 
-        FileUpload fileUpload = null;
-        try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
-            ImageHelper.writeCompressedFormat(mainImage, byteArrayOutputStream, "jpg", 1f);
-            String imageName = game.getName() + "_" + getTimeStamp() + ".jpg";
-            fileUpload = FileUpload.fromData(byteArrayOutputStream.toByteArray(), imageName);
-        } catch (IOException e) {
-            BotLogger.log("Failed to create FileUpload for tile.", e);
-        }
-        return fileUpload;
+        return FileUploadService.createFileUpload(mainImage, game.getName());
     }
 
     private static Set<String> getTilesToShow(Game game, int context, String focusTile) {

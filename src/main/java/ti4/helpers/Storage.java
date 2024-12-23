@@ -4,8 +4,10 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.message.BotLogger;
@@ -262,21 +264,26 @@ public class Storage {
     }
 
     @NotNull
-    public static File getGameUndoStorage(String gameName) {
-        return new File(getStoragePath() + GAMES_UNDO + gameName);
+    @SneakyThrows
+    public static Path getGameUndo(String gameName, String fileName) {
+        var path = Path.of(getStoragePath() + GAMES_UNDO + gameName + File.separator + fileName);
+        Files.createDirectories(path.getParent());
+        return path;
     }
 
     @NotNull
-    public static Path getGameUndoStoragePath(String fileName) {
-        return Path.of(getStoragePath() + GAMES_UNDO + fileName);
+    @SneakyThrows
+    public static Path getGameUndoDirectory(String gameName) {
+        Path directory = Path.of(getStoragePath() + GAMES_UNDO + gameName);
+        Files.createDirectories(directory);
+        return directory;
     }
 
     @NotNull
-    public static File getGameUndoDirectory() {
-        File directory = new File(getStoragePath() + GAMES_UNDO);
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
+    @SneakyThrows
+    public static Path getBaseGameUndoDirectory() {
+        Path directory = Path.of(getStoragePath() + GAMES_UNDO);
+        Files.createDirectories(directory);
         return directory;
     }
 
