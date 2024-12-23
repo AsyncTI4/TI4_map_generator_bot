@@ -51,14 +51,15 @@ public class MessageListener extends ListenerAdapter {
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
             if (!event.getAuthor().isBot()) {
+                if (checkForFogOfWarInvitePrompt(message)) return;
+                if (copyLFGPingsToLFGPingsChannel(event, message)) return;
+
                 String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
                 if (GameManager.isValid(gameName)) {
                     if (handleWhispers(event, message, gameName)) return;
                     if (endOfRoundSummary(event, message, gameName)) return;
-                    addFactionEmojiReactionsToMessages(event, gameName);
+                    if (addFactionEmojiReactionsToMessages(event, gameName)) return;
                 }
-                if (checkForFogOfWarInvitePrompt(message)) return;
-                if (copyLFGPingsToLFGPingsChannel(event, message)) return;
             }
             handleFogOfWarCombatThreadMirroring(event);
         } catch (Exception e) {
