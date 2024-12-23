@@ -111,11 +111,6 @@
             <version>0.10.2</version>
         </dependency>
         <dependency>
-            <groupId>com.sksamuel.scrimage</groupId>
-            <artifactId>scrimage-core</artifactId>
-            <version>4.3.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>5.0.0-alpha.14</version>

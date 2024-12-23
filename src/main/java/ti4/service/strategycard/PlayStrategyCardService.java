@@ -52,18 +52,16 @@ public class PlayStrategyCardService {
             BotLogger.log("`PlayStrategyCardService.playSC` - Game: `" + game.getName() + "` - SC Model not found for SC `" + scToPlay + "` from set `" + game.getScSetID() + "`");
         }
 
-        String stratCardName = Helper.getSCName(scToPlay.intValue(), game);
+        String stratCardName = Helper.getSCName(scToPlay, game);
         if (game.getPlayedSCs().contains(scToPlay) && !winnuHero) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**" + stratCardName + "** has already been played previously.");
             return;
         }
 
         // HANDLE COUP
-        if (!winnuHero && game.getStoredValue("Coup") != null
-            && game.getStoredValue("Coup").contains("_" + scToPlay)) {
+        if (!winnuHero && game.getStoredValue("Coup") != null && game.getStoredValue("Coup").contains("_" + scToPlay)) {
             for (Player p2 : game.getRealPlayers()) {
-                if (game.getStoredValue("Coup").contains(p2.getFaction())
-                    && p2.getActionCards().containsKey("coup")) {
+                if (game.getStoredValue("Coup").contains(p2.getFaction()) && p2.getActionCards().containsKey("coup")) {
                     if (p2 == player) {
                         continue;
                     }
@@ -73,8 +71,7 @@ public class PlayStrategyCardService {
                     String message = "Use buttons to end turn, or, if Coup is Sabo'd, play **" + stratCardName + "**.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     game.setStoredValue("Coup", "");
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
-                        .getRepresentation()
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
                         + " you have been Coup'd due to attempting to play **" + stratCardName 
                         + "**. If this is a mistake or the Coup is Sabo'd, feel free to play **" + stratCardName 
                         + "**. Otherwise, please end turn after doing any end of turn abilities you wish to perform.");
@@ -182,7 +179,6 @@ public class PlayStrategyCardService {
                 + " __after__ assigning speaker, use this button to look at the top agendas, which will be shown to you in your `#cards-info` thread.";
             Button draw2Agenda = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawAgenda_2", "Draw 2 Agendas", CardEmojis.Agenda);
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), drawAgendasMessage, draw2Agenda);
-
         }
 
         // Cryypter's Additional Look at Top Agenda Buttons
@@ -202,8 +198,7 @@ public class PlayStrategyCardService {
                 + " you may force players to replenish commodities. This is normally done in order to trigger a _Trade Agreement_ or because of a pre-existing deal."
                 + " This is not required, and not advised if you are offering them a conditional replenishment.";
             List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player, playersToFollow);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                assignSpeakerMessage2, forceRefresh);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), assignSpeakerMessage2, forceRefresh);
 
             for (Player p2 : playersToFollow) {
                 if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
@@ -266,8 +261,8 @@ public class PlayStrategyCardService {
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
         if (!game.isHomebrewSCMode() && player.hasAbility("grace")
-            && !player.getExhaustedAbilities().contains("grace")
-            && ButtonHelperAbilities.getGraceButtons(game, player, scToPlay).size() > 2) {
+                && !player.getExhaustedAbilities().contains("grace")
+                && ButtonHelperAbilities.getGraceButtons(game, player, scToPlay).size() > 2) {
             List<Button> graceButtons = new ArrayList<>();
             graceButtons.add(Buttons.green("resolveGrace_" + scToPlay, "Resolve Grace Ability"));
             graceButtons.add(Buttons.red("deleteButtons", "Decline"));
@@ -285,9 +280,7 @@ public class PlayStrategyCardService {
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.green("winnuPNPlay_" + scToPlay, "Use Acquiescence"));
                             buttons.add(Buttons.red("deleteButtons", "Decline"));
-                            MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), acqMessage,
-                                buttons);
-
+                            MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), acqMessage, buttons);
                         }
                     }
                 }
@@ -381,14 +374,15 @@ public class PlayStrategyCardService {
                         StringBuilder neighborsMsg = new StringBuilder("__Are__ neighbors with the **Trade** holder:");
                         StringBuilder notNeighborsMsg = new StringBuilder("__Not__ neighbors with the **Trade** holder:");
                         for (Player p2 : game.getRealPlayers()) {
-                            if (player == p2) {
-                            } else if (player.getNeighbouringPlayers().contains(p2)) {
-                                neighborsMsg.append(" ").append(p2.getFactionEmoji());
-                            } else {
-                                notNeighborsMsg.append(" ").append(p2.getFactionEmoji());
+                            if (player != p2) {
+                                if (player.getNeighbouringPlayers().contains(p2)) {
+                                    neighborsMsg.append(" ").append(p2.getFactionEmoji());
+                                } else {
+                                    notNeighborsMsg.append(" ").append(p2.getFactionEmoji());
+                                }
                             }
                         }
-                        MessageHelper.sendMessageToChannel(m5, neighborsMsg.toString() + "\n" + notNeighborsMsg);
+                        MessageHelper.sendMessageToChannel(m5, neighborsMsg + "\n" + notNeighborsMsg);
                     }
                 }
             });
