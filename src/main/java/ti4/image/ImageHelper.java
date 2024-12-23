@@ -146,7 +146,10 @@ public class ImageHelper {
 
     @SneakyThrows
     public static byte[] writeJpg(BufferedImage image) {
-        var immutableImage = ImmutableImage.fromAwt(image).removeTransparency(transparencyReplacementColor);
+        var immutableImage = ImmutableImage.fromAwt(image);
+        if (immutableImage.hasAlpha()) {
+            immutableImage = immutableImage.removeTransparency(transparencyReplacementColor);
+        }
         return immutableImage.bytes(JPG_WRITER);
     }
 }
