@@ -62,6 +62,7 @@ import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
+import ti4.temp.MoveUndoToDirectory;
 
 import static org.reflections.scanners.Scanners.SubTypes;
 
@@ -209,6 +210,8 @@ public class AsyncTI4DiscordBot {
         // LOAD GAMES NAMES
         BotLogger.logWithTimestamp(" LOADING GAMES");
         GameManager.initialize();
+        // TODO: Remove this once all games have been migrated to the directories
+        MoveUndoToDirectory.moveUndoFilesToDirectories();
 
         // RUN DATA MIGRATIONS
         if (DataMigrationManager.runMigrations()) {
