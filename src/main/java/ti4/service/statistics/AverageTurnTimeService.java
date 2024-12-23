@@ -1,10 +1,12 @@
 package ti4.service.statistics;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -20,6 +22,8 @@ import ti4.map.Game;
 import ti4.map.GamesPage;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
+import ti4.map.manage.ManagedPlayer;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -111,9 +115,20 @@ public class AverageTurnTimeService {
     }
 
     String getAverageTurnTime(List<User> users) {
-        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = getAllPlayersTurnTimes(false);
-        StringBuilder sb = new StringBuilder();
+        List<ManagedGame> userGames = users.stream()
+            .map(user -> GameManager.getManagedPlayer(user.getId()))
+            .filter(Objects::nonNull)
+            .map(ManagedPlayer::getGames)
+            .flatMap(Collection::stream)
+            .distinct()
+            .toList();
 
+        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
+        for (ManagedGame game : userGames) {
+            getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
+        }
+
+        StringBuilder sb = new StringBuilder();
         sb.append("## __**Average Turn Time:**__\n");
         int index = 1;
         for (User user : users) {
@@ -135,18 +150,5 @@ public class AverageTurnTimeService {
             index++;
         }
         return sb.toString();
-    }
-
-    private Map<String, Map.Entry<Integer, Long>> getAllPlayersTurnTimes(boolean ignoreEndedGames) {
-        Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
-        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
-        Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
-
-        GamesPage.consumeAllGames(
-            endedGamesFilter,
-            game -> getAverageTurnTimeForGame(game, playerTurnTimes, playerAverageTurnTimes)
-        );
-
-        return playerTurnTimes;
     }
 }

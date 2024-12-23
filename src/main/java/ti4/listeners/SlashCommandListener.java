@@ -33,7 +33,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private static void queue(SlashCommandInteractionEvent event) {
         String gameName = GameNameService.getGameName(event);
-        ExecutorManager.runAsync("SlashCommandListener task: " + event.getFullCommandName(), gameName, () -> process(event));
+        ExecutorManager.runAsync("SlashCommandListener task: " + event.getFullCommandName(), gameName, event.getMessageChannel(), () -> process(event));
     }
 
     private static void process(SlashCommandInteractionEvent event) {

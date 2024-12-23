@@ -1,90 +1,75 @@
 package ti4.executors;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.TimedRunnable;
 import ti4.map.manage.GameManager;
+import ti4.message.MessageHelper;
 
 @UtilityClass
 public class ExecutorManager {
 
-    private static final List<ExecutorService> EXECUTORS;
-    static {
-        List<ExecutorService> executors = new ArrayList<>();
-        int numberOfThreads = Math.max(2, Runtime.getRuntime().availableProcessors());
-        for (int i = 0; i < numberOfThreads; i++) {
-            executors.add(Executors.newSingleThreadScheduledExecutor());
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
+    private static final Set<String> gameExecutions = ConcurrentHashMap.newKeySet();
+
+    public static void runAsync(String name, String gameName, MessageChannel messageChannel, Runnable runnable) {
+        if (canExecuteGameCommand(gameName, messageChannel)) {
+            runAsync(name, wrapWithGameRelease(gameName, runnable));
         }
-        EXECUTORS = List.copyOf(executors);
     }
 
-    private static void runAsync(ExecutorService executor, String name, Runnable runnable) {
-        var timedRunnable = new TimedRunnable(name, runnable);
-        executor.execute(timedRunnable);
-    }
-
-    private static void runAsync(ExecutorService executor, String name, int executionTimeWarningThresholdSeconds, Runnable runnable) {
-        var timedRunnable = new TimedRunnable(name, executionTimeWarningThresholdSeconds, runnable);
-        executor.execute(timedRunnable);
-    }
-
-    public static void runAsync(String name, String gameName, Runnable runnable) {
-        if (!GameManager.isValid(gameName)) {
-            runAsync(name, runnable);
-            return;
+    private static boolean canExecuteGameCommand(String gameName, MessageChannel messageChannel) {
+        if (GameManager.isValid(gameName) && !gameExecutions.add(gameName)) {
+            MessageHelper.sendMessageToChannel(messageChannel, "The bot hasn't finished processing the last command for this game. Please wait.");
+            return false;
         }
-        runAsync(getExecutor(gameName), name, runnable);
+        return true;
     }
 
-    private static ExecutorService getExecutor(String gameName) {
-        int index = Math.abs(gameName.hashCode()) % EXECUTORS.size();
-        return EXECUTORS.get(index);
+    private static Runnable wrapWithGameRelease(String gameName, Runnable runnable) {
+        return () -> {
+            try {
+                runnable.run();
+            } finally {
+                gameExecutions.remove(gameName);
+            }
+        };
     }
 
-    public static void runAsync(String name, String gameName, int executionTimeWarningThresholdSeconds, Runnable runnable) {
-        if (!GameManager.isValid(gameName)) {
-            runAsync(name, executionTimeWarningThresholdSeconds, runnable);
-            return;
+    public static void runAsync(String name, String gameName, MessageChannel messageChannel, int executionTimeWarningThresholdSeconds, Runnable runnable) {
+        if (canExecuteGameCommand(gameName, messageChannel)) {
+            runAsync(name, executionTimeWarningThresholdSeconds, wrapWithGameRelease(gameName, runnable));
         }
-        runAsync(getExecutor(gameName), name, executionTimeWarningThresholdSeconds, runnable);
     }
 
     public static void runAsync(String name, Runnable runnable) {
-        runAsync(getRandomExecutor(), name, runnable);
-    }
-
-    private static ExecutorService getRandomExecutor() {
-        int random = ThreadLocalRandom.current().nextInt(EXECUTORS.size());
-        return EXECUTORS.get(random);
+        var timedRunnable = new TimedRunnable(name, runnable);
+        EXECUTOR_SERVICE.execute(timedRunnable);
     }
 
     public static void runAsync(String name, int executionTimeWarningThresholdSeconds, Runnable runnable) {
-        runAsync(getRandomExecutor(), name, executionTimeWarningThresholdSeconds, runnable);
+        var timedRunnable = new TimedRunnable(name, executionTimeWarningThresholdSeconds, runnable);
+        EXECUTOR_SERVICE.execute(timedRunnable);
     }
 
     public static boolean shutdown() {
-        for (ExecutorService executor : EXECUTORS) {
-            executor.shutdown();
-        }
-        boolean shutdown = true;
-        for (ExecutorService executor : EXECUTORS) {
-            try {
-                if (!executor.awaitTermination(20, TimeUnit.SECONDS)) {
-                    executor.shutdownNow();
-                    shutdown = false;
-                }
-            } catch (InterruptedException e) {
-                executor.shutdownNow();
-                Thread.currentThread().interrupt();
-                shutdown = false;
+        EXECUTOR_SERVICE.shutdown();
+        try {
+            if (!EXECUTOR_SERVICE.awaitTermination(20, TimeUnit.SECONDS)) {
+                EXECUTOR_SERVICE.shutdownNow();
+                return false;
             }
+        } catch (InterruptedException e) {
+            EXECUTOR_SERVICE.shutdownNow();
+            Thread.currentThread().interrupt();
+            return false;
         }
-        return shutdown;
+        return true;
     }
 }
