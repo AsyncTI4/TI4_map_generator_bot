@@ -10,7 +10,7 @@ import ti4.message.BotLogger;
 
 class ButtonRuntimeWarningService {
 
-    private static final int WARNING_THRESHOLD_MILLISECONDS = 1000;
+    private static final int WARNING_THRESHOLD_MILLISECONDS = 1500;
 
     private int runtimeWarningCount;
     private LocalDateTime pauseWarningsUntil = LocalDateTime.now();
