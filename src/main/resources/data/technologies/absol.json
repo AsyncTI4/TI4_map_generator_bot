@@ -80,7 +80,7 @@
             "BIOTIC"
         ],
         "source": "absol",
-        "text": "You can use technology specialties on planets you control without exhausting them, even if those planets are exhausted.\nAt the end of your turn, you may discard 2 action cards to explore a readied planet you control.",
+        "text": "You can use technology specialties on planets you control without exhausting them, even if those planets are exhausted.\n\nAt the end of your turn, you may discard 2 action cards to explore a readied planet you control.",
         "homebrewReplacesID": "pa"
     },
     {
@@ -91,7 +91,7 @@
         ],
         "requirements": "G",
         "source": "absol",
-        "text": "You may exhaust this card during the action phase to place 2 infantry from your reinforcements on a planet that contains your ground forces.\n \n After you win a ground combat, you may place 1 infantry from your reinforcements on that planet.",
+        "text": "After you gain control of a planet, you may place 1 infantry from your reinforcements on that planet.\n\nIf you have an infantry unit upgrade technology, you may reroll any dice rolled as part of your infantry units' abilities..",
         "homebrewReplacesID": "dxa"
     },
     {
@@ -102,7 +102,7 @@
         ],
         "requirements": "G",
         "source": "absol",
-        "text": "You may exhaust this card at the end of your turn to ready 1 of your planets or 1 of your other technologies.",
+        "text": "You may exhaust this card at the end of your turn to ready 1 of your other technologies.",
         "homebrewReplacesID": "bs"
     },
     {
@@ -113,7 +113,7 @@
         ],
         "requirements": "GG",
         "source": "absol",
-        "text": "You may exhaust this card at the end of your turn to gain 1 command token or spend 1 command token from your strategy pool to ready an agent you control.",
+        "text": "Once per turn, after you perform an action, you may take a component action.",
         "homebrewReplacesID": "hm"
     },
     {
@@ -124,7 +124,7 @@
         ],
         "requirements": "GGG",
         "source": "absol",
-        "text": "When your units use BOMBARDMENT, you may assign the first hit generated to all ground forces on the planet.\n \n At the start of a round of ground combat on a planet you control, you may exhaust this card to destroy all ground forces on the planet.",
+        "text": "When your units use BOMBARDMENT, the first hit may be used to produce and assign 1 hit against each ground force on the planet.\n \n At the start of a round of ground combat on a planet you control, you may exhaust this card to destroy all ground forces on the planet.",
         "homebrewReplacesID": "x89"
     },
     {
@@ -134,7 +134,7 @@
             "CYBERNETIC"
         ],
         "source": "absol",
-        "text": "'When you produce units, reduce the combined cost of the produced units by 1, plus an additional 1 for every 10 of the combined cost.\n\nDuring the production step of your tactical actions, you may spend 1 resource to repair 1 of your units if the active system contains 1 of your space docks, or 2 resources to repair 1 of your units if it does not.",
+        "text": "'When you produce units, reduce the combined cost of the produced units by 1, plus an additional 1 for every 10 of the combined cost.\n\nDuring the production step of your tactical actions, you may spend 1 resource to repair 1 of your damaged units in the active system, or all of your damaged units in the active system if that system contains 1 or more of your space docks.",
         "homebrewReplacesID": "st"
     },
     {
