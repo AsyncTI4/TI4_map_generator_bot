@@ -421,9 +421,12 @@ public class MessageHelper {
 	 * @param player Player to send a message to
 	 * @param game Active map
 	 * @param messageText Message to send
-	 * @return True if the message was send successfully, false otherwise
+	 * @return True if the message was sent successfully, false otherwise
 	 */
 	public static boolean sendPrivateMessageToPlayer(Player player, Game game, String messageText) {
+		if (player.getUser().isBot()) {
+			return true;
+		}
 		return sendPrivateMessageToPlayer(player, game, (MessageChannel) null, messageText, null, null);
 	}
 
