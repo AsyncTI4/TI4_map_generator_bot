@@ -3,14 +3,13 @@ package ti4.image;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 
-import com.sksamuel.scrimage.ImmutableImage;
-import com.sksamuel.scrimage.nio.JpegWriter;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
@@ -20,13 +19,6 @@ import ti4.message.BotLogger;
 
 @UtilityClass
 public class ImageHelper {
-
-    private static final JpegWriter JPG_WRITER = JpegWriter.Default;
-    private static final Color transparencyReplacementColor;
-    static {
-        float[] hsb = Color.RGBtoHSB(34, 34, 34, new float[3]);
-        transparencyReplacementColor = Color.getHSBColor(hsb[0], hsb[1], hsb[2]);
-    }
 
     @Nullable
     public static BufferedImage read(String filePath) {
@@ -146,10 +138,18 @@ public class ImageHelper {
 
     @SneakyThrows
     public static byte[] writeJpg(BufferedImage image) {
-        var immutableImage = ImmutableImage.fromAwt(image);
-        if (immutableImage.hasAlpha()) {
-            immutableImage = immutableImage.removeTransparency(transparencyReplacementColor);
+        var imageWithoutAlpha = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
+        try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
+            ImageIO.write(imageWithoutAlpha, "jpg", byteArrayOutputStream);
+            return byteArrayOutputStream.toByteArray();
         }
-        return immutableImage.bytes(JPG_WRITER);
+    }
+
+    private static BufferedImage redrawWithoutAlpha(BufferedImage image) {
+        var imageWithoutAlpha = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = imageWithoutAlpha.createGraphics();
+        g2d.drawImage(image, 0, 0, Color.BLACK, null);
+        g2d.dispose();
+        return imageWithoutAlpha;
     }
 }
