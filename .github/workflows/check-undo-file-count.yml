@@ -21,4 +21,4 @@ jobs:
           script: |
             cd ~/ti4bot/ti4bot_saves/maps/undo
             echo "Number of files in the undo directory:"
-            ls -1 | wc -l
+            find . -type f | wc -l
