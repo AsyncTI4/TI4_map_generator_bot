@@ -18,10 +18,6 @@ class ShowMapString extends GameStateSubcommand {
     }
 
     public static void showMapString(GenericInteractionCreateEvent event, Game game) {
-        if (game.isFowMode() && !game.isHasEnded()) {
-            MessageHelper.sendMessageToEventChannel(event, "You can't use this in a Fog of War game");
-            return;
-        }
         MessageHelper.sendMessageToEventChannel(event, game.getName() + " map string below:");
         MessageHelper.sendMessageToEventChannel(event, game.getMapString());
     }

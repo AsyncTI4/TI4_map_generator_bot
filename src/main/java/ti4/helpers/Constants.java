@@ -280,6 +280,9 @@ public class Constants {
     public static final String REMOVE_CUSTOM_ADJACENT_TILES = "remove_custom_adjacent_tiles";
     public static final String REMOVE_ALL_CUSTOM_ADJACENT_TILES = "remove_all_custom_adjacent_tiles";
     public static final String ADD_TILE = "add_tile";
+    public static final String ADD_TILE_RANDOM = "add_tile_random";
+    public static final String INCLUDE_ERONOUS_TILES = "eronous_tiles";
+    public static final String DRAW_ONLY = "draw_only";
     public static final String INTERACTIVE_BUILDER = "interactive_builder";
     public static final String ADD_CC = "add_cc";
     public static final String ADD_CC_FROM_TACTICS = "add_cc_from_tactics";

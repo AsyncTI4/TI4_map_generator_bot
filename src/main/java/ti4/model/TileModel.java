@@ -81,13 +81,9 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        StringBuilder sb = new StringBuilder();
-        sb.append("(").append(getId()).append(") ");
-        if (getEmoji() != null) sb.append(getEmoji().emojiString()).append(" ");
-        if (!getNameNullSafe().isEmpty()) sb.append("__").append(getNameNullSafe()).append("__");
-        eb.setTitle(sb.toString());
+        eb.setTitle(getEmbedTitle());
 
-        sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         if (isEmpty()) sb.append(ExploreEmojis.Frontier);
         if (isAsteroidField()) sb.append(MiscEmojis.Asteroids);
         if (isSupernova()) sb.append(MiscEmojis.Supernova);
@@ -103,6 +99,14 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
         if (includeAliases) eb.setFooter("Aliases: " + getAliases());
         return eb.build();
+    }
+
+    public String getEmbedTitle() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(").append(getId()).append(") ");
+        if (getEmoji() != null) sb.append(getEmoji().emojiString()).append(" ");
+        if (!getNameNullSafe().isEmpty()) sb.append("__").append(getNameNullSafe()).append("__");
+        return sb.toString();
     }
 
     @JsonIgnore
