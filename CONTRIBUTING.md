@@ -1,8 +1,10 @@
+- [Getting the Code](#getting-the-code)
 - [Setup a Test Server](#setup-a-test-server)
 - [Setup a Test Bot](#setup-a-test-bot)
   - [Run Locally](#run-locally)
     - [JAVA, IntelliJ, VSCode, or other Java IDE](#java-intellij-vscode-or-other-java-ide)
     - [Default Formatter](#default-formatter)
+    - [Running from Terminal](#running-from-terminal)
   - [Run Docker Container](#run-docker-container)
     - [Windows 10, VS Code, Docker Desktop](#windows-10-vs-code-docker-desktop)
 - [Adding New Buttons](#adding-new-buttons)
@@ -10,13 +12,22 @@
 - [Testing your Changes](#testing-your-changes)
   - [VSCode Test](#vscode-test)
 - [Helpful Tips for Debugging](#helpful-tips-for-debugging)
-  
+
+# Getting the Code
+Get in touch with us at the TI4-Async discord and let us know you'd like the developer role.
+Branch permissions can be granted, but for now you may fork the repository and clone it to a suitable location.
+
 # Setup a Test Server
 
 1. Enable developer mode on your Discord client, if you have not already
 2. Create a new Discord Server
 3. Record the Server's ID (right click Server Name -> "Copy Server ID")
-4. Setup a Test Bot - see [Step 1 from here](https://discord.com/developers/docs/getting-started#step-1-creating-an-app)
+4. Setup a Test Bot - see [Step 1 from here](https://discord.com/developers/docs/getting-started#step-1-creating-an-app). The main steps are:
+* Note down the bot's credentials.
+* Enable "Privileged Gateway Intents".
+* Tick both Installation Contexts' Methods.
+* Ensure Default Install Settings are correct.
+* Create an install link, paste it into the discord server you want your bot in.
 5. Invite your Test Bot to your server
 6. Create a `bot-log` channel, and `Admin`, `Developer` and `Bothelper` roles; add the role IDs to `src/main/java/ti4/AsyncTI4DiscordBot.java`
 
@@ -73,7 +84,7 @@ For vscode, this is in `.vscode/launch.json`.
 
 Set the 5 {VARIABLES} to match your bot, user, server, and system.
 
-### Default Formatter
+#### Default Formatter
 
 Ensure your default formatter is set to use the `eclipse-formatter.xml` configuration file.
 
@@ -84,6 +95,45 @@ For VSCode you can set it within User/Workspace settings:
 In VSCode, to check your current formatter, you can use prompt `Java: Open Java Formatter Settings` and it should open the `eclipse-formatter.xml` file if set correctly.
 
 ![image](https://github.com/AsyncTI4/TI4_map_generator_bot/assets/39609802/f036b3ff-a1b1-40ba-8d64-e3fed493ae76)
+
+### Running from Terminal
+
+NB: This was done using Linux Ubuntu.
+
+Ensure the pre-requisites are met, you have cloned the GitHub code in a suitable place, and you've set your Bot App up in your discord server.
+[You may use](https://www.baeldung.com/linux/java-choose-default-version) `update-alternatives --config java` to ensure that Java is using the same SDK that you installed earlier.
+Next is to install [Maven](https://maven.apache.org/what-is-maven.html), which will create a JAR file for us to compile and run the bot.
+Ensure it is the latest version and you add the installed binary to your `$PATH`, which is covered by this [StackOverflow answer](https://stackoverflow.com/questions/67985216/install-latest-maven-package-in-ubuntu-via-apt-package-manager-or-other-ways).
+Now, at the root of your project:
+```
+mvn clean install
+```
+This will build and package everything into a JAR file for you, watch the output!
+You will be told about where the JAR file has been placed.
+For example:
+```
+[INFO] Installing <PROJECT_DIR>/TI4_map_generator_bot/target/TI4_map_generator_discord_bot-1.0-SNAPSHOT-jar-with-dependencies.jar to /home/<USERNAME>/.m2/repository/me/terterro/TI4_map_generator_discord_bot/1.0-SNAPSHOT/TI4_map_generator_discord_bot-1.0-SNAPSHOT-jar-with-dependencies.jar
+```
+Note down the directory and file name of the jar with dependencies.
+
+To run the bot, we now need to run `jar-with-dependencies.jar` with `java` and provide it with 3 arguments:
+* `discordBotKey`: Your bot's API token (never reveal this to anyone).
+* `discordUserID`: The User ID of the bot that's in your server.
+* `discordServerID`: The ID of the server your bot is in.
+It would be tedious to do this every time, so I created a bash script to automate this for me, `run_locally.sh`.
+Similarly to the docker script described below, you could adapt this to be a PowerShell script.
+Do not include the angle braces:
+```bash
+jar_with_deps="<full_file_path_of_jar_with_dependencies.jar>"
+discordBotKey="<BOT API KEY HERE>"
+discordUserID="<BOT USER ID HERE>"
+discordServerID="<SERVER ID HERE>"
+
+java -jar $jar_with_deps $discordBotKey $discordUserID $discordServerID
+```
+If using bash, make it executable: `chmod +x run_locally.sh`.
+Now run it: `./run_locally.sh`, you should see your `bot-log` channel fill up with some logs.
+Your bot is now running!
 
 ## Run Container
 
