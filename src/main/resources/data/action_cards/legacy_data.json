@@ -862,5 +862,14 @@
         "text": "Either redistribute your command tokens or place 1 command token from your reinforcements in your fleet pool.",
         "flavorText": "Unlenn massaged his brow and shut off his holoscreen. The magnum opus on Lazax war theory at his fingertips, and yet... it was the most boring piece of literature he'd ever had the displeasure to read.",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "blackmail",
+        "name": "Blackmail",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome must give you 1 promissory note from their hand.",
+        "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
+        "source": "action_deck_2_old"
     }
 ]
