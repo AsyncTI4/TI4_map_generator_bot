@@ -14,5 +14,6 @@
     "spaceTokenLocations": [],
     "wormholes": [],
     "planets": [],
-    "source": "base"
+    "source": "base",
+    "tileBack": "black"
 }

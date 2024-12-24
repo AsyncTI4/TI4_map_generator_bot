@@ -31,5 +31,6 @@
     "planets": [
         "prism"
     ],
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "blue"
 }

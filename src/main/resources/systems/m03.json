@@ -30,5 +30,6 @@
     "planets": [
         "andokxull"
     ],
-    "source": "asteroid"
+    "source": "asteroid",
+    "tileBack": "blue"
 }

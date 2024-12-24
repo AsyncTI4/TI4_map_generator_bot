@@ -31,5 +31,6 @@
         "kull",
         "minaluk"
     ],
-    "source": "ignis_aurora"
+    "source": "ignis_aurora",
+    "tileBack": "green"
 }

@@ -29,5 +29,6 @@
     "planets": [
         "echo"
     ],
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "blue"
 }

@@ -20,5 +20,6 @@
         "drah",
         "trykk"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

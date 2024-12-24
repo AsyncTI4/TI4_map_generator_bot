@@ -31,5 +31,11 @@
         }
     ],
     "wormholes": null,
-    "planets": []
+    "planets": [],
+    "isAsteroidField": false,
+    "isSupernova": false,
+    "isNebula": false,
+    "isGravityRift": false,
+    "source": "eronous",
+    "tileBack": "red"
 }

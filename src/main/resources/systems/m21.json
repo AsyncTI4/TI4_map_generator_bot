@@ -31,5 +31,6 @@
     "planets": [
         "99omega"
     ],
-    "source": "asteroid"
+    "source": "asteroid",
+    "tileBack": "blue"
 }

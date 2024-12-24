@@ -33,5 +33,6 @@
     "isSupernova": true,
     "isNebula": true,
     "isGravityRift": false,
-    "source": "eronous"
+    "source": "eronous",
+    "tileBack": "red"
 }

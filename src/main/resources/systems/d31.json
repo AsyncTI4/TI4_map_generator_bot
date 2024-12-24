@@ -17,5 +17,6 @@
     "planets": [
         "prind"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

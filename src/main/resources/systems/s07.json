@@ -17,5 +17,6 @@
     "planets": [
         "albredaan"
     ],
-    "source": "somno"
+    "source": "somno",
+    "tileBack": "blue"
 }

@@ -19,5 +19,6 @@
         "somna",
         "hospoona"
     ],
-    "source": "somno"
+    "source": "somno",
+    "tileBack": "blue"
 }

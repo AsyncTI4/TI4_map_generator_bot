@@ -13,5 +13,6 @@
     "planets": [
         "drobna"
     ],
-    "source": "somno"
+    "source": "somno",
+    "tileBack": "blue"
 }

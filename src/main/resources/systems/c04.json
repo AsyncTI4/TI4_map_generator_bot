@@ -13,5 +13,6 @@
         "lapidus"
     ],
     "isAsteroidField": true,
-    "source": "lost_star_charts_of_ixth"
+    "source": "lost_star_charts_of_ixth",
+    "tileBack": "red"
 }

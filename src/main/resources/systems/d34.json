@@ -17,5 +17,6 @@
     "planets": [
         "susuros"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

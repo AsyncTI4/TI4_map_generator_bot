@@ -23,5 +23,6 @@
     ],
     "wormholes": [],
     "planets": [],
-    "source": "andcat"
+    "source": "andcat",
+    "tileBack": "black"
 }

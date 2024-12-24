@@ -17,5 +17,6 @@
         "zelian"
     ],
     "isAsteroidField": true,
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }
