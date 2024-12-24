@@ -314,11 +314,9 @@ public class MiltyDraftHelper {
     }
 
     private static boolean isInvalid(TileModel tileModel) {
-        if (tileModel.getTileBackOption().isPresent()) {
-            String back = tileModel.getTileBackOption().orElse("");
-            if (!back.equals("red") && !back.equals("blue")) {
-                return true;
-            }
+        TileModel.TileBack back = tileModel.getTileBack();
+        if (!TileModel.TileBack.RED.equals(back) && !TileModel.TileBack.BLUE.equals(back)) {
+            return true;
         }
 
         String id = tileModel.getId().toLowerCase();
