@@ -31,5 +31,8 @@
         }
     ],
     "wormholes": null,
-    "planets": []
+    "planets": [],
+    "isGravityRift": false,
+    "source": "eronous",
+    "tileBack": "red"
 }

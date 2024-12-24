@@ -36,5 +36,6 @@
     "isNebula": false,
     "isGravityRift": false,
     "source": "eronous",
-    "valid": true
+    "valid": true,
+    "tileBack": "blue"
 }

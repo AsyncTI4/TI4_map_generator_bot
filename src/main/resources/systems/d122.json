@@ -35,5 +35,6 @@
     ],
     "planets": [],
     "isGravityRift": true,
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "red"
 }
