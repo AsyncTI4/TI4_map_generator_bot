@@ -33,5 +33,6 @@
             "y": 170.0
         }
     ],
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "blue"
 }

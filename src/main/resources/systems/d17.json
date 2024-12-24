@@ -19,5 +19,6 @@
         "empero"
     ],
     "isNebula": true,
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

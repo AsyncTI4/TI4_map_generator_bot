@@ -15,5 +15,6 @@
     "planets": [
         "discordia"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

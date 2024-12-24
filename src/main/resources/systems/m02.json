@@ -29,5 +29,6 @@
     "planets": [
         "tralloc"
     ],
-    "source": "asteroid"
+    "source": "asteroid",
+    "tileBack": "blue"
 }
