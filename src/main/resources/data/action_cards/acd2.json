@@ -9,15 +9,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "annexation",
-    "name": "Annexation",
-    "phase": "Action",
-    "window": "After you commit units to land on another player's non-legendary, non-home planet other than Mecatol Rex",
-    "text": "That player must remove each of their units from that planet and place them on any other planets they control, if able.",
-    "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of their hand. \"Our dominion knows no border.\"",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "anomalous_conditions",
     "name": "Anomalous Conditions",
     "phase": "Action",
@@ -87,6 +78,15 @@
     "window": "Action",
     "text": "Purge 3 relic fragments to gain 1 relic; you may spend any number of resources to reduce the number of relic fragments to be purged by 1 for every 3 resources spent.",
     "flavorText": "The black shard dripped with blood—some of it her own. What she had done, she did for the Federation. For all of humankind.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "blackmail",
+    "name": "Blackmail",
+    "phase": "Agenda",
+    "window": "Before another player casts votes",
+    "text": "That player must cast at least 1 vote for an outcome of your choice or give you 1 random promissory note from their hand.",
+    "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
     "source": "action_deck_2"
   },
   {
@@ -319,7 +319,7 @@
     "name": "Early Voting",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome, cast 5 additional votes for that outcome. [Note: This ability works like Argent Zeal. Argent votes before the chosen player.]",
+    "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome of this agenda, cast 5 additional votes for that outcome. [Note: This ability works like Argent Zeal. Argent votes before the chosen player.]",
     "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
     "source": "action_deck_2"
   },
@@ -797,7 +797,7 @@
     "phase": "Any",
     "window": "When another player plays an action card other than 'Sabotage'",
     "text": "Cancel that action card.",
-    "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
+    "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked the Admiral to his core.",
     "source": "action_deck_2"
   },
   {
