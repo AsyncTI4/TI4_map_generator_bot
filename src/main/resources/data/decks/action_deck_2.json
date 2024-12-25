@@ -6,7 +6,6 @@
         "description": "Homebrew collection of action cards that replaces the 84 1-of/unique cards, as well as Diplomatic Pressure, Maneuvering Jets, Morale Boost, and Shields Holding.\n[Spreadsheet & FAQ](https://docs.google.com/spreadsheets/d/1AapgrSMRePEgKOXffhkCqHU_8_SBiV5ONxiA3cjBt-Y/edit?usp=sharing) | [Card Sheet](https://i.imgur.com/uKOJd1y.jpeg) | [Homebrew Discord Channel](https://discord.com/channels/743629929484386395/1214775467123544134/1214775467123544134)",
         "cardIDs": [
             "ancient_trade_routes",
-            "annexation",
             "anomalous_conditions",
             "armament_rider",
             "armistice",
@@ -15,6 +14,7 @@
             "artifact_research",
             "betrayal",
             "black_market_raid",
+            "blackmail",
             "boarding_party",
             "bounty",
             "breakthrough",
