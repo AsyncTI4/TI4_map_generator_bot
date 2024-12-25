@@ -864,12 +864,12 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "blackmail",
-        "name": "Blackmail",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome must give you 1 promissory note from their hand.",
-        "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
+        "alias": "annexation",
+        "name": "Annexation",
+        "phase": "Action",
+        "window": "After you commit units to land on another player's non-legendary, non-home planet other than Mecatol Rex",
+        "text": "That player must remove each of their units from that planet and place them on any other planets they control, if able.",
+        "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of their hand. \"Our dominion knows no border.\"",
         "source": "action_deck_2_old"
     }
 ]
