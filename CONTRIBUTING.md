@@ -120,10 +120,15 @@ To run the bot, we now need to run `jar-with-dependencies.jar` with `java` and p
 * `discordBotKey`: Your bot's API token (never reveal this to anyone).
 * `discordUserID`: The User ID of the bot that's in your server.
 * `discordServerID`: The ID of the server your bot is in.
-It would be tedious to do this every time, so I created a bash script to automate this for me, `run_locally.sh`.
+It would be tedious to do this every time, so I created a bash script to automate this for me, `run_locally.sh` in the same directory as the TI4 bot.
+This bash script should also provide _environment variables_ that tell Java where resources such as emojis or images are and where our local database should be.
+
 Similarly to the docker script described below, you could adapt this to be a PowerShell script.
 Do not include the angle braces:
 ```bash
+#!/bin/bash
+export DB_PATH="./storage"
+export RESOURCE_PATH="./src/main/resources"
 jar_with_deps="<full_file_path_of_jar_with_dependencies.jar>"
 discordBotKey="<BOT API KEY HERE>"
 discordUserID="<BOT USER ID HERE>"
@@ -135,6 +140,15 @@ If using bash, make it executable: `chmod +x run_locally.sh`.
 Now run it: `./run_locally.sh`, you should see your `bot-log` channel fill up with some logs.
 Your bot is now running!
 
+To enable debugging, the final line should be changed to:
+```bash
+java -jar -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005 $jar_with_deps $discordBotKey $discordUserID $discordServerID
+```
+Which will wait (`supsend=y`) on the java debugger, `jdb`, to run on port 5005.
+In a seperate terminal, run:
+```
+jdb -attach localhost:5005
+```
 ## Run Container
 
 ### Windows 10, VS Code, Docker/Podman Desktop
