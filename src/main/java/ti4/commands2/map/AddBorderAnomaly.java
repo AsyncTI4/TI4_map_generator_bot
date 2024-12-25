@@ -1,6 +1,11 @@
 package ti4.commands2.map;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -20,36 +25,60 @@ public class AddBorderAnomaly extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        String tile = event.getOption(Constants.PRIMARY_TILE).getAsString();
-        if (!game.getTileMap().containsKey(tile)) {
-            MessageHelper.replyToMessage(event, "Map does not contain that tile");
-        }
 
-        String direction = event.getOption(Constants.PRIMARY_TILE_DIRECTION).getAsString();
+        Set<String> tiles = resolveTiles(event, game);
+        Set<Integer> directions = resolveDirections(event);
+
         String anomalyTypeString = event.getOption(Constants.BORDER_TYPE).getAsString();
         BorderAnomalyModel model = new BorderAnomalyModel();
         BorderAnomalyModel.BorderAnomalyType anomalyType = model.getBorderAnomalyTypeFromString(anomalyTypeString);
 
-        int directionVal = -1;
-        switch (direction.toLowerCase()) {
-            case "north" -> directionVal = 0;
-            case "northeast" -> directionVal = 1;
-            case "southeast" -> directionVal = 2;
-            case "south" -> directionVal = 3;
-            case "southwest" -> directionVal = 4;
-            case "northwest" -> directionVal = 5;
+        StringBuffer sb = new StringBuffer();
+        int amountAdded = 0;
+        for (String tile : tiles) {
+            for (int d : directions) {
+                if (game.hasBorderAnomalyOn(tile, d)) {
+                    sb.append("Tile " + tile + " already has an anomaly in position " + d + "\n");
+                } else {
+                    game.addBorderAnomaly(tile, d, anomalyType);
+                    amountAdded++;
+                }
+            }
         }
+        sb.append(anomalyType.getName() + " anomalies added: " + amountAdded);
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+    }
 
-        if (directionVal == -1) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid direction");
-            return;
+    public static Set<String> resolveTiles(SlashCommandInteractionEvent event, Game game) {
+        Set<String> tiles = new HashSet<>();
+        String tilesString = event.getOption(Constants.PRIMARY_TILE).getAsString();
+        StringTokenizer tilesTokenizer = new StringTokenizer(tilesString, ",");
+        while (tilesTokenizer.hasMoreTokens()) {
+            String tile = tilesTokenizer.nextToken().trim();
+            if (!game.getTileMap().containsKey(tile)) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Map does not contain tile " + tile);
+            }
+            tiles.add(tile);
         }
+        return tiles;
+    }
 
-        if (game.hasBorderAnomalyOn(tile, directionVal)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile already has an anomaly there!");
-            return;
+    public static Set<Integer> resolveDirections(SlashCommandInteractionEvent event) {
+        String directionString = event.getOption(Constants.PRIMARY_TILE_DIRECTION, "", OptionMapping::getAsString);
+        StringTokenizer directionTokenizer = new StringTokenizer(directionString, ",");
+        Set<Integer> directions = new HashSet<>();
+        while (directionTokenizer.hasMoreTokens()) {
+            String dir = directionTokenizer.nextToken().trim().toLowerCase();
+            switch (dir) {
+                case "north", "n" -> directions.add(0);
+                case "northeast", "ne" -> directions.add(1);
+                case "southeast", "se" -> directions.add(2);
+                case "south", "s" -> directions.add(3);
+                case "southwest", "sw" -> directions.add(4);
+                case "northwest", "nw" -> directions.add(5);
+                default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid direction " + dir);
+            }
         }
-
-        game.addBorderAnomaly(tile, directionVal, anomalyType);
+        return directions;
     }
 }
