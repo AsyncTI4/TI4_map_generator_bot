@@ -27,12 +27,12 @@ import ti4.service.map.AddTileService;
 
 class AddTileRandom extends GameStateSubcommand {
 
-    private final List<String> TYPES = Arrays.asList("blue", "red", "green", "hyperlane");
+    private final List<String> TYPES = Arrays.asList("blue", "red", "hs", "green", "hyperlane");
 
     public AddTileRandom() {
         super(Constants.ADD_TILE_RANDOM, "Add random tile to map (empty tiles can be duplicates)", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile positions", true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_TYPE, "Tile type (blue/red/green/hyperlane)", true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_TYPE, "Tile type (blue/red/hs/hyperlane)", true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ERONOUS_TILES, "Include Eronous tiles"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DRAW_ONLY, "Only draw the tile, don't add to map"));
     }
@@ -81,26 +81,31 @@ class AddTileRandom extends GameStateSubcommand {
             sources.add(ComponentSource.eronous);
         }
 
+        List<TileModel> drawnTiles = new ArrayList<>();
+        StringBuffer msg = new StringBuffer();
         for (String position : positions) {
-            List<TileModel> availableTiles = availableTiles(game, sources, type);
+            List<TileModel> availableTiles = availableTiles(game, sources, type, drawnTiles);
             if (availableTiles.isEmpty()) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "No available tiles found.");
+                msg.append("No available tiles found.");
                 break;
             }
             Collections.shuffle(availableTiles);
             TileModel randomTile = availableTiles.getFirst();
+            drawnTiles.add(randomTile);
             if (!drawOnly) {
                 AddTileService.addTile(getGame(), new Tile(randomTile.getId(), position));
             }
 
-            MessageHelper.sendMessageToChannel(event.getChannel(), (drawOnly ? "Drew " : "Added ") + randomTile.getEmbedTitle() 
-                + " to " + position + " from " + availableTiles.size() + " options");
+            msg.append((drawOnly ? "Drew " : "Added ") + randomTile.getEmbedTitle() 
+                + " to " + position + " from " + availableTiles.size() + " options\n");
         }
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
 
         if (!drawOnly) game.rebuildTilePositionAutoCompleteList();
     }
 
-    private static List<TileModel> availableTiles(Game game, Set<ComponentSource> sources, String type) {
+    private static List<TileModel> availableTiles(Game game, Set<ComponentSource> sources, String type, List<TileModel> drawnTiles) {
         Set<TileModel> existingTileModels = game.getTileMap().values().stream()
             .map(Tile::getTileModel).collect(Collectors.toSet());
 
@@ -111,6 +116,7 @@ class AddTileRandom extends GameStateSubcommand {
                   .filter(tileModel -> TileBack.BLUE.equals(tileModel.getTileBack()))
                   .filter(tileModel -> sources.contains(tileModel.getSource()))
                   .filter(tileModel -> !existingTileModels.contains(tileModel))
+                  .filter(tileModel -> !drawnTiles.contains(tileModel))
                   .collect(Collectors.toList());
               break;
           case "red":
@@ -118,14 +124,17 @@ class AddTileRandom extends GameStateSubcommand {
               availableTiles = TileHelper.getAllTileModels().stream()
                   .filter(tileModel -> TileBack.RED.equals(tileModel.getTileBack()))
                   .filter(tileModel -> sources.contains(tileModel.getSource()))
-                  .filter(tileModel -> tileModel.isEmpty() || !existingTileModels.contains(tileModel))
+                  .filter(tileModel -> tileModel.isEmpty() || (!existingTileModels.contains(tileModel) && !drawnTiles.contains(tileModel)))
                   .collect(Collectors.toList());
               break;
           case "green":
+          case "hs":
               availableTiles = TileHelper.getAllTileModels().stream()
                   .filter(tileModel -> TileBack.GREEN.equals(tileModel.getTileBack()))
                   .filter(tileModel -> sources.contains(tileModel.getSource()))
                   .filter(tileModel -> !existingTileModels.contains(tileModel))
+                  .filter(tileModel -> !drawnTiles.contains(tileModel))
+                  .filter(tileModel -> new Tile(tileModel.getId(), "none").isHomeSystem())
                   .collect(Collectors.toList());
               break;
           case "hyperlane":
