@@ -21,7 +21,8 @@ public class MapCommand implements ParentCommand {
         new ShowMapString(),
         new SetMapTemplate(),
         new MoveTile(),
-        new AddTileRandom()
+        new AddTileRandom(),
+        new AddTileListRandom()
     ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
 

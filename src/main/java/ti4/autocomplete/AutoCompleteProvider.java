@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands2.CommandHelper;
+import ti4.commands2.map.AddTileRandom.RandomOption;
 import ti4.commands2.uncategorized.ServerPromoteCommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -715,6 +716,15 @@ public class AutoCompleteProvider {
                     .filter(value -> value.getValue().search(enteredValue))
                     .limit(25)
                     .map(value -> new Command.Choice(value.getValue().getAutoCompleteName(), value.getKey()))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.RANDOM_TYPE -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Arrays.asList(RandomOption.values()).stream()
+                    .filter(value -> value.search(enteredValue))
+                    .limit(25)
+                    .map(value -> new Command.Choice(value.getAutoCompleteName(), value.toString()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
