@@ -35,7 +35,8 @@ public class TechSummaryCron {
     private static boolean tryToPostTechSummary(String gameName, TechSummariesMetadataManager.RoundTechSummaries roundTechSummaries) {
         try {
             var managedGame = GameManager.getManagedGame(gameName);
-            if (managedGame == null || managedGame.isHasEnded() ||  managedGame.getTableTalkChannel() == null) {
+            if (managedGame == null || managedGame.isHasEnded() ||  managedGame.getTableTalkChannel() == null
+                    || managedGame.getRound() != roundTechSummaries.round()) {
                 return true;
             }
             var techSummaries = roundTechSummaries.techSummaries();
