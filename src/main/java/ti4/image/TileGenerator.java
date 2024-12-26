@@ -127,6 +127,7 @@ public class TileGenerator {
             tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Tile));
             tilesWithExtra.forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Extras));
             tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Units));
+            tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.LastStep));
 
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
@@ -231,13 +232,7 @@ public class TileGenerator {
                     tileGraphics.drawImage(border, TILE_PADDING, TILE_PADDING, null);
                 }
 
-                switch (game.getTextSize()) {
-                    case "large" -> tileGraphics.setFont(Storage.getFont40());
-                    case "medium" -> tileGraphics.setFont(Storage.getFont30());
-                    case "tiny" -> tileGraphics.setFont(Storage.getFont12());
-                    case null, default -> // "small"
-                        tileGraphics.setFont(Storage.getFont20());
-                }
+                setTextSize(tileGraphics);
 
                 if (isFoWPrivate && tile.hasFog(fowPlayer)) {
                     BufferedImage frogOfWar = ImageHelper.read(tile.getFowTilePath(fowPlayer));
@@ -246,10 +241,6 @@ public class TileGenerator {
                     int labelY = TILE_PADDING + LABEL_POSITION_POINT.y;
                     DrawingUtil.superDrawString(tileGraphics, tile.getFogLabel(fowPlayer), labelX, labelY, Color.WHITE, null, null, null, null);
                 }
-
-                int textX = TILE_PADDING + TILE_POSITION_POINT.x;
-                int textY = TILE_PADDING + TILE_POSITION_POINT.y;
-                DrawingUtil.superDrawString(tileGraphics, tile.getPosition(), textX, textY, Color.WHITE, MapGenerator.HorizontalAlign.Right, MapGenerator.VerticalAlign.Bottom, stroke7, Color.BLACK);
 
                 if (TileHelper.isDraftTile(tile.getTileModel())) {
                     String tileID = tile.getTileID();
@@ -1077,8 +1068,25 @@ public class TileGenerator {
                     tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
                 }
             }
+            case LastStep -> {
+                //Tile number as the last step to put it on top of everything else
+                setTextSize(tileGraphics);
+                int textX = TILE_PADDING + TILE_POSITION_POINT.x;
+                int textY = TILE_PADDING + TILE_POSITION_POINT.y;
+                DrawingUtil.superDrawString(tileGraphics, tile.getPosition(), textX, textY, Color.WHITE, MapGenerator.HorizontalAlign.Right, MapGenerator.VerticalAlign.Bottom, stroke7, Color.BLACK);
+            }
         }
         return tileOutput;
+    }
+
+    private void setTextSize(Graphics tileGraphics) {
+      switch (game.getTextSize()) {
+          case "large" -> tileGraphics.setFont(Storage.getFont40());
+          case "medium" -> tileGraphics.setFont(Storage.getFont30());
+          case "tiny" -> tileGraphics.setFont(Storage.getFont12());
+          case null, default -> // "small"
+              tileGraphics.setFont(Storage.getFont20());
+      }
     }
 
     private static String getColorFilterForDistance(int distance) {
