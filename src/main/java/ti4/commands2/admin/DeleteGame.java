@@ -32,7 +32,7 @@ class DeleteGame extends Subcommand {
             return;
         }
 
-        EndGameService.secondHalfOfGameEnd(event, game, false, true, false);
+        EndGameService.secondHalfOfGameEnd(event, game, false, true);
         MessageHelper.replyToMessage(event, "Map: " + gameName + " deleted.");
     }
 }
