@@ -13,7 +13,8 @@ public class UserCommand implements ParentCommand {
     private final Map<String, Subcommand> subcommands = Stream.of(
                     new ShowUserSettings(),
                     new SetPreferredColourList(),
-                    new SetPersonalPingInterval())
+                    new SetPersonalPingInterval(),
+                    new OfferAFKTimeOptions())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
