@@ -8,6 +8,7 @@ import ti4.commands2.GameStateSubcommand;
 import ti4.draft.FrankenDraft;
 import ti4.draft.OnePickFrankenDraft;
 import ti4.draft.PoweredFrankenDraft;
+import ti4.draft.PoweredOnePickFrankenDraft;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -50,6 +51,7 @@ class StartFrankenDraft extends GameStateSubcommand {
             switch (draftMode) {
                 case POWERED -> game.setBagDraft(new PoweredFrankenDraft(game));
                 case ONEPICK -> game.setBagDraft(new OnePickFrankenDraft(game));
+                case POWEREDONEPICK -> game.setBagDraft(new PoweredOnePickFrankenDraft(game));
             }
         }
 
