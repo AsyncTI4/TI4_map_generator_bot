@@ -40,8 +40,8 @@
         "name": "Arms Reduction",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Each player destroys all but 2 of their dreadnoughts and all but 4 of their cruisers. The player who cast the most votes \"For\" adds 1 command token from their reinforcements to their strategy pool.",
-        "text2": "Against: At the start of the next strategy phase, each player exhausts each of their planets that has a technology specialty. The player who cast the most votes \"Against\" may research 1 unit upgrade technology.",
+        "text1": "For: Each player destroys all of their dreadnoughts and half of their cruisers (rounding up). Players gain 2 trade goods for each dreadnought and 1 trade good for each cruiser destroyed this way. The player who cast the most votes \"For\" adds 1 command token from their reinforcements to their strategy pool.",
+        "text2": "Against: The player who cast the most votes \"Against\" may research 1 unit upgrade technology, then place 1 dreadnought or 2 cruisers in a system that contains only their units.",
         "source": "absol"
     },
     {
@@ -50,7 +50,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: The player who cast the most votes \"For\" places 3 of their control tokens on this card. All mechs lose their printed abilities except for Sustain Damage. When any player activates a system, a player whose control token is on this card may discard 1 control token to ignore the effects of this law during that tactical action.",
-        "text2": "Against: Players who voted \"For\" or abstained must remove all of their mechs from the game board. The player who cast the most votes \"Against\" may place any number of mechs in their reinforcements on any planet or planets they control.",
+        "text2": "Against: Players who voted \"For\" or abstained replace each of their mechs on the game board with an infantry from their reinforcements. The player who cast the most votes \"Against\" may place any number of mechs in their reinforcements on any planet or planets they control.",
         "mapText": "All mechs lose their printed abilities except for Sustain Damage. After any player activates a system, a player whose control token is on this card may discard that control token to ignore the effects of this law during that activation.",
         "source": "absol"
     },
@@ -78,7 +78,7 @@
         "name": "Classified Document Leak",
         "type": "Law",
         "target": "Elect Scored Secret Objective",
-        "text1": "The elected secret objective becomes a public objective. The player who cast the most votes for that objective may immediately score it, if they meet the requirements.",
+        "text1": "The elected secret objective becomes a public objective. The player who cast the most votes for that objective may immediately score it, if they meet the requirements, or draw 2 action cards if they do not.",
         "mapText": "The elected secret objective becomes a public objective.",
         "source": "absol"
     },
@@ -95,7 +95,7 @@
         "name": "Committee Formation",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card and gives the other player who cast the most votes for them 1 promissory note from their hand.\nBefore players vote on an agenda that requires a player to be elected, the owner of this card may discard this card to choose the player to be elected. Players do not vote on that agenda. The owner of this card is considered to have cast the most votes for the resolved outcome.",
+        "text1": "The elected player gains this card and gives each other player who voted for them 1 promissory note from their hand (in order of most votes to least), if able.\nBefore players vote on an agenda that requires a player to be elected, the owner of this card may discard this card to choose the player to be elected. Players do not vote on that agenda. The owner of this card is considered to have cast the most votes for the resolved outcome.",
         "mapText": "Before players vote on an agenda that requires a player to be elected, the owner of this card may discard this card to choose the player to be elected. Players do not vote on that agenda. The owner of this card is considered to have cast the most votes for the resolved outcome.",
         "source": "absol"
     },
@@ -130,7 +130,7 @@
         "name": "Discretionary Spending",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: All players gain trade goods equal to the number of planets they control.\nThe player who cast the most votes \"For\" replenishes their commodities.\nIn voting order, each player may spend any number of trade goods as follows, with the given costs (they may not choose the same system or planet more than once):\n- use the PRODUCTION ability of their units in any system (Cost)\n- research up to 2 technologies (4 each)\n- place 1 structure on a planet they control (3)\n- draw 1 action card (1)\n- explore a planet they control or a frontier token in a system that contains their ships (1) [Note: You cannot explore the same planet multiple times]",
+        "text1": "For: All players gain trade goods equal to the number of planets they control.\nThe player who cast the most votes \"For\" replenishes their commodities.\nIn voting order, each player may spend any number of trade goods as follows, with the given costs (they cannot choose the same system or planet more than once):\n- use the PRODUCTION ability of their units in any system (Cost)\n- research up to 2 technologies (4 each)\n- place 1 structure on a planet they control (3)\n- draw 1 action card (1)\n- explore a planet they control or a frontier token in a system that contains their ships (1) [Note: You cannot explore the same planet multiple times]",
         "text2": "Against: All players except the player who cast the most votes \"Against\" lose half of their trade goods (rounded up).",
         "source": "absol"
     },
@@ -140,7 +140,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "Each player returns all their trade goods to the supply. All players have a commodity value of 3.  The player that cast the most votes \"For\" replenishes their commodities.",
-        "text2": "Against: The player who cast the most votes \"Against\" gains a number of trade goods equal to their current number of trade goods. If they gained 4 or more trade goods this way, all other players lose 1 trade good, if able.",
+        "text2": "Against: The player who cast the most votes \"Against\" gains a number of trade goods equal to their current number of trade goods. For every 3 trade goods they gain this way, all other players lose 1 trade good, if able.",
         "source": "absol"
     },
     {
@@ -190,7 +190,7 @@
         "name": "Executive Sanctions",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: The player who cast the most votes “For” places 1 of their control tokens on this card. Any player who does not have a control token on this card can have a maximum of 3 action cards in their hand. A player whose control token is on this card can have a maximum of 5 action cards in their hand.",
+        "text1": "For: The player who cast the most votes “For” places 1 of their control tokens on this card.  A player whose control token is on this card can have a maximum of 5 action cards in their hand. All other players can have a maximum of 3 action cards in their hand.",
         "text2": "Against: The player who cast the most votes \"Against\" draws 5 action cards.",
         "mapText": "Place a control token for the player who cast the most votes 'For' on this card. Any player who does not have a control token on this card has an action card hand limit of 3. A player whose control token is on this card has an action card hand limit of 5.",
         "source": "absol"
@@ -200,7 +200,7 @@
         "name": "Fleet Regulations",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: The player who cast the most votes \"For\" places 1 of their control tokens on this card. Any player who does not have a control token on this card can have a maximum of 4 of their command tokens in their fleet pool. A player whose control token is on this card can have a maximum of 5 of their command tokens in their fleet pool.",
+        "text1": "For: The player who cast the most votes \"For\" places 1 of their control tokens on this card. A player whose control token is on this card can have a maximum of 5 of their command tokens in their fleet pool. All other players can have a maximum of 4 of their command tokens in their fleet pool.",
         "text2": "Against: The player who cast the most votes \"Against\" places 2 command tokens from their reinforcements in their fleet pool.",
         "mapText": "Place a control token for the player that cast the most votes 'For' on this card. Any player who does not have a control token on this card can have a maximum of 4 of their command tokens in their fleet pool. A player whose control token is on this card can have a maximum of 5 of their command tokens in their fleet pool.",
         "source": "absol"
@@ -228,8 +228,8 @@
         "name": "Hyperlane Development Program",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: The player who cast the most votes \"For\" may research 1 propulsion technology. Systems that contain no planets or anomalies do not cost movement for ships to move through. Players may allow other players' ships to move through their ships in those systems.",
-        "text2": "Against: Exhaust the Trade strategy card. All players lose 3 trade goods to the supply, or all of their trade goods if they have less than 3. The player who cast the most votes \"Against\" may place 1 cruiser or destroyer from their reinforcements in each system that contains their ships and no planets or anomalies.",
+        "text1": "For: The player who cast the most votes \"For\" may research 1 propulsion technology. Non-anomaly systems that contain no planets do not cost movement for ships to move through. Players may allow other players' ships to move through their ships in those systems.",
+        "text2": "Against:  Exhaust the Trade strategy card. All players return 3 trade goods to the supply, or all of their trade goods if they have less than 3. The player who cast the most votes \"Against\" may place 1 cruiser or destroyer from their reinforcements in each system that contains their ships and no planets or anomalies.",
         "mapText": "Systems that contain no planets or anomalies do not cost movement for ships to move through. Players may allow other players' ships to move through those systems.",
         "source": "absol"
     },
@@ -247,8 +247,8 @@
         "name": "Incentive Program",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Draw and reveal 1 stage I public objective from the deck and place it near the public objectives. The player who cast the most votes \"For\" may immediately score that objective, if they meet the requirements.",
-        "text2": "Against: Draw and reveal 1 stage II public objective from the deck and place it near the public objectives. The player who cast the most votes \"Against\" may immediately score that objective, if they meet the requirements.",
+        "text1": "For: Draw and reveal 1 stage I public objective from the deck and place it near the public objectives. The player who cast the most votes \"For\" may immediately score that objective, if they meet the requirements, or draw 2 action cards if they do not.",
+        "text2": "Against: Draw and reveal 1 stage II public objective from the deck and place it near the public objectives. The player who cast the most votes \"Against\" may immediately score that objective, if they meet the requirements, or draw 3 action cards if they do not.",
         "source": "absol"
     },
     {
@@ -263,9 +263,10 @@
     {
         "alias": "absol_abolishment",
         "name": "Judicial Abolishment",
-        "type": "Directive",
-        "target": "Elect Law",
-        "text1": "When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.\nDiscard the elected law. The player who cast the most votes for the elected law places 1 command token from their reinforcements in their strategy pool, then gives a promissory note from their hand to any player who owned or had a control token on the law.",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "At the start of the Agenda Phase, the speaker may spend 6 influence to discard any 1 law in play.",
+        "text2": "Reveal cards from the bottom of the agenda deck until a law is revealed. Put that law into play.  The player that cast the most votes \"Against\" is considered to have cast the most votes for that law and chooses what outcome is elected, if applicable.",
         "source": "absol"
     },
     {
@@ -273,8 +274,8 @@
         "name": "Minister of Antiquities",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. The owner of this card may resolve the secondary ability of the Imperial strategy card without spending a command token.\nWhen the owner of this card resolves the primary ability of the Imperial strategy card, they may draw a relic instead of scoring a public objective.",
-        "mapText": "Follow Imperial without spending a command token. When resolve Primary of Imperial, may draw a relic instead of scoring a public objective.",
+        "text1": "The elected player gains this card. The owner of this card may resolve the secondary ability of the Imperial strategy card without spending a command token.\nWhenever the owner of this card may score a public objective, they may choose to draw a relic instead.",
+        "mapText": "Follow Imperial without spending a command token. May draw a relic instead of scoring a public objective.",
         "source": "absol"
     },
     {
@@ -291,7 +292,7 @@
         "name": "Minister of Exploration",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. The owner of this card gains 1 additional command token when resolving the secondary ability of the Leadership strategy card.\nAfter performing a tactical action, the owner of this card may explore one planet that contains their units in the active system.",
+        "text1": "The elected player gains this card. The owner of this card gains 1 additional command token when resolving the secondary ability of the Leadership strategy card.\nAfter performing a tactical action, the owner of this card may explore 1 frontier token or 1 planet that contains their units in the active system.",
         "mapText": "When following leadership secondary, gain 1 addition command token. After tactical action, may explore one planet in the active system that contains their units.",
         "source": "absol"
     },
@@ -362,7 +363,7 @@
         "name": "New Constitution",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Discard all laws in play, if any. The player who cast the most votes \"For\" takes the speaker token, then reveals cards from the bottom of the agenda deck until a law is revealed. Players vote on that law as if it had just been revealed from the top of the deck. Shuffle the other revealed cards (except for any Emergency Sessions) back into the agenda deck.",
+        "text1": "For: Discard all laws in play, if any. The player who cast the most votes \"For\" takes the speaker token, then reveals cards from the bottom of the agenda deck until a law is revealed. Players vote on that law as if it had just been revealed from the top of the deck. Shuffle the other revealed agendas back into the agenda deck.",
         "text2": "Against: Every player who voted \"Against\" or abstained must give a player who voted \"For\" a promissory note from their hand, if possible.",
         "source": "absol"
     },
@@ -382,7 +383,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: Exhaust the Warfare strategy card. The player who cast the most votes \"For\" adds 2 command tokens from their reinforcements to their strategy pool. Players reveal all Ceasefire promissory notes in their hand, then in voting order, give each Ceasefire matching their color to another player. Players may not receive Ceasefire promissory notes matching their color as part of transactions.",
-        "text2": "Against: Exhaust the Diplomacy strategy card. The player who cast the most votes \"Against\" adds 2 command tokens from their reinforcements to their fleet pool. Players may use the Production ability of any number of their units. After resolving this outcome, the agenda phase ends.",
+        "text2": "Against: Exhaust the Diplomacy strategy card. The player who cast the most votes \"Against\" adds 2 command tokens from their reinforcements to their fleet pool. Players may use the Production ability of any number of their units.  After resolving this outcome, skip to the Ready Planets step of the agenda phase.",
         "mapText": "Players may not receive Ceasefire promissory notes matching their color as part of transactions.",
         "source": "absol"
     },
@@ -410,7 +411,7 @@
         "name": "Prophecy of Ixth",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. The owner of this card may ignore the prerequisites on fighter unit upgrade technologies and applies +1 to the results of their fighter's combat rolls. Hits produced by their fighters must be applied to non-fighter ships, if possible. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
+        "text1": "The elected player gains this card. The owner of this card may ignore the prerequisites on fighter unit upgrade technologies and applies +1 to the results of their fighter's combat rolls. Hits produced by their fighters must be applied to non-fighter ships, if able.  When the owner of this card uses PRODUCTION, they return this card to the common play area unless they produce 2 or more fighters.  If this card is in the common play area, a player may take it if they produce 4 or more fighters when using PRODUCTION.",
         "mapText": "Can ignore prerequisite of Fighter 2 unit upgrade technology. Fighters get +1 combat. Hits from fighters must be applied to non-fighter ships first. When use production, discard this card unless produce 2 or more fighters.",
         "source": "absol"
     },
@@ -419,7 +420,7 @@
         "name": "Public Execution",
         "type": "Directive",
         "target": "Elect Player",
-        "text1": "The elected player exhausts all of their planets, then reveals the action cards in their hand. The players that voted for the elected player (in order of most to least votes) may each take 1 action card from that player's hand, then the rest are discarded. If the elected player has the speaker token, they give it to the player who cast the most votes for them.",
+        "text1": "The elected player exhausts all of their planets, then reveals the action cards in their hand. The players that voted for the elected player (in order of most to least votes) may each take 1 action card from that player's hand, then the rest are discarded. If the elected player has the speaker token, they give it to the other player who cast the most votes for them.",
         "source": "absol"
     },
     {
@@ -427,7 +428,7 @@
         "name": "Publicize Weapon Schematics",
         "type": "Law",
         "target": "Elect owned non-faction unit upgrade technology",
-        "text1": "When this agenda is revealed, if there are no eligible technologies in play, discard this card and reveal another agenda from the top of the deck.\nEvery player may ignore the prerequisites on the elected technology.\nThat unit upgrade loses the Sustain Damage ability if it has it.\nThe player who cast the most votes for the elected technology may immediately gain that technology.",
+        "text1": "When this agenda is revealed, if there are no eligible technologies in play, discard this card and reveal another agenda from the top of the deck.\nEach player may ignore the prerequisites on unit upgrade technologies that match the unit type of the elected technology.\nThat unit upgrade loses the Sustain Damage ability if it has it.\nThe player who cast the most votes for the elected technology may immediately gain a unit upgrade technology for that unit type.",
         "mapText": "Every player may ignore the prerequisites on the elected technology. That unit upgrade loses the Sustain Damage ability if it has it.",
         "source": "absol"
     },
@@ -456,7 +457,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: The player who cast the most votes \"For\" takes the speaker token. Players cannot exhaust planets to cast votes during the agenda phase; each player may cast 1 vote on each agenda instead, except for the player who controls Mecatol Rex, who may cast 2 votes on each agenda. Players cannot cast additional votes.",
-        "text2": "Against: At the start of the next strategy phase, each player who voted \"Against\" or abstained exhausts all of their cultural planets and may not select the Politics strategy card.",
+        "text2": "Against: At the start of the next strategy phase, each player who voted \"Against\" or abstained exhausts all of their cultural planets and cannot choose the Politics strategy card unless it is the only unchosen strategy card.",
         "mapText": "Cannot exhaust planets to cast votes. Player can cast 1 vote on each agenda. Mecatol Rex owner may cast 2 votes on each agenda. Cannot cast additional votes.",
         "source": "absol"
     },
@@ -492,7 +493,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: The player who cast the most votes \"For\" may explore any frontier tokens in systems that contain anomalies and their ships. During tactical actions, the active player may decide that any anomaly that does not contain a frontier token does not affect movement.",
-        "text2": "Against: The player who cast the most votes \"For\" takes 1 command token from the reinforcements of each player who voted \"Against\" or abstained and places them in any number of systems that contain anomalies.",
+        "text2": "Against: The player who cast the most votes \"For\" takes 1 command token from the reinforcements of each player who voted \"Against\" or abstained and places them in any number of anomaly systems.",
         "mapText": "During tactical actions, the active player may decide that any anomaly that does not contain a Frontier token does not affect movement.",
         "source": "absol"
     },
@@ -520,7 +521,7 @@
         "name": "Unconventional Measures",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Each player who voted \"For\" draws 2 action cards. Each player who voted \"Against\" places 1 command token from their reinforcements into their strategy pool.",
+        "text1": "For: Each player who voted \"For\" draws 2 action cards. Each player who voted \"Against\" places 1 command token.",
         "text2": "Against: Each player who voted \"Against\" or abstained discards their action cards. The player that cast the most votes \"For\" chooses one strategy card to become exhausted.",
         "source": "absol"
     },
@@ -529,7 +530,7 @@
         "name": "Wormhole Reconstruction",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: The player who cast the most votes \"For\" places 1 control token on this card. Players may treat alpha wormholes as beta wormholes during movement, and vice versa. A player whose control token is on this card gains 1 commodity every time another player does so.",
+        "text1": "For: The player who cast the most votes \"For\" places 1 control token on this card. Players may treat alpha wormholes as beta wormholes during movement, and vice versa. A player whose control token is on this card gains 1 commodity each time another player's ships move through an alpha or beta wormhole.",
         "text2": "Against: The player who cast the most votes \"For\" takes a command token from the reinforcements of each player who voted \"Against\" or abstained and places them into any number of systems that contain alpha or beta wormholes of their choice.",
         "mapText": "Players may treat alpha wormholes as beta wormholes during movement, and vice versa. This player gains 1 commodity every time another player does so.",
         "source": "absol"
