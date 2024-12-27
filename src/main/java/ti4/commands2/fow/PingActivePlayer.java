@@ -40,7 +40,7 @@ class PingActivePlayer extends GameStateSubcommand {
         }
 
         long milliSinceLastPing = System.currentTimeMillis() - latestPingMilliseconds;
-        if (milliSinceLastPing < (1000 * 60 * 60 * 8) && !samePlayer) { //eight hours
+        if (!game.getPlayersWithGMRole().contains(playerThatRanCommand) && milliSinceLastPing < (1000 * 60 * 60 * 8) && !samePlayer) { //eight hours
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently. Try again later.");
         } else {
             String ping = player.getRepresentationUnfogged() + " this is a gentle reminder that it is your turn.";
