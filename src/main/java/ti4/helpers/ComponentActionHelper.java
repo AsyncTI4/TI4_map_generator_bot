@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
+import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -564,7 +565,7 @@ public class ComponentActionHelper {
         String purgeOrExhaust = "Purged";
         List<String> juniorRelics = List.of("titanprototype", "absol_jr");
         if (juniorRelics.contains(relicID)) { // EXHAUST THE RELIC
-            List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
+            List<Button> buttons2 = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "jrResolution", null);
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "Exhausted";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),

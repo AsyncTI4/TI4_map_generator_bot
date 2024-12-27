@@ -24,6 +24,8 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     private String target;
     private String text1;
     private String text2;
+    private String forEmoji;
+    private String againstEmoji;
     private String mapText;
     private String imageURL;
     private ComponentSource source;
@@ -82,6 +84,14 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
 
     public String getText2() {
         return Optional.ofNullable(text2).orElse("");
+    }
+
+    public String getForEmoji() {
+        return Optional.ofNullable(forEmoji).orElse("👍");
+    }
+
+    public String getAgainstEmoji() {
+        return Optional.ofNullable(againstEmoji).orElse("👎");
     }
 
     public String getMapText() {

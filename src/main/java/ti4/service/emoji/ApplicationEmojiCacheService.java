@@ -61,5 +61,6 @@ public class ApplicationEmojiCacheService {
         public String toString() {
             return name + " " + id + " " + formatted + " " + timeCreated;
         }
+
     }
 }
