@@ -26,6 +26,7 @@ import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 
 @UtilityClass
@@ -150,7 +151,7 @@ public class VoteButtonHandler {
             forEmojiString = agendaDetails.getForEmoji();
             for (TI4Emoji emoji: TI4Emoji.allEmojiEnums())
             {
-                if (emoji.toString().contains(forEmojiString)) {
+                if (forEmojiString.equals(emoji.name())) {
                     forEmojiString = emoji.toString();
                     break;
                 }
@@ -158,7 +159,7 @@ public class VoteButtonHandler {
             againstEmojiString = agendaDetails.getAgainstEmoji();
             for (TI4Emoji emoji: TI4Emoji.allEmojiEnums())
             {
-                if (emoji.toString().contains(againstEmojiString)) {
+                if (againstEmojiString.equals(emoji.name())) {
                     againstEmojiString = emoji.toString();
                     break;
                 }
@@ -237,12 +238,11 @@ public class VoteButtonHandler {
         StrategyCardSetModel stratCards = game.getStrategyCardSet();
         for (int x = 1; x < 9; x++) {
             Button button;
+            TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(x);
             if (rider == null) {
-                TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(x);
                 button = Buttons.blue(prefix + "_" + x, stratCards.getSCName(x), scEmoji);
-
             } else {
-                button = Buttons.blue(prefix + "rider_sc;" + x + "_" + rider, x + "");
+                button = Buttons.blue(prefix + "rider_sc;" + x + "_" + rider, stratCards.getSCName(x), scEmoji);
             }
             strategyButtons.add(button);
         }
@@ -254,11 +254,12 @@ public class VoteButtonHandler {
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
             Button button;
+            TI4Emoji planetEmoji = PlanetEmojis.getPlanetEmoji(planet);
             if (rider == null) {
-                button = Buttons.blue(prefix + "_" + planet, Helper.getPlanetRepresentation(planet, game));
+                button = Buttons.blue(prefix + "_" + planet, Helper.getPlanetRepresentation(planet, game), planetEmoji);
             } else {
                 button = Buttons.blue(prefix + "rider_planet;" + planet + "_" + rider,
-                    Helper.getPlanetRepresentation(planet, game));
+                    Helper.getPlanetRepresentation(planet, game), planetEmoji);
             }
             planetOutcomeButtons.add(button);
         }
