@@ -4,11 +4,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.PermissionOverride;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -87,22 +91,22 @@ class Replace extends GameStateSubcommand {
         }
 
         Guild guild = game.getGuild();
-        Member replacementMember = guild.getMemberById(replacementUser.getId());
-        if (replacementMember == null) {
+        Member newMember = guild.getMemberById(replacementUser.getId());
+        if (newMember == null) {
             MessageHelper.replyToMessage(event, "Added player must be on the game's server.");
             return;
         }
 
         //REMOVE ROLE
-        Member replacedMember = guild.getMemberById(replacedPlayer.getUserID());
+        Member oldMember = guild.getMemberById(replacedPlayer.getUserID());
         List<Role> roles = guild.getRolesByName(game.getName(), true);
-        if (replacedMember != null && roles.size() == 1) {
-            guild.removeRoleFromMember(replacedMember, roles.getFirst()).queue();
+        if (oldMember != null && roles.size() == 1) {
+            guild.removeRoleFromMember(oldMember, roles.getFirst()).queue();
         }
 
         //ADD ROLE
         if (roles.size() == 1) {
-            guild.addRoleToMember(replacementMember, roles.getFirst()).queue();
+            guild.addRoleToMember(newMember, roles.getFirst()).queue();
         }
 
         Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
@@ -115,6 +119,7 @@ class Replace extends GameStateSubcommand {
         }
 
         String oldPlayerUserId = replacedPlayer.getUserID();
+        String oldPlayerUserName = replacedPlayer.getUserName();
         replacedPlayer.setUserID(replacementUser.getId());
         replacedPlayer.setUserName(replacementUser.getName());
         replacedPlayer.setTotalTurnTime(0);
@@ -127,10 +132,48 @@ class Replace extends GameStateSubcommand {
             game.setActivePlayerID(replacementUser.getId());
         }
 
+        //UPDATE FOW PERMISSIONS
+        if (game.isFowMode()) {
+            long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+            TextChannel privateChannel = (TextChannel)replacedPlayer.getPrivateChannel();
+
+            PermissionOverride oldOverride = privateChannel.getMemberPermissionOverrides().stream()
+                .filter(override -> override.getMember().equals(oldMember)).findFirst().orElse(null);
+            if (oldOverride != null) {
+                oldOverride.delete().queue();
+            }
+
+            //Update private channel
+            String newPrivateChannelName = privateChannel.getName().replace(getNormalizedName(oldMember), getNormalizedName(newMember));
+            privateChannel.getManager().setName(newPrivateChannelName).queue();
+            privateChannel.getManager().putMemberPermissionOverride(newMember.getIdLong(), permission, 0)
+                .queue(success -> accessMessage(privateChannel, newMember));
+
+            //Update Cards Info
+            ThreadChannel cardsInfo = replacedPlayer.getCardsInfoThread();
+            if (cardsInfo != null) {
+                String newCardsInfoName = cardsInfo.getName().replace(oldPlayerUserName.replace("/", ""), replacedPlayer.getUserName().replace("/", ""));
+                cardsInfo.getManager().setName(newCardsInfoName).queue();
+                cardsInfo.removeThreadMember(oldMember).queue();
+                cardsInfo.addThreadMember(newMember).queue(success -> accessMessage(cardsInfo, newMember));
+            }
+
+            //Update private threads
+            for (ThreadChannel thread : game.getMainGameChannel().getThreadChannels()) {
+                if (thread.getThreadMember(oldMember) != null) {
+                    thread.removeThreadMember(oldMember).queue(success -> {
+                        thread.addThreadMember(newMember).queue(success2 -> {
+                            accessMessage(thread, newMember);
+                        });
+                    });
+                }
+            }
+        }
+
         Helper.fixGameChannelPermissions(event.getGuild(), game);
         ThreadChannel mapThread = game.getBotMapUpdatesThread();
         if (mapThread != null && !mapThread.isLocked()) {
-            mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(replacementMember).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
+            mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(newMember).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
         }
 
         game.getMiltyDraftManager().replacePlayer(oldPlayerUserId, replacedPlayer.getUserID());
@@ -145,5 +188,23 @@ class Replace extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
         }
+    }
+
+    private void accessMessage(MessageChannel channel, Member member) {
+        MessageHelper.sendMessageToChannel(channel, 
+            "Access to " + channel.getName() + " granted for " + member.getAsMention());
+    }
+
+    private String getNormalizedName(Member member) {
+        String name = member.getNickname();
+        if (name == null) {
+            name = member.getEffectiveName();
+        }
+        name = name.toLowerCase()
+            .replaceAll("[\\s]+", "-")
+            .replaceAll("[^a-z0-9-]", "")
+            .replaceAll("-{2,}", "-")
+            .replaceAll("^-|-$", "");
+        return name;
     }
 }
