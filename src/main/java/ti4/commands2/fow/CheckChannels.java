@@ -1,6 +1,7 @@
 package ti4.commands2.fow;
 
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.GameStateSubcommand;
@@ -34,6 +35,9 @@ class CheckChannels extends GameStateSubcommand {
                 output.append("No private channel");
             } else {
                 output.append(channel.getAsMention());
+                if (!((TextChannel)channel).getMembers().contains(player.getMember())) {
+                    output.append(" - No access");
+                }
             }
             output.append(" - ");
 
