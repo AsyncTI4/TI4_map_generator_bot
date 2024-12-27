@@ -26,7 +26,7 @@
     {
         "alias": "absol_luxarchtreatise",
         "name": "Luxarch Treatise",
-        "text": "You may exhaust this card to perform a tactical action in a system that contains 1 of your command tokens.\n\nWhen you activate a system, you may place this card next to the game board.  If you do, you may ignore your fleet pool limit and add +2 to the results of your ships' combat rolls in the active system.  At the end of that action, purge this card.",
+        "text": "When performing a tactical action, you may exhaust this card to activate a system that contains 1 of your command tokens.[Note: still costs a command token]\n\nWhen you activate a system, you may place this card next to the game board.  If you do, you may ignore your fleet pool limit and add +2 to the results of your ships' combat rolls in the active system.  At the end of that action, purge this card.",
         "source": "absol",
         "flavourText": "*Written thousands of years before the fall of the Lazax, the Luxarch Treatsie contained detailed analyses of the Lazax's greatest victories.  With the return of the Mahact, it was imperative that the document be found.*"
     },
@@ -49,7 +49,7 @@
     {
         "alias": "absol_plenaryorbital",
         "name": "Plenary Orbital",
-        "text": "PLENARY ORBITAL DEPLOY:  After you activate a system, you may place this space dock on a non-home planet you control in that system other than Mecatol Rex and which does not contain a space dock.  This unit cannot be affected by opponent's action cards.  When this unit is destroyed or removed, purge this card. Up to 8 fighters in this system do not count against your ships' capacity. Up to 2 non-fighter ships in this system do not count against your fleet pool. PRODUCTION 10;PLANETARY SHIELD",
+        "text": "PLENARY ORBITAL (Space Dock) DEPLOY:  After you activate a system, you may place this space dock on a non-home planet you control in that system other than Mecatol Rex and which does not contain a space dock.  This unit cannot be affected by opponent's action cards.  When this unit is destroyed or removed, purge this card. Up to 8 fighters in this system do not count against your ships' capacity. Up to 2 non-fighter ships in this system do not count against your fleet pool. PRODUCTION 10;PLANETARY SHIELD",
         "source": "absol",
         "flavourText": "*To many, the ring represented hope - a testament to the preseverance of the Gashlai.  To Magmus, it represented waste.  Extravagance.  Foolishness.  He sneered.*"
     },
@@ -112,7 +112,7 @@
     {
         "alias": "absol_emphidia",
         "name": "The Crown of Emphidia",
-        "text": "After you perform a tactical action, you may explore 1 planet you control in that system. At the start of the status phase, if you control the 'Tomb of Emphidia', you may purge this card to gain 1 victory point.",
+        "text": "After you perform a tactical action, you may explore 1 planet you control in the active system that contains 1 or more of your units. At the start of the status phase, if you control the 'Tomb of Emphidia', you may purge this card to gain 1 victory point.",
         "source": "absol",
         "flavourText": "*The machines of the forgotten throne-world could only be controlled through the data-impulses of the black-barbed crown.*",
         "homebrewReplacesID": "emphidia"
@@ -120,7 +120,7 @@
     {
         "alias": "absol_thalnos",
         "name": "The Crown of Thalnos",
-        "text": "During the roll dice step of combat, you may also roll a number of dice up to the unused capacity of your ships in the active system. For each result of 5-10, generate 1 hit. For each result of 1-4, your opponent generates 1 additional hit. At the end of combat, if you used this ability, exhaust this card.",
+        "text": "At the start of combat, you may exhaust this card to place a number of dice up to the capacity of your ships in the active system on this card. Each combat round, roll the dice on this card in addition to your combat dice.  For each result of 5-10, you produce 1 additional hit. For each result of 1-4, your opponent produces 1 additional hit. At the end of combat, remove all dice from this card.",
         "source": "absol",
         "flavourText": "*A cloud of satellites spewed from the dreadnought's hull, drifting into a halo around the vessel. The battle seemed to pause for one long moment, before the drones' weapons flared, unleashing beams of energy in all directions.*",
         "homebrewReplacesID": "thalnos"
@@ -152,7 +152,7 @@
     {
         "alias": "absol_tyrantslament",
         "name": "Tyrant's Lament",
-        "text": "TYRANT'S LAMENT (Note: is a Flagship) Deploy: At the end of your turn, you may place this unit in any system that contains your ships. When this unit is removed or captured, purge this card.  This unit is not affected by action cards, anomalies, or your faction abilities or your technologies. Space Cannon 5(x3), Anti-Fighter Barrage 5(x3), Sustain Damage, Move 2, Combat 5(x3)",
+        "text": "TYRANT'S LAMENT (Note: is NOT a Flagship) Deploy: At the end of your turn, you may place this unit in any system that contains your ships. When this unit is removed or captured, purge this card.  This unit is not affected by action cards, anomalies, or your faction abilities or your technologies. Space Cannon 5(x3), Anti-Fighter Barrage 5(x3), Sustain Damage, Move 2, Combat 5(x3)",
         "source": "absol",
         "flavourText": "*Instrument of Judgement\nThe Tyrant's Lament has never responded to a hail, and fights under no banner.  Wherever it appears, death rains.  And then it is gone.*"
     }

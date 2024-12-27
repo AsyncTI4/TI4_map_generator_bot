@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -13,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -335,9 +336,11 @@ public class StartCombatService {
         pdsMessage.append("Buttons for Space Cannon Offence:");
         List<Button> spaceCannonButtons = getSpaceCannonButtons(game, activePlayer, tile);
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, pdsMessage.toString(), spaceCannonButtons);
-        for (Player player : game.getRealPlayers()) {
-            if (ButtonHelper.doesPlayerHaveFSHere("argent_flagship", player, tile)) {
-                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use space cannon offense against " + player.getFactionEmojiOrColor() + " due to the ability of the Quetzecoatl (the Argent flagship).");
+        if (!game.isFowMode()) {
+            for (Player player : game.getRealPlayers()) {
+                if (ButtonHelper.doesPlayerHaveFSHere("argent_flagship", player, tile)) {
+                    MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use space cannon offense against " + player.getFactionEmojiOrColor() + " due to the ability of the Quetzecoatl (the Argent flagship).");
+                }
             }
         }
     }
@@ -496,11 +499,13 @@ public class StartCombatService {
         List<Button> afbButtons = new ArrayList<>();
         afbButtons.add(Buttons.gray("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll AFB (if applicable):", afbButtons);
-        for (Player player : combatPlayers) {
-            if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !ButtonHelper.isLawInPlay(game, "articles_war") 
+        if (!game.isFowMode()) {
+            for (Player player : combatPlayers) {
+                if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !ButtonHelper.isLawInPlay(game, "articles_war")
                     || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_1", player, tile)
                     || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_2", player, tile)) {
-                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use AFB against " + player.getFactionEmojiOrColor() + " due to their mech power");
+                    MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use AFB against " + player.getFactionEmojiOrColor() + " due to their mech power");
+                }
             }
         }
 
