@@ -1472,6 +1472,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                                     + " command token" + (properGain == 1 ? "" : "s") + " due to: " + reasons);
                         }
                     }
+                    if (game.isFowMode()) {
+                        MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "## " 
+                            + player.getRepresentationUnfogged() + "\nRemember to click **Ready for " + (game.isCustodiansScored() ? "Agenda" : "Strategy Phase") 
+                            + "** when done with homework! " + game.getMainGameChannel().getJumpUrl(), Buttons.DONE_DELETE_BUTTONS);
+                    }
                 }
                 player.setTotalExpenses(player.getTotalExpenses() + netGain * 3);
             }

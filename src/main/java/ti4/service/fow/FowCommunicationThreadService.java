@@ -32,7 +32,7 @@ public class FowCommunicationThreadService {
         return game.isFowMode() && Boolean.parseBoolean(game.getFowOption(FowConstants.MANAGED_COMMS));
     }
 
-    public static void checkCommThreadsAndNewNeighbors(Game game, Player player, List<Button> startButtons) {
+    public static void checkCommThreadsAndNewNeighbors(Game game, Player player, List<Button> buttons) {
         if (!isActive(game)) {
             return;
         }
@@ -47,7 +47,7 @@ public class FowCommunicationThreadService {
         Set<Player> newNeighbors = checkNewNeighbors(player, neighbors, commThreads);
         
         if (!newNeighbors.isEmpty()) {
-            startButtons.add(Buttons.blue("fowComms_" + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")), "Open Comms"));
+            buttons.add(Buttons.blue("fowComms_" + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")), "Open Comms"));
         }
     }
 
