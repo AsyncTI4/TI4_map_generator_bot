@@ -438,15 +438,11 @@ public class StartPhaseService {
             buttons.add(yssarilPolicy);
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Remember to click Ready for " + (custodiansTaken ? "Agenda" : "Strategy Phase") + " when done with homework!");
-        }
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
     }
 
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
-        String msg;
         game.setStoredValue("willRevolution", "");
         game.setPhaseOfGame("action");
         Collection<Player> activePlayers = game.getPlayers().values().stream()

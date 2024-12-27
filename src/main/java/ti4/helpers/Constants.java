@@ -916,6 +916,7 @@ public class Constants {
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
     public static final String SHOW_GAME_AS_PLAYER = "show_game_as";
+    public static final String CHECK_PRIVATE_COMMUNICATIONS = "check_private_communications";
 
     //DRAFTS
     public static final String BAG_DRAFT = "bag_draft";
