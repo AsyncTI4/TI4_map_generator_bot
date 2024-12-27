@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -16,13 +17,19 @@ import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.AgendaModel;
+import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
+import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
+import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.TI4Emoji;
 
 @UtilityClass
-class VoteButtonHandler {
+public class VoteButtonHandler {
 
     @ButtonHandler("erasePreVote")
     public static void erasePreVote(ButtonInteractionEvent event, Player player, Game game) {
@@ -53,7 +60,7 @@ class VoteButtonHandler {
             String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
             List<Button> outcomeActionRow;
             if (agendaDetails.contains("For") || agendaDetails.contains("for")) {
-                outcomeActionRow = AgendaHelper.getForAgainstOutcomeButtons(null, "outcome");
+                outcomeActionRow = getForAgainstOutcomeButtons(game, null, "outcome", game.getCurrentAgendaInfo().split("_")[2]);
             } else if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
                 outcomeActionRow = getPlayerOutcomeButtons(game, null, "outcome", null);
             } else if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
@@ -63,7 +70,7 @@ class VoteButtonHandler {
             } else if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
                 outcomeActionRow = getSecretOutcomeButtons(game, null, "outcome");
             } else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
-                outcomeActionRow = getStrategyOutcomeButtons(null, "outcome");
+                outcomeActionRow = getStrategyOutcomeButtons(game, null, "outcome");
             } else if (agendaDetails.contains("unit upgrade")) {
                 outcomeActionRow = getUnitUpgradeOutcomeButtons(game, null, "outcome");
             } else if (agendaDetails.contains("Unit") || agendaDetails.contains("unit")) {
@@ -110,13 +117,67 @@ class VoteButtonHandler {
             String lawName = Mapper.getAgendaTitleNoCap(law.getKey());
             Button button;
             if (rider == null) {
-                button = Buttons.gray(prefix + "_" + law.getKey(), lawName);
+                button = Buttons.blue(prefix + "_" + law.getKey(), lawName);
             } else {
-                button = Buttons.gray(prefix + "rider_law;" + law.getKey() + "_" + rider, lawName);
+                button = Buttons.blue(prefix + "rider_law;" + law.getKey() + "_" + rider, lawName);
             }
             lawButtons.add(button);
         }
         return lawButtons;
+    }
+
+    public static List<Button> getForAgainstOutcomeButtons(Game game, String rider, String prefix, String agendaID) {
+        List<Button> voteButtons = new ArrayList<>();
+        Button buttonFor;
+        Button buttonAgainst;
+        Map<String, Integer> discardAgendas = game.getDiscardAgendas();
+        Integer agendaInt = null;
+        String forEmojiString = "👍";
+        String againstEmojiString = "👎";
+        try {
+            agendaInt = Integer.valueOf(agendaID);
+        } catch (NumberFormatException e) {
+        }
+        if (agendaInt != null) {
+            String agendaAlias = "";
+            for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
+                if (agendas.getValue().equals(agendaInt)) {
+                    agendaAlias = agendas.getKey();
+                    break;
+                }
+            }
+            AgendaModel agendaDetails = Mapper.getAgenda(agendaAlias);
+            forEmojiString = agendaDetails.getForEmoji();
+            for (TI4Emoji emoji: TI4Emoji.allEmojiEnums())
+            {
+                if (emoji.toString().contains(forEmojiString)) {
+                    forEmojiString = emoji.toString();
+                    break;
+                }
+            }
+            againstEmojiString = agendaDetails.getAgainstEmoji();
+            for (TI4Emoji emoji: TI4Emoji.allEmojiEnums())
+            {
+                if (emoji.toString().contains(againstEmojiString)) {
+                    againstEmojiString = emoji.toString();
+                    break;
+                }
+            }
+        }
+        if (rider == null) {
+            buttonFor = Buttons.green(prefix + "_for", "For");
+            buttonAgainst = Buttons.red(prefix + "_against", "Against");
+        } else {
+            buttonFor = Buttons.green(prefix + "rider_fa;for_" + rider, "For");
+            buttonAgainst = Buttons.red(prefix + "rider_fa;against_" + rider, "Against");
+        }
+        
+        buttonFor = buttonFor.withEmoji(Emoji.fromFormatted(forEmojiString));
+        buttonAgainst = buttonAgainst.withEmoji(Emoji.fromFormatted(againstEmojiString));
+        
+        voteButtons.add(buttonFor);
+        voteButtons.add(buttonAgainst);
+        return voteButtons;
     }
 
     public static List<Button> getSecretOutcomeButtons(Game game, String rider, String prefix) {
@@ -126,10 +187,14 @@ class VoteButtonHandler {
                 Button button;
                 String soName = Mapper.getSecretObjectivesJustNames().get(so.getKey());
                 if (rider == null) {
-
-                    button = Buttons.gray(prefix + "_" + so.getKey(), soName);
+                    button = Buttons.blue(prefix + "_" + so.getKey(), soName);
                 } else {
-                    button = Buttons.gray(prefix + "rider_so;" + so.getKey() + "_" + rider, soName);
+                    button = Buttons.blue(prefix + "rider_so;" + so.getKey() + "_" + rider, soName);
+                }
+                if (!game.isFowMode())
+                {
+                    String colorEmojiString = ColorEmojis.getColorEmoji(player.getColor()).toString();
+                    button = button.withEmoji(Emoji.fromFormatted(colorEmojiString));
                 }
                 secretButtons.add(button);
             }
@@ -143,9 +208,9 @@ class VoteButtonHandler {
             for (TechnologyModel tech : Helper.getAllNonFactionUnitUpgradeTech(game, player)) {
                 Button button;
                 if (rider == null) {
-                    button = Buttons.gray(prefix + "_" + tech.getAlias(), tech.getName());
+                    button = Buttons.blue(prefix + "_" + tech.getAlias(), tech.getName());
                 } else {
-                    button = Buttons.gray(prefix + "rider_so;" + tech.getAlias() + "_" + rider, tech.getName());
+                    button = Buttons.blue(prefix + "rider_so;" + tech.getAlias() + "_" + rider, tech.getName());
                 }
                 buttons.add(button);
             }
@@ -158,29 +223,26 @@ class VoteButtonHandler {
         for (TechnologyModel tech : Helper.getAllNonFactionUnitUpgradeTech(game)) {
             Button button;
             if (rider == null) {
-                button = Buttons.gray(prefix + "_" + tech.getAlias(), tech.getName());
+                button = Buttons.blue(prefix + "_" + tech.getAlias(), tech.getName());
             } else {
-                button = Buttons.gray(prefix + "rider_so;" + tech.getAlias() + "_" + rider, tech.getName());
+                button = Buttons.blue(prefix + "rider_so;" + tech.getAlias() + "_" + rider, tech.getName());
             }
             buttons.add(button);
         }
         return buttons;
     }
 
-    public static List<Button> getStrategyOutcomeButtons(String rider, String prefix) {
+    public static List<Button> getStrategyOutcomeButtons(Game game, String rider, String prefix) {
         List<Button> strategyButtons = new ArrayList<>();
+        StrategyCardSetModel stratCards = game.getStrategyCardSet();
         for (int x = 1; x < 9; x++) {
             Button button;
             if (rider == null) {
                 TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(x);
-                if (scEmoji != CardEmojis.SCBackBlank) {
-                    button = Buttons.gray(prefix + "_" + x, null, scEmoji);
-                } else {
-                    button = Buttons.gray(prefix + "_" + x, Integer.toString(x), scEmoji);
-                }
+                button = Buttons.blue(prefix + "_" + x, stratCards.getSCName(x), scEmoji);
 
             } else {
-                button = Buttons.gray(prefix + "rider_sc;" + x + "_" + rider, x + "");
+                button = Buttons.blue(prefix + "rider_sc;" + x + "_" + rider, x + "");
             }
             strategyButtons.add(button);
         }
@@ -193,9 +255,9 @@ class VoteButtonHandler {
         for (String planet : planets) {
             Button button;
             if (rider == null) {
-                button = Buttons.gray(prefix + "_" + planet, Helper.getPlanetRepresentation(planet, game));
+                button = Buttons.blue(prefix + "_" + planet, Helper.getPlanetRepresentation(planet, game));
             } else {
-                button = Buttons.gray(prefix + "rider_planet;" + planet + "_" + rider,
+                button = Buttons.blue(prefix + "rider_planet;" + planet + "_" + rider,
                     Helper.getPlanetRepresentation(planet, game));
             }
             planetOutcomeButtons.add(button);
@@ -212,25 +274,25 @@ class VoteButtonHandler {
             if (!game.isFowMode() && !faction.contains("franken")) {
                 if (rider != null) {
                     if (planetRes != null) {
-                        button = Buttons.gray(prefix + planetRes + "_" + faction + "_" + rider, " ");
+                        button = Buttons.blue(prefix + planetRes + "_" + faction + "_" + rider, StringUtils.capitalize(faction));
                     } else {
-                        button = Buttons.gray(prefix + "rider_player;" + faction + "_" + rider, " ");
+                        button = Buttons.blue(prefix + "rider_player;" + faction + "_" + rider, StringUtils.capitalize(faction));
                     }
                 } else {
-                    button = Buttons.gray(prefix + "_" + faction, " ");
+                    button = Buttons.blue(prefix + "_" + faction, StringUtils.capitalize(faction));
                 }
-                String factionEmojiString = player.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                String colorEmojiString = ColorEmojis.getColorEmoji(player.getColor()).toString();
+                button = button.withEmoji(Emoji.fromFormatted(colorEmojiString));
             } else {
                 if (rider != null) {
                     if (planetRes != null) {
-                        button = Buttons.gray(planetRes + "_" + player.getColor() + "_" + rider, " ");
+                        button = Buttons.blue(planetRes + "_" + player.getColor() + "_" + rider, " ");
                     } else {
-                        button = Buttons.gray(prefix + "rider_player;" + player.getColor() + "_" + rider,
+                        button = Buttons.blue(prefix + "rider_player;" + player.getColor() + "_" + rider,
                             player.getColor());
                     }
                 } else {
-                    button = Buttons.gray(prefix + "_" + player.getColor(), player.getColor());
+                    button = Buttons.blue(prefix + "_" + player.getColor(), player.getColor());
                 }
             }
             playerOutcomeButtons.add(button);

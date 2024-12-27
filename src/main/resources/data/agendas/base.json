@@ -141,6 +141,8 @@
         "target": "For/Against",
         "text1": "For: Draw and reveal 1 stage I public objective from the deck and place it near the public objectives.",
         "text2": "Against: Draw and reveal 1 stage II public from the deck and place it near the public objectives.",
+        "forEmoji": "Public1alt",
+        "againstEmoji": "Public2alt",
         "source": "base"
     },
     {
@@ -150,6 +152,7 @@
         "target": "For/Against",
         "text1": "For: The speaker rolls 1 die. If the result is 6-10, each player may research 2 technologies. If the result is 1-5, destroy all units in Mecatol Rex's system, and each player with units in systems adjacent to Mecatol Rex's system destroys 3 of their own units in each of those systems.",
         "text2": "Against: No effect.",
+        "againstEmoji": "🚫",
         "source": "base"
     },
     {
@@ -247,6 +250,8 @@
         "target": "For/Against",
         "text1": "For: Each player that voted \"For\" gains 1 victory point.",
         "text2": "Against: Each player that voted \"For\" loses 1 victory point.",
+        "forEmoji": "➕",
+        "againstEmoji": "➖",
         "source": "base"
     },
     {
@@ -256,6 +261,7 @@
         "target": "For/Against",
         "text1": "(When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.) For: Discard all laws from play. At the start of the next strategy phase, each player exhausts each planet in their home system.",
         "text2": "Against: No effect.",
+        "againstEmoji": "🚫",
         "source": "base"
     },
     {
@@ -294,6 +300,7 @@
         "target": "For/Against",
         "text1": "For: When a player produces units, they produce only 1 fighter and infantry for its cost instead of 2.",
         "text2": "Against: No effect.",
+        "againstEmoji": "🚫",
         "mapText": "When a player produces units, they produce only 1 fighter and infantry for its cost instead of 2.",
         "source": "base"
     },

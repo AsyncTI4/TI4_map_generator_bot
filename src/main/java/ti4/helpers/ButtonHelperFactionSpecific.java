@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
+import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -335,7 +336,7 @@ public class ButtonHelperFactionSpecific {
 
     @ButtonHandler("yssarilAgentAsJr")
     public static void yssarilAgentAsJr(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
+        List<Button> buttons2 = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "jrResolution", null);
         player.getLeader("yssarilagent").get().setExhausted(true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " is using Clever Clever JR-XS455-O, the Relic/Yssaril agent.");
