@@ -1864,9 +1864,14 @@ public class Helper {
     }
 
     public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Game game) {
-        if (game.isFowMode() || game.isCommunityMode()) {
+        if (game.isCommunityMode()) {
             return;
         }
+        if (game.isFowMode()) {
+            addPlayerPermissionsToPrivateChannels(game);
+            return;
+        }
+
         String gameName = game.getName();
         List<Role> roles = guild.getRolesByName(gameName, true);
         Role role = null;
@@ -1883,6 +1888,17 @@ public class Helper {
             addMapPlayerPermissionsToGameChannels(guild, game.getName());
         } else { // make sure players have the role
             addGameRoleToMapPlayers(guild, role, game);
+        }
+    }
+
+    public static void addPlayerPermissionsToPrivateChannels(Game game) {
+        //Make sure everyone has access to their own private thread
+        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+        for (Player player : game.getPlayers().values()) {
+            MessageChannel channel = player.getPrivateChannel();
+            if (channel != null) {
+                ((TextChannel)channel).getManager().putMemberPermissionOverride(player.getMember().getIdLong(), permission, 0).queue();
+            }
         }
     }
 
