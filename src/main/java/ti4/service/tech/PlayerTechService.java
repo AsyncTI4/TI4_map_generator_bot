@@ -44,6 +44,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class PlayerTechService {
@@ -376,7 +377,7 @@ public class PlayerTechService {
     }
 
     public static void getTech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String ident = player.getFactionEmoji();
+        String ident = player.getRepresentationNoPing();
         boolean paymentRequired = !buttonID.contains("__noPay");
         final String[] buttonIDComponents = buttonID.split("__");
         buttonID = buttonIDComponents[0];
@@ -436,7 +437,7 @@ public class PlayerTechService {
                         + " which allows you to produce 2 fighters/infantry that don't count towards the PRODUCTION limit";
                 }
                 if (val > 0 && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
-                    message2 = message2 + ". And reminder that you have _Prophecy of Ixth_ and should produce 2 fighters if you want to keep it. Its removal is not automated";
+                    message2 = message2 + ". And reminder that you have _Prophecy of Ixth_ and should produce 2 fighters if you wish to keep it. Its removal is not automated.";
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), generalMsg);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2 + ".");
@@ -479,12 +480,13 @@ public class PlayerTechService {
                 if (nextPlayer == player) {
                     text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
                 } else {
-                    text += "\n-# " + nextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
+                    String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn() ? nextPlayer.getRepresentationUnfogged() : nextPlayer.getRepresentationNoPing();
+                    text += "\n-# " + ping + " will start their turn once you've ended yours.";
                 }
             }
             String buttonText = "Use buttons to do your turn. ";
             if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
-                buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];
+                buttonText = buttonText + "Your strategy card initiative number is " + player.getSCs().toArray()[0] + ".";
             }
             List<Button> buttons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);

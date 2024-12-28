@@ -16,5 +16,6 @@
         "phaeton"
     ],
     "isGravityRift": true,
-    "source": "somno"
+    "source": "somno",
+    "tileBack": "red"
 }

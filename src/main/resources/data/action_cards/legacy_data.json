@@ -862,5 +862,14 @@
         "text": "Either redistribute your command tokens or place 1 command token from your reinforcements in your fleet pool.",
         "flavorText": "Unlenn massaged his brow and shut off his holoscreen. The magnum opus on Lazax war theory at his fingertips, and yet... it was the most boring piece of literature he'd ever had the displeasure to read.",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "annexation",
+        "name": "Annexation",
+        "phase": "Action",
+        "window": "After you commit units to land on another player's non-legendary, non-home planet other than Mecatol Rex",
+        "text": "That player must remove each of their units from that planet and place them on any other planets they control, if able.",
+        "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of their hand. \"Our dominion knows no border.\"",
+        "source": "action_deck_2_old"
     }
 ]

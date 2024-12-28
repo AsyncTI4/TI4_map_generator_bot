@@ -50,8 +50,8 @@ public class SecretObjectiveInfoService {
         // SCORE/DISCARD BUTTONS
         String secretMsg = "_ _\nClick a button to either score or discard a secret objective";
         List<Button> buttons = new ArrayList<>();
-        Button scoreB = Buttons.blue("get_so_score_buttons", "Score an SO");
-        Button discardB = Buttons.red("get_so_discard_buttons", "Discard an SO");
+        Button scoreB = Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
+        Button discardB = Buttons.red("get_so_discard_buttons", "Discard A Secret Objective");
         ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
         buttons.add(scoreB);
         buttons.add(discardB);

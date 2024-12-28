@@ -20,5 +20,6 @@
         "ellas"
     ],
     "isGravityRift": true,
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

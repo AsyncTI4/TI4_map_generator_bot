@@ -25,7 +25,7 @@ class GameStatistics extends Subcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog game"));
         addOptions(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter by if the game has any homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Filter by if the game has a winner"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you want the history of").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you wish to get the history of").setAutoComplete(true));
     }
 
     @Override

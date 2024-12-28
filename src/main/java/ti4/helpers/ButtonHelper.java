@@ -39,6 +39,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
+import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands2.commandcounter.RemoveCommandCounterService;
 import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.DiceHelper.Die;
@@ -97,6 +98,7 @@ import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.settings.users.UserSettingsManager;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -811,7 +813,7 @@ public class ButtonHelper {
             && getNumberOfUnitsOnTheBoard(game, ghostPlayer, "mech", false) > 0
             && !ButtonHelper.isLawInPlay(game, "articles_war")) {
             event.getHook().sendMessage(player.getRepresentation() + ", this is a reminder that if you are moving via a Creuss wormhole, you should " +
-                "first pause and check if the Creuss player wants to use their mech to move that wormhole.")
+                "first pause and check if the Creuss player wishes to use their mech to move that wormhole.")
                 .setEphemeral(true).queue();
         }
         if (!game.isFowMode() && ButtonHelper.isLawInPlay(game, "minister_peace")) {
@@ -981,7 +983,7 @@ public class ButtonHelper {
                     Button decline = Buttons.red(fincheckerForNonActive + "deleteButtons", "Decline Hero");
                     List<Button> buttons = List.of(gainTG, decline);
                     MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCorrectChannel(),
-                        ident + " use buttons to decide if you want to use Titus Flavius, the Celdauri Hero.", buttons);
+                        ident + " use buttons to decide if you wish to use Titus Flavius, the Celdauri Hero.", buttons);
                 }
             }
             if (nonActivePlayer.hasUnit("mahact_mech") && nonActivePlayer.hasMechInSystem(activeSystem)
@@ -2167,7 +2169,7 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsForAgentSelection(Game game, String agent) {
-        return AgendaHelper.getPlayerOutcomeButtons(game, null, "exhaustAgent_" + agent, null);
+        return VoteButtonHandler.getPlayerOutcomeButtons(game, null, "exhaustAgent_" + agent, null);
     }
 
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}
@@ -4169,7 +4171,7 @@ public class ButtonHelper {
         }
         buttons.add(Buttons.red("deleteButtons", "Done resolving Transit Diodes"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation() + ", use buttons to choose the planet you want to move troops to.", buttons);
+            player.getRepresentation() + ", use buttons to choose the planet you wish to move troops to.", buttons);
     }
 
     @ButtonHandler("transitDiodes_")
@@ -4177,7 +4179,7 @@ public class ButtonHelper {
         List<Button> buttons = getButtonsForMovingGroundForcesToAPlanet(game, buttonID.split("_")[1], player);
         deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation() + ", use buttons to choose the troops you want to move to "
+            player.getRepresentation() + ", use buttons to choose the troops you wish to move to "
                 + Helper.getPlanetRepresentation(buttonID.split("_")[1] + ".", game),
             buttons);
     }
@@ -5691,7 +5693,8 @@ public class ButtonHelper {
             if (nextPlayer == player) {
                 msgExtra += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
             } else if (nextPlayer != null) {
-                msgExtra += "\n-# " + nextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
+                String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn() ? nextPlayer.getRepresentationUnfogged() : nextPlayer.getRepresentationNoPing();
+                msgExtra += "\n-# " + ping + " will start their turn once you've ended yours.";
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
 
@@ -5721,7 +5724,7 @@ public class ButtonHelper {
         game.removeLaw("arbiter");
         List<Button> buttons = ButtonHelperFactionSpecific.getSwapSCButtons(game, "imperialarbiter", player);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + ", choose who you want to swap a strategy card with.",
+            player.getRepresentationUnfogged() + ", choose who you wish to swap a strategy card with.",
             buttons);
         deleteMessage(event);
     }

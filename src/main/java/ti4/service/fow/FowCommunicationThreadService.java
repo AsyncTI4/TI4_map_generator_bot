@@ -11,11 +11,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -33,7 +32,7 @@ public class FowCommunicationThreadService {
         return game.isFowMode() && Boolean.parseBoolean(game.getFowOption(FowConstants.MANAGED_COMMS));
     }
 
-    public static void checkCommThreadsAndNewNeighbors(Game game, Player player, List<Button> startButtons) {
+    public static void checkCommThreadsAndNewNeighbors(Game game, Player player, List<Button> buttons) {
         if (!isActive(game)) {
             return;
         }
@@ -48,7 +47,7 @@ public class FowCommunicationThreadService {
         Set<Player> newNeighbors = checkNewNeighbors(player, neighbors, commThreads);
         
         if (!newNeighbors.isEmpty()) {
-            startButtons.add(Buttons.blue("fowComms_" + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")), "Open Comms"));
+            buttons.add(Buttons.blue("fowComms_" + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")), "Open Comms"));
         }
     }
 
@@ -81,7 +80,7 @@ public class FowCommunicationThreadService {
                 //Allow talking
                 threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR)).queue(success -> {
                     MessageHelper.sendMessageToChannel(threadChannel,  notice + " are neighbors again and **may** communicate.");
-                });;
+                });
 
             } else if (!areNeighbors && !threadLocked) {
                 //Deny talking
@@ -138,7 +137,7 @@ public class FowCommunicationThreadService {
         String color = buttonID.replace("fowCommsSuggest_", "");
         Player targetPlayer = game.getPlayerFromColorOrFaction(color);
         if (targetPlayer != null) {
-            String msg = targetPlayer.getRepresentationUnfogged() + " " + player.getRepresentationNoPing() + " wants to open private communications thread with you."; 
+            String msg = targetPlayer.getRepresentationUnfogged() + " " + player.getRepresentationNoPing() + " wishes to open private communications thread with you."; 
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("fowCommsAccept_" + player.getColor(), "Accept"));
             buttons.add(Buttons.DONE_DELETE_BUTTONS);

@@ -337,6 +337,7 @@ public class MapGenerator implements AutoCloseable {
         } else if (displayType == DisplayType.attachments) {
             tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Attachments));
         }
+        tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.LastStep));
     }
 
     private void setupFow(Map<String, Tile> tilesToDisplay) {

@@ -32,7 +32,6 @@ public class CustomCommand implements ParentCommand {
                     new RevealSpecificStage2(),
                     new SpinTilesInRings(),
                     new OfferAutoPassOptions(),
-                    new OfferAFKTimeOptions(),
                     new ChangeToBaseGame(),
                     new CustomizationOptions())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));

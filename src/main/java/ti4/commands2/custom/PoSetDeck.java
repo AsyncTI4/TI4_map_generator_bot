@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 class PoSetDeck extends GameStateSubcommand {
 
     public PoSetDeck() {
-        super(Constants.SET_PO_DECK, "Create fixed order PO deck from specific POs", true, true);
+        super(Constants.SET_PO_DECK, "Create fixed order public objective deck from specific public objectives", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.SET_PO_DECK_STAGE1_LIST, "ID list separated by comma"));
         addOptions(new OptionData(OptionType.STRING, Constants.SET_PO_DECK_STAGE2_LIST, "ID list separated by comma"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SET_PO_DECK_SHUFFLE, "Shuffle the deck after creation (default: false)"));
@@ -41,7 +41,7 @@ class PoSetDeck extends GameStateSubcommand {
                 Collections.shuffle(stage1IdList);
             }
             getGame().setPublicObjectives1(stage1IdList);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "PO stage1 deck created.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Public objective stage 1 deck created.");
         } 
 
         if (!stage2IdList.isEmpty()) {
@@ -49,13 +49,13 @@ class PoSetDeck extends GameStateSubcommand {
                 Collections.shuffle(stage2IdList);
             }
             getGame().setPublicObjectives2(stage2IdList);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "PO stage2 deck created.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Public objective stage 2 deck created.");
         } 
 
         if (stage1IdList.isEmpty() && stage2IdList.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), 
-                "PO stage1 deck: " + getGame().getPublicObjectives1() + "\n"
-              + "PO stage2 deck: " + getGame().getPublicObjectives2());  
+                "Public objective stage 1 deck: " + getGame().getPublicObjectives1() + "\n"
+              + "Public objective stage 2 deck: " + getGame().getPublicObjectives2());  
         }
     }
 
@@ -70,7 +70,7 @@ class PoSetDeck extends GameStateSubcommand {
     private boolean validateIds(List<String> ids, SlashCommandInteractionEvent event) {
         for (String id : ids) {
             if (!Mapper.getPublicObjectives().containsKey(id)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid PO id: " + id);
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid public objective id: " + id);
                 return false;
             }
         }

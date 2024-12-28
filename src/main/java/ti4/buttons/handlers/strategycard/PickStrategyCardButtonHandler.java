@@ -61,7 +61,7 @@ class PickStrategyCardButtonHandler {
         if (game.getStoredValue("deflectedSC").equalsIgnoreCase(num)) {
             if (player.getStrategicCC() < 1) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
-                    + ", you can't pick this SC because it has been targeted by _Deflection_, and you don't have a command token in your strategy pool to spend.");
+                    + ", you can't pick this strategy card because it has been targeted by _Deflection_, and you don't have a command token in your strategy pool to spend.");
                 return;
             } else {
                 player.setStrategicCC(player.getStrategicCC() - 1);
@@ -140,7 +140,7 @@ class PickStrategyCardButtonHandler {
             game.setPhaseOfGame("strategy");
             game.updateActivePlayer(privatePlayer);
             MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                privatePlayer.getRepresentationUnfogged() + "Use buttons to pick which strategy card you want to give someone else.", Helper.getRemainingSCButtons(game, privatePlayer));
+                privatePlayer.getRepresentationUnfogged() + ", please use buttons to pick which strategy card you wish to give someone else.", Helper.getRemainingSCButtons(game, privatePlayer));
         }
     }
 

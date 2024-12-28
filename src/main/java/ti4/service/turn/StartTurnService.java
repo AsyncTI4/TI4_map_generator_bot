@@ -39,6 +39,7 @@ import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class StartTurnService {
@@ -80,13 +81,14 @@ public class StartTurnService {
             if (nextPlayer == player) {
                 text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
             } else {
-                text += "\n-# " + nextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
+                String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn() ? nextPlayer.getRepresentationUnfogged() : nextPlayer.getRepresentationNoPing();
+                text += "\n-# " + ping + " will start their turn once you've ended yours.";
             }
         }
         
         String buttonText = "Use buttons to do your turn. ";
         if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
-            buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];
+            buttonText = buttonText + "Your strategy card initiative number is " + player.getSCs().toArray()[0] + ".";
         }
         List<Button> buttons = getStartOfTurnButtons(player, game, false, event);
         MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel()
@@ -332,7 +334,8 @@ public class StartTurnService {
                     for (int sc : player.getSCs()) {
                         StringBuilder sb = new StringBuilder();
                         sb.append(p2.getRepresentationUnfogged());
-                        sb.append(" You are getting this ping because ").append(Helper.getSCName(sc, game)).append(" has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
+                        sb.append(" You are getting this ping because **").append(Helper.getSCName(sc, game))
+                            .append("** has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
                         appendScMessages(game, p2, sc, sb);
                     }
                 }

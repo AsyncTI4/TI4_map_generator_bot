@@ -1,15 +1,15 @@
 package ti4.service.emoji;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import ti4.image.TileHelper;
 import ti4.model.TileModel;
+import ti4.model.TileModel.TileBack;
 
 public enum TileEmojis implements TI4Emoji {
 
     // tile backs
-    TileGreenBack, TileRedBack, TileBlueBack,
+    TileGreenBack, TileRedBack, TileBlueBack, TileBlackBack,
 
     // base
     Jord_01, MollPrimus_02, Darien_03, Muaat_04, Nestphar_05, L1_000_06, Winnu_07, MordaiII_08, //
@@ -215,13 +215,12 @@ public enum TileEmojis implements TI4Emoji {
     public static TI4Emoji getTileBackEmojiFromTileID(String tileID) {
         if (!TileHelper.isValidTile(tileID)) return null;
         TileModel tileModel = TileHelper.getTileById(tileID);
-        if (tileModel.getTileBackOption().isEmpty()) return null;
 
         return switch (tileModel.getTileBack()) {
-            case "green" -> TileGreenBack;
-            case "blue" -> TileBlueBack;
-            case "red" -> TileRedBack;
-            default -> null;
+            case TileBack.GREEN -> TileGreenBack;
+            case TileBack.BLUE -> TileBlueBack;
+            case TileBack.RED -> TileRedBack;
+            default -> TileBlackBack;
         };
     }
 }

@@ -2,11 +2,11 @@
     "id": "er66",
     "name": "Super Rift",
     "aliases": [
+        "er66",
         "superrift",
         "superift"
     ],
     "imagePath": "er66_superrift.png",
-    "planetIds": [],
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -31,5 +31,8 @@
         }
     ],
     "wormholes": null,
-    "planets": []
+    "planets": [],
+    "isGravityRift": true,
+    "source": "eronous",
+    "tileBack": "red"
 }

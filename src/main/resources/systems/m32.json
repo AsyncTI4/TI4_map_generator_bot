@@ -38,5 +38,6 @@
         "apis",
         "vespa"
     ],
-    "source": "asteroid"
+    "source": "asteroid",
+    "tileBack": "blue"
 }

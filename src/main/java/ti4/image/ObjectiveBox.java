@@ -1,6 +1,7 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -78,7 +79,7 @@ public class ObjectiveBox {
 		List<String> playerIDs;
 		if (objective.revealed() && objective.scoredPlayerIDs() != null) {
 			playerIDs = objective.scoredPlayerIDs();
-		} else if (objective.peekPlayerIDs() != null) {
+		} else if (objective.peekPlayerIDs() != null && !game.isFowMode()) {
 			playerIDs = objective.peekPlayerIDs();
 		} else {
 			return;

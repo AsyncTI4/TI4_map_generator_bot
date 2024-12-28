@@ -33,5 +33,6 @@
     "planets": [
         "gaea"
     ],
-    "source": "asteroid"
+    "source": "asteroid",
+    "tileBack": "blue"
 }

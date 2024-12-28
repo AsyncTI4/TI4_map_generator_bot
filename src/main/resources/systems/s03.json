@@ -22,5 +22,6 @@
     "planets": [
         "groosemihsal"
     ],
-    "source": "somno"
+    "source": "somno",
+    "tileBack": "blue"
 }

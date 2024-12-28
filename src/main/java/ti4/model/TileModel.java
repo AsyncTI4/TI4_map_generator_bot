@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -25,6 +26,21 @@ import ti4.service.emoji.TileEmojis;
 
 @Data
 public class TileModel implements ModelInterface, EmbeddableModel {
+
+    public enum TileBack {
+        GREEN, BLUE, RED, BLACK;
+
+        @JsonCreator
+        public static TileBack fromString(String value) {
+            return value == null ? TileBack.BLACK : TileBack.valueOf(value.toUpperCase());
+        }
+
+        @JsonValue
+        public String toValue() {
+            return this.name().toLowerCase();
+        }
+    }
+
     private String id;
     private String name;
     private List<String> aliases;
@@ -46,7 +62,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private boolean gravityRift = false;
     private String imageURL;
     private ComponentSource source;
-    private String tileBack;
+    private TileBack tileBack;
 
     @Override
     @JsonIgnore
@@ -65,13 +81,9 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        StringBuilder sb = new StringBuilder();
-        sb.append("(").append(getId()).append(") ");
-        if (getEmoji() != null) sb.append(getEmoji().emojiString()).append(" ");
-        if (!getNameNullSafe().isEmpty()) sb.append("__").append(getNameNullSafe()).append("__");
-        eb.setTitle(sb.toString());
+        eb.setTitle(getEmbedTitle());
 
-        sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         if (isEmpty()) sb.append(ExploreEmojis.Frontier);
         if (isAsteroidField()) sb.append(MiscEmojis.Asteroids);
         if (isSupernova()) sb.append(MiscEmojis.Supernova);
@@ -87,6 +99,14 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
         if (includeAliases) eb.setFooter("Aliases: " + getAliases());
         return eb.build();
+    }
+
+    public String getEmbedTitle() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(").append(getId()).append(") ");
+        if (getEmoji() != null) sb.append(getEmoji().emojiString()).append(" ");
+        if (!getNameNullSafe().isEmpty()) sb.append("__").append(getNameNullSafe()).append("__");
+        return sb.toString();
     }
 
     @JsonIgnore
@@ -163,11 +183,6 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getAlias() {
         return getId();
-    }
-
-    @JsonIgnore
-    public Optional<String> getTileBackOption() {
-        return Optional.ofNullable(tileBack);
     }
 
     @JsonIgnore

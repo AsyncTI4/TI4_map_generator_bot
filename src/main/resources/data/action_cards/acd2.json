@@ -9,15 +9,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "annexation",
-    "name": "Annexation",
-    "phase": "Action",
-    "window": "After you commit units to land on another player's non-legendary, non-home planet other than Mecatol Rex",
-    "text": "That player must remove each of their units from that planet and place them on any other planets they control, if able.",
-    "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of their hand. \"Our dominion knows no border.\"",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "anomalous_conditions",
     "name": "Anomalous Conditions",
     "phase": "Action",
@@ -93,8 +84,8 @@
     "alias": "blackmail",
     "name": "Blackmail",
     "phase": "Agenda",
-    "window": "After an agenda is revealed",
-    "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome must give you 1 promissory note from their hand.",
+    "window": "Before another player casts votes",
+    "text": "That player must cast at least 1 vote for an outcome of your choice or give you 1 random promissory note from their hand.",
     "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
     "source": "action_deck_2"
   },
@@ -328,7 +319,7 @@
     "name": "Early Voting",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome, cast 5 additional votes for that outcome. [Note: This ability works like Argent Zeal. Argent votes before the chosen player.]",
+    "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome of this agenda, cast 5 additional votes for that outcome. [Note: This ability works like Argent Zeal. Argent votes before the chosen player.]",
     "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
     "source": "action_deck_2"
   },
@@ -346,7 +337,7 @@
     "name": "Energy Pulse",
     "phase": "Action",
     "window": "After the \"Move Ships\" substep of a tactical action in a system that contains your units",
-    "text": "Choose up to 2 units in that system. Those units lose their printed unit abilities during this tactical action.",
+    "text": "Choose 1 non-flagship unit in that system. That unit loses its printed abilities during this tactical action.",
     "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
     "source": "action_deck_2"
   },
@@ -573,6 +564,15 @@
     "window": "After you pass",
     "text": "You may purge 1 of your relics to gain 1 relic; otherwise, gain trade goods equal to the number of players that have not passed.",
     "flavorText": "The broker sat unmoving. Its body, nearly stone, lent it to such an activity. However, this being was worth its weight in credits, for its memories stretched to the dawn of wonders, and its stories flowed to those who would fulfill its needs.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "opportunists",
+    "name": "Opportunists",
+    "phase": "Action",
+    "window": "After a space combat you did not participate in ends",
+    "text": "Place 1 cruiser and/or 1 destroyer from your reinforcements in the active system. If that system contains another player's ships, resolve a space combat.",
+    "flavorText": "Nekro ships waited on the periphery like hungering beasts. Soon they would feast on the hulking carrion of the suddenly meaningless battle.",
     "source": "action_deck_2"
   },
   {
@@ -967,7 +967,7 @@
     "name": "Special Considerations",
     "phase": "Agenda",
     "window": "When an agenda is revealed",
-    "text": "Ready up to 3 planets you control. Game effects cannot prevent you from voting on this agenda.",
+    "text": "Ready up to 3 planets you control. Game effects cannot prevent you from playing this card or voting on this agenda.",
     "flavorText": "\"It is our right to determine the future of this artifact,\" Mathis said calmly, flashing his imperial seal in a practiced motion. \"Are we not owed such respect?\"",
     "source": "action_deck_2"
   },
@@ -976,7 +976,7 @@
     "name": "Stasis Haul",
     "phase": "Action",
     "window": "After you activate a system",
-    "text": "During this tactical action, apply +1 to the capacity value of each of your ships that have a capacity value.",
+    "text": "During this tactical action, apply +2 to the capacity value of 1 of your ships and gain commodities equal to the number of different systems that ship moves into or through.",
     "flavorText": "The cargo ships blasted out of the planet's gravity field. Vast space and time lay before them. For all, it meant the promise of new life; for some, it would mean death.",
     "source": "action_deck_2"
   },

@@ -27,7 +27,8 @@ public class FOWCommand implements ParentCommand {
                     new Whisper(),
                     new Announce(),
                     new FOWOptions(),
-                    new ShowGameAsPlayer())
+                    new ShowGameAsPlayer(),
+                    new PrivateCommunicationsCheck())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
 

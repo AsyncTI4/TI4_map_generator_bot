@@ -47,11 +47,11 @@ public class AddTileListService {
             MessageHelper.replyToMessage(event, e.getMessage());
         }
 
-        MessageHelper.sendMessageToEventChannel(event, "Setting Map String to: ```\n" + tileList + "\n```");
+        MessageHelper.sendMessageToEventChannel(event, "Map String set to: ```\n" + game.getMapString() + "\n```");
         ShowGameService.simpleShowGame(game, event, DisplayType.map);
 
         if (!badTiles.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles + "\n");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There were some bad tiles that were replaced with gray tiles: " + badTiles + "\n");
         }
 
         finishSetup(game, event);
@@ -102,14 +102,14 @@ public class AddTileListService {
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
         if (!game.isBaseGameMode()) {
             AddFrontierTokensService.addFrontierTokens(event, game);
-            MessageHelper.sendMessageToChannel(channel, ExploreEmojis.Frontier + " Frontier Tokens have been added to empty spaces.");
+            MessageHelper.sendMessageToChannel(channel, ExploreEmojis.Frontier + " frontier tokens have been added to empty spaces.");
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
-            game.getMainGameChannel(), "Press this button after every player is setup",
-            List.of(Buttons.green("deal2SOToAll", "Deal 2 SO To All")));
+            game.getMainGameChannel(), "Press this button after every player is setup.",
+            List.of(Buttons.green("deal2SOToAll", "Deal 2 Secret Objectives To All")));
 
-        if (game.getRealPlayers().size() < game.getPlayers().size()) {
+        if (!game.isFowMode() && game.getRealPlayers().size() < game.getPlayers().size()) {
             ButtonHelper.offerPlayerSetupButtons(channel, game);
         }
     }
