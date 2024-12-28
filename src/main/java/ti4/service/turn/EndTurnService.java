@@ -121,12 +121,9 @@ public class EndTurnService {
             try {
                 if (lastTransaction != null && !lastTransaction.isEmpty()) {
                     game.setLatestTransactionMsg("");
-                    game.getMainGameChannel().deleteMessageById(lastTransaction).queue(null, e -> {
-                    });
+                    game.getMainGameChannel().deleteMessageById(lastTransaction).queue();
                 }
-            } catch (Exception e) {
-                //  Block of code to handle errors
-            }
+            } catch (Exception ignored) {}
         }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game);
         if (isFowPrivateGame) {

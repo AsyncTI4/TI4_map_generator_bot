@@ -128,15 +128,12 @@ public class MessageHelper {
 				error -> BotLogger.log(getRestActionFailureMessage(message.getChannel(), "Failed to add reaction to message", null, error)));
 		}
 		String messageId = message.getId();
-		if (game.getStoredValue(messageId) != null
-			&& !game.getStoredValue(messageId).isEmpty()) {
+		if (game.getStoredValue(messageId) != null && !game.getStoredValue(messageId).isEmpty()) {
 			if (!game.getStoredValue(messageId).contains(player.getFaction())) {
 				game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
-				//GameSaveLoadManager.saveGame(game, "Stored reaction."); TODO: this should save, I think, but saving is heavy...
 			}
 		} else {
 			game.setStoredValue(messageId, player.getFaction());
-			//GameSaveLoadManager.saveGame(game, "Stored reaction."); TODO: this should save, I think, but saving is heavy...
 		}
 	}
 
@@ -152,7 +149,7 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game game, Player player,
-		List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
+																		List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
 		MessageFunction addFactionReact = (msg) -> {
 			addFactionReactToMessage(game, player, msg);
 			if (saboable) {
@@ -329,9 +326,8 @@ public class MessageHelper {
 
 		if (channel instanceof ThreadChannel thread) {
 			if (thread.isArchived() && !thread.isLocked()) {
-				String txt = messageText;
-				List<Button> butts = buttons;
-				thread.getManager().setArchived(false).queue((v) -> splitAndSentWithAction(txt, channel, restAction, sanitizedEmbeds, butts), BotLogger::catchRestError);
+                thread.getManager().setArchived(false).queue();
+				splitAndSentWithAction(messageText, channel, restAction, sanitizedEmbeds, buttons);
 				return;
 			} else if (thread.isLocked()) {
 				BotLogger.log("WARNING: Attempting to send a message to locked thread: " + thread.getJumpUrl());
@@ -351,8 +347,8 @@ public class MessageHelper {
 			}
 		}
 
-		final String message = messageText;
-		List<MessageCreateData> objects = getMessageCreateDataObjects(message, sanitizedEmbeds, buttons);
+		final String finalMessageText = messageText;
+		List<MessageCreateData> objects = getMessageCreateDataObjects(finalMessageText, sanitizedEmbeds, buttons);
 		Iterator<MessageCreateData> iterator = objects.iterator();
 		while (iterator.hasNext()) {
 			MessageCreateData messageCreateData = iterator.next();
@@ -360,20 +356,18 @@ public class MessageHelper {
 				channel.sendMessage(messageCreateData).queue(null,
 					error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send intermediate message", messageCreateData, error)));
 			} else { // last message, do action
-				channel.sendMessage(messageCreateData).queue(complete -> {
-					ManagedGame managedGame = GameManager.getManagedGame(gameName);
-					if (message != null && managedGame != null && !managedGame.isFowMode()) {
-						if (message.contains("Use buttons to do your turn") || message.contains("Use buttons to end turn")) {
-							Game game = managedGame.getGame();
-							game.setLatestTransactionMsg(complete.getId());
-						}
+				Message message = channel.sendMessage(messageCreateData).complete();
+				ManagedGame managedGame = GameManager.getManagedGame(gameName);
+				if (finalMessageText != null && managedGame != null && !managedGame.isFowMode()) {
+					if (finalMessageText.contains("Use buttons to do your turn") || finalMessageText.contains("Use buttons to end turn")) {
+						Game game = managedGame.getGame();
+						game.setLatestTransactionMsg(message.getId());
 					}
+				}
 
-					// RUN SUPPLIED ACTION
-					if (restAction != null) {
-						restAction.run(complete);
-					}
-				}, error -> BotLogger.log(getRestActionFailureMessage(channel, message, messageCreateData, error)));
+				if (restAction != null) {
+					restAction.run(message);
+				}
 			}
 		}
 	}
@@ -541,7 +535,7 @@ public class MessageHelper {
 	 *          <p>
 	 *          </p>
 	 *          Example of use:
-	 * 
+	 *
 	 *          <pre>
 	* {@code
 		for (MessageCreateData messageData : getMessageObject(message, embeds, buttons)) {
