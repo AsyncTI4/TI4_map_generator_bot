@@ -149,7 +149,7 @@ public class MessageHelper {
 	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game game, Player player, List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
 		MessageFunction addFactionReact = (msg) -> {
 			addFactionReactToMessage(game, player, msg);
-            if (!saboable) {
+			if (!saboable) {
 				return;
 			}
             game.addMessageIDForSabo(msg.getId());
