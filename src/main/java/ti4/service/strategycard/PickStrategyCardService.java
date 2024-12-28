@@ -27,6 +27,7 @@ import ti4.message.MessageHelper;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
+import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class PickStrategyCardService {
@@ -191,7 +192,8 @@ public class PickStrategyCardService {
                 if (nextPlayer == privatePlayer) {
                     text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
                 } else if (nextPlayer != null) {
-                    text += "\n-# " + nextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
+                    String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn() ? nextPlayer.getRepresentationUnfogged() : nextPlayer.getRepresentationNoPing();
+                    text += "\n-# " + ping + " will start their turn once you've ended yours.";
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), text);
                 if (privatePlayer.getGenSynthesisInfantry() > 0) {
