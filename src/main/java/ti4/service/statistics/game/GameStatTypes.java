@@ -10,7 +10,7 @@ public enum GameStatTypes {
     FACTIONS_PLAYED("Plays per Faction", "Show faction play count"),
     COLOURS_PLAYED("Plays per Colour", "Show colour play count"),
     FACTION_WINS("Wins per Faction", "Show the wins per faction"),
-    SOS_SCORED("Times a secret objective has been scored", "Show the amount of times each secret objective has been scored"),
+    SOS_SCORED("Times a secret objective has been scored", "Show the amount of times each secret objective was scored"),
     FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"),
     COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
     WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"),
