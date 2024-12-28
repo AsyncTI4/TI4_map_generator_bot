@@ -46,6 +46,7 @@ import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
+import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class StartPhaseService {
@@ -581,7 +582,8 @@ public class StartPhaseService {
             if (nextNextPlayer == nextPlayer) {
                 msgExtra += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
             } else if (nextNextPlayer != null) {
-                msgExtra += "\n-# " + nextNextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
+                String ping = UserSettingsManager.get(nextNextPlayer.getUserID()).isPingOnNextTurn() ? nextNextPlayer.getRepresentationUnfogged() : nextNextPlayer.getRepresentationNoPing();
+                msgExtra += "\n-# " + ping + " will start their turn once you've ended yours.";
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
 

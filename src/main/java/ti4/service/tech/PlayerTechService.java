@@ -44,6 +44,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class PlayerTechService {
@@ -479,7 +480,8 @@ public class PlayerTechService {
                 if (nextPlayer == player) {
                     text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
                 } else {
-                    text += "\n-# " + nextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
+                    String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn() ? nextPlayer.getRepresentationUnfogged() : nextPlayer.getRepresentationNoPing();
+                    text += "\n-# " + ping + " will start their turn once you've ended yours.";
                 }
             }
             String buttonText = "Use buttons to do your turn. ";
