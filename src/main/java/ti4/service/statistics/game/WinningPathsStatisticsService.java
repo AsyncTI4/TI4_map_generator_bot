@@ -61,7 +61,7 @@ class WinningPathsStatisticsService {
 
         AtomicInteger atomicInteger = new AtomicInteger();
         StringBuilder sb = new StringBuilder();
-        sb.append("__**Winning Paths With SftT Count:**__").append("\n");
+        sb.append("__**Winning Paths Holding Support for the Throne Count:**__").append("\n");
         supportWinCount.entrySet().stream()
             .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
             .forEach(entry -> sb.append(atomicInteger.getAndIncrement() + 1)
@@ -71,9 +71,9 @@ class WinningPathsStatisticsService {
                 .append(Math.round(100 * entry.getValue() / (double) gameWithWinnerCount.get()))
                 .append("%)` ")
                 .append(entry.getKey())
-                .append(" SftT wins")
+                .append(" Support for the Throne wins")
                 .append("\n"));
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "SftT wins", sb.toString());
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Support for the Throne wins", sb.toString());
     }
 
     private static void getWinsWithSupport(Game game, Map<Integer, Integer> supportWinCount, AtomicInteger gameWithWinnerCount) {

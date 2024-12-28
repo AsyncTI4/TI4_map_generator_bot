@@ -98,6 +98,7 @@ import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.settings.users.UserSettingsManager;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -5692,7 +5693,8 @@ public class ButtonHelper {
             if (nextPlayer == player) {
                 msgExtra += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
             } else if (nextPlayer != null) {
-                msgExtra += "\n-# " + nextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
+                String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn() ? nextPlayer.getRepresentationUnfogged() : nextPlayer.getRepresentationNoPing();
+                msgExtra += "\n-# " + ping + " will start their turn once you've ended yours.";
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
 

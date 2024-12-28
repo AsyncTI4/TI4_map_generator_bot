@@ -14,6 +14,7 @@ public class UserCommand implements ParentCommand {
                     new ShowUserSettings(),
                     new SetPreferredColourList(),
                     new SetPersonalPingInterval(),
+                    new SetPingOnNextTurn(),
                     new OfferAFKTimeOptions())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

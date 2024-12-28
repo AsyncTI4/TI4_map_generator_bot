@@ -21,6 +21,7 @@ public class UserSettings {
     private boolean prefersDistanceBasedTacticalActions;
     private String afkHours;
     private LocalDateTime lockedFromCreatingGamesUntil;
+    private boolean pingOnNextTurn;
 
     UserSettings() {} // needed for ObjectMapper
 

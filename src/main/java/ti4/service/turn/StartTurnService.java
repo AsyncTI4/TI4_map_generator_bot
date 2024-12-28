@@ -39,6 +39,7 @@ import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class StartTurnService {
@@ -80,7 +81,8 @@ public class StartTurnService {
             if (nextPlayer == player) {
                 text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
             } else {
-                text += "\n-# " + nextPlayer.getRepresentationNoPing() + " will start their turn once you've ended yours.";
+                String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn() ? nextPlayer.getRepresentationUnfogged() : nextPlayer.getRepresentationNoPing();
+                text += "\n-# " + ping + " will start their turn once you've ended yours.";
             }
         }
         
