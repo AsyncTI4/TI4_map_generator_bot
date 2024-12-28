@@ -170,7 +170,7 @@ public class ListPlayerInfoService {
     }
 
     public static String representSecrets(Game game) {
-        StringBuilder representation = new StringBuilder("__**Scored Secrets**__\n> ");
+        StringBuilder representation = new StringBuilder("__**Scored Secret Objectives**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ").append(player.getSoScored()).append("/").append(player.getMaxSOCount()).append("  ");

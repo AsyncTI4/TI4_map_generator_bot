@@ -1055,7 +1055,7 @@ public class Game extends GameProperties {
                 ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
                 tradeGoodCount = 0;
                 MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + tradeGoodCount + " trade good" + (tradeGoodCount == 1 ? "" : "s")
-                    + " that would be placed on the SC " + sc + " have instead been given to the Kyro Hero player, as per Kyro Hero text.");
+                    + " that would be placed on **" + Helper.getSCName(sc, this) + "** have instead been given to the Kyro Hero player, as per Kyro Hero text.");
             }
         }
         scTradeGoods.put(sc, tradeGoodCount);

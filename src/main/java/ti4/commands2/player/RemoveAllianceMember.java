@@ -16,7 +16,7 @@ class RemoveAllianceMember extends GameStateSubcommand {
     public RemoveAllianceMember() {
         super(Constants.REMOVE_ALLIANCE_MEMBER, "Remove an alliance member", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR,
-            "Faction or Color with which you want to remove from your alliance").setAutoComplete(true).setRequired(true));
+            "Faction or Color with which you wish to remove from your alliance").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,
             "Faction or Color (defaults you))").setAutoComplete(true));
     }

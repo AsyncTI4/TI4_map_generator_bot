@@ -9,12 +9,12 @@ import ti4.service.info.SecretObjectiveInfoService;
 class SOInfo extends GameStateSubcommand {
 
     public SOInfo() {
-        super(Constants.INFO, "Sent scored and unscored Secret Objectives to your Cards Info thread", true, true);
+        super(Constants.INFO, "Sends scored and unscored secret objectives to your #cards-info thread", true, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         SecretObjectiveInfoService.sendSecretObjectiveInfo(getGame(), getPlayer(), event);
-        MessageHelper.sendMessageToEventChannel(event, "SO Info Sent");
+        MessageHelper.sendMessageToEventChannel(event, "Secret objective info sent.");
     }
 }

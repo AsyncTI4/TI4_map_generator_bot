@@ -30,7 +30,7 @@ class DealSO extends GameStateSubcommand {
         for (int i = 0; i < count; i++) {
             game.drawSecretObjective(player.getUserID());
         }
-        MessageHelper.sendMessageToEventChannel(event, count + " SO Dealt");
+        MessageHelper.sendMessageToEventChannel(event, count + " Secret objective dealt.");
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
     }
 }

@@ -812,7 +812,7 @@ public class ButtonHelper {
             && getNumberOfUnitsOnTheBoard(game, ghostPlayer, "mech", false) > 0
             && !ButtonHelper.isLawInPlay(game, "articles_war")) {
             event.getHook().sendMessage(player.getRepresentation() + ", this is a reminder that if you are moving via a Creuss wormhole, you should " +
-                "first pause and check if the Creuss player wants to use their mech to move that wormhole.")
+                "first pause and check if the Creuss player wishes to use their mech to move that wormhole.")
                 .setEphemeral(true).queue();
         }
         if (!game.isFowMode() && ButtonHelper.isLawInPlay(game, "minister_peace")) {
@@ -982,7 +982,7 @@ public class ButtonHelper {
                     Button decline = Buttons.red(fincheckerForNonActive + "deleteButtons", "Decline Hero");
                     List<Button> buttons = List.of(gainTG, decline);
                     MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCorrectChannel(),
-                        ident + " use buttons to decide if you want to use Titus Flavius, the Celdauri Hero.", buttons);
+                        ident + " use buttons to decide if you wish to use Titus Flavius, the Celdauri Hero.", buttons);
                 }
             }
             if (nonActivePlayer.hasUnit("mahact_mech") && nonActivePlayer.hasMechInSystem(activeSystem)
@@ -4170,7 +4170,7 @@ public class ButtonHelper {
         }
         buttons.add(Buttons.red("deleteButtons", "Done resolving Transit Diodes"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation() + ", use buttons to choose the planet you want to move troops to.", buttons);
+            player.getRepresentation() + ", use buttons to choose the planet you wish to move troops to.", buttons);
     }
 
     @ButtonHandler("transitDiodes_")
@@ -4178,7 +4178,7 @@ public class ButtonHelper {
         List<Button> buttons = getButtonsForMovingGroundForcesToAPlanet(game, buttonID.split("_")[1], player);
         deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation() + ", use buttons to choose the troops you want to move to "
+            player.getRepresentation() + ", use buttons to choose the troops you wish to move to "
                 + Helper.getPlanetRepresentation(buttonID.split("_")[1] + ".", game),
             buttons);
     }
@@ -5722,7 +5722,7 @@ public class ButtonHelper {
         game.removeLaw("arbiter");
         List<Button> buttons = ButtonHelperFactionSpecific.getSwapSCButtons(game, "imperialarbiter", player);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + ", choose who you want to swap a strategy card with.",
+            player.getRepresentationUnfogged() + ", choose who you wish to swap a strategy card with.",
             buttons);
         deleteMessage(event);
     }

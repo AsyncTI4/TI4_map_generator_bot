@@ -12,7 +12,7 @@ class DrawSpecificAC extends GameStateSubcommand {
 
     public DrawSpecificAC() {
         super(Constants.DRAW_SPECIFIC_AC, "Draw Specific Action Card", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.AC_ID, "ID of the card you want to draw").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.AC_ID, "ID of the card you wish to draw").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
@@ -25,7 +25,8 @@ class DrawSpecificAC extends GameStateSubcommand {
 
         int currentAcCount = player.getAc();
         if (currentAcCount == player.getAc()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Card not drawn. It could be in someone's hand, or you could be using the wrong ID. Remember, you need the word ID (i.e scramble for Scramble Frequency) and not the number ID. You may find the word ID by proper usage of the /search command.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Card not drawn. It could be in someone's hand, or you could be using the wrong ID."
+                + " Remember, you need the word ID (i.e `scramble` for _Scramble Frequency_) and not the number ID. You may find the word ID with the `/search action_cards` command.");
             return;
         }
 

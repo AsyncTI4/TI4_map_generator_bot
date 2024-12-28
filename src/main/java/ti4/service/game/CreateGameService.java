@@ -271,11 +271,11 @@ public class CreateGameService {
     private static void introductionToTableTalkChannel(Game game) {
         TextChannel chatChannel = game.getTableTalkChannel();
         String tabletalkGetStartedMessage = game.getPing() + " - table talk channel\n" +
-            "This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n" +
+            "This channel is for typical over the table conversation, as you would over the table while playing the game in real life.\n" +
             "If this group has agreed to whispers (secret conversations), you can create private threads off this channel.\n" +
             "Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n" +
             game.getPing() + " if you are playing with strangers, you should take a few moments at the start here to discuss how you're going handle disputes and take-backs. Async is an odd format, it can get messy " +
-            "and takebacks are often not only advisable but necessary. A common standard is no new relevant information, but if you want to get more specific or do something else (like you can only takeback if the whole table says so) then state that here. \n" +
+            "and takebacks are often not only advisable but necessary. A common standard is no new relevant information, but if you wish to get more specific or do something else (like you can only takeback if the whole table says so) then state that here. \n" +
             "Regarding disputes, playing a diplomatic game with strangers online, with no tone to go off of or human face to empathize with, can often lead to harsh words and hurt feelings. No matter what happens mechanically in the game, you should always " +
             "strive to treat the other people with respect, patience, and hopefully kindness. If you cannot, you should step away, and if you ever feel the need to leave a game permanently, we do have a replacement system that gets a fair amount of use (ping or dm a bothelper for specifics)";
         MessageHelper.sendMessageToChannelAndPin(chatChannel, tabletalkGetStartedMessage);

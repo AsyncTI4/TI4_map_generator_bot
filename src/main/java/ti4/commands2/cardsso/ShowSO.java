@@ -61,7 +61,7 @@ class ShowSO extends GameStateSubcommand {
             return;
         }
 
-        MessageHelper.sendMessageToEventChannel(event, "SO shown to player");
+        MessageHelper.sendMessageToEventChannel(event, "Secret objective shown to player.");
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, sb);
     }

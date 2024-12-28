@@ -202,14 +202,14 @@ public class PlayHeroService {
                 List<Button> buttons = ButtonHelperHeroes.getButtonsForGheminaLadyHero(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getRepresentationUnfogged()
-                        + " use the button to pick on which planet you want to resolve The Lady, a Ghemina hero.",
+                        + " use the button to pick on which planet you wish to resolve The Lady, a Ghemina hero.",
                     buttons);
             }
             case "gheminaherolord" -> {
                 List<Button> buttons = ButtonHelperHeroes.getButtonsForGheminaLordHero(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getRepresentationUnfogged()
-                        + " use the button to pick on which planet you want to resolve The Lord, a Ghemina hero",
+                        + " use the button to pick on which planet you wish to resolve The Lord, a Ghemina hero",
                     buttons);
             }
             case "arborechero" -> {
@@ -231,7 +231,7 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                     .getFactionEmoji() + " may resolve " + size
                     + " agenda" + (size == 1 ? "" : "s") + " because that's how many Sigils they got."
-                    + " After putting the agendas on top in the order you want (don't bottom any), please press the button to reveal an agenda");
+                    + " After putting the agendas on top in the order you wish (don't bottom any), please press the button to reveal an agenda.");
                 AgendaHelper.drawAgenda(event, size, game, player);
                 Button flipAgenda = Buttons.blue("flip_agenda", "Press this to flip agenda");
                 List<Button> buttons = List.of(flipAgenda);

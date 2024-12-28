@@ -318,7 +318,7 @@ public class ButtonHelperAbilities {
                 buttons.add(button);
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged() + " tell the bot whose planet you want to put a trap on", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged() + " tell the bot whose planet you wish to put a trap on.", buttons);
     }
 
     @ButtonHandler("setTrapStep2_")
@@ -330,7 +330,7 @@ public class ButtonHelperAbilities {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-            player.getRepresentationUnfogged() + " select the planet you want to put a trap on", buttons);
+            player.getRepresentationUnfogged() + " select the planet you wish to put a trap on.", buttons);
     }
 
     @ButtonHandler("setTrapStep3_")
@@ -340,8 +340,8 @@ public class ButtonHelperAbilities {
         for (String availableTrap : getUnusedTraps(game, player)) {
             availableTraps.add(Buttons.green("setTrapStep4_" + planet + "_" + availableTrap, availableTrap));
         }
-        String msg = player.getRepresentationUnfogged() + " choose the trap you want to set on the planet "
-            + Helper.getPlanetRepresentation(planet, game);
+        String msg = player.getRepresentationUnfogged() + " choose the trap you wish to set on the planet "
+            + Helper.getPlanetRepresentation(planet, game) + ".";
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, availableTraps);
     }
@@ -353,7 +353,7 @@ public class ButtonHelperAbilities {
             availableTrap = translateNameIntoTrapIDOrReverse(availableTrap);
             availableTraps.add(Buttons.green("removeTrapStep2_" + availableTrap, availableTrap));
         }
-        String msg = player.getRepresentationUnfogged() + " choose the trap you want to remove";
+        String msg = player.getRepresentationUnfogged() + " choose the trap you wish to remove.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, availableTraps);
     }
 
@@ -364,7 +364,7 @@ public class ButtonHelperAbilities {
             availableTrap = translateNameIntoTrapIDOrReverse(availableTrap);
             availableTraps.add(Buttons.green("revealTrapStep2_" + availableTrap, availableTrap));
         }
-        String msg = player.getRepresentationUnfogged() + " choose the trap you want to reveal";
+        String msg = player.getRepresentationUnfogged() + " choose the trap you wish to reveal.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, availableTraps);
     }
 

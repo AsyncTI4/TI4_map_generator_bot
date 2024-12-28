@@ -892,7 +892,7 @@ public class ButtonHelperModifyUnits {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
         }
 
-        String message = "Landed troops. Use buttons to decide if you want to build or finish the activation";
+        String message = "Landed troops. Use buttons to decide if you wish to build or finish the activation.";
         ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, game, event);
         Tile tile = null;
         if (buttonID.contains("_")) {
@@ -1872,7 +1872,7 @@ public class ButtonHelperModifyUnits {
             buttons.add(validTile);
         }
 
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select unit you want to move",
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select the unit you wish to move.",
             buttons);
         event.getMessage().delete().queue();
     }
@@ -1893,7 +1893,7 @@ public class ButtonHelperModifyUnits {
                     "Move " + unit + " to " + tile2.getRepresentationForButtons(game, player)));
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select tile you want to move to", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select the tile you wish to move to.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -1930,7 +1930,7 @@ public class ButtonHelperModifyUnits {
         }
         buttons.add(Buttons.red("deleteButtons", "Delete These"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " choose how many fighters you want to convert to infantry",
+            player.getRepresentationUnfogged() + ", please choose how many fighters you wish to convert to infantry.",
             buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -1951,7 +1951,7 @@ public class ButtonHelperModifyUnits {
         }
         buttons.add(Buttons.red("deleteButtons", "Delete These"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " choose how many infantry you wish to convert to fighters",
+            player.getRepresentationUnfogged() + ", please choose how many infantry you wish to convert to fighters.",
             buttons);
         ButtonHelper.deleteTheOneButton(event);
     }

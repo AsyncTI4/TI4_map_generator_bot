@@ -209,23 +209,28 @@ public class ButtonHelperSCs {
         }
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
-        String message = "Drew A Secret Objective";
+        String message = " drew a secret objective.";
         for (Player player2 : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
             if (player2 == player) {
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    message = message + ". Drew a second SO due to Plausible Deniability";
+                    message = message + " Drew a second secret objective due to **Plausible Deniability**.";
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
                 break;
             }
             if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
-                message = "Wants to draw an SO but has people ahead of them in speaker order who need to resolve first. They have been queued and will automatically draw an SO when everyone ahead of them is clear."
-                    + " They may cancel this by hitting 'No Follow'";
+                message = " wishes to draw a secret objective but has people ahead of them in speaker order who need to resolve first."
+                    + " They have been queued and will automatically draw a secret objective when everyone ahead of them is clear."
+                    + " They may cancel this by hitting \"No Follow\".";
                 if (!game.isFowMode()) {
-                    message = message + "\n" + player2.getRepresentationUnfogged()
-                        + " is the one the game is currently waiting on. Remember it is not enough to simply draw an SO, they will also need to discard one. ";
+                    message += "\n" + player2.getRepresentationUnfogged()
+                        + " is the one the game is currently waiting on.";
+                    if (player2.getSecretsScored().size() + player2.getSecretsUnscored().size() >= player2.getMaxSOCount())
+                    {
+                        message += " Remember it is not enough to simply draw a secret objective, they will also need to discard one.";
+                    }
                 }
                 game.setStoredValue(key2,
                     game.getStoredValue(key2) + player.getFaction() + "*");
@@ -384,7 +389,7 @@ public class ButtonHelperSCs {
         }
         if (val > 0 && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
             message = message
-                + "Reminder that you have Prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated.";
+                + "Reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.";
         }
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
@@ -652,7 +657,7 @@ public class ButtonHelperSCs {
         }
         String stratCardName = Helper.getSCName(scNum, game);
         return " following to perform the secondary ability of **" + stratCardName + "**."
-            + "1 command token has been spent from strategy pool.";
+            + " 1 command token has been spent from strategy pool.";
     }
 
     @ButtonHandler("sc_ac_draw")

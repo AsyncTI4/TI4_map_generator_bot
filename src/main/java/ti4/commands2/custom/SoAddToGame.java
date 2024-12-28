@@ -12,8 +12,8 @@ import ti4.message.MessageHelper;
 class SoAddToGame extends GameStateSubcommand {
 
     public SoAddToGame() {
-        super(Constants.ADD_SO_TO_GAME, "Add SO to game", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret ID").setRequired(true).setAutoComplete(true));
+        super(Constants.ADD_SO_TO_GAME, "Add a secret objective to the game", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -21,15 +21,15 @@ class SoAddToGame extends GameStateSubcommand {
         Game game = getGame();
         String soID = event.getOption(Constants.SO_ID).getAsString();
         if (!Mapper.getSecretObjectives().containsKey(soID)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid SO ID");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid secret objective ID.");
             return;
         }
 
         game.addSOToGame(soID);
         if (game.getSecretObjectives().contains(soID)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "SO added to game deck");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Secret objective added to game deck.");
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "SO was not added for an unknown reason");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Secret objective was not added for an unknown reason.");
         }
     }
 }

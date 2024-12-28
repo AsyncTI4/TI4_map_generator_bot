@@ -131,12 +131,12 @@ public class StartCombatService {
                 && (unitHolder.getUnitCount(Units.UnitType.Pds, player2.getColor()) > 0
                     || unitHolder.getUnitCount(Units.UnitType.Spacedock, player2.getColor()) > 0)) {
                 String msg2 = player2.getRepresentation()
-                    + " you may want to remove structures on " + unitHolder.getName() + " if your opponent is not playing Infiltrate or using Assimilate. Use buttons to resolve.";
+                    + " you may wish to remove structures on " + unitHolder.getName() + " if your opponent is not playing _Infiltrate_ or using **Assimilate**. Use buttons to resolve.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(
                     Buttons.red(player2.getFinsFactionCheckerPrefix() + "removeAllStructures_" + unitHolder.getName(),
                         "Remove Structures"));
-                buttons.add(Buttons.gray("deleteButtons", "Don't remove Structures"));
+                buttons.add(Buttons.gray("deleteButtons", "Don't Remove Structures"));
                 MessageHelper.sendMessageToChannelWithButtons(player2.getCorrectChannel(), msg2, buttons);
             }
         } else {

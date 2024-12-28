@@ -151,9 +151,9 @@ public class FrankenDraftBagService {
         if (draftQueueCount > 0) {
             List<Button> queueButtons = new ArrayList<>();
             if (isQueueFull || draftables.isEmpty()) {
-                queueButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;confirm_draft", "I want to draft these cards."));
+                queueButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;confirm_draft", "I wish to draft these cards."));
             }
-            queueButtons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;reset_queue", "I want to draft different cards."));
+            queueButtons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;reset_queue", "I wish to draft different cards."));
             MessageHelper.sendMessageToChannelWithButtons(bagChannel, "# __Queue:__\n> You are drafting the following from this bag:\n" + getDraftQueueRepresentation(player), queueButtons);
 
             if (isQueueFull || draftables.isEmpty()) {

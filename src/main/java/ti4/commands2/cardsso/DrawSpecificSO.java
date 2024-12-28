@@ -16,10 +16,10 @@ import ti4.service.info.SecretObjectiveInfoService;
 class DrawSpecificSO extends GameStateSubcommand {
 
     public DrawSpecificSO() {
-        super(Constants.DRAW_SPECIFIC_SO, "Draw specific SO", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "SO ID").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do draw SO. Default yourself"));
-        addOptions(new OptionData(OptionType.STRING, Constants.PURGE_SO, "Enter YES to purge SO instead of drawing it"));
+        super(Constants.DRAW_SPECIFIC_SO, "Draw specific secret objective", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player who draws the secret objective (default is you)"));
+        addOptions(new OptionData(OptionType.STRING, Constants.PURGE_SO, "Enter YES to purge the secret objective instead of drawing it"));
     }
 
     @Override
@@ -29,9 +29,9 @@ class DrawSpecificSO extends GameStateSubcommand {
         OptionMapping optionPurge = event.getOption(Constants.PURGE_SO);
         if (optionPurge != null && "YES".equals(optionPurge.getAsString())) {
             if (game.removeSOFromGame(soId)) {
-                MessageHelper.sendMessageToEventChannel(event, "Purged specified SO");
+                MessageHelper.sendMessageToEventChannel(event, "Purged specified secret objective.");
             } else {
-                MessageHelper.sendMessageToEventChannel(event, "Failed to purge specified SO");
+                MessageHelper.sendMessageToEventChannel(event, "Failed to purge specified secret objective.");
             }
             return;
         }
@@ -39,10 +39,10 @@ class DrawSpecificSO extends GameStateSubcommand {
         Player player = getPlayer();
         Map<String, Integer> secrets = game.drawSpecificSecretObjective(soId, player.getUserID());
         if (secrets == null) {
-            MessageHelper.sendMessageToEventChannel(event, "SO not retrieved");
+            MessageHelper.sendMessageToEventChannel(event, "Secret objective not retrieved");
             return;
         }
-        MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand");
+        MessageHelper.sendMessageToEventChannel(event, "Secret objective sent to player's hand");
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
     }
 }

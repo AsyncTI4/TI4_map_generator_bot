@@ -34,7 +34,7 @@ class VictoryPointsScoredStatisticsService {
             .collect(Collectors.toMap(
                 Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         int index = 1;
-        StringBuilder sb = new StringBuilder("List of times a particular secret has been scored\n");
+        StringBuilder sb = new StringBuilder("List of times a particular secret objective has been scored.\n");
         for (String ket : topThousand.keySet()) {
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(ket).append(": ");
@@ -42,13 +42,13 @@ class VictoryPointsScoredStatisticsService {
             sb.append("\n");
             index++;
         }
-        MessageHelper.sendMessageToThread(event.getChannel(), "Secret Score Counts", sb.toString());
+        MessageHelper.sendMessageToThread(event.getChannel(), "Secret Objective Score Counts", sb.toString());
 
         topThousand = publics.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(3000)
             .collect(Collectors.toMap(
                 Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         index = 1;
-        sb = new StringBuilder("List of times a particular public has been revealed \n");
+        sb = new StringBuilder("List of times a particular public objective has been revealed \n");
         for (String ket : topThousand.keySet()) {
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(ket).append(": ");

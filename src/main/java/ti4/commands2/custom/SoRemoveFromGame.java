@@ -11,8 +11,8 @@ import ti4.message.MessageHelper;
 class SoRemoveFromGame extends GameStateSubcommand {
 
     public SoRemoveFromGame() {
-        super(Constants.REMOVE_SO_FROM_GAME, "SO remove from game", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret ID").setRequired(true).setAutoComplete(true));
+        super(Constants.REMOVE_SO_FROM_GAME, "Removes a secret objective from the game", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -20,9 +20,9 @@ class SoRemoveFromGame extends GameStateSubcommand {
         Game game = getGame();
         boolean removed = game.removeSOFromGame(event.getOption(Constants.SO_ID).getAsString());
         if (removed) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "SO removed from game deck");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Secret objective removed from game deck.");
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "SO not found in game deck");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Secret objective not found in game deck.");
         }
     }
 }

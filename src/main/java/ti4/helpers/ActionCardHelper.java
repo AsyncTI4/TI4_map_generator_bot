@@ -394,9 +394,9 @@ public class ActionCardHelper {
                     Button button;
                     TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
                     if (scEmoji != CardEmojis.SCBackBlank) {
-                        button = Buttons.gray(player.finChecker() + "increaseTGonSC_" + sc, null, scEmoji);
+                        button = Buttons.gray(player.finChecker() + "increaseTGonSC_" + sc, Helper.getSCName(sc, game), scEmoji);
                     } else {
-                        button = Buttons.gray(player.finChecker() + "increaseTGonSC_" + sc, sc + " " + Helper.getSCName(sc, game), scEmoji);
+                        button = Buttons.gray(player.finChecker() + "deflectSC_" + sc, sc + " " + Helper.getSCName(sc, game));
                     }
                     scButtons.add(button);
                 }
@@ -410,14 +410,14 @@ public class ActionCardHelper {
                     TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
                     Button button;
                     if (scEmoji != CardEmojis.SCBackBlank) {
-                        button = Buttons.gray(player.finChecker() + "deflectSC_" + sc, null, scEmoji);
+                        button = Buttons.gray(player.finChecker() + "deflectSC_" + sc, Helper.getSCName(sc, game), scEmoji);
                     } else {
-                        button = Buttons.gray(player.finChecker() + "deflectSC_" + sc, sc + " " + Helper.getSCName(sc, game), scEmoji);
+                        button = Buttons.gray(player.finChecker() + "deflectSC_" + sc, sc + " " + Helper.getSCName(sc, game));
                     }
                     scButtons.add(button);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(channel2,
-                    player.getRepresentation() + " Use buttons to choose which SC will be deflected.",
+                    player.getRepresentation() + " Use buttons to choose which strategy card will be _Deflect_'d.",
                     scButtons);
             }
 

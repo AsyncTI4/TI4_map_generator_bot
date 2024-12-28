@@ -47,7 +47,7 @@ class Info extends GameStateSubcommand {
 
         sb.append("### Setup: ").append("\n");
         sb.append("Victory Point Count: ").append(game.getVp()).append("\n");
-        sb.append("SO Count: ").append(game.getMaxSOCountPerPlayer()).append("\n");
+        sb.append("Secret Objective Count: ").append(game.getMaxSOCountPerPlayer()).append("\n");
         sb.append("Private Game: ").append(privateGame).append("\n");
         sb.append("Game Modes: ").append(game.getGameModesText()).append("\n");
         if (game.isCompetitiveTIGLGame()) {
@@ -160,7 +160,7 @@ class Info extends GameStateSubcommand {
         sb.append("LeftMostTileOffset: `").append(PositionMapper.getLeftMostTileOffsetInGame(game)).append("`\n");
         sb.append("RightMostTileOffset: `").append(PositionMapper.getRightMostTileOffsetInGame(game)).append("`\n");
         sb.append("Map Images Generated: ").append(game.getMapImageGenerationCount()).append("\n");
-        sb.append("SC Trade Goods: `").append(game.getScTradeGoods()).append("`").append("\n");
+        sb.append("Strategy Card Trade Goods: `").append(game.getScTradeGoods()).append("`").append("\n");
         sb.append("Public Objectives: `").append(game.getRevealedPublicObjectives()).append("`").append("\n");
         sb.append("Laws: `").append(game.getLaws()).append("`").append("\n");
         sb.append("Laws Info: `").append(game.getLawsInfo()).append("`").append("\n");

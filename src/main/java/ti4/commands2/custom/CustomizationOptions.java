@@ -30,7 +30,7 @@ class CustomizationOptions extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIGHT_FOG_MODE, "Retain sight on formerly seen tiles"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.RED_TAPE_MODE, "Reveal all objectives and diplo gets the power to pre-reveal"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace TG emojis with nomad coin emojis"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue SO Discards"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue secret objective discards"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BUBBLES, "Show the bubbles around anti-bombardment planets"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TRANSACTION_METHOD, "Use the new transaction method"));

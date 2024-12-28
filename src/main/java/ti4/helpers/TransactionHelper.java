@@ -516,7 +516,7 @@ public class TransactionHelper {
                 if (requesting) {
                     message = message + player.getRepresentation(false, false)
                         + " Click the number of action cards you wish to request."
-                        + " Since action cards are private info, you will have to use messages to explain which action cards you want;"
+                        + " Since action cards are private info, you will have to discuss with other other player to explain which action cards you wish to transact;"
                         + " these buttons will just make sure that the player is offered buttons to send them.";
                     int limit = Math.min(7, p2.getAc());
                     for (int x = 1; x < limit + 1; x++) {
@@ -543,7 +543,8 @@ public class TransactionHelper {
                         + " Click the promissory note you wish to request."
                         + " Since promissory notes are private info, all of the player's starting promissory notes (which are not already in someone's play areas) are available,"
                         + " though the player may not currently hold all of these. "
-                        + "Click the \"TBD Promissory Note\" button if you want someone else's promissory note, and it will give the player the option to send it.";
+                        + "Click the \"TBD Promissory Note\" button if you wish to transact someone else's promissory note, and it will give the player the option to send it;"
+                        + " you should discuss this with the player you're transacting with.";
                     for (String pnShortHand : p1.getPromissoryNotesOwned()) {
                         if (ButtonHelper.anyoneHaveInPlayArea(game, pnShortHand)) {
                             continue;
@@ -682,10 +683,10 @@ public class TransactionHelper {
             opposing = p1;
         }
         String message = "Current transaction offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
-            + "\n## Click something that you want to __request from__ " + p1.getRepresentation(false, false);
+            + "\n## Click something that you wish to __request from__ " + p1.getRepresentation(false, false);
         if (p1 == player) {
             message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
-                + "\n## Click something that you want to __offer to__ " + p1.getRepresentation(false, false);
+                + "\n## Click something that you wish to __offer to__ " + p1.getRepresentation(false, false);
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
@@ -1346,7 +1347,7 @@ public class TransactionHelper {
             if (!game.isFowMode() && game.isNewTransactionMethod()) {
                 buttons = TransactionHelper.getStuffToTransButtonsNew(game, player, player, p2);
             }
-            String message = player.getRepresentation(true, false) + " Use the buttons to select what you want to transact with " + p2.getRepresentation(false, false);
+            String message = player.getRepresentation(true, false) + ", please choose what you wish to transact with " + p2.getRepresentation(false, false) + ".";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             TransactionHelper.checkTransactionLegality(game, player, p2);
             ButtonHelper.deleteMessage(event);

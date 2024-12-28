@@ -601,12 +601,12 @@ public class ComponentActionHelper {
             case "decrypted_cartoglyph" -> DiscordantStarsHelper.drawBlueBackTiles(event, game, player, 3);
             case "throne_of_the_false_emperor" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("drawRelic", "Draw a relic"));
-                buttons.add(Buttons.blue("thronePoint", "Score a secret someone else scored"));
-                buttons.add(Buttons.red("deleteButtons", "Score one of your unscored secrets"));
+                buttons.add(Buttons.green("drawRelic", "Draw a Relic"));
+                buttons.add(Buttons.blue("thronePoint", "Score a Secret Objective Another Player Has Scored"));
+                buttons.add(Buttons.red("deleteButtons", "Score 1 of Your Unscored Secret Objectives"));
                 message = player.getRepresentation()
-                    + " choose one of the options. Reminder than you can't score more secrets than normal with this relic (even if they're someone else's), and you can't score the same secret twice."
-                    + " If scoring one of your unscored secrets, just score it via the normal process after pressing the button.";
+                    + " choose one of the options. Reminder than you can't score more secret objectives than normal with this relic (even if they're someone else's), and you can't score the same secret objective twice."
+                    + " If scoring one of your unscored secret objectives, just score it via the normal process after pressing the button.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
             case "dynamiscore", "absol_dynamiscore" -> {

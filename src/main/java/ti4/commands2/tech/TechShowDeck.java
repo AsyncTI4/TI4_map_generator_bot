@@ -11,7 +11,7 @@ class TechShowDeck extends GameStateSubcommand {
 
     public TechShowDeck() {
         super("show_deck", "Look at the available non-faction technology", false, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH_TYPE, "The deck type you want to see")
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH_TYPE, "The deck type you wish to to see")
             .setRequired(true).setAutoComplete(true));
     }
 

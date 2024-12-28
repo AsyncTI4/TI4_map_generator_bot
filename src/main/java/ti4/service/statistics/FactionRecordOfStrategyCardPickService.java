@@ -31,7 +31,7 @@ public class FactionRecordOfStrategyCardPickService {
         for (int x = 1; x < 7; x++) {
             text.append(getSCPick(event, x));
         }
-        MessageHelper.sendMessageToThread(event.getChannel(), "SC Pick Record", text.toString());
+        MessageHelper.sendMessageToThread(event.getChannel(), "Strategy Card Pick Record", text.toString());
     }
 
     private String getSCPick(SlashCommandInteractionEvent event, int round) {

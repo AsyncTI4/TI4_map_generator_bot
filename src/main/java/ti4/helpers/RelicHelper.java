@@ -33,7 +33,7 @@ public class RelicHelper {
             buttons.add(Buttons.green("drawRelicAtPosition_" + x, relicData.getName()));
             info.append(relicData.getName()).append(": ").append(relicData.getText()).append("\n");
         }
-        String msg = player.getRepresentationUnfogged() + " choose the relic that you want. The relic text is reproduced for your conveinenance";
+        String msg = player.getRepresentationUnfogged() + ", please choose the relic that you wish to draw. The relic text is reproduced for your convenience";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), info.toString());
     }
@@ -87,29 +87,29 @@ public class RelicHelper {
                 game.drawSecretObjective(player.getUserID());
 
                 if (game.isFowMode()) {
-                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew An SO");
+                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew a secret objective.");
                 }
 
-                helpMessage.append("\nAn SO has been automatically drawn.");
+                helpMessage.append("A secret objective has been automatically drawn.");
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    helpMessage.append(" Drew a second SO due to Plausible Deniability.");
+                    helpMessage.append(" Drew a second secret objective due to **Plausible Deniability**.");
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
             }
             case "shard" -> {
                 Integer poIndex = game.addCustomPO("Shard of the Throne", 1);
                 game.scorePublicObjective(player.getUserID(), poIndex);
-                helpMessage.append("Custom PO 'Shard of the Throne' has been added.\n")
-                    .append(player.getRepresentation()).append(" scored 'Shard of the Throne'");
+                helpMessage.append("Custom objective _Shard of the Throne_ has been added.\n")
+                    .append(player.getRepresentation()).append(" scored _Shard of the Throne_.");
             }
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
                 String customPOName = "Shard of the Throne (" + absolShardNum + ")";
                 Integer poIndex = game.addCustomPO(customPOName, 1);
                 game.scorePublicObjective(player.getUserID(), poIndex);
-                helpMessage.append("Custom PO '").append(customPOName).append("' has been added.\n")
-                    .append(player.getRepresentation()).append(" scored '").append(customPOName).append("'");
+                helpMessage.append("Custom objective _").append(customPOName).append("_ has been added.\n")
+                    .append(player.getRepresentation()).append(" scored _").append(customPOName).append("_.");
             }
         }
 

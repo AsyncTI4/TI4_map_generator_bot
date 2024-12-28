@@ -146,7 +146,7 @@ public class AgendaHelper {
             + " if you intend to preset an abstention or vote on this agenda, you have the option to preset it here. Feel free not to, this is simply an optional way to resolve agendas faster.";
         List<Button> buttons = new ArrayList<>();
         if (player.hasAbility("future_sight")) {
-            msg += " Reminder that you have future sight and may not want to abstain.";
+            msg += " Reminder that you have **Future Sight** and may not wish to abstain.";
         }
         buttons.add(Buttons.green("preVote", "Pre-Vote"));
         buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
@@ -272,9 +272,9 @@ public class AgendaHelper {
             game.setStoredValue("Genetic Recombination " + player.getFaction(), "");
             if (player.hasTechReady("gr")) {
                 String msg = player.getRepresentation()
-                    + " you have the option to pre-assign the declaration of using genetic recombination on someone."
-                    + " When they are up to vote, it will ping them saying that you wish to use genetic recombination, and then it will be your job to clarify."
-                    + " Feel free to not preassign if you don't want to use it on this agenda.";
+                    + " you have the option to pre-assign the declaration of using _Genetic Recombination_ on someone."
+                    + " When they are up to vote, it will ping them saying that you wish to use _Genetic Recombination_, and then it will be your job to clarify."
+                    + " Feel free to not preassign if you don't wish to use it on this agenda.";
                 List<Button> buttons2 = new ArrayList<>();
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) {
@@ -750,7 +750,7 @@ public class AgendaHelper {
             String finChecker = "FFCC_" + quasher.getFaction() + "_";
             Button quashButton = Buttons.red(finChecker + "quash", "Quash Agenda", FactionEmojis.Xxcha);
             if (game.isFowMode()) {
-                MessageHelper.sendMessageToChannelWithButton(quasher.getPrivateChannel(), "Use Button To Quash If You Want", quashButton);
+                MessageHelper.sendMessageToChannelWithButton(quasher.getPrivateChannel(), "Please use this button to **Quash**, if you so wish.", quashButton);
             } else {
                 whenButtons.add(quashButton);
             }
@@ -1156,12 +1156,12 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
                         if (specificVote.contains("Construction Rider")) {
-                            String message = identity + ", you have a _Construction Rider_ to resolve. Click the name of the planet you wish to put your space dock on.";
+                            String message = identity + ", you have a _Construction Rider_ to resolve. Click the name of the planet you wish to place your space dock on.";
                             List<Button> buttons = Helper.getPlanetPlaceUnitButtons(winningR, game, "sd", "place");
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
                         if (specificVote.contains("Warfare Rider")) {
-                            String message = identity + ", you have a _Warfare Rider_ to resolve. Select the system where you want to put the dreadnought.";
+                            String message = identity + ", you have a _Warfare Rider_ to resolve. Select the system where you wish to place the dreadnought.";
                             List<Button> buttons = Helper.getTileWithShipsPlaceUnitButtons(winningR, game, "dreadnought", "placeOneNDone_skipbuild");
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
@@ -1192,18 +1192,18 @@ public class AgendaHelper {
                             ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep1(winningR, game, tiles);
                         }
                         if (specificVote.contains("Tarrock Ability")) {
-                            String message = winningR.getFactionEmoji() + " Drew A Secret Objective.";
+                            String message = winningR.getFactionEmoji() + " drew a secret objective.";
                             game.drawSecretObjective(winningR.getUserID());
                             if (winningR.hasAbility("plausible_deniability")) {
                                 game.drawSecretObjective(winningR.getUserID());
-                                message = message + " Drew a second SO due to **Plausible Deniability**.";
+                                message += " Drew a second secret objective due to **Plausible Deniability**.";
                             }
                             SecretObjectiveInfoService.sendSecretObjectiveInfo(game, winningR, event);
                             MessageHelper.sendMessageToChannel(winningR.getCorrectChannel(), message);
                         }
                         if (specificVote.contains("Kyro Rider")) {
                             String message = winningR.getRepresentationUnfogged()
-                                + " Click the names of the planet you wish to drop 3 infantry on";
+                                + ", please choose which planet you wish to drop 3 infantry on";
                             List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(winningR, game, "3gf", "placeOneNDone_skipbuild"));
                             MessageHelper.sendMessageToChannelWithButtons(winningR.getCorrectChannel(), message, buttons);
                         }
@@ -1504,7 +1504,7 @@ public class AgendaHelper {
             if (!player.getPromissoryNotes().containsKey(player.getColor() + "_ps")
                 && player.getPromissoryNotesOwned().contains(player.getColor() + "_ps")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
-                    + " this is a reminder that you don't currently hold your Political Secret, and thus may want to wait until the holder indicates \"no whens\" before you do any afters.");
+                    + " this is a reminder that you don't currently hold your _Political Secret_, and thus may wish to wait until the holder indicates \"no whens\" before you do any \"after\"s.");
             }
         }
     }
@@ -2503,8 +2503,9 @@ public class AgendaHelper {
         if ((agendaTarget.toLowerCase().contains("elect law") || agendaID.equalsIgnoreCase("constitution"))
             && game.getLaws().isEmpty()) {
             MessageHelper.sendMessageToChannel(channel,
-                game.getPing() + "A Law Related Agenda (" + agendaName
-                    + ") was revealed when no laws in play, flipping next agenda");
+                game.getPing() + "An \"elect law\" agenda (" + agendaName
+                    + ") was revealed with no laws in play."
+                    + " As such, the agenda has been discarded, and the next agenda is being flipped.");
             aCount -= 1;
             game.setStoredValue("agendaCount", aCount + "");
             revealAgenda(event, revealFromBottom, game, channel);
@@ -2513,8 +2514,9 @@ public class AgendaHelper {
         if ((agendaTarget.toLowerCase().contains("secret objective"))
             && game.getScoredSecrets() < 1) {
             MessageHelper.sendMessageToChannel(channel,
-                game.getPing() + "An Elect Secret Agenda (" + agendaName
-                    + ") was revealed when no scored secrets were in play, flipping next agenda");
+                game.getPing() + ", an \"elect scored secret objective\" agenda (" + agendaName
+                    + ") was revealed when no secret objectives have been scored."
+                    + " As such, the agenda has been discarded, and the next agenda is being flipped.");
             aCount -= 1;
             game.setStoredValue("agendaCount", aCount + "");
             revealAgenda(event, revealFromBottom, game, channel);
@@ -2528,7 +2530,7 @@ public class AgendaHelper {
                 if ("Emergency Session".equalsIgnoreCase(agendaName)) {
                     game.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(channel, game.getPing()
-                        + " Emergency Session revealed underneath Covert Legislation, discarding it.");
+                        + " _Emergency Session_ revealed underneath _Covert Legislation_, discarding it.");
                 }
                 notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName);
                 String id2 = game.getNextAgenda(revealFromBottom);
@@ -2542,14 +2544,16 @@ public class AgendaHelper {
                     notEmergency = false;
                     game.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(channel,
-                        game.getPing()
-                            + " an elect law agenda revealed underneath Covert Legislation while there were no laws in play, discarding it.");
+                        game.getPing() + ", an \"elect law\" agenda (" + agendaName
+                            + ") was hidden under _Covert Legislation_ with no laws in play."
+                            + " As such, both that agenda and _Covert Legislation_ have been discarded, and the next agenda is being flipped.");
                 }
                 if ((agendaTarget.toLowerCase().contains("secret objective"))
                     && game.getScoredSecrets() < 1) {
                     MessageHelper.sendMessageToChannel(channel,
-                        game.getPing() + "An Elect Secret Agenda (" + agendaName
-                            + ") was revealed under Covert when no scored secrets were in play, flipping next agenda");
+                        game.getPing() + ", an \"elect scored secret objective\" agenda (" + agendaName
+                            + ") was hidden under _Covert Legislation_ when no secret objectives have been scored."
+                            + " As such, both that agenda and _Covert Legislation_ have been discarded, and the next agenda is being flipped.");
                     notEmergency = false;
                     game.revealAgenda(revealFromBottom);
                 }
@@ -2563,7 +2567,7 @@ public class AgendaHelper {
                     }
                     if (speaker != null) {
                         String sb = speaker.getRepresentationUnfogged() +
-                            " this is the top agenda for Covert Legislation:";
+                            " this is the hidden agenda for _Covert Legislation_:";
                         List<MessageEmbed> embeds = List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
                         MessageHelper.sendMessageEmbedsToCardsInfoThread(speaker, sb, embeds);
                         game.drawAgenda();

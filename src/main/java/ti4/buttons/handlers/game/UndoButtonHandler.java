@@ -33,8 +33,8 @@ class UndoButtonHandler {
             if (p != null && player != p && !colorOrFaction.equals("null")) {
                 // if the last button was pressed by a non-faction player, allow anyone to undo
                 // it
-                String msg = "You were not the player who pressed the latest button. Use /game undo if you truly want to undo "
-                    + game.getLatestCommand();
+                String msg = "You were not the player who pressed the latest button. Use `/game undo` if you truly wish to undo "
+                    + game.getLatestCommand() + ".";
                 MessageHelper.sendMessageToChannel(event.getChannel(), msg);
                 return;
             }
@@ -73,13 +73,14 @@ class UndoButtonHandler {
             return;
         }
 
-        StringBuilder msg = new StringBuilder("You undid something, the details of which can be found in the undo-log thread");
+        StringBuilder msg = new StringBuilder("You undid something, the details of which can be found in the `#undo-log` thread");
         List<ThreadChannel> threadChannels = game.getMainGameChannel().getThreadChannels();
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(game.getName() + "-undo-log")) {
                 msg.append(": ").append(threadChannel_.getJumpUrl());
+                break;
             }
         }
-        event.getHook().sendMessage(msg.toString()).setEphemeral(true).queue();
+        event.getHook().sendMessage(msg.toString()+".").setEphemeral(true).queue();
     }
 }
