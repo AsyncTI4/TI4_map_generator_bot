@@ -36,7 +36,7 @@ public class SourceSettings extends SettingsMenu {
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
     public SourceSettings(Game game, JsonNode json, SettingsMenu parent) {
-        super("source", "Expansions and Homebrew", "Adjust various settings related to expansions and homebrew that you want to use", parent);
+        super("source", "Expansions and Homebrew", "Adjust various settings related to expansions and homebrew that you wish to use", parent);
 
         // Initialize Settings to default values
         base = new BooleanSetting("BaseGame", "Base Game", true);

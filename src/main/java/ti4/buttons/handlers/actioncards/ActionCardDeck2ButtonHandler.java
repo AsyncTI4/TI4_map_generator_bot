@@ -221,7 +221,7 @@ class ActionCardDeck2ButtonHandler {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " tell the bot which neighbor you want to get 1 cruiser and 1 destroyer",
+            player.getRepresentationUnfogged() + ", please choose which neighbor gets 1 cruiser and 1 destroyer.",
             buttons);
     }
 
@@ -233,11 +233,11 @@ class ActionCardDeck2ButtonHandler {
         List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
         buttons.add(Buttons.red("deleteButtons", "Don't place"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() +
-            "Use buttons to put 1 cruiser with your ships due to the arms deal", buttons);
+            ", please choose where you wish to place the _Arms Deal_ cruiser.", buttons);
         buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
         buttons.add(Buttons.red("deleteButtons", "Don't place"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() +
-            "Use buttons to put 1 destroyer with your ships due to the arms deal", buttons);
+            ", please choose where you wish to place the _Arms Deal_ destroyer.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -353,8 +353,8 @@ class ActionCardDeck2ButtonHandler {
 
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " Chose the tile you want to swap places with "
-                + tile1.getRepresentationForButtons(game, player),
+            player.getRepresentationUnfogged() + ", please choose which tile you wish to swap places with "
+                + tile1.getRepresentationForButtons(game, player) + ".",
             buttons);
         event.getMessage().delete().queue();
     }

@@ -137,7 +137,7 @@ public class FowCommunicationThreadService {
         String color = buttonID.replace("fowCommsSuggest_", "");
         Player targetPlayer = game.getPlayerFromColorOrFaction(color);
         if (targetPlayer != null) {
-            String msg = targetPlayer.getRepresentationUnfogged() + " " + player.getRepresentationNoPing() + " wants to open private communications thread with you."; 
+            String msg = targetPlayer.getRepresentationUnfogged() + " " + player.getRepresentationNoPing() + " wishes to open private communications thread with you."; 
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("fowCommsAccept_" + player.getColor(), "Accept"));
             buttons.add(Buttons.DONE_DELETE_BUTTONS);

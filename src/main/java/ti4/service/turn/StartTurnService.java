@@ -86,7 +86,7 @@ public class StartTurnService {
         
         String buttonText = "Use buttons to do your turn. ";
         if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
-            buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];
+            buttonText = buttonText + "Your strategy card initiative number is " + player.getSCs().toArray()[0] + ".";
         }
         List<Button> buttons = getStartOfTurnButtons(player, game, false, event);
         MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel()
@@ -332,7 +332,8 @@ public class StartTurnService {
                     for (int sc : player.getSCs()) {
                         StringBuilder sb = new StringBuilder();
                         sb.append(p2.getRepresentationUnfogged());
-                        sb.append(" You are getting this ping because ").append(Helper.getSCName(sc, game)).append(" has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
+                        sb.append(" You are getting this ping because **").append(Helper.getSCName(sc, game))
+                            .append("** has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
                         appendScMessages(game, p2, sc, sb);
                     }
                 }

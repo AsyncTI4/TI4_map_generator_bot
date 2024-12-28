@@ -9,7 +9,7 @@ import ti4.service.info.ListTurnOrderService;
 class ListTurnOrder extends GameStateSubcommand {
 
     public ListTurnOrder() {
-        super(Constants.TURN_ORDER, "List Turn order with SC played and Player passed status", false, false);
+        super(Constants.TURN_ORDER, "List turn order with strategy card played and player passed status", false, false);
     }
 
     @Override

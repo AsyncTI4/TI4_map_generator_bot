@@ -225,7 +225,7 @@ public class EndGameService {
                 }
             }
             if (!summary.isEmpty()) {
-                summary.insert(0, "**__Round " + x + " Secret Summary__**\n");
+                summary.insert(0, "**__Round " + x + " Secret Objective Summary__**\n");
                 endOfGameSummary.append(summary);
             }
         }

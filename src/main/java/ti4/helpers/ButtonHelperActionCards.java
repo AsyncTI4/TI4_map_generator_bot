@@ -893,7 +893,7 @@ public class ButtonHelperActionCards {
             if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
                 button = Buttons.gray("psStep2_" + sc, label, scEmoji);
             } else {
-                button = Buttons.gray("psStep2_" + sc, sc + " " + label, scEmoji);
+                button = Buttons.gray("psStep2_" + sc, sc + " " + label);
             }
             buttons.add(button);
         }
@@ -1435,7 +1435,7 @@ public class ButtonHelperActionCards {
                 if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
                     button = Buttons.gray("resolvePreassignment_Coup_" + sc, label, scEmoji);
                 } else {
-                    button = Buttons.gray("resolvePreassignment_Coup_" + sc, sc + " " + label, scEmoji);
+                    button = Buttons.gray("resolvePreassignment_Coup_" + sc, sc + " " + label);
                 }
                 scButtons.add(button);
             }
@@ -1540,7 +1540,7 @@ public class ButtonHelperActionCards {
                 if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
                     button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, label, scEmoji);
                 } else {
-                    button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, sc + " " + label, scEmoji);
+                    button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, sc + " " + label);
                 }
                 scButtons.add(button);
             }
@@ -1910,7 +1910,7 @@ public class ButtonHelperActionCards {
         else
         {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you exhausted "
-                + planetRep + " belonging to " + p2.getCorrectChannel() + ".");
+                + planetRep + " belonging to " + p2.getRepresentationUnfogged() + ".");
         }
         ButtonHelper.deleteMessage(event);
     }

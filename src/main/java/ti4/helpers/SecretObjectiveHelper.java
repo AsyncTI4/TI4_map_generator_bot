@@ -52,7 +52,8 @@ public class SecretObjectiveHelper {
                     String soStringID = entry.getKey();
                     buttons.add(Buttons.green("tnelisHeroAttach_" + soStringID, "Attach to " + Mapper.getSecretObjectivesJustNames().get(soStringID)));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    String msg = p2.getRepresentationUnfogged() + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored SO " + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve.";
+                    String msg = p2.getRepresentationUnfogged() + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored secret objective "
+                        + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
@@ -127,7 +128,7 @@ public class SecretObjectiveHelper {
             sb.append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id)).append("\n");
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player_, sb.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, "All SOs shown to player");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, "All secret objectives shown to player");
     }
 
     public static List<Button> getUnscoredSecretObjectiveButtons(Player player) {
@@ -152,9 +153,9 @@ public class SecretObjectiveHelper {
 
     public static void sendSODiscardButtons(Player player, String suffix) {
         List<Button> buttons = getSODiscardButtonsWithSuffix(player, suffix);
-        String message = "Use buttons to discard a Secret Objective:";
+        String message = "Use buttons to discard a secret objective:";
         if ("redraw".equals(suffix)) {
-            message += "\n> - A new secret will be automatically drawn for you";
+            message += "\n> - A new secret objective will be automatically drawn for you.";
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }

@@ -102,12 +102,12 @@ public class AddTileListService {
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
         if (!game.isBaseGameMode()) {
             AddFrontierTokensService.addFrontierTokens(event, game);
-            MessageHelper.sendMessageToChannel(channel, ExploreEmojis.Frontier + " Frontier Tokens have been added to empty spaces.");
+            MessageHelper.sendMessageToChannel(channel, ExploreEmojis.Frontier + " frontier tokens have been added to empty spaces.");
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
-            game.getMainGameChannel(), "Press this button after every player is setup",
-            List.of(Buttons.green("deal2SOToAll", "Deal 2 SO To All")));
+            game.getMainGameChannel(), "Press this button after every player is setup.",
+            List.of(Buttons.green("deal2SOToAll", "Deal 2 Secret Objectives To All")));
 
         if (!game.isFowMode() && game.getRealPlayers().size() < game.getPlayers().size()) {
             ButtonHelper.offerPlayerSetupButtons(channel, game);
