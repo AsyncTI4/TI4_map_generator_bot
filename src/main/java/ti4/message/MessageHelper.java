@@ -149,18 +149,18 @@ public class MessageHelper {
 	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game game, Player player, List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
 		MessageFunction addFactionReact = (msg) -> {
 			addFactionReactToMessage(game, player, msg);
-				if (!saboable) {
-					return;
+			if (!saboable) {
+				return;
+			}
+			game.addMessageIDForSabo(msg.getId());
+			for (Player p2 : game.getRealPlayers()) {
+				if (p2 == player) {
+					continue;
 				}
-				game.addMessageIDForSabo(msg.getId());
-				for (Player p2 : game.getRealPlayers()) {
-					if (p2 == player) {
-						continue;
-					}
-					if (p2.getAc() == 0 && !p2.hasUnit("empyrean_mech") && !p2.hasTechReady("it")) {
-						addFactionReactToMessage(game, p2, msg);
-					}
+				if (p2.getAc() == 0 && !p2.hasUnit("empyrean_mech") && !p2.hasTechReady("it")) {
+					addFactionReactToMessage(game, p2, msg);
 				}
+			}
         };
 		splitAndSentWithAction(messageText, channel, addFactionReact, embeds, buttons);
 	}
