@@ -281,9 +281,6 @@ class GameLoadService {
             switch (identification) {
                 case Constants.LATEST_COMMAND -> game.setLatestCommand(info);
                 case Constants.LATEST_OUTCOME_VOTED_FOR -> game.setLatestOutcomeVotedFor(info);
-                case Constants.LATEST_AFTER_MSG -> game.setLatestAfterMsg(info);
-                case Constants.LATEST_WHEN_MSG -> game.setLatestWhenMsg(info);
-                case Constants.LATEST_TRANSACTION_MSG -> game.setLatestTransactionMsg(info);
                 case Constants.PHASE_OF_GAME -> game.setPhaseOfGame(info);
                 case Constants.SO -> game.setSecretObjectives(getCardList(info));
                 case Constants.MESSAGEID_FOR_SABOS -> game.setMessageIDForSabo(getCardList(info));
@@ -603,7 +600,6 @@ class GameLoadService {
                 case Constants.SAVED_CHANNEL -> game.setSavedChannelID(info);
                 case Constants.SAVED_MESSAGE -> game.setSavedMessage(info);
                 case Constants.BOT_MAP_CHANNEL -> game.setBotMapUpdatesThreadID(info);
-                case Constants.BAG_DRAFT_STATUS_MESSAGE_ID -> game.setBagDraftStatusMessageID(info);
                 case Constants.GAME_LAUNCH_THREAD_ID -> game.setLaunchPostThreadID(info);
 
                 // GAME MODES

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import lombok.experimental.UtilityClass;
 import ti4.json.PersistenceManager;
@@ -60,6 +61,41 @@ public class GameMessageManager {
         gameNames.forEach(allGameMessages.gameNameToMessages::remove);
 
         persistFile(allGameMessages);
+    }
+
+    public static synchronized Optional<String> remove(String gameName, GameMessageType type) {
+        GameMessages allGameMessages = readFile();
+        if (allGameMessages == null) {
+            return Optional.empty();
+        }
+
+        List<GameMessage> messages = allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+        GameMessage message = messages.stream()
+            .filter(m -> m.type == type)
+            .findFirst()
+            .orElse(null);
+        if (message == null) {
+            return Optional.empty();
+        }
+
+        messages.remove(message);
+
+        persistFile(allGameMessages);
+
+        return Optional.of(message.messageId);
+    }
+
+    public static synchronized Optional<String> get(String gameName, GameMessageType type) {
+        GameMessages allGameMessages = readFile();
+        if (allGameMessages == null) {
+            return Optional.empty();
+        }
+
+        List<GameMessage> messages = allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+        return messages.stream()
+            .filter(m -> m.type == type)
+            .findFirst()
+            .map(GameMessage::messageId);
     }
 
     private static GameMessages readFile() {

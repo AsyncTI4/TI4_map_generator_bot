@@ -353,8 +353,8 @@ public class MessageHelper {
 			}
 		}
 
-		final String message = messageText;
-		List<MessageCreateData> objects = getMessageCreateDataObjects(message, sanitizedEmbeds, buttons);
+		final String finalMessageText = messageText;
+		List<MessageCreateData> objects = getMessageCreateDataObjects(finalMessageText, sanitizedEmbeds, buttons);
 		Iterator<MessageCreateData> iterator = objects.iterator();
 		while (iterator.hasNext()) {
 			MessageCreateData messageCreateData = iterator.next();
@@ -362,20 +362,18 @@ public class MessageHelper {
 				channel.sendMessage(messageCreateData).queue(null,
 					error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send intermediate message", messageCreateData, error)));
 			} else { // last message, do action
-				channel.sendMessage(messageCreateData).queue(complete -> {
+				channel.sendMessage(messageCreateData).queue(message -> {
 					ManagedGame managedGame = GameManager.getManagedGame(gameName);
-					if (message != null && managedGame != null && !managedGame.isFowMode()) {
-						if (message.contains("Use buttons to do your turn") || message.contains("Use buttons to end turn")) {
-							Game game = managedGame.getGame();
-							game.setLatestTransactionMsg(complete.getId());
+					if (finalMessageText != null && managedGame != null && !managedGame.isFowMode()) {
+						if (finalMessageText.contains("Use buttons to do your turn") || finalMessageText.contains("Use buttons to end turn")) {
+							GameMessageManager.replace(gameName, message.getId(), GameMessageType.TURN, managedGame.getLastModifiedDate());
 						}
 					}
 
-					// RUN SUPPLIED ACTION
 					if (restAction != null) {
-						restAction.run(complete);
+						restAction.run(message);
 					}
-				}, error -> BotLogger.log(getRestActionFailureMessage(channel, message, messageCreateData, error)));
+				}, error -> BotLogger.log(getRestActionFailureMessage(channel, finalMessageText, messageCreateData, error)));
 			}
 		}
 	}

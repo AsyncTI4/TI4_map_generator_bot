@@ -33,6 +33,8 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.emoji.CardEmojis;
@@ -117,16 +119,9 @@ public class EndTurnService {
 
         Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
         if (!game.isFowMode()) {
-            String lastTransaction = game.getLatestTransactionMsg();
-            try {
-                if (lastTransaction != null && !lastTransaction.isEmpty()) {
-                    game.setLatestTransactionMsg("");
-                    game.getMainGameChannel().deleteMessageById(lastTransaction).queue(null, e -> {
-                    });
-                }
-            } catch (Exception e) {
-                //  Block of code to handle errors
-            }
+            GameMessageManager
+                .remove(game.getName(), GameMessageType.TURN)
+                .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
         }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game);
         if (isFowPrivateGame) {

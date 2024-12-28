@@ -36,8 +36,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.buttons.UnfiledButtonHandlers;
+import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands2.planet.PlanetExhaust;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -52,6 +52,8 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
@@ -65,7 +67,6 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.SourceEmojis;
-import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowConstants;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -622,7 +623,7 @@ public class AgendaHelper {
                 message.append(losers.size()).append(" players have the opportunity to play ").append(CardEmojis.ActionCard).append("Deadly Plot.\n");
                 MessageHelper.privatelyPingPlayerList(losers, game, "Please respond to Bribery/Deadly Plot window");
             }
-            MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message.toString(), game, deadlyActionRow, "shenanigans");
+            MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message.toString(), game, deadlyActionRow, GameMessageType.SHENANIGANS_PASS);
             shenanigans = true;
         } else {
             String message = "Either both Bribery and Deadly Plot were in the discard or no player could legally play them.";
@@ -636,7 +637,7 @@ public class AgendaHelper {
                 Button noConfounding = Buttons.blue("generic_button_id_3", "Refuse Confounding Legal Text");
                 Button noConfusing = Buttons.blue("genericReact4", "Refuse Confusing Legal Text");
                 List<Button> buttons = List.of(noConfounding, noConfusing);
-                MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message, game, buttons, "shenanigans");
+                MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message, game, buttons, GameMessageType.SHENANIGANS_PASS);
                 shenanigans = true;
             } else {
                 String message = "Both *Confounding Legal Text* and *Confusing Legal Text* are in the discard pile.\nThere are no shenanigans possible. Please resolve the agenda.";
@@ -2287,7 +2288,7 @@ public class AgendaHelper {
                     inDiscard = "Confusing";
                 }
                 List<Button> buttons = List.of(noConfounding);
-                MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message, game, buttons, "shenanigans");
+                MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message, game, buttons, GameMessageType.SHENANIGANS_PASS);
                 if (!inDiscard.isEmpty())
                 {
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), inDiscard + " Legal Text was found in the discard pile.");
@@ -2380,7 +2381,7 @@ public class AgendaHelper {
                     }
                 }
             }
-            MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, "after");
+            MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
         }
         // "dspnedyn"
         ButtonHelper.deleteMessage(event);
@@ -2587,8 +2588,8 @@ public class AgendaHelper {
             game.setStoredValue("latestOutcomeVotedFor" + p2.getFaction(), "");
             game.setStoredValue("preVoting" + p2.getFaction(), "");
         }
-        game.setLatestWhenMsg("");
-        game.setLatestAfterMsg("");
+        GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_WHEN);
+        GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_AFTER);
         if (!action) {
             offerEveryonePrepassOnShenanigans(game);
             offerEveryonePreAbstain(game);
@@ -2614,9 +2615,9 @@ public class AgendaHelper {
 
         MessageHelper.sendMessageToChannel(channel, whensAftersMessage.toString());
         if (!action) {
-            MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Whens", game, whenButtons, "when");
+            MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Whens", game, whenButtons, GameMessageType.AGENDA_WHEN);
         }
-        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", game, afterButtons, "after");
+        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", game, afterButtons, GameMessageType.AGENDA_AFTER);
 
         game.setStoredValue("lastAgendaReactTime", "" + System.currentTimeMillis());
 
@@ -3011,9 +3012,9 @@ public class AgendaHelper {
         UnfiledButtonHandlers.clearAllReactions(event);
         ReactionService.addReaction(event, game, player, true, true, "Playing When", "When Played");
         List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
-        MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", game, whenButtons, "when");
+        MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", game, whenButtons, GameMessageType.AGENDA_WHEN);
         List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-        MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, "after");
+        MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
         ButtonHelper.deleteMessage(event);
     }
 

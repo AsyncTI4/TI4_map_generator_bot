@@ -4,5 +4,7 @@ public enum GameMessageType {
     AGENDA_WHEN,
     AGENDA_AFTER,
     ACTION_CARD,
-    SHENANIGANS_PASS
+    SHENANIGANS_PASS,
+    TURN,
+    BAG_DRAFT
 }

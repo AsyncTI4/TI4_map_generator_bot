@@ -21,6 +21,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.GenericCardModel;
@@ -796,7 +797,7 @@ public class ActionCardHelper {
 
             if (actionCardWindow.contains("After an agenda is revealed")) {
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, "after");
+                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
                 AutoPingMetadataManager.delayPing(game.getName());
 
                 String finChecker = "FFCC_" + player.getFaction() + "_";
@@ -815,10 +816,10 @@ public class ActionCardHelper {
             if (actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto")) {
                 AutoPingMetadataManager.delayPing(game.getName());
                 List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
-                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", game, whenButtons, "when");
+                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", game, whenButtons, GameMessageType.AGENDA_WHEN);
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel,
-                    "Please indicate no afters again.", game, afterButtons, "after");
+                    "Please indicate no afters again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
             }
             if ("Action".equalsIgnoreCase(actionCardWindow)) {
                 String message = "Use buttons to end turn or do another action.";

@@ -116,12 +116,6 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.LATEST_OUTCOME_VOTED_FOR + " " + game.getLatestOutcomeVotedFor());
         writer.write(System.lineSeparator());
-        writer.write(Constants.LATEST_AFTER_MSG + " " + game.getLatestAfterMsg());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.LATEST_WHEN_MSG + " " + game.getLatestWhenMsg());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.LATEST_TRANSACTION_MSG + " " + game.getLatestTransactionMsg());
-        writer.write(System.lineSeparator());
 
         writer.write(Constants.SO + " " + String.join(",", game.getSecretObjectives()));
         writer.write(System.lineSeparator());
@@ -352,8 +346,6 @@ class GameSaveService {
         writer.write(Constants.SAVED_MESSAGE + " " + game.getSavedMessage());
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_MAP_CHANNEL + " " + game.getBotMapUpdatesThreadID());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.BAG_DRAFT_STATUS_MESSAGE_ID + " " + game.getBagDraftStatusMessageID());
         writer.write(System.lineSeparator());
         writer.write(Constants.GAME_LAUNCH_THREAD_ID + " " + game.getLaunchPostThreadID());
         writer.write(System.lineSeparator());
