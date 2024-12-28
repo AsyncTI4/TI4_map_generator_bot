@@ -28,7 +28,7 @@ class PlayerPromissoryButtonHandler {
             String tech = AliasHandler.resolveTech(pnID.replace("ra_", ""));
             TechnologyModel techModel = Mapper.getTech(tech);
             pnID = pnID.replace("_" + tech, "");
-            String message = player.getFactionEmojiOrColor() + " acquired the technology " + techModel.getRepresentation(false) + " via _Research Agreement_.";
+            String message = player.getRepresentationNoPing() + " acquired the technology " + techModel.getRepresentation(false) + " via _Research Agreement_.";
             player.addTech(tech);
             TechSummariesMetadataManager.addTech(game, player, tech, true);
             ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);

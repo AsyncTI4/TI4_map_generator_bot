@@ -200,7 +200,7 @@ public class EndTurnService {
         poButtons.addAll(poButtonsCustom);
         for (Player player : game.getRealPlayers()) {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !game.isFowMode()) {
-                poButtons.add(Buttons.gray("edynCommanderSODraw", "Draw SO instead of Scoring PO", FactionEmojis.edyn));
+                poButtons.add(Buttons.gray("edynCommanderSODraw", "Draw Secret Objective Instead of Scoring Public Objective", FactionEmojis.edyn));
                 break;
             }
         }
@@ -240,8 +240,8 @@ public class EndTurnService {
             }
         }
         List<Button> poButtons = getScoreObjectiveButtons(game);
-        Button noPOScoring = Buttons.red(Constants.PO_NO_SCORING, "No PO Scored");
-        Button noSOScoring = Buttons.red(Constants.SO_NO_SCORING, "No SO Scored");
+        Button noPOScoring = Buttons.red(Constants.PO_NO_SCORING, "No Public Objective Scored");
+        Button noSOScoring = Buttons.red(Constants.SO_NO_SCORING, "No Secret Objective Scored");
         poButtons.add(noPOScoring);
         poButtons.add(noSOScoring);
         if (game.getActionCards().size() > 130 && game.getPlayerFromColorOrFaction("hacan") != null

@@ -51,9 +51,9 @@ public class GameSettings extends SettingsMenu {
         // Initialize Settings to default values
         int defaultVP = game == null ? 10 : game.getVp();
         pointTotal = new IntegerSetting("Points", "Point Total", defaultVP, 1, 20, 1);
-        stage1s = new IntegerSetting("Stage1s", "# of Stage 1's", 5, 1, 20, 1);
-        stage2s = new IntegerSetting("Stage2s", "# of Stage 2's", 5, 1, 20, 1);
-        secrets = new IntegerSetting("Secrets", "Max # of Secrets", 3, 1, 10, 1);
+        stage1s = new IntegerSetting("Stage1s", "number of Stage 1 public objectives", 5, 1, 20, 1);
+        stage2s = new IntegerSetting("Stage2s", "number of Stage 2 public objectives", 5, 1, 20, 1);
+        secrets = new IntegerSetting("Secrets", "Max number of secret objectives", 3, 1, 10, 1);
         tigl = new BooleanSetting("TIGL", "TIGL Game", false);
         alliance = new BooleanSetting("Alliance", "Alliance Mode", false);
         mapTemplate = new ChoiceSetting<>("Template", "Map Template", "6pStandard");

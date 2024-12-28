@@ -29,7 +29,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MINOR_FACTIONS_MODE, "True to enable the Minor Factions, per Dane Tweet."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
         addOptions(new OptionData(OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
-        addOptions(new OptionData(OptionType.BOOLEAN, "extra_secret_mode", "True to allow each player to start with 2 secrets. Great for SftT-less games!"));
+        addOptions(new OptionData(OptionType.BOOLEAN, "extra_secret_mode", "True to allow each player to start with 2 secret objectives. Great for SftT-less games!"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
     }
 

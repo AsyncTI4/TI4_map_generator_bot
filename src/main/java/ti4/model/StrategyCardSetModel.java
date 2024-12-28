@@ -60,7 +60,7 @@ public class StrategyCardSetModel implements ModelInterface {
             .filter(sc -> sc.getInitiative() == scNumber)
             .map(StrategyCardModel::getName)
             .findFirst()
-            .orElse("Name Unknown - Invalid SC Number: " + scNumber);
+            .orElse("Name Unknown - Invalid Strategy Card Initiative Number: " + scNumber);
     }
 
     public Optional<String> getDescription() {

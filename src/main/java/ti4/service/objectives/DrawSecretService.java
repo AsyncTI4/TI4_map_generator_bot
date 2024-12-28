@@ -46,23 +46,24 @@ public class DrawSecretService {
                 }
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " due to Plausible Deniability, you were dealt an extra SO. You must also discard an extra SO.");
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() 
+                        + " due to **Plausible Deniability**, you were dealt an extra secret objective. Thus, you must also discard an extra secret objective.");
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your Cards-Info threads.");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your `#cards-info` threads.");
         if (game.getRound() == 1) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("startOfGameObjReveal", "Reveal Objectives and Start Strategy Phase"));
-            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Press this button after everyone has discarded", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Press this button after everyone has discarded.", buttons);
             Player speaker = null;
             if (game.getPlayer(game.getSpeakerUserID()) != null) {
                 speaker = game.getPlayers().get(game.getSpeakerUserID());
             }
             if (speaker == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Speaker is not yet assigned. Secrets have been dealt, but please assign speaker soon (command is `/player speaker`)");
+                    "Speaker is not yet assigned. Secret objectives have been dealt, but please assign speaker soon (command is `/player speaker`).");
             }
             Helper.setOrder(game);
         }

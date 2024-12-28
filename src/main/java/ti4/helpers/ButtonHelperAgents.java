@@ -620,12 +620,12 @@ public class ButtonHelperAgents {
                 channel = p2.getPrivateChannel();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to the selected player");
             }
-            message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in."
+            message = "Doing a tactical action. Please select the ring of the map that the system you wish to activate is located in."
                 + " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
             List<Button> ringButtons = ButtonHelper.getPossibleRings(p2, game);
             game.resetCurrentMovedUnitsFrom1TacticalAction();
             MessageHelper.sendMessageToChannelWithButtons(channel, p2.getRepresentationUnfogged()
-                + " Use buttons to resolve tactical action from " + ssruuClever + "Z'eu, the Naalu" + ssruuSlash + " agent. Reminder it is not legal to do a tactical action in a home system.\n"
+                + " Use buttons to resolve tactical action from " + ssruuClever + "Z'eu, the Naalu" + ssruuSlash + " agent. Reminder that you cannot do a tactical action in a home system this way.\n"
                 + message, ringButtons);
         }
 
@@ -974,14 +974,14 @@ public class ButtonHelperAgents {
             if (p2 == null)
                 return;
             channel = p2.getCorrectChannel();
-            message = "Use buttons to select whether you want to place 1 cruiser or 1 destroyer in a system with your ships.";
+            message = p2.getRepresentationUnfogged() + ", please choose whether you wish to place 1 cruiser or 1 destroyer in a system with your ships.";
             List<Button> buttons = new ArrayList<>();
             if (p2 != player) {
                 ButtonHelperStats.gainComms(event, game, player, 2, false, true);
             }
             buttons.add(Buttons.green("step2axisagent_cruiser", "Place 1 cruiser"));
             buttons.add(Buttons.green("step2axisagent_destroyer", "Place 1 destroyer"));
-            MessageHelper.sendMessageToChannelWithButtons(channel, p2.getRepresentationUnfogged() + message, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             String exhaustedMessage = buttonEvent.getMessage().getContentRaw();
@@ -1031,7 +1031,7 @@ public class ButtonHelperAgents {
     public static void presetEdynAgentStep1(Game game, Player player) {
         List<Button> buttons = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "presetEdynAgentStep2", null);
         String msg = player.getRepresentationUnfogged()
-            + " select the player who you want to take the action when the time comes (probably yourself)";
+            + ", please select the player who you wish to take the action when the time comes (probably yourself).";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -1724,7 +1724,7 @@ public class ButtonHelperAgents {
 
     public static void fogAllianceAgentStep1(Game game, Player player) {
         String msg = player.getRepresentationUnfogged()
-            + " use buttons to select the system you want to move ships from";
+            + ", please choose the system that you wish to move ships from.";
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasShipsInSystem(player, tile) && !CommandCounterHelper.hasCC(player, tile)) {
@@ -1737,7 +1737,7 @@ public class ButtonHelperAgents {
 
     @ButtonHandler("fogAllianceAgentStep2_")
     public static void fogAllianceAgentStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String msg = player.getRepresentationUnfogged() + " use buttons to select the system you want to move ships to";
+        String msg = player.getRepresentationUnfogged() + ", please choose the system you wish to move ships to.";
         List<Button> buttons = new ArrayList<>();
         String ogTile = buttonID.split("_")[1];
         for (Tile tile : game.getTileMap().values()) {

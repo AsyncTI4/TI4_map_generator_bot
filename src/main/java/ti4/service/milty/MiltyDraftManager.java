@@ -456,11 +456,12 @@ public class MiltyDraftManager {
             game.setPhaseOfGame("playerSetup");
             AddTileListService.finishSetup(game, event);
             if (keleresExists) {
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " be sure to wait for keleres to get set up before dealing out secrets.");
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing()
+                    + " be sure to wait for Keleres to choose their flavour and starting tech before dealing out secret objectives.");
             }
             game.getMiltyDraftManager().setFinished(true);
         } catch (Exception e) {
-            StringBuilder error = new StringBuilder("Something went wrong and the map could not be built automatically. Here are the slice strings if you want to try doing it manually: ");
+            StringBuilder error = new StringBuilder("Something went wrong and the map could not be built automatically. Here are the slice strings if you wish to try doing it manually: ");
             List<PlayerDraft> speakerOrdered = getDraft().values().stream()
                 .sorted(Comparator.comparing(PlayerDraft::getPosition))
                 .toList();

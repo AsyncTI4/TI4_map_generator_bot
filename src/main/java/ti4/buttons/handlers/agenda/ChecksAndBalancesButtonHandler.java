@@ -80,7 +80,7 @@ class ChecksAndBalancesButtonHandler {
             game.setPhaseOfGame("strategy");
             game.updateActivePlayer(privatePlayer);
             MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                privatePlayer.getRepresentationUnfogged() + "Use buttons to pick which strategy card you want to give someone else.", Helper.getRemainingSCButtons(game, privatePlayer));
+                privatePlayer.getRepresentationUnfogged() + ", please choose which strategy card you wish to give someone else.", Helper.getRemainingSCButtons(game, privatePlayer));
         }
     }
 
