@@ -10,13 +10,14 @@ import java.util.StringTokenizer;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands2.GameStateSubcommand;
-import ti4.commands2.map.AddTileRandom.RandomOption;
+import ti4.service.map.AddTileService.RandomOption;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.service.map.AddTileListService;
+import ti4.service.map.AddTileService;
 
 public class AddTileListRandom extends GameStateSubcommand {
 
@@ -32,7 +33,7 @@ public class AddTileListRandom extends GameStateSubcommand {
         String tileList = event.getOption(Constants.TILE_LIST).getAsString().toUpperCase();
         tileList = tileList.replace(",", " ");
 
-        Set<ComponentSource> sources = AddTileRandom.getSources(event, game);
+        Set<ComponentSource> sources = AddTileService.getSources(event, game);
 
         StringTokenizer tileListTokenizer = new StringTokenizer(tileList, " ");
         List<String> tilesToAdd = new ArrayList<>();
@@ -48,7 +49,7 @@ public class AddTileListRandom extends GameStateSubcommand {
             
             if (RandomOption.isValid(tileToken)) {
                 //Ignoring existing tiles from the map as those will be cleared by addTileListToMap
-                List<TileModel> availableTiles = AddTileRandom.availableTiles(sources, RandomOption.valueOf(tileToken), new HashSet<>(), tilesToAdd);
+                List<TileModel> availableTiles = AddTileService.availableTiles(sources, RandomOption.valueOf(tileToken), new HashSet<>(), tilesToAdd);
                 if (availableTiles.isEmpty()) {
                     MessageHelper.replyToMessage(event, "Not enough " + tileToken + " tiles to draw from.");
                     return;

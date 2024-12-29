@@ -14,7 +14,7 @@ import ti4.model.RelicModel;
 class RelicLookAtTop extends GameStateSubcommand {
 
     public RelicLookAtTop() {
-        super(Constants.RELIC_LOOK_AT_TOP, "Look at the top of the relic deck. Sends to Cards Info thread.", false, true);
+        super(Constants.RELIC_LOOK_AT_TOP, "Privately look at the top of the relic deck.", false, true);
     }
 
     public void execute(SlashCommandInteractionEvent event) {

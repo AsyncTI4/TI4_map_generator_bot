@@ -608,7 +608,7 @@ public class Player {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using ID: " + cardsInfoThreadID + " for potential thread name: " + threadName, e);
+            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing #cards-info thread using ID: " + cardsInfoThreadID + " for potential thread name: " + threadName, e);
         }
 
         // ATTEMPT TO FIND BY NAME
@@ -632,7 +632,7 @@ public class Player {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thread using name: " + threadName, e);
+            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing #cards-info thread using name: " + threadName, e);
         }
 
         // CREATE NEW THREAD

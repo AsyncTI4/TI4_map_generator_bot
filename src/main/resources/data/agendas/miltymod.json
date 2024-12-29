@@ -80,7 +80,7 @@
         "name": "Holy Planet of Ixth",
         "type": "Law",
         "target": "Elect Planet",
-        "text1": "Attach this card to the elected planet. Units on this planet cannot use Production. When a player gains control of this card, they gain 1 victory point. When a player loses control of this card, they lose 1 victory point.",
+        "text1": "Attach this card to the elected planet. Units on this planet cannot use PRODUCTION. When a player gains control of this card, they gain 1 victory point. When a player loses control of this card, they lose 1 victory point.",
         "text2": "",
         "source": "miltymod"
     },

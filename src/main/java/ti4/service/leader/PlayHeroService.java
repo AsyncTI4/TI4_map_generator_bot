@@ -125,7 +125,7 @@ public class PlayHeroService {
                     }
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged()
-                    + "Added 2 fighters to every system with an owned planet and no opponent ships.");
+                    + "Added 2 fighters to every system with an owned planet and no other players' ships.");
                 ButtonHelperHeroes.resolveFlorzenHeroStep1(player, game);
             }
             case "kyrohero" -> {
@@ -163,7 +163,7 @@ public class PlayHeroService {
 
             }
             case "lizhohero" -> MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
-                "You may use the buttons in your cards info to set traps, then when you're done with that, press the following button to start distributing 12 fighters.",
+                "You may use the buttons in your `#cards-info` thread to set traps, then when you're done with that, press the following button to start distributing 12 fighters.",
                 Buttons.green("lizhoHeroFighterResolution", "Distribute 12 Fighters"));
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -314,7 +314,7 @@ public class PlayHeroService {
                 List<Button> buttons = ButtonHelperHeroes.getNekroHeroButtons(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
-                    + " use the button to pick which planet you'd like to get a technology and trade goods from (and kill any opponent units).",
+                    + " use the button to pick which planet you'd like to get a technology and trade goods from (and kill any enemy units).",
                     buttons);
             }
             case "bentorhero" -> {

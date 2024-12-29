@@ -719,7 +719,7 @@ public class ButtonHelper {
                 amount = 2;
             }
             if (player.hasAbility("scheming")) {
-                message += " **Scheming** has been accounted for, please use blue button inside your card info thread to discard 1 action card.";
+                message += " **Scheming** has been accounted for, please use blue button inside your `#cards-info` thread to discard 1 action card.";
                 game.drawActionCard(player.getUserID());
                 amount += 1;
             }
@@ -1281,7 +1281,7 @@ public class ButtonHelper {
             String ident = player.getRepresentationUnfogged();
             MessageHelper.sendMessageToChannel(channel,
                 ident + ", you are exceeding the action card hand limit of " + limit
-                    + ". Please discard down to the limit. Check your cards info thread for the blue discard buttons. ");
+                    + ". Please discard down to the limit. Check your `#cards-info` thread for the blue discard buttons. ");
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 ident + ", use buttons to discard.", ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
@@ -3276,7 +3276,7 @@ public class ButtonHelper {
         }
         if (player.hasAbility("secret_maps")) {
             String msg = player.getRepresentation()
-                + " you may use your **Secret Maps** ability to explore a planet with production that you did not explore this turn.";
+                + " you may use your **Secret Maps** ability to explore a planet with a PRODUCTION unit that you did not explore this turn.";
             List<Button> buttons = new ArrayList<>();
             for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
                 if ("space".equalsIgnoreCase(planetUnit.getName())) {
@@ -3379,7 +3379,7 @@ public class ButtonHelper {
                 String message = player.getRepresentationUnfogged()
                     + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Vassa Hagi , the Lanefir"
                     + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                    + " agent, and thus may decline this explore to draw another one instead.";
+                    + " agent, and thus may decline this exploration to draw another one instead.";
                 if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                     String pF = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(game.getActionsChannel(),
@@ -3399,7 +3399,7 @@ public class ButtonHelper {
 
             if (player.hasAbility("migrant_fleet")) {
                 String msg3 = player.getRepresentation()
-                    + " after you resolve the frontier explore, you may use your **Migrant Explorers** ability to explore a planet you control in an adjacent system.";
+                    + " after you resolve the frontier exploration, you may use your **Migrant Explorers** ability to explore a planet you control in an adjacent system.";
                 List<Button> buttons = new ArrayList<>();
                 for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
                     Tile tile2 = game.getTileByPosition(pos);
@@ -3499,8 +3499,8 @@ public class ButtonHelper {
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation()
-                    + " used _Scanlink Drone Network_ to decline explore and gained 1 trade good (trade goods went from "
-                    + oldTg + "->" + player.getTg() + ")");
+                    + " used _Scanlink Drone Network_ to decline exploration and gained 1 trade good (trade goods went from "
+                    + oldTg + "->" + player.getTg() + ").");
             String planetID = buttonID.split("_")[2];
             if (player.hasAbility("awaken") && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
                 && player.getPlanets().contains(planetID)) {
@@ -4147,7 +4147,7 @@ public class ButtonHelper {
         game.resetCurrentMovedUnitsFrom1System();
         if (Helper.getProductionValue(player, game, tile, false) > 0 || (player.hasTech("iihq") && tile.getTileID().equalsIgnoreCase("18"))) {
             Button buildButton = Buttons.green(finChecker + "tacticalActionBuild_" + game.getActiveSystem(),
-                "Build in This System (" + Helper.getProductionValue(player, game, tile, false) + " PRODUCTION Value)");
+                "Build in This System (" + Helper.getProductionValue(player, game, tile, false) + " PRODUCTION value)");
             buttons.add(buildButton);
         }
         if (!game.getStoredValue("possiblyUsedRift").isEmpty()) {
@@ -4954,7 +4954,7 @@ public class ButtonHelper {
             try {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + message, buttons);
             } catch (Exception e) {
-                BotLogger.log("Failing to set up player cards info threads in " + game.getName(), e);
+                BotLogger.log("Failing to set up player #cards-info thread in " + game.getName(), e);
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);

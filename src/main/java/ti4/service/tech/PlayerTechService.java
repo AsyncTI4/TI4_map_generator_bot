@@ -451,7 +451,7 @@ public class PlayerTechService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged()
                     + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh, the Rhodun"
-                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") 
+                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                     + " agent, to produce 1 ship at home or in a system where you have a technology specialty planet.",
                 buttons);
         }
@@ -473,7 +473,7 @@ public class PlayerTechService {
                     // Block of code to handle errors
                 }
             }
-            String text = player.getRepresentationUnfogged() + ", it is now your turn (your " 
+            String text = player.getRepresentationUnfogged() + ", it is now your turn (your "
                 + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
             if (nextPlayer != null && !game.isFowMode()) {
@@ -514,7 +514,7 @@ public class PlayerTechService {
         }
         if (player.hasUnit("augers_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getFactionEmoji() + " has the opportunity to deploy an Iledrith (Ilyxum mech) on a legendary planet or planet with a technology specialty.");
+                player.getFactionEmoji() + " has the opportunity to DEPLOY an Iledrith (Ilyxum mech) on a legendary planet or planet with a technology specialty.");
             String message2 = player.getRepresentationUnfogged() + ", please use buttons to drop 1 mech on a legendary planet or planet with a technology specialty.";
             List<Button> buttons2 = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
@@ -525,7 +525,7 @@ public class PlayerTechService {
 
     /**
      * Generate buttons to pay for tech.
-     * 
+     *
      * @param game
      * @param player
      * @param event

@@ -1052,7 +1052,7 @@ public class ButtonHelperAbilities {
     @ButtonHandler("meteorSlings_")
     public static void meteorSlings(Player player, String buttonID, Game game, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getRepresentation() + " cancelled one bombardment hit to place one infantry on " + Helper.getPlanetRepresentation(planet, game);
+        String msg = player.getRepresentation() + " cancelled one BOMBARDMENT hit to place one infantry on " + Helper.getPlanetRepresentation(planet, game);
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 inf " + planet);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }

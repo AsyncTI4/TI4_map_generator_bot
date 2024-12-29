@@ -13,11 +13,11 @@
         "name": "Articles of War",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: All mechs lose their printed abilities except for Sustain Damage.",
+        "text1": "For: All mechs lose their printed abilities except for SUSTAIN DAMAGE.",
         "text2": "Against: Each player that voted \"For\" gains 3 trade goods.",
         "forEmoji": "SadMech",
         "againstEmoji": "tg",
-        "mapText": "All mechs lose their printed abilities except for Sustain Damage.",
+        "mapText": "All mechs lose their printed abilities except for SUSTAIN DAMAGE.",
         "source": "pok"
     },
     {

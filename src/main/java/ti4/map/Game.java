@@ -2527,18 +2527,18 @@ public class Game extends GameProperties {
 
     public void checkSOLimit(Player player) {
         if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()) {
-            String msg = player.getRepresentationUnfogged() + " you have more SOs than the limit ("
+            String msg = player.getRepresentationUnfogged() + " you have more secret objectives than the limit ("
                 + player.getMaxSOCount()
-                + ") and should discard one. If your game is playing with a higher SO limit, you may change that in /game setup.";
+                + ") and should discard one. If your game is playing with a higher secret objective limit, you may change that in `/game setup`.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-            String secretScoreMsg = "Click a button below to discard your Secret Objective";
+            String secretScoreMsg = "Click a button below to discard your secret objective.";
             List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
             if (!soButtons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), secretScoreMsg,
                     soButtons);
             } else {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    "Something went wrong. Please report to Fin");
+                    "Something went wrong. Please report to Fin.");
             }
         }
     }
@@ -3014,8 +3014,8 @@ public class Game extends GameProperties {
 
     public boolean validateAndSetExploreDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (!getAllExploreDiscard().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change explore deck to **"
-                + deck.getName() + "** while there are explores in the discard pile.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change exploration deck to **"
+                + deck.getName() + "** while there are exploration cards in the discard piles.");
             return false;
         }
         setExplorationDeckID(deck.getAlias());

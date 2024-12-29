@@ -196,7 +196,7 @@ public class ButtonHelperHeroes {
 
     public static void resolveGledgeHero(Player player, Game game) {
         List<Button> buttons = getAttachmentSearchButtons(game, player);
-        String msg = player.getRepresentation() + " use these buttons to find attachments. Explore #";
+        String msg = player.getRepresentation() + " use these buttons to find attachments. Exploration #";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg + "1", buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg + "2", buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg + "3", buttons);
@@ -457,7 +457,7 @@ public class ButtonHelperHeroes {
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         String message = player.getRepresentation() + " sent " + Mapper.getRelic(shipOrder).getName() + " to "
             + p2.getFactionEmojiOrColor()
-            + ", who now owes a promissory note in return. Buttons have been sent to the players cards info thread to resolve.";
+            + ", who now owes a promissory note in return. Buttons have been sent to the players `#cards-info` thread to resolve.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
         String message2 = p2.getRepresentationUnfogged()
@@ -603,7 +603,7 @@ public class ButtonHelperHeroes {
                 sb.append(player.getRepresentation()).append(" Found attachment ").append(explore.getName());
                 game.purgeExplore(cardID);
                 MessageHelper.sendMessageToChannel(channel, sb.toString());
-                String msg = player.getRepresentation() + " tell the bot what planet this should be attached too";
+                String msg = player.getRepresentation() + " tell the bot what planet this should be attached to.";
                 MessageHelper.sendMessageToChannelWithButtons(channel, msg,
                     getAttachmentAttach(game, player, type, explore.getAttachmentId().get()));
                 return;
@@ -1029,7 +1029,7 @@ public class ButtonHelperHeroes {
         if (Helper.getProductionValue(player, game, tile, false) > 0
             && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message3 = message3
-                + ". You also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards production limit.\n";
+                + ". You also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit.\n";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             message.toString());
@@ -1795,7 +1795,7 @@ public class ButtonHelperHeroes {
         vaden.clearDebt(target, 1);
         MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(),
             vaden.getRepresentation() + " returned 1 debt tokens owned by " + target.getRepresentation(false, true)
-                + " using Putriv Sirvonsk, the Vaden hero. Buttons have been sent to their cards info to resolve.");
+                + " using Putriv Sirvonsk, the Vaden hero. Buttons have been sent to their `#cards-info` thread to resolve.");
         MessageHelper.sendMessageToChannelWithButtons(target.getCardsInfoThread(), target.getRepresentationUnfogged()
             + " please select something to give due to Putriv Sirvonsk, the Vaden hero,"
             + " returning one of your tokens (\"your kneecaps\" are not an option).", buttons);

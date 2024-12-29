@@ -30,7 +30,7 @@ public class AllInfoCommand extends GameStateCommand {
 
     @Override
     public String getDescription() {
-        return "Send all available info to your Cards Info thread.";
+        return "Send all available infomation to your #cards-info thread";
     }
 
     @Override

@@ -28,7 +28,7 @@
         "capacityValue": 4,
         "isStructure": true,
         "isShip": true,
-        "ability": "This unit is placed in a space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed.",
+        "ability": "This unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.",
         "homebrewReplacesID": "saar_spacedock"
     },
     {
@@ -142,7 +142,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "At the start of a round combat, you may spend 1 trade good to place 1 trade good on this ship's unit card. If that ships generates a hit in that round of combat, add to this ship's unit card a number of trade goods equal to the number of players who control units in this ship's system or adjacent systems. When this ships is repaired, gain the trade goods on its unit card.",
+        "ability": "At the start of a round combat, you may spend 1 trade good to place 1 trade good on this ship's unit card. If that ships generates a hit in that round of combat, add to this ship's unit card a number of trade goods equal to the number of players who control units in this ship's system or adjacent systems.\nWhen this ships is repaired, gain the trade goods on its unit card.",
         "homebrewReplacesID": "hacan_flagship"
     },
     {
@@ -160,7 +160,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "This ship can move though systmes that contain other player's ships.",
+        "ability": "This ship can move though systems that contain other player's ships.",
         "homebrewReplacesID": "yssaril_flagship"
     },
     {
@@ -252,7 +252,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "This ship's system contains a delta wormhole. Other players' units cannot move through this system. During movement, this ship may move before or after your other ships.",
+        "ability": "This ship's system contains a delta wormhole. Other players' units cannot move through this system.\nDuring movement, this ship may move before or after your other ships.",
         "homebrewReplacesID": "ghost_flagship"
     },
     {
@@ -358,7 +358,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "This unit does not count against capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values",
+        "ability": "This unit does not count against capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values.",
         "homebrewReplacesID": "argent_mech"
     },
     {
@@ -462,7 +462,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "While not participating in ground combat, this unit can use it's BOMBARDMENT ability on planets in its system as if it were a ship",
+        "ability": "While not participating in ground combat, this unit can use it's BOMBARDMENT ability on planets in its system as if it were a ship.",
         "homebrewReplacesID": "l1z1x_mech"
     },
     {
@@ -580,7 +580,7 @@
         "combatDieCount": 2,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "If this unit is in the space area of the active system, it is also a ship. At the end of a space battle in the active system, flip this card.",
+        "ability": "If this unit is in the space area of the active system, it is also a ship.\nAt the end of a space battle in the active system, flip this card.",
         "homebrewReplacesID": "naaz_mech_space"
     },
     {

@@ -468,7 +468,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 MessageHelper
                     .sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                            + ", use buttons to discard 1 action card and explore a readied planet.",
+                            + ", use buttons to discard 1 action card to explore a readied planet.",
                         absolPAButtons);
             }
         }
@@ -491,7 +491,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         buttons.add(Buttons.gray(buttonID.replace("bombardConfirm_", ""), "Roll Bombardment"));
         String message = player.getRepresentationUnfogged()
             + " please declare what units are bombarding what planet before hitting this button"
-            + " (e.g. if you have two dreadnoughts and are splitting their bombardment across two planets, specify which planet the first one is hitting)."
+            + " (e.g. if you have two dreadnoughts and are splitting their BOMBADMENT across two planets, specify which planet the first one is hitting)."
             + " The bot does not track this.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
@@ -859,7 +859,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "_afb",
             "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelAFBHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
-        String msg2 = "You may automatically assign " + h + " AFB hit" + (h == 1 ? "" : "s") + ".";
+        String msg2 = "You may automatically assign " + h + " ANTI-FIGHTER BARRAGE hit" + (h == 1 ? "" : "s") + ".";
         event.getMessage().editMessage(msg2).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
             .queue();
     }
@@ -950,7 +950,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             String traitNameWithEmoji = ExploreEmojis.getTraitEmoji(type) + type;
             if (deck.isEmpty() && discard.isEmpty()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+                    traitNameWithEmoji + " exploration deck & discard is empty - nothing to look at.");
                 continue;
             }
 
@@ -961,7 +961,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
         }
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Top of Cultural, Industrial, and Hazardous explore decks has been set to " + player.getFactionEmoji() + " Cards info thread.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            "The top card of each of the cultural, industrial, and hazardous exploration decks has been set to " + player.getFactionEmoji() + " `#cards-info` thread.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1475,9 +1476,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                         }
                     }
                     if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "## " 
-                            + player.getRepresentationUnfogged() + ", remember to click \"Ready for " + (game.isCustodiansScored() ? "Agenda" : "Strategy Phase") 
-                            + "\" when done with homework. " + game.getMainGameChannel().getJumpUrl(), Buttons.DONE_DELETE_BUTTONS);
+                        MessageHelper.sendMessageToChannelWithButton(player.getPrivateChannel(),
+                            "## Remember to click \"Ready for " + (game.isCustodiansScored() ? "Agenda" : "Strategy Phase")
+                            + "\" when done with homework!\n" + game.getMainGameChannel().getJumpUrl(), Buttons.DONE_DELETE_BUTTONS);
                     }
                 }
                 player.setTotalExpenses(player.getTotalExpenses() + netGain * 3);
@@ -2245,11 +2246,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     public static void declineExplore(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
-        ReactionService.addReaction(event, game, player, "Declined Explore");
+        ReactionService.addReaction(event, game, player, "Declined Exploration");
         ButtonHelper.deleteMessage(event);
         if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
             String pF = player.getFactionEmoji();
-            MessageHelper.sendMessageToChannel(mainGameChannel, pF + " declined explore");
+            MessageHelper.sendMessageToChannel(mainGameChannel, pF + " declined exploration.");
         }
     }
 

@@ -343,7 +343,7 @@ public class ButtonHelperTacticalAction {
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
             && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message3 = message3
-                + "You also have That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 " + UnitEmojis.fighter + "/" + UnitEmojis.infantry + " that don't count towards production limit.\n";
+                + "You also have That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 " + UnitEmojis.fighter + "/" + UnitEmojis.infantry + " that don't count towards PRODUCTION limit.\n";
         }
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
             && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
