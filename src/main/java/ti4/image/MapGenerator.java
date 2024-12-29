@@ -295,11 +295,16 @@ public class MapGenerator implements AutoCloseable {
                     BotLogger.log("Hitting an error");
                 }
 
+                Tile setupTile = null;
                 if (tileRingNumber > -1 && tileRingNumber <= ringCount && !tileMap.containsKey(position)) {
-                    addTile(new Tile("0gray", position), TileStep.Tile);
+                    setupTile = new Tile("0gray", position);
                 }
-                if (tileRingNumber > -1 && tileRingNumber <= ringCount + 1 && !tileMap.containsKey(position)) {
-                    addTile(new Tile("0border", position), TileStep.Tile);
+                else if (tileRingNumber > -1 && tileRingNumber <= ringCount + 1 && !tileMap.containsKey(position)) {
+                    setupTile = new Tile("0border", position);
+                }
+                if (setupTile != null) {
+                    addTile(setupTile, TileStep.Tile);
+                    addTile(setupTile, TileStep.TileNumber);
                 }
             }
         }
@@ -337,7 +342,7 @@ public class MapGenerator implements AutoCloseable {
         } else if (displayType == DisplayType.attachments) {
             tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Attachments));
         }
-        tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.LastStep));
+        tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.TileNumber));
     }
 
     private void setupFow(Map<String, Tile> tilesToDisplay) {
