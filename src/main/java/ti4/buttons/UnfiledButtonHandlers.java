@@ -1473,9 +1473,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                         }
                     }
                     if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "## " 
-                            + player.getRepresentationUnfogged() + "\nRemember to click **Ready for " + (game.isCustodiansScored() ? "Agenda" : "Strategy Phase") 
-                            + "** when done with homework! " + game.getMainGameChannel().getJumpUrl(), Buttons.DONE_DELETE_BUTTONS);
+                        MessageHelper.sendMessageToChannelWithButton(player.getPrivateChannel(), 
+                            "## Remember to click Ready for " + (game.isCustodiansScored() ? "Agenda" : "Strategy Phase") 
+                            + " when done with homework!\n" + game.getMainGameChannel().getJumpUrl(), Buttons.DONE_DELETE_BUTTONS);
                     }
                 }
                 player.setTotalExpenses(player.getTotalExpenses() + netGain * 3);
