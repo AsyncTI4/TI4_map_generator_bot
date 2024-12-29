@@ -87,7 +87,7 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
         if (hsTiles > 0) sb.append(" + ").append(hsTiles).append(" hs placeholders");
         if (supernovas > 0) sb.append(" + ").append(supernovas).append(" supernovas");
         if (fixedTilesList.size() > 0) sb.append(" + ").append(fixedTilesList.size()).append(" fixed tiles");
-        sb.append(") into ").append(rings).append("\nUse `/map add_tile_list_random` to insert the map string:");
+        sb.append(") into ").append(rings).append(" rings.\nUse `/map add_tile_list_random` to insert the map string:");
 
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
         MessageHelper.sendMessageToChannel(event.getChannel(), "`" + mapString + "`");
