@@ -127,7 +127,7 @@ public class TileGenerator {
             tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Tile));
             tilesWithExtra.forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Extras));
             tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Units));
-            tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.LastStep));
+            tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.TileNumber));
 
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
@@ -1068,7 +1068,7 @@ public class TileGenerator {
                     tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
                 }
             }
-            case LastStep -> {
+            case TileNumber -> {
                 //Tile number as the last step to put it on top of everything else
                 setTextSize(tileGraphics);
                 int textX = TILE_PADDING + TILE_POSITION_POINT.x;
