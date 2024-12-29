@@ -321,15 +321,15 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private String getProductionText() {
+        if ("res".equals(getBasicProduction()))
+        {
+            return "PRODUCTION: " + MiscEmojis.resources + "+" + getProductionValue() + "\n";
+        }
+        if (getBasicProduction() != null)
+        {
+            return "PRODUCTION: *️⃣+" + getProductionValue() + "\n";
+        }
         if (getProductionValue() > 0) {
-            if ("res".equals(getBasicProduction()))
-            {
-                return "PRODUCTION: " + MiscEmojis.resources + "+" + getProductionValue() + "\n";
-            }
-            if (getBasicProduction() != null)
-            {
-                return "PRODUCTION: *️⃣+" + getProductionValue() + "\n";
-            }
             return "PRODUCTION: " + getProductionValue() + "\n";
         }
         return "";
