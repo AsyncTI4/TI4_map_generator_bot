@@ -656,7 +656,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
                 Tile tile = game.getTileFromPlanet(planetName);
                 String msg = player.getRepresentation() + " added 1 infantry to " + planetName
-                    + " due to the arcane citadel";
+                    + " due to the _Arcane Citadel_.";
                 AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planetName);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
@@ -2401,7 +2401,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("exhauste6g0network")
     public static void exhaustE6G0Network(ButtonInteractionEvent event, Player player, Game game) {
         player.addExhaustedRelic("e6-g0_network");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " Chose to exhaust e6-g0_network");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " chose to exhaust _E6-G0 Network_.");
         String message;
         if (player.hasAbility("scheming")) {
             game.drawActionCard(player.getUserID());

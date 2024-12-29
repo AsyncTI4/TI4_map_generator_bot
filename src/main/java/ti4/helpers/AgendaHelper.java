@@ -1530,7 +1530,7 @@ public class AgendaHelper {
                     if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
                         Tile tile = game.getTileFromPlanet(planet);
                         String msg = player.getRepresentation() + " added 1 infantry to " + planet
-                            + " due to the arcane citadel";
+                            + " due to the _Arcane Citadel_.";
                         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planet);
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
@@ -1583,7 +1583,7 @@ public class AgendaHelper {
                             if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
                                 Tile tile = game.getTileFromPlanet(planet);
                                 String msg = player.getRepresentation() + " added 1 infantry to " + planet
-                                    + " due to the Arcane Citadel";
+                                    + " due to the _Arcane Citadel_.";
                                 AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planet);
                                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                             }

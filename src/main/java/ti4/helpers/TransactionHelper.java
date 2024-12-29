@@ -470,7 +470,7 @@ public class TransactionHelper {
 
             }
             case "starCharts" -> {
-                message = message + " Click the Star Chart you wish to " + requestOrOffer + ".";
+                message = message + " Click the _Star Chart_ you wish to " + requestOrOffer + ".";
                 for (String shipOrder : ButtonHelper.getPlayersStarCharts(p1)) {
                     Button transact = Buttons.green(
                         "offerToTransact_starCharts_" + p1.getFaction() + "_" + p2.getFaction() + "_" + shipOrder,
