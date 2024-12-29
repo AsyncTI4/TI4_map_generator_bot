@@ -15,6 +15,7 @@ import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 
 @UtilityClass
 public class ShowGameService {
@@ -56,7 +57,8 @@ public class ShowGameService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
         } else if (game.isFowMode()) {
             Player player = game.getPlayer(event.getUser().getId());
-            if (game.getRealPlayers().contains(player) && !game.getPlayersWithGMRole().contains(player) 
+            if (!event.getClass().equals(UserOverridenSlashCommandInteractionEvent.class) 
+              && game.getRealPlayers().contains(player) && !game.getPlayersWithGMRole().contains(player)
               && player.getPrivateChannel() != null && !channel.equals(player.getPrivateChannel())) {
                 channel = player.getPrivateChannel();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + ((TextChannel)player.getPrivateChannel()).getJumpUrl());
