@@ -18,7 +18,7 @@
         ],
         "requirements": "RG",
         "source": "nomadfalcon",
-        "text": "After 1 of your opponents ships are destroyed you may exhyast this card to destroy 2 infantry in the space area of the active system.\nThis card counts as either a red or green prerequiste."
+        "text": "After 1 of your opponents ships are destroyed you may exhaust this card to destroy 2 infantry in the space area of the active system.\nThis card counts as either a red or green prerequisite."
     },
     {
         "alias": "nf_hg",
@@ -28,7 +28,7 @@
         ],
         "requirements": "BBY",
         "source": "nomadfalcon",
-        "text": "After you activate a system that conatins 1 or more of your structures you may exhaust this card to treat all systems with your structures as adjacent till the end of your turn."
+        "text": "After you activate a system that contains 1 or more of your structures you may exhaust this card to treat all systems with your structures as adjacent till the end of your turn."
     },
     {
         "alias": "nf_prs",
@@ -39,7 +39,7 @@
         ],
         "requirements": "RG",
         "source": "nomadfalcon",
-        "text": "If you win a combat in a system with 3 or more non-fighter ships you may move 1 ship with a cost of 4 or fewer out of the active system into an adjacent system with any of your ships.\nThis card counts as either a red or green prerequiste."
+        "text": "If you win a combat in a system with 3 or more non-fighter ships you may move 1 ship with a cost of 4 or fewer out of the active system into an adjacent system with any of your ships.\nThis card counts as either a red or green prerequisite."
     },
     {
         "alias": "nf_pdn",
@@ -71,7 +71,7 @@
         ],
         "requirements": "GB",
         "source": "nomadfalcon",
-        "text": "At the start of the status phase you may place 1 infantry on each planet with 1 or more structures.\nThis card counts as either a green or blue prerequiste."
+        "text": "At the start of the status phase you may place 1 infantry on each planet with 1 or more structures.\nThis card counts as either a green or blue prerequisite."
     },
     {
         "alias": "nf_ni",
@@ -82,7 +82,7 @@
         ],
         "requirements": "YG",
         "source": "nomadfalcon",
-        "text": "At the start of your turn you may remove 1 of your infantry from the game board to gain 1 trade good.\nThis card counts as either a green or yellow prerequsite."
+        "text": "At the start of your turn you may remove 1 of your infantry from the game board to gain 1 trade good.\nThis card counts as either a green or yellow prerequisite."
     },
     {
         "alias": "nf_clp",

@@ -38,6 +38,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private List<String> eligiblePlanetTypes;
     private int moveValue;
     private int productionValue;
+    private String basicProduction;
     private int capacityValue;
     private int fleetSupplyBonus;
     private int capacityUsed;
@@ -307,7 +308,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (getCost() >= 1) {
             return "Cost: " + MiscEmojis.getResourceEmoji(Math.round(getCost())) + "\n";
         } else if (getCost() == 0.5) {
-            return "Cost: " + MiscEmojis.Resources_1 + " (for 2 " + getUnitEmoji() + ")\n";
+            return "Cost: " + MiscEmojis.Resources_1 + " per 2 " + getUnitEmoji() + "\n";
         }
         return "";
     }
@@ -321,7 +322,15 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     private String getProductionText() {
         if (getProductionValue() > 0) {
-            return "Production: " + getProductionValue() + "\n";
+            if ("res".equals(getBasicProduction()))
+            {
+                return "PRODUCTION: " + MiscEmojis.resources + "+" + getProductionValue() + "\n";
+            }
+            if (getBasicProduction() != null)
+            {
+                return "PRODUCTION: *️⃣+" + getProductionValue() + "\n";
+            }
+            return "PRODUCTION: " + getProductionValue() + "\n";
         }
         return "";
     }
@@ -345,38 +354,38 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private String getAFBText() {
-        if (getAfbDieCount() > 0) {
-            return "Anti-Fighter Barrage " + getAfbHitsOn() + " (x" + getAfbDieCount() + ")\n";
+        if (getAfbDieCount() >= 1) {
+            return "ANTI-FIGHTER BARRAGE " + getAfbHitsOn() + " (x" + getAfbDieCount() + ")\n";
         }
         return "";
     }
 
     private String getBombardText() {
         if (getBombardDieCount() == 1) {
-            return "Bombardment: " + getBombardHitsOn() + "\n";
-        } else if (getBombardDieCount() > 0) {
-            return "Bombardment: " + getBombardHitsOn() + " (x" + getBombardDieCount() + ")\n";
+            return "BOMBARDMENT: " + getBombardHitsOn() + "\n";
+        } else if (getBombardDieCount() >= 2) {
+            return "BOMBARDMENT: " + getBombardHitsOn() + " (x" + getBombardDieCount() + ")\n";
         }
         return "";
     }
 
     private String getSpaceCannonText() {
-        if (getSpaceCannonDieCount() > 0) {
-            return ((getDeepSpaceCannon()) ? "Deep " : "") + "Space Cannon " + getSpaceCannonHitsOn() + " (x" + getSpaceCannonDieCount() + ")\n";
+        if (getSpaceCannonDieCount() >= 1) {
+            return "SPACE CANNON " + getSpaceCannonHitsOn() + " (x" + getSpaceCannonDieCount() + ")\n";
         }
         return "";
     }
 
     private String getPlanetaryShieldText() {
         if (getPlanetaryShield()) {
-            return "Planetary Shield\n";
+            return "PLANETARY SHIELD\n";
         }
         return "";
     }
 
     private String getSustainDamageText() {
         if (getSustainDamage()) {
-            return "Sustain Damage\n";
+            return "SUSTAIN DAMAGE\n";
         }
         return "";
     }

@@ -32,9 +32,9 @@
         "category": "agenda",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: All mechs lose their printed abilities except for Sustain Damage.",
-        "text2": "Against: Each player must place a command token in a system that contains one of their units with sustain damage, if possible.",
-        "mapText": "All mechs lose their printed abilities except for Sustain Damage.",
+        "text1": "For: All mechs lose their printed abilities except for SUSTAIN DAMAGE.",
+        "text2": "Against: Each player must place a command token in a system that contains one of their units with SUSTAIN DAMAGE, if possible.",
+        "mapText": "All mechs lose their printed abilities except for SUSTAIN DAMAGE.",
         "source": "ignis_aurora"
     },
     {
@@ -130,9 +130,9 @@
         "category": "agenda",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Players may not decline to fire space cannon or anti-fighter barrage.",
+        "text1": "For: Players may not decline to fire SPACE CANNON or ANTI-FIGHTER BARRAGE.",
         "text2": "Against: Each player that voted For may place 1 PDS from their reinforcements on a planet they control.",
-        "mapText": "Players may not decline to fire space cannon or anti-fighter barrage.",
+        "mapText": "Players may not decline to fire SPACE CANNON or ANTI-FIGHTER BARRAGE.",
         "source": "ignis_aurora"
     },
     {
@@ -230,8 +230,8 @@
         "category": "agenda",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card.\nWhen the owner of this card places a space dock in a system, their units in that system may use their Production abilities.\nWhen the owner of this card uses the Production ability of 1 or more of their units, they apply +2 to the total production value.",
-        "mapText": "When you place a space dock in a system, your units in that system may use their Production abilities. When you use Production apply +2 to the total production value.",
+        "text1": "The elected player gains this card.\nWhen the owner of this card places a space dock in a system, their units in that system may use their PRODUCTION abilities.\nWhen the owner of this card uses the PRODUCTION ability of 1 or more of their units, they apply +2 to the total PRODUCTION value.",
+        "mapText": "When you place a space dock in a system, your units in that system may use their PRODUCTION abilities. When you use PRODUCTION apply +2 to the total PRODUCTION value.",
         "source": "ignis_aurora"
     },
     {
@@ -503,9 +503,9 @@
         "categoryDescription": "letnev",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: A player must give the Letnev player 1 trade good or commodity before moving ships into a system that contains or is adjacent to a system that contains a Letnev unit with bombardment",
-        "text2": "Against: Each ship with sustain damage that belongs to a player that did not cast at least 1 vote For becomes damaged.",
-        "mapText": "You must give the Letnev player 1 trade good or commodity before moving ships into or adjacent to a system containing a Letnev unit with bombardment",
+        "text1": "For: A player must give the Letnev player 1 trade good or commodity before moving ships into a system that contains or is adjacent to a system that contains a Letnev unit with BOMBARDMENT",
+        "text2": "Against: Each ship with SUSTAIN DAMAGE that belongs to a player that did not cast at least 1 vote For becomes damaged.",
+        "mapText": "You must give the Letnev player 1 trade good or commodity before moving ships into or adjacent to a system containing a Letnev unit with BOMBARDMENT",
         "source": "ignis_aurora"
     },
     {
@@ -573,9 +573,9 @@
         "categoryDescription": "arborec",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: When the Arborec player uses Production, reduce the combined cost of the produced units by 1.",
+        "text1": "For: When the Arborec player uses PRODUCTION, reduce the combined cost of the produced units by 1.",
         "text2": "Against: For each player that voted Against, the Arborec player may may place 1 command token from that player's reinforcements in any non-home system.",
-        "mapText": "When the Arborec player uses Production, reduce the combined cost of the produced units by 1.",
+        "mapText": "When the Arborec player uses PRODUCTION, reduce the combined cost of the produced units by 1.",
         "source": "ignis_aurora"
     },
     {
@@ -585,9 +585,9 @@
         "categoryDescription": "yssaril",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: When using their stall tactics ability, if the Yssaril player does not deploy a mech they may instead place 2 infantry from their reinforcements on a planet they control.",
+        "text1": "For: When using their stall tactics ability, if the Yssaril player does not DEPLOY a mech they may instead place 2 infantry from their reinforcements on a planet they control.",
         "text2": "Against: Each player that voted For may draw 1 action card.",
-        "mapText": "When using their stall tactics ability, if Yssaril does not deploy a mech they can place 2 infantry from their reinforcements on a planet they control.",
+        "mapText": "When using their stall tactics ability, if Yssaril does not DEPLOY a mech they can place 2 infantry from their reinforcements on a planet they control.",
         "source": "ignis_aurora"
     },
     {

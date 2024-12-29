@@ -644,7 +644,7 @@ public class MiltyService {
         if (player.hasAbility("oracle_ai")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                    + " you may peek at the next objective in your cards info (by your promissory note). "
+                    + " you may peek at the next objective in your `#cards-info` thread (by your promissory note). "
                     + "This holds true for anyone with _Read the Fates_. Don't do this until after secret objectives are dealt and discarded.");
         }
         CardsInfoService.sendVariousAdditionalButtons(game, player);

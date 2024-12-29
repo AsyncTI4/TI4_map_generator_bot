@@ -89,7 +89,7 @@
             "Redistribute any number of the command tokens on your command sheet."
         ],
         "secondaryTexts": [
-            "Spend 1 token from your strategy pool to use the Production ability of 1 of your space docks in your home system (This token is not placed in your home system)"
+            "Spend 1 token from your strategy pool to use the PRODUCTION ability of 1 of your space docks in your home system (this token is not placed in your home system)."
         ],
         "imageFileName": "base_game_6",
         "colourHexCode": "#008ed4",

@@ -60,6 +60,7 @@
         "spaceCannonHitsOn": 7,
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": true,
+        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems.",
         "isStructure": true
     }
 ]

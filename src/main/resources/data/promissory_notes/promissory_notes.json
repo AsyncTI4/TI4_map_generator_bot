@@ -30,7 +30,7 @@
         "faction": "muaat",
         "playArea": false,
         "source": "base",
-        "text": "Action: Remove 1 token from the Muaat player's fleet pool and return it to their reinforcements. Then, gain your war sun unit upgrade technology card.  Then, return this card to the Muaat Player.",
+        "text": "ACTION: Remove 1 token from the Muaat player's fleet pool and return it to their reinforcements. Then, gain your war sun unit upgrade technology card.  Then, return this card to the Muaat Player.",
         "shrinkName": true
     },
     {
@@ -40,7 +40,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "base",
-        "text": "Action: Place this card faceup in your play area. While this card is in your play area, you may negotiate transactions with players who are not your neighbor.  If you activate a system that contains 1 or more of the Hacan player's units, return this card to the Hacan player."
+        "text": "ACTION: Place this card faceup in your play area. While this card is in your play area, you may negotiate transactions with players who are not your neighbor.  If you activate a system that contains 1 or more of the Hacan player's units, return this card to the Hacan player."
     },
     {
         "alias": "blood_pact",
@@ -49,7 +49,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "pok",
-        "text": "Action: Place this card faceup in your play area. When you and the Empyrean player cast votes for the same outcome, cast 4 additional votes for that outcome. If you activate a system that contains 1 or more of the Empyrean player's units, return this card to the Empyrean player."
+        "text": "ACTION: Place this card faceup in your play area. When you and the Empyrean player cast votes for the same outcome, cast 4 additional votes for that outcome. If you activate a system that contains 1 or more of the Empyrean player's units, return this card to the Empyrean player."
     },
     {
         "alias": "ms",
@@ -92,7 +92,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "base",
-        "text": "Action: Place this card faceup in your play area. While this card is in your play area, the Mentak player cannot use their Pillage faction ability against you. If you activate a system that contains 1 or more of the Mentak player's units, return this card to the Mentak player."
+        "text": "ACTION: Place this card faceup in your play area. While this card is in your play area, the Mentak player cannot use their Pillage faction ability against you. If you activate a system that contains 1 or more of the Mentak player's units, return this card to the Mentak player."
     },
     {
         "alias": "gift",
@@ -109,7 +109,7 @@
         "faction": "naaz",
         "playArea": false,
         "source": "pok",
-        "text": "Action: Purge 2 of your relic fragments of the same type to gain 1 relic. Then, return this card to the Naaz-Rokha player.",
+        "text": "ACTION: Purge 2 of your relic fragments of the same type to gain 1 relic. Then, return this card to the Naaz-Rokha player.",
         "shortName": "Black M'rk't Forgery",
         "shrinkName": true
     },
@@ -128,7 +128,7 @@
         "faction": "nomad",
         "playArea": false,
         "source": "pok",
-        "text": "At the start of a space combat against a player other than the Nomad: During this combat, treat 1 of your non-fighter ships as if it has the Sustain Damage ability, combat value, and Anti-Fighter Barrage value of the Nomad's flagship. Return this card to the Nomad player at the end of the combat."
+        "text": "At the start of a space combat against a player other than the Nomad: During this combat, treat 1 of your non-fighter ships as if it has the SUSTAIN DAMAGE ability, combat value, and ANTI-FIGHTER BARRAGE value of the Nomad's flagship. Return this card to the Nomad player at the end of the combat."
     },
     {
         "alias": "tekklar",
@@ -146,7 +146,7 @@
         "playImmediately": false,
         "attachment": "titanspn",
         "source": "pok",
-        "text": "Action: Attach this card to a non-home planet you control other than Mecatol Rex. Its resource and influence values are each increased by 1, and it is treated as having all 3 planet traits (cultural, hazardous, and industrial)."
+        "text": "ACTION: Attach this card to a non-home planet you control other than Mecatol Rex. Its resource and influence values are each increased by 1, and it is treated as having all 3 planet traits (cultural, hazardous, and industrial)."
     },
     {
         "alias": "ra",
@@ -212,7 +212,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "pok",
-        "text": "Action: Place this card faceup in your play area. When you give a number of commodities to the Empyrean player equal to your maximum commodity value, you each gain 1 trade good. If you activate a system that contains 1 or more of the Empyrean player's units, return this card to the Empyrean player."
+        "text": "ACTION: Place this card faceup in your play area. When you give a number of commodities to the Empyrean player equal to your maximum commodity value, you each gain 1 trade good. If you activate a system that contains 1 or more of the Empyrean player's units, return this card to the Empyrean player."
     },
     {
         "alias": "rider",

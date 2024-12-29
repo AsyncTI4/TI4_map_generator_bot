@@ -271,7 +271,7 @@ public class AddPlanetService {
             if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd") < 3) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
-                        + " if you have the correct amount of infantry (3 or 4), you may remove them and deploy 1 space dock on "
+                        + " if you have the correct amount of infantry (3 or 4), you may remove them and DEPLOY 1 space dock on "
                         + planet + " using the buttons.",
                     buttons);
 

@@ -22,7 +22,7 @@
         "types": ["BIOTIC"],
         "requirements": "G",
         "source": "miltymod",
-        "text": "After 1 of your ground forces is destroyed during ground combat, you may place that unit on this card.\n \n At the end of your turn, you may exhaust this card to place any number of units from it onto a planet you control.",
+        "text": "After 1 of your ground forces is destroyed during ground combat, you may place that unit on this card.\nAt the end of your turn, you may exhaust this card to place any number of units from it onto a planet you control.",
         "homebrewReplacesID": "dxa"
     },
     {
@@ -57,7 +57,7 @@
         "types": ["CYBERNETIC"],
         "requirements": "Y",
         "source": "miltymod",
-        "text": "You may exhaust this card before 1 or more of your units use SPACE CANNON; hits produced by those units must be assigned to non-fighter ships if able.\n \n You may exhaust this card at the start of a space combat round; hits produced by your units this round must be assigned to non-fighter ships if able.",
+        "text": "You may exhaust this card before 1 or more of your units use SPACE CANNON; hits produced by those units must be assigned to non-fighter ships if able.\nYou may exhaust this card at the start of a space combat round; hits produced by your units this round must be assigned to non-fighter ships if able.",
         "homebrewReplacesID": "gls"
     },
     {
@@ -101,7 +101,7 @@
         "types": ["UNITUPGRADE"],
         "requirements": "YY",
         "source": "miltymod",
-        "text": "This unit's Production value is equal to 5 more than the resource value of this planet.\n \n Up to 5 fighters in this system do not count against your ships' capacity.\n \nWhen you use this unit's PRODUCTION ability, you may place the produced units on any planet in this system.\n \n PRODUCTION X",
+        "text": "PRODUCTION X\nThis unit's PRODUCTION value is equal to 5 more than the resource value of this planet.\nUp to 5 fighters in this system do not count against your ships' capacity.\nWhen you use this unit's PRODUCTION ability, you may place the produced units on any planet in this system.",
         "homebrewReplacesID": "sd2"
     },
     {
@@ -110,7 +110,7 @@
         "types": ["UNITUPGRADE"],
         "requirements": "GG",
         "source": "miltymod",
-        "text": "COST: 1(x2); COMBAT 7\n \n When you gain control of a planet, if you have more infantry on that planet than that planet's resource value, gain that planet readied.",
+        "text": "Cost: 1(x2), Combat 7\nWhen you gain control of a planet, if you have more infantry on that planet than that planet's resource value, gain that planet readied.",
         "homebrewReplacesID": "inf2"
     },
     {
@@ -119,7 +119,7 @@
         "types": ["UNITUPGRADE"],
         "requirements": "BY",
         "source": "miltymod",
-        "text": "COST: 1(x2); COMBAT 8; MOVE 2\n \n This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "text": "Cost: 1(x2), Combat 8, Move 2\nThis unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
         "homebrewReplacesID": "ff2"
     },
     {
@@ -128,7 +128,7 @@
         "types": ["UNITUPGRADE"],
         "requirements": "GYR",
         "source": "miltymod",
-        "text": "COST 2; COMBAT 6; MOVE 3; CAPACITY 1\n \n When making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 1 additional hit.",
+        "text": "Cost 2, Combat 6, Move 3, Capacity 1\nWhen making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 1 additional hit.",
         "homebrewReplacesID": "cr2"
     },
     {
@@ -137,7 +137,7 @@
         "types": ["UNITUPGRADE"],
         "requirements": "GB",
         "source": "miltymod",
-        "text": "COST 3; COMBAT 9; MOVE 2; CAPACITY 6",
+        "text": "Cost 3, Combat 9, Move 2, Capacity 6",
         "homebrewReplacesID": "cv2"
     },
     {
@@ -146,7 +146,7 @@
         "types": ["UNITUPGRADE"],
         "requirements": "RBY",
         "source": "miltymod",
-        "text": "COST 4; COMBAT 4; MOVE 2; CAPACITY 1\n \n SUSTAIN DAMAGE, BOMBARDMENT 4",
+        "text": "Cost 4, Combat 4, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 4",
         "homebrewReplacesID": "dn2"
     },
     {
@@ -155,7 +155,7 @@
         "types": ["UNITUPGRADE"],
         "requirements": "GYRR",
         "source": "miltymod",
-        "text": "COST 12; COMBAT 3(x3); MOVE 2; CAPACITY 6\n \n Other player's units in this system lose PLANETARY SHIELD.\n \n SUSTAIN DAMAGE, BOMBARDMENT 3(x3)",
+        "text": "Cost 12, Combat 3(x3), Move 2, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther player's units in this system lose PLANETARY SHIELD.",
         "homebrewReplacesID": "ws"
     },
     {
@@ -176,7 +176,7 @@
         "faction": "sol",
         "baseUpgrade": "miltymod_cv2",
         "source": "miltymod",
-        "text": "COST 3; COMBAT 9; MOVE 2; CAPACITY 8\n \n SUSTAIN DAMAGE",
+        "text": "Cost 3, Combat 9, Move 2, Capacity 8\nSUSTAIN DAMAGE",
         "homebrewReplacesID": "ac2"
     },
     {
@@ -187,7 +187,7 @@
         "faction": "sol",
         "baseUpgrade": "miltymod_inf2",
         "source": "miltymod",
-        "text": "COST: 1(x2); COMBAT 6\n \n When you gain control of a planet, if you have more infantry on that planet than that planet's resource or influence value, gain that planet readied.",
+        "text": "Cost: 1(x2), Combat 6\nWhen you gain control of a planet, if you have more infantry on that planet than that planet's resource or influence value, gain that planet readied.",
         "homebrewReplacesID": "so2"
     },
     {
@@ -197,7 +197,7 @@
         "requirements": "",
         "faction": "letnev",
         "source": "miltymod",
-        "text": "During an invasion, units cannot use Space Cannon against your units.",
+        "text": "During an invasion, units cannot use SPACE CANNON against your units.",
         "homebrewReplacesID": "l4"
     },
     {
@@ -238,7 +238,7 @@
         "faction": "sardakk",
         "baseUpgrade": "miltymod_dn2",
         "source": "miltymod",
-        "text": "COST 4; COMBAT 4; MOVE 2; CAPACITY 1After a round of space combat, you may destroy this unit to destroy up to 2 ships in this system.\n \n SUSTAIN DAMAGE, BOMBARDMENT 3(x2)",
+        "text": "Cost 4, Combat 4, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 3(x2)\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in this system.",
         "homebrewReplacesID": "exo2"
     },
     {
@@ -259,7 +259,7 @@
         "faction": "l1z1x",
         "baseUpgrade": "miltymod_dn2",
         "source": "miltymod",
-        "text": "COST 4; COMBAT 3; MOVE 2; CAPACITY 2\n \n SUSTAIN DAMAGE, BOMBARDMENT 3",
+        "text": "Cost 4, Combat 3, Move 2, Capacity 2\nSUSTAIN DAMAGE, BOMBARDMENT 3",
         "homebrewReplacesID": "sdn2"
     },
     {
@@ -270,7 +270,7 @@
         "faction": "naalu",
         "baseUpgrade": "miltymod_ff2",
         "source": "miltymod",
-        "text": "COST: 1(x2); COMBAT 7; MOVE 2\n \n This unit may move without being transported. Fighters in excess of your ships' capacity count as 1/2 of a ship against your fleet pool.",
+        "text": "Cost: 1(x2), Combat 7, Move 2\nThis unit may move without being transported.\nFighters in excess of your ships' capacity count as 1/2 of a ship against your fleet pool.",
         "homebrewReplacesID": "hcf2"
     },
     {
@@ -280,7 +280,7 @@
         "requirements": "B",
         "faction": "winnu",
         "source": "miltymod",
-        "text": "During your tactical actions, treat the Mecatol Rex system as if it contains each non-delta wormhole.\n \n ACTION: If you control Mecatol Rex, exhaust this card to place 1 infantry from your reinforcements on Mecatol Rex.",
+        "text": "During your tactical actions, treat the Mecatol Rex system as if it contains each non-delta wormhole.\nACTION: If you control Mecatol Rex, exhaust this card to place 1 infantry from your reinforcements on Mecatol Rex.",
         "homebrewReplacesID": "lgf"
     },
     {
@@ -290,7 +290,7 @@
         "requirements": "Y",
         "faction": "winnu",
         "source": "miltymod",
-        "text": "Exhaust this card when 1 or more of your units use Production; swap the resource and influence values of 1 planet you control during that use of Production.",
+        "text": "Exhaust this card when 1 or more of your units use PRODUCTION; swap the resource and influence values of 1 planet you control during that use of PRODUCTION.",
         "homebrewReplacesID": "htp"
     },
     {
@@ -300,7 +300,7 @@
         "requirements": "RR",
         "faction": "muaat",
         "source": "miltymod",
-        "text": "Your ships can move into supernovas.\n \n After you place 1 or more units in a system that either contains a war sun or is adjacent to a supernova, gain 1 trade good.",
+        "text": "Your ships can move into supernovas.\nAfter you place 1 or more units in a system that either contains a war sun or is adjacent to a supernova, gain 1 trade good.",
         "homebrewReplacesID": "mr"
     },
     {
@@ -310,7 +310,7 @@
         "requirements": "GYRR",
         "faction": "muaat",
         "source": "miltymod",
-        "text": "COST 10; COMBAT 3(x3); MOVE 3; CAPACITY 6\n \n Other player's units in this system lose PLANETARY SHIELD.\n \n SUSTAIN DAMAGE, BOMBARDMENT 3(x3)",
+        "text": "Cost 10, Combat 3(x3), Move 3, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther player's units in this system lose PLANETARY SHIELD.",
         "homebrewReplacesID": "pws2"
     },
     {
@@ -340,7 +340,7 @@
         "requirements": "BBB",
         "faction": "saar",
         "source": "miltymod",
-        "text": "Other players cannot move ships into asteroid fields that contain 1 or more of your ships.\n \n At the start of your turn during the action phase, you may produce 1 unit in a system that contains at least 1 of your units that has Production.",
+        "text": "Other players cannot move ships into asteroid fields that contain 1 or more of your ships.\nAt the start of your turn during the action phase, you may produce 1 unit in a system that contains at least 1 of your units that has PRODUCTION.",
         "homebrewReplacesID": "cm"
     },
     {
@@ -351,7 +351,7 @@
         "faction": "saar",
         "baseUpgrade": "miltymod_sd2",
         "source": "miltymod",
-        "text": "MOVE 2; CAPACITY 6\n \n This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed.\n \n PRODUCTION 7",
+        "text": "Move 2, Capacity 6\nPRODUCTION 7\nThis unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.",
         "homebrewReplacesID": "ff2"
     },
     {
@@ -361,7 +361,7 @@
         "requirements": "B",
         "faction": "ghost",
         "source": "miltymod",
-        "text": "Action: Exhaust this card to place or move a Creuss wormhole token into either a system that contains a planet you control or a non-home system that does not contain another player's ships.",
+        "text": "ACTION: Exhaust this card to place or move a Creuss wormhole token into either a system that contains a planet you control or a non-home system that does not contain another player's ships.",
         "homebrewReplacesID": "wg"
     },
     {
@@ -382,7 +382,7 @@
         "faction": "arborec",
         "baseUpgrade": "miltymod_inf2",
         "source": "miltymod",
-        "text": "COST: 1(x2); COMBAT 7\n \n When you gain control of a planet, if you have more infantry on that planet than that planet's resource value, gain that planet readied.\n \n PRODUCTION 2",
+        "text": "Cost: 1(x2), Combat 7\nPRODUCTION 2\nWhen you gain control of a planet, if you have more infantry on that planet than that planet's resource value, gain that planet readied.",
         "homebrewReplacesID": "lw2"
     }
 ]
