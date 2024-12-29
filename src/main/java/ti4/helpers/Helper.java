@@ -1723,21 +1723,12 @@ public class Helper {
         boolean ccCountIsOver = ccCount > limit;
         if (ccCountIsOver && game.isCcNPlasticLimit()) {
             Player player = game.getPlayerFromColorOrFaction(color);
-
-            String msg = game.getPing() + " ";
-            if (!game.isFowMode()) {
-                if (player != null) {
-                    msg += player.getFactionEmoji() + " " + player.getFaction() + " ";
-                    msg += player.getPing() + " ";
-                }
+            if (player == null) {
+                return;
             }
 
-            msg += "(" + color + ") is over the command token limit of " + limit + ". Command tokens used: " + ccCount;
-            if (player != null) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            } else if (!game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
-            }
+            String msg = player.getRepresentationUnfogged() + " is over the command token limit of " + limit + ". Command tokens used: " + ccCount;
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
     }
 
