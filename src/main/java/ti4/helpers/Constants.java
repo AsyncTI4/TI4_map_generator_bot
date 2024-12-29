@@ -285,6 +285,11 @@ public class Constants {
     public static final String INCLUDE_ERONOUS_TILES = "eronous_tiles";
     public static final String DRAW_ONLY = "draw_only";
     public static final String ADD_TILE_LIST_RANDOM = "add_tile_list_random";
+    public static final String GENERATE_PAINBOX_MAP = "generate_painbox_map";
+    public static final String BLUE_TILES = "blue_tiles";
+    public static final String RED_TILES = "red_tiles";
+    public static final String HOME_SYSTEMS = "home_systems";
+    public static final String SUPERNOVAS = "supernovas";
     public static final String INTERACTIVE_BUILDER = "interactive_builder";
     public static final String ADD_CC = "add_cc";
     public static final String ADD_CC_FROM_TACTICS = "add_cc_from_tactics";

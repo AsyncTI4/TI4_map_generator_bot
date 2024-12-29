@@ -11,7 +11,8 @@ import ti4.helpers.Constants;
 public class Special2Command implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-            new SetupNeutralPlayer()
+            new SetupNeutralPlayer(),
+            new GeneratePainBoxMapString()
     ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
 
