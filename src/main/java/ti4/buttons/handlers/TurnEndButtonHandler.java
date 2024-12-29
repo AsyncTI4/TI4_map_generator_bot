@@ -18,7 +18,8 @@ class TurnEndButtonHandler {
     @ButtonHandler("turnEnd")
     public static void turnEnd(ButtonInteractionEvent event, Game game, Player player) {
         if (game.isFowMode() && !player.isActivePlayer()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not the active player. Force End Turn with /player turn_end.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "You are not the active player. If you need to, you can force end the current player's turn with `/player turn_end`.");
             return;
         }
         CommanderUnlockCheckService.checkPlayer(player, "hacan");

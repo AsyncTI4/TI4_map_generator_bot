@@ -104,7 +104,7 @@
         "name": "Cultural Relic Fragment",
         "type": "Cultural",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -112,7 +112,7 @@
         "name": "Cultural Relic Fragment",
         "type": "Cultural",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -120,7 +120,7 @@
         "name": "Cultural Relic Fragment",
         "type": "Cultural",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -128,7 +128,7 @@
         "name": "Cultural Relic Fragment",
         "type": "Cultural",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -136,7 +136,7 @@
         "name": "Cultural Relic Fragment",
         "type": "Cultural",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -144,7 +144,7 @@
         "name": "Cultural Relic Fragment",
         "type": "Cultural",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -152,7 +152,7 @@
         "name": "Cultural Relic Fragment",
         "type": "Cultural",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -160,7 +160,7 @@
         "name": "Cultural Relic Fragment",
         "type": "Cultural",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -168,7 +168,7 @@
         "name": "Cultural Relic Fragment",
         "type": "Cultural",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -293,7 +293,7 @@
         "name": "Hazardous Relic Fragment",
         "type": "Hazardous",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your hazardous relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -301,7 +301,7 @@
         "name": "Hazardous Relic Fragment",
         "type": "Hazardous",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your hazardous relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -309,7 +309,7 @@
         "name": "Hazardous Relic Fragment",
         "type": "Hazardous",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your hazardous relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -317,7 +317,7 @@
         "name": "Hazardous Relic Fragment",
         "type": "Hazardous",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your hazardous relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -325,7 +325,7 @@
         "name": "Hazardous Relic Fragment",
         "type": "Hazardous",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your hazardous relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -333,7 +333,7 @@
         "name": "Hazardous Relic Fragment",
         "type": "Hazardous",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your hazardous relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -341,7 +341,7 @@
         "name": "Hazardous Relic Fragment",
         "type": "Hazardous",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your hazardous relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -484,7 +484,7 @@
         "name": "Industrial Relic Fragment",
         "type": "Industrial",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your industrial relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -492,7 +492,7 @@
         "name": "Industrial Relic Fragment",
         "type": "Industrial",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your industrial relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -500,7 +500,7 @@
         "name": "Industrial Relic Fragment",
         "type": "Industrial",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your industrial relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -508,7 +508,7 @@
         "name": "Industrial Relic Fragment",
         "type": "Industrial",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your industrial relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -516,7 +516,7 @@
         "name": "Industrial Relic Fragment",
         "type": "Industrial",
         "resolution": "Fragment",
-        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "text": "ACTION: Purge 3 of your industrial relic fragments to gain 1 relic.",
         "source": "pok"
     },
     {
@@ -542,7 +542,7 @@
         "name": "Enigmatic Device",
         "type": "Frontier",
         "resolution": "Instant",
-        "text": "Place this card faceup in your play area. Action: You may spend 6 resource and purge this card to research 1 technology.",
+        "text": "Place this card faceup in your play area.\nACTION: You may spend 6 resource and purge this card to research 1 technology.",
         "flavorText": "*A needle longer than a dreadnought but no wider than a landcar flew through the void, its surface glowing with a pale violet light.*",
         "source": "pok"
     },
@@ -551,7 +551,7 @@
         "name": "Enigmatic Device",
         "type": "Frontier",
         "resolution": "Instant",
-        "text": "Place this card faceup in your play area. Action: You may spend 6 resource and purge this card to research 1 technology.",
+        "text": "Place this card faceup in your play area.\nACTION: You may spend 6 resource and purge this card to research 1 technology.",
         "flavorText": "*The silver pinwheel spun slowly in the midst of the nebula, each kilometer-long blade glittering faintly with reflected starlight.*",
         "source": "pok"
     },

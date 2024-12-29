@@ -91,8 +91,8 @@
         "type": "Event",
         "category": "event",
         "categoryDescription": "permanent",
-        "text": "The production capacity of each space dock is increased by 1.",
-        "mapText": "The production capacity of each space dock is increased by 1.",
+        "text": "The PRODUCTION capacity of each space dock is increased by 1.",
+        "mapText": "The PRODUCTION capacity of each space dock is increased by 1.",
         "source": "ignis_aurora"
     },
     {

@@ -268,7 +268,7 @@
         "type": "agent",
         "name": "Berekar Berekon",
         "title": "Arbiter of Divine Right",
-        "abilityWindow": "When 1 or more of a player's units use Production:",
+        "abilityWindow": "When 1 or more of a player's units use PRODUCTION:",
         "abilityText": "You may exhaust this card to reduce the combined cost of the produced units by 2.",
         "unlockCondition": "Always Unlocked",
         "source": "pok"
@@ -323,7 +323,7 @@
         "type": "commander",
         "name": "Dirzuga Rophal",
         "title": "Peace Through Strength",
-        "abilityWindow": "After another player activates a system that contains 1 or more of your units that have Production:",
+        "abilityWindow": "After another player activates a system that contains 1 or more of your units that have PRODUCTION:",
         "abilityText": "You may produce 1 unit in that system.",
         "unlockCondition": "Have 12 ground forces on planets you control.",
         "source": "pok"
@@ -336,7 +336,7 @@
         "title": "Strike Wing Commander",
         "abilityWindow": "When 1 or more of your units make a roll for a unit ability:",
         "abilityText": "You may choose 1 of those units to roll 1 additional die.",
-        "unlockCondition": "Have 6 units that have Anti-Fighter Barrage, Space Cannon, or Bombardment on the game board.",
+        "unlockCondition": "Have 6 units that have ANTI-FIGHTER BARRAGE, SPACE CANNON, or BOMBARDMENT on the game board.",
         "source": "pok"
     },
     {
@@ -346,7 +346,7 @@
         "name": "That Which Molds Flesh",
         "title": "Grisly Abomination",
         "abilityWindow": "When you produce fighter or infantry units:",
-        "abilityText": "Up to 2 of those units do not count against your Production limit.",
+        "abilityText": "Up to 2 of those units do not count against your PRODUCTION limit.",
         "unlockCondition": "Have units in 3 gravity rifts.",
         "source": "pok",
         "shrinkName": true
@@ -414,7 +414,7 @@
         "name": "2RAM",
         "title": "Integrated Systems Engineer",
         "abilityWindow": "At any time:",
-        "abilityText": "Units that have Planetary Shield do not prevent you from using Bombardment.",
+        "abilityText": "Units that have PLANETARY SHIELD do not prevent you from using BOMBARDMENT.",
         "unlockCondition": "Have 4 dreadnoughts on the game board.",
         "source": "pok",
         "searchTags": [
@@ -428,7 +428,7 @@
         "type": "commander",
         "name": "Rear Admiral Farran",
         "title": "Sector XVIII Viceroy",
-        "abilityWindow": "After 1 of your units uses Sustain Damage:",
+        "abilityWindow": "After 1 of your units uses SUSTAIN DAMAGE:",
         "abilityText": "You may gain 1 trade good.",
         "unlockCondition": "Have 5 non-fighter ships in 1 system.",
         "source": "pok",
@@ -550,7 +550,7 @@
         "type": "commander",
         "name": "Tungstantus",
         "title": "The Gardener",
-        "abilityWindow": "When 1 or more of your units use Production:",
+        "abilityWindow": "When 1 or more of your units use PRODUCTION:",
         "abilityText": "You may gain 1 trade good.",
         "unlockCondition": "Have 5 structures on the game board.",
         "source": "pok",
@@ -669,8 +669,8 @@
         "name": "Harrugh Gefhara",
         "title": "The Nascent Twilight",
         "abilityName": "Galactic Securities Net: Sanction of the Quieron",
-        "abilityWindow": "When 1 or more of your units use Production:",
-        "abilityText": "You may reduce the cost of each of your units to 0 during this use of Production. If you do, purge this card.",
+        "abilityWindow": "When 1 or more of your units use PRODUCTION:",
+        "abilityText": "You may reduce the cost of each of your units to 0 during this use of PRODUCTION. If you do, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "pok"
     },
@@ -882,7 +882,7 @@
         "title": "Elysium's Core",
         "abilityName": "Geoform: Awakening",
         "abilityWindow": "ACTION:",
-        "abilityText": "Ready Elysium and attach this card to it. Its resource and influence values are each increased by 3, and it gains the Space Cannon 5 (x3) ability as if it were a unit.",
+        "abilityText": "Ready Elysium and attach this card to it. Its resource and influence values are each increased by 3, and it gains the SPACE CANNON 5(x3) ability as if it were a unit.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "pok"
     },
@@ -918,7 +918,7 @@
         "title": "High Priest of Yin",
         "abilityName": "Quantum Dissemination: Blessing of the Yin",
         "abilityWindow": "ACTION:",
-        "abilityText": "Commit up to 3 infantry from your reinforcements to any non-home planets and resolve ground combats on those planets. Players cannot use Space Cannon against these units. Then, purge this card.",
+        "abilityText": "Commit up to 3 infantry from your reinforcements to any non-home planets and resolve ground combats on those planets. Players cannot use SPACE CANNON against these units. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "pok"
     },

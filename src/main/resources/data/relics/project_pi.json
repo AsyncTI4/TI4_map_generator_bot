@@ -2,7 +2,7 @@
     {
         "alias": "pi_stellarconverter",
         "name": "Stellar Converter",
-        "text": "After you activate a system that cintain a planet, your ships that have BOMBARDMENT gain +1 to movement.\nAction: Choose 1 non-home planet other than Mecatol Rex in a system that is adjacent to 1 or more of your units that have BOMBARDMENT; destroy all units on that planet and purge its attachments and its planet card.\nThen, place the destroyed planet token on that planet and purge this card.",
+        "text": "After you activate a system that cintain a planet, your ships that have BOMBARDMENT gain +1 to movement.\nACTION: Choose 1 non-home planet other than Mecatol Rex in a system that is adjacent to 1 or more of your units that have BOMBARDMENT; destroy all units on that planet and purge its attachments and its planet card.\nThen, place the destroyed planet token on that planet and purge this card.",
         "source": "project_pi"
     },
     {
@@ -14,7 +14,7 @@
     {
         "alias": "pi_ringofking",
         "name": "The Ring of King Poon",
-        "text": "Action: Exhaust this card to peek at a facedown public objective.\nAction: Exhaust this card to reveal a facedown public objective. Score a revealed public objective. Purge this card.",
+        "text": "ACTION: Exhaust this card to peek at a facedown public objective.\nACTION: Exhaust this card to reveal a facedown public objective. Score a revealed public objective. Purge this card.",
         "source": "project_pi"
     },
     {

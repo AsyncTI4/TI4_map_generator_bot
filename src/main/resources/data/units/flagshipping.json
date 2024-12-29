@@ -14,7 +14,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "At the start of a space combat in this system, you may place 1 fighter in this system. At the start of a ground combat in this system, you may place 1 infantry on that planet if you have not placed a unit with this ship's ability this action.",
+        "ability": "At the start of a space combat in this system, you may place 1 fighter in this system.\nAt the start of a ground combat in this system, you may place 1 infantry on that planet if you have not placed a unit with this ship's ability this action.",
         "unlock": "UNLOCK: Win a ground combat.",
         "homebrewReplacesID": "sol_flagship"
     },
@@ -33,7 +33,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "At the start of a space combat in this system, place 1 fighter in this system. At the start of a ground combat in this system, place 1 infantry on that planet.",
+        "ability": "At the start of a space combat in this system, place 1 fighter in this system.\nAt the start of a ground combat in this system, place 1 infantry on that planet.",
         "unlock": "UNLOCK: Win a ground combat on a legendary planet, Mecatol Rex, or in a home system."
     },
     
@@ -53,7 +53,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players cannot cancel more than 1 hit with SUSTAIN DAMAGE during each space combat round in this system.",
-        "unlock": "When you resolve your PILLAGE faction ability, place 1 control token on this card.\nUNLOCK: have 6 control tokens on this card.",
+        "unlock": "When you resolve your Pillage faction ability, place 1 control token on this card.\nUNLOCK: have 6 control tokens on this card.",
         "homebrewReplacesID": "mentak_flagship"
     },
     {
@@ -72,7 +72,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players' ships in or adjacent to this system cannot use SUSTAIN DAMAGE.",
-        "unlock": "When you resolve your PILLAGE faction ability, place 1 control token on this card.\nUNLOCK: have 12 control tokens on this card."
+        "unlock": "When you resolve your Pillage faction ability, place 1 control token on this card.\nUNLOCK: have 12 control tokens on this card."
     },
     
     {
@@ -109,7 +109,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When a hit is produced against your units in this system, you may assign that hit to any of your units in this system, regardless of type. When this ship is destroyed, destroy all ships in this system.",
+        "ability": "When a hit is produced against your units in this system, you may assign that hit to any of your units in this system, regardless of type.\nWhen this ship is destroyed, destroy all ships in this system.",
         "unlock": "After 1 of your units is destroyed, place 1 control token on this card.\nUNLOCK: Have 12 control tokens on this card."
     },
     
@@ -163,7 +163,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "When you use your STAR FORGE faction ability in this or an adjacent system, or use the component action of your flagship when it is in this or an adjacent system, you may place 1 infantry from your reinforcements with this unit.",
+        "ability": "When you use your Star Forge faction ability in this or an adjacent system, or use the component action of your flagship when it is in this or an adjacent system, you may place 1 infantry from your reinforcements with this unit.",
         "homebrewReplacesID": "muaat_mech"
     },
     
@@ -321,7 +321,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "If you own each non-faction technology owned by your opponent, apply +2 to the result of this unit's combat rolls. At the start of a space combat, choose any number of your ground forces in this system to participate in that combat as though they were ships.",
+        "ability": "If you own each non-faction technology owned by your opponent, apply +2 to the result of this unit's combat rolls.\nAt the start of a space combat, choose any number of your ground forces in this system to participate in that combat as though they were ships.",
         "unlock": "UNLOCK: When you would gain a technology from a player with their Flagship II unlocked using 1 of your faction abilities, you may instead unlock this unit."
     },
     
@@ -359,7 +359,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other players cannot use ANTI-FIGHTER BARRAGE against your units in this system. During an invasion in this system, you may commit fighters to planets as though they were ground forces. When combat ends, return those units to the space area.",
+        "ability": "Other players cannot use ANTI-FIGHTER BARRAGE against your units in this system.\nDuring an invasion in this system, you may commit fighters to planets as though they were ground forces. When combat ends, return those units to the space area.",
         "unlock": "UNLOCK: Have 20 fighters on the game board."
     },
     {
@@ -375,7 +375,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Only this unit rolls combat dice during the first round of ground combat on this planet. When another player activates this system, place 1 infantry on this planet.",
+        "ability": "Only this unit rolls combat dice during the first round of ground combat on this planet.\nWhen another player activates this system, place 1 infantry on this planet.",
         "homebrewReplacesID": "naalu_mech"
     },
     
@@ -413,7 +413,7 @@
         "sustainDamage": true,
         "canBeDirectHit": false,
         "isShip": true,
-        "ability": "At the start of each space combat round in this system, repair this ship, then place 1 fighter for every 8 resources in the combined cost of your non-fighter ships in this system. This unit cannot be destroyed by \"Direct Hit\" action cards.",
+        "ability": "At the start of each space combat round in this system, repair this ship, then place 1 fighter for every 8 resources in the combined cost of your non-fighter ships in this system.\nThis unit cannot be destroyed by \"Direct Hit\" action cards.",
         "unlock": "When 1 of your opponent's non-fighter ships is destroyed during space combat, place a number of control tokens on this card equal to that ship's cost.\nUNLOCK: Have 20 control tokens on this card."
     },
     
@@ -567,7 +567,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You may use this ship's SPACE CANNON against ships that are in adjacent systems. Each hit produced from your space cannon rolls against ships in or adjacent to this system must be assigned to a different type of ship if possible.",
+        "ability": "You may use this ship's SPACE CANNON against ships that are in adjacent systems.\nEach hit produced from your space cannon rolls against ships in or adjacent to this system must be assigned to a different type of ship if possible.",
         "spaceCannonHitsOn": 5,
         "spaceCannonDieCount": 4,
         "deepSpaceCannon": true,
@@ -647,7 +647,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "You may spend any number of trade goods to cancel up to 3 hits each, all produced by the same player against your units in this system; that player gains the trade good.",
-        "unlock": "When you resolve a transaction with another player, place 1 of their control tokens on this card. UNLOCK: Have 6 control tokens for each other player in the game on this card."
+        "unlock": "When you resolve a transaction with another player, place 1 of their control tokens on this card.\nUNLOCK: Have 6 control tokens for each other player in the game on this card."
     },
     
     {
@@ -665,7 +665,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You treat this system as if it contained a delta wormhole. During movement, this ship may move before or after your other ships. This ship does not roll for gravity rifts.",
+        "ability": "You treat this system as if it contained a delta wormhole.\nDuring movement, this ship may move before or after your other ships.\nThis ship does not roll for gravity rifts.",
         "unlock": "UNLOCK: Have ships in systems that collectively contain a total of 4 or more wormholes.",
         "homebrewReplacesID": "ghost_flagship"
     },
@@ -684,7 +684,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You treat this system as if it contained a delta wormhole. During movement, this ship may move before or after your other ships. This ship does not roll for gravity rifts. You may move this ship to an adjacent system at the start of a space combat there.",
+        "ability": "You treat this system as if it contained a delta wormhole.\nDuring movement, this ship may move before or after your other ships.\nThis ship does not roll for gravity rifts.\nYou may move this ship to an adjacent system at the start of a space combat there.",
         "unlock": "UNLOCK: Have ships in systems that collectively contain a total of 6 or more wormholes."
     },
     
@@ -722,7 +722,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During a combat against a player without a command token in your fleet pool, apply +2 to the result of this unit's combat rolls. When you win a combat in this system, place 1 command token from your opponent's reinforcements in this system.",
+        "ability": "During a combat against a player without a command token in your fleet pool, apply +2 to the result of this unit's combat rolls.\nWhen you win a combat in this system, place 1 command token from your opponent's reinforcements in this system.",
         "unlock": "UNLOCK: Have 2 Supports Fors Thes Thrones in your play area."
     },
     
@@ -856,7 +856,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When you capture a unit in this system, also capture a fighter or infantry token from the supply. When you produce this ship, you may return 24 fighters and/or infantry tokens instead of spending resources.",
+        "ability": "When you capture a unit in this system, also capture a fighter or infantry token from the supply.\nWhen you produce this ship, you may return 24 fighters and/or infantry tokens instead of spending resources.",
         "unlock": "When you capture another player's unit, place 1 of that player's control tokens on this card.\nUNLOCK: Have 4 of 1 player's control tokens on this card.",
         "homebrewReplacesID": "cabal_flagship"
     },
@@ -875,7 +875,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When another unit is destroyed in this system, including your own, capture it, then capture a fighter or infantry token from the supply. When you produce this ship, you may return 16 fighters and/or infantry tokens instead of spending resources.",
+        "ability": "When another unit is destroyed in this system, including your own, capture it, then capture a fighter or infantry token from the supply.\nWhen you produce this ship, you may return 16 fighters and/or infantry tokens instead of spending resources.",
         "unlock": "When you capture another player's unit, place 1 of that player's control tokens on this card.\nUNLOCK: Have 12 of 1 player's control tokens on this card."
     },
     
@@ -913,7 +913,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this ship is destroyed, place a ship with a cost of 4 or less from your reinforcements in this system. DEPLOY: After you activate a system that contains 1 of your PDS, you may replace that PDS with this ship.",
+        "ability": "When this ship is destroyed, place a ship with a cost of 4 or less from your reinforcements in this system.\nDEPLOY: After you activate a system that contains 1 of your PDS, you may replace that PDS with this ship.",
         "unlock": "UNLOCK: Control 5 attachments amongst planets you control."
     },
     
@@ -989,7 +989,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Your mechs in this system roll 1 additional die during combat. When you win a combat in this system, you may repair 1 participating unit.",
+        "ability": "Your mechs in this system roll 1 additional die during combat.\nWhen you win a combat in this system, you may repair 1 participating unit.",
         "unlock": "When you purge a relic fragment, or when an exploration deck is depleted, place the corresponding trait token on this card.\nUNLOCK: have 3 tokens on this card."
     },
     

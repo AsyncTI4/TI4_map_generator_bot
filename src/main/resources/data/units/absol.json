@@ -10,7 +10,7 @@
         "fleetSupplyBonus": 2,
         "planetaryShield": true,
         "isStructure": true,
-        "ability": "Deploy: After you activate a system, attach this card to a non-home planet other than Mecatol Rex you control in that system that does not contain a space dock. The planet this card is attached to contains this unit. Up to 8 fighters in this system do not count against your ships' capacity. Up to 2 non-fighter ships in the system do not count against your fleet pool.  This unit cannot be affected by opponent's action cards.  When this unit is destroyed or removed, purge this card."
+        "ability": "DEPLOY: After you activate a system, attach this card to a non-home planet other than Mecatol Rex you control in that system that does not contain a space dock. The planet this card is attached to contains this unit.\nUp to 8 fighters in this system do not count against your ships' capacity. Up to 2 non-fighter ships in the system do not count against your fleet pool.\nThis unit cannot be affected by opponent's action cards.\nWhen this unit is destroyed or removed, purge this card."
     },
     {
         "id": "tyrantslament",
@@ -28,7 +28,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Deploy: At the end of your turn, you may place this unit in any system that contains your ships. When this unit is removed or captured, purge this card. This unit is not affected by action cards, anomalies, or your faction abilities or technologies."
+        "ability": "DEPLOY: At the end of your turn, you may place this unit in any system that contains your ships.\nWhen this unit is removed or captured, purge this card.\nThis unit is not affected by action cards, anomalies, or your faction abilities or technologies."
     },
     {
         "id": "absol_xxcha_mech",
@@ -110,7 +110,7 @@
         "planetaryShield": true,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This unit may count as a structure when it is on a planet; DEPLOY:  When you would place a structure on a planet, you may place 1 mech on that planet instead.",
+        "ability": "This unit may count as a structure when it is on a planet.\nDEPLOY: When you would place a structure on a planet, you may place 1 mech on that planet instead.",
         "homebrewReplacesID": "arborec_mech"
     },
     {
@@ -141,7 +141,7 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "If this unit is in the space area of the active system, it is also a ship. At the end of a space battle in the active system, flip this card.",
+        "ability": "If this unit is in the space area of the active system, it is also a ship.\nAt the end of a space battle in the active system, flip this card.",
         "homebrewReplacesID": "naaz_mech_space"
     },
     {
@@ -153,10 +153,12 @@
         "requiredTechId": "absol_sd2",
         "source": "absol",
         "productionValue": "+4",
+        "basicProduction": "res",
         "capacityValue": 5,
         "fleetSupplyBonus": 1,
         "isStructure": true,
-        "homebrewReplacesID": "spacedock2"
+        "homebrewReplacesID": "spacedock2",
+        "ability": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 5 fighters in this system do not count against your ships' capacity."
     },
     {
         "id": "absol_infantry2",
@@ -185,6 +187,7 @@
         "spaceCannonHitsOn": 5,
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": true,
+        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems.",
         "planetaryShield": true,
         "isStructure": true,
         "homebrewReplacesID": "pds2"
@@ -203,7 +206,7 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "ability": "This unit may move without being transported.\nFighters in excess of your ships' capacity count against your fleet pool.",
         "homebrewReplacesID": "fighter2"
     },
     {
@@ -358,7 +361,7 @@
         "bombardDieCount": 2,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. After a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
         "homebrewReplacesID": "sardakk_dreadnought2"
     },
     {
@@ -399,7 +402,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "homebrewReplacesID": "naalu_fighter2",
-        "ability": "This unit may move without being transported. Each fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
+        "ability": "This unit may move without being transported.\nEach fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
     },
     {
         "id": "absol_muaat_warsun2",
@@ -422,7 +425,7 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": false,
         "isShip": true,
-        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.This unit cannot be destroyed by \"Direct Hit\" action cards.",
+        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.\nThis unit cannot be destroyed by \"Direct Hit\" action cards.",
         "homebrewReplacesID": "muaat_warsun2"
     },
     {
@@ -439,7 +442,7 @@
         "capacityValue": 6,
         "fleetSupplyBonus": 1,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed. 1 non-fighter ship in this system does not count against your fleet pool.",
+        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.\n1 non-fighter ship in this system does not count against your fleet pool.",
         "homebrewReplacesID": "saar_spacedock2"
     },
     {
@@ -479,7 +482,7 @@
         "sustainDamage": true,
         "isStructure": true,
         "isGroundForce": true,
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems.",
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems.",
         "homebrewReplacesID": "titans_pds2"
     },
     {
@@ -519,7 +522,7 @@
         "afbHitsOn": 6,
         "afbDieCount": 3,
         "isShip": true,
-        "ability": "When this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able. When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system.",
+        "ability": "When this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able.\nWhen this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system.",
         "homebrewReplacesID": "argent_destroyer2"
     },
     {
@@ -534,7 +537,7 @@
         "productionValue": 7,
         "fleetSupplyBonus": 1,
         "isStructure": true,
-        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 10 fighters in this system do not count against your ships' capacity. 1 non-fighter ship in this system does not count against your fleet pool.",
+        "ability": "PRODUCTION 7. This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 10 fighters in this system do not count against your ships' capacity. 1 non-fighter ship in this system does not count against your fleet pool.",
         "homebrewReplacesID": "cabal_spacedock2"
     },
     {
@@ -548,7 +551,7 @@
         "faction": "cabal",
         "productionValue": 7,
         "isStructure": true,
-        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 12 fighters in this system do not count against your ships' capacity.",
+        "ability": "PRODUCTION 7. This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 12 fighters in this system do not count against your ships' capacity.",
         "homebrewReplacesID": "cabal_spacedock2"
     },
     {

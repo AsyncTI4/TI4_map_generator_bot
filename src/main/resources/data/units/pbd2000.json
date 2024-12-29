@@ -41,7 +41,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Deploy: During the commit ground forces step of your tactical action in a system that contains your ships, if you have no ground forces in the active system, you may spend 2 resources to place 1 mech on 1 planet in the system."
+        "ability": "DEPLOY: During the commit ground forces step of your tactical action in a system that contains your ships, if you have no ground forces in the active system, you may spend 2 resources to place 1 mech on 1 planet in the system."
     },
     {
         "id": "pbd2000_raven_flagship",

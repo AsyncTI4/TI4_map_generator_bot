@@ -17,7 +17,7 @@ import ti4.model.EventModel;
 class EventInfo extends GameStateSubcommand {
 
     public EventInfo() {
-        super(Constants.INFO, "Send Event Cards to your Cards Info thread", true, true);
+        super(Constants.INFO, "Send Event Cards to your #cards-info thread", true, true);
     }
 
     @Override

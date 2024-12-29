@@ -11,7 +11,7 @@ import ti4.service.info.UnitInfoService;
 class UnitInfo extends GameStateSubcommand {
 
     public UnitInfo() {
-        super(Constants.UNIT_INFO, "Send special unit information to your Cards Info channel", false, true);
+        super(Constants.UNIT_INFO, "Send special unit information to your #cards-info thread", false, true);
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_ALL_UNITS, "'True' also show basic (non-faction) units (Default: False)"));
     }
 

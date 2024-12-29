@@ -43,9 +43,9 @@
         "category": "agenda",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Players may no longer use Bombardment against planets in another player's home system.",
-        "text2": "Against: Starting with the Speaker and continuing clockwise, each player may use the Production ability of 1 space dock they control.",
-        "mapText": "Players may no longer use Bombardment against planets in another player's home system.",
+        "text1": "For: Players may no longer use BOMBARDMENT against planets in another player's home system.",
+        "text2": "Against: Starting with the Speaker and continuing clockwise, each player may use the PRODUCTION ability of 1 space dock they control.",
+        "mapText": "Players may no longer use BOMBARDMENT against planets in another player's home system.",
         "source": "byz_agendas"
     },
     {
@@ -86,7 +86,7 @@
         "category": "agenda",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "For: All players gain the War Sun technology. All War Suns lose sustain damage.",
+        "text1": "For: All players gain the War Sun technology. All War Suns lose SUSTAIN DAMAGE.",
         "mapText": "After the owner of this card replenishes commodities, they gain 1 trade good for each player that is their neighbor. The owner of this card may discard this card when they replenish commodities to gain 5 trade goods.",
         "source": "byz_agendas"
     },
@@ -106,8 +106,8 @@
         "category": "agenda",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. When the owner of this card places a space dock in a system, their units in that system may use their PRODUCTION abilities. The owner of this card may discard this card when they use one of their PRODUCTION abilities to increase their production capacity in that system by 8.",
-        "mapText": "When the owner of this card places a space dock in a system, their units in that system may use their PRODUCTION abilities. The owner of this card may discard this card when they use one of their PRODUCTION abilities to increase their production capacity in that system by 8.",
+        "text1": "The elected player gains this card. When the owner of this card places a space dock in a system, their units in that system may use their PRODUCTION abilities. The owner of this card may discard this card when they use one of their PRODUCTION abilities to increase their PRODUCTION capacity in that system by 8.",
+        "mapText": "When the owner of this card places a space dock in a system, their units in that system may use their PRODUCTION abilities. The owner of this card may discard this card when they use one of their PRODUCTION abilities to increase their PRODUCTION capacity in that system by 8.",
         "source": "byz_agendas"
     },
     {
@@ -146,9 +146,9 @@
         "category": "agenda",
         "type": "Law",
         "target": "For/Against (When this agenda is revealed, if no player owns a War Sun technology, discard this card and reveal another agenda from the top of the deck.)",
-        "text1": "For: All players gain the War Sun technology. All War Suns lose sustain damage.",
+        "text1": "For: All players gain the War Sun technology. All War Suns lose SUSTAIN DAMAGE.",
         "text2": "Against: Each player that owns a War Sun technology may produce one War Sun from a space dock in their home system, if able.",
-        "mapText": "All War Suns lose sustain damage.",
+        "mapText": "All War Suns lose SUSTAIN DAMAGE.",
         "source": "byz_agendas"
     },
     {
