@@ -426,7 +426,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "Your infantry on this planet are not affected by your FRAGILE faction ability.",
+        "ability": "Your infantry on this planet are not affected by your Fragile faction ability.",
         "homebrewReplacesID": "jolnar_mech"
     },
     {
@@ -530,7 +530,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "When you use your STAR FORGE faction ability in this system or an adjacent system, you may place 1 infantry from your reinforcements with this unit.",
+        "ability": "When you use your Star Forge faction ability in this system or an adjacent system, you may place 1 infantry from your reinforcements with this unit.",
         "homebrewReplacesID": "muaat_mech"
     },
     {
@@ -665,7 +665,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you use your ORBITAL DROP faction ability, you may spend 3 resources to place 1 mech on that planet.",
+        "ability": "DEPLOY: After you use your Orbital Drop faction ability, you may spend 3 resources to place 1 mech on that planet.",
         "homebrewReplacesID": "sol_mech"
     },
     {
@@ -737,7 +737,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: When you use your INDOCTRINATION faction ability, you may spend 1 additional influence to replace your opponent's unit with 1 mech instead of 1 infantry.",
+        "ability": "DEPLOY: When you use your Indoctrination faction ability, you may spend 1 additional influence to replace your opponent's unit with 1 mech instead of 1 infantry.",
         "homebrewReplacesID": "yin_mech"
     },
     {
@@ -754,7 +754,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you use your STALL TACTICS faction ability, you may place 1 mech on a planet you control.",
+        "ability": "DEPLOY: After you use your Stall Tactics faction ability, you may place 1 mech on a planet you control.",
         "homebrewReplacesID": "yssaril_mech"
     }
 ]

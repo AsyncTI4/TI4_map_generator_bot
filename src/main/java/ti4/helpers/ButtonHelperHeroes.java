@@ -263,7 +263,7 @@ public class ButtonHelperHeroes {
 
     public static void resolveAxisHeroStep1(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
-        String message = player.getRepresentation() + " Click the axis order you would like to send";
+        String message = player.getRepresentation() + " Click the _Axis Order_ you wish to send.";
         for (String shipOrder : ButtonHelper.getPlayersShipOrders(player)) {
             Button transact = Buttons.green("axisHeroStep2_" + shipOrder, Mapper.getRelic(shipOrder).getName());
             buttons.add(transact);
@@ -1223,7 +1223,7 @@ public class ButtonHelperHeroes {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
         if (sendSftT || sendAlliance)
         {
-            String text = sendSftT ? "**Support for the Throne** " : "**Alliance** ";
+            String text = sendSftT ? "_Support for the Throne_ " : "_Alliance_ ";
             message2 = p1.getRepresentation() + " sent " + text + " directly to the play area of " + ident2;
         }
         else
@@ -1407,7 +1407,8 @@ public class ButtonHelperHeroes {
         game.setStoredValue("kyroHeroSC", dieResult + "");
         game.setStoredValue("kyroHeroPlayer", player.getFaction());
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            Helper.getSCName(dieResult, game) + ", has been marked with Speygh, the Kyro hero, and the faction that played the hero as " + player.getFaction());
+            Helper.getSCName(dieResult, game) + ", has been marked with Speygh, the Kyro hero"
+            + (game.isFrankenGame() ? ", and the faction that played the hero as " + player.getFaction() : "") + ".");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1430,11 +1431,11 @@ public class ButtonHelperHeroes {
         if ("people".equalsIgnoreCase(policy)) {
             if (player.hasAbility("policy_the_people_connect")) {
                 player.removeAbility("policy_the_people_connect");
-                msg = msg + "removed Policy - The People: Connect (+) and added Policy - The People: Control (-).";
+                msg = msg + "removed _Policy - The People: Connect ➕_ and added _Policy - The People: Control ➖_.";
                 player.addAbility("policy_the_people_control");
             } else if (player.hasAbility("policy_the_people_control")) {
                 player.removeAbility("policy_the_people_control");
-                msg = msg + "removed Policy - The People: Control (-) and added Policy - The People: Connect (+).";
+                msg = msg + "removed _Policy - The People: Control ➖_ and added _Policy - The People: Connect ➕_.";
                 player.addAbility("policy_the_people_connect");
             }
         }
@@ -1442,30 +1443,30 @@ public class ButtonHelperHeroes {
             if (player.hasAbility("policy_the_environment_preserve")) {
                 player.removeAbility("policy_the_environment_preserve");
                 msg = msg
-                    + "removed Policy - The Environment: Preserve (+) and added Policy - The Environment: Plunder (-).";
+                    + "removed _Policy - The Environment: Preserve ➕_ and added _Policy - The Environment: Plunder ➖_.";
                 player.addAbility("policy_the_environment_plunder");
             }
             if (player.hasAbility("policy_the_environment_plunder")) {
                 player.removeAbility("policy_the_environment_plunder");
                 msg = msg
-                    + "removed Policy - The Environment: Plunder (-) and added Policy - The Environment: Preserve (+).";
+                    + "removed _Policy - The Environment: Plunder ➖_ and added _Policy - The Environment: Preserve ➕_.";
                 player.addAbility("policy_the_environment_preserve");
             }
         }
         if ("economy".equalsIgnoreCase(policy)) {
             if (player.hasAbility("policy_the_economy_empower")) {
                 player.removeAbility("policy_the_economy_empower");
-                msg = msg + "removed Policy - The Economy: Empower (+)";
+                msg = msg + "removed _Policy - The Economy: Empower ➕_";
                 player.addAbility("policy_the_economy_exploit");
                 player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
                 msg = msg
-                    + " and added Policy - The Economy: Exploit (-). Decreased Commodities total by 1 - double check the value is correct!";
+                    + " and added _Policy - The Economy: Exploit ➖_. Decreased commodities total by 1 (double check the value is correct).";
             } else if (player.hasAbility("policy_the_economy_exploit")) {
                 player.removeAbility("policy_the_economy_exploit");
                 player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
-                msg = msg + "removed Policy - The Economy: Exploit (-)";
+                msg = msg + "removed _Policy - The Economy: Exploit ➖_";
                 player.addAbility("policy_the_economy_empower");
-                msg = msg + " and added Policy - The Economy: Empower (+).";
+                msg = msg + " and added _Policy - The Economy: Empower ➕_.";
             }
         }
         player.removeOwnedUnitByID("olradin_mech");
@@ -1565,7 +1566,7 @@ public class ButtonHelperHeroes {
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
         boolean groundCombatStarted = StartCombatService.groundCombatCheck(game, unitHolder, tile, event);
         if (groundCombatStarted) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Reminder that Dannel of the Tenth, the Yin hero, skips space cannon fire.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + ", reminder that Dannel of the Tenth, the Yin hero, skips the space cannon defense step.");
         }
         ButtonHelper.deleteMessage(event);
     }

@@ -163,7 +163,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "When you use your STAR FORGE faction ability in this or an adjacent system, or use the component action of your flagship when it is in this or an adjacent system, you may place 1 infantry from your reinforcements with this unit.",
+        "ability": "When you use your Star Forge faction ability in this or an adjacent system, or use the component action of your flagship when it is in this or an adjacent system, you may place 1 infantry from your reinforcements with this unit.",
         "homebrewReplacesID": "muaat_mech"
     },
     

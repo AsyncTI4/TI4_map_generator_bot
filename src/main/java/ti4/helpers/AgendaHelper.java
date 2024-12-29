@@ -114,12 +114,12 @@ public class AgendaHelper {
             if (playerDoesNotHaveShenanigans(player)) {
                 continue;
             }
-            String msg = player.getRepresentation()
-                + " you have the option to prepass on agenda shenanigans here. Agenda shenanigans are the action cards known as Bribery, Deadly Plot, and the Confounding/Confusing Legal Texts."
+            String msg = player.getRepresentation() + " you have the option to pre-pass on agenda shenanigans here."
+                + " Agenda shenanigans are the action cards _Bribery_, _Confusing Legal Text_, _Confounding Legal Text_, and _Deadly Plot_."
                 + " Feel free not to pre-pass, this is simply an optional way to resolve agendas faster.";
             List<Button> buttons = new ArrayList<>();
 
-            buttons.add(Buttons.green("resolvePreassignment_Pass On Shenanigans", "Pre-pass"));
+            buttons.add(Buttons.green("resolvePreassignment_Pass On Shenanigans", "Pre-Pass"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
@@ -189,7 +189,7 @@ public class AgendaHelper {
         String watchPartyPing = watchPartyPing(game);
 
         Die d1 = new Die(6);
-        String msg = "# Rolled a " + d1.getResult() + " for Ixthian!";
+        String msg = "# Rolled a " + d1.getResult() + " for Ixthian Artifact!";
         if (d1.isSuccess()) {
             msg += TechEmojis.Propulsion3 + " " + TechEmojis.Biotic3 + " " + TechEmojis.Cybernetic3 + " " + TechEmojis.Warfare3;
         } else {
@@ -204,18 +204,18 @@ public class AgendaHelper {
             if (Helper.getPlayerFromAbility(game, "propagation") != null) {
                 Player player = Helper.getPlayerFromAbility(game, "propagation");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                String message2 = player.getRepresentation() + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
+                String message2 = player.getRepresentation() + ", you would research a technology, but because of **Propagation**, you instead gain 6 command tokens."
                     + " Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message2, buttons);
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
             MessageHelper.sendMessageToChannelWithButton(game.getMainGameChannel(),
-                "You may use the button to get your technology.", Buttons.GET_A_TECH);
+                "You may use the button to get your two technologies.", Buttons.GET_A_TECH);
         } else if (!d1.isSuccess() && !game.isFowMode()) {
             Button modify = Buttons.gray("getModifyTiles", "Modify Units");
             MessageHelper.sendMessageToChannelWithButton(game.getMainGameChannel(),
-                "Please remove units on or adjacent to Mecatol Rex.", modify);
+                "Please remove units in or adjacent to the Mecatol Rex system.", modify);
         }
     }
 
@@ -516,7 +516,7 @@ public class AgendaHelper {
                 Button Vote = Buttons.green(finChecker + "vote", pFaction + " Choose To Vote");
                 Button Abstain;
                 if (nextInLine.hasAbility("future_sight")) {
-                    Abstain = Buttons.red(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain (You have future sight)");
+                    Abstain = Buttons.red(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain (You have Future Sight)");
                 } else {
                     Abstain = Buttons.red(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain");
                 }
@@ -617,29 +617,29 @@ public class AgendaHelper {
                 for (Player loser : losers) {
                     message.append("> ").append(loser.getRepresentationUnfogged()).append("\n");
                 }
-                message.append("Please confirm you will not be playing Bribery or Deadly Plot");
+                message.append("Please play or confirm that you will not be playing _Bribery_ or _Deadly Plot_.");
             } else {
-                message.append(losers.size()).append(" players have the opportunity to play ").append(CardEmojis.ActionCard).append("Deadly Plot.\n");
-                MessageHelper.privatelyPingPlayerList(losers, game, "Please respond to Bribery/Deadly Plot window");
+                message.append(losers.size()).append(" players have the opportunity to play _Deadly Plot_.\n");
+                MessageHelper.privatelyPingPlayerList(losers, game, "Please play or confirm that you will not be playing _Deadly Plot_.");
             }
             MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message.toString(), game, deadlyActionRow, "shenanigans");
             shenanigans = true;
         } else {
-            String message = "Either both Bribery and Deadly Plot were in the discard or no player could legally play them.";
+            String message = "Either both _Bribery_ and _Deadly Plot_ were in the discard or no player could legally play them.";
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
         }
 
         // Confounding & Confusing Legal Text
         if (game.getCurrentAgendaInfo().contains("Elect Player")) {
             if (!game.isACInDiscard("Confounding") || !game.isACInDiscard("Confusing")) {
-                String message = game.getPing() + " please confirm no Confusing/Confounding Legal Texts.";
+                String message = game.getPing() + " please confirm no _Confusing/Confounding Legal Texts_.";
                 Button noConfounding = Buttons.blue("generic_button_id_3", "Refuse Confounding Legal Text");
                 Button noConfusing = Buttons.blue("genericReact4", "Refuse Confusing Legal Text");
                 List<Button> buttons = List.of(noConfounding, noConfusing);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message, game, buttons, "shenanigans");
                 shenanigans = true;
             } else {
-                String message = "Both *Confounding Legal Text* and *Confusing Legal Text* are in the discard pile.\nThere are no shenanigans possible. Please resolve the agenda.";
+                String message = "Both _Confounding Legal Text_ and _Confusing Legal Text_ are in the discard pile.\nThere are no shenanigans possible. Please resolve the agenda.";
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
             }
         }
@@ -816,7 +816,7 @@ public class AgendaHelper {
         for (Player p1 : game.getRealPlayers()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             if (p1.hasTechReady("dsedyng")) {
-                afterButtons.add(Buttons.gray(finChecker + "play_after_Edyn Unity Algorithm", "Use Edyn Unity Algorithm Technology", FactionEmojis.edyn));
+                afterButtons.add(Buttons.gray(finChecker + "play_after_Edyn Unity Algorithm", "Use Unity Algorithm", FactionEmojis.edyn));
             }
             if (game.getCurrentAgendaInfo().contains("Player") && ButtonHelper.isPlayerElected(game, p1, "committee")) {
                 afterButtons.add(Buttons.gray(finChecker + "autoresolve_manualcommittee", "Use Committee Formation", CardEmojis.Agenda));
@@ -832,7 +832,7 @@ public class AgendaHelper {
         GenericInteractionCreateEvent event) {
         if (ButtonHelper.isPlayerElected(game, player, "minister_industry")) {
             String msg = player.getRepresentationUnfogged()
-                + "since you have Minister of Industry, you may build in tile "
+                + "since you have _Minister of Industry_, you may build in tile "
                 + tile.getRepresentationForButtons(game, player) + ". You have "
                 + Helper.getProductionValue(player, game, tile, false) + " PRODUCTION Value in the system.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg,
@@ -1681,7 +1681,7 @@ public class AgendaHelper {
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")) {
             int count = player.getTechs().size() / 2;
-            planetButtons.add(Buttons.gray("exhaustForVotes_augerscommander_" + count, "Use Augurs Commander Votes (" + count + ")", FactionEmojis.augers));
+            planetButtons.add(Buttons.gray("exhaustForVotes_augerscommander_" + count, "Use Ilyxum Commander Votes (" + count + ")", FactionEmojis.augers));
         }
 
         if (CollectionUtils.containsAny(player.getRelics(),
@@ -1701,7 +1701,7 @@ public class AgendaHelper {
         // Ghoti Wayfarer Tech
         if (player.hasTechReady("dsghotg")) {
             int fleetCC = player.getFleetCC();
-            planetButtons.add(Buttons.gray("exhaustForVotes_dsghotg_" + fleetCC, "Use Networked Command Votes (" + fleetCC + ")", FactionEmojis.ghoti));
+            planetButtons.add(Buttons.gray("exhaustForVotes_dsghotg_" + fleetCC, "Use Some Silly Ghoti Technology Votes (" + fleetCC + ")", FactionEmojis.ghoti));
         }
         planetButtons.add(Buttons.gray("exhaustForVotes_allPlanets_" + totalPlanetVotes, "Exhaust All Voting Planets (" + totalPlanetVotes + ")"));
         planetButtons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "proceedToFinalizingVote", "Done exhausting planets."));
@@ -1747,7 +1747,7 @@ public class AgendaHelper {
             + player.getRepresentation() + " you are currently voting " + votes
             + " vote" + (votes.equals("1") ? "" : "s") + ". You may confirm this or you may modify this number if the bot missed something.";
         if (player.getPromissoryNotesInPlayArea().contains("blood_pact")) {
-            msg = msg + " Any Blood Pact Votes will be automatically added";
+            msg += " Any _Blood Pact_ votes will be automatically added.";
         }
         boolean prevoting = !game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
         if (prevoting) {
@@ -1762,9 +1762,8 @@ public class AgendaHelper {
 
     public static void resolveAbsolAgainstChecksNBalances(Game game) {
         StringBuilder message = new StringBuilder();
-        // Integer poIndex = game.addCustomPO("Points Scored Prior to Absol C&B
-        // Wipe", 1);
-        // message.append("Custom PO 'Points Scored Prior to Absol C&B Wipe' has been
+        // Integer poIndex = game.addCustomPO("Points Scored Prior to Absol Checks and Balances Wipe", 1);
+        // message.append("Custom PO 'Points Scored Prior to Absol Checks and Balances Wipe' has been
         // added and people have scored it. \n");
 
         // game.scorePublicObjective(playerWL.getUserID(), poIndex);
@@ -1969,7 +1968,7 @@ public class AgendaHelper {
         ButtonHelper.deleteTheOneButton(event);
         boolean success = game.removeLaw(game.getLaws().get("minister_war"));
         if (success) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Minister of War Law removed");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "The _Minister of War_ law has been discarded.");
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found");
         }
@@ -2013,9 +2012,9 @@ public class AgendaHelper {
         if (game.getLaws().containsKey("rep_govt") || game.getLaws().containsKey("absol_government")) {
             sb = new StringBuilder();
             if (game.getLaws().containsKey("absol_government") && player.controlsMecatol(false)) {
-                sb.append(" vote count (Representative Government while controlling Mecatol Rex): **2**");
+                sb.append(" vote count (_Representative Government_ while controlling Mecatol Rex): **2**");
             } else {
-                sb.append(" vote count (Representative Government): **1**");
+                sb.append(" vote count (_Representative Government_): **1**");
             }
 
         }
@@ -2160,13 +2159,13 @@ public class AgendaHelper {
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")) {
             int count = player.getTechs().size() / 2;
-            additionalVotesAndSources.put(FactionEmojis.augers + "Augers Commander", count);
+            additionalVotesAndSources.put(FactionEmojis.augers + "Ilyxum Commander", count);
         }
 
         // Ghoti Wayfarer Tech
         if (player.hasTechReady("dsghotg")) {
             int fleetCC = player.getFleetCC();
-            additionalVotesAndSources.put(TechEmojis.BioticTech + "Exhaust Networked Command", fleetCC);
+            additionalVotesAndSources.put(TechEmojis.BioticTech + "Exhaust Some Silly Ghoti Technology", fleetCC);
         }
 
         return additionalVotesAndSources;
@@ -2268,29 +2267,30 @@ public class AgendaHelper {
                         + " has chosen to discard _Committee Formation_ to choose the winner."
                         + " Note that \"afters\" may be played before this occurs."
                         + " _Confounding Legal Text_ and/or _Confounding Legal Text_ would be playable, but they're both in the discard pile.");
-                }
-                MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor()
-                    + " has chosen to discard _Committee Formation_ to choose the winner."
-                    + " Note that \"afters\" may be played before this occurs, and that _Confounding Legal Text_ and/or _Confounding Legal Text_ may still be played."
-                    + " You should probably wait and confirm no Legal Texts before resolving.");
-                boolean success = game.removeLaw(game.getLaws().get("committee"));
-                String message = game.getPing() + " please confirm no Legal Texts.";
-                Button noConfounding = Buttons.blue("generic_button_id_3", "Refuse Legal Texts");
-                String inDiscard = "";
-                if (game.isACInDiscard("Confounding")) {
-                    message = game.getPing() + " please confirm no _Confusing Legal Text_.";
-                    noConfounding = Buttons.blue("generic_button_id_3", "Confusing Legal Text");
-                    inDiscard = "Confounding";
-                } else if (game.isACInDiscard("Confusing")) {
-                    message = game.getPing() + " please confirm no _Confounding Legal Text_.";
-                    noConfounding = Buttons.blue("generic_button_id_3", "Confounding Legal Text");
-                    inDiscard = "Confusing";
-                }
-                List<Button> buttons = List.of(noConfounding);
-                MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message, game, buttons, "shenanigans");
-                if (!inDiscard.isEmpty())
-                {
-                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), inDiscard + " Legal Text was found in the discard pile.");
+                } else {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor()
+                        + " has chosen to discard _Committee Formation_ to choose the winner."
+                        + " Note that \"afters\" may be played before this occurs, and that _Confounding Legal Text_ and/or _Confounding Legal Text_ may still be played."
+                        + " You should probably wait and confirm no Legal Texts before resolving.");
+                    boolean success = game.removeLaw(game.getLaws().get("committee"));
+                    String message = game.getPing() + " please confirm no _Confusing/Confounding Legal Texts_.";
+                    Button noLegalText = Buttons.blue("generic_button_id_3", "Refuse Legal Texts");
+                    String inDiscard = "";
+                    if (game.isACInDiscard("Confounding")) {
+                        message = game.getPing() + " please confirm no _Confusing Legal Text_.";
+                        noLegalText = Buttons.blue("generic_button_id_3", "Refuse Confusing Legal Text");
+                        inDiscard = "Confounding";
+                    } else if (game.isACInDiscard("Confusing")) {
+                        message = game.getPing() + " please confirm no _Confounding Legal Text_.";
+                        noLegalText = Buttons.blue("generic_button_id_3", "Refuse Confounding Legal Text");
+                        inDiscard = "Confusing";
+                    }
+                    List<Button> buttons = List.of(noLegalText);
+                    MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message, game, buttons, "shenanigans");
+                    if (!inDiscard.isEmpty())
+                    {
+                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "_" + inDiscard + " Legal Text_ was found in the discard pile.");
+                    }
                 }
             }
             String resMessage3 = "Please select the winner.";
@@ -2493,8 +2493,8 @@ public class AgendaHelper {
         boolean cov = false;
 
         if ("Emergency Session".equalsIgnoreCase(agendaName)) {
-            MessageHelper.sendMessageToChannel(channel, "# " + game.getPing()
-                + " __Emergency Session__ revealed.\n## This agenda phase will have an additional agenda compared to normal. Flipping next agenda");
+            MessageHelper.sendMessageToChannel(channel, game.getPing()
+                + " _Emergency Session_ revealed. This agenda phase will have an additional agenda compared to normal. Flipping next agenda.");
             aCount -= 1;
             game.setStoredValue("agendaCount", aCount + "");
             revealAgenda(event, revealFromBottom, game, channel);
@@ -2628,7 +2628,7 @@ public class AgendaHelper {
             proceedButtons.add(Buttons.red("autoresolve_manual", "Skip Straight To Resolution"));
         } else {
             listVoteCount(game, channel);
-            msg = "Press this button if the last person forgot to react, but verbally said no whens/afters";
+            msg = "Press this button if the last player forgot to react, but verbally said no whens/afters";
             proceedButtons.add(Buttons.red("proceedToVoting", "Skip waiting and start the voting for everyone"));
             proceedButtons.add(Buttons.blue("transaction", "Transaction"));
             proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
@@ -2646,12 +2646,9 @@ public class AgendaHelper {
             pingAboutDebt(game);
             String key = "round" + game.getRound() + "AgendaPlacement";
             if (!game.getStoredValue(key).isEmpty() && !game.isFowMode()) {
-                StringBuilder message = new StringBuilder("Politics holder did the following with the agendas in terms of topping or bottoming them:");
-                for (String actionA : game.getStoredValue(key).split("_")) {
-                    message.append(" ").append(software.amazon.awssdk.utils.StringUtils.capitalize(actionA));
-                }
-                MessageHelper.sendMessageToChannel(channel,
-                    message.toString());
+                String message = "During the action phase, the **Politics** player did the following with the agendas that they looked at: "
+                    + game.getStoredValue(key).replace("_", ", ") + ".";
+                MessageHelper.sendMessageToChannel(channel, message);
 
             }
         }
@@ -2848,7 +2845,7 @@ public class AgendaHelper {
         MessageEmbed embed = null;
         if (game.getSentAgendas().get(agendaID) != null) {
             if (game.getCurrentAgendaInfo().contains("_CL_") && game.getPhaseOfGame().startsWith("agenda")) {
-                sb.append("You are currently voting on Covert Legislation and the top agenda is in the speaker's hand.");
+                sb.append("You are currently voting on _Covert Legislation_, and the top agenda is in the speaker's hand.");
                 sb.append(" Showing the next agenda because that's how it should be by the RULEZ\n");
                 agendaID = game.lookAtTopAgenda(1);
 
@@ -3023,7 +3020,7 @@ public class AgendaHelper {
         List<Button> voteActionRow = Helper.getPlanetRefreshButtons(player, game);
         Button concludeRefreshing = Buttons.red(player.getFinsFactionCheckerPrefix() + "votes_" + votes, "Done readying planets.");
         voteActionRow.add(concludeRefreshing);
-        String voteMessage2 = "Use the buttons to ready planets. When you're done it will prompt the next person to vote.";
+        String voteMessage2 = "Use the buttons to ready planets. When you're done it will prompt the next player to vote.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), voteMessage2, voteActionRow);
         ButtonHelper.deleteMessage(event);
     }

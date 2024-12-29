@@ -1399,13 +1399,13 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "You have not selected your policies yet. This mech's ability depends on your policies.\nIf you have at least 2 “+” policies, and if this planet contains no more than 1 of your mechs, apply +1 to its influence value.\nIf you have at least 2 “-” policies, and if this planet contains no more than 1 of your mechs, apply +1 to its resource value."
+        "ability": "You have not selected your policies yet. This mech's ability depends on your Policies.\nIf you have at least 2 ➕ Policies, and if this planet contains no more than 1 of your mechs, apply +1 to its influence value.\nIf you have at least 2 ➖ Policies, and if this planet contains no more than 1 of your mechs, apply +1 to its resource value."
     },
     {
         "id": "olradin_mech_negative",
         "baseType": "mech",
         "asyncId": "mf",
-        "name": "Exemplar Malus (-)",
+        "name": "Exemplar Malus ➖",
         "source": "ds",
         "faction": "Olradin",
         "capacityUsed": 1,
@@ -1420,7 +1420,7 @@
         "id": "olradin_mech_positive",
         "baseType": "mech",
         "asyncId": "mf",
-        "name": "Exemplar Bonum (+)",
+        "name": "Exemplar Bonum ➕",
         "source": "ds",
         "faction": "Olradin",
         "capacityUsed": 1,
@@ -1475,7 +1475,7 @@
         "id": "rohdhna_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
-        "name": "Ky'vir",
+        "name": "Ky'vir The Replicator",
         "source": "ds",
         "faction": "Rohdhna",
         "moveValue": 1,
