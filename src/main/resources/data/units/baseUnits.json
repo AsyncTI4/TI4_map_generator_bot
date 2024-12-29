@@ -174,7 +174,7 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "ability": "This unit may move without being transported.\nFighters in excess of your ships' capacity count against your fleet pool.",
         "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/fighter_2.jpg?raw=true"
     },
     {
@@ -250,6 +250,7 @@
         "spaceCannonHitsOn": 5,
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": true,
+        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems.",
         "planetaryShield": true,
         "isStructure": true,
         "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/pds_2.jpg?raw=true"
@@ -262,9 +263,11 @@
         "upgradesToUnitId": "spacedock2",
         "source": "base",
         "productionValue": "+2",
+        "basicProduction": "res",
         "capacityValue": 3,
         "isStructure": true,
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/data/rawCards/SpaceDock.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/data/rawCards/SpaceDock.png?raw=true",
+        "ability": "This unit's PRODUCTION value is equal to 2 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity."
     },
     {
         "id": "spacedock2",
@@ -276,9 +279,11 @@
         "requiredTechId": "sd2",
         "source": "base",
         "productionValue": "+4",
+        "basicProduction": "res",
         "capacityValue": 3,
         "isStructure": true,
-        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/space_dock_2.jpg?raw=true"
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/space_dock_2.jpg?raw=true",
+        "ability": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity."
     },
     {
         "id": "nowarsun",

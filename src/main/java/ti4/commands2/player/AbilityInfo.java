@@ -8,7 +8,7 @@ import ti4.service.info.AbilityInfoService;
 class AbilityInfo extends GameStateSubcommand {
 
     public AbilityInfo() {
-        super(Constants.ABILITY_INFO, "Send faction abilities information to your Cards Info channel", false, true);
+        super(Constants.ABILITY_INFO, "Send faction abilities information to your #cards-info thread", false, true);
     }
 
     @Override

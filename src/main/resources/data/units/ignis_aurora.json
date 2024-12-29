@@ -109,7 +109,7 @@
         "combatDieCount": 1,
         "isShip": true,
         "homebrewReplacesID": "fighter2",
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
+        "ability": "This unit may move without being transported.\nFighters in excess of your ships' capacity count against your fleet pool."
     },
     {
         "id": "baldrick_naalu_fighter2",
@@ -127,7 +127,7 @@
         "combatDieCount": 1,
         "isShip": true,
         "homebrewReplacesID": "naalu_fighter2",
-        "ability": "This unit may move without being transported. Each fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
+        "ability": "This unit may move without being transported.\nEach fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
     },
     {
         "id": "baldrick_infantry2",
@@ -138,7 +138,7 @@
         "source": "ignis_aurora",
         "isGroundForce": true,
         "homebrewReplacesID": "infantry2",
-        "ability": "You may produce 1 additional infantry for their cost. These infantry do not count against your production limit."
+        "ability": "You may produce 1 additional infantry for their cost. These infantry do not count against your PRODUCTION limit."
     },
     {
         "id": "baldrick_sol_infantry2",
@@ -155,7 +155,7 @@
         "combatDieCount": 1,
         "isGroundForce": true,
         "homebrewReplacesID": "sol_infantry2",
-        "ability": "You may produce 1 additional infantry for their cost. These infantry do not count against your production limit."
+        "ability": "You may produce 1 additional infantry for their cost. These infantry do not count against your PRODUCTION limit."
     },
     {
         "id": "baldrick_mahact_infantry2",
@@ -172,7 +172,7 @@
         "combatDieCount": 1,
         "isGroundForce": true,
         "homebrewReplacesID": "mahact_infantry2",
-        "ability": "After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good. You may produce 1 additional infantry for their cost. These infantry do not count against your production limit."
+        "ability": "After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good.\nYou may produce 1 additional infantry for their cost. These infantry do not count against your PRODUCTION limit."
     },
     {
         "id": "baldrick_pds2",
@@ -188,7 +188,7 @@
         "planetaryShield": true,
         "isStructure": true,
         "homebrewReplacesID": "pds2",
-        "ability": "You may use this unit's Space Cannon against ships that are adjacent to this unit's system. When your units use Space Cannon, at least half of the hits produced by those units (rounded up) must be assigned to non-fighter ships if able. "
+        "ability": "You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.\nWhen your units use SPACE CANNON, at least half of the hits produced by those units (rounded up) must be assigned to non-fighter ships if able. "
     },
     {
         "id": "baldrick_titans_pds2",
@@ -210,7 +210,7 @@
         "isStructure": true,
         "isGroundForce": true,
         "homebrewReplacesID": "titans_pds2",
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. \nYou may use this unit's Space Cannon against ships that are adjacent to this unit's system.\nWhen your units use Space Cannon, at least half of the hits produced by those units (rounded up) must be assigned to non-fighter ships if able."
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.\nWhen your units use SPACE CANNON, at least half of the hits produced by those units (rounded up) must be assigned to non-fighter ships if able."
     },
     {
         "id": "baldrick_spacedock2",
@@ -221,7 +221,9 @@
         "requiredTechId": "baldrick_sd2",
         "source": "ignis_aurora",
         "productionValue": "+5",
+        "basicProduction": "res",
         "capacityValue": 6,
+        "ability": "This unit's PRODUCTION value is equal to 5 more than the resource value of this planet.\nUp to 6 fighters in this system do not count against your ships' capacity.",
         "isStructure": true,
         "homebrewReplacesID": "spacedock2"
     },
@@ -244,7 +246,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "homebrewReplacesID": "warsun",
-        "ability": "Other players units in this system lose PLANETARY SHIELD ability."
+        "ability": "Other players' units in this system lose PLANETARY SHIELD."
     },
     {
         "id": "baldrick_muaat_warsun",
@@ -266,6 +268,6 @@
         "canBeDirectHit": false,
         "isShip": true,
         "homebrewReplacesID": "muaat_warsun",
-        "ability": "Other players units in this system lose PLANETARY SHIELD ability. This unit cannot be destroyed by Direct Hit action cards."
+        "ability": "Other players units' in this system lose PLANETARY SHIELD ability.\nThis unit cannot be destroyed by \"Direct Hit\" action cards."
     }
 ]

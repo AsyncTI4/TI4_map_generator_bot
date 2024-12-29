@@ -18,7 +18,7 @@
     {
         "alias": "absol_jr",
         "name": "JR-SX455-O",
-        "text": "Action: Exhaust this agent and choose a planet. The player that controls that planet may place a structure on that planet. If they do not, they gain 1 trade good for each structure on that planet.",
+        "text": "ACTION: Exhaust this agent and choose a planet. The player that controls that planet may place a structure on that planet. If they do not, they gain 1 trade good for each structure on that planet.",
         "source": "absol",
         "flavourText": "*There was a long moment, stretching in silence until Dart blurted, “Can we help you somehow?”\nAll of the individuals seemed startled by the question, but the titan seemed the most perplexed.  “I do not know,” it said at last.  “I only remember that… I want to learn.  And… and to remember.”\n\n“I have no name. You,” it said, pointing to Dart. “Perhaps I shall be Dart II.”\n“H-how about Junior instead?” Dart offered. “I wouldn’t want anyone to get us confused, we already look so… uh… alike.”\nThe titan nodded solemnly.  “Yes. Yes, this is true.” It turned. “Junior. Yes. I like that name, and I would also like to come with you.”*",
         "homebrewReplacesID": "titanprototype"
@@ -41,7 +41,7 @@
     {
         "alias": "absol_nanoforge",
         "name": "Nanoforge",
-        "text": "Action: Attach this card to a non-legendary, non-home planet you control. Its resource and influence values are increased by 2 and it is a legendary planet. Take the corresponding legendary planet ability card. This action cannot be performed once attached.\nRECONSTRUCTION MATRIX: After you exhaust the planet Nano-Forge is attached to, you may exhaust this card to ready that planet.",
+        "text": "ACTION: Attach this card to a non-legendary, non-home planet you control. Its resource and influence values are increased by 2 and it is a legendary planet. Take the corresponding legendary planet ability card. This action cannot be performed once attached.\nRECONSTRUCTION MATRIX: After you exhaust the planet Nano-Forge is attached to, you may exhaust this card to ready that planet.",
         "source": "absol",
         "flavourText": "*Intended to bring prosperity, the forge was twisted into an instrument of war.\nThe planet heaved and shuddered as it merged with the Nano-forge, sputtering as its atmosphere became breathable for the first time.*",
         "homebrewReplacesID": "nanoforge"
@@ -152,7 +152,7 @@
     {
         "alias": "absol_tyrantslament",
         "name": "Tyrant's Lament",
-        "text": "TYRANT'S LAMENT (Note: is NOT a Flagship) Deploy: At the end of your turn, you may place this unit in any system that contains your ships. When this unit is removed or captured, purge this card.  This unit is not affected by action cards, anomalies, or your faction abilities or your technologies. Space Cannon 5(x3), Anti-Fighter Barrage 5(x3), Sustain Damage, Move 2, Combat 5(x3)",
+        "text": "TYRANT'S LAMENT (Note: is NOT a Flagship) DEPLOY: At the end of your turn, you may place this unit in any system that contains your ships. When this unit is removed or captured, purge this card.  This unit is not affected by action cards, anomalies, or your faction abilities or your technologies. SPACE CANNON 5(x3), ANTI-FIGHTER BARRAGE 5(x3), SUSTAIN DAMAGE, Move 2, Combat 5(x3)",
         "source": "absol",
         "flavourText": "*Instrument of Judgement\nThe Tyrant's Lament has never responded to a hail, and fights under no banner.  Wherever it appears, death rains.  And then it is gone.*"
     }

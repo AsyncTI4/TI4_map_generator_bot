@@ -47,7 +47,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, roll 1 die.  If the result is 6 or greater, place the unit on this card.  At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
+        "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
     },
     {
         "id": "arborec_mech",
@@ -135,7 +135,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This unit does not count against capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values"
+        "ability": "This unit does not count against capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values."
     },
     {
         "id": "cabal_flagship",
@@ -182,7 +182,7 @@
         "faction": "Cabal",
         "productionValue": 5,
         "isStructure": true,
-        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 6 fighters in this system do not count against your ships' capacity."
+        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 6 fighters in this system do not count against your ships' capacity."
     },
     {
         "id": "cabal_spacedock2",
@@ -195,7 +195,7 @@
         "faction": "Cabal",
         "productionValue": 7,
         "isStructure": true,
-        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 12 fighters in this system do not count against your ships' capacity."
+        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 12 fighters in this system do not count against your ships' capacity."
     },
     {
         "id": "empyrean_flagship",
@@ -246,7 +246,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "This ship's system contains a delta wormhole. During movement, this ship may move before or after your other ships."
+        "ability": "This ship's system contains a delta wormhole.\nDuring movement, this ship may move before or after your other ships."
     },
     {
         "id": "ghost_mech",
@@ -327,7 +327,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Your infantry on this planet are not affected by your FRAGILE faction ability."
+        "ability": "Your infantry on this planet are not affected by your Fragile faction ability."
     },
     {
         "id": "l1z1x_dreadnought",
@@ -386,7 +386,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During a space combat, hits produced by this ship and by your dreadnaughts in this system must be assigned to non-fighter ships if able."
+        "ability": "During a space combat, hits produced by this ship and by your dreadnoughts in this system must be assigned to non-fighter ships if able."
     },
     {
         "id": "l1z1x_mech",
@@ -403,7 +403,7 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "While not participating in ground combat, this unit can use it's BOMBARDMENT ability on planets in its system as if it were a ship"
+        "ability": "While not participating in ground combat, this unit can use it's BOMBARDMENT ability on planets in its system as if it were a ship."
     },
     {
         "id": "letnev_flagship",
@@ -423,7 +423,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other player's units in this system lose PLANETARY SHIELD. At the start of each space combat round, repair this ship."
+        "ability": "Other player's units in this system lose PLANETARY SHIELD.\nAt the start of each space combat round, repair this ship."
     },
     {
         "id": "letnev_mech",
@@ -644,7 +644,7 @@
         "isShip": true,
         "combatHitsOn": 7,
         "combatDieCount": 1,
-        "ability": "This unit may move without being transported. Each fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
+        "ability": "This unit may move without being transported.\nEach fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
     },
     {
         "id": "naalu_flagship",
@@ -739,7 +739,7 @@
         "combatHitsOn": 8,
         "combatDieCount": 2,
         "isShip": true,
-        "ability": "If this unit is in the space area of the active system, it is also a ship. At the end of a space battle in the active system, flip this card."
+        "ability": "If this unit is in the space area of the active system, it is also a ship.\nAt the end of a space battle in the active system, flip this card."
     },
     {
         "id": "nekro_flagship",
@@ -866,7 +866,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "While this unit is in a space area during combat, you may use it's SUSTAIN DAMAGE ability to cancel a hit that is produced against your ships in this system"
+        "ability": "While this unit is in a space area during combat, you may use its SUSTAIN DAMAGE ability to cancel a hit that is produced against your ships in this system."
     },
     {
         "id": "saar_flagship",
@@ -899,7 +899,7 @@
         "productionValue": 5,
         "capacityValue": 4,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed."
+        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed."
     },
     {
         "id": "saar_spacedock2",
@@ -914,7 +914,7 @@
         "productionValue": 7,
         "capacityValue": 5,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed."
+        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed."
     },
     {
         "id": "saar_mech",
@@ -970,7 +970,7 @@
         "bombardDieCount": 2,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. After a round of space combat, you may destroy this unit to destroy up to 2 ships in the system."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in the system."
     },
     {
         "id": "sardakk_flagship",
@@ -1101,7 +1101,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you use your ORBITAL DROP faction ability, you may spend 3 resources to place 1 mech on that planet."
+        "ability": "DEPLOY: After you use your Orbital Drop faction ability, you may spend 3 resources to place 1 mech on that planet."
     },
     {
         "id": "titans_cruiser",
@@ -1208,7 +1208,7 @@
         "sustainDamage": true,
         "isStructure": true,
         "isGroundForce": true,
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems."
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems."
     },
     {
         "id": "winnu_flagship",
@@ -1226,7 +1226,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this unit makes a combat roll, it rolls a number of dice (hit on a 7) equal to the number of your opponent's non-fighter ships in this system"
+        "ability": "When this unit makes a combat roll, it rolls a number of dice (hit on a 7) equal to the number of your opponent's non-fighter ships in this system."
     },
     {
         "id": "winnu_mech",
@@ -1241,7 +1241,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After you resolve a tactical action where you gained control of this planet, you may place 1 PDS or 1 Space Dock from your reinforcements on this planet"
+        "ability": "After you resolve a tactical action where you gained control of this planet, you may place 1 PDS or 1 Space Dock from your reinforcements on this planet."
     },
     {
         "id": "xxcha_flagship",
@@ -1313,7 +1313,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: When you use your INDOCTRINATION faction ability, you may spend 1 additional influence to replace your opponent's unit with 1 mech instead of 1 infantry."
+        "ability": "DEPLOY: When you use your Indoctrination faction ability, you may spend 1 additional influence to replace your opponent's unit with 1 mech instead of 1 infantry."
     },
     {
         "id": "yssaril_flagship",
@@ -1346,6 +1346,6 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you use your STALL TACTICS faction ability, you may place 1 mech on a planet you control."
+        "ability": "DEPLOY: After you use your Stall Tactics faction ability, you may place 1 mech on a planet you control."
     }
 ]

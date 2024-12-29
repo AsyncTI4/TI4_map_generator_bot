@@ -39,7 +39,7 @@
     "alias": "miltymod_dh1",
     "name": "Direct Hit",
     "phase": "Action",
-    "window": "After another player's unit uses Sustain Damage to cancel a hit produced by your units or abilities",
+    "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
     "text": "Destroy that unit.",
     "flavorText": "There it was! An opening! Neekuaq gestured wildly, a rare display for one normally quite reserved. \"Fire the main battery!\"",
     "source": "miltymod"
@@ -48,7 +48,7 @@
     "alias": "miltymod_dh2",
     "name": "Direct Hit",
     "phase": "Action",
-    "window": "After another player's unit uses Sustain Damage to cancel a hit produced by your units or abilities",
+    "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
     "text": "Destroy that unit.",
     "flavorText": "The Loncara Ssodu's main battery flared to life, firing a volley directly into the flickering starboard shield of the Letnev dreadnought.",
     "source": "miltymod"
@@ -57,7 +57,7 @@
     "alias": "miltymod_dh3",
     "name": "Direct Hit",
     "phase": "Action",
-    "window": "After another player's unit uses Sustain Damage to cancel a hit produced by your units or abilities",
+    "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
     "text": "Destroy that unit.",
     "flavorText": "For a moment, it looked as if the dreadnought's shield would hold, but a moment later, the ship began to come apart where the attack had pierced its hull.",
     "source": "miltymod"
@@ -66,7 +66,7 @@
     "alias": "miltymod_dh4",
     "name": "Direct Hit",
     "phase": "Action",
-    "window": "After another player's unit uses Sustain Damage to cancel a hit produced by your units or abilities",
+    "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
     "text": "Destroy that unit.",
     "flavorText": "Neekuaq watched, satisfied, as the ship was wracked by a series of explosions from within, huge armored plates and other debris hurtling off into the darkness.",
     "source": "miltymod"
@@ -76,7 +76,7 @@
     "name": "Experimental Battlestation",
     "phase": "Action",
     "window": "When you roll Space Cannon Offense",
-    "text": "Choose 1 of your space docks that is either in or adjacent to the active system. That space dock gains SPACE CANNON 5 (x3) and can use the ability against ships in adjacent systems during this roll.",
+    "text": "Choose 1 of your space docks that is either in or adjacent to the active system. That space dock gains SPACE CANNON 5(x3) and can use the ability against ships in adjacent systems during this roll.",
     "flavorText": "Arm the relay! Mendosa bared his fangs. \"The Saar will not submit!\"",
     "source": "miltymod"
   },
@@ -120,8 +120,8 @@
     "alias": "miltymod_tactical",
     "name": "Tactical Bombardment",
     "phase": "Action",
-    "window": "When you roll Bombardment",
-    "text": "Choose 1 of your ships with Bombardment in the active system. That ship may roll 2 additional dice.",
+    "window": "When you roll BOMBARDMENT",
+    "text": "Choose 1 of your ships with BOMBARDMENT in the active system. That ship may roll 2 additional dice.",
     "flavorText": "A6's red eyes flickered with activity, and a string of numbers flashed briefly across the screen before he spoke. \"Bombardment complete. All enemy installations have been neutralized.\"",
     "source": "miltymod"
   },

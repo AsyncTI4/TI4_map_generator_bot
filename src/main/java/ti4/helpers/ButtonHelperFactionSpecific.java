@@ -153,9 +153,9 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " due to your mech ability, you may explore "
                 + Helper.getPlanetRepresentation(planet, game) + " twice now.");
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " Explore #1",
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", exploration #1",
             buttons);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " Explore #2",
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", exploration #2",
             buttons);
         event.getMessage().delete().queue();
     }
@@ -368,7 +368,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + " you have all your mechs out and can't deploy more.");
+                player.getRepresentationUnfogged() + " you have all your mechs out and can't DEPLOY more.");
             return;
         }
         for (String planet : player.getPlanets()) {
@@ -795,7 +795,7 @@ public class ButtonHelperFactionSpecific {
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 mech " + planet);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " landed 1 mech on "
-                + Helper.getPlanetRepresentation(planet, game) + " using Tnelis mech deploy ability");
+                + Helper.getPlanetRepresentation(planet, game) + " using Tnelis mech DEPLOY ability");
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, game.getTileFromPlanet(planet), planet);
         if (players.size() > 1) {
             StartCombatService.startGroundCombat(players.get(0), players.get(1), game, event,
@@ -1383,7 +1383,7 @@ public class ButtonHelperFactionSpecific {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 player.getFactionEmoji() + " does not have " + requiredNum + " infantry on " + planet
-                    + " and therefore cannot deploy the space dock");
+                    + " and therefore cannot DEPLOY the space dock");
         }
     }
 
@@ -1506,11 +1506,12 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Looked at top of the " + deckType + " deck.");
         String traitNameWithEmoji = ExploreEmojis.getTraitEmoji(deckType) + deckType;
         if (deck.isEmpty() && game.getExploreDiscard(deckType).isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), traitNameWithEmoji + " exploration deck & discard is empty - nothing to look at.");
             return;
         }
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "top of " + traitNameWithEmoji + " explore deck has been sent to " + player.getFactionEmojiOrColor() + " Cards info thread.");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            "The top card of the " + traitNameWithEmoji + " exploration deck has been sent to " + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
 
         // Cards Info Message
         String message = "__**Look at Top of " + traitNameWithEmoji + " Deck**__\n";

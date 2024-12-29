@@ -830,7 +830,7 @@
         "name": "Midir - Living Will",
         "title": "Golden Order",
         "abilityName": "Peace Eternal",
-        "abilityWindow": "Action:",
+        "abilityWindow": "ACTION:",
         "abilityText": "For each Sigil on the game board, draw 1 Agenda. Reveal and resolve each agenda in any order as if you had cast 1 vote for an outcome of your choice. Other players cannot resolve abilities during this action. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"

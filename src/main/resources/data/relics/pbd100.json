@@ -2,7 +2,7 @@
     {
         "alias": "ring_king_poon",
         "name": "The Ring of King Poon",
-        "text": "Action: Exhaust this card to peek at a face down objective. Action: You may flip a face down public objective. Score a revealed public objective. Purge this card.",
+        "text": "ACTION: Exhaust this card to peek at a face down objective.\nACTION: You may flip a face down public objective. Score a revealed public objective. Purge this card.",
         "source": "pbd100"
     },
     {

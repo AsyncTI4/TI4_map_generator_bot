@@ -85,7 +85,7 @@
     "name": "Bunker",
     "phase": "Action",
     "window": "At the start of an invasion",
-    "text": "During this invasion, apply -4 to the result of each Bombardment roll against planets you control.",
+    "text": "During this invasion, apply -4 to the result of each BOMBARDMENT roll against planets you control.",
     "flavorText": "Elder Junn crossed his arms and steadied his breathing. The bombs could not reach them, not this far down. At least, that is what the soldiers had told him.",
     "source": "base"
   },
@@ -138,7 +138,7 @@
     "alias": "dh1",
     "name": "Direct Hit",
     "phase": "Action",
-    "window": "After another player's ship uses Sustain Damage to cancel a hit produced by your units or abilities",
+    "window": "After another player's ship uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
     "text": "Destroy that ship.",
     "flavorText": "There it was! An opening! Neekuaq gestured wildly, a rare display for one normally quite reserved. \"Fire the main battery!\"",
     "source": "base"
@@ -147,7 +147,7 @@
     "alias": "dh2",
     "name": "Direct Hit",
     "phase": "Action",
-    "window": "After another player's ship uses Sustain Damage to cancel a hit produced by your units or abilities",
+    "window": "After another player's ship uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
     "text": "Destroy that ship.",
     "flavorText": "The Loncara Ssodu's main battery flared to life, firing a volley directly into the flickering starboard shield of the Letnev dreadnought.",
     "source": "base"
@@ -156,7 +156,7 @@
     "alias": "dh3",
     "name": "Direct Hit",
     "phase": "Action",
-    "window": "After another player's ship uses Sustain Damage to cancel a hit produced by your units or abilities",
+    "window": "After another player's ship uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
     "text": "Destroy that ship.",
     "flavorText": "For a moment, it looked as if the dreadnought's shield would hold, but a moment later, the ship began to come apart where the attack had pierced its hull.",
     "source": "base"
@@ -165,7 +165,7 @@
     "alias": "dh4",
     "name": "Direct Hit",
     "phase": "Action",
-    "window": "After another player's ship uses Sustain Damage to cancel a hit produced by your units or abilities",
+    "window": "After another player's ship uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
     "text": "Destroy that ship.",
     "flavorText": "Neekuaq watched, satisfied, as the ship was wracked by a series of explosions from within, huge armored plates and other debris hurtling off into the darkness.",
     "source": "base"
@@ -175,7 +175,7 @@
     "name": "Disable",
     "phase": "Action",
     "window": "At the start of an invasion in a system that contains 1 or more of your opponents' PDS units",
-    "text": "Your opponents' PDS units lose Planetary Shield and Space Cannon during this invasion.",
+    "text": "Your opponents' PDS units lose PLANETARY SHIELD and SPACE CANNON during this invasion.",
     "flavorText": "Ssruu has met their systems and fixed them. Ssruu dropped a handful of ripped wires and broken circuitry on the pedestal before Q'uesh Sish. \"He will await his next task aboard his ship.\"",
     "source": "base"
   },
@@ -184,7 +184,7 @@
     "name": "Disable",
     "phase": "Action",
     "window": "At the start of an invasion in a system that contains 1 or more of your opponents' PDS units",
-    "text": "Your opponents' PDS units lose Planetary Shield and Space Cannon during this invasion.",
+    "text": "Your opponents' PDS units lose PLANETARY SHIELD and SPACE CANNON during this invasion.",
     "flavorText": "Ssruu has met their systems and fixed them. Ssruu dropped a handful of ripped wires and broken circuitry on the pedestal before Q'uesh Sish. \"He will await his next task aboard his ship.\"",
     "source": "base"
   },
@@ -220,7 +220,7 @@
     "name": "Emergency Repairs",
     "phase": "Action",
     "window": "At the start or end of a combat round",
-    "text": "Repair all of your units that have Sustain Damage in the active system.",
+    "text": "Repair all of your units that have SUSTAIN DAMAGE in the active system.",
     "flavorText": "What do you mean 'It's fine!?' Dahla said, nearly tripping over a damaged bulkhead as the ship rocked from the explosive barrage.",
     "source": "base"
   },
@@ -229,7 +229,7 @@
     "name": "Experimental Battlestation",
     "phase": "Action",
     "window": "After another player moves ships into a system during a tactical action",
-    "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses Space Cannon 5 (x3) against ships in the active system.",
+    "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses SPACE CANNON 5(x3) against ships in the active system.",
     "flavorText": "Arm the relay! Mendosa bared his fangs. \"The Saar will not submit!\"",
     "source": "base"
   },
@@ -238,7 +238,7 @@
     "name": "Experimental Battlestation",
     "phase": "Action",
     "window": "After another player moves ships into a system during a tactical action",
-    "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses Space Cannon 5 (x3) against ships in the active system.",
+    "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses SPACE CANNON 5(x3) against ships in the active system.",
     "flavorText": "Arm the relay! Mendosa bared his fangs. \"The Saar will not submit!\"",
     "source": "base"
   },
@@ -489,7 +489,7 @@
     "alias": "mjets1",
     "name": "Maneuvering Jets",
     "phase": "Action",
-    "window": "Before you assign hits produced by another player's Space Cannon roll",
+    "window": "Before you assign hits produced by another player's SPACE CANNON roll",
     "text": "Cancel 1 hit.",
     "flavorText": "Something was wrong. T'esla sensed a flicker of movement on the planet's surface, followed by a faint glint of light. Reflexively, she veered her fighter to the side - an action that saved her life.",
     "source": "base"
@@ -498,7 +498,7 @@
     "alias": "mjets2",
     "name": "Maneuvering Jets",
     "phase": "Action",
-    "window": "Before you assign hits produced by another player's Space Cannon roll",
+    "window": "Before you assign hits produced by another player's SPACE CANNON roll",
     "text": "Cancel 1 hit.",
     "flavorText": "The fighter's thrusted boosted her just out of the cannon's firing solution, and a metal slug the size of a building rocketed past her crystalline ship.",
     "source": "base"
@@ -507,7 +507,7 @@
     "alias": "mjets3",
     "name": "Maneuvering Jets",
     "phase": "Action",
-    "window": "Before you assign hits produced by another player's Space Cannon roll",
+    "window": "Before you assign hits produced by another player's SPACE CANNON roll",
     "text": "Cancel 1 hit.",
     "flavorText": "T'esla breathed a sigh of relief as the massive slug disappeared into the distance. A touch slower and she would have been annihilated.",
     "source": "base"
@@ -516,7 +516,7 @@
     "alias": "mjets4",
     "name": "Maneuvering Jets",
     "phase": "Action",
-    "window": "Before you assign hits produced by another player's Space Cannon roll",
+    "window": "Before you assign hits produced by another player's SPACE CANNON roll",
     "text": "Cancel 1 hit.",
     "flavorText": "The flickering red warning lights on her control panel reflected in her scales as she regained her composure. \"Well,\" she said aloud. \"Zat was close.\"",
     "source": "base"
@@ -805,7 +805,7 @@
     "name": "Tactical Bombardment",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 system that contains 1 or more of your units that have Bombardment. Exhaust each planet controlled by other players in that system. [Note, this does not have to result in any planets being exhausted]",
+    "text": "Choose 1 system that contains 1 or more of your units that have BOMBARDMENT. Exhaust each planet controlled by other players in that system. [Note, this does not have to result in any planets being exhausted]",
     "flavorText": "A6's red eyes flickered with activity, and a string of numbers flashed briefly across the screen before he spoke. \"Bombardment complete. All enemy installations have been neutralized.\"",
     "source": "base"
   },
@@ -931,7 +931,7 @@
     "name": "Blitz",
     "phase": "Action",
     "window": "At the start of an invasion",
-    "text": "Each of your non-fighter ships in the active system that do not have Bombardment gain Bombardment 6 until the end of the invasion.",
+    "text": "Each of your non-fighter ships in the active system that do not have BOMBARDMENT gain BOMBARDMENT 6 until the end of the invasion.",
     "flavorText": "T-these weren't meant to be used like this. T-this is a t-terrible idea. Tai mumbled, wringing his hands. \"Well 'course it is,\" Dart grinned, slamming his fist down on the release lock. \"But we've got about sixty kilotons of 'surprise' and nothing to lose!\"",
     "source": "codex1"
   },
@@ -1074,7 +1074,7 @@
     "alias": "reflective",
     "name": "Reflective Shielding",
     "phase": "Action",
-    "window": "When one of your ships uses Sustain Damage during combat",
+    "window": "When one of your ships uses SUSTAIN DAMAGE during combat",
     "text": "Produce 2 hits against your opponent's ships in the active system.",
     "flavorText": "Prit scrambled up Hesh's shoulder, gleefully clapping as the entropic shielding tore the mercenary cruisers apart.",
     "source": "codex1"
@@ -1092,7 +1092,7 @@
     "alias": "scramble",
     "name": "Scramble Frequency",
     "phase": "Action",
-    "window": "After another player makes a Bombardment, Space Cannon, or Anti-Fighter Barrage roll",
+    "window": "After another player makes a BOMBARDMENT, SPACE CANNON, or ANTI-FIGHTER BARRAGE roll",
     "text": "That player rerolls all of their dice.",
     "flavorText": "I will not accept this from that worthless scum! Feng growled as his enigmatic companion interfaced with the ship's nav suite. The Memoria's position flickered and shifted, and the blast flashed harmlessly by.",
     "source": "codex1"
@@ -1102,7 +1102,7 @@
     "name": "Solar Flare",
     "phase": "Action",
     "window": "After you activate a system",
-    "text": "During this movement, other players cannot use Space Cannon against your ships.",
+    "text": "During this movement, other players cannot use SPACE CANNON against your ships.",
     "flavorText": "Meian braced for combat as the fleet entered the Ordinian system, but there were no Valefar droneships waiting to meet them. The solar flare gambit had succeeded - they were completely undetected.",
     "source": "codex1"
   },
@@ -1110,8 +1110,8 @@
     "alias": "war_machine1",
     "name": "War Machine",
     "phase": "Action",
-    "window": "When 1 or more of your units use Production",
-    "text": "Apply +4 to the total Production value of your units and reduce the combined cost of the produced units by 1.",
+    "window": "When 1 or more of your units use PRODUCTION",
+    "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
     "flavorText": "This would take weeks to replace if you had run it backwards, Varish called as she rotated the massive capacitor bank. \"Okay, fire it up.\"",
     "source": "codex1"
   },
@@ -1119,8 +1119,8 @@
     "alias": "war_machine2",
     "name": "War Machine",
     "phase": "Action",
-    "window": "When 1 or more of your units use Production",
-    "text": "Apply +4 to the total Production value of your units and reduce the combined cost of the produced units by 1.",
+    "window": "When 1 or more of your units use PRODUCTION",
+    "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
     "flavorText": "The station vibrated as the device sputtered to life, emitting a high-pitched buzz to Varish's ears. \"Micro-wormholes are cycling at 19 kilohertz,\" Cole read. \"The entropic field tap's stable.\"",
     "source": "codex1"
   },
@@ -1128,8 +1128,8 @@
     "alias": "war_machine3",
     "name": "War Machine",
     "phase": "Action",
-    "window": "When 1 or more of your units use Production",
-    "text": "Apply +4 to the total Production value of your units and reduce the combined cost of the produced units by 1.",
+    "window": "When 1 or more of your units use PRODUCTION",
+    "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
     "flavorText": "The station's production facilities spooled up to new intensities, lights flaring as the assembly line drones increased their speeds to keep up.",
     "source": "codex1"
   },
@@ -1137,8 +1137,8 @@
     "alias": "war_machine4",
     "name": "War Machine",
     "phase": "Action",
-    "window": "When 1 or more of your units use Production",
-    "text": "Apply +4 to the total Production value of your units and reduce the combined cost of the produced units by 1.",
+    "window": "When 1 or more of your units use PRODUCTION",
+    "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
     "flavorText": "Varish, let the Commanders know they can contact the Tetrarchy. Tell them the fighter squadron assembly will be done ahead of schedule, and under budget.",
     "source": "codex1"
   },
@@ -1434,7 +1434,7 @@
     "alias": "waylay",
     "name": "Waylay",
     "phase": "Action",
-    "window": "Before you roll dice for Anti-Fighter Barrage",
+    "window": "Before you roll dice for ANTI-FIGHTER BARRAGE",
     "text": "Hits from this roll are produced against all ships (not just fighters).",
     "flavorText": "The destroyers sprayed fire with their secondary batteries as they advanced. The Mahact dreadnought began to list, fire and atmosphere gushing from a thousand tiny wounds.",
     "source": "pok"

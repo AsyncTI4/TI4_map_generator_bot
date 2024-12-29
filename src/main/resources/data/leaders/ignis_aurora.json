@@ -41,7 +41,7 @@
         "title": "Dark Matter Affinity ",
         "abilityName": "Void Transference",
         "abilityWindow": "ACTION:",
-        "abilityText": "Action: Gain 6 command tokens; you may redistribute any number of the command tokens on your command sheet. Then, purge this card. ",
+        "abilityText": "Gain 6 command tokens; you may redistribute any number of the command tokens on your command sheet. Then, purge this card. ",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ignis_aurora"
     },

@@ -74,9 +74,9 @@
         "name": "Conventions of War",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Players cannot use Bombardment against units that are on cultural planets.",
+        "text1": "For: Players cannot use BOMBARDMENT against units that are on cultural planets.",
         "text2": "Against: Each player that voted \"Against\" discards all of their action cards.",
-        "mapText": "Players cannot use Bombardment against units that are on cultural planets.",
+        "mapText": "Players cannot use BOMBARDMENT against units that are on cultural planets.",
         "source": "base"
     },
     {
@@ -200,9 +200,9 @@
         "name": "Minister of Industry",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. When the owner of this card places a space dock in a system, their units in that system may use their Production abilities.",
+        "text1": "The elected player gains this card. When the owner of this card places a space dock in a system, their units in that system may use their PRODUCTION abilities.",
         "text2": "",
-        "mapText": "When you place a space dock in a system, your units in that system may use their Production abilities.",
+        "mapText": "When you place a space dock in a system, your units in that system may use their PRODUCTION abilities.",
         "source": "base"
     },
     {
@@ -280,7 +280,7 @@
         "name": "Prophecy of Ixth",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighter's combat rolls. When the owner of this card uses Production, they discard this card unless they produce 2 or more fighters.",
+        "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighter's combat rolls. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
         "text2": "",
         "mapText": "Apply +1 to the result of your fighter's combat rolls. When you use PRODUCTION, discard this card unless you produce 2 or more fighters.",
         "source": "base"
@@ -299,10 +299,10 @@
         "name": "Publicize Weapon Schematics",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: If any player owns a war sun technology, all players may ignore all prerequisites on war sun technologies. All war suns lose Sustain Damage.",
+        "text1": "For: If any player owns a war sun technology, all players may ignore all prerequisites on war sun technologies. All war suns lose SUSTAIN DAMAGE.",
         "text2": "Against: Each player that owns a war sun technology discards all of their action cards.",
         "forEmoji": "CrackedWarSun",
-        "mapText": "If any player owns a war sun technology, all players may ignore all prerequisites on war sun technologies. All war suns lose Sustain Damage.",
+        "mapText": "If any player owns a war sun technology, all players may ignore all prerequisites on war sun technologies. All war suns lose SUSTAIN DAMAGE.",
         "source": "base"
     },
     {

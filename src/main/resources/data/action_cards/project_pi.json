@@ -35,7 +35,7 @@
         "alias": "pi_dh1",
         "name": "Direct Hit",
         "phase": "Action",
-        "window": "After another player's unit uses Sustain Damage to cancel a hit produced by your units or abilities",
+        "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
         "text": "Destroy that unit.",
         "source": "project_pi"
     },
@@ -43,7 +43,7 @@
         "alias": "pi_dh2",
         "name": "Direct Hit",
         "phase": "Action",
-        "window": "After another player's unit uses Sustain Damage to cancel a hit produced by your units or abilities",
+        "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
         "text": "Destroy that unit.",
         "source": "project_pi"
     },
@@ -51,7 +51,7 @@
         "alias": "pi_dh3",
         "name": "Direct Hit",
         "phase": "Action",
-        "window": "After another player's unit uses Sustain Damage to cancel a hit produced by your units or abilities",
+        "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
         "text": "Destroy that unit.",
         "source": "project_pi"
     },
@@ -59,7 +59,7 @@
         "alias": "pi_dh4",
         "name": "Direct Hit",
         "phase": "Action",
-        "window": "After another player's unit uses Sustain Damage to cancel a hit produced by your units or abilities",
+        "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
         "text": "Destroy that unit.",
         "source": "project_pi"
     },
@@ -68,7 +68,7 @@
         "name": "Experimental Battlestation",
         "phase": "Action",
         "window": "When you roll Space Cannon Offense",
-        "text": "Choose 1 of your space docks that is either in or adjacent to the active system. That space dock gains SPACE CANNON 5 (x3) and can use the ability against ships in adjacent systems during this roll.",
+        "text": "Choose 1 of your space docks that is either in or adjacent to the active system. That space dock gains SPACE CANNON 5(x3) and can use the ability against ships in adjacent systems during this roll.",
         "source": "project_pi"
     },
     {
@@ -107,8 +107,8 @@
         "alias": "pi_tactical",
         "name": "Tactical Bombardment",
         "phase": "Action",
-        "window": "When you roll Bombardment",
-        "text": "Choose 1 of your ships with Bombardment in the active system. That ship may roll 2 additional dice.",
+        "window": "When you roll BOMBARDMENT",
+        "text": "Choose 1 of your ships with BOMBARDMENT in the active system. That ship may roll 2 additional dice.",
         "source": "project_pi"
     },
     {

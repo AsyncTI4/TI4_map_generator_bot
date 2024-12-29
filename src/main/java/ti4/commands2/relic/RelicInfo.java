@@ -8,7 +8,7 @@ import ti4.service.info.RelicInfoService;
 class RelicInfo extends GameStateSubcommand {
 
     public RelicInfo() {
-        super(Constants.RELIC_INFO, "Send relic information to your Cards Info channel", false, true);
+        super(Constants.RELIC_INFO, "Send relic information to your #cards-info thread", false, true);
     }
 
     @Override

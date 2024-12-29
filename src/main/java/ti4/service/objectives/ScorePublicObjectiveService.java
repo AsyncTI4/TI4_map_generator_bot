@@ -43,16 +43,16 @@ public class ScorePublicObjectiveService {
             if (playerProgress < threshold) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getFactionEmoji() + " the bot does not believe you meet the requirements to score "
-                        + poName + ", The bot has you at " + playerProgress + "/" + threshold
-                        + ". If this is a mistake, please report and then you can manually score via /status po_score with the number ID of "
-                        + poID);
+                        + poName + ". The bot has you at " + playerProgress + "/" + threshold
+                        + ". If this is a mistake, please report and then you can manually score via `/status po_score` with the number ID of `"
+                        + poID + "`.");
                 return;
             }
         }
         boolean scored = game.scorePublicObjective(player.getUserID(), poID);
         if (!scored) {
             MessageHelper.sendMessageToChannel(channel,
-                player.getFactionEmoji() + "No such Public Objective ID found or already scored, please retry");
+                player.getFactionEmoji() + "No such public objective ID found, or already scored, please retry.");
         } else {
             informAboutScoring(event, channel, game, player, poID);
             for (Player p2 : player.getNeighbouringPlayers()) {

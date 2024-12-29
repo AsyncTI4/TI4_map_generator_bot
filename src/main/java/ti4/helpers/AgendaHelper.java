@@ -2639,7 +2639,7 @@ public class AgendaHelper {
         if (cov) {
             MessageHelper.sendMessageToChannel(channel,
                 "# " + game.getPing() + " the agenda target is " + agendaTarget
-                    + ". Sent the agenda to the speakers cards info");
+                    + ". Sent the agenda to the speaker's `#cards-info` thread.");
         }
 
         if (!action && aCount == 1) {

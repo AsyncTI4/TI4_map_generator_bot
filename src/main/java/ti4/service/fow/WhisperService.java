@@ -19,7 +19,9 @@ public class WhisperService {
         String player1 = ColorEmojis.getColorEmojiWithName(player.getColor());
         if (!game.isFowMode() && !(feedbackChannel instanceof ThreadChannel)) {
             feedbackChannel = player.getCardsInfoThread();
-            MessageHelper.sendMessageToChannel(feedbackChannel, player.getRepresentation() + " Reminder you should start all whispers from your cards info channel, and do not need to use the /fow whisper command, you can just start a message with toblue or something");
+            MessageHelper.sendMessageToChannel(feedbackChannel, player.getRepresentation()
+                + " Reminder you should start all whispers from your `#cards-info` thread, and do not need to use the `/fow whisper` command,"
+                + " you can just start a message with `toblue message...` or something.");
         }
         if (!game.isFowMode()) {
             player1 = player.getFactionEmoji() + "(" + StringUtils.capitalize(player.getFaction()) + ") " + player1;

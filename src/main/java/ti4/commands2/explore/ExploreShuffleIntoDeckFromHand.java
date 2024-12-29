@@ -15,7 +15,7 @@ class ExploreShuffleIntoDeckFromHand extends GameStateSubcommand {
 
     public ExploreShuffleIntoDeckFromHand() {
         super(Constants.SHUFFLE_INTO_DECK_FROM_HAND, "Discard an Exploration Card from the hand to deck.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card ids. May include multiple comma-separated ids.").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Exploration card ids. May include multiple comma-separated ids.").setRequired(true));
     }
 
     @Override

@@ -14,7 +14,7 @@ import ti4.model.Source.ComponentSource;
 class SearchExploresSubcommand extends SearchComponentModelSubcommand {
 
     public SearchExploresSubcommand() {
-        super(Constants.SEARCH_EXPLORES, "List all explore cards the bot can use");
+        super(Constants.SEARCH_EXPLORES, "List all exploration cards the bot can use");
     }
 
     @Override

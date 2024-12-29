@@ -69,13 +69,13 @@ public class CombatRollService {
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         if (combatOnHolder == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition());
+                "Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition() + ".");
             return 0;
         }
 
         if (rollType == CombatRollType.SpaceCannonDefence && !(combatOnHolder instanceof Planet)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Planet needs to be specified to fire space cannon defence on tile " + tile.getPosition());
+                "Planet needs to be specified to fire SPACE CANNON against ships on tile " + tile.getPosition() + ".");
         }
 
         Map<UnitModel, Integer> playerUnitsByQuantity = getUnitsInCombat(tile, combatOnHolder, player, event, rollType, game);
@@ -285,7 +285,7 @@ public class CombatRollService {
             }
         }
         if (!game.isFowMode() && rollType == CombatRollType.AFB && opponent != player) {
-            String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from AFB";
+            String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from ANTI-FIGHTER BARRAGE.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (h > 0) {
                 String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";
@@ -298,7 +298,7 @@ public class CombatRollService {
             }
         }
         if (!game.isFowMode() && rollType == CombatRollType.SpaceCannonOffence && h > 0 && opponent != player) {
-            String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from space cannon offense";
+            String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from SPACE CANNON against your ships.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             List<Button> buttons = new ArrayList<>();
             String finChecker = "FFCC_" + opponent.getFaction() + "_";
@@ -314,7 +314,7 @@ public class CombatRollService {
 
             buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "_bombardment", "Assign Hit" + (h == 1 ? "" : "s")));
 
-            String msg2 = " you may use this button to assign " + (h == 1 ? "the bombardment hit" : "bombardment hits") + ".";
+            String msg2 = " you may use this button to assign " + (h == 1 ? "the BOMBARDMENT hit" : "BOMBARDMENT hits") + ".";
             boolean someone = false;
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
@@ -341,7 +341,7 @@ public class CombatRollService {
                 buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "meteorSlings_" + uH.getName(), "Infantry on " + Helper.getPlanetRepresentation(uH.getName(), game)));
             }
             buttons.add(Buttons.red("deleteButtons", "Done"));
-            String msg2 = player.getRepresentation() + " you could potentially cancel " + (h == 1 ? "the bombardment hit" : "some bombardment hits") + " to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
+            String msg2 = player.getRepresentation() + " you could potentially cancel " + (h == 1 ? "the BOMBARDMENT hit" : "some BOMBARDMENT hits") + " to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
 
         }
@@ -431,7 +431,7 @@ public class CombatRollService {
                         player.setTg(player.getTg() + 1);
                         ButtonHelperAbilities.pillageCheck(player, game);
                         ButtonHelperAgents.resolveArtunoCheck(player, 1);
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1TG due to hitting on a bombardment roll with the Aurum Vadra (the Vaden flagship).");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1TG due to hitting on a BOMBARDMENT roll with the Aurum Vadra (the Vaden flagship).");
                         break;
 
                     }
@@ -497,9 +497,9 @@ public class CombatRollService {
             }
             if (rollType == CombatRollType.SpaceCannonOffence || rollType == CombatRollType.SpaceCannonDefence) {
                 if (player.ownsUnit("gledge_pds2") && totalHits > 0) {
-                    String msg = player.getRepresentation() + " use the buttons to explore a planet with the pds that got the hit. It should be " +
-                        "noted that the bot has no idea which pds rolled which dice, but default practice would be to go from lowest tile position to highest" +
-                        ", with plasma applying to the last die. You can specify any order before rolling though.";
+                    String msg = player.getRepresentation() + " use the buttons to explore a planet with the PDS that got the hit. It should be " +
+                        "noted that the bot has no idea which PDS rolled which dice, but default practise would be to go from lowest tile position to highest" +
+                        ", with _Plasma Scoring_ applying to the last die. You can specify any order before rolling though.";
                     for (int x = 0; x < totalHits; x++) {
                         List<Button> buttons = new ArrayList<>();
                         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds)) {
@@ -517,12 +517,12 @@ public class CombatRollService {
                                 }
                             }
                         }
-                        buttons.add(Buttons.red("deleteButtons", "No Valid Explore"));
+                        buttons.add(Buttons.red("deleteButtons", "No Valid Exploration"));
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                     }
                 }
                 if (player.ownsUnit("gledge_pds")) {
-                    String msg = player.getRepresentation() + " use the buttons to explore a planet with the pds that got the hit.";
+                    String msg = player.getRepresentation() + " use the buttons to explore a planet with the PDS that got the hit.";
                     for (DiceHelper.Die die : resultRolls) {
                         if (die.getResult() < 8) {
                             continue;
@@ -541,7 +541,7 @@ public class CombatRollService {
                                 buttons.addAll(planetButtons);
                             }
                         }
-                        buttons.add(Buttons.red("deleteButtons", "No Valid Explore"));
+                        buttons.add(Buttons.red("deleteButtons", "No Valid Exploration"));
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                     }
 
@@ -875,7 +875,9 @@ public class CombatRollService {
                     unitsOnTile.put(starfallFakeUnit, count);
                 }
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " this is a reminder that due to the Starfall Gunnery ability, only Space Cannon of 1 unit should be counted at this point. Hopefully you declared beforehand what that unit was, but by default it's probably the best one. Only look at/count the rolls of that one unit");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()
+                    + ", this is a reminder that due to the **Starfall Gunnery** ability, the SPACE CANNON of only 1 unit should be counted at this point."
+                    + " Hopefully you declared beforehand what that unit was, but by default it's probably the best one. Only look at/count the rolls of that one unit.");
             }
         }
 

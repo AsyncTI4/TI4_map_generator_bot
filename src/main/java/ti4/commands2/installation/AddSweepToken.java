@@ -34,6 +34,6 @@ class AddSweepToken extends GameStateSubcommand {
         String sweepToken = Mapper.getSweepID(player.getColor());
         tile.addCC(sweepToken);
         MapRenderPipeline.renderToWebsiteOnly(game, event);
-        MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
+        MessageHelper.replyToMessage(event, "Executed command. Use `/show_game` to check map.");
     }
 }

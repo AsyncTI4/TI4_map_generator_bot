@@ -148,11 +148,12 @@
         "source": "ds",
         "faction": "Celdauri",
         "productionValue": "+2",
+        "basicProduction": "res",
         "capacityValue": 3,
         "afbHitsOn": 6,
         "afbDieCount": 2,
         "isStructure": true,
-        "ability": "This unit's PRODUCTION value is equal to 2 more than the resource or influence value of this planet. Up to 3 fighters in this system do not count against your ships' capacity."
+        "ability": "This unit's PRODUCTION value is equal to 2 more than the resource or influence value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity."
     },
     {
         "id": "celdauri_spacedock2",
@@ -164,11 +165,12 @@
         "source": "ds",
         "faction": "Celdauri",
         "productionValue": "+4",
+        "basicProduction": "res",
         "capacityValue": 3,
         "afbHitsOn": 6,
         "afbDieCount": 2,
         "isStructure": true,
-        "ability": "This unit's PRODUCTION value is equal to 4 more than the resource or influence value of this planet. Up to 3 fighters in this system do not count against your ships' capacity. This unit may use its ANTI-FIGHTER BARRAGE during each round of space combat."
+        "ability": "This unit's PRODUCTION value is equal to 4 more than the resource or influence value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity.\nThis unit may use its ANTI-FIGHTER BARRAGE during each round of space combat."
     },
     {
         "id": "cheiran_dreadnought",
@@ -210,7 +212,7 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. When this unit is destroyed, you may place 1 fighter or 1 destroyer from your reinforcements in this system's space area."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.\nWhen this unit is destroyed, you may place 1 fighter or 1 destroyer from your reinforcements in this system's space area."
     },
     {
         "id": "cheiran_flagship",
@@ -433,7 +435,7 @@
         "combatDieCount": 1,
         "afbHitsOn": 9,
         "afbDieCount": 1,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "ability": "This unit may move without being transported.\nFighters in excess of your ships' capacity count against your fleet pool.",
         "isShip": true
     },
     {
@@ -639,7 +641,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This unit can be blockaded. When producing ships in your home system, place up to 1 of those units in this system's space area if it is not blockaded."
+        "ability": "This unit can be blockaded.\nWhen producing ships in your home system, place up to 1 of those units in this system's space area if it is not blockaded."
     },
     {
         "id": "gledge_flagship",
@@ -704,7 +706,7 @@
         "planetaryShield": true,
         "isStructure": true,
         "deepSpaceCannon": true,
-        "ability": "When this unit produces 1 or more hits against another player's units, explore this planet. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system."
+        "ability": "When this unit produces 1 or more hits against another player's units, explore this planet.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's system."
     },
     {
         "id": "khrask_cruiser",
@@ -1048,7 +1050,7 @@
         "combatDieCount": 1,
         "bombardHitsOn": 8,
         "bombardDieCount": 1,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "ability": "This unit may move without being transported.\nFighters in excess of your ships' capacity count against your fleet pool.",
         "isShip": true
     },
     {
@@ -1132,7 +1134,7 @@
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": false,
         "isStructure": true,
-        "ability": "This unit is placed in a space area instead of on a planet. This unit can move and retreat as if it were a ship. This unit can be blockaded, if it is blockaded, it is destroyed."
+        "ability": "This unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed."
     },
     {
         "id": "mirveda_pds2",
@@ -1151,7 +1153,7 @@
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": false,
         "isStructure": true,
-        "ability": "This unit is placed in a space area instead of on a planet. This unit can move and retreat as if it were a ship. This unit can be blockaded, if it is blockaded, it is destroyed."
+        "ability": "This unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed."
     },
     {
         "id": "mortheus_flagship",
@@ -1228,10 +1230,11 @@
         "source": "ds",
         "faction": "Mykomentori",
         "productionValue": "+2",
+        "basicProduction": "res",
         "capacityValue": 0,
         "isStructure": true,
         "planetaryShield": true,
-        "ability": "DEPLOY: When you gain control of a planet, you may replace 4 infantry on that planet with 1 space dock. Planetary Shield"
+        "ability": "This unit’s PRODUCTION value is equal to 2 more than the resource value of this planet.\nDEPLOY: When you gain control of a planet, you may replace 4 infantry on that planet with 1 space dock."
     },
     {
         "id": "mykomentori_spacedock2",
@@ -1243,9 +1246,10 @@
         "source": "ds",
         "faction": "Mykomentori",
         "productionValue": "+5",
+        "basicProduction": "res",
         "isStructure": true,
         "planetaryShield": true,
-        "ability": "DEPLOY: When you gain control of a planet, you may replace 3 infantry on that planet with 1 space dock. Planetary Shield"
+        "ability": "This unit’s PRODUCTION value is equal to 5 more than the resource value of this planet.\nDEPLOY: When you gain control of a planet, you may replace 3 infantry on that planet with 1 space dock."
     },
     {
         "id": "nivyn_flagship",
@@ -1445,7 +1449,7 @@
         "combatHitsOn": 5,
         "combatDieCount": 2,
         "isShip": true,
-        "ability": "This unit produces only 1 fighter or infantry for their cost instead of 2. This unit cannot move or be produced."
+        "ability": "This unit produces only 1 fighter or infantry for their cost instead of 2.\nThis unit cannot move or be produced."
     },
     {
         "id": "rohdhna_warsun2",
@@ -1469,7 +1473,7 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other player's units in this system lose PLANETARY SHIELD. This unit produces only 1 fighter or infantry for their cost instead of 2."
+        "ability": "Other player's units in this system lose PLANETARY SHIELD.\nThis unit produces only 1 fighter or infantry for their cost instead of 2."
     },
     {
         "id": "rohdhna_flagship",
@@ -1502,7 +1506,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you use your RECYCLED MATERIALS faction ability in a system, you may place 1 mech in that system's space area or on a planet you control in that system."
+        "ability": "DEPLOY: After you use your Recycled Materials faction ability in a system, you may place 1 mech in that system's space area or on a planet you control in that system."
     },
     {
         "id": "tnelis_destroyer",
@@ -1571,7 +1575,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you move a destroyer into a non-home system other than Mecatol Rex, you may spend 3 resources to place 1 mech on a planet in that system. [Note: can deploy 1 mech for each destroyer that moves]"
+        "ability": "DEPLOY: After you move a destroyer into a non-home system other than Mecatol Rex, you may spend 3 resources to place 1 mech on a planet in that system. [Note: can DEPLOY 1 mech for each destroyer that moves]"
     },
     {
         "id": "vaden_flagship",
@@ -1623,7 +1627,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "During a round of space combat, if your opponent cannot declare a retreat, hits produced by this ship must be assigned to non-fighter ships, if able. This unit may only transport ground forces."
+        "ability": "During a round of space combat, if your opponent cannot declare a retreat, hits produced by this ship must be assigned to non-fighter ships, if able.\nThis unit may only transport ground forces."
     },
     {
         "id": "vaylerian_cruiser2",
@@ -1659,7 +1663,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "At the start of a space combat in this system, you may choose 1 adjacent system. Your opponent cannot retreat to that system."
+        "ability": "At the start of a space combat in this system, you may choose 1 adjacent system.\nYour opponent cannot retreat to that system."
     },
     {
         "id": "vaylerian_mech",

@@ -23,7 +23,7 @@ class ExploreUse extends GameStateSubcommand {
 
     public ExploreUse() {
         super(Constants.USE, "Draw and activate an explore card from the deck or discard", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card ID").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Exploration card ID").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FORCE, "True to force the draw, even if none are in the deck"));
@@ -41,7 +41,7 @@ class ExploreUse extends GameStateSubcommand {
         }
 
         if (!force && game.pickExplore(id) == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Explore Card ID: `" + id + "` is not in the deck or discard pile.");
+            MessageHelper.sendMessageToEventChannel(event, "Exploration Card ID: `" + id + "` is not in the deck or discard pile.");
             return;
         }
 
@@ -70,7 +70,7 @@ class ExploreUse extends GameStateSubcommand {
             }
         }
         Player player = getPlayer();
-        String messageText = player.getRepresentation() + " used explore card: " + id;
+        String messageText = player.getRepresentation() + " used exploration card: " + id;
         if (force) messageText += "\nTHIS CARD WAS DRAWN FORCEFULLY (if the card wasn't in the deck, it was created from thin air)";
         ExploreService.resolveExplore(event, id, tile, planetName, messageText, player, game);
     }

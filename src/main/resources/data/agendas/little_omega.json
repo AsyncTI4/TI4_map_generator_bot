@@ -54,7 +54,7 @@
         "target": "For/Against",
         "text1": "For: At the start of an invasion, players must discard 1 random action card from their hand to use BOMBARDMENT during that invasion.",
         "text2": "Against: Each player who voted \"Against\" or abstained discards 1 random action card from their hand.",
-        "mapText": "Players cannot use Bombardment against units that are on planets that have a trait.",
+        "mapText": "Players cannot use BOMBARDMENT against units that are on planets that have a trait.",
         "source": "little_omega"
     },
     {
@@ -225,9 +225,9 @@
         "name": "Prophecy of Ixth ω",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighters' combat rolls and may produce 1 additional fighter for their cost; these additional units do not count against their production limit.",
+        "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighters' combat rolls and may produce 1 additional fighter for their cost; these additional units do not count against their PRODUCTION limit.",
         "text2": "",
-        "mapText": "+1 to fighter combat rolls. Produce 1 additional fighter for their cost that doesn't count against production limits.",
+        "mapText": "+1 to fighter combat rolls. Produce 1 additional fighter for their cost that doesn't count against PRODUCTION limits.",
         "source": "little_omega"
     },
     {
@@ -301,9 +301,9 @@
         "name": "Articles of War ω",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: All mechs lose their printed abilities except for Sustain Damage.",
+        "text1": "For: All mechs lose their printed abilities except for SUSTAIN DAMAGE.",
         "text2": "Against: Each player removes 4 of their infantry from the game board.",
-        "mapText": "All mechs lose their printed abilities except for Sustain Damage.",
+        "mapText": "All mechs lose their printed abilities except for SUSTAIN DAMAGE.",
         "source": "little_omega"
     },
     {

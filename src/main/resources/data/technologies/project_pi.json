@@ -23,7 +23,7 @@
         "requirements": "G",
         "source": "project_pi",
         "homebrewReplacesID": "da",
-        "text": "After 1 of your ground forces is destroyed during combat, you may place that unit on this card. At the end of your turn, you may exhaust this card to place any number of units from it onto a planet you control."
+        "text": "After 1 of your ground forces is destroyed during combat, you may place that unit on this card.\nAt the end of your turn, you may exhaust this card to place any number of units from it onto a planet you control."
     },
     {
         "alias": "pi_hm",
@@ -40,7 +40,7 @@
         "types": ["BIOTIC"],
         "source": "project_pi",
         "homebrewReplacesID": "pa",
-        "text": "You may exhaust this card to use thechnology specialties on planets you control without exhausting them, even if those planets are exhausted. You may exhaust this card at the end of your turn to ready 1 of your planets that has a technology specialty."
+        "text": "You may exhaust this card to use technology specialties on planets you control without exhausting them, even if those planets are exhausted.\nYou may exhaust this card at the end of your turn to ready 1 of your planets that has a technology specialty."
     },
     {
         "alias": "pi_x89",
@@ -49,7 +49,7 @@
         "requirements": "GGG",
         "source": "project_pi",
         "homebrewReplacesID": "x89",
-        "text": "At the start of your tuen, exhaust this card and remove one of your structures from the board to choose a planet controlled by another player that is in or adjacent to a system where you have ships. Destroy all ground forces on that planet."
+        "text": "At the start of your turn, exhaust this card and remove one of your structures from the board to choose a planet controlled by another player that is in or adjacent to a system where you have ships. Destroy all ground forces on that planet."
     },
     {
         "alias": "pi_bs",
@@ -84,7 +84,7 @@
         "requirements": "RR",
         "source": "project_pi",
         "homebrewReplacesID": "da",
-        "text": "During each round of combat, after you assign hits to your units, repair one participating damaged units that did not use Sustain Damage during this combat round. You may exhaust this tech before assigning hits; Your units cannot be targeted by Direct Hit during this combat round."
+        "text": "During each round of combat, after you assign hits to your units, repair one participating damaged units that did not use SUSTAIN DAMAGE during this combat round.\nYou may exhaust this tech before assigning hits; Your units cannot be targeted by \"Direct Hit\" during this combat round."
     },
     {
         "alias": "pi_gls",
@@ -93,7 +93,7 @@
         "requirements": "R",
         "source": "project_pi",
         "homebrewReplacesID": "gls",
-        "text": "You may exhaust this card before 1 or more of your units use SPACE CANNON; hits produced by those units must be assigned to non-fighter ships if able. You may exhaust this card at the start of a space combat round; hits produced by your units this round must be assigned to non-fighter ships if able."
+        "text": "You may exhaust this card before 1 or more of your units use SPACE CANNON; hits produced by those units must be assigned to non-fighter ships if able.\nYou may exhaust this card at the start of a space combat round; hits produced by your units this round must be assigned to non-fighter ships if able."
     },
     {
         "alias": "pi_sar",
@@ -102,7 +102,7 @@
         "requirements": "Y",
         "source": "project_pi",
         "homebrewReplacesID": "sar",
-        "text": "After 1 or more of your units use PRODUCTION, you may exhaust thiscard to place 1 mech from your reinformcements on a planet you control in that system. After 1 of your mechs is destroyed, gain 1 trade good."
+        "text": "After 1 or more of your units use PRODUCTION, you may exhaust this card to place 1 mech from your reinforcements on a planet you control in that system.\nAfter 1 of your mechs is destroyed, gain 1 trade good."
     },
     {
         "alias": "pi_fl",
@@ -128,7 +128,7 @@
         "requirements": "YYY",
         "source": "project_pi",
         "homebrewReplacesID": "ie",
-        "text": "When your perform a tacticle action: Treat each planet in the active system as if they are a unit with PRODUCTION X, where X is equal to the sum of the planet's resource and influence values. Planets granted PRODUCTION by this tech may only produce fighters or infantry,"
+        "text": "When your perform a tactical action: Treat each planet in the active system as if they are a unit with PRODUCTION X, where X is equal to the sum of the planet's resource and influence values. Planets granted PRODUCTION by this tech may only produce fighters or infantry,"
     },
     {
         "alias": "pi_pi",
@@ -137,7 +137,7 @@
         "requirements": "YY",
         "source": "project_pi",
         "homebrewReplacesID": "pi",
-        "text": "At the end of your turn, you may exhaust this card to redistribute your command tokens. When you redistribute your command tokens, you may convert all your commodities into trade goods."
+        "text": "At the end of your turn, you may exhaust this card to redistribute your command tokens.\nWhen you redistribute your command tokens, you may convert all your commodities into trade goods."
     },
     {
         "alias": "pi_l4",
@@ -167,7 +167,7 @@
         "faction": "sardakk",
         "source": "project_pi",
         "homebrewReplacesID": "exo2",
-        "text": "Cost 4, Comabt 5, Move 2, Capacity 1, BOMBARDMENT 4(x2). When making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 1 additional hit. After a round of space combat, you may destroy this unit to destroy up to 2 ships in this system."
+        "text": "When making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 1 additional hit.\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in this system."
     },
     {
         "alias": "pi_ac2",
@@ -178,7 +178,7 @@
         "faction": "sol",
         "source": "project_pi",
         "homebrewReplacesID": "ac2",
-        "text": "Cost 3, Combat 9, Move 2, Capacity 8, SUSTAIN DAMANGE."
+        "text": "Cost 3, Combat 9, Move 2, Capacity 8\nSUSTAIN DAMANGE."
     },
     {
         "alias": "pi_so2",
@@ -189,7 +189,7 @@
         "faction": "sol",
         "source": "project_pi",
         "homebrewReplacesID": "so2",
-        "text": "Cost 1 (x2), Combat 6. When you gain control of a planet, if the number of infantry you have on the planet is greater than the planet's resource value, gain that planet readied."
+        "text": "Cost 1(x2), Combat 6\nWhen you gain control of a planet, if the number of infantry you have on the planet is greater than the planet's resource value, gain that planet readied."
     },
     {
         "alias": "pi_it",
@@ -199,7 +199,7 @@
         "faction": "xxcha",
         "source": "project_pi",
         "homebrewReplacesID": "it",
-        "text": "You may exhasut this card when another player plays an action card; cancel that action card."
+        "text": "You may exhaust this card when another player plays an action card; cancel that action card."
     },
     {
         "alias": "pi_nf",
@@ -250,7 +250,7 @@
         "faction": "naalu",
         "source": "project_pi",
         "homebrewReplacesID": "hcf2",
-        "text": "Cost 1 (x2), Combat 7, Move 2. This unit may move without being transported. Each fighter in excess of your ship's capacity counts as 1/2 of a ship against your fleet pool."
+        "text": "Cost 1(x2), Combat 7, Move 2\nThis unit may move without being transported.\nEach fighter in excess of your ship's capacity counts as 1/2 of a ship against your fleet pool."
     },
     {
         "alias": "pi_sdn2",
@@ -261,7 +261,7 @@
         "faction": "l1z1x",
         "source": "project_pi",
         "homebrewReplacesID": "sdn2",
-        "text": "Cost 4, Combat 4, Move 2, Capacity 2, BOMBARDMENT 4, SUSTAIN DAMAGE. When making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 1 additional hit. Other players' units in this system lose PLANETARY SHIELD."
+        "text": "Cost 4, Combat 4, Move 2, Capacity 2\nBOMBARDMENT 4, SUSTAIN DAMAGE\nWhen making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 1 additional hit.\nOther players' units in this system lose PLANETARY SHIELD."
     },
     {
         "alias": "pi_is",
@@ -271,7 +271,7 @@
         "faction": "l1z1x",
         "source": "project_pi",
         "homebrewReplacesID": "is",
-        "text": "You may exhaust this card when you research a technology; ingore all of that technology's prerequisites."
+        "text": "You may exhaust this card when you research a technology; ignore all of that technology's prerequisites."
     },
     {
         "alias": "pi_lgf",
@@ -301,7 +301,7 @@
         "faction": "saar",
         "source": "project_pi",
         "homebrewReplacesID": "cm",
-        "text": "Other players cannon move into asteroid fields that contain 1 or more of your units. At the start of your turn during the action phase, you may produce 1 unit in an asteroid field that contains at least 1 of your units that has PRODUCTION."
+        "text": "Other players cannon move into asteroid fields that contain 1 or more of your units.\nAt the start of your turn during the action phase, you may produce 1 unit in an asteroid field that contains at least 1 of your units that has PRODUCTION."
     },
     {
         "alias": "pi_ffac2",
@@ -312,7 +312,7 @@
         "baseUpgrade": "sd2",
         "source": "project_pi",
         "homebrewReplacesID": "ffac2",
-        "text": "Move 2, Capacity 6, PRODUCTION 7. This unit is placed in a space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockadedm it is destroyed."
+        "text": "Move 2, Capacity 6\nPRODUCTION 7\nThis unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded it is destroyed."
     },
     {
         "alias": "pi_pws2",
@@ -323,7 +323,7 @@
         "baseUpgrade": "ws",
         "source": "project_pi",
         "homebrewReplacesID": "pws2",
-        "text": "Cost 10, Combat 3 (x3), Move 3, Capacity 8, BOMBARDMENT 3 (x3), SUSTAIN DAMAGE. Other players units in this system lose the PLANETARY SHIELD ability."
+        "text": "Cost 10, Combat 3(x3), Move 3, Capacity 8\nBOMBARDMENT 3(x3), SUSTAIN DAMAGE\nOther players units in this system lose the PLANETARY SHIELD ability."
     },
     {
         "alias": "pi_ic",
@@ -354,7 +354,7 @@
         "faction": "arborec",
         "source": "project_pi",
         "homebrewReplacesID": "lw2",
-        "text": "Cost 1, Combat 7, Production 2, When you gain control of a planet, if the number of infantry you have on the planet is greater than the planet's resource value, gain that planet readied."
+        "text": "Cost 1, Combat 7\nPRODUCTION 2\nWhen you gain control of a planet, if the number of infantry you have on the planet is greater than the planet's resource value, gain that planet readied."
     },
     {
         "alias": "pi_wg",
@@ -375,7 +375,7 @@
         "faction": "titans",
         "source": "project_pi",
         "homebrewReplacesID": "se2",
-        "text": "Cost 2, Combat 6, Move 3, Capacity 2, SUSTAIN DAMAGE."
+        "text": "Cost 2, Combat 6, Move 3, Capacity 2\nSUSTAIN DAMAGE."
     },
     {
         "alias": "pi_gr",
@@ -396,7 +396,7 @@
         "faction": "mahact",
         "source": "project_pi",
         "homebrewReplacesID": "cl2",
-        "text": "Cost 1 (x2), Combat 7. After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good. When you gain control of a planet, if the number of infantry you have on the planet is greater than the planet's resource value, gain that planet readied."
+        "text": "Cost 1(x2), Combat 7\nAfter this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good.\nWhen you gain control of a planet, if the number of infantry you have on the planet is greater than the planet's resource value, gain that planet readied."
     },
     {
         "alias": "pi_m2",
@@ -406,7 +406,7 @@
         "faction": "nomad",
         "source": "project_pi",
         "homebrewReplacesID": "m2",
-        "text": "Cost 8, Combat 5 (x2), Move 2, Capacity 6, ANTI-FIGHTER BARRAGE 5 (x3), BOMBARDMENT 5. You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs."
+        "text": "Cost 8, Combat 5(x2), Move 2, Capacity 6\nANTI-FIGHTER BARRAGE 5(x3), BOMBARDMENT 5\nYou may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs."
     },
     {
         "alias": "pi_ws",
@@ -415,7 +415,7 @@
         "requirements": "YRRR",
         "source": "project_pi",
         "homebrewReplacesID": "ws",
-        "text": "Cost 12, Comabt 3 (x3), Move 2, Capacity 8, SUSTAIN DAMAGE, BOMBARDMENT 3 (x3). Other players' units in this system lose PLANETARY SHIELD."
+        "text": "Cost 12, Combat 3(x3), Move 2, Capacity 8\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther players' units in this system lose PLANETARY SHIELD."
     },
     {
         "alias": "pi_cr2",
@@ -424,16 +424,16 @@
         "requirements": "GYB",
         "source": "project_pi",
         "homebrewReplacesID": "cr2",
-        "text": "Cost 2, Combat 6, Move 3, Capacity 1. While your curisers participate in combat, oppenent's ships apply -1 to their combat rolls."
+        "text": "Cost 2, Combat 6, Move 3, Capacity 1\nWhile your cruisers participate in combat, opponent's ships apply -1 to their combat rolls."
     },
     {
         "alias": "pi_dn2",
-        "name": "Dreadnaught II",
+        "name": "Dreadnought II",
         "types": ["UNITUPGRADE"],
         "requirements": "RBY",
         "source": "project_pi",
         "homebrewReplacesID": "dn2",
-        "text": "Cost 4, Combat 5, Move 2, Capactiy 1, SUSTAIN DAMAGE, BOMBARDMENT 5. When making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 1 additional hits."
+        "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 5\nWhen making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 1 additional hits."
     },
     {
         "alias": "pi_cv2",
@@ -451,7 +451,7 @@
         "requirements": "BY",
         "source": "project_pi",
         "homebrewReplacesID": "ff2",
-        "text": "Cost 1 (x2), Combat 8, Move 2. This unit may move wihtout being transported. Fighters in excess of your ship's capacity count against your fleet pool."
+        "text": "Cost 1(x2), Combat 8, Move 2\nThis unit may move whiteout being transported.\nFighters in excess of your ship's capacity count against your fleet pool."
     },
     {
         "alias": "pi_inf2",
@@ -460,7 +460,7 @@
         "requirements": "GG",
         "source": "project_pi",
         "homebrewReplacesID": "inf2",
-        "text": "Cost 1 (x2), Combat 7. When you gain control of a planet, if the number of infantry you have on the planet is greater than the planet's resource value, gain that planet readied."
+        "text": "Cost 1(x2), Combat 7\nWhen you gain control of a planet, if the number of infantry you have on the planet is greater than the planet's resource value, gain that planet readied."
     },
     {
         "alias": "pi_sd2",
@@ -469,6 +469,6 @@
         "requirements": "YY",
         "source": "project_pi",
         "homebrewReplacesID": "sd2",
-        "text": "PRODUCTION X. This unit's PRODUCTION value is equal to 5 more than the resource value of this planet, Up to 6 fighters in this system do not count against your ship's capacity. When you use this unit's PRODUCTION ability, you may place the produced units on any planet in this system."
+        "text": "PRODUCTION X\nThis unit's PRODUCTION value is equal to 5 more than the resource value of this planet.\nUp to 6 fighters in this system do not count against your ship's capacity.\nWhen you use this unit's PRODUCTION ability, you may place the produced units on any planet in this system."
     }
 ]

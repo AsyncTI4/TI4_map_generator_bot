@@ -25,7 +25,8 @@ class Whisper extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game is not fog mode, and should not use this command. Instead whisper by beginning your message with to[color] or to[faction] from inside your cards info thread (for instance saying toblue hi)");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game is not fog mode, and should not use this command."
+                +" Instead whisper by beginning your message with to[color] or to[faction] from inside your `#cards-info` thread (for instance, saying `toblue hi`).");
             return;
         }
 

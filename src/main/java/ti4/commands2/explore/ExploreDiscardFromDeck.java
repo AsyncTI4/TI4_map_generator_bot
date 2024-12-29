@@ -14,7 +14,7 @@ class ExploreDiscardFromDeck extends GameStateSubcommand {
 
     public ExploreDiscardFromDeck() {
         super(Constants.DISCARD_FROM_DECK, "Discard an Exploration Card from the deck.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card ids. May include multiple comma-separated ids.").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Exploration card ids. May include multiple comma-separated ids.").setRequired(true));
     }
 
     @Override

@@ -26,6 +26,14 @@
 - Leader names should be written as `Faction Rank`;
 - No text formatting;
 - No period;
+# Data
+- For unit upgrade technologies, attributes on a single line in title case without period, keyword abilities on a single line in all caps without period, text abilities on another line(s)
+    - E.g. war sun "Cost 12, Combat 3(x3), Move 2, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther players' units in this system lose PLANETARY SHIELD."
+    - E.g. space dock "PRODUCTION X\nThis unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity."
+- For unit themselves, no attributes or keyword abilities in ability text field(s) - these are taken from dedicated data fields
+    - E.g. war sun "Other players' units in this system lose PLANETARY SHIELD."
+    - E.g. space dock "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity."
+- for technologies and unit abilities, split unrelated abilities by a single newline
 # Vocabulary
 - Short faction names should be what appears on their promissory notes/unit upgrades;
   - In particular, "N'orr", "Creuss", "Vuil'raith", "Ul";

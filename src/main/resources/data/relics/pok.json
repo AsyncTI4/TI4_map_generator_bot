@@ -34,7 +34,7 @@
     {
         "alias": "stellarconverter",
         "name": "Stellar Converter",
-        "text": "Action: Choose 1 non-home, non-legendary planet other than Mecatol Rex in a system that is adjacent to 1 or more of your units that have Bombardment, destroy all units on that planet and purge its attachments and its planet card. Then, place the destroyed planet token on that planet and purge this card. [Note: You cannot choose a planet that you control]",
+        "text": "ACTION: Choose 1 non-home, non-legendary planet other than Mecatol Rex in a system that is adjacent to 1 or more of your units that have BOMBARDMENT, destroy all units on that planet and purge its attachments and its planet card. Then, place the destroyed planet token on that planet and purge this card. [Note: You cannot choose a planet that you control]",
         "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/stellar_converter.jpg",
         "source": "pok",
         "flavourText": "*A power great enough to envelop a star, such that its energies might be concentrated… and scattered.*"
@@ -42,7 +42,7 @@
     {
         "alias": "codex",
         "name": "The Codex",
-        "text": "Action: Purge this card to take up to 3 action cards of your choice from the action card discard pile.",
+        "text": "ACTION: Purge this card to take up to 3 action cards of your choice from the action card discard pile.",
         "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/the_codex.jpg",
         "source": "pok",
         "flavourText": "*No single tome could contain the collected knowledge of millennia of rulers. Thus, the last Emperor built a massive cruiser, its holds bulging with crystal info-matrices. It roams the outer reaches of the Mecatol system, awaiting a summons that will never come.*"

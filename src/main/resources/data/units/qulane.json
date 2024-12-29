@@ -44,7 +44,7 @@
         "sustainDamage": true,
         "isGroundForce": true,
         "homebrewReplacesID": "mech",
-        "ability": "Deploy: After another player commits ground forces to a planet you control, you may spend 3 resources to place 1 mech on 1 planet you control in the active system"
+        "ability": "DEPLOY: After another player commits ground forces to a planet you control, you may spend 3 resources to place 1 mech on 1 planet you control in the active system"
     },
     {
         "id": "qulane_flagship",

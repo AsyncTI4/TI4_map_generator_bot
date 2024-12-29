@@ -68,7 +68,7 @@
         "faction": "celdauri",
         "baseUpgrade": "sd2",
         "source": "ds",
-        "text": "This unit's PRODUCTION value is equal to 4 more than the resource or influence value of this planet. Up to 3 fighters in this system do not count against your ships' capacity. This unit may use its ANTI-FIGHTER BARRAGE during each round of space combat. PRODUCTION X, ANTI-FIGHTER BARRAGE 6(x2)"
+        "text": "PRODUCTION X, ANTI-FIGHTER BARRAGE 6(x2).\nThis unit's PRODUCTION value is equal to 4 more than the resource or influence value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity.\nThis unit may use its ANTI-FIGHTER BARRAGE during each round of space combat."
     },
     {
         "alias": "dscheidn",
@@ -80,7 +80,7 @@
         "faction": "cheiran",
         "baseUpgrade": "dn2",
         "source": "ds",
-        "text": "This unit cannot be destroyed by “Direct Hit” action cards. When this unit is destroyed, you may place 1 fighter or 1 destroyer from your reinforcements in this system's space area. Cost 4, Combat 5, Move 2, Capacity 1; SUSTAIN DAMAGE, BOMBARDMENT 5"
+        "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 5\nThis unit cannot be destroyed by “Direct Hit” action cards.\nWhen this unit is destroyed, you may place 1 fighter or 1 destroyer from your reinforcements in this system's space area."
     },
     {
         "alias": "dscheir",
@@ -103,7 +103,7 @@
         "faction": "cymiae",
         "baseUpgrade": "inf2",
         "source": "ds",
-        "text": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your turn, place each unit that is on this card on a planet you control, if able. Cost 1, Combat 4"
+        "text": "Cost 1, Combat 4\nAfter this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your turn, place each unit that is on this card on a planet you control, if able."
     },
     {
         "alias": "dscymiy",
@@ -126,7 +126,7 @@
         "faction": "dihmohn",
         "baseUpgrade": "dn2",
         "source": "ds",
-        "text": "When another ship in this system would be destroyed by a game effect, you may have this ship become damaged instead. Cost 4, Combat 4, Move 2, Capacity 1; SUSTAIN DAMAGE, BOMBARDMENT 5"
+        "text": "Cost 4, Combat 4, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 5\nWhen another ship in this system would be destroyed by a game effect, you may have this ship become damaged instead."
     },
     {
         "alias": "dsdihmy",
@@ -137,7 +137,7 @@
         "requirements": "YY",
         "faction": "dihmohn",
         "source": "ds",
-        "text": "When you explore a planet, you may produce 1 ship in that planet's system. ACTION: Exhaust this card and 1 planet you control to explore that planet. [Note: this cannot produce ships if enemy ships are present]",
+        "text": "When you explore a planet, you may produce 1 ship in that planet's system.\nACTION: Exhaust this card and 1 planet you control to explore that planet.\n[Note: this cannot produce ships if enemy ships are present]",
         "shortName": "Impress.\nPrograms",
         "shrinkName": false
     },
@@ -161,7 +161,7 @@
         "requirements": "YY",
         "faction": "edyn",
         "source": "ds",
-        "text": "You may exhaust this card to allow a player to exchange 1 of their relics or agendas as part of a transaction. You always vote last during the agenda phase. When an outcome you voted for or predicted is resolved, each player who voted for that outcome gains 1 commodity."
+        "text": "You may exhaust this card to allow a player to exchange 1 of their relics or agendas as part of a transaction.\nYou always vote last during the agenda phase.\nWhen an outcome you voted for or predicted is resolved, each player who voted for that outcome gains 1 commodity."
     },
     {
         "alias": "dsflorg",
@@ -184,7 +184,7 @@
         "faction": "florzen",
         "baseUpgrade": "ff2",
         "source": "ds",
-        "text": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. Cost 1(x2), Combat 8, Move 3; ANTI-FIGHTER BARRAGE 8"
+        "text": "Cost 1(x2), Combat 8, Move 3\nANTI-FIGHTER BARRAGE 8\nThis unit may move without being transported.\nFighters in excess of your ships' capacity count against your fleet pool."
     },
     {
         "alias": "dsfreeg",
@@ -219,7 +219,7 @@
         "faction": "ghemina",
         "baseUpgrade": "cv2",
         "source": "ds",
-        "text": "You may reroll 1 of your unit's combat dice during each round of ground combat on a planet in this system that contains 2 or fewer of your infantry. Cost 3, Combat 9, Move 2, Capacity 6"
+        "text": "Cost 3, Combat 9, Move 2, Capacity 6\nYou may reroll 1 of your unit's combat dice during each round of ground combat on a planet in this system that contains 2 or fewer of your infantry."
     },
     {
         "alias": "dsghemg",
@@ -241,7 +241,7 @@
         "requirements": "G",
         "faction": "ghoti",
         "source": "ds",
-        "text": "Up to 3 ships in your home system do not count against your fleet pool. When you cast 1 or more votes, you may exhaust this card to cast an additional number of votes equal to the number of command tokens in your fleet pool.",
+        "text": "Up to 3 ships in your home system do not count against your fleet pool.\nWhen you cast 1 or more votes, you may exhaust this card to cast an additional number of votes equal to the number of command tokens in your fleet pool.",
         "shrinkName": true
     },
     {
@@ -277,7 +277,7 @@
         "faction": "gledge",
         "baseUpgrade": "pds2",
         "source": "ds",
-        "text": "When this unit produces 1 or more hits against another player's units, explore this planet. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system. PLANETARY SHIELD, SPACE CANNON 5"
+        "text": "PLANETARY SHIELD, SPACE CANNON 5\nWhen this unit produces 1 or more hits against another player's units, explore this planet.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's system."
     },
     {
         "alias": "dsaugug",
@@ -311,7 +311,7 @@
         "requirements": "G",
         "faction": "kjalengard",
         "source": "ds",
-        "text": "At the start of combat in a system that contains a Glory token, gain 1 trade good. After a player rolls combat dice, you may exhaust this card to allow that player to reroll any number of those dice. ",
+        "text": "At the start of combat in a system that contains a Glory token, gain 1 trade good.\nAfter a player rolls combat dice, you may exhaust this card to allow that player to reroll any number of those dice.",
         "shortName": "Zhrgar Stimul'nts"
     },
     {
@@ -324,7 +324,7 @@
         "faction": "kjalengard",
         "baseUpgrade": "cv2",
         "source": "ds",
-        "text": "This unit may ignore the movement effects of anomalies. Cost 3, Combat 7, Move 2, Capacity 6"
+        "text": "Cost 3, Combat 7, Move 2, Capacity 6\nThis unit may ignore the movement effects of anomalies."
     },
     {
         "alias": "dskollb",
@@ -358,7 +358,7 @@
         "requirements": "GG",
         "faction": "kolume",
         "source": "ds",
-        "text": "When you pass, you may gain 1 commodity for each other player who has already passed. ACTION: Exhaust this card.",
+        "text": "When you pass, you may gain 1 commodity for each other player who has already passed.\nACTION: Exhaust this card.",
         "shrinkName": true
     },
     {
@@ -440,7 +440,7 @@
         "requirements": "RR",
         "faction": "lanefir",
         "source": "ds",
-        "text": "After you explore, or purge 1 or more relic fragments, place 1 commodity token on this card. At the start of a round of combat, remove any number of tokens from this card to reroll up to that many of your dice during this round of combat.",
+        "text": "After you explore, or purge 1 or more relic fragments, place 1 commodity token on this card.\nAt the start of a round of combat, remove any number of tokens from this card to reroll up to that many of your dice during this round of combat.",
         "shortName": "ATS Arm\n-aments"
     },
     {
@@ -464,7 +464,7 @@
         "faction": "lizho",
         "baseUpgrade": "ff2",
         "source": "ds",
-        "text": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. Cost 1(x2), Combat 8, Move 2; BOMBARDMENT 8"
+        "text": "Cost 1(x2), Combat 8, Move 2\nBOMBARDMENT 8\nThis unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
     },
     {
         "alias": "dskhrag",
@@ -487,7 +487,7 @@
         "faction": "khrask",
         "baseUpgrade": "cr2",
         "source": "ds",
-        "text": "Cost 2, Combat 6, Move 3, Capacity 2; BOMBARDMENT 6"
+        "text": "Cost 2, Combat 6, Move 3, Capacity 2\nBOMBARDMENT 6"
     },
     {
         "alias": "dsmirvr",
@@ -498,7 +498,7 @@
         "requirements": "RR",
         "faction": "mirveda",
         "source": "ds",
-        "text": "At the start of invasion, choose up to 1 unit you control in the active system; that unit gains PLANETARY SHIELD. When a player commits a unit to land on a planet you control, you may exhaust this card to destroy that unit.",
+        "text": "At the start of invasion, choose up to 1 unit you control in the active system; that unit gains PLANETARY SHIELD.\nWhen a player commits a unit to land on a planet you control, you may exhaust this card to destroy that unit.",
         "shortName": "Orbital\nDef. Grid"
     },
     {
@@ -511,7 +511,7 @@
         "faction": "mirveda",
         "baseUpgrade": "pds2",
         "source": "ds",
-        "text": "This unit is placed in a space area instead of on a planet. This unit can move and retreat as if it were a ship. This unit can be blockaded, if it is blockaded, it is destroyed. 2; SPACE CANNON 4, BOMBARDMENT 4, CAPACITY 1"
+        "text": "Move 2, Capacity 1\nSPACE CANNON 4, BOMBARDMENT 4\nThis unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed."
     },
     {
         "alias": "dsmortr",
@@ -559,7 +559,7 @@
         "faction": "mykomentori",
         "baseUpgrade": "sd2",
         "source": "ds",
-        "text": "This unit's PRODUCTION value is equal to 5 more than the resource value of this planet. DEPLOY: When you gain control of a planet, you may replace 3 infantry on that planet with 1 space dock. Planetary Shield"
+        "text": "PLANETARY SHIELD, PRODUCTION X\nThis unit's PRODUCTION value is equal to 5 more than the resource value of this planet.\nDEPLOY: When you gain control of a planet, you may replace 3 infantry on that planet with 1 space dock."
     },
     {
         "alias": "dsnivymf",
@@ -570,7 +570,7 @@
         "requirements": "BRY",
         "faction": "nivyn",
         "source": "ds",
-        "text": "After a system is activated, you may have this unit become damaged to place or move the Wound token into this system. Cost 2, Combat 4; SUSTAIN DAMAGE"
+        "text": "Cost 2, Combat 4\nSUSTAIN DAMAGE\nAfter a system is activated, you may have this unit become damaged to place or move the Wound token into this system."
     },
     {
         "alias": "dsnivyy",
@@ -593,7 +593,7 @@
         "faction": "nokar",
         "baseUpgrade": "dd2",
         "source": "ds",
-        "text": "After this unit is destroyed during combat, roll a die, on a result equal to or greater than 7, produce up to 1 hit against your opponent's ships. Cost 1, Combat 7, Move 2; ANTI-FIGHTER BARRAGE 6(x3)"
+        "text": "Cost 1, Combat 7, Move 2\nANTI-FIGHTER BARRAGE 6(x3)\nAfter this unit is destroyed during combat, roll a die, on a result equal to or greater than 7, produce up to 1 hit against your opponent's ships."
     },
     {
         "alias": "dsnokay",
@@ -665,7 +665,7 @@
         "faction": "rohdhna",
         "baseUpgrade": "ws",
         "source": "ds",
-        "text": "Other player's units in this system lose PLANETARY SHIELD. This unit produces only 1 fighter or infantry for their cost instead of 2. Cost 12, Combat 3(x3), Move 2, Capacity 6; SUSTAIN DAMAGE, PRODUCTION 5, BOMBARDMENT 3(x3)"
+        "text": "Cost 12, Combat 3(x3), Move 2, Capacity 6\nSUSTAIN DAMAGE, PRODUCTION 5, BOMBARDMENT 3(x3)\nOther player's units in this system lose PLANETARY SHIELD.\nThis unit produces only 1 fighter or infantry for their cost instead of 2."
     },
     {
         "alias": "dsrohdy",
@@ -690,7 +690,7 @@
         "faction": "tnelis",
         "baseUpgrade": "dd2",
         "source": "ds",
-        "text": "This ship can move through systems that contain other players' ships. 1, 8, 2; ANTI-FIGHTER BARRAGE 6(x4)"
+        "text": "Cost 1, Combat 8, Move 2\nANTI-FIGHTER BARRAGE 6(x4)\nThis ship can move through systems that contain other players' ships."
     },
     {
         "alias": "dstnely",
@@ -748,7 +748,7 @@
         "faction": "vaylerian",
         "baseUpgrade": "cr2",
         "source": "ds",
-        "text": "During a round of space combat, if your opponent cannot declare a retreat, hits produced by this ship cannot be canceled and must be assigned to non-fighter ships, if able. Cost 2, Combat 6, Move 3, Capacity 1"
+        "text": "Cost 2, Combat 6, Move 3, Capacity 1\nDuring a round of space combat, if your opponent cannot declare a retreat, hits produced by this ship cannot be canceled and must be assigned to non-fighter ships, if able."
     },
     {
         "alias": "dsveldr",
@@ -771,7 +771,7 @@
         "faction": "veldyr",
         "baseUpgrade": "dn2",
         "source": "ds",
-        "text": "This unit cannot be destroyed by “Direct Hit” action cards. Cost 4, Combat 5, Move 2, Capacity 1; SUSTAIN DAMAGE, BOMBARDMENT 5, SPACE CANNON 5"
+        "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 5, SPACE CANNON 5\nThis unit cannot be destroyed by “Direct Hit” action cards."
     },
     {
         "alias": "dszelir",
@@ -794,6 +794,6 @@
         "faction": "zelian",
         "baseUpgrade": "inf2",
         "source": "ds",
-        "text": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system. Cost 1(x2), Combat 7; BOMBARDMENT 8"
+        "text": "Cost 1(x2), Combat 7\nBOMBARDMENT 8\nAfter this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
     }
 ]
