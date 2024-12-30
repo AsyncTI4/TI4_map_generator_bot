@@ -248,7 +248,7 @@ class ActionCardDeck2ButtonHandler {
         if (p2 == null) return;
         p2.setCommodities(p2.getCommodities() + 2);
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getFactionEmoji()
-            + " gained 2 commodities due to _Ancient Trade Routes) and is neighbors with " + player.getFactionEmojiOrColor() + " for this turn.");
+            + " gained 2 commodities due to _Ancient Trade Routes_ and is neighbors with " + player.getFactionEmojiOrColor() + " for this turn.");
         event.getMessage().delete().queue();
     }
 
