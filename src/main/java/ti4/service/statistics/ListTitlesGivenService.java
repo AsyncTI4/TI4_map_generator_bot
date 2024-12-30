@@ -38,7 +38,7 @@ public class ListTitlesGivenService {
         for (String title : sortedTitlesMapAsc.keySet()) {
             longMsg.append(title).append(": ").append(sortedTitlesMapAsc.get(title)).append(" \n");
         }
-        longMsg.append("\nThe number of titles each player has: \n");
+        longMsg.append("\nThe number of titles each person has: \n");
         Map<String, Integer> sortedMapAscPlayers = SortHelper.sortByValue(titlesAPersonHas, false);
         for (String person : sortedMapAscPlayers.keySet()) {
             if (event.getGuild().getMemberById(person) == null) {
@@ -48,7 +48,7 @@ public class ListTitlesGivenService {
         }
         if (titleOnly) {
             Map<String, Integer> sortedMapAscPlayersNTitles = SortHelper.sortByValue(timesPersonHasGottenSpecificTitle, false);
-            longMsg.append("\nThe number of titles each player has for the title of ").append(specificTitle).append(": \n");
+            longMsg.append("\nThe number of titles each person has for the title of ").append(specificTitle).append(": \n");
             for (String personNTitle : sortedMapAscPlayersNTitles.keySet()) {
                 if (!personNTitle.toLowerCase().contains(specificTitle.toLowerCase())) {
                     continue;

@@ -9,24 +9,24 @@ import ti4.message.MessageHelper;
 class FlipGrace extends GameStateSubcommand {
 
     public FlipGrace() {
-        super(Constants.FLIP_GRACE, "Flip Grace (Edyn faction ability) to show it has been used", true, true);
+        super(Constants.FLIP_GRACE, "Flip Grace (Edyn Faction Ability) to show it has been used", true, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
         if (!player.hasAbility("grace")) {
-            MessageHelper.sendMessageToEventChannel(event, "Player does not have **Grace** (Edyn faction ability).");
+            MessageHelper.sendMessageToEventChannel(event, "Player does not have Grace (Edyn Faction Ability)");
             return;
         }
 
         if (player.removeExhaustedAbility("grace")) {
-            MessageHelper.sendMessageToEventChannel(event, "**Grace** (Edyn faction ability) was exhausted. Flipping it back to ready.");
+            MessageHelper.sendMessageToEventChannel(event, "Grace (Edyn Faction Ability) was exhausted. Flipping it back to ready.");
             return;
         }
 
         player.addExhaustedAbility("grace");
-        MessageHelper.sendMessageToEventChannel(event, "**Grace** (Edyn faction ability) has been exhausted.");
+        MessageHelper.sendMessageToEventChannel(event, "Grace (Edyn Faction Ability) exhausted");
     }
 
 }

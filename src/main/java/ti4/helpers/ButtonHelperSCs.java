@@ -76,7 +76,7 @@ public class ButtonHelperSCs {
             if (!buttons2.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " use buttons to resolve **Peace Accords**.", buttons2);
+                    player.getRepresentationUnfogged() + " use buttons to resolve peace accords", buttons2);
             }
         }
 
@@ -132,7 +132,7 @@ public class ButtonHelperSCs {
         if (player == null || game == null) return;
         if (!player.controlsMecatol(true)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Only the player who controls Mecatol Rex may score the **Imperial** victory point.");
+                "Only the player who controls Mecatol Rex may score the Imperial point.");
             return;
         }
         boolean used = addUsedSCPlayer(event.getMessageId() + "score_imperial", game, player);
@@ -380,7 +380,7 @@ public class ButtonHelperSCs {
         buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "warfare", "place");
         int val = Helper.getProductionValue(player, game, tile, true);
         String message = player.getRepresentation()
-            + " Use the buttons to produce. Reminder that when following **Warfare**, you may only use 1 space dock in your home system. "
+            + " Use the buttons to produce. Reminder that when following warfare, you may only use 1 space dock in your home system. "
             + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true) + "\n"
             + "You have " + val + " PRODUCTION value in this system.";
         if (val > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
@@ -691,12 +691,12 @@ public class ButtonHelperSCs {
         }
         boolean hasSchemingAbility = player.hasAbility("scheming");
         String message = hasSchemingAbility
-            ? "Drew 3 Action Cards (**Scheming**) - please discard 1 action card from your hand"
+            ? "Drew 3 Action Cards (Scheming) - please discard 1 action card from your hand"
             : "Drew 2 Action cards";
         int count = hasSchemingAbility ? 3 : 2;
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
-            message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
+            message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
 
         } else {
             for (int i = 0; i < count; i++) {
@@ -719,14 +719,14 @@ public class ButtonHelperSCs {
             if (!buttons2.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + ", please resolve **Contagion**.", buttons2);
+                    player.getRepresentationUnfogged() + " use buttons to resolve contagion", buttons2);
 
                 if (Helper.getDateDifference(game.getCreationDate(),
                     Helper.getDateRepresentation(1711997257707L)) > 0) {
                     MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         player.getRepresentationUnfogged()
-                            + ", please resolve **Contagion** again (on a different planet).",
+                            + " use buttons to resolve contagion planet #2 (should not be the same as planet #1)",
                         buttons2);
                 }
             }

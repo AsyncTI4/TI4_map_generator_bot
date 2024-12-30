@@ -22,14 +22,14 @@ public class WinningPathHelper {
         if (supportCount >= 2)
         {
             return String.format(
-                "%d stage 1 objectives, %d stage 2 objectives, %d secret objectives, %d _Supports for the Thrones_%s",
+                "%d stage 1 objectives, %d stage 2 objectives, %d secret objectives, %d Supports for the Thrones%s",
                 stage1Count, stage2Count, secretCount, supportCount,
                 otherPoints.isEmpty() ? "" : ", " + otherPoints
             );
         }
 
         return String.format(
-            "%d stage 1 objectives, %d stage 2 objectives, %d secret objectives, %d _Support for the Throne_%s",
+            "%d stage 1 objectives, %d stage 2 objectives, %d secret objectives, %d Support for the Throne%s",
             stage1Count, stage2Count, secretCount, supportCount,
             otherPoints.isEmpty() ? "" : ", " + otherPoints
         );
@@ -72,6 +72,6 @@ public class WinningPathHelper {
         if (normalized.contains("imperial")) return "imperial rider";
         if (normalized.contains("censure")) return "censure";
         if (normalized.contains("crown") || normalized.contains("emph")) return "crown";
-        return "other (probably _Classified Document Leaks_)";
+        return "other (probably Classified Document Leaks)";
     }
 }

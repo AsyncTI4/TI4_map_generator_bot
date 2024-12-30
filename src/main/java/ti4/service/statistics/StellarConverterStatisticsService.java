@@ -40,7 +40,7 @@ public class StellarConverterStatisticsService {
         int index = 1;
         int width = (int) Math.round(Math.ceil(Math.log10(count.get() + 1)));
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
-        StringBuilder output = new StringBuilder("## _Stellar Converter_ Statistics\n");
+        StringBuilder output = new StringBuilder("## **__Stellar Converter Stats__**\n");
         for (Map.Entry<String, Integer> planetStats : numberConverts.entrySet().stream().sorted(comparator).toList()) {
             String planetName = planetRepresentations.get(planetStats.getKey());
             output.append("`(").append(Helper.leftpad(String.valueOf(index), width)).append(")` ");

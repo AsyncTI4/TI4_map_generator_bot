@@ -133,7 +133,7 @@ class Stats extends GameStateSubcommand {
             if (player.hasAbility("military_industrial_complex")
                 && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", you have the opportunity to buy _Axis Orders_.",
+                    player.getRepresentationUnfogged() + " you have the opportunity to buy axis orders",
                     ButtonHelperAbilities.getBuyableAxisOrders(player, game));
             }
             CommanderUnlockCheckService.checkPlayer(player, "mykomentori");

@@ -484,7 +484,7 @@ public class ButtonHelperTacticalAction {
         Tile tile = game.getTileByPosition(pos);
         int distance = CheckDistanceHelper.getDistanceBetweenTwoTiles(game, player, pos, game.getActiveSystem(), true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "From system "
-            + tile.getRepresentationForButtons(game, player) + " (**" + distance + " tile" + (distance == 1 ? "" : "s") + " away**)\n"
+            + tile.getRepresentationForButtons(game, player) + " (" + distance + " tile" + (distance == 1 ? "" : "s") + " away)\n"
             + event.getMessage().getContentRaw());
         String message = "Choose a different system to move from, or finalize movement.";
         game.resetCurrentMovedUnitsFrom1System();
@@ -582,16 +582,15 @@ public class ButtonHelperTacticalAction {
         game.setStoredValue("lastActiveSystem", pos);
         List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, game, event);
         Tile activeSystem = game.getTileByPosition(pos);
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged() + " activated "
-            + activeSystem.getRepresentationForButtons(game, player));
+        String message = player.getRepresentationUnfogged() + " activated "
+            + activeSystem.getRepresentationForButtons(game, player) + ".";
 
         if (!game.isFowMode()) {
             for (Player player_ : game.getRealPlayers()) {
                 if (!game.isL1Hero() && !player.getFaction().equalsIgnoreCase(player_.getFaction())
                     && !player_.isPlayerMemberOfAlliance(player)
                     && FoWHelper.playerHasUnitsInSystem(player_, activeSystem)) {
-                    String msgA = player_.getRepresentation() + " has units in the system";
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msgA);
+                    message += "\n" + player_.getRepresentation() + " has units in the system.";
                 }
             }
         } else {
@@ -615,31 +614,38 @@ public class ButtonHelperTacticalAction {
 
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, pos);
         if (!game.isFowMode() && !playersWithPds2.isEmpty() && !game.isL1Hero()) {
-            StringBuilder pdsMessage = new StringBuilder(player.getRepresentationUnfogged()
-                + " the selected system is in range of space cannon units owned by");
-            if (playersWithPds2.size() != 1 || playersWithPds2.getFirst() != player) {
-                for (Player playerWithPds : playersWithPds2) {
-                    pdsMessage.append(" ").append(playerWithPds.getRepresentation());
+            List<String> mentions = new ArrayList<>();
+            for (Player playerWithPds : playersWithPds2) {
+                if (playerWithPds == player) {
+                    continue;
                 }
-                MessageHelper.sendMessageToChannel(event.getChannel(), pdsMessage.toString());
+                mentions.add(playerWithPds.getRepresentation());
+            }
+            if (!mentions.isEmpty()) {
+                message += "\n" + player.getRepresentationUnfogged()
+                    + " the selected system is in range of space cannon units owned by "
+                    + String.join(", ", mentions) + ".";
             }
         }
 
-        List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(game, player);
-        if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !game.isL1Hero()) {
-            String msg = player.getRepresentationUnfogged() + " You can use buttons to resolve " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "I48S, the L1Z1Z " + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + "agent, if you so wish.";
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, button3);
-        }
         Tile tile = game.getTileByPosition(pos);
         if (tile.getPlanetUnitHolders().isEmpty()
             && ButtonHelper.doesPlayerHaveFSHere("mortheus_flagship", player, tile)
             && !tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
-            String msg = player.getRepresentationUnfogged()
-                + " automatically added 1 frontier token to the system due to the Particle Sieve (the Mortheus flagship).";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            message += "\n" + player.getRepresentationUnfogged()
+                + " automatically added 1 frontier token to the system due to the Particle Sieve, the Mortheus Flagship.";
             AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         }
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+
+        List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(game, player);
+        if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !game.isL1Hero()) {
+            String msg = player.getRepresentationUnfogged() + ", you can use buttons to resolve " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "I48S, the L1Z1Z " + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + "agent, if you so wish.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, button3);
+        }
+
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, game);
         if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn")) && !button2.isEmpty() && !game.isL1Hero()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", Please resolve _Scanlink Drone Network_.", button2);

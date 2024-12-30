@@ -43,7 +43,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public String getRepresentation() {
-        return getObjectiveEmoji() + "**__" + name + "__**: " + text + " (" + points + " VP)";
+        return getObjectiveEmoji() + "_" + name + "_ - " + text + " (" + points + " VP)";
     }
 
     public static final Comparator<PublicObjectiveModel> sortByPointsAndName = (po1, po2) -> {

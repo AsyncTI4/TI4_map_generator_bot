@@ -612,21 +612,21 @@ public class MiltyService {
         if (player.hasAbility("diplomats")) {
             ButtonHelperAbilities.resolveFreePeopleAbility(game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Set up **Free People** ability markers. " + player.getRepresentationUnfogged()
-                    + " any planet with a **Free People** token on it will show up as spendable in your various spends. Once spent, the token will be removed.");
+                "Set up free people ability markers. " + player.getRepresentationUnfogged()
+                    + " any planet with the free people token on it will show up as spendable in your various spends. Once spent, the token will be removed");
         }
 
         if (player.hasAbility("private_fleet")) {
             String unitID = AliasHandler.resolveUnit("destroyer");
             player.setUnitCap(unitID, 12);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Set destroyer max to 12 for " + player.getRepresentation() + " due to the **Private Fleet** ability,");
+                "Set destroyer max to 12 for " + player.getRepresentation() + " due to the private fleet ability");
         }
         if (player.hasAbility("industrialists")) {
             String unitID = AliasHandler.resolveUnit("spacedock");
             player.setUnitCap(unitID, 4);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Set space dock max to 4 for " + player.getRepresentation() + " due to the **Industrialists** ability,");
+                "Set space dock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
         }
         if (player.hasAbility("teeming")) {
             String unitID = AliasHandler.resolveUnit("dreadnought");
@@ -635,7 +635,7 @@ public class MiltyService {
             player.setUnitCap(unitID, 5);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
-                    + " due to the **Teeming** ability.");
+                    + " due to the teeming ability");
         }
         if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,

@@ -96,7 +96,7 @@ public class ButtonHelperExplore {
         if (player.hasTech("dslaner")) {
             player.setAtsCount(player.getAtsCount() + 1);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                player.getRepresentation() + " Put 1 commodity on ATS Armaments");
         }
 
     }

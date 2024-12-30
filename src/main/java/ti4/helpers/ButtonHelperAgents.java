@@ -343,7 +343,7 @@ public class ButtonHelperAgents {
             }
         }
         unitButtons.add(Buttons.red("deleteButtons_spitItOut",
-            "Done With Argent Agent"));
+            "Argent Agent"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " use buttons to place ground forces via " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Trillossa Aun Mirik, the Argent" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.",
@@ -407,13 +407,13 @@ public class ButtonHelperAgents {
         }
 
         if ("augersagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Clodho, the Ilyxum" + ssruuSlash + " agent.";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Clodho, the Augers" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             Player p2 = game.getPlayerFromColorOrFaction(rest.split("_")[1]);
             int oldTg = p2.getTg();
             p2.setTg(oldTg + 2);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                player.getFactionEmojiOrColor() + " gained 2 trade goods from " + ssruuClever + "Clodho, the Ilyxum" + ssruuSlash + " agent, being used ("
+                player.getFactionEmojiOrColor() + " gained 2 trade goods from " + ssruuClever + "Clodho, the Augers" + ssruuSlash + " agent, being used ("
                     + oldTg + "->" + p2.getTg() + ").");
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -453,7 +453,7 @@ public class ButtonHelperAgents {
                 activePlayer.setCommodities(newComms);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getFactionEmoji()
-                        + " exhausted " + ssruuClever + "Merkismathr Asvand, the Kjalengard" + ssruuSlash + " agent, to potentially move a **Glory** token into the system. "
+                        + " exhausted " + ssruuClever + "Merkismathr Asvand, the Kjalengard" + ssruuSlash + " agent, to potentially move a glory token into the system. "
                         + activePlayer.getFactionEmoji() + " commodities went from " + oldComms + " -> "
                         + newComms + ".");
             }
@@ -462,7 +462,7 @@ public class ButtonHelperAgents {
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getFactionEmoji()
-                        + " there were no **Glory** tokens on the game board to move. Go win some battles and earn some, or your ancestors will laugh at ya when "
+                        + " there were no Glory tokens on the game board to move. Go win some battles and earn some, or your ancestors will laugh at ya when "
                         + (ThreadLocalRandom.current().nextInt(20) == 0 ? "(if) " : "") + "you reach Valhalla.");
 
             }
@@ -1020,7 +1020,7 @@ public class ButtonHelperAgents {
                 buttons2.add(Buttons.green("exhaustTCS_" + agent + "_" + player.getFaction(), "Exhaust Temporal Command Suite to Ready " + agent));
                 buttons2.add(Buttons.red("deleteButtons", "Decline"));
                 String msg = p2.getRepresentationUnfogged()
-                    + " you have the opportunity to exhaust _ Temporal Command Suite_ to ready " + agent
+                    + " you have the opportunity to exhaust your _ Temporal Command Suite_ technology to ready " + agent
                     + " and potentially resolve a transaction.";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons2);
             }
@@ -1157,7 +1157,7 @@ public class ButtonHelperAgents {
                 if (player.hasTech("dslaner")) {
                     player.setAtsCount(player.getAtsCount() + 1);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                        player.getRepresentation() + " Put 1 commodity on ATS Armaments");
                 }
             }
         } else {
@@ -1196,7 +1196,7 @@ public class ButtonHelperAgents {
                 if (player.hasTech("dslaner")) {
                     player.setAtsCount(player.getAtsCount() + 1);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                        player.getRepresentation() + " Put 1 commodity on ATS Armaments");
                 }
             }
         }
@@ -1540,7 +1540,7 @@ public class ButtonHelperAgents {
         }
         String msg = player.getFactionEmojiOrColor()
             + " may produce a unit in their home system or in a system with a technology specialty planet due to " + (zealots.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-            + "Priestess Tuh, the Rhodun" + (zealots.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
+            + "Priestess Tuh, the Zealots" + (zealots.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         if (game.isFowMode() && zealots != player) {
             MessageHelper.sendMessageToChannel(zealots.getCorrectChannel(), msg);
@@ -1771,7 +1771,7 @@ public class ButtonHelperAgents {
 
     @ButtonHandler("moveGloryStart_")
     public static void offerMoveGloryOptions(Game game, Player player, GenericInteractionCreateEvent event) {
-        String msg = player.getRepresentationUnfogged() + " use buttons to select system to move a **Glory** token from.";
+        String msg = player.getRepresentationUnfogged() + " use buttons to select system to move glory from";
         Tile tileAS = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : getGloryTokenTiles(game)) {
@@ -1796,7 +1796,7 @@ public class ButtonHelperAgents {
             space.removeToken(tokenToMove);
         }
         spaceAS.addToken(tokenToMove);
-        String msg = player.getFactionEmoji() + " moved a **Glory** token from " + tile.getRepresentation() + " to " + tileAS.getRepresentation();
+        String msg = player.getFactionEmoji() + " moved glory token from " + tile.getRepresentation() + " to " + tileAS.getRepresentation();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
@@ -1807,12 +1807,12 @@ public class ButtonHelperAgents {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         List<String> gloryTokens = getGloryTokensLeft(game);
         if (gloryTokens.isEmpty()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " cannot place more **Glory** tokens, you've hit the limit.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " cannot place more glory, you've hit the limit");
             return;
         }
         space.addToken(gloryTokens.getFirst());
 
-        String msg = player.getFactionEmoji() + " added a **Glory** token to " + tile.getRepresentation();
+        String msg = player.getFactionEmoji() + " added glory token to " + tile.getRepresentation();
         CommanderUnlockCheckService.checkPlayer(player, "kjalengard");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         ButtonHelper.deleteMessage(event);

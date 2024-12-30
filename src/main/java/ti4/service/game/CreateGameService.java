@@ -193,7 +193,7 @@ public class CreateGameService {
             newGame.setLaunchPostThreadID(thread.getId());
             ThreadChannelManager manager = thread.getManager()
                 .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
-                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
+                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             if (thread.getName().toLowerCase().contains("tigl")) {
                 TIGLHelper.initializeTIGLGame(newGame);
             }

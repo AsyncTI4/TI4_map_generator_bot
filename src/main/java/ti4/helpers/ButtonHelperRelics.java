@@ -24,14 +24,14 @@ public class ButtonHelperRelics {
         String faction2 = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction2);
         if (p2 != null) {
-            Button sdButton = Buttons.green("jrStructure_sd", "Place 1 Space Dock", UnitEmojis.spacedock);
+            Button sdButton = Buttons.green("jrStructure_sd", "Place 1 space dock", UnitEmojis.spacedock);
             Button pdsButton = Buttons.green("jrStructure_pds", "Place 1 PDS", UnitEmojis.pds);
-            Button tgButton = Buttons.green("jrStructure_tg", "Gain 1 Trade Good");
+            Button tgButton = Buttons.green("jrStructure_tg", "Gain 1TG");
             List<Button> buttons = new ArrayList<>();
             buttons.add(sdButton);
             buttons.add(pdsButton);
             buttons.add(tgButton);
-            String msg = p2.getRepresentationUnfogged() + ", please choose which structure to build.";
+            String msg = p2.getRepresentationUnfogged() + " Use buttons to decide what structure to build";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons);
             ButtonHelper.deleteMessage(event);
         }
@@ -41,23 +41,23 @@ public class ButtonHelperRelics {
     public static void prophetsTears(Player player, String buttonID, Game game, ButtonInteractionEvent event) {
         player.addExhaustedRelic("prophetstears");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " is exhausting _The Prophet's Tears_.");
+            player.getFactionEmoji() + " Chose to exhaust The Prophets Tears");
         if (buttonID.contains("AC")) {
             String message;
             if (player.hasAbility("scheming")) {
                 game.drawActionCard(player.getUserID());
                 game.drawActionCard(player.getUserID());
                 message = player.getFactionEmoji()
-                    + " drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
+                    + " Drew 2 ACs With Scheming. Please Discard 1 AC with the blue buttons";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " use buttons to discard",
                     ActionCardHelper.getDiscardActionCardButtons(player, false));
             } else if (player.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-                message = player.getFactionEmoji() + " triggered **Autonetic Memory Option**.";
+                message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
             } else {
                 game.drawActionCard(player.getUserID());
-                message = player.getFactionEmoji() + " drew 1 action card.";
+                message = player.getFactionEmoji() + " Drew 1 AC";
                 ActionCardHelper.sendActionCardInfo(game, player, event);
             }
             CommanderUnlockCheckService.checkPlayer(player, "yssaril");
@@ -66,7 +66,7 @@ public class ButtonHelperRelics {
             ButtonHelper.checkACLimit(game, player);
             ButtonHelper.deleteTheOneButton(event);
         } else {
-            String msg = " exhausted _The Prophet's Tears_.";
+            String msg = " exhausted the Prophet's Tears";
             String exhaustedMessage = event.getMessage().getContentRaw();
             List<ActionRow> actionRow2 = new ArrayList<>();
             for (ActionRow row : event.getMessage().getActionRows()) {
@@ -99,7 +99,7 @@ public class ButtonHelperRelics {
                 buttons.add(Buttons.green("nanoforgePlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
             }
         }
-        String message = "Please choose which planet you wish to attach _Nano-Forge_ to.";
+        String message = "Use buttons to select which planet to nanoforge";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
@@ -108,7 +108,7 @@ public class ButtonHelperRelics {
         String planet = buttonID.replace("nanoforgePlanet_", "");
         Planet planetReal = game.getPlanetsInfo().get(planet);
         planetReal.addToken("attachment_nanoforge.png");
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Attached _Nano-Forge_ to " + Helper.getPlanetRepresentation(planet, game) + ".");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Attached Nano-Forge to " + Helper.getPlanetRepresentation(planet, game));
         ButtonHelper.deleteMessage(event);
     }
 
