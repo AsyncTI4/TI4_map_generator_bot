@@ -324,13 +324,8 @@ public class ActionCardHelper {
             game.discardActionCard(player.getUserID(), acIndex);
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(game.getPing()).append(" ").append(game.getName()).append("\n");
-        if (game.isFowMode()) {
-            sb.append("Someone played the action card _").append(actionCardTitle).append("_:\n");
-        } else {
-            sb.append(player.getRepresentation()).append(" played the action card _").append(actionCardTitle).append("_:\n");
-        }
+        String message = game.getPing() + ", " + (game.isFowMode() ? "someone" : player.getRepresentation())
+            + " played the action card _" + actionCardTitle + "_.";
 
         List<Button> buttons = new ArrayList<>();
         Button sabotageButton = Buttons.red("sabotage_ac_" + actionCardTitle, "Cancel Action Card With Sabotage", MiscEmojis.Sabotage);
@@ -364,14 +359,14 @@ public class ActionCardHelper {
         buttons.add(noSabotageButton);
         buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_" + actionCardTitle, "Pause Timer While Waiting For Sabo"));
         if (acID.contains("sabo")) {
-            MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, sb.toString(), acEmbed);
+            MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
         } else {
             String buttonLabel = "Resolve " + actionCardTitle;
 
             if (Helper.isSaboAllowed(game, player)) {
-                MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(mainGameChannel, sb.toString(), game, player, Collections.singletonList(acEmbed), buttons, true);
+                MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
             } else {
-                MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, sb.toString(), acEmbed);
+                MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
                 StringBuilder noSabosMessage = new StringBuilder("> " + Helper.noSaboReason(game, player));
                 boolean it = false, watcher = false;
                 for (Player p : game.getRealPlayers()) {
@@ -821,10 +816,9 @@ public class ActionCardHelper {
                     "Please indicate no afters again.", game, afterButtons, "after");
             }
             if ("Action".equalsIgnoreCase(actionCardWindow)) {
-                String message = "Use buttons to end turn or do another action.";
                 game.setJustPlayedComponentAC(true);
                 List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
-                MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, "Use buttons to end turn or do another action.", systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
                     String message2 = player.getRepresentationUnfogged() + " you may unleash Suffi An, your commander, by paying 1 trade good (if the action card isn't Sabo'd).";
                     List<Button> buttons2 = new ArrayList<>();
@@ -844,7 +838,7 @@ public class ActionCardHelper {
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             Button cymiaeButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", FactionEmojis.cymiae);
-            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), player.getRepresentationUnfogged() 
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), player.getRepresentationUnfogged()
                 + ", you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Skhot Unit X-12, the Cymiae" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw action card.", cymiaeButton);
         }

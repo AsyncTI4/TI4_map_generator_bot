@@ -74,7 +74,7 @@ class EliminatePlayer extends GameStateSubcommand {
             game.removePlayer(player.getUserID());
         } else {
             if (!player.getPlanetsAllianceMode().isEmpty()) {
-                String msg = "This player doesn't meet the elimination conditions. If you wish to replace a player, run `/game replace`. Ping a bothelper for assistance if you need it.";
+                String msg = "This person doesn't meet the elimination conditions. If you wish to replace a player, run `/game replace`. Ping a Bothelper for assistance if you need it.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 return;
             }

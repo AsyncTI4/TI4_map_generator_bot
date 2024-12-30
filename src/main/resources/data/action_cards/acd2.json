@@ -84,8 +84,8 @@
     "alias": "blackmail",
     "name": "Blackmail",
     "phase": "Agenda",
-    "window": "After an agenda is revealed",
-    "text": "Choose another player. That player may give you 1 random promissory note from their hand; otherwise, they must cast at least 1 vote for an outcome of your choice during this agenda, if able.",
+    "window": "Before another player casts votes",
+    "text": "That player must cast at least 1 vote for an outcome of your choice or give you 1 random promissory note from their hand.",
     "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
     "source": "action_deck_2"
   },
@@ -184,7 +184,7 @@
     "name": "Covert Operation",
     "phase": "Action",
     "window": "After you move ships into the active system",
-    "text": "Remove 1 of your ships or ground forces from a system that does not contain 1 of your command tokens and place that unit in the space area of the active system.",
+    "text": "Remove up to 2 of your ships or ground forces from systems that do not contain 1 of your command tokens and place them in the space area of the active system.",
     "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
     "source": "action_deck_2"
   },
@@ -1012,7 +1012,7 @@
     "name": "Syndicate",
     "phase": "Action",
     "window": "Action",
-    "text": "Reveal a number of cards from the top of the action card deck equal to the number of players. Each player takes 1 of those cards of your choice. During this turn, you can exchange action cards as part of transactions.",
+    "text": "Reveal a number of cards from the top of the action card deck equal to the number of players. Each player draws 1 of those cards of your choice. During this turn, you can exchange action cards as part of transactions.",
     "flavorText": "\"What if I'm not ready?\" the operative asked, looking away. Harka squeezed her hand. \"Believe in me, who believes in you.\"",
     "source": "action_deck_2"
   },

@@ -71,7 +71,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
 
 		if (activePlayer.hasTech("dslaner")) {
 			activePlayer.setAtsCount(activePlayer.getAtsCount() + 1);
-			MessageHelper.sendMessageToEventChannel(event, activePlayer.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+			MessageHelper.sendMessageToEventChannel(event, activePlayer.getRepresentation() + " Put 1 commodity on ATS Armaments");
 		}
 
 		boolean drawRelic = event.getOption(Constants.ALSO_DRAW_RELIC, false, OptionMapping::getAsBoolean);

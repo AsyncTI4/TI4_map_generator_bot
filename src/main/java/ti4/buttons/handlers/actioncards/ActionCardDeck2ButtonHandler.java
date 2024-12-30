@@ -118,7 +118,7 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveChainReaction(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         int hits = 1;
-        StringBuilder msg = new StringBuilder("The _Chain Reaction_ rolled: ");
+        StringBuilder msg = new StringBuilder("The chain reaction rolled: ");
         int currentRequirement = 7;
         Die die;
         while ((die = new Die(currentRequirement)).isSuccess()) {
@@ -247,8 +247,7 @@ class ActionCardDeck2ButtonHandler {
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) return;
         p2.setCommodities(p2.getCommodities() + 2);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getFactionEmoji()
-            + " gained 2 commodities due to _Ancient Trade Routes) and is neighbors with " + player.getFactionEmojiOrColor() + " for this turn.");
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getFactionEmoji() + " gained 2 commodities due to ancient trade routes and is neighbors with " + player.getFactionEmojiOrColor() + " for this turn");
         event.getMessage().delete().queue();
     }
 
@@ -415,7 +414,7 @@ class ActionCardDeck2ButtonHandler {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() +
-            " choose the target of _Brutal Occupation_.", buttons);
+            " choose the target of **Brutal Occupation**", buttons);
     }
 
     @ButtonHandler("resolveShrapnelTurrets_")
