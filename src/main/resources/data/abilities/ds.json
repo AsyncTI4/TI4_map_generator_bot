@@ -612,7 +612,7 @@
     },
     {
         "id": "policy_the_economy_empower",
-        "name": "Policy: The Economy - Empower (+)",
+        "name": "Policy - The Economy: Empower ➕",
         "faction": "olradin",
         "window": "Once per action, after you exhaust an industrial or legendary planet you control",
         "windowEffect": "Gain 1 commodity.",
@@ -620,7 +620,7 @@
     },
     {
         "id": "policy_the_economy_exploit",
-        "name": "Policy: The Economy - Exploit (-)",
+        "name": "Policy - The Economy: Exploit ➖",
         "faction": "olradin",
         "permanentEffect": "Place the \"2\" commodity token on your faction sheet, your commodity value is 2.",
         "window": "Once per action, after you exhaust an industrial planet you control",
@@ -629,7 +629,7 @@
     },
     {
         "id": "policy_the_environment_plunder",
-        "name": "Policy: The Environment - Plunder (-)",
+        "name": "Policy - The Environment: Plunder ➖",
         "faction": "olradin",
         "window": "When 1 or more of your units use PRODUCTION",
         "windowEffect": "Reduce the PRODUCTION value of 1 of those units by 2.\\nOnce per action, after you explore a hazardous planet, you may remove 1 unit from that planet to explore that planet.",
@@ -637,7 +637,7 @@
     },
     {
         "id": "policy_the_environment_preserve",
-        "name": "Policy: The Environment - Preserve (+)",
+        "name": "Policy - The Environment: Preserve ➕",
         "faction": "olradin",
         "window": "Once per action, after you exhaust a hazardous or legendary planet you control",
         "windowEffect": "You may reveal the top card of the exploration deck that matches 1 of those planets; if it is a relic fragment, gain it, otherwise discard that card.",
@@ -645,7 +645,7 @@
     },
     {
         "id": "policy_the_people_connect",
-        "name": "Policy: The People - Connect (+)",
+        "name": "Policy - The People: Connect ➕",
         "faction": "olradin",
         "window": "Once per action, after you exhaust a cultural or legendary planet you control",
         "windowEffect": "You may move 1 infantry on that planet to another planet you control.",
@@ -653,7 +653,7 @@
     },
     {
         "id": "policy_the_people_control",
-        "name": "Policy: The People - Control (-)",
+        "name": "Policy - The People: Control ➖",
         "faction": "olradin",
         "permanentEffect": "You cannot perform transactions during the agenda phase.",
         "window": "During the agenda phase, after you cast votes on an agenda",

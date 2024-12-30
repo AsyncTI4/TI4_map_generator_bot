@@ -122,14 +122,14 @@ public class Helper {
 
     public static String noSaboReason(Game game, Player player) {
         if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
-            return "All sabotages are in the discard.";
+            return "All _Sabotages_ are in the discard.";
         }
         if (player.hasTech("tp") && game.getActivePlayerID() != null && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) continue;
                 if (!p2.isPassed()) return null;
             }
-            return "Player has " + FactionEmojis.Yssaril + " **Transparasteel Plating**, and all other players have passed.";
+            return "Player has " + FactionEmojis.Yssaril + " _Transparasteel Plating_, and all other players have passed.";
         }
         return null;
     }
@@ -250,12 +250,12 @@ public class Helper {
         }
 
         for (Player player : getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
-            String message = player.getRepresentationUnfogged() + " Drew Queued Secret Objective From Imperial. ";
+            String message = player.getRepresentationUnfogged() + " drew their queued secret objective from **Imperial**. ";
             if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    message = message + " Drew a second secret objective due to Plausible Deniability.";
+                    message = message + " Drew a second secret objective due to **Plausible Deniability**.";
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2,
@@ -269,7 +269,7 @@ public class Helper {
                 && game.getStoredValue(key2).length() > 2) {
                 if (!game.isFowMode()) {
                     message = player.getRepresentationUnfogged()
-                        + " is the one the game is currently waiting on before advancing to the next player, with regards to queued Imperial follows.";
+                        + " is the one the game is currently waiting on before advancing to the next player, with regards to queued **Imperial** follows.";
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (!game.isFowMode()) {
@@ -847,24 +847,26 @@ public class Helper {
                 case "tg" -> msg.append("Spent ").append(tg).append(" trade good").append(tg == 1 ? "" : "s").append(" for ").append(tg * 2).append(" votes.\n");
                 case "infantry" -> msg.append("Spent ").append(player.getSpentInfantryThisWindow()).append(" infantry for ").append(player.getSpentInfantryThisWindow()).append(" vote").append(player.getSpentInfantryThisWindow() == 1 ? "" : "s").append(".\n");
                 case "planet" -> msg.append(getPlanetRepresentation(secondHalf, game)).append(" for ").append(count).append(" vote").append(count == 1 ? "" : "s").append(".\n");
-                case "absolShard" -> msg.append("Used Absol Shard of the Throne for ").append(count).append(" vote").append(count == 1 ? "" : "s").append(".\n");
-                case "dsghotg" -> msg.append("Exhausted some silly Ghoti Technology for ").append(count).append(" vote").append(count == 1 ? "" : "s").append(".\n");
+                case "absolShard" -> msg.append("Used _Shard of the Throne_ for ").append(count).append(" vote").append(count == 1 ? "" : "s").append(".\n");
+                case "dsghotg" -> msg.append("Exhausted _Some Silly Ghoti Technology_ for ").append(count).append(" vote").append(count == 1 ? "" : "s").append(".\n");
                 case "absolsyncretone" -> msg.append("Used Syncretone for ").append(count).append(" vote").append(count == 1 ? "" : "s").append(".\n");
-                case "augerscommander" -> msg.append("Used Augurs Commander for ").append(count).append(" vote").append(count == 1 ? "" : "s").append(".\n");
-                case "zeal" -> msg.append("Used Zeal Ability for ").append(count).append(" vote").append(count == 1 ? "" : "s").append(".\n");
-                case "predictive" -> msg.append("Used Predictive Intelligence for ").append(count).append(" vote").append(count == 1 ? "" : "s").append(".\n");
+                case "augerscommander" -> msg.append("Used Ilyxum Commander for ").append(count).append(" vote").append(count == 1 ? "" : "s").append(".\n");
+                case "zeal" -> msg.append("Used **Zeal** ability for ").append(count).append(" vote").append(count == 1 ? "" : "s").append(".\n");
+                case "predictive" -> msg.append("Used _Predictive Intelligence_ for ").append(count).append(" vote").append(count == 1 ? "" : "s").append(".\n");
                 case "specialVotes" -> msg.append("Used Special Votes for ").append(count).append(" vote").append(count == 1 ? "" : "s").append(".\n");
-                case "representative" -> msg.append("Got 1 vote for Representative Government.\n");
-                case "distinguished" -> msg.append("Used the action card Distinguished Councilor for 5 votes.\n");
-                case "absolRexControlRepresentative" -> msg.append("Got 1 vote for controlling Mecatol Rex while Representative Government is in play.\n");
-                case "bloodPact" -> msg.append("Got 4 votes from voting the same way as another Blood Pact member.\n");
+                case "representative" -> msg.append("Got 1 vote for _Representative Government_.\n");
+                case "distinguished" -> msg.append("Used _Distinguished Councilor_ for 5 votes.\n");
+                case "absolRexControlRepresentative" -> msg.append("Got 1 vote for controlling Mecatol Rex while _Representative Government_ is in play.\n");
+                case "bloodPact" -> msg.append("Got 4 votes from voting the same way as another _Blood Pact_ member.\n");
 
             }
         }
         if (game.getCurrentAgendaInfo().contains("Secret") && Mapper.getSecretObjectivesJustNames().get(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction())) != null) {
-            msg.append("For a total of **").append(votes).append("** vote").append(votes == 1 ? "" : "s").append(" on the outcome ").append(Mapper.getSecretObjectivesJustNames().get(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction())));
+            msg.append("For a total of **").append(votes).append("** vote").append(votes == 1 ? "" : "s").append(" on the outcome ")
+                .append(Mapper.getSecretObjectivesJustNames().get(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction())));
         } else {
-            msg.append("For a total of **").append(votes).append("** vote").append(votes == 1 ? "" : "s").append(" on the outcome ").append(StringUtils.capitalize(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction())));
+            msg.append("For a total of **").append(votes).append("** vote").append(votes == 1 ? "" : "s").append(" on the outcome ")
+                .append(StringUtils.capitalize(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction())));
         }
         if (justVoteTotal) {
             return "" + votes;
@@ -940,13 +942,13 @@ public class Helper {
             System.out.println("Spent thing: " + thing);
             switch (thing) {
                 case "sarween" -> {
-                    msg.append("> Used Sarween Tools " + TechEmojis.CyberneticTech + "\n");
+                    msg.append("> Used _Sarween Tools_ " + TechEmojis.CyberneticTech + "\n");
                     res += 1;
                     found = true;
                 }
                 case "absol_sarween" -> {
                     int sarweenVal = 1 + calculateCostOfProducedUnits(player, game, true) / 10;
-                    msg.append("> Used Sarween Tools " + TechEmojis.CyberneticTech + " for ").append(sarweenVal).append(" resources\n");
+                    msg.append("> Used _Sarween Tools_ " + TechEmojis.CyberneticTech + " for ").append(sarweenVal).append(" resources\n");
                     res += sarweenVal;
                     found = true;
                 }
@@ -1011,11 +1013,11 @@ public class Helper {
                     res += 1;
                 }
                 if (thing.contains("warmachine")) {
-                    msg.append("> Used War Machine ").append(CardEmojis.ActionCard).append("\n");
+                    msg.append("> Used _War Machine_ ").append(CardEmojis.ActionCard).append("\n");
                     res += 1;
                 }
                 if (thing.contains("aida")) {
-                    msg.append("> Exhausted AI Development Algorithm ");
+                    msg.append("> Exhausted _AI Development Algorithm_ ");
                     if (thing.contains("_")) {
                         res += ButtonHelper.getNumberOfUnitUpgrades(player);
                         msg.append(" for ").append(ButtonHelper.getNumberOfUnitUpgrades(player)).append(" resources ");
@@ -1459,7 +1461,7 @@ public class Helper {
                 unitButtons.add(Buttons.green("sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff, "Use Self-Assembly Routines", TechEmojis.WarfareTech));
             }
             if (playerHasWarMachine(player)) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " Reminder that you have War Machine and this is the window for it");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " Reminder that you have _War Machine_ and this is the window for it.");
             }
         }
         for (UnitHolder unitHolder : unitHolders.values()) {

@@ -1167,7 +1167,7 @@ public class ButtonHelperActionCards {
             ButtonHelperAbilities.pillageCheck(p2, game);
             ButtonHelperAgents.resolveArtunoCheck(p2, 2);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                p2.getRepresentation() + " you gained 2 trade goods due to being hit by the _Seeker Drones_ technology.");
+                p2.getRepresentation() + " you gained 2 trade goods due to being hit by  _Seeker Drones_.");
         }
     }
 
@@ -1265,16 +1265,16 @@ public class ButtonHelperActionCards {
         if (game.isFowMode())
         {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " you signal jammed the tile: "
+                player.getRepresentationUnfogged() + " you _Signal Jam_'d the tile: "
                     + tile.getRepresentationForButtons(game, player) + ".");
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                p2.getRepresentationUnfogged() + " you were signal jammed in tile: "
+                p2.getRepresentationUnfogged() + " you were _Signal Jam_'d in tile: "
                     + tile.getRepresentationForButtons(game, p2) + ".");
         }
         else
         {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " has jammed " + p2.getRepresentationUnfogged()
+                player.getRepresentationUnfogged() + " has _Signal Jam_'d " + p2.getRepresentationUnfogged()
                     + " in tile " + tile.getRepresentationForButtons(game, p2) + ".");
         }
 

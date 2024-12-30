@@ -362,7 +362,7 @@ public class StartPhaseService {
             acd2Shenanigans = "This is the window for " + stringJoiner + "! " + game.getPing();
             handleStartOfStrategyForAcd2Player(game);
         } else {
-            acd2Shenanigans = "*Deflection* and *Revolution* are in the discard pile. Feel free to move forward.";
+            acd2Shenanigans = "_Deflection_ and _Revolution_ are in the discard pile. Feel free to move forward.";
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), acd2Shenanigans);
     }
@@ -370,10 +370,10 @@ public class StartPhaseService {
     private static void handleStartOfStrategyForAcd2Player(Game game) {
         for (Player player : game.getRealPlayers()) {
             if (player.getActionCards().containsKey("deflection")) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged() + "Reminder this is the window to play Deflection.");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged() + "Reminder this is the window to play _Deflection_.");
             }
             if (player.getActionCards().containsKey("revolution")) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged() + "Reminder this is the window to play Revolution.");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged() + "Reminder this is the window to play _Revolution_.");
             }
         }
     }
@@ -423,14 +423,18 @@ public class StartPhaseService {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("naaluHeroInitiation", "Play Naalu Hero", LeaderEmojis.NaaluHero));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " Reminder this is the window to play The Oracle, the Naalu Hero. You may use the buttons to start the process.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation()
+                    + ", a reminder this is the window to play The Oracle, the Naalu Hero. You may use the buttons to start the process.", buttons);
             }
             if (player.getRelics() != null && player.hasRelic("mawofworlds") && game.isCustodiansScored()) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " Reminder this is the window to do Maw of Worlds, after you do your status homework things. Maw of worlds is technically start of agenda, but can be done now for efficiency");
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You may use these buttons to resolve Maw Of Worlds.", ButtonHelper.getMawButtons());
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
+                    + ", a reminder this is the window to purge _Maw of Worlds_, after you do your status homework things."
+                    + " _Maw of Worlds_ is technically start of agenda, but can be done now for efficiency");
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation()
+                    + ", you may use these buttons to resolve _Maw Of Worlds_.", ButtonHelper.getMawButtons());
             }
             if (player.getRelics() != null && player.hasRelic("twilight_mirror") && game.isCustodiansScored()) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " Reminder this is the window to do Twilight Mirror");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + ", a reminder this is the window to purge _Twilight Mirror_.");
                 List<Button> playerButtons = new ArrayList<>();
                 playerButtons.add(Buttons.green("resolveTwilightMirror", "Purge Twilight Mirror", ExploreEmojis.Relic));
                 playerButtons.add(Buttons.red("deleteButtons", "Decline"));
@@ -446,9 +450,9 @@ public class StartPhaseService {
                     UnitHolder unitHolder = tile.getUnitHolders().get(pl);
                     if (unitHolder != null && unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
-                            + "Reminder this is the window to purge the _Crown of Emphidia_ if you wish to.");
+                            + ", reminder this is the window to purge _The Crown of Emphidia_ if you wish to.");
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation()
-                            + " You may use these buttons to resolve the _Crown of Emphidia_.", ButtonHelper.getCrownButtons());
+                            + ", you may use these buttons to resolve _The Crown of Emphidia_.", ButtonHelper.getCrownButtons());
                     }
                 }
             }
@@ -482,7 +486,7 @@ public class StartPhaseService {
         Button passOnAbilities;
         if (custodiansTaken) {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Agenda");
-            message2 = message2 + "This is the moment when you should resolve: \n- _Political Stability_ \n- _Ancient Burial Sites_ \n- _Maw of Worlds_ \n- The Oracle, the Naalu hero\n- The _Crown of Emphidia_\n"
+            message2 = message2 + "This is the moment when you should resolve: \n- _Political Stability_ \n- _Ancient Burial Sites_ \n- _Maw of Worlds_ \n- The Oracle, the Naalu hero\n- _The Crown of Emphidia_\n"
                 + "Please click the \"Ready For Agenda\" button once you are done resolving these or if you decline to do so.";
         } else {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Strategy Phase");
