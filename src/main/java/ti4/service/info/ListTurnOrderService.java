@@ -67,7 +67,7 @@ public class ListTurnOrderService {
             }
 
             if (passed) {
-                text += "~~ - PASSED";
+                text += "~~ - passed";
             }
 
             if (player.getUserID().equals(game.getSpeakerUserID())) {
@@ -77,7 +77,7 @@ public class ListTurnOrderService {
             order.put(sc, text);
 
         }
-        StringBuilder msg = new StringBuilder("__**Turn Order:**__\n");
+        StringBuilder msg = new StringBuilder("__Turn Order:__\n");
 
         if (naaluSC != 0) {
             String text = order.get(naaluSC);

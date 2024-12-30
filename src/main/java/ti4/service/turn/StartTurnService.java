@@ -186,7 +186,7 @@ public class StartTurnService {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
                 ButtonHelperCommanders.olradinCommanderStep1(player, game);
             }
-            String text2 = player.getRepresentation(true, false) + " PASSED";
+            String text2 = player.getRepresentation(true, false) + " has passed.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text2);
             if (player.hasTech("absol_aida")) {
                 String msg = player.getRepresentation()

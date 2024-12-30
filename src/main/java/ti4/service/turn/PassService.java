@@ -22,7 +22,7 @@ public class PassService {
             ButtonHelperCommanders.olradinCommanderStep1(player, game);
         }
 
-        String text = player.getRepresentation(true, false) + " PASSED";
+        String text = player.getRepresentation(true, false) + " has passed.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
         if (player.hasTech("absol_aida")) {
             String msg = player.getRepresentation() + " since you have _AI Development Algorithm_, you may research 1 unit upgrade now for 6 influence.";

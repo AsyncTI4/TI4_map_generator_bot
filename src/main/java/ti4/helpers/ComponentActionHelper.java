@@ -258,7 +258,7 @@ public class ComponentActionHelper {
         }
 
         // ACs
-        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play Component Action AC");
+        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play Action Card with Component Action");
         compButtons.add(acButton);
 
         // absol
@@ -319,9 +319,7 @@ public class ComponentActionHelper {
 
                     List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Warsun);
                     List<Button> buttons = new ArrayList<>();
-                    MessageHelper.sendMessageToChannel(event.getChannel(),
-                        p1.getFactionEmoji() + " Chose to use the starforge ability");
-                    String message = "Select the tile you would like to starforge in";
+                    String message = p1.getRepresentationNoPing() + " is using their **Star Forge** ability.\n Please choose the tile you would like to **Star Forge** in.";
                     for (Tile tile : tiles) {
                         Button starTile = Buttons.green("starforgeTile_" + tile.getPosition(),
                             tile.getRepresentationForButtons(game, p1));

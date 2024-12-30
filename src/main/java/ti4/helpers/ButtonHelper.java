@@ -141,8 +141,24 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 (totalAmount <= 10 ? UnitEmojis.infantry.toString().repeat(totalAmount) : UnitEmojis.infantry + "×" + totalAmount)
                 + " died and auto-revived. You will be prompted to place them on a planet in your home system at the start of your next turn.");
+                player.setStasisInfantry(player.getGenSynthesisInfantry() + totalAmount);
             return;
         }
+
+        if (totalAmount == 1){
+            String message = UnitEmojis.infantry + " died. Rolling for resurrection. ";
+            Die dice = new Die(player.hasTech("so2") ? 5 : 6);
+            message += dice.getGreenDieIfSuccessOrRedDieIfFailure();
+            if (dice.isSuccess()) {
+                message += " Success. You will be prompted to place them on a planet in your home system at the start of your next turn.";
+                player.setStasisInfantry(player.getGenSynthesisInfantry() + 1);
+            } else {
+                message += " Failure.";
+            }
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            return;
+        }
+
         while (totalAmount > 0)
         {
             int amount = totalAmount;
@@ -166,6 +182,7 @@ public class ButtonHelper {
                     + " revived. You will be prompted to place them on a planet in your home system at the start of your next turn.";
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            player.setStasisInfantry(player.getGenSynthesisInfantry() + revive);
             totalAmount -= amount;
         }
 
@@ -290,19 +307,28 @@ public class ButtonHelper {
 
     public static List<Button> getPlaceStatusInfButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        if (player.getGenSynthesisInfantry() == 0) {
+        int infCount = player.getGenSynthesisInfantry();
+        if (infCount == 0) {
             return buttons;
         }
         Tile tile = player.getHomeSystemTile();
+        int middleVal = (int) Math.round(Math.sqrt(infCount));
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) {
                 if (player.getPlanets().contains(unitHolder.getName())) {
                     buttons.add(Buttons.green("statusInfRevival_" + unitHolder.getName() + "_1",
                         "Place 1 infantry on " + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
-                    if (player.getGenSynthesisInfantry() > 1) {
+                    if (middleVal > 1) {
                         buttons.add(Buttons.green(
-                            "statusInfRevival_" + unitHolder.getName() + "_" + player.getGenSynthesisInfantry(),
-                            "Place " + player.getGenSynthesisInfantry() + " infantry on "
+                            "statusInfRevival_" + unitHolder.getName() + "_" + middleVal,
+                            "Place " + middleVal + " Infantry on "
+                                + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
+
+                    }
+                    if (infCount > 1) {
+                        buttons.add(Buttons.green(
+                            "statusInfRevival_" + unitHolder.getName() + "_" + infCount,
+                            "Place " + infCount + " Infantry on "
                                 + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
 
                     }
@@ -1242,7 +1268,7 @@ public class ButtonHelper {
         if (buttonID.contains("tech_")) {
             last = buttonID.replace("tech_", "");
             player.refreshTech(last);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied technology: _" + Mapper.getTech(last).getRepresentation(false) + "_.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied technology: " + Mapper.getTech(last).getRepresentation(false) + ".");
             CommanderUnlockCheckService.checkPlayer(player, "kolume");
         } else {
             player.refreshPlanet(last);
