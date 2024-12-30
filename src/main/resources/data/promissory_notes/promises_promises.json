@@ -27,7 +27,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "promises_promises",
-        "text": "ACTION: Place this card faceup in your play area. While this card is in your play area, the Mentak player cannot use their PILLAGE faction ability against you or against other players after they resolve a transaction with you. If you gain control of 1 of the Mentak player's readied planets, return this card to them.",
+        "text": "ACTION: Place this card faceup in your play area. While this card is in your play area, the Mentak player cannot use their Pillage faction ability against you or against other players after they resolve a transaction with you. If you gain control of 1 of the Mentak player's readied planets, return this card to them.",
         "homebrewReplacesID": "pop"
     },
     {
@@ -116,7 +116,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "promises_promises",
-        "text": "At the start of a combat against the Nekro player: Place this card faceup in your play area. While this card is in your play area, the Nekro player cannot use their TECHNOLOGICAL SINGULARITY faction ability against you. If you activate the home system of the Nekro player, or a system that contains a planet they control with a technology specialty, return this card to them.",
+        "text": "At the start of a combat against the Nekro player: Place this card faceup in your play area. While this card is in your play area, the Nekro player cannot use their Technological Singularity faction ability against you. If you activate the home system of the Nekro player, or a system that contains a planet they control with a technology specialty, return this card to them.",
         "homebrewReplacesID": "antivirus"
     },
     {
@@ -127,7 +127,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "promises_promises",
-        "text": "ACTION: Place this card faceup in your play area. When you vote for an outcome that the Nekro player predicted with their GALACTIC THREAT faction ability, you may exhaust the Nekro player's planets as if they were your own, using the influence values to cast votes. If you win a combat against the Nekro player on your turn, return this card to them."
+        "text": "ACTION: Place this card faceup in your play area. When you vote for an outcome that the Nekro player predicted with their Galactic Threat faction ability, you may exhaust the Nekro player's planets as if they were your own, using the influence values to cast votes. If you win a combat against the Nekro player on your turn, return this card to them."
     },
     {
         "alias": "sigma_pilot_conditioning",
@@ -166,7 +166,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "promises_promises",
-        "text": "ACTION: Place this card faceup in your play area. While this card is in your play area, the Saar player cannot resolve their SCAVENGE faction ability when they gain control of planets from you, or move their Floating Factories into systems that contain your ships. If you activate a system that contains 1 or more Floating Factories, return this card to the Saar player."
+        "text": "ACTION: Place this card faceup in your play area. While this card is in your play area, the Saar player cannot resolve their Scavenge faction ability when they gain control of planets from you, or move their Floating Factories into systems that contain your ships. If you activate a system that contains 1 or more Floating Factories, return this card to the Saar player."
     },
     {
         "alias": "sigma_open_source",
@@ -184,7 +184,7 @@
         "color": "",
         "playArea": false,
         "source": "promises_promises",
-        "text": "At the start of a ground combat: Apply +1 to the result of each of your unit's combat rolls during this combat. If your opponent is the N'orr player, they cannot use their UNRELENTING faction ability during this combat. At the end of the combat, return this card to the N'orr player.",
+        "text": "At the start of a ground combat: Apply +1 to the result of each of your unit's combat rolls during this combat. If your opponent is the N'orr player, they cannot use their Unrelenting faction ability during this combat. At the end of the combat, return this card to the N'orr player.",
         "homebrewReplacesID": "tekklar"
     },
     {

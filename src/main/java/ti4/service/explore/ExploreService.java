@@ -70,7 +70,7 @@ public class ExploreService {
 
         if (planetName.equalsIgnoreCase("garbozia")) {
             if (player.hasAbility("distant_suns")) {
-                String reportMessage = "Garbozia exploration with Distant Suns is not implemented."
+                String reportMessage = "Garbozia exploration with **Distant Suns** is not implemented."
                     + "\nPlease use `/explore draw_and_discard trait` then `/explore use explore_card_id` to manually resolve this exploration."
                     + "\n-# (NB: Player chooses a trait, reveals two of that trait and one of each other; reveal four cards total.)";
                 if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
@@ -114,9 +114,9 @@ public class ExploreService {
                         MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
                             planetName + " has been automatically readied because you have _Pre-Fab Arcologies_.");
                     }
-                    String message = "Please decide whether or not to use your " + FactionEmojis.Naaz + "**Distant Suns** (explore twice) ability.";
-                    Button resolveExplore1 = Buttons.green("distant_suns_accept_" + planetName + "_" + drawColor, "Choose to Explore Twice");
-                    Button resolveExplore2 = Buttons.red("distant_suns_decline_" + planetName + "_" + drawColor, "Decline Distant Suns");
+                    String message = "Please decide whether or not to use your " + FactionEmojis.Naaz + "**Distant Suns** ability.";
+                    Button resolveExplore1 = Buttons.green("distant_suns_accept_" + planetName + "_" + drawColor, "Choose from 2 Exploration Cards");
+                    Button resolveExplore2 = Buttons.red("distant_suns_decline_" + planetName + "_" + drawColor, "Resolve First Exploration Card Only");
                     List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     return;
@@ -234,16 +234,16 @@ public class ExploreService {
         }
         if (player.hasTech("dslaner")) {
             player.setAtsCount(player.getAtsCount() + numExplores);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " Put 1 commodity on ATS Armaments");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
         }
         if (ButtonHelper.isPlanetLegendaryOrTechSkip(planetName, game) && Helper.getPlayerFromUnlockedLeader(game, "augersagent") != null) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.hasUnexhaustedLeader("augersagent")) {
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.green("exhaustAgent_augersagent_" + player.getFaction(), "Use Augers Agent on " + player.getColor(), FactionEmojis.augers));
+                    buttons.add(Buttons.green("exhaustAgent_augersagent_" + player.getFaction(), "Use Ilyxum Agent on " + player.getColor(), FactionEmojis.augers));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
                     String msg2 = p2.getRepresentationUnfogged() + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                        + "Clodho, the Augers" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                        + "Clodho, the Ilyxum" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                         + " agent, on " + player.getFactionEmojiOrColor() + " to give them 2 trade goods.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg2, buttons);
                 }
@@ -382,10 +382,10 @@ public class ExploreService {
                     message = "Invalid token or tile";
                 } else {
                     if ("ionalpha".equalsIgnoreCase(token)) {
-                        message = player.getRepresentation() + " please decide to place either an Alpha or a Beta Ion Storm";
+                        message = player.getRepresentation() + " please decide to place the _Ion Storm_ on either its alpha or beta side.";
                         List<Button> buttonIon = new ArrayList<>();
-                        buttonIon.add(Buttons.green("addIonStorm_beta_" + tile.getPosition(), "Place a Beta", MiscEmojis.CreussBeta));
                         buttonIon.add(Buttons.gray("addIonStorm_alpha_" + tile.getPosition(), "Place an Alpha", MiscEmojis.CreussAlpha));
+                        buttonIon.add(Buttons.green("addIonStorm_beta_" + tile.getPosition(), "Place a Beta", MiscEmojis.CreussBeta));
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttonIon);
                     } else {
                         tile.addToken(tokenFilename, Constants.SPACE);
@@ -413,7 +413,7 @@ public class ExploreService {
             case "irf1", "irf2", "irf3", "irf4", "irf5" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + ExploreEmojis.IFrag);
             case "urf1", "urf2", "urf3" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + ExploreEmojis.UFrag);
             case "ed1", "ed2" -> {
-                message = "Card has been added to play area.";
+                message = "_Enigmatic Device_ has been placed in play area.";
                 player.addRelic(Constants.ENIGMATIC_DEVICE);
                 game.purgeExplore(ogID);
                 MessageHelper.sendMessageToEventChannel(event, message);
@@ -421,12 +421,12 @@ public class ExploreService {
             case "lc1", "lc2" -> {
                 boolean hasSchemingAbility = player.hasAbility("scheming");
                 message = hasSchemingAbility
-                    ? "Drew 3 action cards (Scheming) - please discard 1 action card from your hand"
+                    ? "Drew 3 action cards (**Scheming**) - please discard 1 action card from your hand"
                     : "Drew 2 action cards";
                 int count = hasSchemingAbility ? 3 : 2;
                 if (player.hasAbility("autonetic_memory")) {
                     ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
-                    message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
+                    message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
                 } else {
                     for (int i = 0; i < count; i++) {
                         game.drawActionCard(player.getUserID());
@@ -450,19 +450,19 @@ public class ExploreService {
             case "fiveac1", "fiveac2", "fiveac3" -> {
                 boolean hasSchemingAbility = player.hasAbility("scheming");
                 message = hasSchemingAbility
-                    ? "Drew 6 action cards (Scheming) - please discard 1 action card from your hand"
+                    ? "Drew 6 action cards (**Scheming**) - please discard 1 action card from your hand"
                     : "Drew 5 action cards";
                 int count = hasSchemingAbility ? 6 : 5;
                 if (player.hasAbility("autonetic_memory")) {
                     ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
-                    message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
+                    message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
                 } else {
                     for (int i = 0; i < count; i++) {
                         game.drawActionCard(player.getUserID());
                     }
 
                     if (game.isFowMode()) {
-                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 ACs");
+                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 action cards.");
                     }
                     ActionCardHelper.sendActionCardInfo(game, player, event);
                 }
@@ -477,20 +477,20 @@ public class ExploreService {
                 CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             }
             case "dv1", "dv2" -> {
-                message = "Drew a " + CardEmojis.SecretObjective + "Secret Objective";
+                message = "Drew a secret objective.";
                 game.drawSecretObjective(player.getUserID());
                 if (game.isFowMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
                 }
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    message = message + " Drew a second " + CardEmojis.SecretObjective + "Secret Objective due to Plausible Deniability.";
+                    message = message + " Drew a second secret objective due to **Plausible Deniability**.";
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
                 MessageHelper.sendMessageToEventChannel(event, message);
             }
             case "dw" -> {
-                message = "Drew a " + ExploreEmojis.Relic + "Relic";
+                message = "Drew a relic.";
                 MessageHelper.sendMessageToEventChannel(event, message);
                 RelicHelper.drawRelicAndNotify(player, event, game);
             }
@@ -522,14 +522,14 @@ public class ExploreService {
                     saarButton.add(Buttons.green("saarMechRes_" + "mirage", "Pay 1 Trade Good for Mech on " + Helper.getPlanetRepresentation("mirage", game), MiscEmojis.tg));
                     saarButton.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + " you may pay 1 trade good to place one "
-                            + UnitEmojis.mech + " mech here.\n-# Do not do this prior to exploring; it is an \"after\", while exploring is a \"when\".",
+                        player.getRepresentationUnfogged() + " you may pay 1 trade good to place 1 "
+                            + " mech here.\n-# Do not do this prior to exploring; it is an \"after\", while exploring is a \"when\".",
                         saarButton);
                 }
 
                 if (ButtonHelper.isPlayerElected(game, player, "minister_exploration")) {
                     String fac = player.getFactionEmoji();
-                    message = fac + " gained 1 trade good from __Minister of Exploration__ " + player.gainTG(1) + ". You do have this trade good prior to exploring.";
+                    message = fac + " gained 1 trade good from _Minister of Exploration_ " + player.gainTG(1) + ". You do have this trade good prior to exploring.";
                     MessageHelper.sendMessageToEventChannel(event,
                         message);
                     ButtonHelperAbilities.pillageCheck(player, game);
@@ -582,7 +582,7 @@ public class ExploreService {
                             + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
                             + ", however this placement is __optional__.";
                     } else {
-                        message = "Planet has the Demilitarized Zone attached so no infantry could be placed.";
+                        message = "Planet has the _Demilitarized Zone_ attached, so no infantry could be placed.";
                     }
                 } else {
                     message = "Tile was null, no infantry placed.";
@@ -668,34 +668,34 @@ public class ExploreService {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
             case "exp1", "exp2", "exp3" -> {
-                message = player.getRepresentation() + " please resolve Expedition:\n-# You have ";
+                message = player.getRepresentation() + ", please resolve _Expedition_:\n-# You have ";
                 message += ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID);
                 Button readyPlanet = Buttons.green("resolveExpedition_" + planetID, "Ready " + Helper.getPlanetRepresentation(planetID, game) + " by removing 1 infantry from or having mech on planet.");
                 List<Button> buttons = List.of(readyPlanet, decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
             case "frln1", "frln2", "frln3" -> {
-                message = player.getRepresentation() + " please resolve Freelancers:\n-# " + ButtonHelper.getListOfStuffAvailableToSpend(player, game, false);
+                message = player.getRepresentation() + ", please resolve _Freelancers_:\n-# " + ButtonHelper.getListOfStuffAvailableToSpend(player, game, false);
                 Button gainTG = Buttons.green("freelancersBuild_" + planetID, "Produce 1 Unit");
                 List<Button> buttons = List.of(gainTG, decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
             case "cm1", "cm2", "cm3" -> {
-                message = player.getRepresentation() + " please resolve Core Mine:\n-# You have ";
+                message = player.getRepresentation() + ", please resolve _Core Mine_:\n-# You have ";
                 message += ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID);
                 Button gainTG = Buttons.green("resolveCoreMine_" + planetID, "Gain 1 Trade Good by Removing Infantry or Having Mech on " + planetName, MiscEmojis.tg);
                 List<Button> buttons = List.of(gainTG, decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
             case "vfs1", "vfs2", "vfs3" -> {
-                message = player.getRepresentation() + " please resolve Volatile Fuel Source:\n-# Your current command tokens are " + player.getCCRepresentation() + ".";
+                message = player.getRepresentation() + ", please resolve _Volatile Fuel Source_:\n-# Your current command tokens are " + player.getCCRepresentation() + ".";
                 message += " and you have " + ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID);
                 Button gainCC = Buttons.green("resolveVolatile_" + planetID, "Remove 1 Infantry or Have a mech on " + planetName + " to Gain a Command Token");
                 List<Button> buttons = List.of(gainCC, decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
             case "warforgeruins" -> {
-                message = player.getRepresentation() + " please resolve War Forge Ruins:\n-# You have ";
+                message = player.getRepresentation() + ", please resolve _War Forge Ruins_:\n-# You have ";
                 message += ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID);
                 Button ruinsInf = Buttons.green("ruins_" + planetID + "_2inf", "Remove 1 Infantry or Have a Mech on " + planetName + " to Place 2 Infantry Here");
                 Button ruinsMech = Buttons.green("ruins_" + planetID + "_mech", "Remove 1 Infantry or Have a Mech on " + planetName + " to Place Mech Here");
@@ -704,7 +704,7 @@ public class ExploreService {
             }
             case "seedyspaceport" -> {
                 List<Button> buttons = new ArrayList<>();
-                message = player.getRepresentation() + " please resolve Seedy Spaceport:\n-# You have " + ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID);
+                message = player.getRepresentation() + ", please resolve _Seedy Spaceport_:\n-# You have " + ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID);
                 for (Leader leader : player.getLeaders()) {
                     if (leader.isExhausted() && leader.getId().contains("agent")) {
                         LeaderModel leaderM = Mapper.getLeader(leader.getId());
@@ -720,7 +720,7 @@ public class ExploreService {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
             case "hiddenlaboratory" -> {
-                MessageHelper.sendMessageToEventChannel(event, "# Exploring frontier in this system due to finding the _Hidden Laboratory_ industrial exploration.");
+                MessageHelper.sendMessageToEventChannel(event, "# Exploring frontier in this system due to finding the _Hidden Laboratory_.");
                 AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
                 expFront(event, tile, game, player);
             }
@@ -730,7 +730,7 @@ public class ExploreService {
                     AddUnitService.addUnits(event, tile, game, player.getColor(), "cruiser");
                     MessageHelper.sendMessageToEventChannel(event, "Cruiser added to the system automatically.");
                 } else {
-                    MessageHelper.sendMessageToEventChannel(event, "Someone else's ships were in the system, no cruiser added");
+                    MessageHelper.sendMessageToEventChannel(event, "Someone else's ships were in the system, no cruiser added.");
                 }
             }
             case "forgottentradestation" -> {
@@ -758,7 +758,7 @@ public class ExploreService {
             gainComm.add(Buttons.red("deleteButtons", "Decline"));
             String sb = player.getFactionEmoji() + " may use their **Fortune Seekers** ability\n" +
                 player.getRepresentationUnfogged() +
-                " After resolving the exploration, you may use this button to get your commodity from your **Fortune Seekers** ability.";
+                ", after resolving the exploration, you may use this button to get your commodity from your **Fortune Seekers** ability.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), sb, gainComm);
             game.setStoredValue("fortuneSeekers", "Used");
         }
@@ -787,7 +787,7 @@ public class ExploreService {
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " Put 1 commodity on ATS Armaments");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
             }
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No frontier token in given system.");
@@ -804,7 +804,7 @@ public class ExploreService {
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " Put 1 commodity on ATS Armaments");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
             }
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No frontier token in given system.");
