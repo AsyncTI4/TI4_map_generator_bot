@@ -76,7 +76,7 @@ class AgendaResolveButtonHandler {
                 playerWL.exhaustTech("pi");
                 MessageHelper.sendMessageToChannel(playerWL.getCorrectChannel(),
                     playerWL.getRepresentation()
-                        + " Predictive Intelligence was exhausted since you voted the way that lost while using it");
+                        + " _Predictive Intelligence_ was exhausted since you voted for a losing outcome while using it.");
             }
         }
         game.setStoredValue("riskedPredictive", "");
@@ -418,13 +418,13 @@ class AgendaResolveButtonHandler {
 
                         if (uH.getUnitCount(Units.UnitType.Mech, player.getColor()) > 0) {
                             if (player.hasTech("sar")) {
-                                for (int x = 0; x < uH.getUnitCount(Units.UnitType.Mech, player.getColor()); x++) {
+                                int amount = uH.getUnitCount(Units.UnitType.Mech, player.getColor());
+                                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                                    + " you gained " + amount + " trade good (" + player.getTg() + "->" + (player.getTg() + amount)
+                                    + ") from _Self-Assembly Routines_ because of " + amount + " of your mechs dying."
+                                    + " This is not an optional gain" + (amount > 1 ? ", and happens 1 trade good at a time" : "") + ".");
+                                for (int x = 0; x < amount; x++) {
                                     player.setTg(player.getTg() + 1);
-                                    MessageHelper.sendMessageToChannel(
-                                        player.getCorrectChannel(),
-                                        player.getRepresentation() + " you gained 1 trade good (" + (player.getTg() - 1)
-                                            + "->" + player.getTg()
-                                            + ") from 1 of your mechs dying while you own Self-Assembly Routines.\n-# This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -511,13 +511,13 @@ class AgendaResolveButtonHandler {
 
                         if (uH.getUnitCount(Units.UnitType.Mech, player.getColor()) > 0) {
                             if (player.hasTech("sar")) {
-                                for (int x = 0; x < uH.getUnitCount(Units.UnitType.Mech, player.getColor()); x++) {
+                                int amount = uH.getUnitCount(Units.UnitType.Mech, player.getColor());
+                                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                                    + " you gained " + amount + " trade good (" + player.getTg() + "->" + (player.getTg() + amount)
+                                    + ") from _Self-Assembly Routines_ because of " + amount + " of your mechs dying."
+                                    + " This is not an optional gain" + (amount > 1 ? ", and happens 1 trade good at a time" : "") + ".");
+                                for (int x = 0; x < amount; x++) {
                                     player.setTg(player.getTg() + 1);
-                                    MessageHelper.sendMessageToChannel(
-                                        player.getCorrectChannel(),
-                                        player.getRepresentation() + " you gained 1 trade good (" + (player.getTg() - 1)
-                                            + "->" + player.getTg()
-                                            + ") from 1 of your mechs dying while you own Self-Assembly Routines.\n-# This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -611,7 +611,7 @@ class AgendaResolveButtonHandler {
                         }
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "Sent buttons for each person to remove excess dreadnoughts and cruisers.");
+                        "Sent buttons for each player to remove excess dreadnoughts and cruisers.");
                 } else {
                     game.setStoredValue("agendaArmsReduction", "true");
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -761,11 +761,11 @@ class AgendaResolveButtonHandler {
                 }
                 if ("for".equalsIgnoreCase(winner)) {
                     Button ixthianButton = Buttons.green("rollIxthian", "Roll Ixthian Artifact", PlanetEmojis.Mecatol);
-                    String msg = game.getPing() + "Click this button to roll Ixthian Artifact! 🥁";
+                    String msg = game.getPing() + "Click this button to roll for _Ixthian Artifact_! 🥁";
                     MessageHelper.sendMessageToChannelWithButton(actionsChannel, msg, ixthianButton);
                 } else {
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "Against on Ixthian? Disgraceful");
+                        "Against on _Ixthian Artifact_‽ Disgraceful.");
                 }
             }
             if ("seed_empire".equalsIgnoreCase(agID)) {

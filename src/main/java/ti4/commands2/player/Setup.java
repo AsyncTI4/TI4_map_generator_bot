@@ -19,7 +19,7 @@ class Setup extends GameStateSubcommand {
     public Setup() {
         super(Constants.SETUP, "Player initialisation: Faction and Color", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "Home system tile position (Creuss choose position of gate tile #17)").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "Home system tile position (or equivalent e.g. Creuss Gate)").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SPEAKER, "True to set player as speaker."));
