@@ -1,7 +1,9 @@
 [
     {
-      "alias": "beMyNeighbor6p",
+      "alias": "6pBeMyNeighbor",
+      "author": "meadmonkey",
       "playerCount": 6,
+      "sliceEmulateTiles": ["207", "311", "310", "309", "208", "104"],
       "templateTiles": [
         { "pos": "000", "staticTileId": "18", "custodians": true },
   
@@ -46,8 +48,10 @@
       ]
     },
     {
-      "alias": "beMyNeighbor8pHyperlanes",
+      "alias": "8pBeMyNeighborHyperlanes",
+      "author": "meadmonkey",
       "playerCount": 8,
+      "sliceEmulateTiles": ["207", "311", "310", "309", "208", "104"],
       "templateTiles": [
         { "pos": "000", "staticTileId": "18", "custodians": true },
   
