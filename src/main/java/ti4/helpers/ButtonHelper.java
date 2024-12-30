@@ -143,6 +143,19 @@ public class ButtonHelper {
                 + " died and auto-revived. You will be prompted to place them on a planet in your home system at the start of your next turn.");
             return;
         }
+        if (totalAmount == 1)
+        {
+            String message = UnitEmojis.infantry + " died. Rolling for resurrection. ";
+            Die dice = new Die(player.hasTech("so2") ? 5 : 6);
+            message += dice.getGreenDieIfSuccessOrRedDieIfFailure();
+            if (dice.isSuccess()) {
+                message += " Success. You will be prompted to place them on a planet in your home system at the start of your next turn.";
+            } else {
+                message += " Failure.";
+            }
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            return;
+        }
         while (totalAmount > 0)
         {
             int amount = totalAmount;
