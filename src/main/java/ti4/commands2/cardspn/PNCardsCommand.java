@@ -18,6 +18,7 @@ public class PNCardsCommand implements ParentCommand {
                     new SendPN(),
                     new PurgePN(),
                     new PNInfo(),
+                    new SendRandomPN(),
                     new PNReset())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
