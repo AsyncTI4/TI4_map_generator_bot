@@ -838,7 +838,7 @@ public class ActionCardHelper {
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             Button cymiaeButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", FactionEmojis.cymiae);
-            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), player.getRepresentationUnfogged() 
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), player.getRepresentationUnfogged()
                 + ", you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Skhot Unit X-12, the Cymiae" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw action card.", cymiaeButton);
         }

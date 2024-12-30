@@ -639,6 +639,17 @@ public class ButtonHelperTacticalAction {
 
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
 
+        Tile tile = game.getTileByPosition(pos);
+        if (tile.getPlanetUnitHolders().isEmpty()
+            && ButtonHelper.doesPlayerHaveFSHere("mortheus_flagship", player, tile)
+            && !tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
+            message += "\n" + player.getRepresentationUnfogged()
+                + " automatically added 1 frontier token to the system due to the Particle Sieve, the Mortheus Flagship.";
+            AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
+        }
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+
         List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(game, player);
         if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !game.isL1Hero()) {
             String msg = player.getRepresentationUnfogged() + " You can use buttons to resolve " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")

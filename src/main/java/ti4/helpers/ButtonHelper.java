@@ -136,7 +136,7 @@ public class ButtonHelper {
         if (!player.hasInf2Tech()) {
             return;
         }
-        
+
         if (player.hasTech("cl2")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 (totalAmount <= 10 ? UnitEmojis.infantry.toString().repeat(totalAmount) : UnitEmojis.infantry + "×" + totalAmount)
@@ -150,7 +150,7 @@ public class ButtonHelper {
                 int batches = (totalAmount - 1) / 50 + 1;
                 amount = totalAmount / batches;
             }
-                
+
             String message = (amount <= 10 ? UnitEmojis.infantry.toString().repeat(amount) : UnitEmojis.infantry + "×" + amount) + " died. Rolling for resurrection.\n";
             int revive = 0;
             for (int x = 0; x < amount; x++) {
@@ -1012,7 +1012,7 @@ public class ButtonHelper {
                     Button decline = Buttons.red(fincheckerForNonActive + "deleteButtons", "Decline To Use Mech");
                     List<Button> buttons = List.of(gainTG, decline);
                     MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCorrectChannel(), ident
-                        + ", you may use the buttons to remove the " + player.getColor() 
+                        + ", you may use the buttons to remove the " + player.getColor()
                         + " command token from your fleet pool to end their turn by using the Starlancer (Mahact mech) in the active system.", buttons);
                 }
             }
@@ -2502,7 +2502,7 @@ public class ButtonHelper {
         Helper.isCCCountCorrect(event, game, player.getColor());
         return highest;
     }
-    
+
     public static int checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
         return checkFleetAndCapacity(player, game, tile, event, false);
     }
@@ -5678,7 +5678,7 @@ public class ButtonHelper {
             if (game.isShowBanners()) {
                 BannerGenerator.drawFactionBanner(player);
             }
-            String msgExtra = player.getRepresentationUnfogged() + ", it is now your turn (your " 
+            String msgExtra = player.getRepresentationUnfogged() + ", it is now your turn (your "
                     + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
@@ -5707,7 +5707,7 @@ public class ButtonHelper {
             if (game.isShowBanners()) {
                 BannerGenerator.drawFactionBanner(player);
             }
-            String msgExtra = player.getRepresentationUnfogged() + ", it is now your turn (your " 
+            String msgExtra = player.getRepresentationUnfogged() + ", it is now your turn (your "
                     + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
             if (nextPlayer == player) {
