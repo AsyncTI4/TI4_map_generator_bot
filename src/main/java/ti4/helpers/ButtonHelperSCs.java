@@ -576,7 +576,7 @@ public class ButtonHelperSCs {
         if (setStatus) {
             player.addFollowedSC(scNum, event);
         }
-        ReactionService.addReaction(event, game, player, "Not Following");
+        ReactionService.addReaction(event, game, player, "not following");
         String players = game.getStoredValue(messageID + "SCReacts");
 
         game.setStoredValue(messageID + "SCReacts", players.replace(player.getFaction(), ""));

@@ -54,17 +54,17 @@ public class ReactionService {
 
         String text;
         if (game.isFowMode() && sendPublic) {
-            text = message;
+            text = message + ".";
         } else if (game.isFowMode()) {
-            text = "(You) " + emojiToUse.getFormatted() + " " + message;
+            text = "(You) " + emojiToUse.getFormatted() + " " + message + ".";
         } else if ("Not Following".equalsIgnoreCase(message)) {
-            text = player.getRepresentation(false, false) + " " + message;
+            text = player.getRepresentation(false, false) + " " + message + ".";
         } else {
-            text = player.getRepresentation() + " " + message;
+            text = player.getRepresentation() + " " + message + ".";
         }
 
         if (isNotBlank(additionalMessage)) {
-            text += " " + game.getPing() + " " + additionalMessage;
+            text += "\n" + game.getPing() + " " + additionalMessage + ".";
         }
 
         if (game.isFowMode() && !sendPublic) {

@@ -125,10 +125,10 @@ class ExploreButtonHandler {
         }
         if ("mech".equalsIgnoreCase(mech)) {
             AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "mech " + planet);
-            message = player.getRepresentation() + ", " + message + "Placed mech on" + Mapper.getPlanet(planet).getName();
+            message = player.getRepresentation() + ", " + message + " placed mech on" + Mapper.getPlanet(planet).getName();
         } else {
             AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "2 infantry " + planet);
-            message = player.getRepresentation() + ", " + message + "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
+            message = player.getRepresentation() + ", " + message + " placed 2 infantry on" + Mapper.getPlanet(planet).getName();
         }
         ReactionService.addReaction(event, game, player, message);
         ButtonHelper.deleteMessage(event);

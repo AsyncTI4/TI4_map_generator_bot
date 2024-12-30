@@ -578,8 +578,8 @@ public class ExploreService {
                     boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
                     if (!containsDMZ) {
                         AddUnitService.addUnits(event, tile, game, player.getColor(), "inf " + planetID);
-                        message = player.getFactionEmoji() + ColorEmojis.getColorEmojiWithName(player.getColor()) + UnitEmojis.infantry
-                            + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
+                        message = player.getFactionEmoji() + ColorEmojis.getColorEmojiWithName(player.getColor())
+                            + ", 1 infantry was automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
                             + ", however this placement is __optional__.";
                     } else {
                         message = "Planet has the _Demilitarized Zone_ attached, so no infantry could be placed.";
@@ -782,7 +782,8 @@ public class ExploreService {
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
             String cardID = game.drawExplore(Constants.FRONTIER);
-            String messageText = ExploreEmojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":";
+            String messageText = player.getRepresentation() + " has explored the frontier token in " + tile.getRepresentation() 
+                + " and found _" + Mapper.getExplore(cardID).getName() + "_.";
             ExploreService.resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {
@@ -799,7 +800,8 @@ public class ExploreService {
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
-            String messageText = ExploreEmojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":";
+            String messageText = player.getRepresentation() + " has explored the frontier token in " + tile.getRepresentation() 
+                + " and found _" + Mapper.getExplore(cardID).getName() + "_.";
             resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {

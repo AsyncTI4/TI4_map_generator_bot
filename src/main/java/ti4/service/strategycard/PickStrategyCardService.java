@@ -87,14 +87,23 @@ public class PickStrategyCardService {
                 }
             }
 
-            msgExtra += "\nAll players picked strategy cards.";
+            msgExtra += "\nAll players have picked strategy cards.";
             Set<Integer> scPickedList = new HashSet<>();
             for (Player player_ : activePlayers) {
                 scPickedList.addAll(player_.getSCs());
             }
 
             //ADD A TG TO UNPICKED SC
-            game.incrementScTradeGoods();
+            List<Integer> scUnickedList = game.incrementScTradeGoods();
+            if (!scUnickedList.isEmpty())
+            {
+                List<String> scUnickedNames = new ArrayList<>();
+                for (int sc : scUnickedList) {
+                    scUnickedNames.add("**" + Helper.getSCName(sc, game) + "**");
+                }
+                msgExtra += "\n" + String.join(", ", scUnickedNames) + " were unpicked" 
+                    + (game.islandMode() ? "" : "; a trade good has been placed on each") + ".";
+            }
 
             for (int sc : scPickedList) {
                 game.setScTradeGood(sc, 0);

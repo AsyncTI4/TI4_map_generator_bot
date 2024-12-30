@@ -193,12 +193,12 @@ public class StartCombatService {
         // Create the thread
         final String finalThreadName = threadName;
 
-        channel.sendMessage("Resolve Combat in this thread:").queue(m -> {
+        channel.sendMessage("Resolve combat in this thread:").queue(m -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
             if (game.isFowMode()) {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
             } else {
-                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
+                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             }
             threadChannel.queue(tc -> initializeCombatThread(tc, game, player1, player2, tile, event,
                 spaceOrGround, systemWithContext, unitHolderName));

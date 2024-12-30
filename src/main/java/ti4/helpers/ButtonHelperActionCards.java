@@ -1813,7 +1813,7 @@ public class ButtonHelperActionCards {
         else
         {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " has released a _Plague_ upon " + planetRep + ". "
+                player.getRepresentationUnfogged() + " has released a _Plague_ upon " + planetRep + ".\n"
                 + p2.getRepresentationUnfogged() + ", your planet " + planetRep + " suffered a"
                     + adjective + " _Plague_ and you lost " + hits + " infantry.");
         }

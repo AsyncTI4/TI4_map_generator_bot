@@ -344,7 +344,7 @@ public class PlayStrategyCardService {
             // only do thread in non-fow games
             String threadName = game.getName() + "-round-" + game.getRound() + "-" + scModel.getName();
             ThreadChannelAction threadChannel = mainGameChannel.createThreadChannel(threadName, message.getId());
-            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
+            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             threadChannel.queue(m5 -> {
                 if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
                     MessageHelper.sendFileToChannel(m5, Helper.getSCImageFile(scToPlay, game));

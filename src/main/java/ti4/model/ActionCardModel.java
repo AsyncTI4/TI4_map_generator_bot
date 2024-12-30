@@ -34,19 +34,19 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return CardEmojis.ActionCard + "__**" + name + "**__";
+        return CardEmojis.ActionCard + "_" + name + "_";
     }
 
     public String getRepresentation() {
-        return getRepresentationJustName() + ": _" + window + ":_ " + text + "\n";
+        return getRepresentationJustName() + " - " + window + ": " + text + "\n";
     }
 
     public String getRepresentationJustName() {
-        return CardEmojis.ActionCard + "__**" + name + "**__ *(" + phase + " Phase)*";
+        return CardEmojis.ActionCard + "_" + name + "_ (" + phase + " Phase)";
     }
 
     public String getRepresentationJustText() {
-        return "*" + getWindow() + ":* " + getText();
+        return getWindow() + ": " + getText();
     }
 
     public MessageEmbed getRepresentationEmbed() {

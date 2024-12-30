@@ -446,7 +446,7 @@ public class ButtonHelperFactionSpecific {
                 CommandCounterHelper.addCC(event, color, tile);
             }
             ButtonHelper.sendMessageToRightStratThread(player, game,
-                player.getFactionEmoji() + " Placed 1 command token from reinforcements in the "
+                player.getFactionEmoji() + " placed 1 command token from reinforcements in the "
                     + Helper.getPlanetRepresentation(planet, game) + " system.",
                 "construction");
         }
@@ -1503,7 +1503,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveExpLook(Player player, Game game, GenericInteractionCreateEvent event, String deckType) {
         List<String> deck = game.getExploreDeck(deckType);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Looked at top of the " + deckType + " deck.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " looked at top of the " + deckType + " deck.");
         String traitNameWithEmoji = ExploreEmojis.getTraitEmoji(deckType) + deckType;
         if (deck.isEmpty() && game.getExploreDiscard(deckType).isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), traitNameWithEmoji + " exploration deck & discard is empty - nothing to look at.");
@@ -2258,7 +2258,8 @@ public class ButtonHelperFactionSpecific {
     public static void resolveCreussIFFStart(Game game, @NotNull Player player, String buttonID, ButtonInteractionEvent event) {
         String type = buttonID.split("_")[1];
         List<Button> buttons = getCreusIFFLocationOptions(game, player, type);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " please select the tile you would like to place the " + type + " wormhole in.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getFactionEmojiOrColor()
+            + " please select the tile you would like to place the " + type + " wormhole in.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -2288,15 +2289,15 @@ public class ButtonHelperFactionSpecific {
         } else {
             StringBuilder sb = new StringBuilder(player.getRepresentation());
             tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-            sb.append(" moved ").append(MiscEmojis.getCreussWormhole(tokenName)).append(" to ")
-                .append(tile.getRepresentationForButtons(game, player));
+            sb.append(" moved ").append(MiscEmojis.getCreussWormhole(tokenName)).append(" ").append(type)
+                .append(" Creuss wormhole to ").append(tile.getRepresentationForButtons(game, player));
             for (Tile tile_ : game.getTileMap().values()) {
                 if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
-                    sb.append(" (from ").append(tile_.getRepresentationForButtons(game, player)).append(").");
+                    sb.append(" (from ").append(tile_.getRepresentationForButtons(game, player)).append(")");
                     break;
                 }
             }
-            msg = sb.toString();
+            msg = sb.append(".").toString();
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 

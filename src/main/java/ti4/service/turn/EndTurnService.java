@@ -95,7 +95,7 @@ public class EndTurnService {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _\n"
                 + "**End of Turn " + mainPlayer.getInRoundTurnCount() + " for** " + mainPlayer.getRepresentation());
         } else {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn.");
         }
 
         MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();

@@ -392,12 +392,10 @@ public class ButtonHelperAgents {
         }
 
         if ("nomadagentartuno".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash
+                + " agent, placing " + rest.split("_")[1] + " trade good on her.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             playerLeader.setTgCount(Integer.parseInt(rest.split("_")[1]));
-            String messageText = player.getRepresentation() + " placed " + rest.split("_")[1] + " " + MiscEmojis.getTGorNomadCoinEmoji(game)
-                + " on top of " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
-            MessageHelper.sendMessageToChannel(channel, messageText);
         }
         if ("naazagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Garv and Gunn, the Naaz-Rokha" + ssruuSlash + " agents.";

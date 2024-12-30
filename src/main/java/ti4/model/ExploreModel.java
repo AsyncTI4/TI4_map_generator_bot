@@ -59,7 +59,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     public String textRepresentation() {
         StringBuilder sb = new StringBuilder(getTypeEmoji()).append(" ");
         if (source != null) sb.append(source.emoji()).append(" ");
-        sb.append("**__").append(getName()).append("__**\n> ");
+        sb.append("_").append(getName()).append("_\n> ");
         sb.append(getText().replaceAll("\n(> )?", "\n> "));
         return sb.toString();
     }

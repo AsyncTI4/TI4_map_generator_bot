@@ -1062,7 +1062,7 @@ public class Game extends GameProperties {
         scTradeGoods.put(sc, tradeGoodCount);
     }
 
-    public void incrementScTradeGoods() {
+    public List<Integer> incrementScTradeGoods() {
         Set<Integer> scPickedList = new HashSet<>();
         for (Player player_ : getRealPlayers()) {
             scPickedList.addAll(player_.getSCs());
@@ -1076,16 +1076,20 @@ public class Game extends GameProperties {
             }
         }
 
+        List<Integer> scUnickedList = new ArrayList<>();
         //ADD A TG TO UNPICKED SC
-        if (!islandMode()) {
-            for (Integer scNumber : scTradeGoods.keySet()) {
-                if (!scPickedList.contains(scNumber) && scNumber != 0) {
+        for (Integer scNumber : scTradeGoods.keySet()) {
+            if (!scPickedList.contains(scNumber) && scNumber != 0) {
+                scUnickedList.add(scNumber);
+                if (!islandMode()) {
                     Integer tgCount = scTradeGoods.get(scNumber);
                     tgCount = tgCount == null ? 1 : tgCount + 1;
                     setScTradeGood(scNumber, tgCount);
                 }
             }
         }
+        Collections.sort(scUnickedList);
+        return scUnickedList;
     }
 
     public boolean addSC(Integer sc) {

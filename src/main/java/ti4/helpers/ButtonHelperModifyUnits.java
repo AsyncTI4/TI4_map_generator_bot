@@ -1262,12 +1262,12 @@ public class ButtonHelperModifyUnits {
                 || player.hasTech("absol_ffac2")) {
                 AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)),
                     game, player.getColor(), unitID);
-                successMessage = "Placed 1 space dock in the space area of the "
+                successMessage = " placed 1 space dock in the space area of the "
                     + Helper.getPlanetRepresentation(planetName, game) + " system.";
             } else {
                 AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)),
                     game, player.getColor(), unitID + " " + planetName);
-                successMessage = "Placed 1 " + UnitEmojis.spacedock + " on "
+                successMessage = " placed 1 " + UnitEmojis.spacedock + " on "
                     + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
             CommanderUnlockCheckService.checkPlayer(player, "cabal");
@@ -1284,21 +1284,21 @@ public class ButtonHelperModifyUnits {
             if (player.ownsUnit("mirveda_pds") || player.ownsUnit("mirveda_pds2")) {
                 AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)),
                     game, player.getColor(), unitID);
-                successMessage = "Placed 1 " + UnitEmojis.pds + " in the space area of the "
+                successMessage = " placed 1 " + UnitEmojis.pds + " in the space area of the "
                     + Helper.getPlanetRepresentation(planetName, game) + " system.";
             } else {
                 AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)),
                     game, player.getColor(), unitLong + " " + planetName);
-                successMessage = "Placed 1 " + UnitEmojis.pds + " on "
+                successMessage = " placed 1 " + UnitEmojis.pds + " on "
                     + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
         } else if ("monument".equalsIgnoreCase(unitLong)) {
             if (player.ownsUnit("empyrean_monument")) {
                 AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), unitID);
-                successMessage = "Placed 1 " + UnitEmojis.Monument + " in the space area of the " + Helper.getPlanetRepresentation(planetName, game) + " system.";
+                successMessage = " placed 1 " + UnitEmojis.Monument + " in the space area of the " + Helper.getPlanetRepresentation(planetName, game) + " system.";
             } else {
                 AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), unitLong + " " + planetName);
-                successMessage = "Placed 1 " + UnitEmojis.Monument + " on " + Helper.getPlanetRepresentation(planetName, game) + ".";
+                successMessage = " placed 1 " + UnitEmojis.Monument + " on " + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
         } else {
             Tile tile;
@@ -1464,7 +1464,7 @@ public class ButtonHelperModifyUnits {
             }
 
             if (editedMessage.contains("place 2 infantry")) {
-                successMessage = "Placed 2 " + UnitEmojis.infantry + " on "
+                successMessage = " placed 2 " + UnitEmojis.infantry + " on "
                     + Helper.getPlanetRepresentation(planetName, game) + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                 event.getMessage().delete().queue();
@@ -1552,21 +1552,21 @@ public class ButtonHelperModifyUnits {
         if ("sd".equalsIgnoreCase(unitID)) {
             if (player.ownsUnit("saar_spacedock") || player.ownsUnit("saar_spacedock2")) {
                 AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), unitID);
-                successMessage = "Placed 1 space dock in the space area of the "
+                successMessage = " placed 1 space dock in the space area of the "
                     + Helper.getPlanetRepresentation(planetName, game) + " system.";
             } else {
                 AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), unitID + " " + planetName);
-                successMessage = "Placed 1 " + UnitEmojis.spacedock + " on "
+                successMessage = " placed 1 " + UnitEmojis.spacedock + " on "
                     + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
         } else if ("pd".equalsIgnoreCase(unitID)) {
             if (player.ownsUnit("mirveda_pds") || player.ownsUnit("mirveda_pds2")) {
                 AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), unitID);
-                successMessage = "Placed 1 " + UnitEmojis.pds + " in the space area of the "
+                successMessage = " placed 1 " + UnitEmojis.pds + " in the space area of the "
                     + Helper.getPlanetRepresentation(planetName, game) + " system.";
             } else {
                 AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), unitLong + " " + planetName);
-                successMessage = "Placed 1 " + UnitEmojis.pds + " on "
+                successMessage = " placed 1 " + UnitEmojis.pds + " on "
                     + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
         } else {
@@ -1854,7 +1854,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.fogSafeEmoji() + " Landed " + amount + " " + unitName + " on " + planet);
         String oldMessage = event.getMessage().getContentRaw();
         if (space.getUnitCount(UnitType.Infantry, player.getColor()) < 1 && space.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
-            oldMessage = "Remember to click done landing troops if everything is landed correctly.";
+            oldMessage = "Remember to click \"Done Landing Troops\" if everything is landed correctly.";
         }
         MessageHelper.editMessageWithButtons(event, oldMessage, systemButtons);
     }

@@ -132,11 +132,41 @@ public class ButtonHelper {
         return false;
     }
 
-    public static void resolveInfantryDeath(Player player, int amount) {
-        if (player.hasInf2Tech()) {
-            for (int x = 0; x < amount; x++) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), rollInfantryRevival(player));
+    public static void resolveInfantryDeath(Player player, int totalAmount) {
+        if (!player.hasInf2Tech()) {
+            return;
+        }
+        
+        if (player.hasTech("cl2")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                (totalAmount <= 10 ? UnitEmojis.infantry.toString().repeat(totalAmount) : UnitEmojis.infantry + "×" + totalAmount)
+                + " died and auto-revived. You will be prompted to place them on a planet in your home system at the start of your next turn.");
+            return;
+        }
+        while (totalAmount > 0)
+        {
+            int amount = totalAmount;
+            if (totalAmount > 50) {
+                int batches = (totalAmount - 1) / 50 + 1;
+                amount = totalAmount / batches;
             }
+                
+            String message = (amount <= 10 ? UnitEmojis.infantry.toString().repeat(amount) : UnitEmojis.infantry + "×" + amount) + " died. Rolling for resurrection.\n";
+            int revive = 0;
+            for (int x = 0; x < amount; x++) {
+                Die dice = new Die(player.hasTech("so2") ? 5 : 6);
+                message += dice.getGreenDieIfSuccessOrRedDieIfFailure();
+                revive += dice.isSuccess() ? 1 : 0;
+            }
+            int failed = amount - revive;
+            if (revive == 0) {
+                message += "\nNone of your infantry revived.";
+            } else {
+                message += "\n" + (failed == 0 ? "All " : "") + (revive <= 10 ? UnitEmojis.infantry.toString().repeat(revive) : UnitEmojis.infantry + "×" + revive)
+                    + " revived. You will be prompted to place them on a planet in your home system at the start of your next turn.";
+            }
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            totalAmount -= amount;
         }
     }
 
@@ -189,24 +219,6 @@ public class ButtonHelper {
             || game.getPNOwner("riderx") != null || game.getPNOwner("rider") != null;
     }
 
-    public static String rollInfantryRevival(Player player) {
-        Die d1 = new Die(6);
-        if (player.hasTech("so2")) {
-            d1 = new Die(5);
-        }
-        String msg = UnitEmojis.infantry + " rolled a " + d1.getGreenDieIfSuccessOrRedDieIfFailure();
-        if (player.hasTech("cl2")) {
-            msg = UnitEmojis.infantry + " died";
-        }
-        if (d1.isSuccess() || player.hasTech("cl2")) {
-            msg += " and revived. You will be prompted to place them on a planet in your HS at the start of your next turn.";
-            player.setStasisInfantry(player.getGenSynthesisInfantry() + 1);
-        } else {
-            msg += " and failed. No revival.";
-        }
-        return player.getFactionEmoji() + " " + msg;
-    }
-
     public static void rollMykoMechRevival(Game game, Player player) {
         Die d1 = new Die(6);
         String msg = player.getFactionEmoji() + UnitEmojis.mech + " rolled a " + d1.getGreenDieIfSuccessOrRedDieIfFailure();
@@ -232,7 +244,7 @@ public class ButtonHelper {
         Tile tile = game.getTileFromPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " inf " + planet);
         player.setStasisInfantry(player.getGenSynthesisInfantry() - Integer.parseInt(amount));
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " Placed " + amount + " infantry on "
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " placed " + amount + " infantry on "
             + Helper.getPlanetRepresentation(planet, game) + ". You have " + player.getGenSynthesisInfantry() + " infantry left to revive.");
         if (player.getGenSynthesisInfantry() == 0) {
             deleteMessage(event);

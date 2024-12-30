@@ -308,7 +308,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String planet = buttonID.replace("winnuStructure_", "").split("_")[1];
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
         AddUnitService.addUnits(event, tile, game, player.getColor(), unit + " " + planet);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " Placed a " + unit + " on " + Helper.getPlanetRepresentation(planet, game));
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " placed a " + unit + " on " + Helper.getPlanetRepresentation(planet, game));
     }
 
     @ButtonHandler("removeAllStructures_")
@@ -1339,9 +1339,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                         "No such Action Card ID found, please retry");
                     return;
                 }
-                String sb = player.getRepresentation() + " - " +
-                    "Discarded Action Card:" + "\n" +
-                    Mapper.getActionCard(acID).getRepresentation() + "\n";
+                String sb = player.getRepresentation() + " discarded an action card.\n" + Mapper.getActionCard(acID).getRepresentation();
                 MessageChannel channel2 = game.getMainGameChannel();
                 if (game.isFowMode()) {
                     channel2 = player.getPrivateChannel();
@@ -1875,7 +1873,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (Mapper.isValidColor(color)) {
             CommandCounterHelper.addCC(event, color, tile);
         }
-        String message = player.getFactionEmojiOrColor() + " Placed 1 command token from reinforcements in the " + Helper.getPlanetRepresentation(planet, game) + " system.";
+        String message = player.getFactionEmojiOrColor() + " placed 1 command token from reinforcements in the " + Helper.getPlanetRepresentation(planet, game) + " system.";
         ButtonHelper.sendMessageToRightStratThread(player, game, message, "construction");
         ButtonHelper.deleteMessage(event);
     }
@@ -1902,7 +1900,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (Mapper.isValidColor(color)) {
             CommandCounterHelper.addCC(event, color, tile);
         }
-        String message = player.getRepresentation() + " Placed 1 " + StringUtils.capitalize(color) + " command token in the "
+        String message = player.getRepresentation() + " placed 1 " + StringUtils.capitalize(color) + " command token in the "
             + Helper.getPlanetRepresentation(planet, game)
             + " system due to use of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent on **Construction**.";
@@ -2199,7 +2197,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             game.drawActionCard(player.getUserID());
             CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = "Drew 1 action card.";
+            message = " drew 1 action card.";
         }
         ReactionService.addReaction(event, game, player, true, false, message);
         ButtonHelper.deleteMessage(event);
@@ -2216,7 +2214,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             game.drawActionCard(player.getUserID());
             CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = "Drew 1 action card.";
+            message = " drew 1 action card.";
         }
         ReactionService.addReaction(event, game, player, true, false, message);
         ButtonHelper.checkACLimit(game, player);
