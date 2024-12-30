@@ -305,7 +305,7 @@ public class ActionCardHelper {
         if (player.isPassed() && activePlayerID != null) {
             Player activePlayer = game.getPlayer(activePlayerID);
             if (activePlayer != null && activePlayer.hasTech("tp")) {
-                return "You are passed and the active player owns the _Transparasteel Plating_ technology, preventing you from playing action cards. As such, the action card command has been cancelled.";
+                return "You are passed and the active player owns _Transparasteel Plating_, preventing you from playing action cards. As such, the action card command has been cancelled.";
             }
         }
         if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) != player) {
@@ -377,11 +377,11 @@ public class ActionCardHelper {
                 for (Player p : game.getRealPlayers()) {
                     if (p == player) continue;
                     if (game.isFowMode() || (!it && p.hasTechReady("it"))) {
-                        noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Xxcha + "**Instinct Training**, watch out");
+                        noSabosMessage.append("\n> A player may have access to _Instinct Training_, so watch out.");
                         it = true;
                     }
                     if (game.isFowMode() || (!watcher && Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
-                        noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Empyrean + UnitEmojis.mech + "**Watcher**, watch out");
+                        noSabosMessage.append("\n> A player may have access to a Watcher (Empyrean mech), so 𝓌𝒶𝓉𝒸𝒽 out.");
                         watcher = true;
                     }
                 }
@@ -802,13 +802,13 @@ public class ActionCardHelper {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your prediction target", game, player, riderButtons);
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your prediction target.", game, player, riderButtons);
                 }
                 if (actionCardTitle.contains("Hack Election")) {
                     game.setHasHackElectionBeenPlayed(true);
                     Button setHack = Buttons.red("hack_election", "Set the voting order as normal");
                     List<Button> hackButtons = List.of(setHack);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Voting order reversed. Please hit this button if Hack Election is Sabo'd", game, player, hackButtons);
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Voting order reversed. Please hit this button if _Hack Election_ is Sabo'd.", game, player, hackButtons);
                 }
 
             }
@@ -861,7 +861,7 @@ public class ActionCardHelper {
 
             String reverseEngineerID = "reverse_engineer";
             if (player.getActionCards().containsKey(reverseEngineerID)) {
-                StringBuilder msg = new StringBuilder(player.getRepresentationUnfogged() + " you can use Reverse Engineer on ");
+                StringBuilder msg = new StringBuilder(player.getRepresentationUnfogged() + " you can use _Reverse Engineer_ on ");
                 if (actionCards.size() > 1) msg.append("one of the following cards:");
 
                 List<Button> reverseButtons = new ArrayList<>();
@@ -1039,8 +1039,13 @@ public class ActionCardHelper {
 
         ActionCardHelper.sendActionCardInfo(game, player, event);
         if (player.hasAbility("autonetic_memory")) {
-            String message = player.getRepresentationUnfogged() + ", if you did not just use the Codex to get that action card, "
-                + "please discard 1 action card due to your **Cybernetic Madness** ability.";
+            String message;
+            if (player.hasRelic("codex") || player.hasRelic("absol_codex")) {
+                message = player.getRepresentationUnfogged() + ", if you did not just use _The Codex_ to get that action card,"
+                    + " please discard 1 action card due to your **Cybernetic Madness** ability.";
+            } else {
+                message = player.getRepresentationUnfogged() + ", please discard 1 action card due to your **Cybernetic Madness** ability.";
+            }
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
         ButtonHelper.checkACLimit(game, player);
