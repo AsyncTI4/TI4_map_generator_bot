@@ -632,8 +632,9 @@ public class ButtonHelperTacticalAction {
         if (tile.getPlanetUnitHolders().isEmpty()
             && ButtonHelper.doesPlayerHaveFSHere("mortheus_flagship", player, tile)
             && !tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
-            message += "\n" + player.getRepresentationUnfogged()
-                + " automatically added 1 frontier token to the system due to the Particle Sieve, the Mortheus Flagship.";
+            String msg = player.getRepresentationUnfogged()
+                + " automatically added 1 frontier token to the system due to the Particle Sieve (the Mortheus flagship).";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         }
 
