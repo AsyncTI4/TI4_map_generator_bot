@@ -168,6 +168,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             totalAmount -= amount;
         }
+        
     }
 
     public static List<Button> getDacxiveButtons(String planet, Player player) {
