@@ -130,11 +130,9 @@ public class MessageHelper {
 			&& !game.getStoredValue(messageId).isEmpty()) {
 			if (!game.getStoredValue(messageId).contains(player.getFaction())) {
 				game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
-				//GameSaveLoadManager.saveGame(game, "Stored reaction."); TODO: this should save, I think, but saving is heavy...
 			}
 		} else {
 			game.setStoredValue(messageId, player.getFaction());
-			//GameSaveLoadManager.saveGame(game, "Stored reaction."); TODO: this should save, I think, but saving is heavy...
 		}
 	}
 

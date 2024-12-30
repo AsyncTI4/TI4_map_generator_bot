@@ -874,8 +874,8 @@ public class AgendaHelper {
             int[] voteInfo = getVoteTotal(nextInLine, game);
             int counter = 0;
             while ((voteInfo[0] < 1
-                || game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction()) || !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty())
-                && counter < game.getRealPlayers().size()) {
+                    || game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction()) || !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty())
+                    && counter < game.getRealPlayers().size()) {
                 String skippedMessage = nextInLine.getRepresentation(true, false) + "You are being skipped because the bot thinks you can't vote.";
                 if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
                     skippedMessage = realIdentity

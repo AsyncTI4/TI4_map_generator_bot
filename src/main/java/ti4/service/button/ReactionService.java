@@ -17,6 +17,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -91,7 +92,6 @@ public class ReactionService {
         addReaction(event, game, player, false, false, message, null);
     }
 
-    //TODO Can this be combined? Remove game save queues
     public static void addReaction(Player player, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
         try {
             game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
@@ -99,16 +99,9 @@ public class ReactionService {
                 String messageId = mainMessage.getId();
 
                 game.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
-                if (game.getStoredValue(messageId) != null) {
-                    if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-                        game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
-                        GameManager.save(game, "Add Reaction");
-                    }
-                } else {
-                    game.setStoredValue(messageId, player.getFaction());
-                    GameManager.save(game, "Add Reaction");
-                }
+                GameMessageManager.addReaction(game.getName(), player.getUserID(), messageId);
                 checkForAllReactions(messageId, game);
+
                 if (message == null || message.isEmpty()) {
                     return;
                 }
