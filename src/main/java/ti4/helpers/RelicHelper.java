@@ -48,7 +48,8 @@ public class RelicHelper {
             return;
         }
         if (player.hasAbility("a_new_edifice")) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "Due to A New Edifice Ability, you get to explore 3 planets rather than get a relic. Reminder that they should be different planets. ");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                + "Due to your **A New Edifice** ability, you get to explore 3 planets rather than get a relic. Reminder that they should be different planets. ");
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #1 ", buttons);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #2 ", buttons);
@@ -80,7 +81,7 @@ public class RelicHelper {
         StringBuilder helpMessage = new StringBuilder();
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
-            case "nanoforge" -> helpMessage.append("Run the following commands to use Nanoforge:\n")
+            case "nanoforge" -> helpMessage.append("Run the following commands to use _Nano-Forge_:\n")
                 .append("     `/explore relic_purge relic: nanoforge`\n")
                 .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
             case "obsidian" -> {

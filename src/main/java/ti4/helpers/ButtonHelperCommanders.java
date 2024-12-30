@@ -101,7 +101,7 @@ public class ButtonHelperCommanders {
                 + " S'ula Mentarion, the Mentak commander. Please select the promissory note you would most like to send and/or least like to keep.";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Sent " + color + " the buttons for resolving S'ula Mentarion.");
+                "Sent " + color + " the buttons for resolving S'ula Mentarion, the Mentak commander.");
             ButtonHelper.deleteTheOneButton(event);
         }
 
@@ -178,8 +178,8 @@ public class ButtonHelperCommanders {
         if (!game.playerHasLeaderUnlockedOrAlliance(player, "veldyrcommander")) {
             return;
         }
-        StringBuilder summary = new StringBuilder(player.getRepresentation() + " you could potentially use the Veldyr Commander,"
-            +" to ignore one prerequisite for these technologies (the bot did not check if you have the prerequisites otherwise):\n");
+        StringBuilder summary = new StringBuilder(player.getRepresentation() + " you could potentially use Vera Khage, the Veldyr Commander,"
+            + " to ignore one prerequisite for these technologies (the bot did not check if you have the prerequisites otherwise):\n");
         List<String> techsSummed = new ArrayList<>();
         for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)) {
             for (String tech : p2.getTechs()) {
@@ -500,7 +500,7 @@ public class ButtonHelperCommanders {
                     }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                            + ", you acquired access to a technology while having Nekro Acidos, the Nekro commander, but since it is a faction technology and so you used one of your Valefars,"
+                            + ", you acquired access to a technology while having Nekro Acidos, the Nekro commander, but since it is a faction technology and so you used one of your Valefar Assimilators,"
                             + " the number of technologies you owned did not increase, and therefore you do not draw an action card.");
                 }
             }

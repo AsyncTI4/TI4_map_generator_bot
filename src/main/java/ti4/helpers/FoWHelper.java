@@ -26,6 +26,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.map.manage.GameManager;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
@@ -446,6 +447,11 @@ public class FoWHelper {
 						break;
 					}
 				}
+                if (tokenName.contains("sigma_weirdway"))
+                {
+					wormholeIDs.add(Constants.ALPHA);
+					wormholeIDs.add(Constants.BETA);
+                }
 			}
 		}
 
@@ -472,6 +478,11 @@ public class FoWHelper {
 						break;
 					}
 				}
+                if (tokenName.contains("sigma_weirdway"))
+                {
+					wormholeIDs.add(Constants.ALPHA);
+					wormholeIDs.add(Constants.BETA);
+                }
 			}
 		}
 
@@ -495,6 +506,11 @@ public class FoWHelper {
 						break;
 					}
 				}
+                if (tokenName.contains("sigma_weirdway"))
+                {
+					wormholeIDs.add(Constants.ALPHA);
+					wormholeIDs.add(Constants.BETA);
+                }
 			}
 		}
 
@@ -539,6 +555,11 @@ public class FoWHelper {
 						break;
 					}
 				}
+                if (tokenName.contains("sigma_weirdway"))
+                {
+					wormholeIDs.add(Constants.ALPHA);
+					wormholeIDs.add(Constants.BETA);
+                }
 			}
 			if (unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
 				wormholeIDs.add(Constants.DELTA);
@@ -578,6 +599,10 @@ public class FoWHelper {
 							adjacentPositions.add(position_);
 						}
 					}
+                    if (token.contains("sigma_weirdway") && (wormholeIDs.contains(Constants.ALPHA) || wormholeIDs.contains(Constants.BETA)))
+                    {
+						adjacentPositions.add(position_);
+                    }
 				}
 				if (wormholeIDs.contains(Constants.DELTA)
 					&& unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {

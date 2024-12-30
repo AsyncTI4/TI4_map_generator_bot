@@ -119,7 +119,7 @@ public class PlayerStatsService {
 
         // WARNING IF PICKING TRADE WHEN PLAYER DOES NOT HAVE THEIR TRADE AGREEMENT
         if (scModel.usesAutomationForSCID("pok5trade") && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
-            String message = player.getRepresentationUnfogged() + " heads up, you just picked Trade but don't currently hold your Trade Agreement";
+            String message = player.getRepresentationUnfogged() + " heads up, you just picked **Trade** but don't currently hold your _Trade Agreement_.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
         }
 
