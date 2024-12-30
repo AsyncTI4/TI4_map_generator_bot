@@ -821,7 +821,7 @@ public class ButtonHelperAbilities {
     public static void resolveAxisOrderExhaust(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String order = buttonID.split("_")[1];
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " Chose to Use " + Mapper.getRelic(order).getName());
+            player.getRepresentationNoPing() + " is using _" + Mapper.getRelic(order).getName() + "_.");
         List<Button> buttons = new ArrayList<>();
         String message = "";
         String techName = "";

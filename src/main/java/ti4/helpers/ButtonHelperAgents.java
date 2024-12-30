@@ -1392,9 +1392,9 @@ public class ButtonHelperAgents {
         String planet = buttonID.split("_")[1];
         PlanetExhaustAbility.doAction(player, planet, game, false);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " chose to use " + Helper.getPlanetRepresentation(planet, game)
-                + " ability. This did not exhaust the ability since it was done with " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Cordo Haved , the Free Systems" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
+            player.getRepresentationNoPing() + " chose to replicate the " + Helper.getPlanetRepresentation(planet, game)
+                + " legendary ability by exhausting " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Cordo Haved, the Free Systems" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         ButtonHelper.deleteMessage(event);
     }
 
