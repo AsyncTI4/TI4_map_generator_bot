@@ -544,4 +544,26 @@ public class PromissoryNoteHelper {
         MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, sb.toString());
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, "All PNs shown to player");
     }
+
+    public void sendRandom(GenericInteractionCreateEvent event, Game game, Player sourcePlayer, Player targetPlayer) {
+        Map<String, Integer> promissoryNoteCounts = sourcePlayer.getPromissoryNotes();
+        List<String> promissoryNotes = new ArrayList<>(promissoryNoteCounts.keySet());
+        if (promissoryNotes.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No Promissory Notes in hand");
+        }
+        Collections.shuffle(promissoryNotes);
+        String promissoryNoteId = promissoryNotes.getFirst();
+        if (game.isFowMode()) {
+            FoWHelper.pingPlayersTransaction(game, event, sourcePlayer, targetPlayer, CardEmojis.ActionCard + " Action Card", null);
+        }
+
+        sourcePlayer.removePromissoryNote(promissoryNoteCounts.get(promissoryNoteId));
+        sendPromissoryNoteInfo(game, sourcePlayer, false);
+        MessageHelper.sendMessageToChannel(sourcePlayer.getCardsInfoThread(), "# " + sourcePlayer.getRepresentation() + " you lost the promissory note _" + Mapper.getPromissoryNote(promissoryNoteId).getName() + "_.");
+
+        targetPlayer.setPromissoryNote(promissoryNoteId);
+        sendPromissoryNoteInfo(game, targetPlayer, false);
+
+        MessageHelper.sendMessageToChannel(targetPlayer.getCardsInfoThread(), "# " + targetPlayer.getRepresentation() + " you gained the promissory note _" + Mapper.getPromissoryNote(promissoryNoteId).getName() +"_.");
+    }
 }
