@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -280,6 +280,16 @@ public class Constants {
     public static final String REMOVE_CUSTOM_ADJACENT_TILES = "remove_custom_adjacent_tiles";
     public static final String REMOVE_ALL_CUSTOM_ADJACENT_TILES = "remove_all_custom_adjacent_tiles";
     public static final String ADD_TILE = "add_tile";
+    public static final String ADD_TILE_RANDOM = "add_tile_random";
+    public static final String RANDOM_TYPE = "random_type";
+    public static final String INCLUDE_ERONOUS_TILES = "eronous_tiles";
+    public static final String DRAW_ONLY = "draw_only";
+    public static final String ADD_TILE_LIST_RANDOM = "add_tile_list_random";
+    public static final String GENERATE_PAINBOX_MAP = "generate_painbox_map";
+    public static final String BLUE_TILES = "blue_tiles";
+    public static final String RED_TILES = "red_tiles";
+    public static final String HOME_SYSTEMS = "home_systems";
+    public static final String SUPERNOVAS = "supernovas";
     public static final String INTERACTIVE_BUILDER = "interactive_builder";
     public static final String ADD_CC = "add_cc";
     public static final String ADD_CC_FROM_TACTICS = "add_cc_from_tactics";
@@ -911,6 +921,7 @@ public class Constants {
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
     public static final String SHOW_GAME_AS_PLAYER = "show_game_as";
+    public static final String CHECK_PRIVATE_COMMUNICATIONS = "check_private_communications";
 
     //DRAFTS
     public static final String BAG_DRAFT = "bag_draft";
@@ -937,7 +948,6 @@ public class Constants {
     public static final String LATEST_AFTER_MSG = "latest_after_msg";
     public static final String LATEST_WHEN_MSG = "latest_when_msg";
     public static final String LATEST_TRANSACTION_MSG = "latest_transaction_msg";
-    public static final String LATEST_UPNEXT_MSG = "latest_upnext_msg";
     public static final String PHASE_OF_GAME = "phase_of_game";
     public static final String ALL_SLASH_COMMANDS = "all_slash_commands";
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER = "players_who_hit_persistent_no_after";

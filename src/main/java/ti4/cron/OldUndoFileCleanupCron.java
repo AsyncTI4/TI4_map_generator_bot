@@ -32,22 +32,56 @@ public class OldUndoFileCleanupCron {
         long daysOld = 60;
         Instant cutoff = Instant.now().minus(daysOld, ChronoUnit.DAYS);
         int count = 0;
-        Path mapUndoDirectory = Storage.getGameUndoDirectory().toPath();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(mapUndoDirectory)) {
-            for (Path path : stream) {
-                try {
-                    FileTime lastModifiedTime = Files.getLastModifiedTime(path);
-                    if (lastModifiedTime.toInstant().isBefore(cutoff)) {
-                        Files.delete(path);
-                        count++;
-                    }
-                } catch (Exception e) {
-                    BotLogger.log("Failed to delete undo file: " + path.getFileName(), e);
+
+        Path baseGameUndoDirectory = Storage.getBaseGameUndoDirectory();
+        try (DirectoryStream<Path> subdirectories = Files.newDirectoryStream(baseGameUndoDirectory, Files::isDirectory)) {
+            for (Path subdirectory : subdirectories) {
+                count += deleteOldFilesInDirectory(subdirectory, cutoff);
+            }
+        } catch (IOException e) {
+            BotLogger.log("Error accessing directory: " + baseGameUndoDirectory, e);
+        }
+
+        BotLogger.log(String.format("OldUndoFileCleanupCron: Cleaned up `%d` undo files that were over `%d` days old (%s)", count, daysOld, cutoff));
+    }
+
+    private int deleteOldFilesInDirectory(Path directory, Instant cutoff) {
+        int count = 0;
+        try (DirectoryStream<Path> files = Files.newDirectoryStream(directory)) {
+            for (Path file : files) {
+                if (deleteOldFile(file, cutoff)) {
+                    count++;
                 }
             }
         } catch (IOException e) {
-            BotLogger.log("Failed to access the undo directory: " + mapUndoDirectory, e);
+            BotLogger.log("Error accessing directory: " + directory, e);
         }
-        BotLogger.log(String.format("OldUndoFileCleanupCron: Cleaned up `%d` undo files that were over `%d` days old (%s)", count, daysOld, cutoff));
+
+        deleteEmptyDirectory(directory);
+
+        return count;
+    }
+
+    private boolean deleteOldFile(Path file, Instant cutoff) {
+        try {
+            FileTime lastModifiedTime = Files.getLastModifiedTime(file);
+            if (lastModifiedTime.toInstant().isBefore(cutoff)) {
+                Files.delete(file);
+                return true;
+            }
+        } catch (Exception e) {
+            BotLogger.log("Failed to delete undo file: " + file, e);
+        }
+        return false;
+    }
+
+    private static void deleteEmptyDirectory(Path directory) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory)) {
+            if (!stream.iterator().hasNext()) {
+                Files.delete(directory);
+            }
+        } catch (IOException e) {
+            BotLogger.log("Error deleting empty directory: " + directory, e);
+        }
     }
 }

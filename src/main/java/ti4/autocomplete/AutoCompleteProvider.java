@@ -57,6 +57,7 @@ import ti4.service.UnitDecalService;
 import ti4.service.franken.FrankenDraftMode;
 import ti4.service.game.GameNameService;
 import ti4.service.game.GameUndoNameService;
+import ti4.service.map.AddTileService.RandomOption;
 import ti4.service.map.MapPresetService;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
@@ -715,6 +716,15 @@ public class AutoCompleteProvider {
                     .filter(value -> value.getValue().search(enteredValue))
                     .limit(25)
                     .map(value -> new Command.Choice(value.getValue().getAutoCompleteName(), value.getKey()))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.RANDOM_TYPE -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Arrays.asList(RandomOption.values()).stream()
+                    .filter(value -> value.search(enteredValue))
+                    .limit(25)
+                    .map(value -> new Command.Choice(value.getAutoCompleteName(), value.toString()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }

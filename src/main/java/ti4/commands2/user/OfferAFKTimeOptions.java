@@ -1,4 +1,4 @@
-package ti4.commands2.custom;
+package ti4.commands2.user;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands2.GameStateSubcommand;

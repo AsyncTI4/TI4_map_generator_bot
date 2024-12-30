@@ -14,9 +14,9 @@ class Setup extends GameStateSubcommand {
     public Setup() {
         super(Constants.SETUP, "Game Setup", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Number of players between 1 or 30. Default 6"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Game VP count. Default is 10"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Game victory point count. Default is 10"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC_COUNT_FOR_MAP, "Number of strategy cards each player gets. Default 1"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_SO_COUNT, "Max Number of SO's per player. Default 3"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_SO_COUNT, "Max Number of secret objectives per player. Default 3"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Custom description"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "True to mark the game as TIGL"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
@@ -59,7 +59,9 @@ class Setup extends GameStateSubcommand {
             game.setStoredValue(key2, "");
             game.setStoredValue(key3, "");
             if (game.getRound() > 1) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Any SO queue has been erased due to the change in SO count. You can resolve the previously queued draws by just pressing draw again.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Any secret objective queue has been erased due to the change in secret objective count."
+                    + " You can resolve the previously queued draws by just pressing draw again.");
             }
 
         }

@@ -1,8 +1,6 @@
 package ti4.image;
 
-import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -12,6 +10,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -137,39 +136,20 @@ public class ImageHelper {
         return null;
     }
 
-    public static String writeWebpOrDefaultTo(BufferedImage image, ByteArrayOutputStream out, String defaultFormat, float compressionForDefault) throws IOException {
-        // max webp dimensions are 16383 x 16383
-        // if (image.getHeight() > 16383 || image.getWidth() > 16383) {
-        // TODO: Disabling WEBP until we find a new library. Old one was segfaulting in native code.
-        writeCompressedFormat(image, out, defaultFormat, compressionForDefault);
-        return defaultFormat;
-        //}
-        //ImageIO.write(image, "webp", out);
-        //return "webp";
-    }
-
-    public static String writeWebpOrDefaultTo(BufferedImage image, ByteArrayOutputStream out, String defaultFormat) throws IOException {
-        return writeWebpOrDefaultTo(image, out, defaultFormat, .1f);
-    }
-
-    public static void writeCompressedFormat(BufferedImage image, ByteArrayOutputStream out, String format, float compressionQuality) throws IOException {
-        var imageWriter = ImageIO.getImageWritersByFormatName(format).next();
-        try (var imageOutputStream = ImageIO.createImageOutputStream(out)) {
-            imageWriter.setOutput(imageOutputStream);
-            ImageWriteParam param = imageWriter.getDefaultWriteParam();
-            if (param.canWriteCompressed()) {
-                param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                param.setCompressionQuality(compressionQuality);
-            }
-            imageWriter.write(null, new IIOImage(image, null, null), param);
-        } finally {
-            imageWriter.dispose();
+    @SneakyThrows
+    public static byte[] writeJpg(BufferedImage image) {
+        var imageWithoutAlpha = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
+        try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
+            ImageIO.write(imageWithoutAlpha, "jpg", byteArrayOutputStream);
+            return byteArrayOutputStream.toByteArray();
         }
     }
 
-    public static BufferedImage redrawWithoutAlpha(BufferedImage image) {
+    private static BufferedImage redrawWithoutAlpha(BufferedImage image) {
         var imageWithoutAlpha = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
-        imageWithoutAlpha.createGraphics().drawImage(image, 0, 0, Color.BLACK, null);
+        Graphics2D g2d = imageWithoutAlpha.createGraphics();
+        g2d.drawImage(image, 0, 0, Color.BLACK, null);
+        g2d.dispose();
         return imageWithoutAlpha;
     }
 }

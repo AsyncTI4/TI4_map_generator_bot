@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -891,7 +892,7 @@ public class ButtonHelperModifyUnits {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
         }
 
-        String message = "Landed troops. Use buttons to decide if you want to build or finish the activation";
+        String message = "Landed troops. Use buttons to decide if you wish to build or finish the activation.";
         ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, game, event);
         Tile tile = null;
         if (buttonID.contains("_")) {
@@ -1621,8 +1622,9 @@ public class ButtonHelperModifyUnits {
                         && player.getHomeSystemTile() == tile2
                         && !ButtonHelperAbilities.getTilesToRallyToTheCause(game, player).isEmpty()) {
                         String msg = player.getRepresentation()
-                            + " due to your Rally to the Cause ability, if you just produced a ship in your HS, you may produce up to 2 ships in a system that contains a planet with a trait but no legendary planets and no opponent units."
-                            + " Press button to resolve.";
+                            + " due to your **Rally to the Cause** ability, if you just produced a ship in your home system,"
+                            + " you may produce up to 2 ships in a system that contains a planet with a trait,"
+                            + " but does not contain a legendary planet or another player's units. Press button to resolve";
                         List<Button> buttons2 = new ArrayList<>();
                         buttons2.add(Buttons.green("startRallyToTheCause", "Rally To The Cause"));
                         buttons2.add(Buttons.red("deleteButtons", "Decline"));
@@ -1870,7 +1872,7 @@ public class ButtonHelperModifyUnits {
             buttons.add(validTile);
         }
 
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select unit you want to move",
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select the unit you wish to move.",
             buttons);
         event.getMessage().delete().queue();
     }
@@ -1891,7 +1893,7 @@ public class ButtonHelperModifyUnits {
                     "Move " + unit + " to " + tile2.getRepresentationForButtons(game, player)));
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select tile you want to move to", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select the tile you wish to move to.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -1928,7 +1930,7 @@ public class ButtonHelperModifyUnits {
         }
         buttons.add(Buttons.red("deleteButtons", "Delete These"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " choose how many fighters you want to convert to infantry",
+            player.getRepresentationUnfogged() + ", please choose how many fighters you wish to convert to infantry.",
             buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -1949,7 +1951,7 @@ public class ButtonHelperModifyUnits {
         }
         buttons.add(Buttons.red("deleteButtons", "Delete These"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " choose how many infantry you wish to convert to fighters",
+            player.getRepresentationUnfogged() + ", please choose how many infantry you wish to convert to fighters.",
             buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -2303,4 +2305,44 @@ public class ButtonHelperModifyUnits {
             && player.hasUnit("nomad_mech")
             && !noMechPowers;
     }
+
+    public static List<Button> getContractualObligationsButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p : game.getRealPlayers()) {
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray("resolveContractual_" + p.getFaction(), p.getColor()));
+            } else {
+                Button button = Buttons.gray("resolveContractual_" + p.getFaction(), " ");
+                buttons.add(button.withEmoji(Emoji.fromFormatted(p.getFactionEmoji())));
+            }
+        }
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
+        return buttons;
+    }
+
+    @ButtonHandler("resolveContractual_")
+    public static void resolveContractualObligations(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String targetFaction = buttonID.replace("resolveContractual_", "");
+        Player targetPlayer = game.getPlayerFromColorOrFaction(targetFaction);
+
+        List<Button> buttons = new ArrayList<>();
+        List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(game, targetPlayer,
+                    Units.UnitType.Spacedock, Units.UnitType.CabalSpacedock, Units.UnitType.PlenaryOrbital, Units.UnitType.Warsun));
+        for (Tile tile : tiles) {
+            Button tileButton = Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_sling",
+                tile.getRepresentationForButtons(game, targetPlayer));
+            buttons.add(tileButton);
+        }
+        MessageHelper.sendMessageToChannelWithButtons(targetPlayer.getCorrectChannel(), targetPlayer.getRepresentationUnfogged()
+            + " " + (game.isFowMode() ? "Someone" : player.getRepresentationNoPing())
+            + " is using Contractual Obligations to force you to produce 1 ship in a system that contains 1 or more of your space docks or war suns.\n"
+            + "Select which tile you would like to produce 1 ship in.", buttons);
+
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Used Contractual Obligations to force " 
+                + targetPlayer.getRepresentationNoPing() + " to produce 1 ship.");
+        }
+        event.getMessage().delete().queue();
+    }
+
 }

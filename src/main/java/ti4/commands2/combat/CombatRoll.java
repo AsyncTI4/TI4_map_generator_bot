@@ -22,9 +22,9 @@ class CombatRoll extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
             .setRequired(true)
             .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "(optional) Planet to have combat on. Default is space combat.")
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "(optional) Space or planet to have combat at (default is space)")
             .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_ROLL_TYPE, "switch to afb/bombardment/spacecannonoffence"));
+        addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_ROLL_TYPE, "Switch to afb/bombardment/spacecannonoffence/spacecannondefence"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "roll for player (default you)")
             .setAutoComplete(true));
     }

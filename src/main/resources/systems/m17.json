@@ -29,5 +29,6 @@
         "origin"
     ],
     "isAsteroidField": true,
-    "source": "asteroid"
+    "source": "asteroid",
+    "tileBack": "red"
 }

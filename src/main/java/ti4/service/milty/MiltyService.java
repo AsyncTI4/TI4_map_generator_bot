@@ -10,12 +10,11 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Function;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands2.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
@@ -427,7 +426,8 @@ public class MiltyService {
         }
 
         if (player.isRealPlayer() && player.getSo() > 0) {
-            String message = player.getRepresentationNoPing() + "has SOs that would get lost to the void if they were setup again. If they wish to change color, use /player change_color. If they want to setup as another faction, they must discard their SOs first";
+            String message = player.getRepresentationNoPing() + "has secret objectives that would get lost to the void if they were setup again."
+                + " If they wish to change color, use `/player change_color`. If they wish to setup as another faction, they must discard their secret objective first.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
             return;
@@ -559,7 +559,7 @@ public class MiltyService {
         }
 
         // SEND STUFF
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, factionModel.getFactionSheetMessage());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, factionModel.getFactionSheetMessage());
         AbilityInfoService.sendAbilityInfo(game, player, event);
         TechInfoService.sendTechInfo(game, player, event);
         LeaderInfoService.sendLeadersInfo(game, player, event);
@@ -644,7 +644,8 @@ public class MiltyService {
         if (player.hasAbility("oracle_ai")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                    + " you may peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN. Don't do this until after secrets are dealt and discarded.");
+                    + " you may peek at the next objective in your `#cards-info` thread (by your promissory note). "
+                    + "This holds true for anyone with _Read the Fates_. Don't do this until after secret objectives are dealt and discarded.");
         }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 

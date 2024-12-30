@@ -61,7 +61,7 @@ class WinningPathsStatisticsService {
 
         AtomicInteger atomicInteger = new AtomicInteger();
         StringBuilder sb = new StringBuilder();
-        sb.append("__**Winning Paths With SftT Count:**__").append("\n");
+        sb.append("__**Winning Paths Holding Support for the Throne Count:**__").append("\n");
         supportWinCount.entrySet().stream()
             .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
             .forEach(entry -> sb.append(atomicInteger.getAndIncrement() + 1)
@@ -71,9 +71,9 @@ class WinningPathsStatisticsService {
                 .append(Math.round(100 * entry.getValue() / (double) gameWithWinnerCount.get()))
                 .append("%)` ")
                 .append(entry.getKey())
-                .append(" SftT wins")
+                .append(" Support for the Throne wins")
                 .append("\n"));
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "SftT wins", sb.toString());
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Support for the Throne wins", sb.toString());
     }
 
     private static void getWinsWithSupport(Game game, Map<Integer, Integer> supportWinCount, AtomicInteger gameWithWinnerCount) {
@@ -89,11 +89,12 @@ class WinningPathsStatisticsService {
         Map<String, Integer> winningPathCounts = getNormalGameWinningPaths(playerCount, victoryPointTotal);
         int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
         if (gamesWithWinnerCount >= 100) {
-            int winningPathCount = winningPathCounts.get(winningPath);
+            // TODO: Previously this was never null, but after loadless it is? Need investigation, but for now defaulting to 1.
+            int winningPathCount = winningPathCounts.getOrDefault(winningPath, 1);
             double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
             String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
-            sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games (").append(victoryPointTotal).append("VP, ")
-                .append(playerCount).append("P)")
+            sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games (").append(victoryPointTotal).append(" victory points, ")
+                .append(playerCount).append(" player)")
                 .append(", this path has been seen ")
                 .append(winningPathCount - 1)
                 .append(" times before. It's the ").append(winningPathCommonality).append(" most common path (out of ")

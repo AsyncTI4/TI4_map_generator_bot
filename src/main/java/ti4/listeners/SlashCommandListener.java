@@ -17,7 +17,7 @@ import ti4.service.game.GameNameService;
 
 public class SlashCommandListener extends ListenerAdapter {
 
-    private static final long DELAY_THRESHOLD_MILLISECONDS = 2000;
+    private static final long DELAY_THRESHOLD_MILLISECONDS = 1500;
 
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
@@ -33,7 +33,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private static void queue(SlashCommandInteractionEvent event) {
         String gameName = GameNameService.getGameName(event);
-        ExecutorManager.runAsync("SlashCommandListener task: " + event.getFullCommandName(), gameName, () -> process(event));
+        ExecutorManager.runAsync("SlashCommandListener task: " + event.getFullCommandName(), gameName, event.getMessageChannel(), () -> process(event));
     }
 
     private static void process(SlashCommandInteractionEvent event) {

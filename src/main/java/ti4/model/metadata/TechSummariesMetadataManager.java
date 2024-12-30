@@ -32,14 +32,18 @@ public class TechSummariesMetadataManager {
 
         RoundTechSummaries roundTechSummaries = techSummaries.gameNameToTechSummary
             .computeIfAbsent(game.getName(), k -> new RoundTechSummaries(game.getRound(), new ArrayList<>()));
+        if (roundTechSummaries.round != game.getRound()) {
+            roundTechSummaries = new RoundTechSummaries(game.getRound(), new ArrayList<>());
+            techSummaries.gameNameToTechSummary.put(game.getName(), roundTechSummaries);
+        }
 
         FactionTechSummary factionTechSummary = roundTechSummaries.techSummaries.stream()
             .filter(summary -> summary.faction.equals(player.getFaction()))
             .findFirst()
             .orElseGet(() -> {
-                var newSummary = new FactionTechSummary(player.getFaction());
-                roundTechSummaries.techSummaries.add(newSummary);
-                return newSummary;
+                var newFactionTechSummary = new FactionTechSummary(player.getFaction());
+                techSummaries.gameNameToTechSummary.get(game.getName()).techSummaries.add(newFactionTechSummary);
+                return newFactionTechSummary;
             });
 
         if (isResearchAgreement) {

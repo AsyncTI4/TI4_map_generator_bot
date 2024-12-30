@@ -10,7 +10,7 @@ import ti4.message.BotLogger;
 
 class ButtonRuntimeWarningService {
 
-    private static final int warningThresholdMilliseconds = 2000;
+    private static final int WARNING_THRESHOLD_MILLISECONDS = 1500;
 
     private int runtimeWarningCount;
     private LocalDateTime pauseWarningsUntil = LocalDateTime.now();
@@ -37,13 +37,13 @@ class ButtonRuntimeWarningService {
         if (now.minusMinutes(1).isAfter(lastWarningTime)) {
             runtimeWarningCount = 0;
         }
-        if (eventDelay > warningThresholdMilliseconds || processingTime > warningThresholdMilliseconds) {
+        if (eventDelay > WARNING_THRESHOLD_MILLISECONDS || processingTime > WARNING_THRESHOLD_MILLISECONDS) {
             totalRuntimeThresholdMissCount++;
             if (pauseWarningsUntil.isBefore(now)) {
                 String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(eventDelay);
                 String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingTime);
                 String message = "[" + event.getChannel().getName() + "](" + event.getMessage().getJumpUrl() + ") " + event.getUser().getEffectiveName() + " pressed button: " + ButtonHelper.getButtonRepresentation(event.getButton()) +
-                    "\n> Warning: This button took over " + warningThresholdMilliseconds + "ms to respond or execute\n> " +
+                    "\n> Warning: This button took over " + WARNING_THRESHOLD_MILLISECONDS + "ms to respond or execute\n> " +
                     DateTimeHelper.getTimestampFromMillisecondsEpoch(eventTime) + " button was pressed by user\n> " +
                     DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
                     DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (processingTime > eventDelay ? "😲" : "");

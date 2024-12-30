@@ -30,7 +30,7 @@ class ShowRandomSO extends GameStateSubcommand {
 
         List<String> secrets = new ArrayList<>(player.getSecrets().keySet());
         if (secrets.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No secrets to reveal");
+            MessageHelper.sendMessageToEventChannel(event, "No secret objectives to reveal");
             return;
         }
         Collections.shuffle(secrets);
@@ -49,8 +49,8 @@ class ShowRandomSO extends GameStateSubcommand {
             return;
         }
 
-        MessageHelper.sendMessageToEventChannel(event, "SO shown to player");
+        MessageHelper.sendMessageToEventChannel(event, "Secret objective shown to player.");
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer, game, sb);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer, sb);
     }
 }

@@ -30,7 +30,13 @@ public enum CardEmojis implements TI4Emoji {
     sc_5_1, sc_5_2, sc_5_3, sc_5_4, // Trade
     sc_6_1, sc_6_2, sc_6_3, sc_6_4, sc_6_5, // Warfare
     sc_7_1, sc_7_2, sc_7_3, sc_7_4, sc_7_5, sc_7_6, sc_7_7, // Technology
-    sc_8_1, sc_8_2, sc_8_3, sc_8_4, sc_8_5; // Imperial
+    sc_8_1, sc_8_2, sc_8_3, sc_8_4, sc_8_5, // Imperial
+    
+    // Agendas
+    CrackedWarSun, ExhaustedPlanet, MixedWormhole, SadMech, TechExplode, ThroughAnomaly
+    
+    ;
+    
 
     public static TI4Emoji getObjectiveEmoji(String type) {
         return switch (type.toLowerCase()) {

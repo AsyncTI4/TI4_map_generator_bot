@@ -124,7 +124,7 @@ public class PlayHeroService {
                     }
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged()
-                    + "Added 2 fighters to every system with an owned planet and no opponent ships.");
+                    + "Added 2 fighters to every system with an owned planet and no other players' ships.");
                 ButtonHelperHeroes.resolveFlorzenHeroStep1(player, game);
             }
             case "kyrohero" -> {
@@ -161,7 +161,7 @@ public class PlayHeroService {
 
             }
             case "lizhohero" -> MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
-                "You may use the buttons in your cards info to set traps, then when you're done with that, press the following button to start distributing 12 fighters.",
+                "You may use the buttons in your `#cards-info` thread to set traps, then when you're done with that, press the following button to start distributing 12 fighters.",
                 Buttons.green("lizhoHeroFighterResolution", "Distribute 12 Fighters"));
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -202,14 +202,14 @@ public class PlayHeroService {
                 List<Button> buttons = ButtonHelperHeroes.getButtonsForGheminaLadyHero(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getRepresentationUnfogged()
-                        + " use the button to pick on which planet you want to resolve The Lady, a Ghemina hero.",
+                        + " use the button to pick on which planet you wish to resolve The Lady, a Ghemina hero.",
                     buttons);
             }
             case "gheminaherolord" -> {
                 List<Button> buttons = ButtonHelperHeroes.getButtonsForGheminaLordHero(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getRepresentationUnfogged()
-                        + " use the button to pick on which planet you want to resolve The Lord, a Ghemina hero",
+                        + " use the button to pick on which planet you wish to resolve The Lord, a Ghemina hero",
                     buttons);
             }
             case "arborechero" -> {
@@ -231,7 +231,7 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                     .getFactionEmoji() + " may resolve " + size
                     + " agenda" + (size == 1 ? "" : "s") + " because that's how many Sigils they got."
-                    + " After putting the agendas on top in the order you want (don't bottom any), please press the button to reveal an agenda");
+                    + " After putting the agendas on top in the order you wish (don't bottom any), please press the button to reveal an agenda.");
                 AgendaHelper.drawAgenda(event, size, game, player);
                 Button flipAgenda = Buttons.blue("flip_agenda", "Press this to flip agenda");
                 List<Button> buttons = List.of(flipAgenda);
@@ -267,7 +267,8 @@ public class PlayHeroService {
                 List<Button> removeCCs = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
                 if (!removeCCs.isEmpty()) {
                     for (int x = 0; x < ButtonHelperAgents.getGloryTokenTiles(game).size(); x++) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to remove a token from the board", removeCCs);
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                        "Use buttons to remove 1 of your command tokens from the game board.", removeCCs);
                     }
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -311,7 +312,7 @@ public class PlayHeroService {
                 List<Button> buttons = ButtonHelperHeroes.getNekroHeroButtons(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
-                    + " use the button to pick which planet you'd like to get a technology and trade goods from (and kill any opponent units).",
+                    + " use the button to pick which planet you'd like to get a technology and trade goods from (and kill any enemy units).",
                     buttons);
             }
             case "bentorhero" -> {
@@ -396,12 +397,12 @@ public class PlayHeroService {
                         getYssarilHeroActionCardButtons(player, p2));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                         p2.getRepresentationUnfogged()
-                            + " Kyver, Blade and Key, the Yssaril hero, has been played.  Use buttons to select which AC you will offer to them.",
+                            + " Kyver, Blade and Key, the Yssaril hero, has been played. Please buttons to select which action card you will offer to them.",
                         buttons);
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText)
-                        + " sent everyone a ping in their private threads with buttons to send you 1 AC");
+                        + " sent everyone a ping in their `#cards-info` thread with buttons to choose an action card to offer you.");
             }
             case "keleresheroharka" -> resolveKeleresHeroMentak(game, player, event);
         }

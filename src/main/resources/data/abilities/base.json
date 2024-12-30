@@ -88,7 +88,7 @@
         "name": "Harrow",
         "faction": "l1z1x",
         "window": "At the end of each round of ground combat",
-        "windowEffect": "Your ships in the active system may use their Bombardment abilities against your opponent's ground forces on the planet.",
+        "windowEffect": "Your ships in the active system may use their BOMBARDMENT abilities against your opponent's ground forces on the planet.",
         "source": "base"
     },
     {

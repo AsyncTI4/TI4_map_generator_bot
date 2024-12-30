@@ -21,5 +21,6 @@
     "planets": [
         "sayensbeach"
     ],
-    "source": "somno"
+    "source": "somno",
+    "tileBack": "blue"
 }

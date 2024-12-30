@@ -34,5 +34,6 @@
     ],
     "planets": [],
     "isNebula": true,
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "red"
 }

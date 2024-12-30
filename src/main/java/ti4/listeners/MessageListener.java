@@ -51,14 +51,15 @@ public class MessageListener extends ListenerAdapter {
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
             if (!event.getAuthor().isBot()) {
+                if (checkForFogOfWarInvitePrompt(message)) return;
+                if (copyLFGPingsToLFGPingsChannel(event, message)) return;
+
                 String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
                 if (GameManager.isValid(gameName)) {
                     if (handleWhispers(event, message, gameName)) return;
                     if (endOfRoundSummary(event, message, gameName)) return;
                     if (addFactionEmojiReactionsToMessages(event, gameName)) return;
                 }
-                if (checkForFogOfWarInvitePrompt(message)) return;
-                if (copyLFGPingsToLFGPingsChannel(event, message)) return;
             }
             handleFogOfWarCombatThreadMirroring(event);
         } catch (Exception e) {
@@ -85,8 +86,7 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private static boolean checkForFogOfWarInvitePrompt(Message message) {
-        if (!message.getContentRaw().contains("boldly go where no stroter has gone before") &&
-                !message.getContentRaw().contains("go boldly where no stroter has gone before")) {
+        if (!message.getContentRaw().toLowerCase().contains("where no stroter has gone before")) {
             return false;
         }
         message.reply("to explore strange new maps; to seek out new tiles and new factions\nhttps://discord.gg/RZ7qg9kbVZ").queue();
@@ -246,6 +246,7 @@ public class MessageListener extends ListenerAdapter {
     private static void handleFogOfWarCombatThreadMirroring(MessageReceivedEvent event) {
         if (AsyncTI4DiscordBot.guildFogOfWar != null && // fog server exists
             !AsyncTI4DiscordBot.guildFogOfWar.getId().equals(event.getGuild().getId()) && // event server IS NOT the fog server
+            !AsyncTI4DiscordBot.guildCommunityPlays.getId().equals(event.getGuild().getId()) && // NOR the community server
             AsyncTI4DiscordBot.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) {// bot is running in production
             return;
         } // else it's probably a dev/test server, so execute

@@ -25,33 +25,33 @@ public class SecretObjectiveInfoService {
 
     public static void sendSecretObjectiveInfo(Game game, Player player, ButtonInteractionEvent event) {
         String headerText = player.getRepresentationUnfogged() + " pressed button: " + event.getButton().getLabel();
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendSecretObjectiveInfo(game, player);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player, SlashCommandInteractionEvent event) {
         String headerText = player.getRepresentationUnfogged() + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendSecretObjectiveInfo(game, player);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentationUnfogged() + " used something";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendSecretObjectiveInfo(game, player);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player) {
         //SO INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getSecretObjectiveCardInfo(game, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, getSecretObjectiveCardInfo(game, player));
 
         if (player.getSecretsUnscored().isEmpty()) return;
 
         // SCORE/DISCARD BUTTONS
         String secretMsg = "_ _\nClick a button to either score or discard a secret objective";
         List<Button> buttons = new ArrayList<>();
-        Button scoreB = Buttons.blue("get_so_score_buttons", "Score an SO");
-        Button discardB = Buttons.red("get_so_discard_buttons", "Discard an SO");
+        Button scoreB = Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
+        Button discardB = Buttons.red("get_so_discard_buttons", "Discard A Secret Objective");
         ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
         buttons.add(scoreB);
         buttons.add(discardB);

@@ -45,6 +45,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 class AgendaResolveButtonHandler {
@@ -97,10 +98,10 @@ class AgendaResolveButtonHandler {
                 if ("censure".equalsIgnoreCase(agID) || "absol_censure".equalsIgnoreCase(agID)) {
                     StringBuilder message = new StringBuilder();
                     Integer poIndex = game.addCustomPO("Political Censure", 1);
-                    message.append("Custom PO 'Political Censure' has been added.\n");
+                    message.append("Custom objective _Political Censure_ has been added.\n");
                     game.scorePublicObjective(player2.getUserID(), poIndex);
                     if (!game.isFowMode()) {
-                        message.append(player2.getRepresentation()).append(" scored 'Political Censure'\n");
+                        message.append(player2.getRepresentation()).append(" scored _Political Censure_.\n");
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message.toString());
                     Helper.checkEndGame(game, player2);
@@ -114,7 +115,7 @@ class AgendaResolveButtonHandler {
                     }
                     SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player2, event);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "Drew elected 2 SOs and set their SO info as public");
+                        (game.isFowMode() ? "The elected player" : player2.getRepresentation()) + " has drawn 2 secret objectives, and their secret objective info is now public.");
                 }
             } else {
                 if ("for".equalsIgnoreCase(winner)) {
@@ -320,16 +321,18 @@ class AgendaResolveButtonHandler {
                         return;
                     }
                     if (winner.isEmpty()) {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "Can make just Scored SO to Public");
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "Can make only scored secret objective to public objective.");
                         return;
                     }
                     game.addToSoToPoList(winner);
                     Integer poIndex = game.addCustomPO(Mapper.getSecretObjectivesJustNames().get(winner), 1);
                     game.scorePublicObjective(playerWithSO.getUserID(), poIndex);
 
-                    String sb = "**Public Objective added from Secret:**" + "\n" +
-                        "(" + poIndex + ") " + "\n" +
-                        Mapper.getSecretObjectivesJustNames().get(winner) + "\n";
+                    String sb = "_" + Mapper.getSecretObjectivesJustNames().get(winner) + "_ has been made in to a public objective (" + poIndex + ").";
+                    if (!game.isFowMode())
+                    {
+                        sb += "\n-# " + playerWithSO.getRepresentationUnfogged() + " has been marked as having scored this, and it no longer counts towards their secret objective limit.";
+                    }
                     MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
                     SecretObjectiveInfoService.sendSecretObjectiveInfo(game, playerWithSO, event);
@@ -347,7 +350,7 @@ class AgendaResolveButtonHandler {
                     game.drawSecretObjective(player2.getUserID());
                     if (player2.hasAbility("plausible_deniability")) {
                         game.drawSecretObjective(player2.getUserID());
-                        message = message + " Drew a second SO due to Plausible Deniability";
+                        message = message + " Drew a second secret objective due to **Plausible Deniability**.";
                     }
                     SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player2, event);
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
@@ -447,7 +450,26 @@ class AgendaResolveButtonHandler {
                             uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), player.getColorID()),
                                 uH.getUnitCount(Units.UnitType.Infantry, player.getColor()));
                         }
+                        boolean containsDMZ = uH.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
+                        if (containsDMZ)
+                        {
+                            MessageHelper.sendMessageToChannel(actionsChannel,
+                                "Because " + Helper.getPlanetRepresentation(winner, game) + " is the _Demilitarized Zone_,"
+                                + " there is no point in choosing a player to place an infantry.");
+                            continue;
+                        }
                         uH.removeAllUnits(player.getColor());
+                        if (AgendaHelper.getPlayersWithLeastPoints(game).size() == 1)
+                        {
+                            Player p2 = AgendaHelper.getPlayersWithLeastPoints(game).get(0);
+                            Tile tile = game.getTileFromPlanet(winner);
+                            if (tile != null) {
+                                AddUnitService.addUnits(event, tile, game, p2.getColor(), "1 inf " + winner);
+                            }
+                            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                                "1 " + p2.getColor() + " infantry was added to " + Helper.getPlanetRepresentation(winner, game) + " automatically.");
+                            continue;
+                        }
                         List<Button> buttons = new ArrayList<>();
                         for (Player player2 : AgendaHelper.getPlayersWithLeastPoints(game)) {
                             if (game.isFowMode()) {
@@ -459,11 +481,12 @@ class AgendaResolveButtonHandler {
                             }
                         }
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + " choose who you want to get the planet",
+                            player.getRepresentationUnfogged() + ", please choose who you wish to place an infantry on, and thus gain control of "
+                                + Helper.getPlanetRepresentation(winner, game) + ".",
                             buttons);
 
                         MessageHelper.sendMessageToChannel(actionsChannel,
-                            "Removed all units and gave player the option of who to give the planet to");
+                            "Removed all units and gave player who owns the planet the option of who to give it to.");
 
                     }
                 }
@@ -660,14 +683,14 @@ class AgendaResolveButtonHandler {
                     winOrLose = AgendaHelper.getLosingVoters(winner, game);
                     poIndex = game.addCustomPO("Mutiny", -1);
                 }
-                message.append("Custom PO 'Mutiny' has been added.\n");
+                message.append("Custom objective _Mutiny_ has been added.\n");
                 for (Player playerWL : winOrLose) {
                     if (playerWL.getTotalVictoryPoints() < 1 && !"for".equalsIgnoreCase(winner)) {
                         continue;
                     }
                     game.scorePublicObjective(playerWL.getUserID(), poIndex);
                     if (!game.isFowMode()) {
-                        message.append(playerWL.getRepresentation()).append(" scored 'Mutiny'\n");
+                        message.append(playerWL.getRepresentation()).append(" scored _Mutiny_.\n");
                     }
                     Helper.checkEndGame(game, playerWL);
                     if (playerWL.getTotalVictoryPoints() >= game.getVp()) {
@@ -749,17 +772,17 @@ class AgendaResolveButtonHandler {
                 List<Player> winOrLose;
                 StringBuilder message = new StringBuilder();
                 Integer poIndex;
-                poIndex = game.addCustomPO("Seed", 1);
+                poIndex = game.addCustomPO("Seed of an Empire", 1);
                 if ("for".equalsIgnoreCase(winner)) {
                     winOrLose = AgendaHelper.getPlayersWithMostPoints(game);
                 } else {
                     winOrLose = AgendaHelper.getPlayersWithLeastPoints(game);
 
                 }
-                message.append("Custom PO 'Seed' has been added.\n");
+                message.append("Custom objective _Seed of an Empire_ has been added.\n");
                 for (Player playerWL : winOrLose) {
                     game.scorePublicObjective(playerWL.getUserID(), poIndex);
-                    message.append(playerWL.getRepresentation()).append(" scored 'Seed'\n");
+                    message.append(playerWL.getRepresentation()).append(" scored _Seed of an Empire_.\n");
                     Helper.checkEndGame(game, playerWL);
                     if (playerWL.getTotalVictoryPoints() >= game.getVp()) {
                         break;
@@ -771,26 +794,26 @@ class AgendaResolveButtonHandler {
                 List<Player> winOrLose;
                 StringBuilder message = new StringBuilder();
                 Integer poIndex;
-                poIndex = game.addCustomPO("Seed", 1);
+                poIndex = game.addCustomPO("Seed of an Empire", 1);
                 if ("for".equalsIgnoreCase(winner)) {
                     winOrLose = AgendaHelper.getPlayersWithMostPoints(game);
                 } else {
                     winOrLose = AgendaHelper.getPlayersWithLeastPoints(game);
 
                 }
-                message.append("Custom PO 'Seed' has been added.\n");
+                message.append("Custom public objective _Seed of an Empire_ has been added.\n");
                 if (winOrLose.size() == 1) {
                     Player playerWL = winOrLose.getFirst();
                     game.scorePublicObjective(playerWL.getUserID(), poIndex);
-                    message.append(playerWL.getRepresentation()).append(" scored 'Seed'\n");
+                    message.append(playerWL.getRepresentation()).append(" scored _Seed of an Empire_\n");
                     Helper.checkEndGame(game, playerWL);
                     if ("for".equalsIgnoreCase(winner)) {
                         game.setSpeakerUserID(playerWL.getUserID());
-                        message.append(playerWL.getRepresentation()).append(" was made speaker and owes everyone who voted for them a PN\n");
+                        message.append(playerWL.getRepresentation()).append(" was made speaker and so must give each other player that voted \"for\" a promissory note.\n");
                         for (Player p2 : AgendaHelper.getWinningVoters(winner, game)) {
                             if (p2 != playerWL) {
                                 MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(), "You owe " + p2.getRepresentation() +
-                                    "a PN", ButtonHelper.getForcedPNSendButtons(game, p2, playerWL));
+                                    "a promissory note.", ButtonHelper.getForcedPNSendButtons(game, p2, playerWL));
                             }
                         }
                     } else {

@@ -52,29 +52,29 @@ public class PlayStrategyCardService {
             BotLogger.log("`PlayStrategyCardService.playSC` - Game: `" + game.getName() + "` - SC Model not found for SC `" + scToPlay + "` from set `" + game.getScSetID() + "`");
         }
 
+        String stratCardName = Helper.getSCName(scToPlay, game);
         if (game.getPlayedSCs().contains(scToPlay) && !winnuHero) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Strategy card already played.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**" + stratCardName + "** has already been played previously.");
             return;
         }
 
         // HANDLE COUP
-        if (!winnuHero && game.getStoredValue("Coup") != null
-            && game.getStoredValue("Coup").contains("_" + scToPlay)) {
+        if (!winnuHero && game.getStoredValue("Coup") != null && game.getStoredValue("Coup").contains("_" + scToPlay)) {
             for (Player p2 : game.getRealPlayers()) {
-                if (game.getStoredValue("Coup").contains(p2.getFaction())
-                    && p2.getActionCards().containsKey("coup")) {
+                if (game.getStoredValue("Coup").contains(p2.getFaction()) && p2.getActionCards().containsKey("coup")) {
                     if (p2 == player) {
                         continue;
                     }
                     ActionCardHelper.playAC(event, game, p2, "coup", game.getMainGameChannel());
                     List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                     game.setJustPlayedComponentAC(true);
-                    String message = "Use buttons to end turn, or (if Coup is Sabo'd) play your strategy card.";
+                    String message = "Use buttons to end turn, or, if Coup is Sabo'd, play **" + stratCardName + "**.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     game.setStoredValue("Coup", "");
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
-                        .getRepresentation()
-                        + " you have been Coup'd due to attempting to play " + Helper.getSCName(scToPlay, game) + ". If this is a mistake or the Coup is Sabo'd, feel free to play the strategy card again. Otherwise, end turn after doing any end of turn abilities you have.");
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                        + " you have been Coup'd due to attempting to play **" + stratCardName 
+                        + "**. If this is a mistake or the Coup is Sabo'd, feel free to play **" + stratCardName 
+                        + "**. Otherwise, please end turn after doing any end of turn abilities you wish to perform.");
                     return;
                 }
             }
@@ -85,8 +85,7 @@ public class PlayStrategyCardService {
         }
         ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
         StringBuilder message = new StringBuilder();
-        message.append(Helper.getSCRepresentation(game, scToPlay));
-        message.append(" played");
+        message.append(Helper.getSCRepresentation(game, scToPlay)).append(" played");
         if (!game.isFowMode()) {
             message.append(" by ").append(player.getRepresentation());
         }
@@ -113,12 +112,7 @@ public class PlayStrategyCardService {
         if (!gamePing.isEmpty()) {
             message.append(gamePing).append("\n");
         }
-        message.append("Indicate your choice by pressing a button below");
-
-        String scName = Helper.getSCName(scToPlay, game).toLowerCase();
-        if (winnuHero) {
-            scName = scName + "WinnuHero";
-        }
+        message.append("Indicate your choice by pressing a button below.");
 
         for (Player player2 : playersToFollow) {
             if (winnuHero) {
@@ -164,7 +158,7 @@ public class PlayStrategyCardService {
         if (scModel.usesAutomationForSCID("pok3politics") || scModel.usesAutomationForSCID("cryypter_3")) {
             game.setStoredValue("hasntSetSpeaker", "waiting");
             String assignSpeakerMessage = player.getRepresentation()
-                + ", please, before you draw your action cards or look at agendas, click a faction below to assign Speaker "
+                + ", please, __before__ you draw your action cards or look at agendas, choose a faction below to receive the Speaker token."
                 + MiscEmojis.SpeakerToken;
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(game, player);
@@ -181,10 +175,10 @@ public class PlayStrategyCardService {
 
         // Politics Agenda Draw Buttons
         if (scModel.usesAutomationForSCID("pok3politics") || scModel.usesAutomationForSCID("cryypter_3")) {
-            String drawAgendasMessage = player.getRepresentation() + " after assigning speaker, use this button to draw agendas into your cards info thread.";
+            String drawAgendasMessage = player.getRepresentation()
+                + " __after__ assigning speaker, use this button to look at the top agendas, which will be shown to you in your `#cards-info` thread.";
             Button draw2Agenda = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawAgenda_2", "Draw 2 Agendas", CardEmojis.Agenda);
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), drawAgendasMessage, draw2Agenda);
-
         }
 
         // Cryypter's Additional Look at Top Agenda Buttons
@@ -201,21 +195,24 @@ public class PlayStrategyCardService {
 
         if (scModel.usesAutomationForSCID("pok5trade")) {
             String assignSpeakerMessage2 = player.getRepresentation()
-                + " you may force players to refresh, normally done in order to trigger a Trade Agreement. This is not required and not advised if you are offering them a conditional refresh.";
+                + " you may force players to replenish commodities. This is normally done in order to trigger a _Trade Agreement_ or because of a pre-existing deal."
+                + " This is not required, and not advised if you are offering them a conditional replenishment.";
             List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player, playersToFollow);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                assignSpeakerMessage2, forceRefresh);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), assignSpeakerMessage2, forceRefresh);
 
             for (Player p2 : playersToFollow) {
                 if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
-                    String message2 = p2.getRepresentationUnfogged() + " heads up, trade has just been played and this is a reminder that you do not hold your Trade Agreement";
+                    String message2 = "Heads up, " + p2.getRepresentationUnfogged() + ", **Trade** has just been played and this is a reminder that you do not hold your _Trade Agreement_.";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message2);
                     for (Player p3 : game.getRealPlayers()) {
                         if (p2 == p3) {
                             continue;
                         }
                         if (p3.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
-                            String message3 = p3.getRepresentationUnfogged() + " heads up, trade has just been played and this is a reminder that hold the trade agreement of " + p2.getColor() + ". If you work out a deal with the trade holder, they may force the player to replenish and then you will be prompted to play the TA. ";
+                            String message3 = "Heads up, " + p3.getRepresentationUnfogged()
+                                + ", **Trade** has just been played and this is a reminder that hold the _Trade Agreement_ of "
+                                + p2.getColor() + ". If you work out a deal with the **Trade** holder,"
+                                + " they may force the player to replenish commodities, and then you will be prompted to play the _Trade Agreemnt_. ";
                             MessageHelper.sendMessageToChannel(p3.getCardsInfoThread(), message3);
                         }
                     }
@@ -236,13 +233,13 @@ public class PlayStrategyCardService {
                 if (player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")) {
                     empNMahButtons.addFirst(emelpar);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
-                        player3.getRepresentationUnfogged() + ", you may follow " + Helper.getSCName(scToPlay, game) + " with the " + RelicHelper.sillySpelling() + ".",
+                        player3.getRepresentationUnfogged() + ", you may follow **" + stratCardName + "** with the _" + RelicHelper.sillySpelling() + "_.",
                         empNMahButtons);
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent") && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty() && !winnuHero) {
                     empNMahButtons.addFirst(Buttons.red("mahactA_follow_" + scToPlay, "Use Mahact Agent", FactionEmojis.Mahact));
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
-                        player3.getRepresentationUnfogged() + " You may follow " + Helper.getSCName(scToPlay, game) + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                        player3.getRepresentationUnfogged() + " You may follow **" + stratCardName + "** with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                             + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.",
                         empNMahButtons);
                 }
@@ -264,8 +261,8 @@ public class PlayStrategyCardService {
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
         if (!game.isHomebrewSCMode() && player.hasAbility("grace")
-            && !player.getExhaustedAbilities().contains("grace")
-            && ButtonHelperAbilities.getGraceButtons(game, player, scToPlay).size() > 2) {
+                && !player.getExhaustedAbilities().contains("grace")
+                && ButtonHelperAbilities.getGraceButtons(game, player, scToPlay).size() > 2) {
             List<Button> graceButtons = new ArrayList<>();
             graceButtons.add(Buttons.green("resolveGrace_" + scToPlay, "Resolve Grace Ability"));
             graceButtons.add(Buttons.red("deleteButtons", "Decline"));
@@ -279,13 +276,11 @@ public class PlayStrategyCardService {
                     for (String pn : player2.getPromissoryNotes().keySet()) {
                         if (!player2.ownsPromissoryNote("acq") && "acq".equalsIgnoreCase(pn)) {
                             String acqMessage = player2.getRepresentationUnfogged()
-                                + " you may use this button to play Winnu PN!";
+                                + " you may use this button to play _Acquiescence_ to perform the secondary without spending a command token from your strategy pool.";
                             List<Button> buttons = new ArrayList<>();
-                            buttons.add(Buttons.green("winnuPNPlay_" + scToPlay, "Use Acquisence"));
+                            buttons.add(Buttons.green("winnuPNPlay_" + scToPlay, "Use Acquiescence"));
                             buttons.add(Buttons.red("deleteButtons", "Decline"));
-                            MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), acqMessage,
-                                buttons);
-
+                            MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), acqMessage, buttons);
                         }
                     }
                 }
@@ -298,6 +293,7 @@ public class PlayStrategyCardService {
         var mainGameChannel = game.getMainGameChannel();
         Message message = mainGameChannel.sendMessage(toSend).complete();
         Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
+        String stratCardName = Helper.getSCName(scToPlay, game);
         if (reactionEmoji != null) {
             message.addReaction(reactionEmoji).queue();
             player.addFollowedSC(scToPlay, event);
@@ -324,7 +320,8 @@ public class PlayStrategyCardService {
                             String key = "factionsThatAreNotDiscardingSOs";
                             game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
                         }
-                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following SC #" + scToPlay + " because the bot believes you can't follow.");
+                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
+                            + stratCardName + "** because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");
                     }
                 }
             }
@@ -363,21 +360,29 @@ public class PlayStrategyCardService {
 
                 // Trade Neighbour Message
                 if (scModel.usesAutomationForSCID("pok5trade")) {
-                    StringBuilder neighborsMsg = new StringBuilder("NOT neighbors with the trade holder:");
-                    for (Player p2 : game.getRealPlayers()) {
-                        if (!player.getNeighbouringPlayers().contains(p2) && player != p2) {
-                            neighborsMsg.append(" ").append(p2.getFactionEmoji());
-                        }
+                    if (player.hasAbility("guild_ships"))
+                    {
+                        MessageHelper.sendMessageToChannel(m5,
+                            "The **Trade** player has the **Guild Ships** ability, and thus may perform transactions with all players.");
                     }
-                    StringBuilder neighborsMsg2 = new StringBuilder("Neighbors with the trade holder:");
-                    for (Player p2 : game.getRealPlayers()) {
-                        if (player.getNeighbouringPlayers().contains(p2) && player != p2) {
-                            neighborsMsg2.append(" ").append(p2.getFactionEmoji());
-                        }
+                    else if (player.getPromissoryNotesInPlayArea().contains("convoys"))
+                    {
+                        MessageHelper.sendMessageToChannel(m5,
+                            "The **Trade** player has the _Trade Convoys_, and thus may perform transactions with all players.");
                     }
-                    if (!player.getPromissoryNotesInPlayArea().contains("convoys") && !player.hasAbility("guild_ships")) {
-                        MessageHelper.sendMessageToChannel(m5, neighborsMsg.toString());
-                        MessageHelper.sendMessageToChannel(m5, neighborsMsg2.toString());
+                    else {
+                        StringBuilder neighborsMsg = new StringBuilder("__Are__ neighbors with the **Trade** holder:");
+                        StringBuilder notNeighborsMsg = new StringBuilder("__Not__ neighbors with the **Trade** holder:");
+                        for (Player p2 : game.getRealPlayers()) {
+                            if (player != p2) {
+                                if (player.getNeighbouringPlayers().contains(p2)) {
+                                    neighborsMsg.append(" ").append(p2.getFactionEmoji());
+                                } else {
+                                    notNeighborsMsg.append(" ").append(p2.getFactionEmoji());
+                                }
+                            }
+                        }
+                        MessageHelper.sendMessageToChannel(m5, neighborsMsg + "\n" + notNeighborsMsg);
                     }
                 }
             });
@@ -426,7 +431,7 @@ public class PlayStrategyCardService {
 
     public static void handleSOQueueing(Game game, boolean winnuHero) {
         if (winnuHero) {
-            String message = "# Since this is the result of playing Mathis Mathinus, the Winnu hero, SO draws will not be queued or resolved in a particular order.";
+            String message = "# Since this is the result of playing Mathis Mathinus, the Winnu hero, secret objectives draws will not be queued or resolved in a particular order.";
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
             return;
         }

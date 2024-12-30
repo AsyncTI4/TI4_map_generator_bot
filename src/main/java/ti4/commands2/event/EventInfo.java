@@ -17,7 +17,7 @@ import ti4.model.EventModel;
 class EventInfo extends GameStateSubcommand {
 
     public EventInfo() {
-        super(Constants.INFO, "Send Event Cards to your Cards Info thread", true, true);
+        super(Constants.INFO, "Send Event Cards to your #cards-info thread", true, true);
     }
 
     @Override
@@ -28,7 +28,7 @@ class EventInfo extends GameStateSubcommand {
 
     public static void sendEventInfo(Game game, Player player, SlashCommandInteractionEvent event) {
         String headerText = player.getRepresentationUnfogged() + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendEventInfo(game, player);
     }
 

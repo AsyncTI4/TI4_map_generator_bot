@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
+import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -150,7 +151,7 @@ public class ComponentActionHelper {
         for (String relic : p1.getRelics()) {
             RelicModel relicData = Mapper.getRelic(relic);
             if (relicData == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that PN, no PN sent");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that relic.");
                 continue;
             }
 
@@ -196,7 +197,7 @@ public class ComponentActionHelper {
             }
             if (prom == null) {
                 MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentationUnfogged()
-                    + " you have a null PN. Please use /pn purge after reporting it " + pn);
+                    + " you have a null promissory note " + pn + ". Please use `/pn purge` after reporting it.");
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
             }
         }
@@ -231,7 +232,7 @@ public class ComponentActionHelper {
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("fabrication") && !p1.getFragments().isEmpty()) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 CC", FactionEmojis.Naaz);
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 Token", FactionEmojis.Naaz);
             compButtons.add(abilityButton);
         }
 
@@ -564,7 +565,7 @@ public class ComponentActionHelper {
         String purgeOrExhaust = "Purged";
         List<String> juniorRelics = List.of("titanprototype", "absol_jr");
         if (juniorRelics.contains(relicID)) { // EXHAUST THE RELIC
-            List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
+            List<Button> buttons2 = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "jrResolution", null);
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "Exhausted";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -600,12 +601,12 @@ public class ComponentActionHelper {
             case "decrypted_cartoglyph" -> DiscordantStarsHelper.drawBlueBackTiles(event, game, player, 3);
             case "throne_of_the_false_emperor" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("drawRelic", "Draw a relic"));
-                buttons.add(Buttons.blue("thronePoint", "Score a secret someone else scored"));
-                buttons.add(Buttons.red("deleteButtons", "Score one of your unscored secrets"));
+                buttons.add(Buttons.green("drawRelic", "Draw a Relic"));
+                buttons.add(Buttons.blue("thronePoint", "Score a Secret Objective Another Player Has Scored"));
+                buttons.add(Buttons.red("deleteButtons", "Score 1 of Your Unscored Secret Objectives"));
                 message = player.getRepresentation()
-                    + " choose one of the options. Reminder than you can't score more secrets than normal with this relic (even if they're someone else's), and you can't score the same secret twice."
-                    + " If scoring one of your unscored secrets, just score it via the normal process after pressing the button.";
+                    + " choose one of the options. Reminder than you can't score more secret objectives than normal with this relic (even if they're someone else's), and you can't score the same secret objective twice."
+                    + " If scoring one of your unscored secret objectives, just score it via the normal process after pressing the button.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
             case "dynamiscore", "absol_dynamiscore" -> {

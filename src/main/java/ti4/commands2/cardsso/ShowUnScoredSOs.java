@@ -8,7 +8,7 @@ import ti4.helpers.SecretObjectiveHelper;
 class ShowUnScoredSOs extends GameStateSubcommand {
 
     public ShowUnScoredSOs() {
-        super(Constants.SHOW_UNSCORED_SOS, "List any SOs that are not scored yet", true, false);
+        super(Constants.SHOW_UNSCORED_SOS, "List any secret objectives that are not scored yet", true, false);
     }
 
     @Override

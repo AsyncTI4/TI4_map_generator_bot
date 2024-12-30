@@ -30,7 +30,7 @@ public class AllInfoCommand extends GameStateCommand {
 
     @Override
     public String getDescription() {
-        return "Send all available info to your Cards Info thread.";
+        return "Send all available infomation to your #cards-info thread";
     }
 
     @Override
@@ -38,7 +38,7 @@ public class AllInfoCommand extends GameStateCommand {
         Game game = getGame();
         Player player = getPlayer();
         String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event) + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         AbilityInfoService.sendAbilityInfo(game, player);
         UnitInfoService.sendUnitInfo(player, false);
         LeaderInfoService.sendLeadersInfo(game, player);

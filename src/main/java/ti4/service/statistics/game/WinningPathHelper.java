@@ -18,9 +18,18 @@ public class WinningPathHelper {
         int secretCount = winner.getSecretVictoryPoints();
         int supportCount = winner.getSupportForTheThroneVictoryPoints();
         String otherPoints = summarizeOtherVictoryPoints(game, winner.getUserID());
+        
+        if (supportCount >= 2)
+        {
+            return String.format(
+                "%d stage 1 objectives, %d stage 2 objectives, %d secret objectives, %d Supports for the Thrones%s",
+                stage1Count, stage2Count, secretCount, supportCount,
+                otherPoints.isEmpty() ? "" : ", " + otherPoints
+            );
+        }
 
         return String.format(
-            "%d stage 1s, %d stage 2s, %d secrets, %d supports%s",
+            "%d stage 1 objectives, %d stage 2 objectives, %d secret objectives, %d Support for the Throne%s",
             stage1Count, stage2Count, secretCount, supportCount,
             otherPoints.isEmpty() ? "" : ", " + otherPoints
         );
@@ -47,7 +56,9 @@ public class WinningPathHelper {
             ));
 
         return otherVictoryPoints.entrySet().stream()
-            .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()))
+            .sorted(
+                Map.Entry.<String, Integer>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey())
+            )
             .map(entry -> entry.getValue() + " " + entry.getKey())
             .collect(Collectors.joining(", "));
     }

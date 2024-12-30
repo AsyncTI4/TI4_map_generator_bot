@@ -18,7 +18,7 @@ import ti4.service.game.ManagedGameService;
 class ListDeadGames extends Subcommand {
 
     private static final String WARNING_MESSAGE = " this is a warning that this game will be cleaned up tomorrow, " +
-        "unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done.";
+        "unless someone takes a turn. You can ignore this if you want it deleted. Ping Fin if this should not be done.";
 
     public ListDeadGames() {
         super(Constants.LIST_DEAD_GAMES, "List games that haven't moved in 2+ months but still have channels");

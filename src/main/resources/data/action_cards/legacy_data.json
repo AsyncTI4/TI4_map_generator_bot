@@ -184,7 +184,7 @@
         "name": "Rapid Mobilization",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 of your units with Production; use that units Production ability, producing only infantry or fighters.",
+        "text": "Choose 1 of your units with PRODUCTION; use that units PRODUCTION ability, producing only infantry or fighters.",
         "flavorText": "Dannel smiled softly. A rare occurrence these days, to be sure. \"Glory to the Yin, my brothers. You have done us all proud.\"",
         "source": "action_deck_2_old"
     },
@@ -210,8 +210,8 @@
         "alias": "shrapnel_turrets2",
         "name": "Shrapnel Turrets",
         "phase": "Action",
-        "window": "Before you roll dice for Anti-Fighter Barrage",
-        "text": "Each of your non-fighter ships in the active system that do not have Anti-Fighter Barrage gain Anti-Fighter Barrage 9 (x2) until the end of the combat.",
+        "window": "Before you roll dice for ANTI-FIGHTER BARRAGE",
+        "text": "Each of your non-fighter ships in the active system that do not have ANTI-FIGHTER BARRAGE gain ANTI-FIGHTER BARRAGE 9(x2) until the end of the combat.",
         "flavorText": "Mendosa grinned widely. \"Ye say we're out of munitions, yet look at all this junk lyin' around. Get it movin' fast enough, and it'll shred them up just fine.\"",
         "source": "action_deck_2_old"
     },
@@ -861,6 +861,15 @@
         "window": "At the start of your turn",
         "text": "Either redistribute your command tokens or place 1 command token from your reinforcements in your fleet pool.",
         "flavorText": "Unlenn massaged his brow and shut off his holoscreen. The magnum opus on Lazax war theory at his fingertips, and yet... it was the most boring piece of literature he'd ever had the displeasure to read.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "annexation",
+        "name": "Annexation",
+        "phase": "Action",
+        "window": "After you commit units to land on another player's non-legendary, non-home planet other than Mecatol Rex",
+        "text": "That player must remove each of their units from that planet and place them on any other planets they control, if able.",
+        "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of their hand. \"Our dominion knows no border.\"",
         "source": "action_deck_2_old"
     }
 ]

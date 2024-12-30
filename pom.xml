@@ -111,14 +111,6 @@
             <version>0.10.2</version>
         </dependency>
         <dependency>
-            <!-- Not many webp libraries exist that handle writes. Keep a check on them for support. -->
-            <!-- swap to: https://github.com/gotson/NightMonkeys -->
-            <!-- swap to: https://github.com/haraldk/TwelveMonkeys -->
-            <groupId>com.github.usefulness</groupId>
-            <artifactId>webp-imageio</artifactId>
-            <version>0.8.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>5.0.0-alpha.14</version>

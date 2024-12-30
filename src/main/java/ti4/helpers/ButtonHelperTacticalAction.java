@@ -343,12 +343,12 @@ public class ButtonHelperTacticalAction {
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
             && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message3 = message3
-                + "You also have That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 " + UnitEmojis.fighter + "/" + UnitEmojis.infantry + " that don't count towards production limit.\n";
+                + "You also have That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 " + UnitEmojis.fighter + "/" + UnitEmojis.infantry + " that don't count towards PRODUCTION limit.\n";
         }
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
             && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
             message3 = message3
-                + "Reminder that you have Prophecy of Ixth and should produce 2 " + UnitEmojis.fighter + " if you want to keep it. Its removal is not automated.\n";
+                + "Reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.\n";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true));
@@ -374,7 +374,7 @@ public class ButtonHelperTacticalAction {
             && !game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
             && tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player) < 1
             && tile.getUnitHolders().get("space").getUnitCount(UnitType.Mech, player) < 1) {
-            message = "Nothing moved. Use buttons to decide if you want to build (if you can) or finish the activation";
+            message = "Nothing moved. Use buttons to decide if you wish to build (if you can), or finish the activation.";
             systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
             needPDSCheck = true;
             systemButtons = ButtonHelper.landAndGetBuildButtons(player, game, event, tile);
@@ -396,10 +396,10 @@ public class ButtonHelperTacticalAction {
                         }
                         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, nonActivePlayer, player);
                         String message2 = player.getRepresentationUnfogged()
-                            + " You have triggered void watch. Please select the PN you would like to send";
+                            + " You have triggered _Voidwatch_. Please select the promissory note you will send.";
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2,
                             stuffToTransButtons);
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you owe the defender one PN");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + ", you owe the defender a promissory note.");
                     }
                 }
             }
@@ -494,7 +494,7 @@ public class ButtonHelperTacticalAction {
         game.resetCurrentMovedUnitsFrom1System();
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Chose to move from "
             + game.getTileByPosition(pos).getRepresentationForButtons(game, player)
-            + ". Use buttons to select the units you want to move.", systemButtons);
+            + ". Use buttons to select the units you wish to move.", systemButtons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -516,7 +516,7 @@ public class ButtonHelperTacticalAction {
         if (!game.isFowMode() && game.getRingCount() < 5 && prefersDistanceBasedTacticalActions) {
             alternateWayOfOfferingTiles(player, game);
         } else {
-            String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in."
+            String message = "Doing a tactical action. Please select the ring of the map that the system you wish to activate is located in."
                 + " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
             List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
@@ -528,14 +528,14 @@ public class ButtonHelperTacticalAction {
         List<String> initialOffering = new ArrayList<>(CheckDistanceHelper.getAllTilesACertainDistanceAway(game, player, distances, 0));
         int maxDistance = 0;
         List<Button> buttons = new ArrayList<>();
-        String message = "Doing a tactical action. Please select the tile you want to activate. Right now showing tiles ";
+        String message = "Doing a tactical action. Please select the tile you wish to activate. Right now showing tiles ";
         if (initialOffering.size()
             + CheckDistanceHelper.getAllTilesACertainDistanceAway(game, player, distances, 1).size() < 6) {
             initialOffering.addAll(CheckDistanceHelper.getAllTilesACertainDistanceAway(game, player, distances, 1));
             maxDistance = 1;
-            message = message + "0-1 tiles away";
+            message += "0-1 tiles away.";
         } else {
-            message = message + "0 tiles away";
+            message += "0 tiles away.";
         }
         for (String pos : initialOffering) {
             Tile tile = game.getTileByPosition(pos);
@@ -563,7 +563,7 @@ public class ButtonHelperTacticalAction {
         }
         buttons.add(Buttons.gray("getTilesThisFarAway_" + (desiredDistance + 1), "Get Tiles " + (desiredDistance + 1) + " Spaces Away"));
 
-        String message = "Doing a tactical action. Please select the tile you want to activate";
+        String message = "Doing a tactical action. Please select the tile you wish to activate.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -622,7 +622,7 @@ public class ButtonHelperTacticalAction {
         List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(game, player);
         if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !game.isL1Hero()) {
             String msg = player.getRepresentationUnfogged() + " You can use buttons to resolve " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "I48S, the L1Z1Z " + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + "agent, if you want.";
+                + "I48S, the L1Z1Z " + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + "agent, if you so wish.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, button3);
         }
         Tile tile = game.getTileByPosition(pos);
@@ -647,7 +647,7 @@ public class ButtonHelperTacticalAction {
         }
 
         // Send buttons to move
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select the first system you want to move from", systemButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select the first system you wish to move from.", systemButtons);
 
         // Resolve other abilities
         if (player.hasAbility("recycled_materials")) {

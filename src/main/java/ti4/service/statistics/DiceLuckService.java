@@ -1,10 +1,12 @@
 package ti4.service.statistics;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
@@ -19,6 +21,8 @@ import ti4.map.Game;
 import ti4.map.GamesPage;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
+import ti4.map.manage.ManagedPlayer;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -57,14 +61,27 @@ public class DiceLuckService {
     }
 
     String getDiceLuck(List<User> users) {
-        Map<String, Map.Entry<Double, Integer>> playerDiceLucks = getAllPlayersDiceLuck(false);
+        List<ManagedGame> userGames = users.stream()
+            .map(user -> GameManager.getManagedPlayer(user.getId()))
+            .filter(Objects::nonNull)
+            .map(ManagedPlayer::getGames)
+            .flatMap(Collection::stream)
+            .distinct()
+            .toList();
+
+        Map<String, Map.Entry<Double, Integer>> playerDiceLucks = new HashMap<>();
+        for (ManagedGame game : userGames) {
+            getDiceLuckForGame(game.getGame(), playerDiceLucks, new HashMap<>());
+        }
+
         StringBuilder sb = new StringBuilder();
         AtomicInteger index = new AtomicInteger(1);
         sb.append("## __**Dice Luck**__\n");
         for (User user : users) {
-            Map.Entry<Double, Integer> userTurnCountTotalTime = playerDiceLucks.get(user.getId());
-            double expectedHits = userTurnCountTotalTime.getKey();
-            int actualHits = userTurnCountTotalTime.getValue();
+            Map.Entry<Double, Integer> expectedHitsToActualHits = playerDiceLucks.get(user.getId());
+            if (expectedHitsToActualHits == null) continue;
+            double expectedHits = expectedHitsToActualHits.getKey();
+            int actualHits = expectedHitsToActualHits.getValue();
             if (expectedHits != 0 && actualHits != 0) {
                 appendDiceLuck(sb, index, user.getEffectiveName(), expectedHits, actualHits);
             }

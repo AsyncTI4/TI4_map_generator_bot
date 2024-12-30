@@ -10,12 +10,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -241,26 +242,26 @@ public class FoWHelper {
 		Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player);
 		adjacentPositions.addAll(wormholeAdjacencies);
 
-    //If player has ghoti commander, is active player and has activated a system
-    if (player != null && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander")
+		//If player has ghoti commander, is active player and has activated a system
+		if (player != null && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander")
 			&& player == game.getActivePlayer() && !game.getCurrentActiveSystem().isEmpty()) {
-        Set<Player> playersToCheck = new HashSet<>();
-        playersToCheck.add(player);
-        if (game.isAllianceMode()) {
-          playersToCheck.addAll(game.getRealPlayers().stream()
-              .filter(alliancePlayer -> player.getAllianceMembers().contains(alliancePlayer.getFaction())) 
-              .collect(Collectors.toSet()));
-        }
+			Set<Player> playersToCheck = new HashSet<>();
+			playersToCheck.add(player);
+			if (game.isAllianceMode()) {
+				playersToCheck.addAll(game.getRealPlayers().stream()
+					.filter(alliancePlayer -> player.getAllianceMembers().contains(alliancePlayer.getFaction()))
+					.collect(Collectors.toSet()));
+			}
 
-        //Check that they or their alliance have units in any empty system to be able to see the other empties as adjacencies
-        Set<Tile> emptyTiles = getEmptyTiles(game);
-        boolean containsUnits = emptyTiles.stream().anyMatch(tile -> playersToCheck.stream().anyMatch(p -> tile.containsPlayersUnits(p)));
-        if (containsUnits) {
-            adjacentPositions.addAll(emptyTiles.stream()
-                .map(Tile::getPosition)
-                .collect(Collectors.toSet()));
-        }   		
-    }
+			//Check that they or their alliance have units in any empty system to be able to see the other empties as adjacencies
+			Set<Tile> emptyTiles = getEmptyTiles(game);
+			boolean containsUnits = emptyTiles.stream().anyMatch(tile -> playersToCheck.stream().anyMatch(p -> tile.containsPlayersUnits(p)));
+			if (containsUnits) {
+				adjacentPositions.addAll(emptyTiles.stream()
+					.map(Tile::getPosition)
+					.collect(Collectors.toSet()));
+			}
+		}
 
 		if (includeTile) {
 			adjacentPositions.add(position);
@@ -270,18 +271,18 @@ public class FoWHelper {
 		return adjacentPositions;
 	}
 
-  private static Set<Tile> getEmptyTiles(Game game) {
-      Set<Tile> emptyTiles = new HashSet<>();
-      Collection<Tile> tileList = game.getTileMap().values();
-      List<String> frontierTileList = Mapper.getFrontierTileIds();
-      for (Tile tile : tileList) {
-        if (tile.getPlanetUnitHolders().isEmpty() && (tile.getUnitHolders().size() == 2 
-          || frontierTileList.contains(tile.getTileID()))) {
-            emptyTiles.add(tile);
-        }
-      }
-      return emptyTiles;
-  }
+	private static Set<Tile> getEmptyTiles(Game game) {
+		Set<Tile> emptyTiles = new HashSet<>();
+		Collection<Tile> tileList = game.getTileMap().values();
+		List<String> frontierTileList = Mapper.getFrontierTileIds();
+		for (Tile tile : tileList) {
+			if (tile.getPlanetUnitHolders().isEmpty() && (tile.getUnitHolders().size() == 2
+				|| frontierTileList.contains(tile.getTileID()))) {
+				emptyTiles.add(tile);
+			}
+		}
+		return emptyTiles;
+	}
 
 	public static Set<String> getAdjacentTilesAndNotThisTile(Game game, String position, Player player, boolean toShow) {
 
@@ -474,7 +475,7 @@ public class FoWHelper {
 			}
 		}
 
-		return wormholeIDs.contains(Constants.BETA);
+		return wormholeIDs.stream().anyMatch(id -> id.contains(Constants.BETA));
 	}
 
 	public static boolean doesTileHaveAlpha(Game game, String position) {
@@ -497,7 +498,7 @@ public class FoWHelper {
 			}
 		}
 
-		return (wormholeIDs.contains(Constants.ALPHA));
+		return wormholeIDs.stream().anyMatch(id -> id.contains(Constants.ALPHA));
 	}
 
 	/**
@@ -643,16 +644,16 @@ public class FoWHelper {
 			return true;
 		}
 
-    if (game.isAllianceMode()) {
-      boolean allianceHasUnits = game.getRealPlayers().stream()
-          .filter(alliancePlayer -> alliancePlayer != player) 
-          .filter(alliancePlayer -> player.getAllianceMembers().contains(alliancePlayer.getFaction())) 
-          .anyMatch(alliancePlayer -> playerHasUnitsInSystem(alliancePlayer, tile));
-  
-      if (allianceHasUnits) {
-          return true;
-      }
-    }
+		if (game.isAllianceMode() && !forNeighbors) {
+			boolean allianceHasUnits = game.getRealPlayers().stream()
+				.filter(alliancePlayer -> alliancePlayer != player)
+				.filter(alliancePlayer -> player.getAllianceMembers().contains(alliancePlayer.getFaction()))
+				.anyMatch(alliancePlayer -> playerHasUnitsInSystem(alliancePlayer, tile));
+
+			if (allianceHasUnits) {
+				return true;
+			}
+		}
 		return playerHasUnitsInSystem(player, tile);
 	}
 
@@ -810,7 +811,7 @@ public class FoWHelper {
 					+ message;
 				success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
 				MessageChannel channel = player_.getPrivateChannel();
-				MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
+				MessageHelper.sendMessageToChannelWithButtons(channel, "Use button to refresh view of system.",
 					StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
 			}
 			successfulCount += success ? 1 : 0;

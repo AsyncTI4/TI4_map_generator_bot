@@ -15,7 +15,9 @@ public class PlayerTitleHelper {
 
     public static void offerEveryoneTitlePossibilities(Game game) {
         for (Player player : game.getRealAndEliminatedPlayers()) {
-            String msg = player.getRepresentation() + " you have the opportunity to anonymously bestow one title on someone else in this game. Titles are just for fun, and have no real significance, but could a nice way to take something away from this game. Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you want to bestow it upon.";
+            String msg = player.getRepresentation() + " you have the opportunity to anonymously bestow one title on someone else in this game."
+                + " Titles are just for fun, and have no real significance, but could a nice way to take something away from this game."
+                + " Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you wish to bestow it upon.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("bestowTitleStep1_Life Of The Table", "Life Of The Table"));
             buttons.add(Buttons.green("bestowTitleStep1_Fun To Be Around", "Fun To Be Around"));

@@ -38,16 +38,18 @@ public class PlayerPreferenceHelper {
             case "afkTimes" -> offerAFKTimeOptions(player);
             case "tacticalAction" -> {
                 List<Button> buttons = new ArrayList<>();
-                String msg = player.getRepresentation()
-                    + " Choose whether you want your tactical action buttons to be distance based (offer you 0 tiles away initially, then 1, 2, 3 tiles away upon more button presses) or ring based (choose what ring the active system is in). Default is ring based. This will apply to all your games";
-                buttons.add(Buttons.green("playerPrefDecision_true_distance", "Make it distance based"));
-                buttons.add(Buttons.green("playerPrefDecision_false_distance", "Make it ring based"));
+                String msg = player.getRepresentation() + ", please choose whether you wish to selected the active system for your tactical action"
+                    + " by distance (offer you 0 tiles away initially, then 1, 2, 3 tiles away upon more button presses)"
+                    + " or by ring (choose what ring the active system is in). Default is by ring. This will apply to all your games.";
+                buttons.add(Buttons.green("playerPrefDecision_true_distance", "By Distance"));
+                buttons.add(Buttons.green("playerPrefDecision_false_distance", "By Ring"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
             case "autoNoWhensAfters" -> {
                 List<Button> buttons = new ArrayList<>();
                 String msg = player.getRepresentation()
-                    + " Choose whether you want the game to auto react no whens/afters after a random amount of time for you when you have no whens/afters. Default is off. This will only apply to this game. If you have any whens or afters or related when/after abilities, it will not do anything. ";
+                    + " Choose whether you wish for the bot to auto react \"no whens\"/\"no afters\" after a random amount of time for you when you have no \"when\"s and no \"after\"s."
+                    + " Default is off. This will only apply to this game. If you have any \"when\"s or \"afters\", or related \"when\"/\"after\" abilities, the bot will do nothing. ";
                 buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
                 buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -98,14 +100,14 @@ public class PlayerPreferenceHelper {
                 String message = player.getRepresentationUnfogged()
                     + " you may choose to automatically pass on Sabos after a random amount of time if you don't have a Sabo/Instinct Training/Watcher mechs."
                     + " How it works is you secretly set a median time (in hours) here, and then from now on when an action card is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below."
-                    + " It's random so people can't derive much information from it. You are free to decline, no-one will ever know either way, but if necessary you may change your time later with /player stats.";
+                    + " It's random so people can't derive much information from it. You are free to decline, no-one will ever know either way, but if necessary you may change your time later with `/player stats`.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             }
         } else {
             String message = player2.getRepresentationUnfogged()
                 + " you may choose to automatically pass on Sabos after a random amount of time if you don't have a Sabo/Instinct Training/Watcher mechs. "
                 + " How it works is you secretly set a median time (in hours) here, and then from now on when an action card is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below."
-                + " It's random so people can't derive much information from it. You are free to decline, no-one will ever know either way, but if necessary you may change your time later with /player stats.";
+                + " It's random so people can't derive much information from it. You are free to decline, no-one will ever know either way, but if necessary you may change your time later with `/player stats`.";
             MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), message, buttons);
         }
     }

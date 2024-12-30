@@ -221,7 +221,7 @@ class ActionCardDeck2ButtonHandler {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " tell the bot which neighbor you want to get 1 cruiser and 1 destroyer",
+            player.getRepresentationUnfogged() + ", please choose which neighbor gets 1 cruiser and 1 destroyer.",
             buttons);
     }
 
@@ -233,11 +233,11 @@ class ActionCardDeck2ButtonHandler {
         List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
         buttons.add(Buttons.red("deleteButtons", "Don't place"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() +
-            "Use buttons to put 1 cruiser with your ships due to the arms deal", buttons);
+            ", please choose where you wish to place the _Arms Deal_ cruiser.", buttons);
         buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
         buttons.add(Buttons.red("deleteButtons", "Don't place"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() +
-            "Use buttons to put 1 destroyer with your ships due to the arms deal", buttons);
+            ", please choose where you wish to place the _Arms Deal_ destroyer.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -353,8 +353,8 @@ class ActionCardDeck2ButtonHandler {
 
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " Chose the tile you want to swap places with "
-                + tile1.getRepresentationForButtons(game, player),
+            player.getRepresentationUnfogged() + ", please choose which tile you wish to swap places with "
+                + tile1.getRepresentationForButtons(game, player) + ".",
             buttons);
         event.getMessage().delete().queue();
     }
@@ -424,7 +424,7 @@ class ActionCardDeck2ButtonHandler {
             ButtonHelper.resolveCombatRoll(player, game, event,
                 "combatRoll_" + buttonID.split("_")[1] + "_space_afb");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`.");
         }
         game.setStoredValue("ShrapnelTurretsFaction", "");
         event.getMessage().delete().queue();
@@ -437,13 +437,14 @@ class ActionCardDeck2ButtonHandler {
         player.refreshPlanet(planet);
         List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
         if (!buttons.isEmpty()) {
-            String message = player.getFactionEmoji() + " Click button to explore "
-                + Helper.getPlanetRepresentation(planet, game);
+            String message = player.getFactionEmoji() + ", please press the button to explore "
+                + Helper.getPlanetRepresentation(planet, game) + ".";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 message, buttons);
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " refreshed and explored " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game));
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+            + " readied and explored " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game) + ".");
     }
 
 }

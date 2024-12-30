@@ -16,7 +16,7 @@ class PlayPN extends GameStateSubcommand {
 
     public PlayPN() {
         super(Constants.PLAY_PN, "Play Promissory Note", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory note ID, which is found between (), or name/part of name").setRequired(true));
     }
 
     @Override
@@ -42,7 +42,7 @@ class PlayPN extends GameStateSubcommand {
                     pnName = pnName.toLowerCase();
                     if (pnName.contains(value) || pn.getKey().contains(value)) {
                         if (foundSimilarName && !cardName.equals(pnName)) {
-                            MessageHelper.sendMessageToEventChannel(event, "Multiple cards with similar name founds, please use ID");
+                            MessageHelper.sendMessageToEventChannel(event, "Multiple cards with similar name found, please use ID.");
                             return;
                         }
                         pnID = pn.getKey();
@@ -54,7 +54,7 @@ class PlayPN extends GameStateSubcommand {
         }
 
         if (pnID == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such promissory note ID found, please retry.");
             return;
         }
 

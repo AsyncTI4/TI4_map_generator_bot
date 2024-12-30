@@ -53,7 +53,7 @@ public class ButtonHelperSCs {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event,
                     "followed diplomacy");
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
         }
         if (scModel != null && !player.getFollowedSCs().contains(scModel.getInitiative())) {
@@ -105,7 +105,7 @@ public class ButtonHelperSCs {
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed tech");
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
         }
         Button getTactic = Buttons.green("increase_tactic_cc", "Gain 1 Tactic Token");
@@ -157,16 +157,16 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("trade").orElse(null);
         }
-        int tradeInitiative = scModel.getInitiative();
+        int scNum = scModel.getInitiative();
 
         if (player.getStrategicCC() > 0) {
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Trade");
         }
-        String message = deductCC(player);
-        if (!player.getFollowedSCs().contains(tradeInitiative)) {
-            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, tradeInitiative, game, event);
+        String message = deductCC(game, player, scNum);
+        if (!player.getFollowedSCs().contains(scNum)) {
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
         }
-        player.addFollowedSC(tradeInitiative, event);
+        player.addFollowedSC(scNum, event);
         ButtonHelperStats.replenishComms(event, game, player, true);
 
         ReactionService.addReaction(event, game, player, message);
@@ -197,7 +197,7 @@ public class ButtonHelperSCs {
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Imperial");
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
         }
         boolean used2 = addUsedSCPlayer(messageID + "so", game, player);
@@ -209,23 +209,28 @@ public class ButtonHelperSCs {
         }
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
-        String message = "Drew A Secret Objective";
+        String message = " drew a secret objective.";
         for (Player player2 : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
             if (player2 == player) {
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    message = message + ". Drew a second SO due to Plausible Deniability";
+                    message = message + " Drew a second secret objective due to **Plausible Deniability**.";
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
                 break;
             }
             if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
-                message = "Wants to draw an SO but has people ahead of them in speaker order who need to resolve first. They have been queued and will automatically draw an SO when everyone ahead of them is clear."
-                    + " They may cancel this by hitting 'No Follow'";
+                message = " wishes to draw a secret objective but has people ahead of them in speaker order who need to resolve first."
+                    + " They have been queued and will automatically draw a secret objective when everyone ahead of them is clear."
+                    + " They may cancel this by hitting \"No Follow\".";
                 if (!game.isFowMode()) {
-                    message = message + "\n" + player2.getRepresentationUnfogged()
-                        + " is the one the game is currently waiting on. Remember it is not enough to simply draw an SO, they will also need to discard one. ";
+                    message += "\n" + player2.getRepresentationUnfogged()
+                        + " is the one the game is currently waiting on.";
+                    if (player2.getSecretsScored().size() + player2.getSecretsUnscored().size() >= player2.getMaxSOCount())
+                    {
+                        message += " Remember it is not enough to simply draw a secret objective, they will also need to discard one.";
+                    }
                 }
                 game.setStoredValue(key2,
                     game.getStoredValue(key2) + player.getFaction() + "*");
@@ -368,7 +373,7 @@ public class ButtonHelperSCs {
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed warfare");
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
         }
         Tile tile = player.getHomeSystemTile();
@@ -380,11 +385,11 @@ public class ButtonHelperSCs {
             + "You have " + val + " PRODUCTION value in this system.";
         if (val > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message = message
-                + ". You also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards production limit. ";
+                + ". You also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit. ";
         }
         if (val > 0 && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
             message = message
-                + "Reminder that you have Prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated.";
+                + "Reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.";
         }
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
@@ -411,15 +416,16 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("construction").orElse(null);
         }
+        int scNum = scModel.getInitiative();
         boolean automationExists = scModel != null && scModel.usesAutomationForSCID("pok4construction");
-        if (!used && scModel != null && !player.getFollowedSCs().contains(scModel.getInitiative())
-            && automationExists && game.getPlayedSCs().contains(scModel.getInitiative())) {
-            player.addFollowedSC(scModel.getInitiative(), event);
-            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
+        if (!used && scModel != null && !player.getFollowedSCs().contains(scNum)
+            && automationExists && game.getPlayedSCs().contains(scNum)) {
+            player.addFollowedSC(scNum, event);
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed construction");
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
         }
         ReactionService.addReaction(event, game, player);
@@ -622,7 +628,7 @@ public class ButtonHelperSCs {
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed " + Helper.getSCName(scNum, game));
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
 
             if (setStatus) {
                 if (!player.getFollowedSCs().contains(scNum)) {
@@ -636,17 +642,22 @@ public class ButtonHelperSCs {
     }
 
     @NotNull
-    public static String deductCC(Player player) {
+    public static String deductCC(Game game, Player player, int scNum) {
         int strategicCC = player.getStrategicCC();
-        String message;
         if (strategicCC == 0) {
-            message = " have 0 command tokens in strategy pool, can't follow.";
-        } else {
-            strategicCC--;
-            player.setStrategicCC(strategicCC);
-            message = " following strategy card, deducted 1 command tokens from strategy pool.";
+            return " have 0 command tokens in strategy pool, can't follow.";
         }
-        return message;
+        
+        strategicCC--;
+        player.setStrategicCC(strategicCC);
+        if (scNum == -1)
+        {
+            return " performing the secondary ability of a strategy card with **Grace**."
+                + "1 command token has been spent from strategy pool.";
+        }
+        String stratCardName = Helper.getSCName(scNum, game);
+        return " following to perform the secondary ability of **" + stratCardName + "**."
+            + " 1 command token has been spent from strategy pool.";
     }
 
     @ButtonHandler("sc_ac_draw")
@@ -675,7 +686,7 @@ public class ButtonHelperSCs {
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Politics");
             }
-            String message = deductCC(player);
+            String message = deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
         }
         boolean hasSchemingAbility = player.hasAbility("scheming");

@@ -15,8 +15,8 @@ import ti4.message.MessageHelper;
 class PurgePN extends GameStateSubcommand {
 
     public PurgePN() {
-        super(Constants.PURGE_PN, "Purge Promissory Note", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between ()").setRequired(true));
+        super(Constants.PURGE_PN, "Purge promissory note", true, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory note ID, which is found between ()").setRequired(true));
     }
 
     @Override
@@ -31,12 +31,12 @@ class PurgePN extends GameStateSubcommand {
         }
 
         if (id == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such promissory note ID found, please retry");
             return;
         }
 
         purgePromissoryFromHand(getGame(), player, id);
-        MessageHelper.sendMessageToEventChannel(event, "PN Purged");
+        MessageHelper.sendMessageToEventChannel(event, "Promissory note purged.");
     }
 
     private static void purgePromissoryFromHand(Game game, Player player, String pn) {

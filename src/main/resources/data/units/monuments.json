@@ -15,7 +15,7 @@
         "spaceCannonDieCount": 2,
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you pass, place 1 infantry on a planet in or adjacent to this system other than Mecatol Rex that contains no other player's units. Then, gain control of that planet, if able."
+        "ability": "When you pass, place 1 infantry on a planet in or adjacent to this system other than Mecatol Rex that contains no other player's units.\nThen, gain control of that planet, if able."
     },
     {
         "id": "argent_monument",
@@ -46,7 +46,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you exhaust this planet to cast votes, you may cast an additional number of votes equal to the number of your non-fighter ships in this system.\n\nDouble the PRODUCTION values of your units in this system."
+        "ability": "When you exhaust this planet to cast votes, you may cast an additional number of votes equal to the number of your non-fighter ships in this system.\nDouble the PRODUCTION values of your units in this system."
     },
     {
         "id": "saar_monument",
@@ -81,7 +81,7 @@
         "productionValue": "1",
         "isStructure": true,
         "isMonument": true,
-        "ability": "After a law enters play, add a command token from your reinforcements to this card.\n\nWhen you would place a command token in this or an adjacent system, you may place that token from this card instead."
+        "ability": "After a law enters play, add a command token from your reinforcements to this card.\nWhen you would place a command token in this or an adjacent system, you may place that token from this card instead."
     },
     {
         "id": "muaat_monument",
@@ -96,7 +96,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you exhaust this planet to cast votes:\n\nFor each war sun or flagship you control in this system, and for each adjacent supernova, cast 2 additional votes or produce 1 hit against another player's ships in a system adjacent to this planet."
+        "ability": "When you exhaust this planet to cast votes:\nFor each war sun or flagship you control in this system, and for each adjacent supernova, cast 2 additional votes or produce 1 hit against another player's ships in a system adjacent to this planet."
     },
     {
         "id": "hacan_monument",
@@ -112,7 +112,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "As part of a transaction, one player may return any of their ships in or adjacent to this system to their reinforcements.\n\nFor each of those ships, the other player produces 1 ship of that type in this system without spending resources."
+        "ability": "As part of a transaction, one player may return any of their ships in or adjacent to this system to their reinforcements.\nFor each of those ships, the other player produces 1 ship of that type in this system without spending resources."
     },
     {
         "id": "empyrean_monument",
@@ -128,7 +128,7 @@
         "productionValue": "1",
         "isStructure": true,
         "isMonument": true,
-        "ability": "This unit is placed in the space area of any system that is not an anomaly and does not contain planets, instead of on a planet.\n\nIf this unit is blockaded, destroy it."
+        "ability": "This unit is placed in the space area of any system that is not an anomaly and does not contain planets, instead of on a planet.\nIf this unit is blockaded, destroy it."
     },
     {
         "id": "sol_monument",
@@ -160,7 +160,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "After a player activates this system:\n\nFor each system adjacent to this planet that contains a wormhole, you may produce 1 hit against another player's ships in that system."
+        "ability": "After a player activates this system:\nFor each system adjacent to this planet that contains a wormhole, you may produce 1 hit against another player's ships in that system."
     },
     {
         "id": "l1z1x_monument",
@@ -226,7 +226,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "During the agenda phase, when an outcome you voted for is resolved:\n\nPlace up to 2 fighters from your reinforcements in this or an adjacent system. If that system contains another player’s ships, immediately resolve\na space combat."
+        "ability": "During the agenda phase, when an outcome you voted for is resolved:\nPlace up to 2 fighters from your reinforcements in this or an adjacent system. If that system contains another player’s ships, immediately resolve\na space combat."
     },
     {
         "id": "naaz-rokha_monument",
@@ -254,7 +254,7 @@
         "faction": "nekro",
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you gain control of a planet that contains another player's structure, you may place the \"W\" assimilator token on that player's monument card. While that token is on a monument card, this card gains that card's attributes, abilities, and ability text."
+        "ability": "When you gain control of a planet that contains another player's structure, you may place the \"W\" assimilator token on that player's monument card.\nWhile that token is on a monument card, this card gains that card's attributes, abilities, and ability text."
     },
     {
         "id": "nomad_monument",
@@ -314,7 +314,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "After an agenda outcome you voted for or predicted is resolved:\n\nPlace up to 2 infantry on a planet you control in this system."
+        "ability": "After an agenda outcome you voted for or predicted is resolved:\nPlace up to 2 infantry on a planet you control in this system."
     },
     {
         "id": "cabal_monument",
@@ -349,7 +349,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the start of the agenda phase: \n\nIf your monument is on the game board, gain any number of trade goods on this card. Otherwise, spend any number of resources to place 1 trade good from the supply on this card for every 3 resources spent."
+        "ability": "At the start of the agenda phase:\nIf your monument is on the game board, gain any number of trade goods on this card. Otherwise, spend any number of resources to place 1 trade good from the supply on this card for every 3 resources spent."
     },
     {
         "id": "xxcha_monument",
@@ -397,7 +397,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When another player plays an action card:\n\nIf that player controls 1 or more units in this or an adjacent system, you may gain 2 trade goods."
+        "ability": "When another player plays an action card:\nIf that player controls 1 or more units in this or an adjacent system, you may gain 2 trade goods."
     },
     {
         "id": "axis_monument",
@@ -413,7 +413,7 @@
         "productionValue": "3",
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you produce 1 or more non-fighter ships in this sytem, gain 1 trade good."
+        "ability": "When you produce 1 or more non-fighter ships in this system, gain 1 trade good."
     },
     {
         "id": "khrask_monument",
@@ -595,7 +595,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "Once per space combat, when a ship you control that has SUSTAIN DAMAGE is destroyed in this system, you may place 1 unit of that type in this system damaged from your reinforcements; trat unit cannot repair until after that space combat."
+        "ability": "Once per space combat, when a ship you control that has SUSTAIN DAMAGE is destroyed in this system, you may place 1 unit of that type in this system damaged from your reinforcements; that unit cannot repair until after that space combat."
     },
     {
         "id": "nivyn_monument",
@@ -733,7 +733,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "During the first round of space combat inthis system, cancel up to 2 hits produced against your units."
+        "ability": "During the first round of space combat in this system, cancel up to 2 hits produced against your units."
     },
     {
         "id": "kollecc_monument",
@@ -874,6 +874,7 @@
             "CULTURAL"
         ],
         "productionValue": "+0",
+        "basicProduction": "struct",
         "isStructure": true,
         "isMonument": true,
         "ability": "This unit's PRODUCTION value is equal to the number of structures you control in or adjacent to this system."

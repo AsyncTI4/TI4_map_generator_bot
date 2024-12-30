@@ -1,46 +1,61 @@
 package ti4.commands2.map;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 class RemoveBorderAnomaly extends GameStateSubcommand {
 
     public RemoveBorderAnomaly() {
-        super(Constants.REMOVE_BORDER_ANOMALY, "Remove a border anomaly from a tile", true, false);
-        addOption(OptionType.STRING, Constants.PRIMARY_TILE, "Tile the border will be linked to", true, true);
-        addOption(OptionType.STRING, Constants.PRIMARY_TILE_DIRECTION, "Side of the tile the anomaly will be on", true, true);
+        super(Constants.REMOVE_BORDER_ANOMALY, "Remove border anomalies", true, false);
+        addOption(OptionType.STRING, Constants.PRIMARY_TILE, "Tile the border is linked to or ALL to remove all border anomalies from the map", true, true);
+        addOption(OptionType.STRING, Constants.PRIMARY_TILE_DIRECTION, "Side of the tile the anomaly is on", false, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        String tile = event.getOption(Constants.PRIMARY_TILE).getAsString();
-        if (!game.getTileMap().containsKey(tile)) {
-            MessageHelper.replyToMessage(event, "Map does not contain that tile");
+
+        String tilesString = event.getOption(Constants.PRIMARY_TILE).getAsString();
+        Set<String> tiles = new HashSet<>();
+        if ("ALL".equals(tilesString)) {
+            tiles = game.getTileMap().values().stream().map(Tile::getTileID).collect(Collectors.toSet());
+        } else {
+            tiles = AddBorderAnomaly.resolveTiles(event, game);
+        }
+
+        Set<Integer> directions = AddBorderAnomaly.resolveDirections(event);
+
+        if ("ALL".equals(tilesString) && directions.isEmpty()) {
+            //No need to loop, just set as empty
+            int amountOfBorderAnomalies = game.getBorderAnomalies().size();
+            game.setBorderAnomalies(new ArrayList<>());
+            MessageHelper.replyToMessage(event, "All " + amountOfBorderAnomalies + " border anomalies removed.");
             return;
         }
 
-        String direction = event.getOption(Constants.PRIMARY_TILE_DIRECTION, null, OptionMapping::getAsString);
-        int directionVal = -1;
-        switch (direction.toLowerCase()) {
-            case "north" -> directionVal = 0;
-            case "northeast" -> directionVal = 1;
-            case "southeast" -> directionVal = 2;
-            case "south" -> directionVal = 3;
-            case "southwest" -> directionVal = 4;
-            case "northwest" -> directionVal = 5;
+        if (directions.isEmpty()) {
+            directions = Set.of(0, 1, 2, 3, 4, 5);
         }
 
-        if (directionVal == -1) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid direction");
-            return;
+        int amountRemoved = 0;
+        for (String tile : tiles) {
+            for (int d : directions) {
+                if (game.hasBorderAnomalyOn(tilesString, d)) {
+                    game.removeBorderAnomaly(tile, d);
+                    amountRemoved++;
+                }
+            }
         }
-
-        game.removeBorderAnomaly(tile, directionVal);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Anomalies removed: " + amountRemoved);
     }
 }

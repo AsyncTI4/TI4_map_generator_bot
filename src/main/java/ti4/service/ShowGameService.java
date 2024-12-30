@@ -2,9 +2,9 @@ package ti4.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -13,7 +13,9 @@ import ti4.buttons.Buttons;
 import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 
 @UtilityClass
 public class ShowGameService {
@@ -53,6 +55,14 @@ public class ShowGameService {
         if (!game.isFowMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
             channel = game.getBotMapUpdatesThread();
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
+        } else if (game.isFowMode()) {
+            Player player = game.getPlayer(event.getUser().getId());
+            if (!event.getClass().equals(UserOverridenSlashCommandInteractionEvent.class) 
+              && game.getRealPlayers().contains(player) && !game.getPlayersWithGMRole().contains(player)
+              && player.getPrivateChannel() != null && !channel.equals(player.getPrivateChannel())) {
+                channel = player.getPrivateChannel();
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + ((TextChannel)player.getPrivateChannel()).getJumpUrl());
+            }
         }
         return channel;
     }

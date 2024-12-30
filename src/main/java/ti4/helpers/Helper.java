@@ -491,7 +491,7 @@ public class Helper {
         if (Optional.ofNullable(game.getScSetID()).isPresent() && !"null".equals(game.getScSetID())) {
             return game.getStrategyCardSet().getSCName(sc);
         }
-        return "**SC" + sc + "**";
+        return "SC#" + sc;
     }
 
     public static Integer getSCNumber(String sc) {
@@ -925,7 +925,7 @@ public class Helper {
 
     public static String buildSpentThingsMessage(Player player, Game game, String resOrInfOrBoth) {
         List<String> spentThings = player.getSpentThingsThisWindow();
-        StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " exhausted the following: \n");
+        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " exhausted the following: \n");
         int res = 0;
         int inf = 0;
         if (resOrInfOrBoth.contains("tech")) {
@@ -1008,16 +1008,16 @@ public class Helper {
 
                 if (thing.contains("boon")) {
                     msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append("\n");
-                    res = res + 1;
+                    res += 1;
                 }
                 if (thing.contains("warmachine")) {
                     msg.append("> Used War Machine ").append(CardEmojis.ActionCard).append("\n");
-                    res = res + 1;
+                    res += 1;
                 }
                 if (thing.contains("aida")) {
                     msg.append("> Exhausted AI Development Algorithm ");
                     if (thing.contains("_")) {
-                        res = res + ButtonHelper.getNumberOfUnitUpgrades(player);
+                        res += ButtonHelper.getNumberOfUnitUpgrades(player);
                         msg.append(" for ").append(ButtonHelper.getNumberOfUnitUpgrades(player)).append(" resources ");
                     } else {
                         msg.append(" to ignore a prerequisite on a unit upgrade technology ");
@@ -1028,43 +1028,44 @@ public class Helper {
                     msg.append("> ").append(thing).append("\n");
                 } else if (thing.contains("Winnu Agent")) {
                     msg.append("> ").append(thing).append("\n");
-                    res = res + 2;
+                    res += 2;
                 } else if (thing.contains("Zealots Agent")) {
                     msg.append("> ").append(thing).append("(Best Resources found were ").append(bestRes).append(")\n");
-                    inf = inf + bestRes;
+                    inf += bestRes;
                 } else if (thing.contains("Agent")) {
                     msg.append("> ").append(thing).append("\n");
                 } else if (thing.contains("custodia")) {
                     //game.getPlanetsInfo().get("custodiavigilia")
                     msg.append("> ").append("Custodia Vigilia (2/3)").append("\n");
-                    res = res + 2;
-                    inf = inf + 3;
+                    res += 2;
+                    inf += 3;
                 } else if (thing.contains("ghoti")) {
                     msg.append("> ").append("Ghoti (3/3)").append("\n");
-                    res = res + 3;
-                    inf = inf + 3;
+                    res += 3;
+                    inf += 3;
                 }
             }
         }
-        res = res + tg + keleresAgent;
-        inf = inf + tg + keleresAgent;
+        res += tg + keleresAgent;
+        inf += tg + keleresAgent;
         if (tg > 0) {
-            msg.append("> Spent ").append(tg).append(" trade good").append(tg == 1 ? "" : "s").append(" ").append(MiscEmojis.getTGorNomadCoinEmoji(game)).append(" (").append(player.getTg() + tg).append("->").append(player.getTg()).append(") \n");
+            msg.append("> Spent ").append(tg).append(" trade good").append(tg == 1 ? "" : "s").append(" ").append(MiscEmojis.getTGorNomadCoinEmoji(game))
+                .append(" (").append(player.getTg() + tg).append("->").append(player.getTg()).append(") \n");
             if (player.hasTech("mc")) {
-                res = res + tg + keleresAgent;
-                inf = inf + tg + keleresAgent;
-                msg.append("> Counted the trade goods twice due to Mirror Computing \n");
+                res += tg + keleresAgent;
+                inf += tg + keleresAgent;
+                msg.append("> Counted the trade goods twice due to _Mirror Computing_\n");
             }
         }
 
         if ("res".equalsIgnoreCase(resOrInfOrBoth)) {
-            msg.append("For a total spend of **").append(res).append(" Resources**");
+            msg.append("for a total spend of ").append(res).append(" resources.");
         } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
-            msg.append("For a total spend of **").append(inf).append(" Influence**");
+            msg.append("for a total spend of ").append(inf).append(" influence.");
         } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
-            msg.append("For a total spend of **").append(res).append(" Resources** (counting influence as resources)");
+            msg.append("for a total spend of").append(res).append(" resources (counting influence as resources).");
         } else {
-            msg.append("For a total spend of **").append(res).append(" Resources** or **").append(inf).append(" Influence**");
+            msg.append("for a total spend of").append(res).append(" resources or ").append(inf).append(" influence.");
         }
         return msg.toString();
     }
@@ -1723,21 +1724,12 @@ public class Helper {
         boolean ccCountIsOver = ccCount > limit;
         if (ccCountIsOver && game.isCcNPlasticLimit()) {
             Player player = game.getPlayerFromColorOrFaction(color);
-
-            String msg = game.getPing() + " ";
-            if (!game.isFowMode()) {
-                if (player != null) {
-                    msg += player.getFactionEmoji() + " " + player.getFaction() + " ";
-                    msg += player.getPing() + " ";
-                }
+            if (player == null) {
+                return;
             }
 
-            msg += "(" + color + ") is over the command token limit of " + limit + ". Command tokens used: " + ccCount;
-            if (player != null) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            } else if (!game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
-            }
+            String msg = player.getRepresentationUnfogged() + " is over the command token limit of " + limit + ". Command tokens used: " + ccCount;
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
     }
 
@@ -1864,9 +1856,14 @@ public class Helper {
     }
 
     public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Game game) {
-        if (game.isFowMode() || game.isCommunityMode()) {
+        if (game.isCommunityMode()) {
             return;
         }
+        if (game.isFowMode()) {
+            addPlayerPermissionsToPrivateChannels(game);
+            return;
+        }
+
         String gameName = game.getName();
         List<Role> roles = guild.getRolesByName(gameName, true);
         Role role = null;
@@ -1883,6 +1880,17 @@ public class Helper {
             addMapPlayerPermissionsToGameChannels(guild, game.getName());
         } else { // make sure players have the role
             addGameRoleToMapPlayers(guild, role, game);
+        }
+    }
+
+    public static void addPlayerPermissionsToPrivateChannels(Game game) {
+        //Make sure everyone has access to their own private thread
+        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+        for (Player player : game.getPlayers().values()) {
+            MessageChannel channel = player.getPrivateChannel();
+            if (channel != null) {
+                ((TextChannel)channel).getManager().putMemberPermissionOverride(player.getMember().getIdLong(), permission, 0).queue();
+            }
         }
     }
 
@@ -2218,7 +2226,7 @@ public class Helper {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## Note about FoW\n"
                     + "When you press **End Game** all the game channels will be deleted immediately!\n"
                     + "A new thread will be generated under the **#fow-war-stories** channel.\n"
-                    + "Round Summaries will be shared there. So it is adviced to hold end-of-game chat until then.");
+                    + "Round Summaries will be shared there. So it is advised to hold end-of-game chat until then.");
                 List<Button> titleButton = new ArrayList<>();
                 titleButton.add(Buttons.blue("offerToGiveTitles", "Offer to bestow a Title"));
                 titleButton.add(Buttons.gray("deleteButtons", "No titles for this game"));

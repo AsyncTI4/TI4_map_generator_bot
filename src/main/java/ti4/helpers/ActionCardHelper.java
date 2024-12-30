@@ -43,7 +43,7 @@ public class ActionCardHelper {
 
     public static void sendActionCardInfo(Game game, Player player) {
         // AC INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getActionCardInfo(game, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, getActionCardInfo(game, player));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nClick a button below to play an Action Card", getPlayActionCardButtons(game, player));
 
         sendTrapCardInfo(game, player);
@@ -51,7 +51,7 @@ public class ActionCardHelper {
 
     private static void sendTrapCardInfo(Game game, Player player) {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { // Lih-zo trap abilities
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getTrapCardInfo(player));
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, getTrapCardInfo(player));
         }
     }
 
@@ -104,24 +104,23 @@ public class ActionCardHelper {
         int index = 1;
 
         Map<String, Integer> actionCards = player.getActionCards();
-        if (actionCards != null) {
-            if (actionCards.isEmpty()) {
-                sb.append("> None");
+        if (actionCards == null || actionCards.isEmpty()) {
+            sb.append("> None");
+            return sb.toString();
+        }
+
+        for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            Integer value = ac.getValue();
+            ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
+
+            sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
+            if (actionCard == null) {
+                sb.append("Something broke here");
             } else {
-                for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
-                    Integer value = ac.getValue();
-                    ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
-
-                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
-                    if (actionCard == null) {
-                        sb.append("Something broke here");
-                    } else {
-                        sb.append(actionCard.getRepresentation());
-                    }
-
-                    index++;
-                }
+                sb.append(actionCard.getRepresentation());
             }
+
+            index++;
         }
 
         return sb.toString();
@@ -132,8 +131,8 @@ public class ActionCardHelper {
         Map<String, Integer> actionCards = player.getActionCards();
 
         if (actionCards != null && !actionCards.isEmpty()
-            && !ButtonHelper.isPlayerElected(game, player, "censure")
-            && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+                && !ButtonHelper.isPlayerElected(game, player, "censure")
+                && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
@@ -148,10 +147,10 @@ public class ActionCardHelper {
         } else {
             acButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard an Action Card"));
         }
-        if (actionCards != null && !actionCards.isEmpty()
-            && !ButtonHelper.isPlayerElected(game, player, "censure")
-            && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace") || actionCards.containsKey("special_session")
-                || actionCards.containsKey("investments") || actionCards.containsKey("last_minute_deliberation") || actionCards.containsKey("revolution") || actionCards.containsKey("deflection") || actionCards.containsKey("summit"))) {
+        if (actionCards != null && !actionCards.isEmpty() && !ButtonHelper.isPlayerElected(game, player, "censure")
+                && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace") || actionCards.containsKey("special_session")
+                    || actionCards.containsKey("investments") || actionCards.containsKey("last_minute_deliberation") || actionCards.containsKey("revolution")
+                    || actionCards.containsKey("deflection") || actionCards.containsKey("summit"))) {
             acButtons.add(Buttons.gray("checkForAllACAssignments", "Pre-Assign Action Cards"));
         }
 
@@ -228,7 +227,7 @@ public class ActionCardHelper {
     @ButtonHandler("refreshACInfo")
     public static void sendActionCardInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendActionCardInfo(game, player);
     }
 
@@ -311,7 +310,7 @@ public class ActionCardHelper {
         }
         if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) != player) {
             return "You are trying to play an action card with a component action, and the game does not think you are the active player."
-            + " You may fix this with /player turn_start. Until then, you are #denied.";
+            + " You may fix this with `/player turn_start`. Until then, you are #denied.";
         }
         if (ButtonHelper.isPlayerOverLimit(game, player)) {
             return player.getRepresentationUnfogged()
@@ -395,9 +394,9 @@ public class ActionCardHelper {
                     Button button;
                     TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
                     if (scEmoji != CardEmojis.SCBackBlank) {
-                        button = Buttons.gray(player.finChecker() + "increaseTGonSC_" + sc, null, scEmoji);
+                        button = Buttons.gray(player.finChecker() + "increaseTGonSC_" + sc, Helper.getSCName(sc, game), scEmoji);
                     } else {
-                        button = Buttons.gray(player.finChecker() + "increaseTGonSC_" + sc, sc + " " + Helper.getSCName(sc, game), scEmoji);
+                        button = Buttons.gray(player.finChecker() + "deflectSC_" + sc, sc + " " + Helper.getSCName(sc, game));
                     }
                     scButtons.add(button);
                 }
@@ -411,14 +410,14 @@ public class ActionCardHelper {
                     TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
                     Button button;
                     if (scEmoji != CardEmojis.SCBackBlank) {
-                        button = Buttons.gray(player.finChecker() + "deflectSC_" + sc, null, scEmoji);
+                        button = Buttons.gray(player.finChecker() + "deflectSC_" + sc, Helper.getSCName(sc, game), scEmoji);
                     } else {
-                        button = Buttons.gray(player.finChecker() + "deflectSC_" + sc, sc + " " + Helper.getSCName(sc, game), scEmoji);
+                        button = Buttons.gray(player.finChecker() + "deflectSC_" + sc, sc + " " + Helper.getSCName(sc, game));
                     }
                     scButtons.add(button);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(channel2,
-                    player.getRepresentation() + " Use buttons to choose which SC will be deflected.",
+                    player.getRepresentation() + " Use buttons to choose which strategy card will be _Deflect_'d.",
                     scButtons);
             }
 
@@ -985,8 +984,8 @@ public class ActionCardHelper {
             sb.append(index).append(". ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
             index++;
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sa.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, sa.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, sb.toString());
     }
 
     public static String actionCardListCondensedNoIds(List<String> discards, String title) {
