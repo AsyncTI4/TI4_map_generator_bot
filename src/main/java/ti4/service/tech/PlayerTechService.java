@@ -52,7 +52,7 @@ public class PlayerTechService {
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
         player.addTech(techID);
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
-        String message = player.getRepresentation() + " added technology: " + Mapper.getTech(techID).getRepresentation(false) + ".";
+        String message = player.getRepresentation() + " added technology: _" + Mapper.getTech(techID).getRepresentation(false) + "_.";
         if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             message = message + "\nAutomatically added the Custodia Vigilia planet.";
         }
@@ -231,7 +231,7 @@ public class PlayerTechService {
                         buttons.add(button);
                     }
                 }
-                String message = player.getRepresentationUnfogged() + ", please choose who you wish to target with _Mageon Implants_.";
+                String message = player.getRepresentationUnfogged() + " Select who you would like to Mageon.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -253,7 +253,7 @@ public class PlayerTechService {
             }
             case "dskolug" -> {
                 deleteIfButtonEvent(event);
-                String message = player.getRepresentationUnfogged() + " stalled using _Applied Biothermics_.";
+                String message = player.getRepresentationUnfogged() + " stalled using the _Applied Biothermics_ technology.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -447,11 +447,11 @@ public class PlayerTechService {
 
         if (player.hasUnexhaustedLeader("zealotsagent")) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.gray("exhaustAgent_zealotsagent_" + player.getFaction(), "Use Rhodun Agent", FactionEmojis.zealots));
+            buttons.add(Buttons.gray("exhaustAgent_zealotsagent_" + player.getFaction(), "Use Zealots Agent", FactionEmojis.zealots));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged()
                     + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh, the Rhodun"
-                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") 
                     + " agent, to produce 1 ship at home or in a system where you have a technology specialty planet.",
                 buttons);
         }
@@ -473,7 +473,7 @@ public class PlayerTechService {
                     // Block of code to handle errors
                 }
             }
-            String text = player.getRepresentationUnfogged() + ", it is now your turn (your "
+            String text = player.getRepresentationUnfogged() + ", it is now your turn (your " 
                 + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
             if (nextPlayer != null && !game.isFowMode()) {
@@ -514,7 +514,7 @@ public class PlayerTechService {
         }
         if (player.hasUnit("augers_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getFactionEmoji() + " has the opportunity to DEPLOY an Iledrith (Ilyxum mech) on a legendary planet or planet with a technology specialty.");
+                player.getFactionEmoji() + " has the opportunity to DEPLOY an Iledrith (Augur mech) on a legendary planet or planet with a technology specialty.");
             String message2 = player.getRepresentationUnfogged() + ", please use buttons to drop 1 mech on a legendary planet or planet with a technology specialty.";
             List<Button> buttons2 = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
@@ -525,7 +525,7 @@ public class PlayerTechService {
 
     /**
      * Generate buttons to pay for tech.
-     *
+     * 
      * @param game
      * @param player
      * @param event
@@ -577,8 +577,8 @@ public class PlayerTechService {
             buttons.add(inheritanceSystemsButton);
         }
         if (player.hasRelicReady("prophetstears")) {
-            buttons.add(Buttons.red("prophetsTears_AC", "Exhaust Prophet's Tears for Action Card"));
-            buttons.add(Buttons.red("prophetsTears_TechSkip", "Exhaust Prophet's Tears for Technology Prerequisite"));
+            buttons.add(Buttons.red("prophetsTears_AC", "Exhaust Prophets Tears for Action Card"));
+            buttons.add(Buttons.red("prophetsTears_TechSkip", "Exhaust Prophets Tears for Technology Prerequisite"));
         }
         if (player.hasExternalAccessToLeader("jolnaragent") || player.hasUnexhaustedLeader("jolnaragent")) {
             buttons.add(Buttons.gray("exhaustAgent_jolnaragent", "Use Jol-Nar Agent", FactionEmojis.Jolnar));
@@ -595,7 +595,7 @@ public class PlayerTechService {
         }
         if (ButtonHelper.isLawInPlay(game, "revolution")) {
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(),
-                player.getRepresentation() + ", due to the _Anti-Intellectual Revolution_ law, you now have to destroy a non-fighter ship (if you __researched__ the technology you just acquired).",
+                player.getRepresentation() + " Due to the _Anti-Intellectual Revolution_ law, you now have to kill a non-fighter ship if you researched the technology you just acquired.",
                 Buttons.gray("getModifyTiles", "Modify Units"));
         }
     }

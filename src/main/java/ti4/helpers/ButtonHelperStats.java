@@ -128,7 +128,7 @@ public class ButtonHelperStats {
 
     public static void afterGainCommsChecks(Game game, Player player, int realGain) {
         if (player.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
-            String axis = player.getRepresentationUnfogged() + " you have the opportunity to buy _Axis Orders_.";
+            String axis = player.getRepresentationUnfogged() + " you have the opportunity to buy axis orders";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), axis, ButtonHelperAbilities.getBuyableAxisOrders(player, game));
         }
         CommanderUnlockCheckService.checkPlayer(player, "mykomentori");

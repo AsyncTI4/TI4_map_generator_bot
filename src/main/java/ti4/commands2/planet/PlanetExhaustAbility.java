@@ -44,7 +44,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         PlanetModel model = Mapper.getPlanet(planet);
         MessageChannel channel = player.getCorrectChannel();
 
-        String exhaustMsg = player.getRepresentationNoPing() + " used the " + model.getName() + " ability.";
+        String exhaustMsg = player.getFactionEmoji() + " used the " + model.getName() + " ability:";
         MessageHelper.sendMessageToChannelWithEmbed(channel, exhaustMsg, model.getLegendaryEmbed());
 
         String output = "blank";

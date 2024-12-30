@@ -59,7 +59,7 @@ public class TechSummaryCron {
 
             msg.append(player.getFactionEmoji()).append(":");
             if (techSummary.getResearchAgreementTech() != null) {
-                msg.append(" (from _Research Agreement_:");
+                msg.append(" (From RA:");
                 for (String tech : techSummary.getResearchAgreementTech()) {
                     msg.append(" ").append(Mapper.getTech(tech).getNameRepresentation());
                 }

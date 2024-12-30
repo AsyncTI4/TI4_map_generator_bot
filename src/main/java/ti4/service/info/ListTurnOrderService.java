@@ -77,11 +77,11 @@ public class ListTurnOrderService {
             order.put(sc, text);
 
         }
-        StringBuilder msg = new StringBuilder("__Turn Order__:");
+        StringBuilder msg = new StringBuilder("__**Turn Order:**__\n");
 
         if (naaluSC != 0) {
             String text = order.get(naaluSC);
-            msg.append("\n`").append(0).append(".`").append(text).append("\n");
+            msg.append("`").append(0).append(".`").append(text).append("\n");
         }
         Integer max = Collections.max(game.getScTradeGoods().keySet());
         if (ButtonHelper.getKyroHeroSC(game) != 1000) {
@@ -93,9 +93,10 @@ public class ListTurnOrderService {
             }
             String text = order.get(i);
             if (text != null) {
-                msg.append("\n`").append(i).append(".`").append(text);
+                msg.append("`").append(i).append(".`").append(text).append("\n");
             }
         }
+        msg.append("_ _"); // forced extra line
         TextChannel channel = game.getMainGameChannel();
         if (event instanceof SlashCommandInteractionEvent slash && slash.getChannel() instanceof TextChannel chan) {
             channel = chan;

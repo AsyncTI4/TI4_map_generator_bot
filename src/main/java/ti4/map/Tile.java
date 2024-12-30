@@ -476,8 +476,8 @@ public class Tile {
         if (getTileModel().getWormholes() != null)
             whs.addAll(getTileModel().getWormholes());
         for (String token : getSpaceUnitHolder().getTokenList()) {
-            if (token.contains("alpha") || token.contains("sigma_weirdway")) whs.add(WormholeModel.Wormhole.ALPHA);
-            if (token.contains("beta") || token.contains("sigma_weirdway")) whs.add(WormholeModel.Wormhole.BETA);
+            if (token.contains("alpha")) whs.add(WormholeModel.Wormhole.ALPHA);
+            if (token.contains("beta")) whs.add(WormholeModel.Wormhole.BETA);
             if (token.contains("gamma")) whs.add(WormholeModel.Wormhole.GAMMA);
         }
         return whs;

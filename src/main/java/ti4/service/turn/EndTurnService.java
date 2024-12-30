@@ -108,11 +108,6 @@ public class EndTurnService {
         }
 
         if (game.getPlayers().values().stream().allMatch(Player::isPassed)) {
-            if (mainPlayer.getSecretsUnscored().containsKey("pe"))
-            {
-                MessageHelper.sendMessageToChannel(mainPlayer.getCardsInfoThread(),
-                    "You were the last player to pass, and so you can score _Prove Endurance_.");
-            }
             showPublicObjectivesWhenAllPassed(event, game, gameChannel);
             game.updateActivePlayer(null);
             ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event);
@@ -307,7 +302,7 @@ public class EndTurnService {
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " you may use the button to pay 3 trade goods and get a technology, using _Sentient Datapool_.", List.of(Buttons.GET_A_TECH));
+                    player.getRepresentationUnfogged() + " you may use the button to pay 3 trade goods and get a technology, using your _Sentient Datapool_ technology.", List.of(Buttons.GET_A_TECH));
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
             if (player.hasLeader("kyrohero") && player.getLeaderByID("kyrohero").isPresent()
@@ -331,13 +326,11 @@ public class EndTurnService {
                     if (unitHolder != null && unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         if (player.hasRelic("emphidia")) {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation() + "Reminder this is __not__ the window to use _The Crown of Emphidia_."
-                                + " You may purge _The Crown of Emphidia_ in the status homework phase, which is when buttons will appear.");
+                                player.getRepresentation() + "Reminder this is not the window to use " + ExploreEmojis.Relic + "Crown of Emphidia. You may purge " +
+                                    ExploreEmojis.Relic + "Crown of Emphidia in the status homework phase, which is when buttons will appear.");
                         } else {
-                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation() + "Reminder this is the window to use _The Crown of Emphidia_.");
-                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                                player.getRepresentation() + " You may use these buttons to resolve _The Crown of Emphidia_.", ButtonHelper.getCrownButtons());
+                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to use " + ExploreEmojis.Relic + "Crown of Emphidia.");
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You may use these buttons to resolve " + ExploreEmojis.Relic + "Crown of Emphidia.", ButtonHelper.getCrownButtons());
                         }
                     }
                 }
@@ -413,7 +406,7 @@ public class EndTurnService {
         }
         Player arborec = Helper.getPlayerFromAbility(game, "mitosis");
         if (arborec != null) {
-            String mitosisMessage = arborec.getRepresentationUnfogged() + ", a reminder to do **Mitosis**.";
+            String mitosisMessage = arborec.getRepresentationUnfogged() + " reminder to do mitosis!";
             MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
         }
         Player veldyr = Helper.getPlayerFromAbility(game, "holding_company");

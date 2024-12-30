@@ -119,22 +119,23 @@ public class PlayerStatsService {
 
         // WARNING IF PICKING TRADE WHEN PLAYER DOES NOT HAVE THEIR TRADE AGREEMENT
         if (scModel.usesAutomationForSCID("pok5trade") && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
-            String message = player.getRepresentationUnfogged() + " heads up, you just picked **Trade** but don't currently hold your _Trade Agreement_.";
+            String message = player.getRepresentationUnfogged() + " heads up, you just picked Trade but don't currently hold your Trade Agreement";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
         }
 
         Integer tgCount = scTradeGoods.get(scNumber);
-        String msg = player.getRepresentationUnfogged() + " picked: " + Helper.getSCRepresentation(game, scNumber);
+        String msg = player.getRepresentationUnfogged() +
+            "\n> Picked: " + Helper.getSCRepresentation(game, scNumber);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (tgCount != null && tgCount != 0) {
             int tg = player.getTg();
             tg += tgCount;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                + " from picking **" + Helper.getSCName(scNumber, game) + "**.");
+                + " from picking " + Helper.getSCName(scNumber, game));
             if (game.isFowMode()) {
                 String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
-                    + " trade good" + (tgCount == 1 ? "" : "s") + " from picking **" + Helper.getSCName(scNumber, game) + "**.";
+                    + " trade good" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game);
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);

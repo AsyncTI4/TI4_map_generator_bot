@@ -275,7 +275,7 @@ public class StartCombatService {
         // DS Lanefir ATS Armaments
         if ((player1.hasTech("dslaner") && player1.getAtsCount() > 0) || (player2.hasTech("dslaner") && player2.getAtsCount() > 0)) {
             List<Button> lanefirATSButtons = ButtonHelperFactionSpecific.getLanefirATSButtons(player1, player2);
-            MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to remove commodities from _ATS Armaments_:", lanefirATSButtons);
+            MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to remove commodities from ATS Armaments:", lanefirATSButtons);
         }
     }
 
@@ -365,45 +365,34 @@ public class StartCombatService {
             if (otherPlayer == player) {
                 otherPlayer = p2;
             }
-            String msg = player.getRepresentation();
+            String msg = player.getRepresentation() + " ";
             if (ButtonHelper.doesPlayerHaveFSHere("cymiae_flagship", player, tile)) {
-                buttons.add(Buttons.green("resolveSpyStep1", "Resolve Cymiae Flagship"));
+                buttons.add(Buttons.green("resolveSpyStep1", "Resolve Reprocessor Alpha (Cymiae Flagship) Ability"));
                 buttons.add(Buttons.red("deleteButtons", "Delete These"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + ", if you win the combat, you have the opportunity to use the Reprocessor Alpha (the Cymiae flagship)"
-                    + " to force the other player to send you a random action card. It will send buttons to the other player to confirm.",
+                    + "if you win the combat, you have the opportunity to use the Reprocessor Alpha (the Cymiae flagship) to force the other player to send you a random action card. It will send buttons to the other player to confirm.",
                     buttons);
             }
             if (type.equalsIgnoreCase("space") && player.getSecretsUnscored().containsKey("uf")
                 && tile.getUnitHolders().get("space").getUnitCount(Units.UnitType.Flagship, player.getColor()) > 0) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    msg + ", this is a reminder that if you win the combat, and your flagship survives, you could score _Unveil Flagship_.");
+                    msg + " this is a reminder that if you win the combat, you may score Unveil Flagship.");
             }
             if (type.equalsIgnoreCase("space") && player.getSecretsUnscored().containsKey("dtgs")
                 && (tile.getUnitHolders().get("space").getUnitCount(Units.UnitType.Flagship, otherPlayer.getColor()) > 0
                     || tile.getUnitHolders().get("space").getUnitCount(Units.UnitType.Warsun,
                         otherPlayer.getColor()) > 0)) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
-                    + " this is a reminder that you could potentially score _Destroy Their Greatest Ship_ in this combat.");
+                    + " this is a reminder that you could potentially score Destroy Their Greatest Ship in this combat.");
             }
             if (player.getSecretsUnscored().containsKey("sar")
                 && otherPlayer.getTotalVictoryPoints() == game.getHighestScore()) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    msg + ", this is a reminder that if you win the combat, you could score _Spark a Rebellion_.");
+                    msg + " this is a reminder that you could potentially score Spark a Rebellion in this combat.");
             }
             if (player.getSecretsUnscored().containsKey("btv") && tile.isAnomaly(game)) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    msg + ", this is a reminder that if you win the combat, you could score _Brave the Void_.");
-            }
-            if (player.getSecretsUnscored().containsKey("dts") && tile.isHomeSystem() && tile != player.getHomeSystemTile()) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    msg + ", this is a reminder that if you win the combat, you could score _Darken the Skies_.");
-            }
-            int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, null, true);
-            if (player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    msg + ", this is a reminder that if you win the combat, and you lose " + (capitalShips == 3 ? "no" : "at most " + (capitalShips - 3))
-                    + " non-fighter ship" + (capitalShips == 4 ? "" : "s") + ", you could score _Demonstrate Your Power_.");
+                    msg + " this is a reminder that you could potentially score Brave the Void in this combat.");
             }
 
             if ((player.hasAbility("edict") || player.hasAbility("imperia"))
@@ -437,7 +426,7 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray("salvageOps_" + tile.getPosition(), "Salvage Operations", FactionEmojis.Mentak));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if the combat does not end in a draw, you may use the button to resolve _Salvage Operations_.",
+                    + " this is a reminder that if the combat does not end in a draw, you may use the button to resolve Salvage Operations.",
                     buttons);
             }
             if (type.equalsIgnoreCase("space")
@@ -455,8 +444,8 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(finChecker + "moult_" + tile.getPosition(), "Moult", FactionEmojis.cheiran));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you win the combat, you will be given buttons to resolve **Moult**, allowing you to produce 1 ship, reducing the cost " +
-                    "by 1 for each non-fighter ship you will have lost in the combat.",
+                    + " this is a reminder that if you win the combat, you may use the button to resolve Moult and produce one ship, reducing the cost " +
+                    "by 1 for each non-fighter ship you lost in the combat.",
                     buttons);
             }
             if (player.getPromissoryNotes().containsKey("dspnmort")
@@ -480,9 +469,9 @@ public class StartCombatService {
             if (techOrLegendary && player.getLeaderIDs().contains("augerscommander")
                 && !player.hasLeaderUnlocked("augerscommander")) {
                 buttons = new ArrayList<>();
-                buttons.add(Buttons.green("unlockCommander_augers", "Unlock Ilyxum Commander", FactionEmojis.augers));
+                buttons.add(Buttons.green("unlockCommander_augers", "Unlock Augurs Commander", FactionEmojis.augers));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you win the combat here, you may use the button to unlock Lachis, the Ilyxum commander.",
+                    + " this is a reminder that if you win the combat here, you may use the button to unlock Lachis, the Augurs commander.",
                     buttons);
             }
             if (player.getLeaderIDs().contains("kortalicommander")
@@ -676,7 +665,7 @@ public class StartCombatService {
         // Exo 2s
         if ("space".equalsIgnoreCase(groundOrSpace) && !game.isFowMode()) {
             if ((tile.getSpaceUnitHolder().getUnitCount(Units.UnitType.Dreadnought, p1.getColor()) > 0 && p1.hasTech("exo2")) || (tile.getSpaceUnitHolder().getUnitCount(Units.UnitType.Dreadnought, p2.getColor()) > 0 && p2.hasTech("exo2"))) {
-                buttons.add(Buttons.blue("assCannonNDihmohn_exo_" + tile.getPosition(), "Use Exotrireme II Ability", FactionEmojis.Sardakk));
+                buttons.add(Buttons.blue("assCannonNDihmohn_exo_" + tile.getPosition(), "Use Exotrireme 2 Ability", FactionEmojis.Sardakk));
             }
         }
 
@@ -777,30 +766,30 @@ public class StartCombatService {
 
         if (isSpaceCombat && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p2, tile) && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "gain_1_comms_stay", "Gain Commodity with Myko-Mentori Flagship", FactionEmojis.mykomentori));
+            buttons.add(Buttons.gray(finChecker + "gain_1_comms_stay", "Psyclobea Qarnyx (Myko Flagship)", FactionEmojis.mykomentori));
         }
         if (isSpaceCombat && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p1, tile)) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "gain_1_comms_stay", "Gain Commodity with Myko-Mentori Flagship", FactionEmojis.mykomentori));
+            buttons.add(Buttons.gray(finChecker + "gain_1_comms_stay", "Psyclobea Qarnyx (Myko Flagship)", FactionEmojis.mykomentori));
         }
 
-        if ((ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_1", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_2", p2, tile)) && !game.isFowMode()) {
+        if ((ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_1", p2, tile) | ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_2", p2, tile)) && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             String tp = tile.getPosition();
-            buttons.add(Buttons.blue(finChecker + "placeOneNDone_skipbuild_ff_space" + tp, "Sol Flagship Fighter", FactionEmojis.Sol));
+            buttons.add(Buttons.gray(finChecker + "placeOneNDone_skipbuild_ff_" + tp, "Genesis (Sol Flagship) Fighter", FactionEmojis.Sol));
             for (Planet planet : tile.getPlanetUnitHolders()) {
                 String pp = planet.getName();
-                Button inf2Button = Buttons.green(finChecker + "placeOneNDone_skipbuild_gf_" + pp, "Sol Flagship Infantry on" + Helper.getPlanetRepresentation(pp, game), FactionEmojis.Sol);
+                Button inf2Button = Buttons.green(finChecker + "placeOneNDone_skipbuild_ff_2gf_" + pp, "Genesis (Sol Flagship) Fighter on" + Helper.getPlanetRepresentation(pp, game), FactionEmojis.Sol);
                 buttons.add(inf2Button);
             }
         }
-        if ((ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_1", p1, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_2", p1, tile)) && !game.isFowMode()) {
+        if ((ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_1", p1, tile) | ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_2", p1, tile)) && !game.isFowMode()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             String tp = tile.getPosition();
-            buttons.add(Buttons.blue(finChecker + "placeOneNDone_skipbuild_ff_space" + tp, "Sol Flagship Fighter", FactionEmojis.Sol));
+            buttons.add(Buttons.gray(finChecker + "placeOneNDone_skipbuild_ff_" + tp, "Genesis (Sol Flagship) Fighter", FactionEmojis.Sol));
             for (Planet planet : tile.getPlanetUnitHolders()) {
                 String pp = planet.getName();
-                buttons.add(Buttons.green(finChecker + "placeOneNDone_skipbuild_gf_" + pp, "Sol Flagship Infantry on" + Helper.getPlanetRepresentation(pp, game), FactionEmojis.Sol));
+                buttons.add(Buttons.green(finChecker + "placeOneNDone_skipbuild_ff_2gf_" + pp, "Genesis (Sol Flagship) Fighter on" + Helper.getPlanetRepresentation(pp, game), FactionEmojis.Sol));
             }
         }
 
@@ -988,11 +977,11 @@ public class StartCombatService {
     private static String getSpaceCombatIntroMessage() {
         return """
             ## Steps for Space Combat:
-            > 1. End of movement abilities (**Foresight**, _Stymie_, etc.)
-            > 2. Space Cannon Defence
-            > 3. Start of Combat (_Skilled Retreat_, _Morale Boost_, etc.)
+            > 1. End of movement abilities (Foresight, Stymie, etc.)
+            > 2. Firing of PDS
+            > 3. Start of Combat (Skilled Retreat, Morale Boost, etc.)
             > 4. Anti-Fighter Barrage
-            > 5. Declare Retreats (including _Rout_)
+            > 5. Declare Retreats (including Rout)
             > 6. Roll Dice!
             """;
     }
@@ -1000,11 +989,11 @@ public class StartCombatService {
     private static String getGroundCombatIntroMessage() {
         return """
             ## Steps for Invasion:
-            > 1. Start of invasion abilities (_Tekklar Legtion_, _Blitz_, _Bunker_, etc.)
+            > 1. Start of invasion abilities (Tekklar, Blitz, Bunker, etc.)
             > 2. Bombardment
             > 3. Commit Ground Forces
-            > 4. After commit window (_Parley_, _Ghost Squad_, etc.)
-            > 5. Start of Combat (_Morale Boost_, etc.)
+            > 4. After commit window (Parley, Ghost Squad, etc.)
+            > 5. Start of Combat (Morale Boost, etc.)
             > 6. Roll Dice!
             """;
     }

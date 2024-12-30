@@ -1055,14 +1055,13 @@ public class Game extends GameProperties {
                 ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
                 tradeGoodCount = 0;
                 MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + tradeGoodCount + " trade good" + (tradeGoodCount == 1 ? "" : "s")
-                    + " that would be placed on **" + Helper.getSCName(sc, this) + "** have instead been given to the Kyro "
-                    + (isFrankenGame() ? "hero " : "") + "player, as per the text on Speygh, the Kyro Hero.");
+                    + " that would be placed on **" + Helper.getSCName(sc, this) + "** have instead been given to the Kyro Hero player, as per Kyro Hero text.");
             }
         }
         scTradeGoods.put(sc, tradeGoodCount);
     }
 
-    public List<Integer> incrementScTradeGoods() {
+    public void incrementScTradeGoods() {
         Set<Integer> scPickedList = new HashSet<>();
         for (Player player_ : getRealPlayers()) {
             scPickedList.addAll(player_.getSCs());
@@ -1076,20 +1075,16 @@ public class Game extends GameProperties {
             }
         }
 
-        List<Integer> scUnickedList = new ArrayList<>();
         //ADD A TG TO UNPICKED SC
-        for (Integer scNumber : scTradeGoods.keySet()) {
-            if (!scPickedList.contains(scNumber) && scNumber != 0) {
-                scUnickedList.add(scNumber);
-                if (!islandMode()) {
+        if (!islandMode()) {
+            for (Integer scNumber : scTradeGoods.keySet()) {
+                if (!scPickedList.contains(scNumber) && scNumber != 0) {
                     Integer tgCount = scTradeGoods.get(scNumber);
                     tgCount = tgCount == null ? 1 : tgCount + 1;
                     setScTradeGood(scNumber, tgCount);
                 }
             }
         }
-        Collections.sort(scUnickedList);
-        return scUnickedList;
     }
 
     public boolean addSC(Integer sc) {
@@ -1832,8 +1827,7 @@ public class Game extends GameProperties {
             if (getLaws().size() > 2) {
                 for (Player p : getRealPlayers()) {
                     if (p.getSecretsUnscored().containsKey("dp")) {
-                        MessageHelper.sendMessageToChannel(p.getCardsInfoThread(), p.getRepresentationUnfogged()
-                            + ", a reminder that you have _Dictate Policy_, and a 3rd law just got put into play.");
+                        MessageHelper.sendMessageToChannel(p.getCardsInfoThread(), p.getRepresentationUnfogged() + " reminder that you have dictate policy and a 3rd law just got put into play");
                     }
                 }
             }

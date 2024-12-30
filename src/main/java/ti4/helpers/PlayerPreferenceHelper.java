@@ -138,7 +138,7 @@ public class PlayerPreferenceHelper {
     public static void offerDirectHitManagementOptions(Game game, Player player) {
         List<Button> buttons = getDirectHitManagementButtons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged()
-            + " select the units you would like to either risk or not risk _Direct Hit_. Upgraded dreadnoughts will automatically \"risk\" _Direct Hits_.  ",
+            + " select the units you would like to either risk or not risk Direct Hit. Upgraded dreadnoughts will automatically risk Direct Hits.  ",
             buttons);
     }
 
