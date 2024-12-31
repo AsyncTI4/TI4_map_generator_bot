@@ -13,8 +13,8 @@ import ti4.model.ExploreModel;
 class ExploreShuffleBackIntoDeck extends GameStateSubcommand {
 
     public ExploreShuffleBackIntoDeck() {
-        super(Constants.SHUFFLE_BACK_INTO_DECK, "Shuffle an Exploration card back into the deck, including purged cards", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card ID sent between ()").setRequired(true));
+        super(Constants.SHUFFLE_BACK_INTO_DECK, "Shuffle an exploration card back into the deck, including purged cards", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Exploration card ID, which is found between ()").setRequired(true));
     }
 
     @Override

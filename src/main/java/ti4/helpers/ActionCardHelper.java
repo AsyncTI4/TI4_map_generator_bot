@@ -306,12 +306,12 @@ public class ActionCardHelper {
         if (player.isPassed() && activePlayerID != null) {
             Player activePlayer = game.getPlayer(activePlayerID);
             if (activePlayer != null && activePlayer.hasTech("tp")) {
-                return "You are passed and the active player owns the _Transparasteel Plating_ technology, preventing you from playing action cards. As such, the action card command has been cancelled.";
+                return "You are passed and the active player owns _Transparasteel Plating_, preventing you from playing action cards. As such, the action card command has been cancelled.";
             }
         }
         if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) != player) {
             return "You are trying to play an action card with a component action, and the game does not think you are the active player."
-            + " You may fix this with /player turn_start. Until then, you are #denied.";
+            + " You may fix this with `/player turn_start`. Until then, you are #denied.";
         }
         if (ButtonHelper.isPlayerOverLimit(game, player)) {
             return player.getRepresentationUnfogged()
@@ -325,13 +325,8 @@ public class ActionCardHelper {
             game.discardActionCard(player.getUserID(), acIndex);
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(game.getPing()).append(" ").append(game.getName()).append("\n");
-        if (game.isFowMode()) {
-            sb.append("Someone played the action card _").append(actionCardTitle).append("_:\n");
-        } else {
-            sb.append(player.getRepresentation()).append(" played the action card _").append(actionCardTitle).append("_:\n");
-        }
+        String message = game.getPing() + ", " + (game.isFowMode() ? "someone" : player.getRepresentation())
+            + " played the action card _" + actionCardTitle + "_.";
 
         List<Button> buttons = new ArrayList<>();
         Button sabotageButton = Buttons.red("sabotage_ac_" + actionCardTitle, "Cancel Action Card With Sabotage", MiscEmojis.Sabotage);
@@ -365,24 +360,24 @@ public class ActionCardHelper {
         buttons.add(noSabotageButton);
         buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_" + actionCardTitle, "Pause Timer While Waiting For Sabo"));
         if (acID.contains("sabo")) {
-            MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, sb.toString(), acEmbed);
+            MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
         } else {
             String buttonLabel = "Resolve " + actionCardTitle;
 
             if (Helper.isSaboAllowed(game, player)) {
-                MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(mainGameChannel, sb.toString(), game, player, Collections.singletonList(acEmbed), buttons, true);
+                MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
             } else {
-                MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, sb.toString(), acEmbed);
+                MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
                 StringBuilder noSabosMessage = new StringBuilder("> " + Helper.noSaboReason(game, player));
                 boolean it = false, watcher = false;
                 for (Player p : game.getRealPlayers()) {
                     if (p == player) continue;
                     if (game.isFowMode() || (!it && p.hasTechReady("it"))) {
-                        noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Xxcha + "**Instinct Training**, watch out");
+                        noSabosMessage.append("\n> A player may have access to _Instinct Training_, so watch out.");
                         it = true;
                     }
                     if (game.isFowMode() || (!watcher && Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
-                        noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Empyrean + UnitEmojis.mech + "**Watcher**, watch out");
+                        noSabosMessage.append("\n> A player may have access to a Watcher (Empyrean mech), so 𝓌𝒶𝓉𝒸𝒽 out.");
                         watcher = true;
                     }
                 }
@@ -803,13 +798,13 @@ public class ActionCardHelper {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your prediction target", game, player, riderButtons);
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your prediction target.", game, player, riderButtons);
                 }
                 if (actionCardTitle.contains("Hack Election")) {
                     game.setHasHackElectionBeenPlayed(true);
                     Button setHack = Buttons.red("hack_election", "Set the voting order as normal");
                     List<Button> hackButtons = List.of(setHack);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Voting order reversed. Please hit this button if Hack Election is Sabo'd", game, player, hackButtons);
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Voting order reversed. Please hit this button if _Hack Election_ is Sabo'd.", game, player, hackButtons);
                 }
 
             }
@@ -822,10 +817,9 @@ public class ActionCardHelper {
                     "Please indicate no afters again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
             }
             if ("Action".equalsIgnoreCase(actionCardWindow)) {
-                String message = "Use buttons to end turn or do another action.";
                 game.setJustPlayedComponentAC(true);
                 List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
-                MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, "Use buttons to end turn or do another action.", systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
                     String message2 = player.getRepresentationUnfogged() + " you may unleash Suffi An, your commander, by paying 1 trade good (if the action card isn't Sabo'd).";
                     List<Button> buttons2 = new ArrayList<>();
@@ -845,7 +839,7 @@ public class ActionCardHelper {
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             Button cymiaeButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", FactionEmojis.cymiae);
-            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), player.getRepresentationUnfogged() 
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), player.getRepresentationUnfogged()
                 + ", you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Skhot Unit X-12, the Cymiae" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw action card.", cymiaeButton);
         }
@@ -862,7 +856,7 @@ public class ActionCardHelper {
 
             String reverseEngineerID = "reverse_engineer";
             if (player.getActionCards().containsKey(reverseEngineerID)) {
-                StringBuilder msg = new StringBuilder(player.getRepresentationUnfogged() + " you can use Reverse Engineer on ");
+                StringBuilder msg = new StringBuilder(player.getRepresentationUnfogged() + " you can use _Reverse Engineer_ on ");
                 if (actionCards.size() > 1) msg.append("one of the following cards:");
 
                 List<Button> reverseButtons = new ArrayList<>();
@@ -1040,8 +1034,13 @@ public class ActionCardHelper {
 
         ActionCardHelper.sendActionCardInfo(game, player, event);
         if (player.hasAbility("autonetic_memory")) {
-            String message = player.getRepresentationUnfogged() + ", if you did not just use the Codex to get that action card, "
-                + "please discard 1 action card due to your **Cybernetic Madness** ability.";
+            String message;
+            if (player.hasRelic("codex") || player.hasRelic("absol_codex")) {
+                message = player.getRepresentationUnfogged() + ", if you did not just use _The Codex_ to get that action card,"
+                    + " please discard 1 action card due to your **Cybernetic Madness** ability.";
+            } else {
+                message = player.getRepresentationUnfogged() + ", please discard 1 action card due to your **Cybernetic Madness** ability.";
+            }
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
         ButtonHelper.checkACLimit(game, player);

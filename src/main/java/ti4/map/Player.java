@@ -608,7 +608,7 @@ public class Player {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using ID: " + cardsInfoThreadID + " for potential thread name: " + threadName, e);
+            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing #cards-info thread using ID: " + cardsInfoThreadID + " for potential thread name: " + threadName, e);
         }
 
         // ATTEMPT TO FIND BY NAME
@@ -632,7 +632,7 @@ public class Player {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thread using name: " + threadName, e);
+            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing #cards-info thread using name: " + threadName, e);
         }
 
         // CREATE NEW THREAD
@@ -2393,10 +2393,10 @@ public class Player {
                 .contains("attachment_nanoforge.png")
             && !getExhaustedPlanetsAbilities().contains(planet)) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("planetAbilityExhaust_" + planet, "Use Nanoforge Ability"));
+            buttons.add(Buttons.green("planetAbilityExhaust_" + planet, "Use Nano-Forge Ability"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(),
-                getRepresentation() + " You may choose to Exhaust Nanoforge Ability to ready the planet.", buttons);
+                getRepresentation() + ", you may choose to exhaust the _Nano-Forge_ legendary ability to ready the planet it's attached to.", buttons);
         }
     }
 

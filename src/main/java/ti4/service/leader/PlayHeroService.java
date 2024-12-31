@@ -21,6 +21,7 @@ import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
@@ -124,7 +125,7 @@ public class PlayHeroService {
                     }
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged()
-                    + "Added 2 fighters to every system with an owned planet and no opponent ships.");
+                    + "Added 2 fighters to every system with an owned planet and no other players' ships.");
                 ButtonHelperHeroes.resolveFlorzenHeroStep1(player, game);
             }
             case "kyrohero" -> {
@@ -132,7 +133,8 @@ public class PlayHeroService {
                 game.setStoredValue("kyroHeroSC", dieResult + "");
                 game.setStoredValue("kyroHeroPlayer", player.getFaction());
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getSCName(dieResult, game) 
-                    + " has been marked with Speygh, the Kyro hero, and the faction that played the hero as " + player.getFaction());
+                    + " has been with Speygh, the Kyro hero"
+                    + (game.isFrankenGame() ? ", and the faction that played the hero as " + player.getFaction() : "") + ".");
                 ListTurnOrderService.turnOrder(event, game);
             }
             case "ghotihero" -> MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -157,11 +159,11 @@ public class PlayHeroService {
                 buttons.add(Buttons.blue("cymiaeHeroAutonetic", "Resolve Autonetic Memory First"));
 
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation() + " choose whether to resolve Autonetic Memory or not.", buttons);
+                    player.getRepresentation() + " choose whether to resolve **Autonetic Memory** or not.", buttons);
 
             }
             case "lizhohero" -> MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
-                "You may use the buttons in your cards info to set traps, then when you're done with that, press the following button to start distributing 12 fighters.",
+                "You may use the buttons in your `#cards-info` thread to set traps, then when you're done with that, press the following button to start distributing 12 fighters.",
                 Buttons.green("lizhoHeroFighterResolution", "Distribute 12 Fighters"));
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -184,7 +186,7 @@ public class PlayHeroService {
                 String message = player.getRepresentation()
                     + " Resolving The Helmsman, the L1Z1X Hero. At the moment, this is implemented as a sort of tactical action, relying on the player to follow the rules."
                     + " The game will know not to take a command token from your tactic pool, and will allow you to move out of locked systems."
-                    + " Reminder that you may carry ground forces and fighters with your dreadnoughts/flagship, and that they can't move into supernovae (or asteroid fields if you don't have Antimass Deflectors).";
+                    + " Reminder that you may carry ground forces and fighters with your dreadnoughts/flagship, and that they can't move into supernovae (or asteroid fields if you don't have _Antimass Deflectors_).";
                 List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
                 game.setL1Hero(true);
                 game.resetCurrentMovedUnitsFrom1TacticalAction();
@@ -192,9 +194,9 @@ public class PlayHeroService {
             }
             case "winnuhero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getWinnuHeroSCButtons(game);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
-                    showFlavourText)
-                    + " use the button to pick which strategy card you'd like to do the primary of."
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
+                    + ", you invoke the Imperial Seal" + (RandomHelper.isOneInX(50) ? " 🦭" : "") + "."
+                    + " Please choose which strategy card you'd like to do the primary of."
                     + " Reminder you may allow others to do the secondary, but they should still spend 1 command token from their strategy pool to resolving it (unless it's **Leadership**).",
                     buttons);
             }
@@ -285,18 +287,18 @@ public class PlayHeroService {
             case "veldyrhero" -> {
                 game.setComponentAction(true);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
-                                + ", for each planet with a Branch Office, you may copy 1 unit upgrade technology from the player that controls that planet.");
+                                + ", for each planet with a _Branch Office_, you may copy 1 unit upgrade technology from the player that controls that planet.");
                 for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)) {
                     if (ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2) == 1)
                     {
-                        String msg = p2.getFactionEmojiOrColor() + " owns 1 Branch Office. You may copy 1 of these unit upgrade technologies.";
+                        String msg = p2.getFactionEmojiOrColor() + " owns 1 _Branch Office_. You may copy 1 of these unit upgrade technologies.";
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg,
                             ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
                     }
                     else
                     {
                         String msg = p2.getFactionEmojiOrColor() + " owns " + ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2)
-                            + " Branch Offices. You may copy " + ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2) + " of these unit upgrade technologies.";
+                            + " _Branch Offices_. You may copy " + ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2) + " of these unit upgrade technologies.";
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg,
                             ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
                         for (int x = 1; x < ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2); x++) {
@@ -312,7 +314,7 @@ public class PlayHeroService {
                 List<Button> buttons = ButtonHelperHeroes.getNekroHeroButtons(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
-                    + " use the button to pick which planet you'd like to get a technology and trade goods from (and kill any opponent units).",
+                    + " use the button to pick which planet you'd like to get a technology and trade goods from (and kill any enemy units).",
                     buttons);
             }
             case "bentorhero" -> {
@@ -370,7 +372,7 @@ public class PlayHeroService {
                 buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 1,
                     "Resolve Ilyxum Hero on Stage 1 Deck"));
                 buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 2,
-                    "ResolveIlyxum Hero on Stage 2 Deck"));
+                    "Resolve Ilyxum Hero on Stage 2 Deck"));
                 buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText)

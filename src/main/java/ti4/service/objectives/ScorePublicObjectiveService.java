@@ -43,16 +43,16 @@ public class ScorePublicObjectiveService {
             if (playerProgress < threshold) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getFactionEmoji() + " the bot does not believe you meet the requirements to score "
-                        + poName + ", The bot has you at " + playerProgress + "/" + threshold
-                        + ". If this is a mistake, please report and then you can manually score via /status po_score with the number ID of "
-                        + poID);
+                        + poName + ". The bot has you at " + playerProgress + "/" + threshold
+                        + ". If this is a mistake, please report and then you can manually score via `/status po_score` with the number ID of `"
+                        + poID + "`.");
                 return;
             }
         }
         boolean scored = game.scorePublicObjective(player.getUserID(), poID);
         if (!scored) {
             MessageHelper.sendMessageToChannel(channel,
-                player.getFactionEmoji() + "No such Public Objective ID found or already scored, please retry");
+                player.getFactionEmoji() + "No such public objective ID found, or already scored, please retry.");
         } else {
             informAboutScoring(event, channel, game, player, poID);
             for (Player p2 : player.getNeighbouringPlayers()) {
@@ -101,7 +101,7 @@ public class ScorePublicObjectiveService {
         String poName = both.split("_")[0];
         String emojiName = both.split("_")[1];
 
-        String message = player.getRepresentation() + " scored " + emojiName + " __**" + poName + "**__";
+        String message = player.getRepresentation() + " scored " + emojiName + " _" + poName + "_.";
         MessageHelper.sendMessageToChannel(channel, message);
         if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
@@ -150,7 +150,7 @@ public class ScorePublicObjectiveService {
             if (currentStrat + currentTact >= 3) {
                 if (currentStrat >= 3) {
                     for (int x = 0; x < 3; x++) {
-                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public1 + " Lead from the Front");
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public1 + " _Lead from the Front_.");
                     }
                     player.setStrategicCC(currentStrat - 3);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
@@ -159,7 +159,7 @@ public class ScorePublicObjectiveService {
                     String currentCC = player.getCCRepresentation();
                     int subtract = 3 - currentStrat;
                     for (int x = 0; x < currentStrat; x++) {
-                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public1 + " Lead from the Front");
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public1 + " _Lead from the Front_.");
                     }
                     player.setStrategicCC(0);
                     player.setTacticalCC(currentTact - subtract);
@@ -187,7 +187,7 @@ public class ScorePublicObjectiveService {
             if (currentStrat + currentTact >= 6) {
                 if (currentStrat >= 6) {
                     for (int x = 0; x < 6; x++) {
-                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public2 + " Galvanize the People");
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public2 + " _Galvanize the People_.");
                     }
                     player.setStrategicCC(currentStrat - 6);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() 
@@ -196,7 +196,7 @@ public class ScorePublicObjectiveService {
                     String currentCC = player.getCCRepresentation();
                     int subtract = 6 - currentStrat;
                     for (int x = 0; x < currentStrat; x++) {
-                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public2 + " Galvanize the People");
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public2 + " _Galvanize the People_.");
                     }
                     player.setStrategicCC(0);
                     player.setTacticalCC(currentTact - subtract);

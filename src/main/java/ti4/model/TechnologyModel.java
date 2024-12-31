@@ -239,7 +239,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         if (!techFaction.isBlank()) factionEmoji = FactionEmojis.getFactionIcon(techFaction).toString();
         String techEmoji = techType.emoji();
         StringBuilder sb = new StringBuilder();
-        sb.append(techEmoji).append("**").append(techName).append("**").append(factionEmoji);
+        sb.append(techEmoji).append("_").append(techName).append("_").append(factionEmoji);
         sb.append(getSource().emoji());
         if (includeCardText) sb.append("\n").append("> ").append(getText()).append("\n");
         return sb.toString();

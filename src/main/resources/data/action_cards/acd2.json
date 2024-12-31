@@ -273,7 +273,7 @@
     "alias": "direct_hit1_acd2",
     "name": "Direct Hit",
     "phase": "Action",
-    "window": "After another player's ship uses Sustain Damage to cancel a hit produced by your units or abilities",
+    "window": "After another player's ship uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
     "text": "Destroy that ship.",
     "flavorText": "A spontaneous cheer erupted from the command staff as the Letnev dreadnought broke apart. Neekuaq was filled with pride.",
     "source": "action_deck_2"
@@ -282,7 +282,7 @@
     "alias": "direct_hit2_acd2",
     "name": "Direct Hit",
     "phase": "Action",
-    "window": "After another player's ship uses Sustain Damage to cancel a hit produced by your units or abilities",
+    "window": "After another player's ship uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
     "text": "Destroy that ship.",
     "flavorText": "Neekuaq allowed the crew a moment to celebrate the fortunate shot before reining them in.",
     "source": "action_deck_2"
@@ -291,7 +291,7 @@
     "alias": "direct_hit3_acd2",
     "name": "Direct Hit",
     "phase": "Action",
-    "window": "After another player's ship uses Sustain Damage to cancel a hit produced by your units or abilities",
+    "window": "After another player's ship uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
     "text": "Destroy that ship.",
     "flavorText": "As the crew calmed, Neekuaq shouted, \"Excellent, but enough celebration! Turn our batteries on the escorts before they flee.\"",
     "source": "action_deck_2"
@@ -300,7 +300,7 @@
     "alias": "direct_hit4_acd2",
     "name": "Direct Hit",
     "phase": "Action",
-    "window": "After another player's ship uses Sustain Damage to cancel a hit produced by your units or abilities",
+    "window": "After another player's ship uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
     "text": "Destroy that ship.",
     "flavorText": "The Loncara Ssodu's secondary batteries made quick work of the escorts as the dreadnought's crew abandoned ship.",
     "source": "action_deck_2"
@@ -328,7 +328,7 @@
     "name": "Efficiency Initiative",
     "phase": "Action",
     "window": "When 1 or more of your units use PRODUCTION",
-    "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods. [Note: These trade goods are available to be spent during this production.]",
+    "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods. [Note: These trade goods are available to be spent during this PRODUCTION.]",
     "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
     "source": "action_deck_2"
   },
@@ -859,7 +859,7 @@
     "name": "Shrapnel Turrets",
     "phase": "Action",
     "window": "At the start of a space combat",
-    "text": "Choose any number of your ships in the active system that have a capacity value. Each of those ships gain ANTI-FIGHTER BARRAGE 8 (x2) during this combat.",
+    "text": "Choose any number of your ships in the active system that have a capacity value. Each of those ships gain ANTI-FIGHTER BARRAGE 8(x2) during this combat.",
     "flavorText": "Mendosa grinned widely as he eyed the cargo. \"Ye say we're out of munitions, yet look at all this junk lyin' around. It'll shred 'em fine!\"",
     "source": "action_deck_2"
   },

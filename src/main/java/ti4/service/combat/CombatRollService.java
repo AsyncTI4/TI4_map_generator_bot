@@ -68,13 +68,13 @@ public class CombatRollService {
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         if (combatOnHolder == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition());
+                "Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition() + ".");
             return 0;
         }
 
         if (rollType == CombatRollType.SpaceCannonDefence && !(combatOnHolder instanceof Planet)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Planet needs to be specified to fire space cannon defence on tile " + tile.getPosition());
+                "Planet needs to be specified to fire SPACE CANNON against ships on tile " + tile.getPosition() + ".");
         }
 
         Map<UnitModel, Integer> playerUnitsByQuantity = getUnitsInCombat(tile, combatOnHolder, player, event, rollType, game);
@@ -83,14 +83,14 @@ public class CombatRollService {
                 playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
                     .filter(e -> !"naaz_mech_space".equals(e.getKey().getAlias()))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping " + FactionEmojis.Naaz + " Z-Grav Eidolon due to Articles of War agenda.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping Z-Grav Eidolon (Naaz-Rokha mech) combat rolls due to _Articles of War_.");
             }
             if (rollType == CombatRollType.SpaceCannonDefence || rollType == CombatRollType.SpaceCannonOffence) {
                 if (playerUnitsByQuantity.keySet().stream().anyMatch(unit -> "xxcha_mech".equals(unit.getAlias()))) {
                     playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
                         .filter(e -> !"xxcha_mech".equals(e.getKey().getAlias()))
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping " + FactionEmojis.Xxcha + " mechs due to Articles of War agenda.");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping Indomitus (Xxcha mech) SPACE CANNON rolls due to _Articles of War_.");
                 }
             }
             if (rollType == CombatRollType.bombardment) {
@@ -98,7 +98,7 @@ public class CombatRollService {
                     playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
                         .filter(e -> !"l1z1x_mech".equals(e.getKey().getAlias()))
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping " + FactionEmojis.L1Z1X + " mechs due to Articles of War agenda.");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping Annihilator (L1Z1X mech) BOMBARDMENT rolls due to _Articles of War_.");
                 }
             }
 
@@ -205,7 +205,7 @@ public class CombatRollService {
                     }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                     if (opponent.hasTech("vpw")) {
-                        msg = player.getRepresentationUnfogged() + " you got hit by Valkyrie Particle Weave. You may autoassign 1 hit.";
+                        msg = player.getRepresentationUnfogged() + " you got hit by _Valkyrie Particle Weave_. You may autoassign 1 hit.";
                         buttons = new ArrayList<>();
                         buttons.add(Buttons.green(opponent.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_1", "Auto-assign Hit" + (h == 1 ? "" : "s")));
                         buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat", "Manually Assign Hit" + (h == 1 ? "" : "s")));
@@ -230,7 +230,7 @@ public class CombatRollService {
                 }
             } else {
                 if (opponent.hasTech("vpw") && h > 0) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " suffered 1 hit due to valkyrie particle weave");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " suffered 1 hit due to _Valkyrie Particle Weave_.");
                 }
             }
         } else {
@@ -284,7 +284,7 @@ public class CombatRollService {
             }
         }
         if (!game.isFowMode() && rollType == CombatRollType.AFB && opponent != player) {
-            String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from AFB";
+            String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from ANTI-FIGHTER BARRAGE.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (h > 0) {
                 String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";
@@ -297,7 +297,7 @@ public class CombatRollService {
             }
         }
         if (!game.isFowMode() && rollType == CombatRollType.SpaceCannonOffence && h > 0 && opponent != player) {
-            String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from space cannon offense";
+            String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from SPACE CANNON against your ships.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             List<Button> buttons = new ArrayList<>();
             String finChecker = "FFCC_" + opponent.getFaction() + "_";
@@ -313,7 +313,7 @@ public class CombatRollService {
 
             buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "_bombardment", "Assign Hit" + (h == 1 ? "" : "s")));
 
-            String msg2 = " you may use this button to assign " + (h == 1 ? "the bombardment hit" : "bombardment hits") + ".";
+            String msg2 = " you may use this button to assign " + (h == 1 ? "the BOMBARDMENT hit" : "BOMBARDMENT hits") + ".";
             boolean someone = false;
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
@@ -340,7 +340,7 @@ public class CombatRollService {
                 buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "meteorSlings_" + uH.getName(), "Infantry on " + Helper.getPlanetRepresentation(uH.getName(), game)));
             }
             buttons.add(Buttons.red("deleteButtons", "Done"));
-            String msg2 = player.getRepresentation() + " you could potentially cancel " + (h == 1 ? "the bombardment hit" : "some bombardment hits") + " to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
+            String msg2 = player.getRepresentation() + " you could potentially cancel " + (h == 1 ? "the BOMBARDMENT hit" : "some BOMBARDMENT hits") + " to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
 
         }
@@ -420,7 +420,8 @@ public class CombatRollService {
                 for (DiceHelper.Die die : resultRolls) {
                     if (die.getResult() > 9) {
                         hitRolls = hitRolls + 1;
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " got an extra hit due to the valor ability (it has been accounted for in the hit count).");
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+                            + " got an extra hit due to their **Valor** ability (it has been accounted for in the hit count).");
                     }
                 }
             }
@@ -430,7 +431,8 @@ public class CombatRollService {
                         player.setTg(player.getTg() + 1);
                         ButtonHelperAbilities.pillageCheck(player, game);
                         ButtonHelperAgents.resolveArtunoCheck(player, 1);
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1TG due to hitting on a bombardment roll with the Aurum Vadra (the Vaden flagship).");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                            + " gained 1 trade good due to hitting on a BOMBARDMENT roll with the Aurum Vadra (the Vaden flagship).");
                         break;
 
                     }
@@ -459,10 +461,12 @@ public class CombatRollService {
                                 }
                             }
                             if (player.hasTech("sar")) {
+                                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                                    + " you gained " + misses + " trade good (" + player.getTg() + "->" + (player.getTg() + misses)
+                                    + ") from _Self-Assembly Routines_ because of " + misses + " of your mechs dying."
+                                    + " This is not an optional gain" + (misses > 1 ? ", and happens 1 trade good at a time" : "") + ".");
                                 for (int x = 0; x < misses; x++) {
                                     player.setTg(player.getTg() + 1);
-                                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you gained 1TG (" + (player.getTg() - 1)
-                                        + "->" + player.getTg() + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -496,9 +500,9 @@ public class CombatRollService {
             }
             if (rollType == CombatRollType.SpaceCannonOffence || rollType == CombatRollType.SpaceCannonDefence) {
                 if (player.ownsUnit("gledge_pds2") && totalHits > 0) {
-                    String msg = player.getRepresentation() + " use the buttons to explore a planet with the pds that got the hit. It should be " +
-                        "noted that the bot has no idea which pds rolled which dice, but default practice would be to go from lowest tile position to highest" +
-                        ", with plasma applying to the last die. You can specify any order before rolling though.";
+                    String msg = player.getRepresentation() + ", use the buttons to explore a planet with the PDS that got the hit. It should be " +
+                        "noted that the bot has no idea which PDS rolled which dice, but default practice would be to go from lowest tile position to highest" +
+                        ", with _Plasma Scoring_ applying to the last die. You can specify any order before rolling though.";
                     for (int x = 0; x < totalHits; x++) {
                         List<Button> buttons = new ArrayList<>();
                         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds)) {
@@ -515,12 +519,12 @@ public class CombatRollService {
                                 }
                             }
                         }
-                        buttons.add(Buttons.red("deleteButtons", "No Valid Explore"));
+                        buttons.add(Buttons.red("deleteButtons", "No Valid Exploration"));
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                     }
                 }
                 if (player.ownsUnit("gledge_pds")) {
-                    String msg = player.getRepresentation() + " use the buttons to explore a planet with the pds that got the hit.";
+                    String msg = player.getRepresentation() + " use the buttons to explore a planet with the PDS that got the hit.";
                     for (DiceHelper.Die die : resultRolls) {
                         if (die.getResult() < 8) {
                             continue;
@@ -538,7 +542,7 @@ public class CombatRollService {
                                 buttons.addAll(planetButtons);
                             }
                         }
-                        buttons.add(Buttons.red("deleteButtons", "No Valid Explore"));
+                        buttons.add(Buttons.red("deleteButtons", "No Valid Exploration"));
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                     }
 
@@ -551,7 +555,7 @@ public class CombatRollService {
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unitModel, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                resultBuilder.append("Munitions rerolling ").append(numMisses).append(" miss").append(numMisses == 1 ? "" : "es").append(": ").append(unitRoll2);
+                resultBuilder.append("**Munitions Reserve** rerolling ").append(numMisses).append(" miss").append(numMisses == 1 ? "" : "es").append(": ").append(unitRoll2);
             }
 
             int argentInfKills = 0;
@@ -569,7 +573,7 @@ public class CombatRollService {
                 argentInfKills = Math.min(argentInfKills, space.getUnitCount(Units.UnitType.Infantry, opponent.getColor()));
             }
             if (argentInfKills > 0) {
-                String kills = "\nDue to SWA II destroyer ability, " + argentInfKills + " of " + opponent.getRepresentation(false, true) + " infantry were destroyed\n";
+                String kills = "\nDue to the Strike Wing Alpha II destroyer ability, " + argentInfKills + " of " + opponent.getRepresentation(false, true) + " infantry were destroyed\n";
                 resultBuilder.append(kills);
                 space.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), opponent.getColorID()), argentInfKills);
                 ButtonHelper.resolveInfantryDeath(opponent, argentInfKills);
@@ -580,11 +584,11 @@ public class CombatRollService {
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
         if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround && totalMisses > 0 && !game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-            result = result + "\n" + player.getFactionEmoji() + " You have the Crown of Thalnos and may reroll " + (totalMisses == 1 ? "the miss" : "misses")
+            result = result + "\n" + player.getFactionEmoji() + " You have _The Crown of Thalnos_ and may reroll " + (totalMisses == 1 ? "the miss" : "misses")
                 + ", adding +1, at the risk of your " + (totalMisses == 1 ? "troop's life" : "troops' lives") + ".";
         }
         if (totalHits > 0 && CombatRollType.bombardment == rollType && player.hasTech("dszelir")) {
-            result = result + "\n" + player.getFactionEmoji() + " You have Shard Volley and thus should produce an additional hit to the ones rolled above.";
+            result = result + "\n" + player.getFactionEmoji() + " You have _Shard Volley_ and thus should produce an additional hit to the ones rolled above.";
         }
         if (!extra.isEmpty()) {
             result = result + "\n\n" + extra;
@@ -872,7 +876,9 @@ public class CombatRollService {
                     unitsOnTile.put(starfallFakeUnit, count);
                 }
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " this is a reminder that due to the Starfall Gunnery ability, only Space Cannon of 1 unit should be counted at this point. Hopefully you declared beforehand what that unit was, but by default it's probably the best one. Only look at/count the rolls of that one unit");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()
+                    + ", a reminder that due to the **Starfall Gunnery** ability, the SPACE CANNON of only 1 unit should be counted at this point."
+                    + " Hopefully you declared beforehand what that unit was, but by default it's probably the best one. Only look at/count the rolls of that one unit.");
             }
         }
 

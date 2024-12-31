@@ -27,7 +27,7 @@
         "combatHitsOn": 5,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "This unit can only use SPACE CANNON if on a planet. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.",
+        "ability": "This unit can only use SPACE CANNON if on a planet.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.",
         "spaceCannonHitsOn": 6,
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": true

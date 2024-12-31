@@ -261,7 +261,7 @@ public class PromissoryNoteHelper {
         }
         if ("greyfire".equalsIgnoreCase(id)) {
             List<Button> buttons = ButtonHelperFactionSpecific.getGreyfireButtons(game);
-            String message = player.getRepresentationUnfogged() + " select planet you wish to use greyfire on";
+            String message = player.getRepresentationUnfogged() + " select planet you wish to use _Greyfire Mutagen_ on.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if ("dspnlizh".equalsIgnoreCase(id) || "dspnchei".equalsIgnoreCase(id)) {
@@ -279,13 +279,13 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
         }
         if ("ragh".equalsIgnoreCase(id)) {
-            String message = player.getRepresentationUnfogged() + " select planet to Ragh's Call on";
+            String message = player.getRepresentationUnfogged() + ", please select a planet to _Ragh's Call_ on.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
                 ButtonHelperFactionSpecific.getRaghsCallButtons(player, game,
                     game.getTileByPosition(game.getActiveSystem())));
         }
         if ("sigma_raghs_call".equalsIgnoreCase(id)) {
-            String message = player.getRepresentationUnfogged() + " select planet to Ragh's Call on. You will need to ready the planet manually if applicable.";
+            String message = player.getRepresentationUnfogged() + ", please select planet to _Ragh's Call_ on. You will need to ready the planet manually if applicable.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
                 ButtonHelperFactionSpecific.getRaghsCallButtons(player, game,
                     game.getTileByPosition(game.getActiveSystem())));
@@ -322,9 +322,17 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if (!"agendas_absol".equals(game.getAgendaDeckID()) && id.endsWith("_ps")) {
-            MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), owner.getRepresentationUnfogged()
-                + " due to a play of your Political Secret, you will be unable to vote in agenda (unless you have Xxcha alliance)."
-                + " The bot doesn't enforce the other restrictions regarding no abilities, but you should abide by them.");
+            if (game.playerHasLeaderUnlockedOrAlliance(owner, "xxchacommander")) {
+                MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), owner.getRepresentationUnfogged()
+                    + ", due to a play of your _Political Secret_, you can't play action cards or use the abilities on your faction sheet."
+                    + " The bot doesn't enforce these restrictions, but you should abide by them."
+                    + " Because of Elder Qanoj, the Xxcha commander, you can still vote.");
+            } else {
+                MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), owner.getRepresentationUnfogged()
+                    + ", due to a play of your _Political Secret_, you will be unable to vote in agenda."
+                    + " You also can't play action cards or use the abilities on your faction sheet."
+                    + " The bot doesn't enforce these other restrictions, but you should abide by them.");
+            }
             game.setStoredValue("AssassinatedReps",
                 game.getStoredValue("AssassinatedReps") + owner.getFaction());
         }
@@ -391,7 +399,7 @@ public class PromissoryNoteHelper {
                     "_Political Favor_ has been played to discard the current agenda.");
             } else if (owner.getFaction().equalsIgnoreCase("xxcha")) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Xxcha does not have any command tokens in their strategy pool."
+                    "The Xxcha player does not have any command tokens in their strategy pool."
                         + " As such, _Political Favor_ cannot be resolved and the current agenda remains.");
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -400,7 +408,7 @@ public class PromissoryNoteHelper {
             }
         }
         if (("scepter".equalsIgnoreCase(id))) {
-            String message = player.getRepresentationUnfogged() + " Use buttons choose which system to mahact diplo";
+            String message = player.getRepresentationUnfogged() + ", please choose which system to Mahact Diplo.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
                 Helper.getPlanetSystemDiploButtons(player, game, false, owner));
         }
@@ -535,5 +543,27 @@ public class PromissoryNoteHelper {
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, sb.toString());
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, "All PNs shown to player");
+    }
+
+    public void sendRandom(GenericInteractionCreateEvent event, Game game, Player sourcePlayer, Player targetPlayer) {
+        Map<String, Integer> promissoryNoteCounts = sourcePlayer.getPromissoryNotes();
+        List<String> promissoryNotes = new ArrayList<>(promissoryNoteCounts.keySet());
+        if (promissoryNotes.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No Promissory Notes in hand");
+        }
+        Collections.shuffle(promissoryNotes);
+        String promissoryNoteId = promissoryNotes.getFirst();
+        if (game.isFowMode()) {
+            FoWHelper.pingPlayersTransaction(game, event, sourcePlayer, targetPlayer, CardEmojis.ActionCard + " Action Card", null);
+        }
+
+        sourcePlayer.removePromissoryNote(promissoryNoteCounts.get(promissoryNoteId));
+        sendPromissoryNoteInfo(game, sourcePlayer, false);
+        MessageHelper.sendMessageToChannel(sourcePlayer.getCardsInfoThread(), "# " + sourcePlayer.getRepresentation() + " you lost the promissory note _" + Mapper.getPromissoryNote(promissoryNoteId).getName() + "_.");
+
+        targetPlayer.setPromissoryNote(promissoryNoteId);
+        sendPromissoryNoteInfo(game, targetPlayer, false);
+
+        MessageHelper.sendMessageToChannel(targetPlayer.getCardsInfoThread(), "# " + targetPlayer.getRepresentation() + " you gained the promissory note _" + Mapper.getPromissoryNote(promissoryNoteId).getName() +"_.");
     }
 }

@@ -132,7 +132,7 @@ public class AddPlanetService {
                         !"action_deck_2".equals(game.getAcDeckID()) &&
                         !game.isACInDiscard("Reparations")) {
                         String msg = player_.getRepresentation()
-                            + " has a window to play Reparations for the taking of "
+                            + " has a window to play _Reparations_ for the taking of "
                             + Mapper.getPlanet(planet).getName();
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
@@ -233,8 +233,8 @@ public class AddPlanetService {
             buttons.add(Buttons.green("scourPlanet_" + planet, "Use Scour", FactionEmojis.vaylerian));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             String msg2 = player.getRepresentationUnfogged()
-                + " if you have not already used Scour this tactical action, you may discard 1AC to ready the planet "
-                + Helper.getPlanetRepresentation(planet, game);
+                + " if you have not already used **Scour** this tactical action, you may discard 1 action card to ready "
+                + Helper.getPlanetRepresentation(planet, game) + ".";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
         }
 
@@ -252,13 +252,13 @@ public class AddPlanetService {
             && game.playerHasLeaderUnlockedOrAlliance(player, "cymiaecommander")) {
             List<Button> saarButton = new ArrayList<>();
             saarButton.add(Buttons.green("cymiaeCommanderRes_" + planet,
-                "Discard AC for mech on " + Helper.getPlanetRepresentation(planet, game)));
+                "Discard Action Card for Mech on " + Helper.getPlanetRepresentation(planet, game)));
             saarButton.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                    + " due to Koryl Ferax, the Cymiae Commander, you may discard 1AC here to place or move 1 mech on "
+                    + " due to Koryl Ferax, the Cymiae Commander, you may discard 1 action card here to place or move 1 mech on "
                     + Helper.getPlanetRepresentation(planet, game)
-                    + ". Do not do this prior to exploring. It is an after, while exploring is a when.",
+                    + ". Do not do this prior to exploring. It is an \"after\", while exploring is a \"when\".",
                 saarButton);
         }
 
@@ -271,7 +271,7 @@ public class AddPlanetService {
             if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd") < 3) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
-                        + " if you have the correct amount of infantry (3 or 4), you may remove them and deploy 1 space dock on "
+                        + " if you have the correct amount of infantry (3 or 4), you may remove them and DEPLOY 1 space dock on "
                         + planet + " using the buttons.",
                     buttons);
 

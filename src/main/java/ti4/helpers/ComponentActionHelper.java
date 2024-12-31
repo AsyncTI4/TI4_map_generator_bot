@@ -258,7 +258,7 @@ public class ComponentActionHelper {
         }
 
         // ACs
-        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play Component Action AC");
+        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play Action Card with Component Action");
         compButtons.add(acButton);
 
         // absol
@@ -319,9 +319,7 @@ public class ComponentActionHelper {
 
                     List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Warsun);
                     List<Button> buttons = new ArrayList<>();
-                    MessageHelper.sendMessageToChannel(event.getChannel(),
-                        p1.getFactionEmoji() + " Chose to use the starforge ability");
-                    String message = "Select the tile you would like to starforge in";
+                    String message = p1.getRepresentationNoPing() + " is using their **Star Forge** ability.\n Please choose the tile you would like to **Star Forge** in.";
                     for (Tile tile : tiles) {
                         Button starTile = Buttons.green("starforgeTile_" + tile.getPosition(),
                             tile.getRepresentationForButtons(game, p1));
@@ -329,8 +327,8 @@ public class ComponentActionHelper {
                     }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("orbitalDrop".equalsIgnoreCase(buttonID)) {
-                    String successMessage = p1.getFactionEmoji() + " Spent 1 strategy token using " + FactionEmojis.Sol
-                        + "Orbital Drop (" + (p1.getStrategicCC()) + "->" + (p1.getStrategicCC() - 1) + ")";
+                    String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Sol
+                        + "**Orbital Drop** (" + (p1.getStrategicCC()) + "->" + (p1.getStrategicCC() - 1) + ")";
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, FactionEmojis.Sol + "Orbital Drop");
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
@@ -579,7 +577,7 @@ public class ComponentActionHelper {
                         "Exhaust Temporal Command Suite to Ready " + relicID));
                     buttons3.add(Buttons.red("deleteButtons", "Decline"));
                     String msg = p2.getRepresentationUnfogged()
-                        + " you have the opportunity to exhaust your _Temporal Command Suite_ technology to ready " + relicID
+                        + " you have the opportunity to exhaust _Temporal Command Suite_ to ready " + relicID
                         + " and potentially resolve a transaction.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons3);
                 }

@@ -68,12 +68,12 @@ public class PlayStrategyCardService {
                     ActionCardHelper.playAC(event, game, p2, "coup", game.getMainGameChannel());
                     List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                     game.setJustPlayedComponentAC(true);
-                    String message = "Use buttons to end turn, or, if Coup is Sabo'd, play **" + stratCardName + "**.";
+                    String message = "Use buttons to end turn, or, if _Coup D'etat_ is Sabo'd, play **" + stratCardName + "**.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     game.setStoredValue("Coup", "");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
                         + " you have been Coup'd due to attempting to play **" + stratCardName 
-                        + "**. If this is a mistake or the Coup is Sabo'd, feel free to play **" + stratCardName 
+                        + "**. If this is a mistake or the _Coup D'etat_ is Sabo'd, feel free to play **" + stratCardName 
                         + "**. Otherwise, please end turn after doing any end of turn abilities you wish to perform.");
                     return;
                 }
@@ -344,7 +344,7 @@ public class PlayStrategyCardService {
             // only do thread in non-fow games
             String threadName = game.getName() + "-round-" + game.getRound() + "-" + scModel.getName();
             ThreadChannelAction threadChannel = mainGameChannel.createThreadChannel(threadName, message.getId());
-            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
+            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             threadChannel.queue(m5 -> {
                 if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
                     MessageHelper.sendFileToChannel(m5, Helper.getSCImageFile(scToPlay, game));
@@ -353,10 +353,10 @@ public class PlayStrategyCardService {
                 if (scModel.usesAutomationForSCID("pok5trade")) {
                     Button transaction = Buttons.blue("transaction", "Transaction");
                     scButtons.add(transaction);
-                    scButtons.add(Buttons.green("sendTradeHolder_tg_" + player.getFaction(), "Send 1TG"));
-                    scButtons.add(Buttons.gray("sendTradeHolder_debt_" + player.getFaction(), "Send 1 debt"));
+                    scButtons.add(Buttons.green("sendTradeHolder_tg_" + player.getFaction(), "Send 1 Trade Good"));
+                    scButtons.add(Buttons.gray("sendTradeHolder_debt_" + player.getFaction(), "Send 1 Debt"));
                 }
-                MessageHelper.sendMessageToChannelWithButtons(m5, "These buttons will work inside the thread", scButtons);
+                MessageHelper.sendMessageToChannelWithButtons(m5, "These buttons will work inside the thread.", scButtons);
 
                 // Trade Neighbour Message
                 if (scModel.usesAutomationForSCID("pok5trade")) {
@@ -368,7 +368,7 @@ public class PlayStrategyCardService {
                     else if (player.getPromissoryNotesInPlayArea().contains("convoys"))
                     {
                         MessageHelper.sendMessageToChannel(m5,
-                            "The **Trade** player has the _Trade Convoys_, and thus may perform transactions with all players.");
+                            "The **Trade** player has _Trade Convoys_, and thus may perform transactions with all players.");
                     }
                     else {
                         StringBuilder neighborsMsg = new StringBuilder("__Are__ neighbors with the **Trade** holder:");

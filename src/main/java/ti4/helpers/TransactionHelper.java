@@ -41,7 +41,7 @@ public class TransactionHelper {
         MessageChannel channel = p1.getCorrectChannel();
         if (game.getName().equalsIgnoreCase("pbd1000")) {
             channel = game.getTableTalkChannel();
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " have transacted");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " have transacted.");
         }
 
         String publicSummary = "A transaction has been ratified:\n" + buildTransactionOffer(p1, p2, game, true);
@@ -231,7 +231,7 @@ public class TransactionHelper {
                     nothing = getNothingMessage();
                     game.setStoredValue(player.getFaction() + "NothingMessage", nothing);
                 }
-                trans.append("> ").append(nothing).append("\n");
+                trans.append("> - ").append(nothing).append("\n");
             }
         }
 
@@ -460,7 +460,7 @@ public class TransactionHelper {
 
             }
             case "shipOrders" -> {
-                message = message + " Click the Axis Order you wish to " + requestOrOffer + ".";
+                message = message + " Click the _Axis Order_ you wish to " + requestOrOffer + ".";
                 for (String shipOrder : ButtonHelper.getPlayersShipOrders(p1)) {
                     Button transact = Buttons.green(
                         "offerToTransact_shipOrders_" + p1.getFaction() + "_" + p2.getFaction() + "_" + shipOrder,
@@ -470,7 +470,7 @@ public class TransactionHelper {
 
             }
             case "starCharts" -> {
-                message = message + " Click the Star Chart you wish to " + requestOrOffer + ".";
+                message = message + " Click the _Star Chart_ you wish to " + requestOrOffer + ".";
                 for (String shipOrder : ButtonHelper.getPlayersStarCharts(p1)) {
                     Button transact = Buttons.green(
                         "offerToTransact_starCharts_" + p1.getFaction() + "_" + p2.getFaction() + "_" + shipOrder,
@@ -539,22 +539,31 @@ public class TransactionHelper {
             }
             case "PNs" -> {
                 if (requesting) {
-                    message = message + player.getRepresentation(false, false)
+                    message += player.getRepresentation(false, false)
                         + " Click the promissory note you wish to request."
                         + " Since promissory notes are private info, all of the player's starting promissory notes (which are not already in someone's play areas) are available,"
-                        + " though the player may not currently hold all of these. "
-                        + "Click the \"TBD Promissory Note\" button if you wish to transact someone else's promissory note, and it will give the player the option to send it;"
+                        + " though the player may not currently hold all of these."
+                        + " Click the \"TBD Promissory Note\" button if you wish to transact someone else's promissory note, and it will give the player the option to send it;"
                         + " you should discuss this with the player you're transacting with.";
+                    boolean hubris = player.hasAbility("hubris");
+                    if (hubris) {
+                        message += "\nSince you " + (game.isFrankenGame() ? "have the **Hubris** ability" : "are playing Mahact") + ", you cannot request the _Alliance_ promissory note.";
+                    }
                     for (String pnShortHand : p1.getPromissoryNotesOwned()) {
                         if (ButtonHelper.anyoneHaveInPlayArea(game, pnShortHand)) {
+                            continue;
+                        }
+                        if (hubris && pnShortHand.endsWith("_an")) {
                             continue;
                         }
                         PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
                         Player owner = game.getPNOwner(pnShortHand);
                         if (p1.getPromissoryNotes().containsKey(pnShortHand)) {
-                            stuffToTransButtons.add(Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
+                            stuffToTransButtons.add(Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand),
+                                promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
                         } else {
-                            stuffToTransButtons.add(Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + pnShortHand.replace("_", "fin9"), promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
+                            stuffToTransButtons.add(Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + pnShortHand.replace("_", "fin9"),
+                            promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
                         }
 
                     }
@@ -564,10 +573,14 @@ public class TransactionHelper {
 
                     stuffToTransButtons.add(transact);
                 } else {
-                    message = message + p1.getRepresentation(true, false) + " Click the promissory note you wish to " + requestOrOffer + ".";
+                    boolean hubris = p2.hasAbility("hubris");
+                    if (hubris) {
+                        message += "\nSince they " + (game.isFrankenGame() ? "have the **Hubris** ability" : "are playing Mahact") + ", you cannot send the _Alliance_ promissory note.";
+                    }
+                    message += p1.getRepresentation(true, false) + " Click the promissory note you wish to " + requestOrOffer + ".";
                     for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
                         if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)
-                            || (p2.getAbilities().contains("hubris") && pnShortHand.endsWith("an"))) {
+                            || (hubris && pnShortHand.endsWith("_an"))) {
                             continue;
                         }
                         PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
@@ -578,8 +591,8 @@ public class TransactionHelper {
                         stuffToTransButtons.add(transact);
                     }
                 }
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Reminder that, unlike other things,"
-                    + " you may only send a player 1 promissory note in each transaction (and you may only perform one transaction with each other player on a turn).");
+                message += "\nReminder that, unlike other things, you may only send a player 1 promissory note in each transaction"
+                    + " (and you may only perform one transaction with each other player on a turn).";
             }
             case "Frags" -> {
                 message = message + " Click the number of relic fragments you wish to " + requestOrOffer + ".";
@@ -695,9 +708,9 @@ public class TransactionHelper {
     @ButtonHandler("sendOffer_")
     public static void sendOffer(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " sent a transaction offer to " + p2.getFactionEmoji());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " sent a transaction offer to " + p2.getRepresentationNoPing() + ".");
         if (game.getTableTalkChannel() != null) {
-            String offerMessage = "Trade offer from " + player.getFactionEmoji() + " to " + p2.getFactionEmoji() + ":\n" + TransactionHelper.buildTransactionOffer(player, p2, game, true);
+            String offerMessage = "Trade offer from " + player.getRepresentationNoPing() + " to " + p2.getRepresentationNoPing() + ":\n" + TransactionHelper.buildTransactionOffer(player, p2, game, true);
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), offerMessage);
         }
 
@@ -1010,7 +1023,7 @@ public class TransactionHelper {
                 try {
                     pnIndex = Integer.parseInt(amountToTrans);
                 } catch (NumberFormatException e) {
-                    MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "# " + p1.getRepresentation() 
+                    MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "# " + p1.getRepresentation()
                         + " heads up, a promissory note failed to send. This is likely due to you not having the promissory note to send."
                         + " Maybe you already gave it to someone else and forgot?");
                     return;
@@ -1329,8 +1342,9 @@ public class TransactionHelper {
         if (p2 != null) {
             List<Button> buttons = TransactionHelper.getStuffToTransButtonsOld(game, p2, player);
             String message = p2.getRepresentation()
-                + " you have been given something on the condition that you give something in return. Hopefully the player explained what. If you don't hand it over, please return what they sent. Use buttons to send something to "
-                + player.getFactionEmojiOrColor();
+                + " you have been given something on the condition that you give something in return. Hopefully the player explained what."
+                + " If you don't hand it over, please return what they sent. Use buttons to send something to "
+                + player.getRepresentationNoPing();
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteMessage(event);
         }

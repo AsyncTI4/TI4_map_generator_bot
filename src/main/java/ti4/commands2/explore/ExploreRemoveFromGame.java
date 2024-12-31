@@ -14,7 +14,7 @@ class ExploreRemoveFromGame extends GameStateSubcommand {
 
     public ExploreRemoveFromGame() {
         super(Constants.REMOVE, "Remove an Exploration card from the game.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card ids. May include multiple comma-separated ids.").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Exploration card ids. May include multiple comma-separated ids.").setRequired(true));
     }
 
     @Override

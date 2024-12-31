@@ -1055,7 +1055,8 @@ public class Game extends GameProperties {
                 ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
                 tradeGoodCount = 0;
                 MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + tradeGoodCount + " trade good" + (tradeGoodCount == 1 ? "" : "s")
-                    + " that would be placed on **" + Helper.getSCName(sc, this) + "** have instead been given to the Kyro Hero player, as per Kyro Hero text.");
+                    + " that would be placed on **" + Helper.getSCName(sc, this) + "** have instead been given to the Kyro "
+                    + (isFrankenGame() ? "hero " : "") + "player, as per the text on Speygh, the Kyro Hero.");
             }
         }
         scTradeGoods.put(sc, tradeGoodCount);
@@ -1827,7 +1828,8 @@ public class Game extends GameProperties {
             if (getLaws().size() > 2) {
                 for (Player p : getRealPlayers()) {
                     if (p.getSecretsUnscored().containsKey("dp")) {
-                        MessageHelper.sendMessageToChannel(p.getCardsInfoThread(), p.getRepresentationUnfogged() + " reminder that you have dictate policy and a 3rd law just got put into play");
+                        MessageHelper.sendMessageToChannel(p.getCardsInfoThread(), p.getRepresentationUnfogged()
+                            + ", a reminder that you have _Dictate Policy_, and a 3rd law just got put into play.");
                     }
                 }
             }
@@ -2525,18 +2527,18 @@ public class Game extends GameProperties {
 
     public void checkSOLimit(Player player) {
         if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()) {
-            String msg = player.getRepresentationUnfogged() + " you have more SOs than the limit ("
+            String msg = player.getRepresentationUnfogged() + " you have more secret objectives than the limit ("
                 + player.getMaxSOCount()
-                + ") and should discard one. If your game is playing with a higher SO limit, you may change that in /game setup.";
+                + ") and should discard one. If your game is playing with a higher secret objective limit, you may change that in `/game setup`.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-            String secretScoreMsg = "Click a button below to discard your Secret Objective";
+            String secretScoreMsg = "Click a button below to discard your secret objective.";
             List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
             if (!soButtons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), secretScoreMsg,
                     soButtons);
             } else {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    "Something went wrong. Please report to Fin");
+                    "Something went wrong. Please report to Fin.");
             }
         }
     }
@@ -3012,8 +3014,8 @@ public class Game extends GameProperties {
 
     public boolean validateAndSetExploreDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (!getAllExploreDiscard().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change explore deck to **"
-                + deck.getName() + "** while there are explores in the discard pile.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change exploration deck to **"
+                + deck.getName() + "** while there are exploration cards in the discard piles.");
             return false;
         }
         setExplorationDeckID(deck.getAlias());
