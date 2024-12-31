@@ -40,8 +40,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
-import ti4.commands2.commandcounter.RemoveCommandCounterService;
-import ti4.commands2.tokens.AddTokenCommand;
+import ti4.commands.commandcounter.RemoveCommandCounterService;
+import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -49,7 +49,6 @@ import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.helpers.StringHelper;
 import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -1148,7 +1147,7 @@ public class ButtonHelper {
 
     public static boolean checkForTechSkips(Game game, String planetName) {
         Planet planet = game.getPlanetsInfo().get(planetName);
-        return !planet.getTechSpecialities().isEmpty();
+        return planet != null && !planet.getTechSpecialities().isEmpty();
     }
 
     public static String getTechSkipAttachments(Game game, String planetName) {

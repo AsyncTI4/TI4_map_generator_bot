@@ -35,7 +35,7 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
-import ti4.commands2.CommandHelper;
+import ti4.commands.CommandHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
