@@ -1,6 +1,5 @@
 package ti4.map.manage;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -24,12 +23,16 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -45,10 +48,6 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
-import ti4.model.BorderAnomalyHolder;
-import ti4.model.TemporaryCombatModifierModel;
-
 import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
 import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
 import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
@@ -69,6 +68,9 @@ import static ti4.map.manage.GamePersistenceKeys.TOKENS;
 import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
 import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
 import static ti4.map.manage.GamePersistenceKeys.UNITS;
+import ti4.message.BotLogger;
+import ti4.model.BorderAnomalyHolder;
+import ti4.model.TemporaryCombatModifierModel;
 
 @UtilityClass
 class GameLoadService {
@@ -1180,7 +1182,7 @@ class GameLoadService {
                 case Constants.PROMISSORY_NOTES_OWNED -> player.setPromissoryNotesOwned(new HashSet<>(Helper.getSetFromCSV(tokenizer.nextToken())));
                 case Constants.PROMISSORY_NOTES_PLAY_AREA -> player.setPromissoryNotesInPlayArea(getCardList(tokenizer.nextToken()));
                 case Constants.UNITS_OWNED -> player.setUnitsOwned(new HashSet<>(Helper.getSetFromCSV(tokenizer.nextToken())));
-                case Constants.PLANETS -> player.setPlanets(getCardList(tokenizer.nextToken().replace("exhausted", "").replace("refreshed", "")));
+                case Constants.PLANETS -> player.setPlanets(getCardList(tokenizer.nextToken().replace("exhausted", "").replace("refreshed", "").replace("blaheo","biaheo")));
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));

@@ -63,7 +63,7 @@ class UndoButtonHandler {
                 .max()
                 .orElseThrow(NoSuchElementException::new);
 
-        if (highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber))) {
+        if (highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber-1))) {
             ButtonHelper.deleteMessage(event);
         }
 
