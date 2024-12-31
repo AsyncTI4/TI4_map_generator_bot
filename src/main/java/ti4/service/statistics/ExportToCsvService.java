@@ -8,7 +8,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.commands2.statistics.GameStatisticsFilterer;
+import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
 import ti4.map.GamesPage;
 import ti4.map.Player;

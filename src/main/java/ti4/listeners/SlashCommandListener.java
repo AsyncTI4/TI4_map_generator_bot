@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands2.Command;
-import ti4.commands2.CommandManager;
+import ti4.commands.Command;
+import ti4.commands.CommandManager;
 import ti4.executors.ExecutorManager;
 import ti4.helpers.DateTimeHelper;
 import ti4.message.BotLogger;

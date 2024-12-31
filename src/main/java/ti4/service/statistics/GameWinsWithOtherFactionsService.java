@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands2.statistics.GameStatisticsFilterer;
+import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.GamesPage;

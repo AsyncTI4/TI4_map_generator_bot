@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands2.CommandHelper;
+import ti4.commands.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;

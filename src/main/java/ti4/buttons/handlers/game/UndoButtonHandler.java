@@ -81,6 +81,6 @@ class UndoButtonHandler {
                 break;
             }
         }
-        event.getHook().sendMessage(msg.toString()+".").setEphemeral(true).queue();
+        event.getHook().sendMessage(msg + ".").setEphemeral(true).queue();
     }
 }

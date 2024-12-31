@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands2.CommandHelper;
+import ti4.commands.CommandHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;

@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands2.statistics.GameStatisticsFilterer;
+import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.helpers.Helper;
 import ti4.helpers.SortHelper;
 import ti4.map.Game;
