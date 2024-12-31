@@ -3,7 +3,7 @@
     "name": "Biaheo/Empero - Mortheus",
     "aliases": [
         "d17",
-        "blaheo",
+        "biaheo",
         "empero",
         "glimmer",
         "mortheus",
@@ -15,7 +15,7 @@
     "spaceTokenLocations": [],
     "wormholes": [],
     "planets": [
-        "blaheo",
+        "biaheo",
         "empero"
     ],
     "isNebula": true,

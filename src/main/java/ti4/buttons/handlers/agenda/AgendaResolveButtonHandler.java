@@ -980,21 +980,37 @@ class AgendaResolveButtonHandler {
             CommanderUnlockCheckService.checkPlayer(player, "florzen");
         }
         String ridSum = "People had Riders to resolve.";
+        Player machinations = null;
         for (Player rid : riders) {
             String rep = rid.getRepresentationUnfogged();
             String message;
             if (rid.hasAbility("future_sight")) {
                 message = rep
-                    + " you have a Rider to resolve or you voted for the correct outcome. Either way a trade good has been added to your total due to your **Future Sight** ability. "
-                    + rid.gainTG(1, true);
+                    + " you have a Rider to resolve or you voted for the correct outcome. Either way a trade good has been added to your total due to your **Future Sight** ability "
+                    + rid.gainTG(1, true) + ".";
                 ButtonHelperAgents.resolveArtunoCheck(rid, 1);
+                for (Player player2 : game.getRealPlayers()) {
+                    if (player2.getPromissoryNotesInPlayArea().contains("sigma_machinations")) {
+                        machinations = player2;
+                    }
+                }
             } else {
                 message = rep + " you have a Rider to resolve.";
             }
             if (game.isFowMode()) {
                 MessageHelper.sendPrivateMessageToPlayer(rid, game, message);
+                if (machinations != null)
+                {
+                    MessageHelper.sendPrivateMessageToPlayer(machinations, game, machinations.getRepresentationUnfogged()
+                        + ", you've gained a trade good from _Machinations_ " + machinations.gainTG(1, true) + ".");
+                }
             } else {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
+                if (machinations != null)
+                {
+                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), machinations.getRepresentationUnfogged()
+                        + ", you've also gained a trade good from _Machinations_ " + machinations.gainTG(1, true) + ".");
+                }
             }
         }
 

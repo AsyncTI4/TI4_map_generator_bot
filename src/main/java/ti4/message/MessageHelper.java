@@ -805,6 +805,7 @@ public class MessageHelper {
 			StringBuilder edited = new StringBuilder(message);
 			StringBuilder copy = new StringBuilder(message.toLowerCase());
 			for (String keyWord : AliasHandler.getInjectedRules()) {
+                if (keyWord.equals("bombardment") && message.contains("Tactical Bombardment")) continue;
 				if (copy.indexOf(keyWord) > -1) {
 					String replace = "](https://www.tirules.com/" + AliasHandler.getInjectedRule(keyWord) + ")";
 					int firstIndex = copy.indexOf(keyWord);
