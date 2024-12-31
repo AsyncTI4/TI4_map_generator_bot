@@ -24,7 +24,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
-import ti4.commands2.CommandManager;
+import ti4.commands.CommandManager;
 import ti4.cron.AgendaPhaseAutoReactCron;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;

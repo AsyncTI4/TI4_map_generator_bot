@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands2.statistics.GameStatisticsFilterer;
+import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
