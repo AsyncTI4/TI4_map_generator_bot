@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import lombok.experimental.UtilityClass;
@@ -24,7 +26,7 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages = allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
-        messages.add(new GameMessage(messageId, type, new ArrayList<>(), gameSaveTime));
+        messages.add(new GameMessage(messageId, type, new HashSet<>(), gameSaveTime));
 
         persistFile(allGameMessages);
     }
@@ -47,7 +49,7 @@ public class GameMessageManager {
             }
         }
 
-        messages.add(new GameMessage(messageId, type, new ArrayList<>(), gameSaveTime));
+        messages.add(new GameMessage(messageId, type, new HashSet<>(), gameSaveTime));
 
         persistFile(allGameMessages);
 
@@ -87,7 +89,15 @@ public class GameMessageManager {
         return Optional.of(message.messageId);
     }
 
-    public static synchronized Optional<String> getOne(String gameName, GameMessageType type) {
+    public static synchronized Optional<GameMessage> getOne(String gameName, GameMessageType type) {
+        return getOne(gameName, message -> message.type == type);
+    }
+
+    public static synchronized Optional<GameMessage> getOne(String gameName, String messageId) {
+        return getOne(gameName, message -> message.messageId.equals(messageId));
+    }
+
+    private static synchronized Optional<GameMessage> getOne(String gameName, Predicate<GameMessage> filter) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             return Optional.empty();
@@ -95,12 +105,11 @@ public class GameMessageManager {
 
         List<GameMessage> messages = allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
         return messages.stream()
-            .filter(m -> m.type == type)
-            .findFirst()
-            .map(GameMessage::messageId);
+            .filter(filter)
+            .findFirst();
     }
 
-    public static synchronized List<String> getAll(String gameName, GameMessageType type) {
+    public static synchronized List<GameMessage> getAll(String gameName, GameMessageType type) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             return Collections.emptyList();
@@ -109,19 +118,18 @@ public class GameMessageManager {
         List<GameMessage> messages = allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
         return messages.stream()
             .filter(m -> m.type == type)
-            .map(GameMessage::messageId)
             .toList();
     }
 
-    public static synchronized void addReaction(String gameName, String userId, GameMessageType type) {
-        addReaction(gameName, userId, message -> message.type == type);
+    public static synchronized void addReaction(String gameName, String faction, GameMessageType type) {
+        addReaction(gameName, faction, message -> message.type == type);
     }
 
-    public static synchronized void addReaction(String gameName, String userId, String messageId) {
-        addReaction(gameName, userId, message -> message.messageId.equals(messageId));
+    public static synchronized void addReaction(String gameName, String faction, String messageId) {
+        addReaction(gameName, faction, message -> message.messageId.equals(messageId));
     }
 
-    private static void addReaction(String gameName, String userId, Predicate<GameMessage> filter) {
+    private static void addReaction(String gameName, String faction, Predicate<GameMessage> filter) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             return;
@@ -136,7 +144,7 @@ public class GameMessageManager {
             .filter(filter)
             .findFirst()
             .ifPresent(message -> {
-                message.userIdsThatReacted.add(userId);
+                message.factionsThatReacted.add(faction);
                 persistFile(allGameMessages);
             });
     }
@@ -161,5 +169,5 @@ public class GameMessageManager {
 
     private record GameMessages(Map<String, List<GameMessage>> gameNameToMessages) {}
 
-    private record GameMessage(String messageId, GameMessageType type, List<String> userIdsThatReacted, long gameSaveTime) {}
+    public record GameMessage(String messageId, GameMessageType type, Set<String> factionsThatReacted, long gameSaveTime) {}
 }

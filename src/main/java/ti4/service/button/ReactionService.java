@@ -18,6 +18,7 @@ import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -100,7 +101,7 @@ public class ReactionService {
 
                 game.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
                 GameMessageManager.addReaction(game.getName(), player.getUserID(), messageId);
-                checkForAllReactions(messageId, game);
+                progressGameIfAllPlayersHaveReacted(messageId, game);
 
                 if (message == null || message.isEmpty()) {
                     return;
@@ -126,10 +127,14 @@ public class ReactionService {
         }
     }
 
-    private static void checkForAllReactions(String messageId, Game game) {
+    private static void progressGameIfAllPlayersHaveReacted(String messageId, Game game) {
+        GameMessageManager.getOne(game.getName(), messageId).ifPresent(gameMessage -> progressGameIfAllPlayersHaveReacted(gameMessage, game));
+    }
+
+    private static void progressGameIfAllPlayersHaveReacted(GameMessageManager.GameMessage gameMessage, Game game) {
         int matchingFactionReactions = 0;
         for (Player player : game.getRealPlayers()) {
-            if (game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction())) {
+            if (gameMessage.factionsThatReacted().contains(player.getFaction())) {
                 matchingFactionReactions++;
             }
         }
@@ -137,15 +142,15 @@ public class ReactionService {
         if (matchingFactionReactions < numberOfPlayers) {
             return;
         }
-        game.getMainGameChannel().retrieveMessageById(messageId).queue(msg -> {
-            if (game.getLatestAfterMsg().equalsIgnoreCase(messageId)) {
-                msg.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
+
+        game.getMainGameChannel().retrieveMessageById(gameMessage.messageId()).queue(message -> {
+            if (gameMessage.type() == GameMessageType.AGENDA_AFTER) {
+                message.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
                 AgendaHelper.startTheVoting(game);
-                GameManager.save(game, "Started Voting"); // TODO: CHANGE TO A BUTTON AND PING PLAYERS?
-            } else if (game.getLatestWhenMsg().equalsIgnoreCase(messageId)) {
-                msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
+            } else if (gameMessage.type() == GameMessageType.AGENDA_WHEN) {
+                message.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
             } else {
-                Matcher acToReact = CARDS_PATTERN.matcher(msg.getContentRaw());
+                Matcher acToReact = CARDS_PATTERN.matcher(message.getContentRaw());
                 String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
                 if (!game.isFowMode()) {
                     String faction = "bob_" + game.getStoredValue(messageId) + "_";
@@ -155,7 +160,7 @@ public class ReactionService {
                         msg2 = playerToPing.getRepresentation() + " " + msg2;
                     }
                 }
-                msg.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
+                message.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
             }
             if (game.getMessageIDsForSabo().contains(messageId)) {
                 game.removeMessageIDForSabo(messageId);
