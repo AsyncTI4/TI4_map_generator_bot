@@ -101,8 +101,8 @@ class SendPN extends GameStateSubcommand {
 		PromissoryNoteHelper.sendPromissoryNoteInfo(game, targetPlayer, false);
 		PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
 
-		String conditionalPNName = placeDirectlyInPlayArea ? "__" + pnModel.getName() + "__" : "";
-        String preposition = placeDirectlyInPlayArea ? " directly to the play area of " : " to the hand of";
+		String conditionalPNName = placeDirectlyInPlayArea ? "_" + pnModel.getName() + "_" : "a promissory note";
+        String preposition = placeDirectlyInPlayArea ? " directly to the play area of " : " to the hand of ";
 		String message = player.getRepresentation() + " sent " + CardEmojis.PN + conditionalPNName + preposition + targetPlayer.getRepresentation();
 		if (game.isFowMode()) {
 			String fail = "User for faction not found. Report to ADMIN.";

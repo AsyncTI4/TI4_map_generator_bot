@@ -626,7 +626,7 @@
         "commodities": 3,
         "factionTech": ["dsmortr", "dsmorty"],
         "startingTech": ["det", "st"],
-        "homePlanets": ["blaheo", "empero"],
+        "homePlanets": ["biaheo", "empero"],
         "abilities": ["facsimile", "illusory_presence"],
         "leaders": ["mortheusagent", "mortheuscommander", "mortheushero"],
         "promissoryNotes": ["dspnmort"],
