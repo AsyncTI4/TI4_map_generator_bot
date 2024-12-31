@@ -1,9 +1,9 @@
 {
-    "id": "blaheo",
+    "id": "biaheo",
     "tileId": "d17",
     "name": "Biaheo",
     "aliases": [
-        "blaheo",
+        "biaheo",
         "biaheo",
         "bia"
     ],
@@ -20,7 +20,7 @@
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
     "unitPositions": {
-        "unitHolderName": "blaheo",
+        "unitHolderName": "biaheo",
         "coordinateMap": {
             "control": [
                 {

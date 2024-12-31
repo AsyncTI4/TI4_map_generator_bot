@@ -1987,7 +1987,7 @@ public class AgendaHelper {
             return sb.toString();
         } else if (player.hasAbility("galactic_threat")
             && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
-            sb.append(" NOT VOTING (Galactic Threat)");
+            sb.append(" __not__ voting due to **Galactic Threat**");
             return sb.toString();
         } else if (player.hasLeaderUnlocked("xxchahero")) {
             sb.append(" vote count: **" + MiscEmojis.ResInf + " ").append(voteCount);
@@ -2125,12 +2125,14 @@ public class AgendaHelper {
 
         // Predictive Intelligence
         if (player.hasTechReady("pi") || player.hasTechReady("absol_pi")) {
-            additionalVotesAndSources.put(TechEmojis.CyberneticTech + "Predictive Intelligence", 3);
+            additionalVotesAndSources.put(TechEmojis.CyberneticTech + "_Predictive Intelligence_", 3);
         }
 
         // Xxcha Alliance
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
-            additionalVotesAndSources.put(FactionEmojis.Xxcha + "Alliance has been counted for", 0);
+        if (player.hasLeaderUnlocked("xxchacommander")) {
+            additionalVotesAndSources.put("with " + FactionEmojis.Xxcha + " commander accounted for", 0);
+        } else if (game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
+            additionalVotesAndSources.put("with " + FactionEmojis.Xxcha + " _Alliance_ accounted for", 0);
         }
 
         // Hacan Alliance
@@ -2602,9 +2604,9 @@ public class AgendaHelper {
             BannerGenerator.drawAgendaBanner(aCount, game);
         }
         StringBuilder whensAftersMessage = new StringBuilder(
-            "Please indicate whether you abstain from playing whens/afters below.\nIf you have an action card with those windows, you may simply play it.");
+            "Please indicate whether you abstain from playing \"whens\" and \"afters\".\nIf you have an action card with those windows, you may simply play it.");
         if (action) {
-            whensAftersMessage.append("\nYou may play afters during this agenda.");
+            whensAftersMessage.append("\nYou may play \"afters\" during this agenda.");
         }
 
         AutoPingMetadataManager.setupAutoPing(game.getName());
@@ -2613,9 +2615,9 @@ public class AgendaHelper {
 
         MessageHelper.sendMessageToChannel(channel, whensAftersMessage.toString());
         if (!action) {
-            MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Whens", game, whenButtons, "when");
+            MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "", game, whenButtons, "when");
         }
-        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", game, afterButtons, "after");
+        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "", game, afterButtons, "after");
 
         game.setStoredValue("lastAgendaReactTime", "" + System.currentTimeMillis());
 
@@ -2674,7 +2676,7 @@ public class AgendaHelper {
         }
         if (!game.isFowMode() && !action) {
             ButtonHelper.updateMap(game, event,
-                "Start of the agenda " + agendaName + " (Agenda #" + aCount + ")");
+                "Start of agenda #" + aCount + " _" + agendaName + "_ .");
             game.setStoredValue("startTimeOfRound" + game.getRound() + "Agenda" + aCount, System.currentTimeMillis() + "");
         }
         if (game.getCurrentAgendaInfo().contains("Secret")) {

@@ -183,7 +183,7 @@ public class TransactionHelper {
                                 }
                                 trans.append(CardEmojis.ActionCard);
                                 if (!hidePrivateCardText) {
-                                    trans.append(" ").append(Mapper.getActionCard(acID).getName());
+                                    trans.append(" _").append(Mapper.getActionCard(acID).getName()).append("_");
                                 }
                             }
 
@@ -213,7 +213,8 @@ public class TransactionHelper {
                                 }
                                 trans.append(CardEmojis.PN);
                                 if (!hidePrivateCardText) {
-                                    trans.append(" ").append(StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse(""))).append(" ").append(Mapper.getPromissoryNote(id).getName());
+                                    trans.append(" ").append(StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse("")))
+                                        .append(" _").append(Mapper.getPromissoryNote(id).getName()).append("_");
                                 }
                             }
                         }
