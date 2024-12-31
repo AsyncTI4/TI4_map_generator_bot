@@ -57,7 +57,7 @@ public class ReactionService {
             text = message;
         } else if (game.isFowMode()) {
             text = "(You) " + emojiToUse.getFormatted() + " " + message;
-        } else if ("Not Following".equalsIgnoreCase(message)) {
+        } else if ("not following.".equalsIgnoreCase(message)) {
             text = player.getRepresentation(false, false) + " " + message;
         } else {
             text = player.getRepresentation() + " " + message;

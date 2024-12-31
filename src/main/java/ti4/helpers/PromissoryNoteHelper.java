@@ -50,7 +50,7 @@ public class PromissoryNoteHelper {
         StringBuilder sb = new StringBuilder();
 
         //PROMISSORY NOTES
-        sb.append("**Promissory Notes:**").append("\n");
+        sb.append("__Promissory Notes:__").append("\n");
         int index = 1;
         Map<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();

@@ -742,6 +742,7 @@ public class ButtonHelper {
         }
         String message = "";
         int amount = 1;
+        boolean hadPoliticalStability = player.getActionCards().containsKey("stability");
         if (player.hasAbility("autonetic_memory")) {
             if (player.hasTech("nm")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, player, 2);
@@ -764,13 +765,25 @@ public class ButtonHelper {
         }
 
         if (isPlayerElected(game, player, "minister_policy") && !player.hasAbility("scheming")) {
-            message += " _Minister of Policy_ has been accounted for.\n-# If this action card is _Political Stability_, you cannot play it at this time. ";
-            game.drawActionCard(player.getUserID());
+            String acAlias = null;
+            for (Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(game.drawActionCard(player.getUserID())).entrySet()) {
+                acAlias = ac.getKey();
+            }
+            message += " _Minister of Policy_ has been accounted for.";
+            if ("stability".equals(acAlias)) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
+                    + ", you drew _Political Stability_ off of _Minister of Policy_."
+                    + " However, as _Minister of Policy_ triggers __after__ strategy cards are returned, this means you can't play _Political Stability_ this round.");
+            } else if (!hadPoliticalStability && player.getActionCards().containsKey("stability")) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
+                    + ", you drew _Political Stability_ off of your regular action card draw, and __not__ from _Minister of Policy_."
+                    + " As such, you are free to play _Political Stability_ this round.");
+            }
             amount += 1;
         }
 
         if (!player.hasAbility("autonetic_memory")) {
-            message = "Drew " + amount + " action cards." + message;
+            message = " drew " + amount + " action cards." + message;
         }
 
         ActionCardHelper.sendActionCardInfo(game, player, event);
@@ -905,7 +918,7 @@ public class ButtonHelper {
                     int cTG = nonActivePlayer.getTg();
                     nonActivePlayer.setTg(cTG + 4);
                     MessageHelper.sendMessageToChannel(channel,
-                        ident + " gained 4 trade goods (" + cTG + "->" + nonActivePlayer.getTg() + ").");
+                        ident + " gained 4 trade goods (" + cTG + "->" + nonActivePlayer.getTg() + ") for _E-Res Siphons_.");
                     ButtonHelperAgents.resolveArtunoCheck(nonActivePlayer, 4);
                     ButtonHelperAbilities.pillageCheck(nonActivePlayer, game);
                 }
@@ -5963,7 +5976,7 @@ public class ButtonHelper {
         StringBuilder youCanSpend = new StringBuilder("You have available to you to spend: ");
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         if (planets.isEmpty()) {
-            youCanSpend.append(" No Ready Planets ");
+            youCanSpend.append(" No readied planets ");
         } else {
             for (String planet : planets) {
                 youCanSpend.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)).append(", ");
@@ -5977,7 +5990,7 @@ public class ButtonHelper {
                 youCanSpend.append(" You also have " + TechEmojis.CyberneticTech + "_Sarween Tools_.");
             }
             if (player.hasTechReady("aida")) {
-                youCanSpend.append(" You also have ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ")
+                youCanSpend.append(" You also have ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ for ")
                     .append(ButtonHelper.getNumberOfUnitUpgrades(player)).append(" resources.");
             }
         }
@@ -6194,7 +6207,7 @@ public class ButtonHelper {
         String planet = buttonID.split("_")[1];
         String warfareOrNot = buttonID.split("_")[2];
         String msg1 = player.getFactionEmoji() + " exhausted _Self-Assembly Routines_ to place 1 mech on "
-            + Helper.getPlanetRepresentation(planet, game);
+            + Helper.getPlanetRepresentation(planet, game) + ".";
         player.exhaustTech("sar");
         Tile tile = game.getTileFromPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "mech " + planet);
