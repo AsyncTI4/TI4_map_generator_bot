@@ -376,7 +376,7 @@ public class Helper {
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
         List<String> messageIDs = new ArrayList<>(game.getMessageIDsForSabo());
         for (String messageID : messageIDs) {
-            if (ReactionService.checkForASpecificPlayerReact(messageID, player, game)) continue;
+            if (ReactionService.checkForSpecificPlayerReact(messageID, player, game)) continue;
 
             game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
                 Emoji reactionEmoji = getPlayerReactionEmoji(game, player, messageID);

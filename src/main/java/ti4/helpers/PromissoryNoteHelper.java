@@ -16,6 +16,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.Source;
@@ -424,7 +425,7 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannelWithFactionReact(game.getMainGameChannel(),
                 "Please select your Rider target", game, player, riderButtons);
             MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
-                "Please indicate \"no afters\" again.", game, afterButtons, "after");
+                "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
 
         }
         if ("dspnedyn".equalsIgnoreCase(id)) {
@@ -436,7 +437,7 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannelWithFactionReact(game.getMainGameChannel(),
                 "Please select your Rider target", game, player, riderButtons);
             MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
-                "Please indicate \"no afters\" again.", game, afterButtons, "after");
+                "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
         }
         if ("dspnkyro".equalsIgnoreCase(id)) {
             String riderName = "Kyro Rider";
@@ -447,7 +448,7 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannelWithFactionReact(game.getMainGameChannel(),
                 "Please select your Rider target", game, player, riderButtons);
             MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
-                "Please indicate \"no afters\" again.", game, afterButtons, "after");
+                "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
         }
         if ("spynet".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerSpyNetOptions(player);

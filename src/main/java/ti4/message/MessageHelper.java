@@ -48,6 +48,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
+import ti4.service.actioncard.SabotageService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.GameNameService;
 import ti4.service.game.GameUndoNameService;
@@ -126,14 +127,7 @@ public class MessageHelper {
 				error -> BotLogger.log(getRestActionFailureMessage(message.getChannel(), "Failed to add reaction to message", null, error)));
 		}
 		String messageId = message.getId();
-		if (game.getStoredValue(messageId) != null
-			&& !game.getStoredValue(messageId).isEmpty()) {
-			if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-				game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
-			}
-		} else {
-			game.setStoredValue(messageId, player.getFaction());
-		}
+		GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
 	}
 
 	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Game game, Player player, List<Button> buttons) {
@@ -144,20 +138,19 @@ public class MessageHelper {
 		sendMessageToChannelWithEmbedsAndFactionReact(channel, messageText, game, player, null, buttons, saboable);
 	}
 
-	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game game, Player player, List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
+	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game game, Player player,
+																	List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
 		MessageFunction addFactionReact = (msg) -> {
 			addFactionReactToMessage(game, player, msg);
 			if (!saboable) {
 				return;
 			}
-			game.addMessageIDForSabo(msg.getId());
+			GameMessageManager.add(game.getName(), msg.getId(), GameMessageType.ACTION_CARD, game.getLastModifiedDate());
 			for (Player p2 : game.getRealPlayers()) {
-				if (p2 == player) {
+				if (p2 == player || SabotageService.canSabotage(p2, game)) {
 					continue;
 				}
-				if (p2.getAc() == 0 && !p2.hasUnit("empyrean_mech") && !p2.hasTechReady("it")) {
-					addFactionReactToMessage(game, p2, msg);
-				}
+				addFactionReactToMessage(game, p2, msg);
 			}
         };
 		splitAndSentWithAction(messageText, channel, addFactionReact, embeds, buttons);
