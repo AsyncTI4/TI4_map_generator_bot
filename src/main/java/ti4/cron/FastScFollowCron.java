@@ -79,7 +79,7 @@ public class FastScFollowCron {
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
                     GameManager.save(game, "Fast SC Ping 2");
                     String messageID = game.getStoredValue("scPlayMsgID" + sc);
-                    ReactionService.addReaction(player, true, "Not following", "", messageID, game);
+                    ReactionService.addReaction(player, true, "not following.", "", messageID, game);
 
                     StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
                     if (scModel != null && scModel.usesAutomationForSCID("pok8imperial")) {

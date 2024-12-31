@@ -22,7 +22,7 @@ public class ShowActionCardsService {
 
     public static void showUnplayedACs(Game game, GenericInteractionCreateEvent event) {
         List<String> unplayedACs = Helper.unplayedACs(game);
-        String title = game.getName() + " -- Unplayed Action Cards";
+        String title = game.getName() + " - Unplayed Action Cards";
         String actionCardString = ActionCardHelper.actionCardListCondensedNoIds(unplayedACs, title);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), actionCardString);
     }
@@ -83,14 +83,14 @@ public class ShowActionCardsService {
         Collections.reverse(entries);
 
         // Build the string
-        StringBuilder sb = new StringBuilder("**__").append(title).append(":__**");
+        StringBuilder sb = new StringBuilder("__").append(title).append(":__");
         int index = 1;
         int pad = cardsByName.size() > 99 ? 4 : (cardsByName.size() > 9 ? 3 : 2);
         for (Map.Entry<String, List<Map.Entry<String, Integer>>> acEntryList : entries) {
             List<String> ids = acEntryList.getValue().stream().map(i -> "`(" + i.getValue() + ")`").toList();
-            sb.append("\n`").append(Helper.leftpad(index + ".", pad)).append("` - ");
+            sb.append("\n`").append(Helper.leftpad(index + ".", pad)).append("` ");
             sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
-            sb.append(" **").append(acEntryList.getKey()).append("**");
+            sb.append(" _").append(acEntryList.getKey()).append("_");
             sb.append(String.join(",", ids));
             index++;
         }

@@ -28,25 +28,24 @@ public class UnlockLeaderService {
         playerLeader.setLocked(false);
 
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
-
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
 
         if (leaderModel != null) {
-            MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " unlocked:");
+            MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " has unlocked their " + leaderModel.getType() + ".");
             channel.sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, true, showFlavourText)).queue();
         } else {
             MessageHelper.sendMessageToChannel(channel, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
-            String message = player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader);
+            String message = player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
             MessageHelper.sendMessageToChannel(channel, message);
         }
         if (leaderID.contains("bentorcommander")) {
             player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
-            MessageHelper.sendMessageToChannel(channel, player.getFactionEmoji() + "Set Commodity Total to " + player.getCommoditiesTotal());
+            MessageHelper.sendMessageToChannel(channel, player.getFactionEmoji() + ", your commodity value has been set to " + player.getCommoditiesTotal() + ".");
         }
         if (leaderID.contains("naalucommander")) {
             //PNInfo.sendPromissoryNoteInfo(game, player, false);
             CardsInfoService.sendVariousAdditionalButtons(game, player);
-            MessageHelper.sendMessageToChannel(channel, player.getRepresentationUnfogged() + " you may use M'aban, the Naalu Commander, via button in your `#cards-info` thread.");
+            MessageHelper.sendMessageToChannel(channel, player.getRepresentationUnfogged() + ", you may use M'aban, the Naalu Commander, via button in your `#cards-info` thread.");
 
         }
         if (leaderID.contains("xxchahero")) {

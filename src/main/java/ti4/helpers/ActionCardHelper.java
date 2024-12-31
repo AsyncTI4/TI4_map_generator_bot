@@ -243,7 +243,8 @@ public class ActionCardHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry: " + acID);
             return;
         }
-        String message = player.getRepresentationNoPing() + " discarded Action Card: " + Mapper.getActionCard(acID).getRepresentationJustName();
+        String message = player.getRepresentationNoPing() + " discarded the action card _" + Mapper.getActionCard(acID).getName() + "_.\n" +
+                    Mapper.getActionCard(acID).getRepresentation();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         sendActionCardInfo(game, player);
     }
@@ -252,9 +253,8 @@ public class ActionCardHelper {
         if (count < 1) {
             return;
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("Player: ").append(player.getUserName()).append(" - ");
-        sb.append("Discarded Action Card:").append("\n");
+        String message = player.getRepresentationNoPing()
+            + " discarded " + count + " random action card" + (count == 1 ? "" : "s") + ".\n" ;
         while (count > 0 && !player.getActionCards().isEmpty()) {
             Map<String, Integer> actionCards_ = player.getActionCards();
             List<String> cards_ = new ArrayList<>(actionCards_.keySet());
@@ -262,13 +262,13 @@ public class ActionCardHelper {
             String acID = cards_.getFirst();
             boolean removed = game.discardActionCard(player.getUserID(), actionCards_.get(acID));
             if (!removed) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Cards found, please retry");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such action card with id `" + acID + "` found, please retry.");
                 return;
             }
-            sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
+            message += Mapper.getActionCard(acID).getRepresentation();
             count--;
         }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         sendActionCardInfo(game, player);
     }
 
@@ -984,7 +984,7 @@ public class ActionCardHelper {
 
     public static String actionCardListCondensedNoIds(List<String> discards, String title) {
         StringBuilder sb = new StringBuilder();
-        if (title != null) sb.append("**__").append(title).append(":__**");
+        if (title != null) sb.append("__").append(title).append("__:");
         Map<String, List<String>> cardsByName = discards.stream()
             .collect(Collectors.groupingBy(ac -> Mapper.getActionCard(ac).getName()));
         int index = 1;
@@ -994,7 +994,7 @@ public class ActionCardHelper {
         for (Map.Entry<String, List<String>> acEntryList : displayOrder) {
             sb.append("\n").append(index).append(". ");
             sb.append(CardEmojis.ActionCard.toString().repeat(acEntryList.getValue().size()));
-            sb.append(" **").append(acEntryList.getKey()).append("**");
+            sb.append(" _").append(acEntryList.getKey()).append("_");
             // sb.append(Mapper.getActionCard()
             index++;
         }

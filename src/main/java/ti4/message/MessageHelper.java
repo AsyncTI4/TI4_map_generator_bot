@@ -530,6 +530,11 @@ public class MessageHelper {
 				index += nextChars.length();
 			}
 			texts.add(textToAdd);
+            if (index + maxLength > messageLength)
+            {
+                texts.add(messageText.substring(index));
+                break;
+            }
 		}
 		return texts;
 	}

@@ -1062,7 +1062,7 @@ public class ButtonHelperAbilities {
             Player pillager = Helper.getPlayerFromAbility(game, "pillage");
             String finChecker = "FFCC_" + pillager.getFaction() + "_";
             List<Button> buttons = new ArrayList<>();
-            String playerIdent = player.getFlexibleDisplayName();
+            String playerIdent = player.getRepresentationNoPing();
             player.getDisplayName();
             MessageChannel channel = game.getMainGameChannel();
             if (game.isFowMode()) {
@@ -1087,7 +1087,7 @@ public class ButtonHelperAbilities {
         Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
         planet.addToken(Constants.GLEDGE_CORE_PNG);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmojiOrColor() + "cracked the mantle of "
+            player.getFactionEmojiOrColor() + " Cracked the Mantle of "
                 + Helper.getPlanetRepresentation(planetName, game) + " and gained 4 trade goods (" + oldTg + "->"
                 + player.getTg() + ").\n-# This is technically an optional gain.");
         pillageCheck(player, game);

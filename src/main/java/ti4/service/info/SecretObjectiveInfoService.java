@@ -68,7 +68,7 @@ public class SecretObjectiveInfoService {
         int index = 1;
 
         //SCORED SECRET OBJECTIVES
-        sb.append("**Scored Secret Objectives (").append(player.getSoScored()).append("/").append(player.getMaxSOCount()).append("):**").append("\n");
+        sb.append("__Scored Secret Objectives__ (").append(player.getSoScored()).append("/").append(player.getMaxSOCount()).append("):").append("\n");
         if (scoredSecretObjective.isEmpty()) {
             sb.append("> None");
         } else {
@@ -81,7 +81,7 @@ public class SecretObjectiveInfoService {
         sb.append("\n");
 
         //UNSCORED SECRET OBJECTIVES
-        sb.append("**Unscored Secret Objectives:**").append("\n");
+        sb.append("__Unscored Secret Objectives:__").append("\n");
         if (secretObjective != null) {
             if (secretObjective.isEmpty()) {
                 sb.append("> None");
@@ -107,7 +107,7 @@ public class SecretObjectiveInfoService {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
         String soName = so.getName();
-        sb.append(CardEmojis.SecretObjective).append("__").append(soName).append("__").append("\n");
+        sb.append(CardEmojis.SecretObjectiveAlt).append("_").append(soName).append("_").append("\n");
         return sb.toString();
     }
 
@@ -125,10 +125,9 @@ public class SecretObjectiveInfoService {
         String soName = so.getName();
         String soPhase = so.getPhase();
         String soDescription = so.getText();
+        sb.append(CardEmojis.SecretObjectiveAlt).append("_").append(soName).append("_").append(" (").append(soPhase).append(" Phase): ").append(soDescription);
         if (newLine) {
-            sb.append(CardEmojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
-        } else {
-            sb.append(CardEmojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription);
+            sb.append("\n");
         }
         return sb.toString();
     }
