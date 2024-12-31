@@ -49,7 +49,6 @@ import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.helpers.StringHelper;
 import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -1135,7 +1134,7 @@ public class ButtonHelper {
 
     public static boolean checkForTechSkips(Game game, String planetName) {
         Planet planet = game.getPlanetsInfo().get(planetName);
-        return !planet.getTechSpecialities().isEmpty();
+        return planet != null && !planet.getTechSpecialities().isEmpty();
     }
 
     public static String getTechSkipAttachments(Game game, String planetName) {
