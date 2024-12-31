@@ -2273,7 +2273,7 @@ public class AgendaHelper {
                         + " has chosen to discard _Committee Formation_ to choose the winner."
                         + " Note that \"afters\" may be played before this occurs, and that _Confounding Legal Text_ and/or _Confounding Legal Text_ may still be played."
                         + " You should probably wait and confirm no Legal Texts before resolving.");
-                    boolean success = game.removeLaw(game.getLaws().get("committee"));
+                    game.removeLaw(game.getLaws().get("committee"));
                     String message = game.getPing() + " please confirm no _Confusing/Confounding Legal Texts_.";
                     Button noLegalText = Buttons.blue("generic_button_id_3", "Refuse Legal Texts");
                     String inDiscard = "";
