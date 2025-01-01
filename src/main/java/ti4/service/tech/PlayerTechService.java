@@ -33,6 +33,8 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
@@ -461,17 +463,11 @@ public class PlayerTechService {
         if ("iihq".equalsIgnoreCase(techID)) {
             message.append("\n Automatically added the Custodia Vigilia planet");
         }
-        if ("cm".equalsIgnoreCase(techID) && game.getActivePlayer() != null
-                && game.getActivePlayerID().equalsIgnoreCase(player.getUserID()) && !player.getSCs().contains(7)) {
+        if ("cm".equalsIgnoreCase(techID) && game.getActivePlayer() != null && game.getActivePlayerID().equalsIgnoreCase(player.getUserID()) && !player.getSCs().contains(7)) {
             if (!game.isFowMode()) {
-                try {
-                    if (game.getLatestTransactionMsg() != null && !game.getLatestTransactionMsg().isEmpty()) {
-                        game.getMainGameChannel().deleteMessageById(game.getLatestTransactionMsg()).queue();
-                        game.setLatestTransactionMsg("");
-                    }
-                } catch (Exception e) {
-                    // Block of code to handle errors
-                }
+                GameMessageManager
+                    .remove(game.getName(), GameMessageType.TURN)
+                    .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
             }
             String text = player.getRepresentationUnfogged() + ", it is now your turn (your "
                 + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
@@ -523,15 +519,6 @@ public class PlayerTechService {
         ButtonHelper.deleteMessage(event);
     }
 
-    /**
-     * Generate buttons to pay for tech.
-     *
-     * @param game
-     * @param player
-     * @param event
-     * @param tech
-     * @param payWith Possible values: {@code ["res", "inf"]}
-     */
     public static void payForTech(Game game, Player player, ButtonInteractionEvent event, String tech, final String payWith) {
         String trueIdentity = player.getRepresentationUnfogged();
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";

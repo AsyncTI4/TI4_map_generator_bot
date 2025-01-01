@@ -1,18 +1,18 @@
 package ti4.cron;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import lombok.experimental.UtilityClass;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.Units;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
+import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
 
 import static java.util.function.Predicate.not;
@@ -43,38 +43,23 @@ public class SabotageAutoReactCron {
     }
 
     private static void automaticallyReactToSabotageWindows(Game game) {
-        List<String> messageIds = new ArrayList<>(game.getMessageIDsForSabo());
-        if (messageIds.isEmpty()) {
+        List<GameMessageManager.GameMessage> acMessages = GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
+        if (acMessages.isEmpty()) {
             return;
         }
 
         for (Player player : game.getRealPlayers()) {
-            if (!playerShouldRandomlyReact(player) || canSabotage(player, game)) {
+            if (!playerShouldRandomlyReact(player) || SabotageService.canSabotage(player, game)) {
                 continue;
             }
 
-            for (String messageId : messageIds) {
-                if (!ReactionService.checkForASpecificPlayerReact(messageId, player, game)) {
+            for (var acMessage : acMessages) {
+                if (!ReactionService.checkForSpecificPlayerReact(acMessage.messageId(), player, game)) {
                     String message = game.isFowMode() ? "No Sabotage" : null;
-                    ReactionService.addReaction(player, false, message, null, messageId, game);//TODO: updates game...
+                    ReactionService.addReaction(player, false, message, null, acMessage.messageId(), game);
                 }
             }
         }
-    }
-
-    private static boolean canSabotage(Player player, Game game) {
-        if (player.hasTechReady("it") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
-            return true;
-        }
-
-        if (player.hasUnit("empyrean_mech") && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Mech).isEmpty()) {
-            return true;
-        }
-
-        boolean bigAcDeckGame = (game.getActionCardDeckSize() + game.getDiscardActionCards().size()) > 180;
-        return (bigAcDeckGame || playerHasSabotage(player))
-            && !ButtonHelper.isPlayerElected(game, player, "censure")
-            && !ButtonHelper.isPlayerElected(game, player, "absol_censure");
     }
 
     private static boolean playerShouldRandomlyReact(Player player) {
@@ -91,17 +76,5 @@ public class SabotageAutoReactCron {
         int rollMax = player.getAutoSaboPassMedian() * RUNS_PER_HOUR;
         int rollResult = ThreadLocalRandom.current().nextInt(1, rollMax + 1);
         return rollResult == rollMax;
-    }
-
-    private static boolean playerHasSabotage(Player player) {
-        return player.getActionCards().containsKey("sabo1")
-            || player.getActionCards().containsKey("sabo2")
-            || player.getActionCards().containsKey("sabo3")
-            || player.getActionCards().containsKey("sabo4")
-            || player.getActionCards().containsKey("sabotage_ds")
-            || player.getActionCards().containsKey("sabotage1_acd2")
-            || player.getActionCards().containsKey("sabotage2_acd2")
-            || player.getActionCards().containsKey("sabotage3_acd2")
-            || player.getActionCards().containsKey("sabotage4_acd2");
     }
 }
