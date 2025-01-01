@@ -142,10 +142,11 @@ public class MessageHelper {
 																	List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
 		MessageFunction addFactionReact = (msg) -> {
 			addFactionReactToMessage(game, player, msg);
+			GameMessageManager.add(game.getName(), msg.getId(), GameMessageType.ACTION_CARD, game.getLastModifiedDate());
+			GameMessageManager.addR;
 			if (!saboable) {
 				return;
 			}
-			GameMessageManager.add(game.getName(), msg.getId(), GameMessageType.ACTION_CARD, game.getLastModifiedDate());
 			for (Player p2 : game.getRealPlayers()) {
 				if (p2 == player || SabotageService.canSabotage(p2, game)) {
 					continue;
