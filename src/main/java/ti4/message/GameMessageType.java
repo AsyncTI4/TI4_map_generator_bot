@@ -7,5 +7,6 @@ public enum GameMessageType {
     AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT,
     ACTION_CARD,
     TURN,
-    BAG_DRAFT
+    BAG_DRAFT,
+    PO_SCORING
 }
