@@ -25,6 +25,10 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages = allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+        if (messages.stream().anyMatch(message -> message.messageId.equals(messageId))) {
+            return;
+        }
+
         messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime));
 
         persistFile(allGameMessages);
@@ -92,7 +96,7 @@ public class GameMessageManager {
         return Optional.of(message.messageId);
     }
 
-    public static synchronized void remove(String gameName, GameMessage gameMessage) {
+    public static synchronized void remove(String gameName, String messageId) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             return;
@@ -103,7 +107,7 @@ public class GameMessageManager {
             return;
         }
 
-        messages.remove(gameMessage);
+        messages.removeIf(message -> message.messageId.equals(messageId));
 
         persistFile(allGameMessages);
     }

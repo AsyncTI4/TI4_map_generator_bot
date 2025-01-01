@@ -141,9 +141,10 @@ public class MessageHelper {
 	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game game, Player player,
 																	List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
 		MessageFunction addFactionReact = (msg) -> {
+			if (saboable) {
+				GameMessageManager.add(game.getName(), msg.getId(), GameMessageType.ACTION_CARD, game.getLastModifiedDate());
+			}
 			addFactionReactToMessage(game, player, msg);
-			GameMessageManager.add(game.getName(), msg.getId(), GameMessageType.ACTION_CARD, game.getLastModifiedDate());
-			GameMessageManager.addR;
 			if (!saboable) {
 				return;
 			}
@@ -153,6 +154,7 @@ public class MessageHelper {
 				}
 				addFactionReactToMessage(game, p2, msg);
 			}
+
         };
 		splitAndSentWithAction(messageText, channel, addFactionReact, embeds, buttons);
 	}

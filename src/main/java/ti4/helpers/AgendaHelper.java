@@ -2363,9 +2363,7 @@ public class AgendaHelper {
                     listVoteCount(game, game.getMainGameChannel());
                 }
             } else {
-                MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel,
-                    "Please select your rider target",
-                    game, player, riderButtons);
+                MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target", game, player, riderButtons);
                 if ("Keleres Xxcha Hero".equalsIgnoreCase(riderName)) {
                     Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
                     if (playerLeader != null) {

@@ -120,7 +120,7 @@ public class ReactionService {
         }
     }
 
-    private static void progressGameIfAllPlayersHaveReacted(String messageId, Game game) {
+    public static void progressGameIfAllPlayersHaveReacted(String messageId, Game game) {
         GameMessageManager.getOne(game.getName(), messageId).ifPresent(gameMessage -> progressGameIfAllPlayersHaveReacted(gameMessage, game));
     }
 
@@ -138,24 +138,43 @@ public class ReactionService {
 
         game.getMainGameChannel().retrieveMessageById(gameMessage.messageId()).queue(message -> {
             if (gameMessage.type() == GameMessageType.AGENDA_AFTER) {
-                message.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
-                AgendaHelper.startTheVoting(game);
+                handleAllPlayersReactingNoAfters(message, game);
             } else if (gameMessage.type() == GameMessageType.AGENDA_WHEN) {
-                message.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
+                handleAllPlayersReactingNoWhens(message, game);
             } else {
-                Matcher acToReact = CARDS_PATTERN.matcher(message.getContentRaw());
-                String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
-                if (!game.isFowMode()) {
-                    String faction = gameMessage.factionsThatReacted().getFirst();
-                    Player playerToPing = game.getPlayerFromColorOrFaction(faction);
-                    if (playerToPing != null) {
-                        msg2 = playerToPing.getRepresentation() + " " + msg2;
-                    }
-                }
-                message.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
+                handleAllPlayersReactingNoSabotage(message, game, gameMessage);
             }
-            GameMessageManager.remove(game.getName(), gameMessage);
         });
+    }
+
+    public static void handleAllPlayersReactingNoAfters(Message message, Game game) {
+        message.reply("All players have indicated 'No Afters'").queueAfter(100, TimeUnit.MILLISECONDS);
+        AgendaHelper.startTheVoting(game);
+        GameMessageManager.remove(game.getName(), message.getId());
+    }
+
+    public static void handleAllPlayersReactingNoWhens(Message message, Game game) {
+        message.reply("All players have indicated 'No Whens'").queueAfter(100, TimeUnit.MILLISECONDS);
+        GameMessageManager.remove(game.getName(), message.getId());
+    }
+
+    public static void handleAllPlayersReactingNoSabotage(Message message, Game game) {
+        var gameMessage = GameMessageManager.getOne(game.getName(), message.getId()).orElse(null);
+        handleAllPlayersReactingNoSabotage(message, game, gameMessage);
+    }
+
+    private static void handleAllPlayersReactingNoSabotage(Message message, Game game, GameMessageManager.GameMessage gameMessage) {
+        Matcher acToReact = CARDS_PATTERN.matcher(message.getContentRaw());
+        String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
+        if (!game.isFowMode() && gameMessage != null) {
+            String factionToPing = gameMessage.factionsThatReacted().getFirst();
+            Player playerToPing = game.getPlayerFromColorOrFaction(factionToPing);
+            if (playerToPing != null) {
+                msg2 = playerToPing.getRepresentation() + " " + msg2;
+            }
+        }
+        message.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
+        GameMessageManager.remove(game.getName(), message.getId());
     }
 
     public static boolean checkForSpecificPlayerReact(Player player, GameMessageManager.GameMessage gameMessage) {
