@@ -5903,8 +5903,7 @@ public class ButtonHelper {
         String messageID = buttonID.split("_")[1];
         String msg = player.getFactionEmoji() + " successfully preset " + messageID;
         String part2 = player.getFaction();
-        if (game.getStoredValue(messageID) != null
-            && !game.getStoredValue(messageID).isEmpty()) {
+        if (game.getStoredValue(messageID) != null && !game.getStoredValue(messageID).isEmpty()) {
             part2 = game.getStoredValue(messageID) + "_" + player.getFaction();
         }
         if (StringUtils.countMatches(buttonID, "_") > 1) {

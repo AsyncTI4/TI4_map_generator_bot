@@ -15,8 +15,9 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -38,13 +39,7 @@ public class ReactionService {
                 game.getActionsChannel().addReactionById(event.getChannel().getId(), emojiToUse).queue();
             }
             event.getChannel().addReactionById(messageId, emojiToUse).queue(Consumers.nop(), BotLogger::catchRestError);
-            if (game.getStoredValue(messageId) != null) {
-                if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-                    game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
-                }
-            } else {
-                game.setStoredValue(messageId, player.getFaction());
-            }
+            GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
 
             UnfiledButtonHandlers.checkForAllReactions(event, game);
             if (isBlank(message)) {
@@ -91,52 +86,44 @@ public class ReactionService {
         addReaction(event, game, player, false, false, message, null);
     }
 
-    //TODO Can this be combined? Remove game save queues
     public static void addReaction(Player player, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
-        try {
-            game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
-                Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
-                String messageId = mainMessage.getId();
+        game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
+            Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
+            String messageId = mainMessage.getId();
 
-                game.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
-                if (game.getStoredValue(messageId) != null) {
-                    if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-                        game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
-                        GameManager.save(game, "Add Reaction");
-                    }
-                } else {
-                    game.setStoredValue(messageId, player.getFaction());
-                    GameManager.save(game, "Add Reaction");
-                }
-                checkForAllReactions(messageId, game);
-                if (message == null || message.isEmpty()) {
-                    return;
-                }
+            game.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
+            GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
+            progressGameIfAllPlayersHaveReacted(messageId, game);
 
-                String text = player.getRepresentation() + " " + message;
-                if (game.isFowMode() && sendPublic) {
-                    text = message;
-                } else if (game.isFowMode()) {
-                    text = "(You) " + emojiToUse.getFormatted() + " " + message;
-                }
+            if (message == null || message.isEmpty()) {
+                return;
+            }
 
-                if (additionalMessage != null && !additionalMessage.isEmpty()) {
-                    text += game.getPing() + " " + additionalMessage;
-                }
+            String text = player.getRepresentation() + " " + message;
+            if (game.isFowMode() && sendPublic) {
+                text = message;
+            } else if (game.isFowMode()) {
+                text = "(You) " + emojiToUse.getFormatted() + " " + message;
+            }
 
-                if (game.isFowMode() && !sendPublic) {
-                    MessageHelper.sendPrivateMessageToPlayer(player, game, text);
-                }
-            }, BotLogger::catchRestError);
-        } catch (Throwable e) {
-            game.removeMessageIDForSabo(messageID);
-        }
+            if (additionalMessage != null && !additionalMessage.isEmpty()) {
+                text += game.getPing() + " " + additionalMessage;
+            }
+
+            if (game.isFowMode() && !sendPublic) {
+                MessageHelper.sendPrivateMessageToPlayer(player, game, text);
+            }
+        }, BotLogger::catchRestError);
     }
 
-    private static void checkForAllReactions(String messageId, Game game) {
+    public static void progressGameIfAllPlayersHaveReacted(String messageId, Game game) {
+        GameMessageManager.getOne(game.getName(), messageId).ifPresent(gameMessage -> progressGameIfAllPlayersHaveReacted(gameMessage, game));
+    }
+
+    private static void progressGameIfAllPlayersHaveReacted(GameMessageManager.GameMessage gameMessage, Game game) {
         int matchingFactionReactions = 0;
         for (Player player : game.getRealPlayers()) {
-            if (game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction())) {
+            if (gameMessage.factionsThatReacted().contains(player.getFaction())) {
                 matchingFactionReactions++;
             }
         }
@@ -144,34 +131,55 @@ public class ReactionService {
         if (matchingFactionReactions < numberOfPlayers) {
             return;
         }
-        game.getMainGameChannel().retrieveMessageById(messageId).queue(msg -> {
-            if (game.getLatestAfterMsg().equalsIgnoreCase(messageId)) {
-                msg.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
-                AgendaHelper.startTheVoting(game);
-                GameManager.save(game, "Started Voting"); // TODO: CHANGE TO A BUTTON AND PING PLAYERS?
-            } else if (game.getLatestWhenMsg().equalsIgnoreCase(messageId)) {
-                msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
+
+        game.getMainGameChannel().retrieveMessageById(gameMessage.messageId()).queue(message -> {
+            if (gameMessage.type() == GameMessageType.AGENDA_AFTER) {
+                handleAllPlayersReactingNoAfters(message, game);
+            } else if (gameMessage.type() == GameMessageType.AGENDA_WHEN) {
+                handleAllPlayersReactingNoWhens(message, game);
             } else {
-                Matcher acToReact = CARDS_PATTERN.matcher(msg.getContentRaw());
-                String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
-                if (!game.isFowMode()) {
-                    String faction = "bob_" + game.getStoredValue(messageId) + "_";
-                    faction = faction.split("_")[1];
-                    Player playerToPing = game.getPlayerFromColorOrFaction(faction);
-                    if (playerToPing != null) {
-                        msg2 = playerToPing.getRepresentation() + " " + msg2;
-                    }
-                }
-                msg.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
-            }
-            if (game.getMessageIDsForSabo().contains(messageId)) {
-                game.removeMessageIDForSabo(messageId);
-                GameManager.save(game, "No Sabo");
+                handleAllPlayersReactingNoSabotage(message, game, gameMessage);
             }
         });
     }
 
-    public static boolean checkForASpecificPlayerReact(String messageId, Player player, Game game) {
-        return game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction());
+    public static void handleAllPlayersReactingNoAfters(Message message, Game game) {
+        message.reply("All players have indicated 'No Afters'").queueAfter(100, TimeUnit.MILLISECONDS);
+        AgendaHelper.startTheVoting(game);
+        GameMessageManager.remove(game.getName(), message.getId());
+    }
+
+    public static void handleAllPlayersReactingNoWhens(Message message, Game game) {
+        message.reply("All players have indicated 'No Whens'").queueAfter(100, TimeUnit.MILLISECONDS);
+        GameMessageManager.remove(game.getName(), message.getId());
+    }
+
+    public static void handleAllPlayersReactingNoSabotage(Message message, Game game) {
+        var gameMessage = GameMessageManager.getOne(game.getName(), message.getId()).orElse(null);
+        handleAllPlayersReactingNoSabotage(message, game, gameMessage);
+    }
+
+    private static void handleAllPlayersReactingNoSabotage(Message message, Game game, GameMessageManager.GameMessage gameMessage) {
+        Matcher acToReact = CARDS_PATTERN.matcher(message.getContentRaw());
+        String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
+        if (!game.isFowMode() && gameMessage != null) {
+            String factionToPing = gameMessage.factionsThatReacted().getFirst();
+            Player playerToPing = game.getPlayerFromColorOrFaction(factionToPing);
+            if (playerToPing != null) {
+                msg2 = playerToPing.getRepresentation() + " " + msg2;
+            }
+        }
+        message.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
+        GameMessageManager.remove(game.getName(), message.getId());
+    }
+
+    public static boolean checkForSpecificPlayerReact(Player player, GameMessageManager.GameMessage gameMessage) {
+        return gameMessage.factionsThatReacted().contains(player.getFaction());
+    }
+
+    public static boolean checkForSpecificPlayerReact(String messageId, Player player, Game game) {
+        return  GameMessageManager.getOne(game.getName(), messageId)
+            .filter(message -> checkForSpecificPlayerReact(player, message))
+            .isPresent();
     }
 }

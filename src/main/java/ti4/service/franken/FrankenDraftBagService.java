@@ -9,7 +9,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -22,6 +21,8 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.service.game.SetOrderService;
 import ti4.service.milty.MiltyService;
@@ -164,7 +165,7 @@ public class FrankenDraftBagService {
     }
 
     public static void passBags(Game game) {
-        game.setBagDraftStatusMessageID(null); // Clear the status message so it will be regenerated
+        GameMessageManager.remove(game.getName(), GameMessageType.BAG_DRAFT); // Clear the status message so it will be regenerated
         game.getActiveBagDraft().passBags();
         for (Player p2 : game.getRealPlayers()) {
             showPlayerBag(game, p2);
@@ -263,7 +264,7 @@ public class FrankenDraftBagService {
 
             showPlayerBag(game, player);
         }
-        game.setBagDraftStatusMessageID(null); // Clear the status message so it will be regenerated
+        GameMessageManager.remove(game.getName(), GameMessageType.BAG_DRAFT); // Clear the status message so it will be regenerated
 
         int first = draft.getPicksFromFirstBag();
         int next = draft.getPicksFromNextBags();
@@ -305,12 +306,14 @@ public class FrankenDraftBagService {
 
     public static void updateDraftStatusMessage(Game game) {
         String statusMessage = game.getActiveBagDraft().getDraftStatusMessage();
-        if (game.getBagDraftStatusMessageID() == null || "null".equals(game.getBagDraftStatusMessageID())) {
-            String messageID = game.getActionsChannel().sendMessage(statusMessage).complete().getId();
-            game.setBagDraftStatusMessageID(messageID);
-            return;
-        }
-        game.getActionsChannel().retrieveMessageById(game.getBagDraftStatusMessageID()).queue(
-            message -> message.editMessage(statusMessage).queue());
+        GameMessageManager.getOne(game.getName(), GameMessageType.BAG_DRAFT)
+            .ifPresentOrElse(gameMessage ->
+                    game.getActionsChannel()
+                        .retrieveMessageById(gameMessage.messageId())
+                        .queue(message -> message.editMessage(statusMessage).queue()),
+                    () -> {
+                        String newMessageId = game.getActionsChannel().sendMessage(statusMessage).complete().getId();
+                        GameMessageManager.add(game.getName(), newMessageId, GameMessageType.BAG_DRAFT, game.getLastModifiedDate());
+                    });
     }
 }

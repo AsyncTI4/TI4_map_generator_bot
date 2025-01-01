@@ -116,17 +116,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.LATEST_OUTCOME_VOTED_FOR + " " + game.getLatestOutcomeVotedFor());
         writer.write(System.lineSeparator());
-        writer.write(Constants.LATEST_AFTER_MSG + " " + game.getLatestAfterMsg());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.LATEST_WHEN_MSG + " " + game.getLatestWhenMsg());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.LATEST_TRANSACTION_MSG + " " + game.getLatestTransactionMsg());
-        writer.write(System.lineSeparator());
 
         writer.write(Constants.SO + " " + String.join(",", game.getSecretObjectives()));
-        writer.write(System.lineSeparator());
-
-        writer.write(Constants.MESSAGEID_FOR_SABOS + " " + String.join(",", game.getMessageIDsForSabo()));
         writer.write(System.lineSeparator());
 
         writer.write(Constants.AC + " " + String.join(",", game.getActionCards()));
@@ -352,8 +343,6 @@ class GameSaveService {
         writer.write(Constants.SAVED_MESSAGE + " " + game.getSavedMessage());
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_MAP_CHANNEL + " " + game.getBotMapUpdatesThreadID());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.BAG_DRAFT_STATUS_MESSAGE_ID + " " + game.getBagDraftStatusMessageID());
         writer.write(System.lineSeparator());
         writer.write(Constants.GAME_LAUNCH_THREAD_ID + " " + game.getLaunchPostThreadID());
         writer.write(System.lineSeparator());
@@ -843,8 +832,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
     }
 
-    private static void writeCardsStrings(Map<String, String> cardList, Writer writer, String saveID)
-        throws IOException {
+    private static void writeCardsStrings(Map<String, String> cardList, Writer writer, String saveID) throws IOException {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : cardList.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");

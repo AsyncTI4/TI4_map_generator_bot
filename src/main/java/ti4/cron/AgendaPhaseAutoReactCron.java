@@ -10,11 +10,12 @@ import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.model.ActionCardModel;
 import ti4.service.button.ReactionService;
 
 import static java.util.function.Predicate.not;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @UtilityClass
 public class AgendaPhaseAutoReactCron {
@@ -64,10 +65,14 @@ public class AgendaPhaseAutoReactCron {
     }
 
     private static void handleWhens(Game game, Player player) {
-        String whensId = game.getLatestWhenMsg();
-        if (isNotBlank(whensId) && !playerHasWhens(player) && !ReactionService.checkForASpecificPlayerReact(whensId, player, game)) {
+        var whensMessage = GameMessageManager.getOne(game.getName(), GameMessageType.AGENDA_WHEN);
+        if (whensMessage.isEmpty()) {
+            return;
+        }
+        String whensId = whensMessage.get().messageId();
+        if (!playerHasWhens(player) && !ReactionService.checkForSpecificPlayerReact(whensId, player, game)) {
             String message = game.isFowMode() ? "No whens" : null;
-            ReactionService.addReaction(player, false, message, null, whensId, game);//TODO: updates game...
+            ReactionService.addReaction(player, false, message, null, whensId, game);
         }
     }
 
@@ -91,11 +96,14 @@ public class AgendaPhaseAutoReactCron {
     }
 
     private static void handleAfters(Game game, Player player) {
-        String aftersId = game.getLatestAfterMsg();
-        //TODO: updates game...
-        if (isNotBlank(aftersId) && !playerHasAfters(player) && !ReactionService.checkForASpecificPlayerReact(aftersId, player, game)) {
+        var aftersMessage = GameMessageManager.getOne(game.getName(), GameMessageType.AGENDA_AFTER);
+        if (aftersMessage.isEmpty()) {
+            return;
+        }
+        var aftersId = aftersMessage.get().messageId();
+        if (!playerHasAfters(player) && !ReactionService.checkForSpecificPlayerReact(aftersId, player, game)) {
             String message = game.isFowMode() ? "No afters" : null;
-            ReactionService.addReaction(player, false, message, null, aftersId, game);//TODO: updates game...
+            ReactionService.addReaction(player, false, message, null, aftersId, game);
         }
     }
 

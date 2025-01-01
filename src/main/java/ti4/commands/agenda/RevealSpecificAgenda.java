@@ -19,6 +19,8 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.SecretObjectiveModel;
@@ -145,8 +147,8 @@ class RevealSpecificAgenda extends GameStateSubcommand {
             game.setStoredValue("latestOutcomeVotedFor" + p2.getFaction(), "");
             game.setStoredValue("preVoting" + p2.getFaction(), "");
         }
-        game.setLatestWhenMsg("");
-        game.setLatestAfterMsg("");
+        GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_WHEN);
+        GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_AFTER);
         MessageHelper.sendMessageToChannel(channel, Helper.getAgendaRepresentation(agendaID, uniqueID));
         String text = game.getPing()
             + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you may simply play it.";
@@ -157,8 +159,8 @@ class RevealSpecificAgenda extends GameStateSubcommand {
 
         MessageHelper.sendMessageToChannel(channel, text);
 
-        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Whens", game, whenButtons, "when");
-        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", game, afterButtons, "after");
+        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Whens", game, whenButtons, GameMessageType.AGENDA_WHEN);
+        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", game, afterButtons, GameMessageType.AGENDA_AFTER);
 
         AgendaHelper.listVoteCount(game, channel);
         Button proceed = Buttons.red("proceedToVoting", "Skip Waiting and Start the Voting for Everyone");

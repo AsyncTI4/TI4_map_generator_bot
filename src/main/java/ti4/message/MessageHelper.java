@@ -48,6 +48,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
+import ti4.service.actioncard.SabotageService;
+import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.GameNameService;
 import ti4.service.game.GameUndoNameService;
@@ -84,8 +86,7 @@ public class MessageHelper {
 
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
 		String gameName = GameNameService.getGameNameFromChannel(channel);
-		if (GameManager.isValid(gameName) && buttons instanceof ArrayList
-			&& !(channel instanceof ThreadChannel) && channel.getName().contains("actions")) {
+		if (GameManager.isValid(gameName) && buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")) {
 			buttons = addUndoButtonToList(buttons, gameName);
 		}
 		sendMessageToChannelWithEmbedsAndButtons(channel, messageText, null, buttons);
@@ -95,8 +96,7 @@ public class MessageHelper {
 		sendMessageToChannelWithEmbedsAndButtons(channel, messageText, null, buttons);
 	}
 
-	public static void sendMessageToChannelWithEmbedsAndButtons(@Nonnull MessageChannel channel, @Nullable String messageText,
-		@Nullable List<MessageEmbed> embeds, @Nullable List<Button> buttons) {
+	public static void sendMessageToChannelWithEmbedsAndButtons(@Nonnull MessageChannel channel, @Nullable String messageText, @Nullable List<MessageEmbed> embeds, @Nullable List<Button> buttons) {
 		splitAndSent(messageText, channel, embeds, buttons);
 	}
 
@@ -128,73 +128,79 @@ public class MessageHelper {
 				error -> BotLogger.log(getRestActionFailureMessage(message.getChannel(), "Failed to add reaction to message", null, error)));
 		}
 		String messageId = message.getId();
-		if (game.getStoredValue(messageId) != null
-			&& !game.getStoredValue(messageId).isEmpty()) {
-			if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-				game.setStoredValue(messageId, game.getStoredValue(messageId) + "_" + player.getFaction());
-				//GameSaveLoadManager.saveGame(game, "Stored reaction."); TODO: this should save, I think, but saving is heavy...
-			}
-		} else {
-			game.setStoredValue(messageId, player.getFaction());
-			//GameSaveLoadManager.saveGame(game, "Stored reaction."); TODO: this should save, I think, but saving is heavy...
-		}
+		GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
 	}
 
-	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Game game,
-		Player player, List<Button> buttons) {
+	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Game game, Player player, List<Button> buttons) {
 		sendMessageToChannelWithFactionReact(channel, messageText, game, player, buttons, false);
 	}
 
-	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Game game,
-		Player player, List<Button> buttons, boolean saboable) {
-		sendMessageToChannelWithEmbedsAndFactionReact(channel, messageText, game, player, null, buttons,
-			saboable);
+	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Game game, Player player, List<Button> buttons, boolean saboable) {
+		sendMessageToChannelWithEmbedsAndFactionReact(channel, messageText, game, player, null, buttons, saboable);
 	}
 
 	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game game, Player player,
-		List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
-		MessageFunction addFactionReact = (msg) -> {
-			addFactionReactToMessage(game, player, msg);
+																	List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
+		MessageFunction addFactionReact = (message) -> {
 			if (saboable) {
-				game.addMessageIDForSabo(msg.getId());
-				for (Player p2 : game.getRealPlayers()) {
-					if (p2 == player) {
-						continue;
-					}
-					if (p2.getAc() == 0 && !p2.hasUnit("empyrean_mech") && !p2.hasTechReady("it")) {
-						addFactionReactToMessage(game, p2, msg);
-					}
-				}
+				GameMessageManager.add(game.getName(), message.getId(), GameMessageType.ACTION_CARD, game.getLastModifiedDate());
 			}
-		};
+			addFactionReactToMessage(game, player, message);
+			if (!saboable) {
+				return;
+			}
+			for (Player p2 : game.getRealPlayers()) {
+				if (p2 == player || SabotageService.couldFeasiblySabotage(p2, game)) {
+					continue;
+				}
+				addFactionReactToMessage(game, p2, message);
+			}
+			ReactionService.progressGameIfAllPlayersHaveReacted(message.getId(), game);
+        };
 		splitAndSentWithAction(messageText, channel, addFactionReact, embeds, buttons);
 	}
 
-	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText, Game game, List<Button> buttons, String whenOrAfter) {
-		MessageFunction addFactionReact = (msg) -> {
-			StringTokenizer players;
-			if ("when".equalsIgnoreCase(whenOrAfter)) {
-				if (game.getLatestWhenMsg() != null && !game.getLatestWhenMsg().isEmpty()) {
-					game.getMainGameChannel().deleteMessageById(game.getLatestWhenMsg()).queue();
+	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText, Game game, List<Button> buttons, GameMessageType messageType) {
+		MessageFunction addFactionReact = (message) -> {
+			StringTokenizer players = switch (messageType) {
+				case AGENDA_WHEN -> {
+					String oldMessageId = GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.AGENDA_WHEN, game.getLastModifiedDate());
+					if (oldMessageId != null) {
+						game.getMainGameChannel().deleteMessageById(oldMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
+					}
+					yield new StringTokenizer(game.getPlayersWhoHitPersistentNoWhen(), "_");
 				}
-				game.setLatestWhenMsg(msg.getId());
-				players = new StringTokenizer(game.getPlayersWhoHitPersistentNoWhen(), "_");
-			} else if ("after".equalsIgnoreCase(whenOrAfter)) {
-				if (game.getLatestAfterMsg() != null && !game.getLatestAfterMsg().isEmpty()) {
-					game.getMainGameChannel().deleteMessageById(game.getLatestAfterMsg()).queue(Consumers.nop(), BotLogger::catchRestError);
+				case AGENDA_AFTER -> {
+					String oldMessageId = GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.AGENDA_AFTER, game.getLastModifiedDate());
+					if (oldMessageId != null) {
+						game.getMainGameChannel().deleteMessageById(oldMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
+					}
+					yield new StringTokenizer(game.getPlayersWhoHitPersistentNoAfter(), "_");
 				}
-				game.setLatestAfterMsg(msg.getId());
-				players = new StringTokenizer(game.getPlayersWhoHitPersistentNoAfter(), "_");
-			} else {
-				if (game.getStoredValue("Pass On Shenanigans") == null) {
-					game.setStoredValue("Pass On Shenanigans", "");
+				case AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT -> {
+					String oldMessageId = GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT, game.getLastModifiedDate());
+					if (oldMessageId != null) {
+						game.getMainGameChannel().deleteMessageById(oldMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
+					}
+					yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
 				}
-				players = new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
-			}
-			while (players.hasMoreTokens()) {
-				String player = players.nextToken();
-				Player player_ = game.getPlayerFromColorOrFaction(player);
-				addFactionReactToMessage(game, player_, msg);
+				case AGENDA_DEADLY_PLOT -> {
+					String oldMessageId = GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.AGENDA_DEADLY_PLOT, game.getLastModifiedDate());
+					if (oldMessageId != null) {
+						game.getMainGameChannel().deleteMessageById(oldMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
+					}
+					yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
+				}
+				default -> {
+					BotLogger.log("Unable to handle message type: " + messageType);
+					yield null;
+				}
+			};
+
+			while (players != null && players.hasMoreTokens()) {
+				String playerString = players.nextToken();
+				Player player = game.getPlayerFromColorOrFaction(playerString);
+				addFactionReactToMessage(game, player, message);
 			}
 		};
 		splitAndSentWithAction(messageText, channel, addFactionReact, null, buttons);
@@ -261,8 +267,7 @@ public class MessageHelper {
 		event.getHook().editOriginal(message).setComponents(rows).setFiles(files).queue();
 	}
 
-	public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload, boolean forceShowMap,
-		String messageText, boolean pinMessage) {
+	public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload, boolean forceShowMap, String messageText, boolean pinMessage) {
 		try {
 			if (forceShowMap && event.getChannel() instanceof MessageChannel) {
 				sendMessageWithFile((MessageChannel) event.getChannel(), fileUpload, messageText, pinMessage);
@@ -271,7 +276,6 @@ public class MessageHelper {
 			if (event.getChannel() instanceof MessageChannel) {
 				sendMessageWithFile((MessageChannel) event.getChannel(), fileUpload, messageText, pinMessage);
 			}
-
 		} catch (Exception e) {
 			replyToMessage(event, "Could not send response, use `/show_game` or contact Admins or Bothelper.");
 		}
@@ -293,9 +297,9 @@ public class MessageHelper {
 			message.addContent(messageText);
 		}
 		MessageCreateData messageObject = message.addFiles(fileUpload).build();
-		channel.sendMessage(messageObject).queue(x -> {
+		channel.sendMessage(messageObject).queue(msg -> {
 			if (pinMessage)
-				x.pin().queue();
+				msg.pin().queue();
 		});
 	}
 
@@ -351,8 +355,8 @@ public class MessageHelper {
 			}
 		}
 
-		final String message = messageText;
-		List<MessageCreateData> objects = getMessageCreateDataObjects(message, sanitizedEmbeds, buttons);
+		final String finalMessageText = messageText;
+		List<MessageCreateData> objects = getMessageCreateDataObjects(finalMessageText, sanitizedEmbeds, buttons);
 		Iterator<MessageCreateData> iterator = objects.iterator();
 		while (iterator.hasNext()) {
 			MessageCreateData messageCreateData = iterator.next();
@@ -360,20 +364,18 @@ public class MessageHelper {
 				channel.sendMessage(messageCreateData).queue(null,
 					error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send intermediate message", messageCreateData, error)));
 			} else { // last message, do action
-				channel.sendMessage(messageCreateData).queue(complete -> {
+				channel.sendMessage(messageCreateData).queue(message -> {
 					ManagedGame managedGame = GameManager.getManagedGame(gameName);
-					if (message != null && managedGame != null && !managedGame.isFowMode()) {
-						if (message.contains("Use buttons to do your turn") || message.contains("Use buttons to end turn")) {
-							Game game = managedGame.getGame();
-							game.setLatestTransactionMsg(complete.getId());
+					if (finalMessageText != null && managedGame != null && !managedGame.isFowMode()) {
+						if (finalMessageText.contains("Use buttons to do your turn") || finalMessageText.contains("Use buttons to end turn")) {
+							GameMessageManager.replace(gameName, message.getId(), GameMessageType.TURN, managedGame.getLastModifiedDate());
 						}
 					}
 
-					// RUN SUPPLIED ACTION
 					if (restAction != null) {
-						restAction.run(complete);
+						restAction.run(message);
 					}
-				}, error -> BotLogger.log(getRestActionFailureMessage(channel, message, messageCreateData, error)));
+				}, error -> BotLogger.log(getRestActionFailureMessage(channel, finalMessageText, messageCreateData, error)));
 			}
 		}
 	}
@@ -408,8 +410,7 @@ public class MessageHelper {
 	 * @param successText Feedback if the message successfully sent
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Game game,
-		GenericInteractionCreateEvent event, String messageText, String failText, String successText) {
+	public static boolean sendPrivateMessageToPlayer(Player player, Game game, GenericInteractionCreateEvent event, String messageText, String failText, String successText) {
 		return sendPrivateMessageToPlayer(player, game, event.getMessageChannel(), messageText, failText, successText);
 	}
 
@@ -727,7 +728,7 @@ public class MessageHelper {
 	}
 
 	/**
-	 * @return a webhook URL for a the bot-log channel of the Primary guild. Add
+	 * @return a webhook URL for the bot-log channel of the Primary guild. Add
 	 *         your test server's ID and #bot-log channel webhook url here
 	 */
 	public static String getBotLogWebhookURL() {
@@ -741,8 +742,7 @@ public class MessageHelper {
 	}
 
 	private static List<Button> sanitizeButtons(List<Button> buttons, MessageChannel channel) {
-		if (buttons == null)
-			return null;
+		if (buttons == null) return null;
 		List<Button> newButtons = new ArrayList<>();
 		List<String> goodButtonIDs = new ArrayList<>();
 		List<String> badButtonIDsAndReason = new ArrayList<>();
@@ -761,17 +761,14 @@ public class MessageHelper {
 			goodButtonIDs.add(button.getId());
 
 			// REMOVE EMOJIS IF BOT CAN'T SEE IT
-			if (button.getEmoji() instanceof CustomEmoji emoji) {
-				if (ApplicationEmojiService.isValidAppEmoji(emoji)) {
-				} else if (AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
-					String label = button.getLabel();
-					if (label.isBlank()) {
-						label = String.format(":%s:", emoji.getName());
-					}
-					badButtonIDsAndReason.add("Button:  " + ButtonHelper.getButtonRepresentation(button) + "\n Error:  Emoji Not Found in Cache: " + emoji.getName() + " " + emoji.getId());
-					button = Button.of(button.getStyle(), button.getId(), label);
-				}
-			}
+            if (button.getEmoji() instanceof CustomEmoji emoji && !ApplicationEmojiService.isValidAppEmoji(emoji) && AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
+                String label = button.getLabel();
+                if (label.isBlank()) {
+                    label = String.format(":%s:", emoji.getName());
+                }
+                badButtonIDsAndReason.add("Button:  " + ButtonHelper.getButtonRepresentation(button) + "\n Error:  Emoji Not Found in Cache: " + emoji.getName() + " " + emoji.getId());
+                button = Button.of(button.getStyle(), button.getId(), label);
+            }
 			if (button.getEmoji() instanceof UnicodeEmoji emoji && StringUtils.countMatches(emoji.getAsCodepoints(), "+") > 4) { //TODO: something better than (plus_sign_count > 4)
 				String label = button.getLabel();
 				if (label.isBlank()) {

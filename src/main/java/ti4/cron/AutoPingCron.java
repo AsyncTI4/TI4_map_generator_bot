@@ -2,6 +2,7 @@ package ti4.cron;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -15,6 +16,8 @@ import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.settings.users.UserSettingsManager;
@@ -234,8 +237,12 @@ public class AutoPingCron {
     }
 
     private static void pingMissingAgendaPlayers(Game game) {
-        List<Player> missingPlayersWhens = ButtonHelper.getPlayersWhoHaventReacted(game.getLatestWhenMsg(), game);
-        List<Player> missingPlayersAfters = ButtonHelper.getPlayersWhoHaventReacted(game.getLatestAfterMsg(), game);
+        List<Player> missingPlayersWhens = GameMessageManager.getOne(game.getName(), GameMessageType.AGENDA_WHEN)
+            .map(gameMessage -> ButtonHelper.getPlayersWhoHaventReacted(gameMessage.messageId(), game))
+            .orElse(Collections.emptyList());
+        List<Player> missingPlayersAfters = GameMessageManager.getOne(game.getName(), GameMessageType.AGENDA_AFTER)
+            .map(gameMessage -> ButtonHelper.getPlayersWhoHaventReacted(gameMessage.messageId(), game))
+            .orElse(Collections.emptyList());
         if (missingPlayersAfters.isEmpty() && missingPlayersWhens.isEmpty()) {
             return;
         }
