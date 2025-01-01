@@ -623,7 +623,7 @@ public class AgendaHelper {
                 message.append(losers.size()).append(" players have the opportunity to play _Deadly Plot_.\n");
                 MessageHelper.privatelyPingPlayerList(losers, game, "Please play or confirm that you will not be playing _Deadly Plot_.");
             }
-            MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message.toString(), game, deadlyActionRow, GameMessageType.SHENANIGANS_PASS);
+            MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message.toString(), game, deadlyActionRow, GameMessageType.AGENDA_DEADLY_PLOT);
             shenanigans = true;
         } else {
             String message = "Either both _Bribery_ and _Deadly Plot_ were in the discard or no player could legally play them.";
@@ -637,7 +637,7 @@ public class AgendaHelper {
                 Button noConfounding = Buttons.blue("generic_button_id_3", "Refuse Confounding Legal Text");
                 Button noConfusing = Buttons.blue("genericReact4", "Refuse Confusing Legal Text");
                 List<Button> buttons = List.of(noConfounding, noConfusing);
-                MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message, game, buttons, GameMessageType.SHENANIGANS_PASS);
+                MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message, game, buttons, GameMessageType.AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT);
                 shenanigans = true;
             } else {
                 String message = "Both _Confounding Legal Text_ and _Confusing Legal Text_ are in the discard pile.\nThere are no shenanigans possible. Please resolve the agenda.";
@@ -2287,7 +2287,7 @@ public class AgendaHelper {
                         inDiscard = "Confusing";
                     }
                     List<Button> buttons = List.of(noLegalText);
-                    MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message, game, buttons, GameMessageType.SHENANIGANS_PASS);
+                    MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message, game, buttons, GameMessageType.AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT);
                     if (!inDiscard.isEmpty())
                     {
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "_" + inDiscard + " Legal Text_ was found in the discard pile.");

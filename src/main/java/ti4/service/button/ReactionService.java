@@ -87,37 +87,33 @@ public class ReactionService {
     }
 
     public static void addReaction(Player player, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
-        try {
-            game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
-                Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
-                String messageId = mainMessage.getId();
+        game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
+            Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
+            String messageId = mainMessage.getId();
 
-                game.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
-                GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
-                progressGameIfAllPlayersHaveReacted(messageId, game);
+            game.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
+            GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
+            progressGameIfAllPlayersHaveReacted(messageId, game);
 
-                if (message == null || message.isEmpty()) {
-                    return;
-                }
+            if (message == null || message.isEmpty()) {
+                return;
+            }
 
-                String text = player.getRepresentation() + " " + message;
-                if (game.isFowMode() && sendPublic) {
-                    text = message;
-                } else if (game.isFowMode()) {
-                    text = "(You) " + emojiToUse.getFormatted() + " " + message;
-                }
+            String text = player.getRepresentation() + " " + message;
+            if (game.isFowMode() && sendPublic) {
+                text = message;
+            } else if (game.isFowMode()) {
+                text = "(You) " + emojiToUse.getFormatted() + " " + message;
+            }
 
-                if (additionalMessage != null && !additionalMessage.isEmpty()) {
-                    text += game.getPing() + " " + additionalMessage;
-                }
+            if (additionalMessage != null && !additionalMessage.isEmpty()) {
+                text += game.getPing() + " " + additionalMessage;
+            }
 
-                if (game.isFowMode() && !sendPublic) {
-                    MessageHelper.sendPrivateMessageToPlayer(player, game, text);
-                }
-            }, BotLogger::catchRestError);
-        } catch (Throwable e) {
-            game.removeMessageIDForSabo(messageID);
-        }
+            if (game.isFowMode() && !sendPublic) {
+                MessageHelper.sendPrivateMessageToPlayer(player, game, text);
+            }
+        }, BotLogger::catchRestError);
     }
 
     public static void progressGameIfAllPlayersHaveReacted(String messageId, Game game) {

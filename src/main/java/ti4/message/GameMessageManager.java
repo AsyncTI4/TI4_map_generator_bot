@@ -70,6 +70,22 @@ public class GameMessageManager {
         persistFile(allGameMessages);
     }
 
+    public static synchronized void removeAfter(String gameName, long gameSaveTime) {
+        GameMessages allGameMessages = readFile();
+        if (allGameMessages == null) {
+            return;
+        }
+
+        List<GameMessage> messages = allGameMessages.gameNameToMessages.get(gameName);
+        if (messages == null) {
+            return;
+        }
+
+        messages.removeIf(message -> message.gameSaveTime > gameSaveTime);
+
+        persistFile(allGameMessages);
+    }
+
     public static synchronized Optional<String> remove(String gameName, GameMessageType type) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {

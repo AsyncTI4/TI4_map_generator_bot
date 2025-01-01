@@ -49,6 +49,7 @@ import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.service.actioncard.SabotageService;
+import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.GameNameService;
 import ti4.service.game.GameUndoNameService;
@@ -140,46 +141,53 @@ public class MessageHelper {
 
 	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game game, Player player,
 																	List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
-		MessageFunction addFactionReact = (msg) -> {
+		MessageFunction addFactionReact = (message) -> {
 			if (saboable) {
-				GameMessageManager.add(game.getName(), msg.getId(), GameMessageType.ACTION_CARD, game.getLastModifiedDate());
+				GameMessageManager.add(game.getName(), message.getId(), GameMessageType.ACTION_CARD, game.getLastModifiedDate());
 			}
-			addFactionReactToMessage(game, player, msg);
+			addFactionReactToMessage(game, player, message);
 			if (!saboable) {
 				return;
 			}
 			for (Player p2 : game.getRealPlayers()) {
-				if (p2 == player || SabotageService.canSabotage(p2, game)) {
+				if (p2 == player || SabotageService.couldFeasiblySabotage(p2, game)) {
 					continue;
 				}
-				addFactionReactToMessage(game, p2, msg);
+				addFactionReactToMessage(game, p2, message);
 			}
-
+			ReactionService.progressGameIfAllPlayersHaveReacted(message.getId(), game);
         };
 		splitAndSentWithAction(messageText, channel, addFactionReact, embeds, buttons);
 	}
 
 	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText, Game game, List<Button> buttons, GameMessageType messageType) {
-		MessageFunction addFactionReact = (msg) -> {
+		MessageFunction addFactionReact = (message) -> {
 			StringTokenizer players = switch (messageType) {
 				case AGENDA_WHEN -> {
-					String oldWhenMessageId = GameMessageManager.replace(game.getName(), msg.getId(), GameMessageType.AGENDA_WHEN, game.getLastModifiedDate());
-					if (oldWhenMessageId != null) {
-						game.getMainGameChannel().deleteMessageById(oldWhenMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
+					String oldMessageId = GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.AGENDA_WHEN, game.getLastModifiedDate());
+					if (oldMessageId != null) {
+						game.getMainGameChannel().deleteMessageById(oldMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
 					}
 					yield new StringTokenizer(game.getPlayersWhoHitPersistentNoWhen(), "_");
 				}
 				case AGENDA_AFTER -> {
-					String oldAfterMessageId = GameMessageManager.replace(game.getName(), msg.getId(), GameMessageType.AGENDA_AFTER, game.getLastModifiedDate());
-					if (oldAfterMessageId != null) {
-						game.getMainGameChannel().deleteMessageById(oldAfterMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
+					String oldMessageId = GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.AGENDA_AFTER, game.getLastModifiedDate());
+					if (oldMessageId != null) {
+						game.getMainGameChannel().deleteMessageById(oldMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
 					}
 					yield new StringTokenizer(game.getPlayersWhoHitPersistentNoAfter(), "_");
 				}
-				case SHENANIGANS_PASS -> {//TODO
-					GameMessageManager.add(game.getName(), msg.getId(), GameMessageType.SHENANIGANS_PASS, game.getLastModifiedDate());
-					if (game.getStoredValue("Pass On Shenanigans") == null) {
-						game.setStoredValue("Pass On Shenanigans", "");
+				case AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT -> {
+					String oldMessageId = GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT, game.getLastModifiedDate());
+					if (oldMessageId != null) {
+						game.getMainGameChannel().deleteMessageById(oldMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
+					}
+					yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
+				}
+				case AGENDA_DEADLY_PLOT -> {
+					String oldMessageId = GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.AGENDA_DEADLY_PLOT, game.getLastModifiedDate());
+					if (oldMessageId != null) {
+						game.getMainGameChannel().deleteMessageById(oldMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
 					}
 					yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
 				}
@@ -192,7 +200,7 @@ public class MessageHelper {
 			while (players != null && players.hasMoreTokens()) {
 				String playerString = players.nextToken();
 				Player player = game.getPlayerFromColorOrFaction(playerString);
-				addFactionReactToMessage(game, player, msg);
+				addFactionReactToMessage(game, player, message);
 			}
 		};
 		splitAndSentWithAction(messageText, channel, addFactionReact, null, buttons);
