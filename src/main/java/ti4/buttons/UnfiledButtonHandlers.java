@@ -24,8 +24,8 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands2.planet.PlanetExhaust;
-import ti4.commands2.planet.PlanetExhaustAbility;
+import ti4.commands.planet.PlanetExhaust;
+import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -1337,9 +1337,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                         "No such Action Card ID found, please retry");
                     return;
                 }
-                String sb = player.getRepresentation() + " - " +
-                    "Discarded Action Card:" + "\n" +
-                    Mapper.getActionCard(acID).getRepresentation() + "\n";
+                String sb = player.getRepresentation() + " discarded the action card _" + Mapper.getActionCard(acID).getName() + "_.\n" +
+                    Mapper.getActionCard(acID).getRepresentation();
                 MessageChannel channel2 = game.getMainGameChannel();
                 if (game.isFowMode()) {
                     channel2 = player.getPrivateChannel();
@@ -2656,7 +2655,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler(Constants.SO_NO_SCORING)
     public static void soNoScoring(ButtonInteractionEvent event, Player player, Game game) {
-        String message = player.getRepresentation() + " - no Secret Objective scored.";
+        String message = player.getRepresentation() + " has opted not to score a secret objective at this point in time.";
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         String key2 = "queueToScoreSOs";
@@ -2694,7 +2693,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler(Constants.PO_NO_SCORING)
     public static void poNoScoring(ButtonInteractionEvent event, Player player, Game game) {
         // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
-        String message = player.getRepresentation() + " - no Public Objective scored.";
+        String message = player.getRepresentation() + " has opted not to score a public objective at this point in time.";
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }

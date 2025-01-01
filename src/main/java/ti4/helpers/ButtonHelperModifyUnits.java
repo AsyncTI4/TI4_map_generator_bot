@@ -1502,8 +1502,12 @@ public class ButtonHelperModifyUnits {
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unitID), player.getColor());
         var unit = new ParsedUnit(key, 1, Constants.SPACE);
         RemoveUnitService.removeUnit(event, tile, game, unit);
+        String name = unitID;
+        if (Mapper.getUnit(AliasHandler.resolveUnit(unitID)) != null) {
+            name = Mapper.getUnit(AliasHandler.resolveUnit(unitID)).getName();
+        }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " captured 1 newly produced " + Mapper.getUnit(unitID).getName()
+            player.getRepresentationUnfogged() + " captured 1 newly produced " + name
                 + " in " + tile.getRepresentationForButtons(game, player) + " using the **Cloaked Fleets** ability (limit of 2 ships may be captured per build).");
         AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), unitID);
         event.getMessage().delete().queue();

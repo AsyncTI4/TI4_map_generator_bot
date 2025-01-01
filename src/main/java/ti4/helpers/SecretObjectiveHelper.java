@@ -32,7 +32,7 @@ public class SecretObjectiveHelper {
             return;
         }
 
-        StringBuilder message = new StringBuilder(player.getRepresentation() + " scored " + CardEmojis.SecretObjectiveAlt + " ");
+        StringBuilder message = new StringBuilder(player.getRepresentation() + " scored ");
         for (Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;

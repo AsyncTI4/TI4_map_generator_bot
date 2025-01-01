@@ -63,7 +63,7 @@ class UndoButtonHandler {
                 .max()
                 .orElseThrow(NoSuchElementException::new);
 
-        if (highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber))) {
+        if (highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber-1))) {
             ButtonHelper.deleteMessage(event);
         }
 
@@ -81,6 +81,6 @@ class UndoButtonHandler {
                 break;
             }
         }
-        event.getHook().sendMessage(msg.toString()+".").setEphemeral(true).queue();
+        event.getHook().sendMessage(msg + ".").setEphemeral(true).queue();
     }
 }

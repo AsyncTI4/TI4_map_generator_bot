@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands2.tokens.AddTokenCommand;
+import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -382,20 +382,20 @@ public class ExploreService {
                     message = "Invalid token or tile";
                 } else {
                     if ("ionalpha".equalsIgnoreCase(token)) {
-                        message = player.getRepresentation() + " please decide to place the _Ion Storm_ on either its alpha or beta side.";
+                        message = player.getRepresentation() + ", please choose if the _Ion Storm_ is placed on its alpha or beta side.";
                         List<Button> buttonIon = new ArrayList<>();
                         buttonIon.add(Buttons.gray("addIonStorm_alpha_" + tile.getPosition(), "Place an Alpha", MiscEmojis.CreussAlpha));
                         buttonIon.add(Buttons.green("addIonStorm_beta_" + tile.getPosition(), "Place a Beta", MiscEmojis.CreussBeta));
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttonIon);
                     } else {
                         tile.addToken(tokenFilename, Constants.SPACE);
-                        message = "Token `" + token + "` added to tile " + tile.getAutoCompleteName();
+                        message = "Token `" + token + "` added to tile " + tile.getAutoCompleteName() + ".";
                     }
 
                     if (Constants.MIRAGE.equalsIgnoreCase(token)) {
                         Helper.addMirageToTile(tile);
                         game.clearPlanetsCache();
-                        message = "Mirage added to map, added to your stats, readied, and explored!";
+                        message = "Mirage added to map, added to your play area, readied, and explored!";
                     }
                     game.purgeExplore(ogID);
                 }

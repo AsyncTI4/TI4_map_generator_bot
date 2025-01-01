@@ -8,6 +8,7 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
@@ -51,7 +52,7 @@ public class PromissoryNoteHelper {
         StringBuilder sb = new StringBuilder();
 
         //PROMISSORY NOTES
-        sb.append("**Promissory Notes:**").append("\n");
+        sb.append("__Promissory Notes:__").append("\n");
         int index = 1;
         Map<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
@@ -210,29 +211,19 @@ public class PromissoryNoteHelper {
         }
 
         String emojiToUse = game.isFowMode() ? "" : owner.getFactionEmoji();
-        StringBuilder sb = new StringBuilder(player.getRepresentation() + " played promissory note: " + pnName + "\n");
-        sb.append(emojiToUse).append(CardEmojis.PN);
-        String pnText;
-
-        // Handle AbsolMode Political Secret
-        if (game.isAbsolMode() && id.endsWith("_ps")) {
-            pnText = "Political Secret" + SourceEmojis.Absol
-                + ":  *When you cast votes:* You may exhaust up to 3 of the {color} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {color} player.";
-        } else {
-            pnText = Mapper.getPromissoryNote(id).getName();
-        }
-        sb.append(pnText).append("\n");
+        String sb = player.getRepresentation() + " played _" + pnName + "_.";
+        MessageEmbed pnEmbed = pn.getRepresentationEmbed();
 
         // Send the message up top before "resolving" so that buttons are at the bottom
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+        MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), sb, pnEmbed);
         if (game.isFowMode()) {
             // Fog of war ping for extra visibility
-            FoWHelper.pingAllPlayersWithFullStats(game, event, player, sb.toString());
+            FoWHelper.pingAllPlayersWithFullStats(game, event, player, sb);
         }
         // And refresh cards info
         sendPromissoryNoteInfo(game, player, false);
         sendPromissoryNoteInfo(game, owner, false);
-        MessageHelper.sendMessageToChannel(owner.getCardsInfoThread(), owner.getRepresentationUnfogged() + " someone played one of your PNs (" + pnName + ")");
+        MessageHelper.sendMessageToChannel(owner.getCardsInfoThread(), owner.getRepresentationUnfogged() + ", someone just played _" + pnName + "_.");
 
         if (id.contains("dspnveld")) {
             ButtonHelperFactionSpecific.offerVeldyrButtons(player, game, id);

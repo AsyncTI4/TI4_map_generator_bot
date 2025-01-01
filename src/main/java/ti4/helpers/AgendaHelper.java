@@ -38,7 +38,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
-import ti4.commands2.planet.PlanetExhaust;
+import ti4.commands.planet.PlanetExhaust;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -1989,7 +1989,7 @@ public class AgendaHelper {
             return sb.toString();
         } else if (player.hasAbility("galactic_threat")
             && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
-            sb.append(" NOT VOTING (Galactic Threat)");
+            sb.append(" __not__ voting due to **Galactic Threat**");
             return sb.toString();
         } else if (player.hasLeaderUnlocked("xxchahero")) {
             sb.append(" vote count: **" + MiscEmojis.ResInf + " ").append(voteCount);
@@ -2127,12 +2127,14 @@ public class AgendaHelper {
 
         // Predictive Intelligence
         if (player.hasTechReady("pi") || player.hasTechReady("absol_pi")) {
-            additionalVotesAndSources.put(TechEmojis.CyberneticTech + "Predictive Intelligence", 3);
+            additionalVotesAndSources.put(TechEmojis.CyberneticTech + "_Predictive Intelligence_", 3);
         }
 
         // Xxcha Alliance
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
-            additionalVotesAndSources.put(FactionEmojis.Xxcha + "Alliance has been counted for", 0);
+        if (player.hasLeaderUnlocked("xxchacommander")) {
+            additionalVotesAndSources.put("with " + FactionEmojis.Xxcha + " commander accounted for", 0);
+        } else if (game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
+            additionalVotesAndSources.put("with " + FactionEmojis.Xxcha + " _Alliance_ accounted for", 0);
         }
 
         // Hacan Alliance
@@ -2602,9 +2604,9 @@ public class AgendaHelper {
             BannerGenerator.drawAgendaBanner(aCount, game);
         }
         StringBuilder whensAftersMessage = new StringBuilder(
-            "Please indicate whether you abstain from playing whens/afters below.\nIf you have an action card with those windows, you may simply play it.");
+            "Please indicate whether you abstain from playing \"whens\" and \"afters\".\nIf you have an action card with those windows, you may simply play it.");
         if (action) {
-            whensAftersMessage.append("\nYou may play afters during this agenda.");
+            whensAftersMessage.append("\nYou may play \"afters\" during this agenda.");
         }
 
         AutoPingMetadataManager.setupAutoPing(game.getName());
@@ -2613,9 +2615,9 @@ public class AgendaHelper {
 
         MessageHelper.sendMessageToChannel(channel, whensAftersMessage.toString());
         if (!action) {
-            MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Whens", game, whenButtons, GameMessageType.AGENDA_WHEN);
+            MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "", game, whenButtons, GameMessageType.AGENDA_WHEN);
         }
-        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", game, afterButtons, GameMessageType.AGENDA_AFTER);
+        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "", game, afterButtons, GameMessageType.AGENDA_AFTER);
 
         game.setStoredValue("lastAgendaReactTime", "" + System.currentTimeMillis());
 
@@ -2674,7 +2676,7 @@ public class AgendaHelper {
         }
         if (!game.isFowMode() && !action) {
             ButtonHelper.updateMap(game, event,
-                "Start of the agenda " + agendaName + " (Agenda #" + aCount + ")");
+                "Start of agenda #" + aCount + " _" + agendaName + "_ .");
             game.setStoredValue("startTimeOfRound" + game.getRound() + "Agenda" + aCount, System.currentTimeMillis() + "");
         }
         if (game.getCurrentAgendaInfo().contains("Secret")) {
@@ -2978,7 +2980,8 @@ public class AgendaHelper {
         String message = game.isFowMode() ? "No whens (locked in)" : null;
         game.addPlayersWhoHitPersistentNoWhen(player.getFaction());
         ReactionService.addReaction(event, game, player, message);
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You hit no whens for this entire agenda. If you change your mind, you can just play a when or remove this setting by hitting no whens (for now)");
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), 
+            "You hit \"No Whens\" for this entire agenda. If you change your mind, you can just play a \"When\" or remove this setting by hitting \"No Whens (For Now)\".");
     }
 
     @ButtonHandler("no_after_persistent")
@@ -2986,7 +2989,8 @@ public class AgendaHelper {
         String message = game.isFowMode() ? "No afters (locked in)" : null;
         game.addPlayersWhoHitPersistentNoAfter(player.getFaction());
         ReactionService.addReaction(event, game, player, message);
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You hit no afters for this entire agenda. If you change your mind, you can just play an after or remove this setting by hitting no afters (for now)");
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+            "You hit \"No Afters\" for this entire agenda. If you change your mind, you can just play an \"After\" or remove this setting by hitting \"No Afters (For Now)\".");
     }
 
     @ButtonHandler("no_after")
@@ -3007,9 +3011,9 @@ public class AgendaHelper {
         UnfiledButtonHandlers.clearAllReactions(event);
         ReactionService.addReaction(event, game, player, true, true, "Playing When", "When Played");
         List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
-        MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", game, whenButtons, GameMessageType.AGENDA_WHEN);
+        MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate \"No Whens\" again.", game, whenButtons, GameMessageType.AGENDA_WHEN);
         List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-        MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
+        MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate \"No Afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -3017,7 +3021,7 @@ public class AgendaHelper {
     public static void refreshVotes(GenericInteractionCreateEvent event, Game game, Player player, String buttonID) {
         String votes = buttonID.replace("refreshVotes_", "");
         List<Button> voteActionRow = Helper.getPlanetRefreshButtons(player, game);
-        Button concludeRefreshing = Buttons.red(player.getFinsFactionCheckerPrefix() + "votes_" + votes, "Done readying planets.");
+        Button concludeRefreshing = Buttons.red(player.getFinsFactionCheckerPrefix() + "votes_" + votes, "Done Readying Planets.");
         voteActionRow.add(concludeRefreshing);
         String voteMessage2 = "Use the buttons to ready planets. When you're done it will prompt the next player to vote.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), voteMessage2, voteActionRow);
@@ -3026,9 +3030,13 @@ public class AgendaHelper {
 
     @ButtonHandler("forceAbstainForPlayer_")
     public static void forceAbstainForPlayer(ButtonInteractionEvent event, String buttonID, Game game) {
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Player was forcefully abstained");
         String faction = buttonID.replace("forceAbstainForPlayer_", "");
         Player p2 = game.getPlayerFromColorOrFaction(faction);
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Player was forcefully abstained.");
+        } else {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), p2.getRepresentation() + " was forcefully abstained.");
+        }
         AgendaHelper.resolvingAnAgendaVote("resolveAgendaVote_0", event, game, p2);
     }
 

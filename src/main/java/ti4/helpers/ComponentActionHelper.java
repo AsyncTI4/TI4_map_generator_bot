@@ -531,7 +531,7 @@ public class ComponentActionHelper {
                 game.setStoredValue("absolMOW", p1.getFaction());
             }
             case "actionCards" -> {
-                String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
+                String secretScoreMsg = "_ _\nClick a button below to play an action card.";
                 List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
                 if (!acButtons.isEmpty()) {
                     List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);

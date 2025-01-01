@@ -137,7 +137,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         StringBuilder title = new StringBuilder();
         title.append(CardEmojis.PN);
         if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(FactionEmojis.getFactionIcon(getFaction().get()));
-        title.append("__**").append(getName()).append("**__");
+        title.append("_").append(getName()).append("_");
         if (!StringUtils.isBlank(getColor().orElse(""))) {
             title.append(" (");
             if (color.equals("<color>")) {

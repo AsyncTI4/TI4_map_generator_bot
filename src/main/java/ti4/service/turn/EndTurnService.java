@@ -338,25 +338,25 @@ public class EndTurnService {
                 }
             }
 
-            String message2a = player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following public objectives: ";
-            StringBuilder message2b = new StringBuilder("none");
+            List<String> scorables = new ArrayList<>();
             for (String obbie : game.getRevealedPublicObjectives().keySet()) {
                 List<String> scoredPlayerList = game.getScoredPublicObjectives().computeIfAbsent(obbie, key -> new ArrayList<>());
                 if (player.isRealPlayer() && !scoredPlayerList.contains(player.getUserID()) && Mapper.getPublicObjective(obbie) != null) {
                     int threshold = ListPlayerInfoService.getObjectiveThreshold(obbie, game);
                     int playerProgress = ListPlayerInfoService.getPlayerProgressOnObjective(obbie, game, player);
                     if (playerProgress >= threshold) {
-                        if (message2b.toString().equalsIgnoreCase("none")) {
-                            message2b = new StringBuilder(Mapper.getPublicObjective(obbie).getName());
-                        } else {
-                            message2b.append(", ").append(Mapper.getPublicObjective(obbie).getName());
-                        }
+                        scorables.add(Mapper.getPublicObjective(obbie).getRepresentation(false));
                     }
                 }
             }
-            if (player.isRealPlayer()) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message2a + message2b);
+            if (scorables.size() == 0) {
+                message = player.getRepresentation() + ", the bot does not believe that you can score any public objectives.";
+            } else {
+                message = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following public objectives: ";
+                message += String.join(", ", scorables);
             }
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
+
             int count = 0;
             StringBuilder message3a = new StringBuilder(player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following secret objectives:");
             for (String soID : player.getSecretsUnscored().keySet()) {
