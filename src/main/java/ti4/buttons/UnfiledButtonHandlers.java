@@ -1698,33 +1698,37 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String buttonID = event.getButton().getId();
 
         String messageId = event.getInteraction().getMessage().getId();
+        var gameMessage = GameMessageManager.getOne(game.getName(), messageId);
         int matchingFactionReactions = 0;
         for (Player player : game.getRealPlayers()) {
             boolean factionReacted = false;
-            if (buttonID.contains("no_after")) {
-                if (game.getPlayersWhoHitPersistentNoAfter().contains(player.getFaction())) {
+            String faction = player.getFaction();
+            if (gameMessage.isPresent() && gameMessage.get().factionsThatReacted().contains(faction)) {
+                factionReacted = true;
+            } else if (buttonID.contains("no_after")) {
+                if (game.getPlayersWhoHitPersistentNoAfter().contains(faction)) {
                     factionReacted = true;
+                } else {
+                    Message mainMessage = event.getMessage();
+                    Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
+                    MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+                    if (reaction != null) {
+                        factionReacted = true;
+                    }
                 }
-                Message mainMessage = event.getMessage();
-
-                Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
-                MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                if (reaction != null) {
+            } else if (buttonID.contains("no_when")) {
+                if (game.getPlayersWhoHitPersistentNoWhen().contains(faction)) {
                     factionReacted = true;
+                } else {
+                    Message mainMessage = event.getMessage();
+                    Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
+                    MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+                    if (reaction != null) {
+                        factionReacted = true;
+                    }
                 }
             }
-            if (buttonID.contains("no_when")) {
-                if (game.getPlayersWhoHitPersistentNoWhen().contains(player.getFaction())) {
-                    factionReacted = true;
-                }
-                Message mainMessage = event.getMessage();
-                Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
-                MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                if (reaction != null) {
-                    factionReacted = true;
-                }
-            }
-            if (factionReacted || (game.getStoredValue(messageId) != null && game.getStoredValue(messageId).contains(player.getFaction()))) {
+            if (factionReacted) {
                 matchingFactionReactions++;
             }
         }
@@ -1758,10 +1762,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     guildMessageChannel.sendMessage(message).queueAfter(10, TimeUnit.SECONDS);
                 }
             }
-            case "no_when", "no_when_persistent" ->
-                ReactionService.handleAllPlayersReactingNoWhens(event.getInteraction().getMessage(), game);
-            case "no_after", "no_after_persistent" ->
-                ReactionService.handleAllPlayersReactingNoAfters(event.getInteraction().getMessage(), game);
+            case "no_when", "no_when_persistent" -> ReactionService.handleAllPlayersReactingNoWhens(event.getInteraction().getMessage(), game);
+            case "no_after", "no_after_persistent" -> ReactionService.handleAllPlayersReactingNoAfters(event.getInteraction().getMessage(), game);
             case "no_sabotage" -> ReactionService.handleAllPlayersReactingNoSabotage(event.getInteraction().getMessage(), game);
             case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {
                 String message2 = "All players have indicated scoring. Flip the relevant public objective using the buttons. This will automatically run status clean-up if it has not been run already.";
@@ -1784,11 +1786,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     }
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-                // event.getMessage().delete().queueAfter(20, TimeUnit.SECONDS);
             }
             case "pass_on_abilities" -> {
                 if (game.isCustodiansScored()) {
-                    // new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
                     Button flipAgenda = Buttons.blue("flip_agenda", "Press this to flip agenda");
                     List<Button> buttons = List.of(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now",
@@ -2706,12 +2706,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
         }
         if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
-            game.setStoredValue(key3,
-                game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+            game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
             String key3b = "potentialScoreSOBlockers";
             if (!game.getStoredValue(key3b).contains(player.getFaction() + "*")) {
                 Helper.resolvePOScoringQueue(game, event);
-                // Helper.resolveSOScoringQueue(game, event);
             }
         }
     }
