@@ -283,7 +283,6 @@ class GameLoadService {
                 case Constants.LATEST_OUTCOME_VOTED_FOR -> game.setLatestOutcomeVotedFor(info);
                 case Constants.PHASE_OF_GAME -> game.setPhaseOfGame(info);
                 case Constants.SO -> game.setSecretObjectives(getCardList(info));
-                case Constants.MESSAGEID_FOR_SABOS -> game.setMessageIDForSabo(getCardList(info));
                 case Constants.AC -> game.setActionCards(getCardList(info));
                 case Constants.PO1 -> game.setPublicObjectives1(getCardList(info));
                 case Constants.PO2 -> game.setPublicObjectives2(getCardList(info));

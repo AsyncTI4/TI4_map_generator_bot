@@ -57,6 +57,8 @@ import ti4.map.UnitHolder;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
@@ -374,17 +376,18 @@ public class Helper {
     }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
-        List<String> messageIDs = new ArrayList<>(game.getMessageIDsForSabo());
-        for (String messageID : messageIDs) {
-            if (ReactionService.checkForSpecificPlayerReact(messageID, player, game)) continue;
+        var gameMessages = GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
+        for (GameMessageManager.GameMessage gameMessage : gameMessages) {
+            if (ReactionService.checkForSpecificPlayerReact(gameMessage.messageId(), player, game)) continue;
 
-            game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
-                Emoji reactionEmoji = getPlayerReactionEmoji(game, player, messageID);
+            game.getMainGameChannel().retrieveMessageById(gameMessage.messageId()).queue(mainMessage -> {
+                Emoji reactionEmoji = getPlayerReactionEmoji(game, player, gameMessage.messageId());
                 MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
                 if (reaction == null) {
                     Calendar rightNow = Calendar.getInstance();
-                    if (rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() > 2 || rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() < -100) {
-                        game.removeMessageIDForSabo(messageID);
+                    if (rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() > 2 ||
+                            rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() < -100) {
+                        GameMessageManager.remove(game.getName(), gameMessage.messageId());
                     }
                 }
             });

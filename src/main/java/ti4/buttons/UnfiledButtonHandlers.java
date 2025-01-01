@@ -588,9 +588,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         } else {
             game.setSpecificActionCardSaboCount(acName, 1 + count);
         }
-        if (game.getMessageIDsForSabo().contains(event.getMessageId())) {
-            game.removeMessageIDForSabo(event.getMessageId());
-        }
+        GameMessageManager.remove(game.getName(), event.getMessageId());
         boolean sendReact = true;
         if ("empy".equalsIgnoreCase(type)) {
             message += "a Watcher (Empyrean mech)! The relevant Watcher should now be removed by the owner.";

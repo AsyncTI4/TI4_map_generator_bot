@@ -120,9 +120,6 @@ class GameSaveService {
         writer.write(Constants.SO + " " + String.join(",", game.getSecretObjectives()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.MESSAGEID_FOR_SABOS + " " + String.join(",", game.getMessageIDsForSabo()));
-        writer.write(System.lineSeparator());
-
         writer.write(Constants.AC + " " + String.join(",", game.getActionCards()));
         writer.write(System.lineSeparator());
 
@@ -835,8 +832,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
     }
 
-    private static void writeCardsStrings(Map<String, String> cardList, Writer writer, String saveID)
-        throws IOException {
+    private static void writeCardsStrings(Map<String, String> cardList, Writer writer, String saveID) throws IOException {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : cardList.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
