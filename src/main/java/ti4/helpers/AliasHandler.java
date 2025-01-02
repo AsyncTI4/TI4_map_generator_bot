@@ -229,7 +229,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         }
-        System.out.println("Could not find an alias for Planet: " + name);
+        if (!"space".equals(name)) System.out.println("Could not find an alias for Planet: " + name);
         return name;
     }
 

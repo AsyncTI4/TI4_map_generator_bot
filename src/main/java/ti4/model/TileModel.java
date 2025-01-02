@@ -62,7 +62,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private boolean gravityRift = false;
     private String imageURL;
     private ComponentSource source;
-    private TileBack tileBack;
+    private TileBack tileBack = TileBack.BLACK;
 
     @Override
     @JsonIgnore

@@ -8,6 +8,11 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -16,6 +21,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
+import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.MapStringMapper;
 import ti4.map.Tile;
@@ -112,5 +118,24 @@ public class AddTileListService {
         if (!game.isFowMode() && game.getRealPlayers().size() < game.getPlayers().size()) {
             ButtonHelper.offerPlayerSetupButtons(channel, game);
         }
+    }
+
+    public static Modal buildMapStringModal(Game game, String modalId) {
+        String fieldId = "mapString";
+        TextInput tags = TextInput.create(fieldId, "Enter Map String", TextInputStyle.PARAGRAPH)
+            .setPlaceholder("Paste the map string here.")
+            .setValue(game.getMapString().substring(0, game.getMapString().length() > 4000 ? 4000 : game.getMapString().length()))
+            .setRequired(true)
+            .build();
+        Modal modal = Modal.create(modalId, "Add Map String for " + game.getName()).addActionRow(tags).build();
+        return modal;
+    }
+    
+    @ModalHandler("addMapString")
+    public static void addMapStringFromModal(ModalInteractionEvent event, Game game) {
+        ModalMapping mapping = event.getValue("mapString");
+        if (mapping == null) return;
+        String mapStringRaw = mapping.getAsString();
+        addTileListToMap(game, mapStringRaw, event);
     }
 }
