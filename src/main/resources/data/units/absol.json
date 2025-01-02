@@ -460,7 +460,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, place the unit on this card. At the start of your next turn, for every 2 units that are on this card, place 1 on a planet you control and return the rest to your reinforcements.",
+        "ability": "After this unit is destroyed, place the unit on this card. At the start of your next turn, for every 2 units that are on this card, place 1 on a planet you control.",
         "homebrewReplacesID": "arborec_infantry2"
     },
     {
