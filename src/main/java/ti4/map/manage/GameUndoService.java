@@ -17,6 +17,7 @@ import ti4.helpers.Storage;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameUndoNameService;
 import ti4.service.info.CardsInfoService;
@@ -90,6 +91,7 @@ class GameUndoService {
 
             generateSavedButtons(gameToUndo);
             sendAnyChangedCardsInfo(gameToUndo, loadedGame);
+            GameMessageManager.removeAfter(gameName, loadedGame.getLastModifiedDate());
 
             sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex);
             return loadedGame;

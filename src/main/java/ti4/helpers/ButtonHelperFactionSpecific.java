@@ -526,7 +526,7 @@ public class ButtonHelperFactionSpecific {
         String warfareOrTactical = buttonID.split("_")[2];
         ButtonHelper.sendMessageToRightStratThread(player, game, msg, warfareOrTactical);
         List<Button> buttons;
-        buttons = Helper.getPlaceUnitButtons(event, player, game, tile, warfareOrTactical, "place");
+        buttons = Helper.getPlaceUnitButtons(event, player, game, tile, warfareOrTactical+"asn", "place");
         String message = player.getRepresentation()
             + ", please use the buttons to produce."
             + ButtonHelper.getListOfStuffAvailableToSpend(player, game);

@@ -122,8 +122,6 @@ public class Game extends GameProperties {
     @Getter
     private Map<String, Integer> discardedEvents = new LinkedHashMap<>();
 
-    private List<String> messageIDsForSaboReacts = new ArrayList<>();
-
     @Getter
     @Setter
     private Map<String, Integer> eventsInEffect = new LinkedHashMap<>();
@@ -1003,22 +1001,6 @@ public class Game extends GameProperties {
         }
         discardedEvents.put(eventID, identifier);
         return identifier;
-    }
-
-    public void addMessageIDForSabo(String messageID) {
-        messageIDsForSaboReacts.add(messageID);
-    }
-
-    public void removeMessageIDForSabo(String messageID) {
-        messageIDsForSaboReacts.remove(messageID);
-    }
-
-    public void setMessageIDForSabo(List<String> messageIDs) {
-        messageIDsForSaboReacts = messageIDs;
-    }
-
-    public List<String> getMessageIDsForSabo() {
-        return messageIDsForSaboReacts;
     }
 
     public void addRevealedPublicObjective(String id) {

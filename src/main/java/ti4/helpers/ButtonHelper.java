@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +15,11 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
@@ -33,10 +40,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -98,8 +101,6 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelper {
 
@@ -2000,12 +2001,9 @@ public class ButtonHelper {
         }
         if ("warfare".equalsIgnoreCase(whatIsItFor)) {
             List<Button> redistributeButton = new ArrayList<>();
-            Button redistribute = Buttons.green("FFCC_" + player.getFaction() + "_" + "redistributeCCButtons",
+            Button redistribute = Buttons.green("FFCC_" + player.getFaction() + "_" + "redistributeCCButtonsdeleteThisMessage",
                 "Redistribute & Gain Command Tokens");
-            Button deleButton = Buttons.red("FFCC_" + player.getFaction() + "_" + "deleteButtons",
-                "Delete These Buttons");
             redistributeButton.add(redistribute);
-            redistributeButton.add(deleButton);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                 player.getRepresentation() + ", you may redistribute command tokens with these buttons after picking up a command token from the game board.", redistributeButton);
         }
@@ -5903,8 +5901,7 @@ public class ButtonHelper {
         String messageID = buttonID.split("_")[1];
         String msg = player.getFactionEmoji() + " successfully preset " + messageID;
         String part2 = player.getFaction();
-        if (game.getStoredValue(messageID) != null
-            && !game.getStoredValue(messageID).isEmpty()) {
+        if (game.getStoredValue(messageID) != null && !game.getStoredValue(messageID).isEmpty()) {
             part2 = game.getStoredValue(messageID) + "_" + player.getFaction();
         }
         if (StringUtils.countMatches(buttonID, "_") > 1) {

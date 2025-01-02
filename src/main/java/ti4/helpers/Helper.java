@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.*;
+import java.awt.Point;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +21,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -39,10 +44,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -57,6 +58,8 @@ import ti4.map.UnitHolder;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
@@ -374,17 +377,18 @@ public class Helper {
     }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
-        List<String> messageIDs = new ArrayList<>(game.getMessageIDsForSabo());
-        for (String messageID : messageIDs) {
-            if (ReactionService.checkForASpecificPlayerReact(messageID, player, game)) continue;
+        var gameMessages = GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
+        for (GameMessageManager.GameMessage gameMessage : gameMessages) {
+            if (ReactionService.checkForSpecificPlayerReact(gameMessage.messageId(), player, game)) continue;
 
-            game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
-                Emoji reactionEmoji = getPlayerReactionEmoji(game, player, messageID);
+            game.getMainGameChannel().retrieveMessageById(gameMessage.messageId()).queue(mainMessage -> {
+                Emoji reactionEmoji = getPlayerReactionEmoji(game, player, gameMessage.messageId());
                 MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
                 if (reaction == null) {
                     Calendar rightNow = Calendar.getInstance();
-                    if (rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() > 2 || rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() < -100) {
-                        game.removeMessageIDForSabo(messageID);
+                    if (rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() > 2 ||
+                            rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() < -100) {
+                        GameMessageManager.remove(game.getName(), gameMessage.messageId());
                     }
                 }
             });
@@ -1382,6 +1386,8 @@ public class Helper {
     public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Game game, Tile tile, String warfareNOtherstuff, String placePrefix) {
         List<Button> unitButtons = new ArrayList<>();
         player.resetProducedUnits();
+        boolean asn = warfareNOtherstuff.contains("asn");
+        warfareNOtherstuff = warfareNOtherstuff.replace("asn", "");
         int resourcelimit = 100;
         String planetInteg = "";
         if (warfareNOtherstuff.contains("integrated")) {
@@ -1466,7 +1472,7 @@ public class Helper {
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planet && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
-                boolean singleDock = "warfare".equalsIgnoreCase(warfareNOtherstuff);
+                boolean singleDock = "warfare".equalsIgnoreCase(warfareNOtherstuff) && !asn;
                 if (singleDock) {
                     if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1
                         && unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) < 1

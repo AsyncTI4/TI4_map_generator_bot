@@ -1,7 +1,5 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,13 +10,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -49,6 +46,8 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.RemoveUnitService;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @UtilityClass
 public class CombatRollService {
@@ -508,15 +507,14 @@ public class CombatRollService {
                         List<Button> buttons = new ArrayList<>();
                         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds)) {
                             for (String planet : ButtonHelper.getPlanetsWithSpecificUnit(player, tile, "pds")) {
-                                UnitHolder planetUnit = game.getUnitHolderFromPlanet(planet);
+                                Planet planetUnit = game.getUnitHolderFromPlanet(planet);
                                 if ("space".equalsIgnoreCase(planetUnit.getName())) {
                                     continue;
                                 }
-                                Planet planetReal = (Planet) planetUnit;
-                                planet = planetReal.getName();
-                                if (isNotBlank(planetReal.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)
+                                planet = planetUnit.getName();
+                                if (isNotBlank(planetUnit.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)
                                     && FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
-                                    List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
+                                    List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planetUnit, player);
                                     buttons.addAll(planetButtons);
                                 }
                             }
@@ -533,15 +531,14 @@ public class CombatRollService {
                         }
                         List<Button> buttons = new ArrayList<>();
                         for (String planet : ButtonHelper.getPlanetsWithSpecificUnit(player, activeSystem, "pds")) {
-                            UnitHolder planetUnit = game.getUnitHolderFromPlanet(planet);
+                            Planet planetUnit = game.getUnitHolderFromPlanet(planet);
                             if ("space".equalsIgnoreCase(planetUnit.getName())) {
                                 continue;
                             }
-                            Planet planetReal = (Planet) planetUnit;
-                            planet = planetReal.getName();
-                            if (isNotBlank(planetReal.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)
+                            planet = planetUnit.getName();
+                            if (isNotBlank(planetUnit.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)
                                 && FoWHelper.playerHasUnitsOnPlanet(player, activeSystem, planet)) {
-                                List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
+                                List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planetUnit, player);
                                 buttons.addAll(planetButtons);
                             }
                         }

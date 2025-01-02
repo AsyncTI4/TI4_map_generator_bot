@@ -1,5 +1,6 @@
 package ti4.map.manage;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -23,16 +24,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nullable;
-
-import org.jetbrains.annotations.NotNull;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -48,6 +45,10 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
+import ti4.model.BorderAnomalyHolder;
+import ti4.model.TemporaryCombatModifierModel;
+
 import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
 import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
 import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
@@ -68,9 +69,6 @@ import static ti4.map.manage.GamePersistenceKeys.TOKENS;
 import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
 import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
 import static ti4.map.manage.GamePersistenceKeys.UNITS;
-import ti4.message.BotLogger;
-import ti4.model.BorderAnomalyHolder;
-import ti4.model.TemporaryCombatModifierModel;
 
 @UtilityClass
 class GameLoadService {
@@ -144,7 +142,7 @@ class GameLoadService {
                     try {
                         readGameInfo(game, data);
                     } catch (Exception e) {
-                        BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
+                        BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.", e);
                         return null;
                     }
                 }
@@ -283,12 +281,8 @@ class GameLoadService {
             switch (identification) {
                 case Constants.LATEST_COMMAND -> game.setLatestCommand(info);
                 case Constants.LATEST_OUTCOME_VOTED_FOR -> game.setLatestOutcomeVotedFor(info);
-                case Constants.LATEST_AFTER_MSG -> game.setLatestAfterMsg(info);
-                case Constants.LATEST_WHEN_MSG -> game.setLatestWhenMsg(info);
-                case Constants.LATEST_TRANSACTION_MSG -> game.setLatestTransactionMsg(info);
                 case Constants.PHASE_OF_GAME -> game.setPhaseOfGame(info);
                 case Constants.SO -> game.setSecretObjectives(getCardList(info));
-                case Constants.MESSAGEID_FOR_SABOS -> game.setMessageIDForSabo(getCardList(info));
                 case Constants.AC -> game.setActionCards(getCardList(info));
                 case Constants.PO1 -> game.setPublicObjectives1(getCardList(info));
                 case Constants.PO2 -> game.setPublicObjectives2(getCardList(info));
@@ -316,7 +310,6 @@ class GameLoadService {
                     if (Mapper.isValidStrategyCardSet(info)) {
                         game.setScSetID(info);
                     } else {
-                        // BotLogger.log("Invalid strategy card set ID found: `" + scSetID + "` Game: `" + game.getName() + "`");
                         game.setScSetID("pok");
                     }
                 }
@@ -605,7 +598,6 @@ class GameLoadService {
                 case Constants.SAVED_CHANNEL -> game.setSavedChannelID(info);
                 case Constants.SAVED_MESSAGE -> game.setSavedMessage(info);
                 case Constants.BOT_MAP_CHANNEL -> game.setBotMapUpdatesThreadID(info);
-                case Constants.BAG_DRAFT_STATUS_MESSAGE_ID -> game.setBagDraftStatusMessageID(info);
                 case Constants.GAME_LAUNCH_THREAD_ID -> game.setLaunchPostThreadID(info);
 
                 // GAME MODES

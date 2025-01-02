@@ -122,10 +122,6 @@ public class GameProperties {
     private @ExportableField String tableTalkChannelID;
     private @ExportableField String mainChannelID;
     private String savedChannelID;
-    private String bagDraftStatusMessageID;
-    private String latestAfterMsg = "";
-    private String latestWhenMsg = "";
-    private String latestTransactionMsg = "";
     private @ExportableField List<String> fogOfWarGMIDs = new ArrayList<>(1); // Game Masters
 
     // More complex objects below

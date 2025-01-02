@@ -32,6 +32,7 @@ import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -156,6 +157,8 @@ public class EndGameService {
         game.setEndedDate(System.currentTimeMillis());
         game.setAutoPing(false);
         game.setAutoPingSpacer(0);
+
+        GameMessageManager.remove(List.of(game.getName()));
 
         if (!game.isFowMode()) {
             PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
