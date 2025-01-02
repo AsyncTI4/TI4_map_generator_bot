@@ -390,8 +390,8 @@ public class PlayerTechService {
             return;
         }
         TechnologyModel techM = Mapper.getTech(techID);
-        StringBuilder message = new StringBuilder(ident).append(" acquired the technology: ")
-            .append(techM.getRepresentation(false));
+        StringBuilder message = new StringBuilder(ident).append(" acquired the technology ")
+            .append(techM.getRepresentation(false)).append(".");
 
         if (techM.getRequirements().isPresent() && techM.getRequirements().get().length() > 1) {
             CommanderUnlockCheckService.checkPlayer(player, "zealots");

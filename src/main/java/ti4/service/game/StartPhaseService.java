@@ -325,12 +325,12 @@ public class StartPhaseService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Speaker not found. Can't proceed.");
             return;
         }
-        String message = speaker.getRepresentationUnfogged() + " is up to pick a strategy card.\n";
+        String message = speaker.getRepresentationUnfogged() + " is up to pick a strategy card.";
         game.updateActivePlayer(speaker);
         game.setPhaseOfGame("strategy");
-        String pickSCMsg = "Use buttons to pick a strategy card.";
+        String pickSCMsg = " Please use the buttons to pick a strategy card.";
         if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
-            pickSCMsg = "Use buttons to pick the strategy card you wish to give to someone else.";
+            pickSCMsg = " Please use the buttons to pick the strategy card you wish to give to someone else.";
         }
         ButtonHelperAbilities.giveKeleresCommsNTg(game, event);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", System.currentTimeMillis() + "");

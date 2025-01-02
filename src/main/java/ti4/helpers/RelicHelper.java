@@ -67,7 +67,7 @@ public class RelicHelper {
         player.addRelic(relicID);
         RelicModel relicModel = Mapper.getRelic(relicID);
 
-        String message = player.getRepresentation() + " drew a Relic:";
+        String message = player.getRepresentation() + " drew the _" + relicModel.getName() + "_ relic.";
         if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
         }

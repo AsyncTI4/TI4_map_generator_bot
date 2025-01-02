@@ -48,7 +48,7 @@ public class SecretObjectiveInfoService {
         if (player.getSecretsUnscored().isEmpty()) return;
 
         // SCORE/DISCARD BUTTONS
-        String secretMsg = "_ _\nClick a button to either score or discard a secret objective";
+        String secretMsg = "_ _\nPlease use these button if you with to score or discard a secret objective.";
         List<Button> buttons = new ArrayList<>();
         Button scoreB = Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
         Button discardB = Buttons.red("get_so_discard_buttons", "Discard A Secret Objective");
