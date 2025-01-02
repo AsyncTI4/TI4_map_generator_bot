@@ -211,14 +211,13 @@ public class SliceGenerationSettings extends SettingsMenu {
         int players = 6;
         numSlices.setVal(players);
         numFactions.setVal(players);
-        List<String> slices = List.of(
+        String ttsString = String.join("|", List.of(
             "",
             "",
             "",
             "",
             "",
-            "");
-        String ttsString = String.join("|", slices);
+            ""));
         return setPresetSlices(ttsString);
     }
 
