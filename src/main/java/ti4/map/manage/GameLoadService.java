@@ -142,7 +142,7 @@ class GameLoadService {
                     try {
                         readGameInfo(game, data);
                     } catch (Exception e) {
-                        BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
+                        BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.", e);
                         return null;
                     }
                 }

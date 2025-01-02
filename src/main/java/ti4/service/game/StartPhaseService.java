@@ -8,7 +8,10 @@ import java.util.StringJoiner;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
@@ -33,6 +36,8 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
 import ti4.model.PromissoryNoteModel;
@@ -522,7 +527,14 @@ public class StartPhaseService {
         if (yssarilPolicy != null) {
             buttons.add(yssarilPolicy);
         }
-        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
+
+        MessageCreateData messageObject = new MessageCreateBuilder()
+            .addContent(message2)
+            .addComponents(ActionRow.of(buttons)).build();
+
+        game.getMainGameChannel().sendMessage(messageObject).queue(message ->
+            GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate()));
+
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
     }
 

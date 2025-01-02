@@ -61,7 +61,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
-import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
@@ -2699,7 +2698,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }
         String reply = game.isFowMode() ? "No public objective scored" : null;
-        GameMessageManager.add(game.getName(), event.getInteraction().getMessageId(), GameMessageType.PO_SCORING, game.getLastModifiedDate());
         ReactionService.addReaction(event, game, player, reply);
         String key2 = "queueToScorePOs";
         String key3 = "potentialScorePOBlockers";
