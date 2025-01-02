@@ -8,5 +8,6 @@ public enum GameMessageType {
     ACTION_CARD,
     TURN,
     BAG_DRAFT,
-    PO_SCORING
+    STATUS_SCORING,
+    STATUS_END
 }

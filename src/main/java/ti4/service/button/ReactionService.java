@@ -74,10 +74,6 @@ public class ReactionService {
         addReaction(event, game, player, skipReaction, sendPublic, message, null);
     }
 
-    public static void addReaction(ButtonInteractionEvent event, Game game, Player player, boolean skipReaction, boolean sendPublic) {
-        addReaction(event, game, player, skipReaction, sendPublic, "", null);
-    }
-
     public static void addReaction(ButtonInteractionEvent event, Game game, Player player) {
         addReaction(event, game, player, false, false, "", null);
     }
