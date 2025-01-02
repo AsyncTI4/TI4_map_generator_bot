@@ -53,7 +53,7 @@ public class AddTileListService {
             MessageHelper.replyToMessage(event, e.getMessage());
         }
 
-        MessageHelper.sendMessageToEventChannel(event, "Map String set to: ```\n" + game.getMapString().length() + "\n```");
+        MessageHelper.sendMessageToEventChannel(event, "Map String set to: ```\n" + game.getMapString() + "\n```");
         ShowGameService.simpleShowGame(game, event, DisplayType.map);
 
         if (!badTiles.isEmpty()) {
