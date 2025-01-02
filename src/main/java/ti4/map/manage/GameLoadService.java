@@ -1,5 +1,6 @@
 package ti4.map.manage;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -23,16 +24,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nullable;
-
-import org.jetbrains.annotations.NotNull;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -48,6 +45,10 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
+import ti4.model.BorderAnomalyHolder;
+import ti4.model.TemporaryCombatModifierModel;
+
 import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
 import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
 import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
@@ -68,9 +69,6 @@ import static ti4.map.manage.GamePersistenceKeys.TOKENS;
 import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
 import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
 import static ti4.map.manage.GamePersistenceKeys.UNITS;
-import ti4.message.BotLogger;
-import ti4.model.BorderAnomalyHolder;
-import ti4.model.TemporaryCombatModifierModel;
 
 @UtilityClass
 class GameLoadService {
@@ -312,7 +310,6 @@ class GameLoadService {
                     if (Mapper.isValidStrategyCardSet(info)) {
                         game.setScSetID(info);
                     } else {
-                        // BotLogger.log("Invalid strategy card set ID found: `" + scSetID + "` Game: `" + game.getName() + "`");
                         game.setScSetID("pok");
                     }
                 }
