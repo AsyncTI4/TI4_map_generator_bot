@@ -114,6 +114,7 @@ public class SliceGenerationSettings extends SettingsMenu {
         String idPrefix = menuAction + "_" + navId() + "_";
         List<Button> ls = new ArrayList<>(super.specialButtons());
         ls.add(Buttons.gray(idPrefix + "scpt2025quals", "SCPT 2025 Qualifiers", "<:scpt:1289722139750039634>"));
+        ls.add(Buttons.gray(idPrefix + "scpt2025prelim", "SCPT 2025 Prelims", "<:scpt:1289722139750039634>"));
         ls.add(Buttons.red(idPrefix + "richPreset", "Rich galaxy", MiscEmojis.tg));
         ls.add(Buttons.red(idPrefix + "poorPreset", "Poor galaxy", MiscEmojis.comm));
         ls.add(Buttons.blue(idPrefix + "presetSlices~MDL", "Use preset slices", MiltyDraftEmojis.sliceA));
@@ -124,6 +125,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         String error = switch (action) {
             case "scpt2025quals" -> scpt2025quals();
+            case "scpt2025prelim" -> scpt2025prelim();
             case "richPreset" -> richGalaxy();
             case "poorPreset" -> poorGalaxy();
             case "presetSlices~MDL" -> getPresetSlicesFromUser(event);
@@ -201,6 +203,21 @@ public class SliceGenerationSettings extends SettingsMenu {
         Collections.shuffle(slices);
         for (int i = players; i < 6; i++)
             slices.removeFirst();
+        String ttsString = String.join("|", slices);
+        return setPresetSlices(ttsString);
+    }
+
+    private String scpt2025prelim() {
+        int players = 6;
+        numSlices.setVal(players);
+        numFactions.setVal(players);
+        List<String> slices = List.of(
+            "",
+            "",
+            "",
+            "",
+            "",
+            "");
         String ttsString = String.join("|", slices);
         return setPresetSlices(ttsString);
     }
