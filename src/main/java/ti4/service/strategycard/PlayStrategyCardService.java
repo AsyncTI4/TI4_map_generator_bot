@@ -133,7 +133,7 @@ public class PlayStrategyCardService {
         baseMessageObject.addContent(message.toString());
 
         // GET BUTTONS
-        List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero));
+        List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero, player));
         if (scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
             scButtons.add(Buttons.gray("nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
         }
@@ -389,7 +389,7 @@ public class PlayStrategyCardService {
         }
     }
 
-    private static List<Button> getSCButtons(int sc, Game game, boolean winnuHero) {
+    private static List<Button> getSCButtons(int sc, Game game, boolean winnuHero, Player player) {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (scModel == null) {
             return getGenericButtons(sc);
@@ -405,7 +405,7 @@ public class PlayStrategyCardService {
         // Return Buttons
         return switch (scAutomationID) {
             case "pok1leadership" -> getLeadershipButtons(sc);
-            case "pok2diplomacy" -> getDiplomacyButtons(sc);
+            case "pok2diplomacy" -> getDiplomacyButtons(sc, player);
             case "pok3politics" -> getPoliticsButtons(sc);
             case "pok4construction" -> getConstructionButtons(sc);
             case "pok5trade" -> getTradeButtons(sc);
@@ -467,9 +467,9 @@ public class PlayStrategyCardService {
         return List.of(leadershipGenerateCCButtons, noFollowButton);
     }
 
-    private static List<Button> getDiplomacyButtons(int sc) {
+    private static List<Button> getDiplomacyButtons(int sc, Player player) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button diploSystemButton = Buttons.blue("diploSystem", "Diplo a System");
+        Button diploSystemButton = Buttons.blue(player.getFinsFactionCheckerPrefix()+"diploSystem", "Diplo a System");
         Button refreshButton = Buttons.green("diploRefresh2", "Ready 2 Planets");
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");

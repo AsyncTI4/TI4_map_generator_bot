@@ -113,7 +113,7 @@
         ],
         "requirements": "GG",
         "source": "absol",
-        "text": "Once per turn, after you perform an action, you may take a component action.",
+        "text": "Once per turn, after you perform an action, you may take a component action. \nYou may exhaust this card at the end of your turn to gain 1 command token.",
         "homebrewReplacesID": "hm"
     },
     {
@@ -208,7 +208,7 @@
             "WARFARE"
         ],
         "source": "absol",
-        "text": "When 1 or more of your units use BOMBARDMENT or SPACE CANNON, 1 of those units may roll 1 additional die. When the result of your non-fighter ships' combat roll exceeds that ship's combat value by 3 or more, your opponent may not assign that hit to a fighter unless they first destroy 1 of their fighters in the active system.",
+        "text": "When 1 or more of your units use unit abilities, 1 of those units may roll 1 additional die.\nWhen the result of your non-fighter ships' combat roll exceeds that ship's combat value by 3 or more, your opponent cannot assign that hit to a fighter unless they first destroy 1 of their fighters in the active system.",
         "homebrewReplacesID": "ps"
     },
     {
@@ -240,7 +240,7 @@
         ],
         "requirements": "R",
         "source": "absol",
-        "text": "When you produce a mech, you may produce 1 additional mech for free. This still counts against PRODUCTION limit.\nACTION: Exhaust this card to produce 1 ship in any system that contains 1 of your space docks.",
+        "text": "When you produce mechs, you may produce 1 additional mech for its cost.\nACTION: Exhaust this card to produce 1 ship in any system that contains 1 of your space docks.",
         "homebrewReplacesID": "sar"
     },
     {
@@ -317,7 +317,7 @@
         ],
         "requirements": "RR",
         "source": "absol",
-        "text": "Cost 1, Combat 8, Move 2\nANTI-FIGHTER BARRAGE 6(x3)\nWhen this unit generates hits on rolls based on its combat value, it generates 1 additional hit that may only be assigned to fighters.",
+        "text": "Cost 1, Combat 8, Move 2\nANTI-FIGHTER BARRAGE 6(x3)\nWhen this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able.",
         "homebrewReplacesID": "dd2"
     },
     {
@@ -545,7 +545,7 @@
         "requirements": "GGG",
         "faction": "naalu",
         "source": "absol",
-        "text": "After another player activates a system that contains 1 or more of your ships, you may force that player to remove 1 token from their fleet pool and return it to their reinforcements.\nDuring combat, when your opponent plays an action card, produce 1 hit; your opponent must assign it to 1 of their ships.",
+        "text": "After another player activates a system that contains 1 or more of your ships, you may force that player to remove 1 token from their fleet pool and return it to their reinforcements.\nDuring combat, when your opponent plays an action card, produce 1 hit; your opponent must assign it to 1 of their units.",
         "homebrewReplacesID": "ng"
     },
     {
@@ -570,7 +570,7 @@
         "requirements": "YY",
         "faction": "mentak",
         "source": "absol",
-        "text": "At the start of each space combat in systems that contain or are adjacent to your ships, gain 1 commodity.\nIf you win a space combat, you may produce 1 ship of any type that was destroyed during that combat, and may spend commodities as resources.",
+        "text": "At the end of each space combat in systems that contain or are adjacent to your ships, gain 1 commodity.\nIf you win a space combat, you may produce 1 ship of any type that was destroyed during that combat, and may spend commodities as resources.",
         "homebrewReplacesID": "so"
     },
     {
@@ -594,7 +594,7 @@
         "requirements": "G",
         "faction": "yssaril",
         "source": "absol",
-        "text": "During your turn of the action phase, players that have passed cannot play action cards.\nDuring combat, you may discard 2 action cards from your hand to cancel an action card played by your opponent.",
+        "text": "During your turn of the action phase, players that have passed cannot play action cards.\nAt the start of a round of ground combat, you may discard 1 action card to apply -1 to the results of your opponent's die rolls during that combat round.",
         "homebrewReplacesID": "tp"
     },
     {
@@ -606,7 +606,7 @@
         "requirements": "GGG",
         "faction": "yssaril",
         "source": "absol",
-        "text": "ACTION: Exhaust this card to look at another player's hand of action cards. If they have 5 or more action cards in their hand, choose 1 of those cards and add it to your hand.",
+        "text": "After 1 of your command tokens is placed in a system that contains another player's units, you may exhaust this card to look at that player's hand of action cards. Choose 1 of those cards and add it to your hand.",
         "homebrewReplacesID": "mi"
     },
     {
@@ -618,7 +618,7 @@
         "requirements": "BB",
         "faction": "winnu",
         "source": "absol",
-        "text": "During your tactical actions, you may treat your home system and the Mecatol Rex system as if they contained a gamma wormhole.",
+        "text": "During your tactical actions, you treat your home system and the Mecatol Rex system as if they each contained a gamma wormhole.",
         "homebrewReplacesID": "lgf"
     },
     {
@@ -630,7 +630,7 @@
         "requirements": "YY",
         "faction": "winnu",
         "source": "absol",
-        "text": "During the production step of your tactical actions, you may treat the resource value of any number of planets you control as if it were equal to its influence value instead.",
+        "text": "During the Production step of your tactical actions, you may treat the resource value of any number of planets you control as if it were equal to that planet's influence value instead.",
         "homebrewReplacesID": "htp"
     },
     {
@@ -678,7 +678,7 @@
         "requirements": "YY",
         "faction": "yin",
         "source": "absol",
-        "text": "ACTION: Exhaust this card, select a system and destroy any number of your cruisers or destroyers in adjacent systems. Generate 1 hit for each ship you destroyed; you opponent must assign those hits to their ships in the chosen system, and must assign them to non-fighter ships, if able.",
+        "text": "ACTION: Exhaust this card, choose a system and destroy any number of your cruisers or destroyers in adjacent systems. Generate 1 hit for each ship you destroyed; you opponent must assign those hits to their ships in the chosen system, and must assign them to non-fighter ships, if able.",
         "homebrewReplacesID": "ic"
     },
     {
@@ -690,7 +690,7 @@
         "requirements": "B",
         "faction": "saar",
         "source": "absol",
-        "text": "At the start of your turn, you may exhaust this card to produce 1 unit at each of your space docks.\nApply +1 to your ship's combat rolls in asteroid fields.",
+        "text": "At the start of your turn, you may exhaust this card to produce 1 unit at each of your space docks.\nApply +2 to your ship's combat rolls in asteroid fields.",
         "homebrewReplacesID": "cm"
     },
     {
@@ -727,7 +727,7 @@
         "requirements": "R",
         "faction": "ghost",
         "source": "absol",
-        "text": "When another player's ship with SUSTAIN DAMAGE moves through a wormhole into a system that contains your ships, that ship becomes damaged.\nAt the start of a space combat in a system that contains a wormhole and 1 or more of your ships, you may produce 1 hit and assign it to 1 of your opponent's ships.",
+        "text": "During each round of space combat in a system that contains 1 or more wormholes, you produce 1 additional hit.  Your opponent must assign this hit to 1 of their non-fighter ships, if able.",
         "homebrewReplacesID": "ds"
     },
     {
@@ -752,7 +752,7 @@
         "faction": "arborec",
         "baseUpgrade": "absol_inf2",
         "source": "absol",
-        "text": "Cost: 1(x2), Combat 7\nPRODUCTION 2\nAfter this unit is destroyed, place the unit on this card.\nAt the start of your next turn, for every 2 units that are on this card, place 1 on a planet you control and return the rest to your reinforcements.",
+        "text": "Cost: 1(x2), Combat 7\nPRODUCTION 2\nAfter this unit is destroyed, place the unit on this card.\nAt the start of your next turn, for every 2 units that are on this card, place 1 on a planet you control.",
         "homebrewReplacesID": "lw2"
     },
     {
@@ -802,7 +802,7 @@
         "requirements": "G",
         "faction": "empyrean",
         "source": "absol",
-        "text": "At any time, you may look at the top card of the frontier exploration deck.\nAfter a player moves ships into a system that contains 1 or more of your units, they must give you 1 promissory note from their hand, if able.",
+        "text": "At any time, you may look at the top card of the frontier exploration deck. After you do, you may exhaust this card to shuffle the frontier exploration deck.\nAfter a player moves ships into a system that contains 1 or more of your units, they must give you 1 promissory note from their hand, if able.",
         "homebrewReplacesID": "vw"
     },
     {
@@ -949,7 +949,7 @@
         "requirements": "YY",
         "faction": "keleres",
         "source": "absol",
-        "text": "After you resolve one of your PRODUCTION abilities, you may resolve an additional one of your PRODUCTION abilities in any system; the additional use does not trigger this ability.",
+        "text": "After you resolve the PRODUCTION abilities of 1 or more of your units, you may resolve the PRODUCTION ability of 1 of your other units in any system; the additional use does not trigger this ability.",
         "homebrewReplacesID": "asn"
     }
 ]

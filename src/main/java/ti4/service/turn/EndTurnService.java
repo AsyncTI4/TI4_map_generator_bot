@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.collections4.ListUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -13,7 +15,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.collections4.ListUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -283,8 +284,7 @@ public class EndTurnService {
             }
         }
 
-        Map<String, Player> players = game.getPlayers();
-        for (Player player : players.values()) {
+        for (Player player : game.getRealPlayers()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for (String pn : pns) {
                 Player pnOwner = game.getPNOwner(pn);
