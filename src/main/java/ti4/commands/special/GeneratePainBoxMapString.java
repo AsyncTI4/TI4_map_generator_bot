@@ -70,6 +70,12 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
         int rings = 0;
         while (!tileList.isEmpty()) {
             rings++;
+
+            if (rings > 16) {
+                MessageHelper.replyToMessage(event, "Amount of rings needed exceeds max allowed (16).");
+                return;
+            }
+
             for (int i = 1; i <= (rings * 6); i++) {
                 if (rings % 2 != 0 || i % 2 == 0 || tileList.isEmpty()) {
                     map.add("-1");
@@ -90,6 +96,6 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
         sb.append(") into ").append(rings).append(" rings.\nUse `/map add_tile_list_random` to insert the map string:");
 
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
-        MessageHelper.sendMessageToChannel(event.getChannel(), "`" + mapString + "`");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "`\n" + mapString + "\n`");
     }
 }
