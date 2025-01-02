@@ -125,7 +125,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         String error = switch (action) {
             case "scpt2025quals" -> scpt2025quals();
-            case "scpt2025prelim" -> scpt2025prelim();
+            case "scpt2025prelim" -> scpt2025prelim(event);
             case "richPreset" -> richGalaxy();
             case "poorPreset" -> poorGalaxy();
             case "presetSlices~MDL" -> getPresetSlicesFromUser(event);
@@ -207,18 +207,31 @@ public class SliceGenerationSettings extends SettingsMenu {
         return setPresetSlices(ttsString);
     }
 
-    private String scpt2025prelim() {
+    private String scpt2025prelim(GenericInteractionCreateEvent event) {
         int players = 6;
         numSlices.setVal(players);
         numFactions.setVal(players);
-        String ttsString = String.join("|", List.of(
-            "",
-            "",
-            "",
-            "",
-            "",
-            ""));
-        return setPresetSlices(ttsString);
+        /*
+        _Malcom In the Middle_ et al: `30,72,49,79,59|29,66,50,80,31|70,36,40,67,63|73,76,48,45,26|74,69,47,41,61|37,65,46,68,64`
+        _TI 4th Ed._ et al: `28,19,25,43,47|34,77,36,41,64|37,60,39,50,67|42,75,78,59,24|76,66,40,62,44|68,73,79,20,65|46,71,63,31,26`
+        _Gone Girl_ et al: `63,40,72,46,68|45,64,34,62,49|36,25,24,50,41|48,22,66,79,32|39,61,59,43,71|42,26,73,78,21|47,70,65,44,19`
+        _Corneeqticut_ et al: `33,62,41,25,32|44,36,19,40,72|45,70,35,64,78|50,74,65,26,63|69,21,23,79,49|38,59,42,39,24`
+        */
+
+        List<List<String>> allSlices = new Array list<>();
+        allSlices.add(new ArrayList<>(List.of("30,72,49,79,59", "29,66,50,80,31", "70,36,40,67,63", "73,76,48,45,26", "74,69,47,41,61", "37,65,46,68,64"));
+        allSlices.add(new ArrayList<>(List.of("28,19,25,43,47", "34,77,36,41,64", "37,60,39,50,67", "42,75,78,59,24", "76,66,40,62,44", "68,73,79,20,65", "46,71,63,31,26"));
+        allSlices.add(new ArrayList<>(List.of("63,40,72,46,68", "45,64,34,62,49", "36,25,24,50,41", "48,22,66,79,32", "39,61,59,43,71", "42,26,73,78,21", "47,70,65,44,19"));
+        allSlices.add(new ArrayList<>(List.of("33,62,41,25,32", "44,36,19,40,72", "45,70,35,64,78", "50,74,65,26,63", "69,21,23,79,49", "38,59,42,39,24"));
+        
+        Collections.shuffle(allSlices);
+        List<String> slices = allSlices.getFirst();
+        Collections.shuffle(slices);
+        while (slices.size() > 6) {
+            slices.removeFirst();
+        }
+        String tts = String.join("|", slices);
+        return setPresetSlices(tts);
     }
 
     private String richGalaxy() {
