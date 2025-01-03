@@ -70,7 +70,7 @@ public class Constants {
     public static final String FIX_SO_DECK = "fix_so_deck";
     public static final String REVISE_LAW = "revise_law";
     public static final String ADD_CONTROL_TOKEN = "add_control_token";
-    public static final String EXHAUST_SC = "exhuast_sc";
+    public static final String EXHAUST_SC = "exhaust_sc";
     public static final String SET_THREAD_NAME = "set_thread_name";
     public static final String THREAD_NAME = "thread_name";
     public static final String SHOW_UNSCORED_SOS = "show_unscored_sos";
