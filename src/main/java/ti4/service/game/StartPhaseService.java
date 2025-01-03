@@ -179,20 +179,18 @@ public class StartPhaseService {
                 && player2.getActionCards().containsKey("deflection")) {
                 ActionCardHelper.playAC(event, game, player2, "deflection", game.getMainGameChannel());
             }
-            if (player2.hasLeader("zealotshero") && player2.getLeader("zealotshero").get().isActive()) {
-                if (!game.getStoredValue("zealotsHeroTechs").isEmpty()) {
-                    String list = game.getStoredValue("zealotsHeroTechs");
-                    List<Button> buttons = new ArrayList<>();
-                    for (String techID : list.split("-")) {
-                        buttons.add(Buttons.green("purgeTech_" + techID, "Purge " + Mapper.getTech(techID).getName()));
-                    }
-                    String msg = player2.getRepresentationUnfogged() + " due to Saint Binal, the Rhodun hero, you have to purge 2 technologies. Use buttons to purge ";
-                    MessageHelper.sendMessageToChannelWithButtons(player2.getCorrectChannel(), msg + "the first technology.", buttons);
-                    MessageHelper.sendMessageToChannelWithButtons(player2.getCorrectChannel(), msg + "the second technology.", buttons);
-                    player2.removeLeader("zealotshero");
-                    game.setStoredValue("zealotsHeroTechs", "");
-                    game.setStoredValue("zealotsHeroPurged", "true");
+            if (player2.hasLeader("zealotshero") && player2.getLeader("zealotshero").get().isActive() && !game.getStoredValue("zealotsHeroTechs").isEmpty()) {
+                String list = game.getStoredValue("zealotsHeroTechs");
+                List<Button> buttons = new ArrayList<>();
+                for (String techID : list.split("-")) {
+                    buttons.add(Buttons.green("purgeTech_" + techID, "Purge " + Mapper.getTech(techID).getName()));
                 }
+                String msg = player2.getRepresentationUnfogged() + " due to Saint Binal, the Rhodun hero, you have to purge 2 technologies. Use buttons to purge ";
+                MessageHelper.sendMessageToChannelWithButtons(player2.getCorrectChannel(), msg + "the first technology.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player2.getCorrectChannel(), msg + "the second technology.", buttons);
+                player2.removeLeader("zealotshero");
+                game.setStoredValue("zealotsHeroTechs", "");
+                game.setStoredValue("zealotsHeroPurged", "true");
             }
         }
         if (!game.getStoredValue("agendaConstitution").isEmpty()) {
@@ -213,13 +211,13 @@ public class StartPhaseService {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                         ", because _New Constitution_ resolved \"Against\", " +
                         String.join(", ", exhausted.subList(0, exhausted.size()-1)) + " and "
-                        + exhausted.get(exhausted.size()-1) + " have been exhausted.");
+                        + exhausted.getLast() + " have been exhausted.");
                 }
                 else if (exhausted.size() == 1)
                 {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                         ", because _New Constitution_ resolved \"Against\", "
-                        + exhausted.get(0) + " has been exhausted.");
+                        + exhausted.getFirst() + " has been exhausted.");
                 }
                 else
                 {
@@ -249,13 +247,13 @@ public class StartPhaseService {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                         ", because _Arms Reduction_ resolved \"Against\", " +
                         String.join(", ", exhausted.subList(0, exhausted.size()-1)) + " and "
-                        + exhausted.get(exhausted.size()-1) + " have been exhausted.");
+                        + exhausted.getLast() + " have been exhausted.");
                 }
                 else if (exhausted.size() == 1)
                 {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                         ", because _Arms Reduction_ resolved \"Against\", "
-                        + exhausted.get(0) + " has been exhausted.");
+                        + exhausted.getFirst() + " has been exhausted.");
                 }
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Exhausted all planets with technology specialties due to _Arms Reduction_ resolving \"Against\".");
@@ -301,13 +299,13 @@ public class StartPhaseService {
                         MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                             ", because you voted \"Against\" on _Representative Government_, " +
                             String.join(", ", exhausted.subList(0, exhausted.size()-1)) + " and "
-                            + exhausted.get(exhausted.size()-1) + " have been exhausted.");
+                            + exhausted.getLast() + " have been exhausted.");
                     }
                     else if (exhausted.size() == 1)
                     {
                         MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                             ", because you voted \"Against\" on _Representative Government_, "
-                            + exhausted.get(0) + " has been exhausted.");
+                            + exhausted.getFirst() + " has been exhausted.");
                     }
                     else
                     {
