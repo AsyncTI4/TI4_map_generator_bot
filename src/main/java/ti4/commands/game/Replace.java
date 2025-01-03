@@ -1,5 +1,6 @@
 package ti4.commands.game;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -131,6 +132,17 @@ class Replace extends GameStateSubcommand {
             // do not update stats for this action
             game.setActivePlayerID(replacementUser.getId());
         }
+        Map<String, Player> playersById = game.getPlayers();
+        Map<String, Player> updatedPlayersById = new HashMap<>();
+        for (String userId: game.getPlayers().keySet()) {
+            if(userId.equalsIgnoreCase(oldPlayerUserId)) {
+                updatedPlayersById.put(replacedPlayer.getUserID(), replacedPlayer);
+            }
+            else {
+                updatedPlayersById.put(userId, playersById.get(userId));
+            }
+        }
+        game.setPlayers(updatedPlayersById);
 
         //UPDATE FOW PERMISSIONS
         if (game.isFowMode()) {
