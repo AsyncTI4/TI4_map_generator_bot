@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -25,6 +26,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftTile;
+import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
 public class DiscordantStarsHelper {
@@ -363,4 +365,40 @@ public class DiscordantStarsHelper {
             }
         }
     }
+
+    public static void checkKjalengardMechs(GenericInteractionCreateEvent event, Player player, Game game) {
+        if (!player.hasUnit("kjalengard_mech")) {
+            return;
+        }
+
+        StringBuffer sb = new StringBuffer();
+        List<String> tilesWithGloryTokens = ButtonHelperAgents.getGloryTokenTiles(game).stream().map(t -> t.getPosition()).toList();
+        for (String planetId : player.getPlanets()) {
+            Planet planet = game.getUnitHolderFromPlanet(planetId);
+            if (planet.getUnitCount(UnitType.Mech, player) == 0) {
+                continue;
+            }
+
+            Tile planetTile = game.getTileFromPlanet(planetId);
+            Set<String> tilesAdjacentToMechPlanet = FoWHelper.getAdjacentTiles(game, planetTile.getPosition(), player, false, true);
+            boolean hasAdjacentGloryToken = tilesAdjacentToMechPlanet.stream().anyMatch(tilesWithGloryTokens::contains);
+
+            if (hasAdjacentGloryToken) {
+                AddUnitService.addUnits(event, planetTile, game, player.getColor(), "1 infantry " + planetId);
+                sb.append(player.getRepresentationNoPing())
+                  .append(" added 1 ")
+                  .append(UnitEmojis.infantry)
+                  .append(" to ")
+                  .append(planet.getPlanetModel().getName())
+                  .append(" due to Skald ")
+                  .append(UnitEmojis.mech)
+                  .append(" being adjacent to a Glory token.\n");
+            }
+        }
+
+        if (!sb.isEmpty()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+        }
+    }
+
 }
