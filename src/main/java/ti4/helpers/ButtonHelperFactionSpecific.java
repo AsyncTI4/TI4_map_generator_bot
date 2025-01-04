@@ -1503,21 +1503,25 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveExpLook(Player player, Game game, GenericInteractionCreateEvent event, String deckType) {
         List<String> deck = game.getExploreDeck(deckType);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " looked at top of the " + deckType + " deck.");
         String traitNameWithEmoji = ExploreEmojis.getTraitEmoji(deckType) + deckType;
         if (deck.isEmpty() && game.getExploreDiscard(deckType).isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), traitNameWithEmoji + " exploration deck & discard is empty - nothing to look at.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "The" + traitNameWithEmoji + " exploration deck & discard is empty - nothing to look at.");
             return;
         }
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "The top card of the " + traitNameWithEmoji + " exploration deck has been sent to " + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " looked at top card of the " 
+                + traitNameWithEmoji + " exploration deck. The card has been sent to their `#cards-info` thread.");
+        }
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "The top card of the " + traitNameWithEmoji + " exploration deck has been sent to " + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
 
         // Cards Info Message
-        String message = "__**Look at Top of " + traitNameWithEmoji + " Deck**__\n";
         String topCard = deck.getFirst();
         game.setStoredValue("lastExpLookedAt" + player.getFaction() + deckType, topCard);
         ExploreModel explore = Mapper.getExplore(topCard);
+        String message = "You looked at the top of the " + traitNameWithEmoji + " exploration deck and saw _" + explore.getName() + "_.";
         MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, explore.getRepresentationEmbed());
     }
 
@@ -1533,7 +1537,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveKolleccAbilities(Player player, Game game) {
         if (player.hasAbility("treasure_hunters")) {
             // resolve treasure hunters
-            String msg = "Kollecc player, please choose which exploration deck to look at the top card of";
+            String msg = player.getRepresentation() + ", please choose which exploration deck to look at the top card of.";
 
             String deckType = "industrial";
             List<String> deck = game.getExploreDeck(deckType);
@@ -1569,7 +1573,7 @@ public class ButtonHelperFactionSpecific {
 
             Button transact = Buttons.green(player.getFinsFactionCheckerPrefix() + "relic_look_top",
                 "Look at top of Relic Deck");
-            msg2 = "Kollecc may also look at the top card of the relic deck.";
+            msg2 = player.getRepresentation() + ", you may also look at the top card of the relic deck.";
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(transact);
             buttons2.add(Buttons.red("deleteButtons", "Decline"));

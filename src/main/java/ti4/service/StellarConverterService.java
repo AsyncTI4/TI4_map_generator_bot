@@ -37,13 +37,13 @@ public class StellarConverterService {
         }
 
         String message1 = (RandomHelper.isOneInX(20) ? "# _Hey, Stellar!_" : "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
-        DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, "Moments before disaster in game " + game.getName());
+        DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, "Moments before disaster in game " + game.getName() + ".");
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message1);
 
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getPlanets().contains(planetName)) {
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                    p2.getRepresentationUnfogged() + " we regret to inform you but " + Mapper.getPlanet(planetName).getName() + " has been Stellar Converted.");
+                    p2.getRepresentationUnfogged() + " we regret to inform you but " + Mapper.getPlanet(planetName).getName() + " has been _Stellar Converter_'d.");
                 int amountToKill;
                 amountToKill = unitHolder.getUnitCount(Units.UnitType.Infantry, p2.getColor());
                 if (p2.hasInf2Tech()) {

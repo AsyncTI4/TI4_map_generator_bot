@@ -866,17 +866,16 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void cancelPDSOffenseHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        String msg = "\n" + player.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
+        String msg = "\n" + player.getRepresentationUnfogged() + " cancelled 1 hit with an ability.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String finChecker = "FFCC_" + player.getFaction() + "_";
         buttons.add(Buttons.green(finChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + h,
-            "Auto-assign Hit" + (h == 1 ? "" : "s")));
+            "Auto-Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "_pds",
             "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelPdsOffenseHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
-        String msg2 = "You may automatically assign " + (h == 1 ? "the hit" : "hits") + ". The hit"
-            + (h == 1 ? "" : "s") + " would be assigned in the following way:\n\n"
+        String msg2 = player.getRepresentationNoPing() + ", you may automatically assign " + (h == 1 ? "the hit" : "hits") + ". "
             + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, h, event, true, true);
         event.getMessage().editMessage(msg2).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
             .queue();
@@ -915,8 +914,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             Buttons.red("getDamageButtons_" + tile.getPosition() + "_spacecombat",
                 "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelSpaceHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
-        String msg2 = "You may automatically assign " + (h == 1 ? "the hit" : "hits") + ". The hit"
-            + (h == 1 ? "" : "s") + " would be assigned in the following way:\n\n"
+        String msg2 = player.getRepresentationNoPing() + ", you may automatically assign " + (h == 1 ? "the hit" : "hits") + ". "
             + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, h, event, true);
         event.getMessage().editMessage(msg2).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
             .queue();
@@ -1585,8 +1583,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (warM) {
                     player.addSpentThing("warmachine");
                 }
-                ButtonHelper.updateMap(game, event,
-                    "Result of build on turn " + player.getInRoundTurnCount() + " for " + player.getFactionEmoji());
+                // ButtonHelper.updateMap(game, event,
+                    // "Result of build on turn " + player.getInRoundTurnCount() + " for " + player.getFactionEmoji());
                 buttons.add(doneExhausting);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 if (tile != null && player.hasAbility("rally_to_the_cause")
@@ -1823,16 +1821,25 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("relic_look_top")
     public static void relicLookTop(ButtonInteractionEvent event, Game game, Player player) {
-        List<String> relicDeck = game.getAllRelics();
-        if (relicDeck.isEmpty()) {
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, "Relic deck is empty");
+        List<String> deck = game.getAllRelics();
+        if (deck.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "The " + ExploreEmojis.Relic + " relic deck & discard is empty - nothing to look at.");
             return;
         }
-        String relicID = relicDeck.getFirst();
-        RelicModel relicModel = Mapper.getRelic(relicID);
-        String rsb = "**Relic - Look at Top**\n" + player.getRepresentation() + "\n" + relicModel.getSimpleRepresentation();
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, rsb);
-        ReactionService.addReaction(event, game, player, true, false, "Looked at top of the Relic deck.");
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "The top card of the " + ExploreEmojis.Relic + " relic deck has been sent to " + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " looked at top card of the " 
+                + ExploreEmojis.Relic + " relic deck. The card has been sent to their `#cards-info` thread.");
+        }
+
+
+        // Cards Info Message
+        String topCard = deck.getFirst();
+        RelicModel relic = Mapper.getRelic(topCard);
+        String message = "You looked at the top of the " + ExploreEmojis.Relic + " relic deck and saw _" + relic.getName() + "_.";
+        MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, relic.getRepresentationEmbed());
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1908,14 +1915,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("drawRelicFromFrag")
     public static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Drew Relic");
         RelicHelper.drawRelicAndNotify(player, event, game);
         doAnotherAction(event, player, game);
     }
 
     @ButtonHandler("drawRelic")
     public static void drawRelic(ButtonInteractionEvent event, Player player, Game game) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Drew Relic");
         RelicHelper.drawRelicAndNotify(player, event, game);
         ButtonHelper.deleteMessage(event);
     }

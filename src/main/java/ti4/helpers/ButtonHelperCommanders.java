@@ -369,7 +369,7 @@ public class ButtonHelperCommanders {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "letnevcommander")) {
             if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
                 String mMessage = player.getRepresentationUnfogged() + " Since you have Rear Admiral Farran, the Letnev commander, unlocked,"
-                    + " 1 trade good has been added automatically (" + player.gainTG(1) + ").";
+                    + " 1 trade good has been added automatically " + player.gainTG(1) + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, 1);

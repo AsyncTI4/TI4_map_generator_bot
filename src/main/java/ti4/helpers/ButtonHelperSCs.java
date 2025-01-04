@@ -170,7 +170,7 @@ public class ButtonHelperSCs {
         ButtonHelperStats.replenishComms(event, game, player, true);
 
         ReactionService.addReaction(event, game, player, message);
-        ReactionService.addReaction(event, game, player, "Replenishing Commodities");
+        ReactionService.addReaction(event, game, player, " has replenished commodities.");
 
     }
 
@@ -262,7 +262,7 @@ public class ButtonHelperSCs {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, tradeInitiative, game, event);
         }
         player.addFollowedSC(tradeInitiative, event);
-        ReactionService.addReaction(event, game, player, "Replenishing Commodities");
+        ReactionService.addReaction(event, game, player, "has replenished commodities.");
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
         ButtonHelperStats.afterGainCommsChecks(game, player, player.getCommodities() - initComm);
@@ -317,17 +317,17 @@ public class ButtonHelperSCs {
                     p2.setCommodities(p2.getCommodities() - washedCommsPower);
                     ButtonHelperAbilities.pillageCheck(p2, game);
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                        p2.getRepresentationUnfogged() + " " + washedCommsPower
+                        p2.getRepresentationUnfogged() + ", " + washedCommsPower
                             + " of your commodities got washed in the process of washing "
-                            + player.getFactionEmojiOrColor());
+                            + player.getRepresentationNoPing() + ".");
                 } else {
                     p2.setTg(p2.getTg() + p2.getCommodities());
                     p2.setCommodities(0);
                     ButtonHelperAbilities.pillageCheck(p2, game);
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                         p2.getRepresentationUnfogged()
-                            + " your commodities got washed in the process of washing "
-                            + player.getFactionEmojiOrColor());
+                            + ", your commodities got washed in the process of washing "
+                            + player.getFactionEmojiOrColor() + ".");
                 }
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2,
                     player.getCommoditiesTotal());

@@ -522,7 +522,8 @@ public class ComponentActionHelper {
                 if (p1.getStrategicCC() > 0) {
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji()
-                        + ", you previously had " + (p1.getStrategicCC() + 1) + " command tokens in your strategy pool and now you have " + p1.getStrategicCC() + ".");
+                        + ", you previously had " + (p1.getStrategicCC() + 1) + " command token" + (p1.getStrategicCC() + 1 == 1 ? "" : "s")
+                        + " in your strategy pool and now you have " + p1.getStrategicCC() + ".");
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event);
                 }
                 List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(p1, game, event, "absol");

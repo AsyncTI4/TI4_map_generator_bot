@@ -13,7 +13,8 @@ import ti4.message.MessageHelper;
 public class FrankenPromissoryService {
 
     public static void addPromissoryNotes(GenericInteractionCreateEvent event, Game game, Player player, List<String> pnIDs) {
-        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added PNs:\n");
+        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added ")
+            .append(pnIDs.size() == 1 ? "a " : "").append("promissory note").append(pnIDs.size() == 1 ? "" : "s").append(":\n");
         for (String pnID : pnIDs ){
             Player pnOwner = game.getPNOwner(pnID);
             sb.append("> ");

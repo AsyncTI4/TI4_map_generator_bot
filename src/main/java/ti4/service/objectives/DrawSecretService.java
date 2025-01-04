@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
+import ti4.helpers.StringHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -23,15 +24,15 @@ public class DrawSecretService {
     }
 
     public static void drawSO(GenericInteractionCreateEvent event, Game game, Player player, int count, boolean useTnelis) {
-        String output = "Drew " + count + " Secret Objective" + (count > 1 ? "s" : "");
+        String output = " drew " + count + " secret objective" + (count > 1 ? "s" : "") + ".";
         if (useTnelis && player.hasAbility("plausible_deniability")) {
-            output = "Used Plausible Deniablity to draw [" + count + " + 1 = " + (count + 1) + "] Secret Objectives";
+            output += "Drew a " + (count == 1 ? "second" : StringHelper.ordinal(count + 1)) + " secret objective due to **Plausible Deniability**.";
             count++;
         }
         for (int i = 0; i < count; i++) {
             game.drawSecretObjective(player.getUserID());
         }
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " " + output);
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + output);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
         if (useTnelis && player.hasAbility("plausible_deniability")) {
             SecretObjectiveHelper.sendSODiscardButtons(player);

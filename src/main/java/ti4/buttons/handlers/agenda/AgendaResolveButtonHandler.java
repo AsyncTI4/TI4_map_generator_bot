@@ -346,11 +346,16 @@ class AgendaResolveButtonHandler {
             if (game.getCurrentAgendaInfo().contains("Player")) {
                 Player player2 = game.getPlayerFromColorOrFaction(winner);
                 if ("secret".equalsIgnoreCase(agID)) {
-                    String message = "Drew A Secret Objective for the elected player.";
+                    String message;
+                    if (game.isFowMode()) {
+                        message = "The elected player drew a secret objective.";
+                    } else {
+                        message = player2.getRepresentation() + " drew a secret objective as the elected player.";
+                    }
                     game.drawSecretObjective(player2.getUserID());
                     if (player2.hasAbility("plausible_deniability")) {
                         game.drawSecretObjective(player2.getUserID());
-                        message = message + " Drew a second secret objective due to **Plausible Deniability**.";
+                        message = message + " They drew a second secret objective due to **Plausible Deniability**.";
                     }
                     SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player2, event);
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
