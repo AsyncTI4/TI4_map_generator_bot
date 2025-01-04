@@ -17,7 +17,7 @@
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": "Mystic Library",
-    "legendaryAbilityText": "Before 7/15/2024: ACTION: Exhaust this card to replace 1 of your non-faction non-unit upgrade technologies with another technology from your technology deck with the same number of prerequisites.\n After 7/15/2024: You may exhaust this card at the end of your turn and purge a non-faction, non-unit upgrade technology you own to gain 1 technology with the same number of prerequisites.",
+    "legendaryAbilityText": "You may exhaust this card at the end of your turn and purge a non-faction, non-unit upgrade technology you own to gain 1 technology with the same number of prerequisites.",
     "unitPositions": {
         "unitHolderName": "prism",
         "coordinateMap": {

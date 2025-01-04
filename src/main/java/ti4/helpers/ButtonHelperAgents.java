@@ -8,13 +8,14 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
@@ -540,7 +541,14 @@ public class ButtonHelperAgents {
         if ("winnuagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Berekar Berekon, the Winnu" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-            player.addSpentThing("Exhausted " + ssruuClever + "Berekar Berekon, the Winnu Agent, for 2 resources.");
+            player.addSpentThing("Exhausted Winnu Agent, for 2 resources.");
+            String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
+            if (event instanceof ButtonInteractionEvent buttonEvent) {
+                buttonEvent.getMessage().editMessage(exhaustedMessage).queue();
+                ButtonHelper.deleteTheOneButton(buttonEvent);
+            }
+            return;
+            
         }
         if ("lizhoagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Vasra Ivo, the Li-Zho" + ssruuSlash + " agent.";
@@ -934,7 +942,6 @@ public class ButtonHelperAgents {
                 + " Use buttons to decide how to use the agent.";
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
-
         if ("arborecagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Letani Ospha, the Arborec" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
