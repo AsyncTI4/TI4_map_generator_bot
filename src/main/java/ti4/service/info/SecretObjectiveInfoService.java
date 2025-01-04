@@ -48,7 +48,7 @@ public class SecretObjectiveInfoService {
         if (player.getSecretsUnscored().isEmpty()) return;
 
         // SCORE/DISCARD BUTTONS
-        String secretMsg = "_ _\nClick a button to either score or discard a secret objective";
+        String secretMsg = "Please use these button if you with to score or discard a secret objective.";
         List<Button> buttons = new ArrayList<>();
         Button scoreB = Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
         Button discardB = Buttons.red("get_so_discard_buttons", "Discard A Secret Objective");
@@ -73,9 +73,9 @@ public class SecretObjectiveInfoService {
             sb.append("> None");
         } else {
             for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
-                sb.append("`").append(index).append(".").append(Helper.leftpad("(" + so.getValue(), 4)).append(")`");
-                sb.append(getSecretObjectiveRepresentationShort(so.getKey()));
-                index++;
+                SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
+                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _")
+                    .append(soModel.getName()).append("_ `(").append(Helper.leftpad("" + so.getValue(), 3)).append(")`\n");
             }
         }
         sb.append("\n");
@@ -87,16 +87,15 @@ public class SecretObjectiveInfoService {
                 sb.append("> None");
             } else {
                 for (Map.Entry<String, Integer> so : secretObjective.entrySet()) {
-                    Integer idValue = so.getValue();
-                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + idValue, 4)).append(")`");
-
-                    if (ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game) > 0) {
-                        sb.append(getSecretObjectiveRepresentationNoNewLine(so.getKey()));
-                        sb.append(" (").append(ListPlayerInfoService.getPlayerProgressOnObjective(so.getKey(), game, player)).append("/").append(ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game)).append(")\n");
-                    } else {
-                        sb.append(getSecretObjectiveRepresentation(so.getKey()));
+                    SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
+                    sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _").append(soModel.getName()).append("_ - ").append(soModel.getPhase()).append(" Phase `(")
+                        .append(Helper.leftpad("" + so.getValue(), 3)).append(")`\n> ").append(soModel.getText());
+                    
+                    int threshold = ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game);
+                    if (threshold > 0) {
+                        sb.append(" (").append(ListPlayerInfoService.getPlayerProgressOnObjective(so.getKey(), game, player)).append("/").append(threshold).append(")");
                     }
-                    index++;
+                    sb.append("\n");
                 }
             }
         }

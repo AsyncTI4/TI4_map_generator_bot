@@ -215,7 +215,7 @@ public class StartCombatService {
         boolean isSpaceCombat = "space".equalsIgnoreCase(spaceOrGround);
         boolean isGroundCombat = "ground".equalsIgnoreCase(spaceOrGround);
 
-        message.append(" Please resolve the interaction here.\n");
+        message.append(", please resolve the interaction here.\n");
         if (isSpaceCombat)
             message.append(getSpaceCombatIntroMessage());
         if (isGroundCombat)
@@ -349,7 +349,7 @@ public class StartCombatService {
         Player player1, Player player2, Tile tile) {
         List<Button> startOfSpaceCombatButtons = getStartOfSpaceCombatButtons(game, player1, player2, tile);
         if (!startOfSpaceCombatButtons.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for Start of Space Combat:",
+            MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for start of space combat abilities.",
                 startOfSpaceCombatButtons);
         }
     }
@@ -612,7 +612,7 @@ public class StartCombatService {
         Player player2, Tile tile, String spaceOrGround, GenericInteractionCreateEvent event) {
         List<Button> buttons = getGeneralCombatButtons(game, tile.getPosition(), player1, player2, spaceOrGround,
             event);
-        MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for Combat:", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for combat.", buttons);
     }
 
     // TODO: Break apart into: [all combats, space combat, ground combat] methods

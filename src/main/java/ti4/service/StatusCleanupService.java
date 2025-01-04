@@ -83,8 +83,8 @@ public class StatusCleanupService {
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, nonActivePlayer, false);
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get("sigma_cyber");
-                MessageHelper.sendMessageToChannel(game.getTableTalkChannel(),
-                    pnModel.getName() + " was returned");
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                    "_" + pnModel.getName() + "_ has been returned.");
             }
         }
         for (int x = 0; x < 13; x++) {
@@ -129,7 +129,8 @@ public class StatusCleanupService {
                     pnOwner.setPromissoryNote(pn);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pnOwner.getFactionEmoji() + " " + pnModel.getName() + " was returned.");
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                        "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing() + ".");
                 }
             }
         }

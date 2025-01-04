@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.image.Mapper;
@@ -62,7 +63,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private boolean gravityRift = false;
     private String imageURL;
     private ComponentSource source;
-    private TileBack tileBack;
+    private TileBack tileBack = TileBack.BLACK;
 
     @Override
     @JsonIgnore
@@ -93,9 +94,14 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         eb.setDescription(sb.toString());
 
         // Image
-        if (getEmoji() != null && getEmoji().asEmoji() instanceof CustomEmoji customEmoji) {
-            eb.setThumbnail(customEmoji.getImageUrl());
-        }
+        TI4Emoji emoji = getEmoji();
+        if (emoji != null && emoji.asEmoji() instanceof CustomEmoji customEmoji) {
+            if (emoji.name().endsWith("Back") && !StringUtils.isEmpty(getImagePath())) {
+                eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tiles/" + getImagePath() + "?raw=true");
+            } else {
+                eb.setThumbnail(customEmoji.getImageUrl());
+            }
+        } 
 
         if (includeAliases) eb.setFooter("Aliases: " + getAliases());
         return eb.build();

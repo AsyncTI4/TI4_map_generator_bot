@@ -592,10 +592,16 @@ public class ButtonHelper {
     @ButtonHandler("forceARefresh_")
     public static void forceARefresh(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String msg = player.getFactionEmoji() + " forced " + p2.getFactionEmojiOrColor() + " to replenish your commodities.";
-        String msg2 = p2.getRepresentationUnfogged() + " the **Trade** holder has forced you to replenish your commodities.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
+        if (game.isFowMode()) {
+            String msg = player.getFactionEmoji() + " forced " + p2.getFactionEmojiOrColor() + " to replenish your commodities.";
+            String msg2 = p2.getRepresentationUnfogged() + ", the **Trade** holder has forced you to replenish your commodities.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
+        } else {
+            String msg = p2.getRepresentationUnfogged() + ", your commodities have been forcefully replenished by "
+                + player.getRepresentationNoPing() + " using **Trade**.";
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+        }
         deleteTheOneButton(event);
         if (!p2.getFollowedSCs().contains(5)) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(p2, 5, game, event);
@@ -1133,8 +1139,13 @@ public class ButtonHelper {
                         nonActivePlayer.setPromissoryNote(pn);
                         PromissoryNoteHelper.sendPromissoryNoteInfo(game, nonActivePlayer, false);
                         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
+                        if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(channel,
-                            nonActivePlayer.getFactionEmoji() + " _" + pnModel.getName() + "_ was returned.");
+                            player.getFactionEmoji() + " returned _" + pnModel.getName() + "_ to " + nonActivePlayer.getFactionEmoji() + ".");
+                        } else {
+                        MessageHelper.sendMessageToChannel(channel,
+                            player.getRepresentation() + " returned _" + pnModel.getName() + "_ to " + nonActivePlayer.getRepresentation() + ".");
+                        }
                         if (pn.endsWith("_an") && nonActivePlayer.hasLeaderUnlocked("bentorcommander")) {
                             player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
                         }
@@ -3486,7 +3497,6 @@ public class ButtonHelper {
             BotLogger.log(event, "`ButtonHelper.sendTradeHolderSomething` tradeHolder was **null**");
             return;
         }
-        String msg = player.getRepresentation() + " sent 1 " + tgOrDebt + " to " + tradeHolder.getRepresentation();
         if ("tg".equalsIgnoreCase(tgOrDebt)) {
             TransactionHelper.checkTransactionLegality(game, player, tradeHolder);
             if (player.getTg() > 0) {
@@ -3497,9 +3507,12 @@ public class ButtonHelper {
                     player.getRepresentationUnfogged() + " you had no trade goods to send, so no trade goods were sent.");
                 return;
             }
+            tgOrDebt = "trade good";
         } else {
             SendDebtService.sendDebt(player, tradeHolder, 1);
+            tgOrDebt = "debt token";
         }
+        String msg = player.getRepresentation() + " sent 1 " + tgOrDebt + " to " + tradeHolder.getRepresentation() + ".";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
     }
@@ -4322,13 +4335,13 @@ public class ButtonHelper {
             }
             UnitType unitType = Units.findUnitType(AliasHandler.resolveUnit(unit.toLowerCase()));
             if (landing) {
-                messageBuilder.append(prefix).append(" Landed ").append(amount).append(" ").append(damagedMsg)
+                messageBuilder.append(prefix).append(" landed ").append(amount).append(" ").append(damagedMsg)
                     .append(unitType.getUnitTypeEmoji());
                 if (planet == null) {
-                    messageBuilder.append("\n");
+                    messageBuilder.append(".\n");
                 } else {
                     messageBuilder.append(" on the planet ")
-                        .append(Helper.getPlanetRepresentation(planet.toLowerCase(), game)).append("\n");
+                        .append(Helper.getPlanetRepresentation(planet.toLowerCase(), game)).append(".\n");
                 }
             } else {
                 messageBuilder.append(prefix).append(" ").append(moveOrRemove).append("d ").append(amount).append(" ")
@@ -4780,7 +4793,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         } else {
             if (!game.isFowMode() && opponent != player) {
-                String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " you suffered " + h
+                String msg = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered " + h
                     + " hit" + (h == 1 ? "" : "s") + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 List<Button> buttons = new ArrayList<>();
@@ -4813,9 +4826,8 @@ public class ButtonHelper {
                     buttons.add(Buttons.gray(finChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + h,
                         "Cancel a Hit"));
 
-                    String msg2 = opponent.getFactionEmoji()
-                        + " may automatically assign " + (h == 1 ? "the hit" : "hits")
-                        + ". The hit" + (h == 1 ? "" : "s") + " would be assigned in the following way:\n\n"
+                    String msg2 = opponent.getRepresentationNoPing()
+                        + ", you may automatically assign " + (h == 1 ? "the hit" : "hits") + ". "
                         + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
                 }

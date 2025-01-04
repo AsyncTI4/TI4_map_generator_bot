@@ -468,11 +468,11 @@ public class AgendaHelper {
             while ((voteInfo[0] < 1 && !nextInLine.getColor().equalsIgnoreCase(player.getColor()))
                 || game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction()) || !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty()) {
                 String skippedMessage = nextInLine.getRepresentation(true, false)
-                    + " You are being skipped because you cannot vote";
+                    + ", you are being skipped because you cannot vote.";
                 if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
                     ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
                     skippedMessage = realIdentity2
-                        + "You are being skipped because you told the bot you wanted to preset an abstain";
+                        + ", you are being skipped because you told the bot you wanted to preset an abstention.";
                     game.setStoredValue("Abstain On Agenda", game
                         .getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();
@@ -590,8 +590,7 @@ public class AgendaHelper {
         game.setPhaseOfGame("agendaEnd");
         game.setActivePlayerID(null);
         StringBuilder message = new StringBuilder();
-        message.append(game.getPing()).append("\n");
-        message.append("### Current winner is ").append(StringUtils.capitalize(winner)).append("\n");
+        message.append(game.getPing()).append(", the current winner is \"").append(StringUtils.capitalize(winner)).append("\".\n");
         if (!"action_deck_2".equals(game.getAcDeckID())) {
             handleShenanigans(game, winner);
             message.append("When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.");

@@ -1375,6 +1375,12 @@ public class MapGenerator implements AutoCloseable {
                 case Constants.HERO -> 3;
                 default -> -1;
             };
+            if (!Mapper.isValidLeader(leader1.getId())) {
+                return leaderRank2;
+            }
+            if (!Mapper.isValidLeader(leader2.getId())) {
+                return leaderRank1;
+            }
             if (leaderRank1 == leaderRank2) {
                 return Mapper.getLeader(leader1.getId()).getName().compareToIgnoreCase(Mapper.getLeader(leader2.getId()).getName());
             }

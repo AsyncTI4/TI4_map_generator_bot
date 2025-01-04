@@ -43,7 +43,7 @@ class ZelianHero extends GameStateSubcommand {
     }
 
     public static void secondHalfOfCelestialImpact(Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
-        String message1 = "Moments before disaster in game " + game.getName();
+        String message1 = "Moments before disaster in game " + game.getName() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, message1);
 
         //Remove all other players ground force units from the tile in question
@@ -63,7 +63,7 @@ class ZelianHero extends GameStateSubcommand {
         for (Planet p : planetsInSystem) {
             resourcesSum += p.getResources();
         }
-        String tgGainMsg = player.getFactionEmoji() + " gained " + resourcesSum + " trade goods" + (resourcesSum == 1 ? "" : "s") + " from Celestial Impact (" +
+        String tgGainMsg = player.getFactionEmoji() + " gained " + resourcesSum + " trade goods" + (resourcesSum == 1 ? "" : "s") + " from _Celestial Impact_ (" +
                 player.getTg() + "->" + (player.getTg() + resourcesSum) + ").";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), tgGainMsg);
         player.gainTG(resourcesSum);
@@ -87,9 +87,9 @@ class ZelianHero extends GameStateSubcommand {
             StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
             boolean purged = player.removeLeader(playerLeader);
             if (purged) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Zelian R, the Zelian heRo, has been purged");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Zelian R, the Zelian heRo, has been purged.");
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Zelian R, the Zelian heRo, was not purged - something went wrong");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Zelian R, the Zelian heRo, was not purged - something went wrong.");
             }
         }
     }

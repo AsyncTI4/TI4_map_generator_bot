@@ -15,6 +15,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 class RelicPurgeFragments extends GameStateSubcommand {
@@ -59,14 +60,22 @@ class RelicPurgeFragments extends GameStateSubcommand {
 		}
 
 		Game game = getGame();
-		for (String id : fragmentsToPurge) {
-			activePlayer.removeFragment(id);
+        String message = activePlayer.getRepresentation() + " purged";
+		for (String fragid : fragmentsToPurge) {
+			activePlayer.removeFragment(fragid);
 			game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+            switch (fragid)
+            {
+                case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message += " " + ExploreEmojis.CFrag;
+                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->  message += " " + ExploreEmojis.HFrag;
+                case "irf1", "irf2", "irf3", "irf4", "irf5" ->  message += " " + ExploreEmojis.IFrag;
+                case "urf1", "urf2", "urf3" ->  message += " " + ExploreEmojis.UFrag;
+                default ->  message += " " + fragid;
+            }
 		}
 
 		CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
-
-		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
+        message += " relic fragments.";
 		MessageHelper.sendMessageToEventChannel(event, message);
 
 		if (activePlayer.hasTech("dslaner")) {

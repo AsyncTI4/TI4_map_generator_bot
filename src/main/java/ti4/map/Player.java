@@ -1935,7 +1935,7 @@ public class Player {
                 EndTurnService.pingNextPlayer(event, game, p2);
                 if (!game.isFowMode()) {
                     ButtonHelper.updateMap(game, event, "End of Turn " + p2.getInRoundTurnCount() + ", Round "
-                        + game.getRound() + " for " + p2.getFactionEmoji());
+                        + game.getRound() + " for " + p2.getRepresentationNoPing() + ".");
                 }
             }
             if (game.getStoredValue("fleetLogWhenSCFinished")
