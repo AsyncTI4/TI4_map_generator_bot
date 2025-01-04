@@ -45,7 +45,10 @@ public class ActionCardHelper {
     public static void sendActionCardInfo(Game game, Player player) {
         // AC INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, getActionCardInfo(game, player));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nClick a button below to play an action card.", getPlayActionCardButtons(game, player));
+        Map<String, Integer> actionCards = player.getActionCards();
+        if (actionCards != null && !actionCards.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nClick a button below to play an action card.", getPlayActionCardButtons(game, player));
+        }
 
         sendTrapCardInfo(game, player);
     }
@@ -69,9 +72,8 @@ public class ActionCardHelper {
             } else {
                 for (Map.Entry<String, Integer> trapCard : trapCards.entrySet()) {
                     Integer value = trapCard.getValue();
-                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
+                    sb.append("").append(index++).append("\\. ").append(Helper.leftpad("(" + value, 4)).append(")`");
                     sb.append(getTrapCardRepresentation(trapCard.getKey(), trapCardsPlanets));
-                    index++;
                 }
             }
         }
@@ -97,8 +99,7 @@ public class ActionCardHelper {
     }
 
     private static String getActionCardInfo(Game game, Player player) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("_ _\n");
+        StringBuilder sb = new StringBuilder("_ _\n");
 
         // ACTION CARDS
         sb.append("__Action Cards__ (").append(player.getAc()).append("/").append(ButtonHelper.getACLimit(game, player)).append("):").append("\n");
@@ -111,19 +112,17 @@ public class ActionCardHelper {
         }
 
         for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
-            Integer value = ac.getValue();
             ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
-
-            sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
+            sb.append(index++).append("\\. ");
+            
             if (actionCard == null) {
                 sb.append("Something broke here");
             } else {
-                sb.append(actionCard.getRepresentation());
+                sb.append(CardEmojis.ActionCard).append(" _").append(actionCard.getName()).append("_ `(")
+                    .append(Helper.leftpad("" + ac.getValue(), 3)).append(")`\n> ")
+                    .append(actionCard.getWindow()).append(": ").append(actionCard.getText()).append("\n");
             }
-
-            index++;
         }
-
         return sb.toString();
     }
 
@@ -241,7 +240,7 @@ public class ActionCardHelper {
         }
 
         if (acID == null || !game.discardActionCard(player.getUserID(), acNumericalID)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry: " + acID);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such action card ID found, please retry: " + acID);
             return;
         }
         String message = player.getRepresentationNoPing() + " discarded the action card _" + Mapper.getActionCard(acID).getName() + "_.\n" +
@@ -508,7 +507,8 @@ public class ActionCardHelper {
 
             if (actionCardTitle.contains("Skilled Retreat")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "retreat_" + game.getActiveSystem() + "_skilled", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg
+                    + "A reminder that you should declare which system you are retreating to now, before other players choose whether they will Sabo.", codedButtons);
             }
 
             if (actionCardTitle.contains("Reparations")) {
@@ -1069,8 +1069,8 @@ public class ActionCardHelper {
         Collections.shuffle(actionCards);
         int index = 1;
         for (String id : actionCards) {
-            sa.append(index).append(". ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
-            sb.append(index).append(". ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
+            sa.append(index).append("\\. ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
+            sb.append(index).append("\\. ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
             index++;
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, sa.toString());
@@ -1087,11 +1087,10 @@ public class ActionCardHelper {
         List<Map.Entry<String, List<String>>> displayOrder = new ArrayList<>(cardsByName.entrySet());
         displayOrder.sort(Map.Entry.comparingByKey());
         for (Map.Entry<String, List<String>> acEntryList : displayOrder) {
-            sb.append("\n").append(index).append(". ");
+            sb.append("\n").append(index++).append("\\. ");
             sb.append(CardEmojis.ActionCard.toString().repeat(acEntryList.getValue().size()));
             sb.append(" _").append(acEntryList.getKey()).append("_");
             // sb.append(Mapper.getActionCard()
-            index++;
         }
         return sb.toString();
     }

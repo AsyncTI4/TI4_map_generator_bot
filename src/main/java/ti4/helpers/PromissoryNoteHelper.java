@@ -52,37 +52,51 @@ public class PromissoryNoteHelper {
         StringBuilder sb = new StringBuilder();
 
         //PROMISSORY NOTES
-        sb.append("__Promissory Notes:__").append("\n");
+        sb.append("__Promissory notes in your hand__:").append("\n");
         int index = 1;
         Map<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
+        int pnCount = promissoryNotes.size() + promissoryNotesInPlayArea.size();
         if (promissoryNotes == null) {
             return sb.toString();
         }
 
         if (promissoryNotes.isEmpty()) {
-            sb.append("> None");
+            return "__Promissory notes__:\n> None";
         } else {
             for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    sb.append("> `").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`");
-                    sb.append(getPromissoryNoteRepresentation(game, pn.getKey(), longFormat));
-                    index++;
+                    PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn.getKey());
+                    sb.append(index++).append("\\. ").append(CardEmojis.PN).append("  _").append(pnModel.getName()).append("_ ");
+                    Player pnOwner = game.getPNOwner(pn.getKey());
+                    if (pnOwner == player) {
+                        sb.append("✋");
+                    } else {
+                        if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
+                        sb.append(ColorEmojis.getColorEmoji(pnOwner.getColor()));
+                    }
+                    sb.append("`(").append(Helper.leftpad("" + pn.getValue(), 2)).append(")`\n> ").append(pnModel.getText()).append("\n");
                 }
             }
 
             if (!excludePlayArea) {
                 //PLAY AREA PROMISSORY NOTES
-                sb.append("\n\n").append("__**PLAY AREA Promissory Notes:**__").append("\n");
+                sb.append("\n").append("__Promissory notes in your play area__:").append("\n");
                 if (promissoryNotesInPlayArea.isEmpty()) {
                     sb.append("> None");
                 } else {
                     for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                         if (promissoryNotesInPlayArea.contains(pn.getKey())) {
-                            sb.append("`").append(index).append(".");
-                            sb.append("(").append(pn.getValue()).append(")`");
-                            sb.append(getPromissoryNoteRepresentation(game, pn.getKey(), longFormat));
-                            index++;
+                            PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn.getKey());
+                            sb.append(index++).append("\\. ").append(CardEmojis.PN).append("  _").append(pnModel.getName()).append("_ ");
+                            Player pnOwner = game.getPNOwner(pn.getKey());
+                            if (pnOwner == player) {
+                                sb.append("✋");
+                            } else {
+                                if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
+                                sb.append(ColorEmojis.getColorEmoji(pnOwner.getColor()));
+                            }
+                            sb.append("`(").append(Helper.leftpad("" + pn.getValue(), 2)).append(")`\n> ").append(pnModel.getText()).append("\n");
                         }
                     }
                 }

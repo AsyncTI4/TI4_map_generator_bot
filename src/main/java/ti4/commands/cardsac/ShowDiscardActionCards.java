@@ -12,7 +12,7 @@ import ti4.service.decks.ShowActionCardsService;
 class ShowDiscardActionCards extends GameStateSubcommand {
 
     public ShowDiscardActionCards() {
-        super(Constants.SHOW_AC_DISCARD_LIST, "Show Action Card discard list", false, false);
+        super(Constants.SHOW_AC_DISCARD_LIST, "Show action card discard list", false, false);
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_FULL_TEXT, "'true' to show full card text"));
     }
 

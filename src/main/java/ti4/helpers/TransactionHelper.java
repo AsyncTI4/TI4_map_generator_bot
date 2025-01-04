@@ -980,12 +980,12 @@ public class TransactionHelper {
                 p2.addRelic(amountToTrans);
             }
             case "SendDebt" -> {
-                message2 = ident + " sent " + amountToTrans + " debt tokens to " + ident2;
+                message2 = ident + " sent " + amountToTrans + " debt token" + (Integer.parseInt(amountToTrans) == 1 ? "" : "s") + " to " + ident2 + ".";
                 p2.addDebtTokens(p1.getColor(), Integer.parseInt(amountToTrans));
                 CommanderUnlockCheckService.checkPlayer(p2, "vaden");
             }
             case "ClearDebt" -> {
-                message2 = ident + " cleared " + amountToTrans + " debt tokens of " + ident2;
+                message2 = ident + " cleared " + amountToTrans + " debt token" + (Integer.parseInt(amountToTrans) == 1 ? "" : "s") + " of " + ident2 + ".";
                 p1.removeDebtTokens(p2.getColor(), Integer.parseInt(amountToTrans));
             }
             case "ACs" -> {

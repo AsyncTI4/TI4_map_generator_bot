@@ -125,7 +125,7 @@ public class PlayerStatsService {
 
         Integer tgCount = scTradeGoods.get(scNumber);
         String msg = player.getRepresentationUnfogged() +
-            "\n> Picked: " + Helper.getSCRepresentation(game, scNumber);
+            " picked " + Helper.getSCRepresentation(game, scNumber) + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (tgCount != null && tgCount != 0) {
             int tg = player.getTg();

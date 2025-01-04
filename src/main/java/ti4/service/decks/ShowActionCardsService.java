@@ -60,11 +60,11 @@ public class ShowActionCardsService {
 
         for (Map.Entry<String, List<Map.Entry<String, Integer>>> acEntryList : entries) {
             List<String> ids = acEntryList.getValue().stream().map(i -> "`(" + i.getValue() + ")`").toList();
-            sb.append("\n").append(index).append(". ");
+            sb.append("\n").append(index++).append("\\. ");
             sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
-            sb.append(" **").append(acEntryList.getKey()).append("** - ");
+            sb.append(" _").append(acEntryList.getKey()).append("_ ");
+            sb.append(String.join(", ", ids)).append("\n> ");
             sb.append(Mapper.getActionCard(acEntryList.getValue().getFirst().getKey()).getRepresentationJustText());
-            index++;
         }
         return sb.toString();
     }
@@ -83,16 +83,15 @@ public class ShowActionCardsService {
         Collections.reverse(entries);
 
         // Build the string
-        StringBuilder sb = new StringBuilder("__").append(title).append(":__");
+        StringBuilder sb = new StringBuilder("__").append(title).append("__:");
         int index = 1;
         int pad = cardsByName.size() > 99 ? 4 : (cardsByName.size() > 9 ? 3 : 2);
         for (Map.Entry<String, List<Map.Entry<String, Integer>>> acEntryList : entries) {
             List<String> ids = acEntryList.getValue().stream().map(i -> "`(" + i.getValue() + ")`").toList();
-            sb.append("\n`").append(Helper.leftpad(index + ".", pad)).append("` ");
+            sb.append("\n").append(index++).append("\\. ");
             sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_");
-            sb.append(String.join(",", ids));
-            index++;
+            sb.append(String.join(", ", ids));
         }
         return sb.toString();
     }

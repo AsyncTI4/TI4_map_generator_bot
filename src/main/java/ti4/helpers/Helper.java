@@ -866,11 +866,11 @@ public class Helper {
             }
         }
         if (game.getCurrentAgendaInfo().contains("Secret") && Mapper.getSecretObjectivesJustNames().get(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction())) != null) {
-            msg.append("For a total of **").append(votes).append("** vote").append(votes == 1 ? "" : "s").append(" on the outcome ")
-                .append(Mapper.getSecretObjectivesJustNames().get(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction())));
+            msg.append("For a total of **").append(votes).append("** vote").append(votes == 1 ? "" : "s").append(" on the outcome \"_")
+                .append(Mapper.getSecretObjectivesJustNames().get(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction()))).append("\"_.");
         } else {
-            msg.append("For a total of **").append(votes).append("** vote").append(votes == 1 ? "" : "s").append(" on the outcome ")
-                .append(StringUtils.capitalize(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction())));
+            msg.append("For a total of **").append(votes).append("** vote").append(votes == 1 ? "" : "s").append(" on the outcome \"")
+                .append(StringUtils.capitalize(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction()))).append("\".");
         }
         if (justVoteTotal) {
             return "" + votes;
@@ -1091,11 +1091,16 @@ public class Helper {
             String tilePos2 = uniquePlace.split("_")[0];
             String planetOrSpace2 = uniquePlace.split("_")[1];
             Tile tile = game.getTileByPosition(tilePos2);
-            StringBuilder localPlace = new StringBuilder("__**In " + tile.getRepresentationForButtons(game, player) + " ");
-            if ("space".equalsIgnoreCase(planetOrSpace2)) {
-                localPlace.append(" in the space area:**__ \n");
+            StringBuilder localPlace = new StringBuilder();
+            if (msg.length() == 0) {
+                localPlace.append(player.getRepresentationNoPing()).append(" is producing units in ").append(tile.getRepresentationForButtons(game, player));
             } else {
-                localPlace.append(" on the planet ").append(getPlanetRepresentation(planetOrSpace2, game)).append(":**__ \n");
+                localPlace.append("And is producing units in ").append(tile.getRepresentationForButtons(game, player));
+            }
+            if ("space".equalsIgnoreCase(planetOrSpace2)) {
+                localPlace.append(" in the __space area__.\n");
+            } else {
+                localPlace.append(" on the __planet ").append(getPlanetRepresentation(planetOrSpace2, game)).append("__.\n");
             }
             for (String unit : producedUnits.keySet()) {
                 String tilePos = unit.split("_")[1];
@@ -1104,14 +1109,18 @@ public class Helper {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(un), player.getColor());
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
                 if (uniquePlace.equalsIgnoreCase(tilePos + "_" + planetOrSpace)) {
-                    localPlace.append(player.getFactionEmoji()).append(" produced ").append(producedUnits.get(unit)).append(" ").append(removedUnit.getUnitEmoji()).append("\n");
+                    localPlace.append("> ").append(producedUnits.get(unit)).append(" ").append(removedUnit.getUnitEmoji()).append("\n");
                 }
             }
             msg.append(localPlace);
         }
-        msg.append("For the total cost of: **").append(calculateCostOfProducedUnits(player, game, true)).append(" Resources**");
-        if (calculateCostOfProducedUnits(player, game, false) > 2) {
-            msg.append(" (total units produced: ").append(calculateCostOfProducedUnits(player, game, false)).append(").");
+        int cost = calculateCostOfProducedUnits(player, game, true);
+        int unitCount = calculateCostOfProducedUnits(player, game, false);
+        if (unitCount <= 1) {
+            msg.append("For a cost of ").append(cost).append(" resource").append(cost == 1 ? "" : "s").append(".");
+        } else {
+            msg.append("Producing a total of ").append(unitCount).append(" unit").append(unitCount == 1 ? "" : "s")
+                .append(" for a total cost of ").append(cost).append(" resource").append(cost == 1 ? "" : "s").append(".");
         }
         return msg.toString();
     }

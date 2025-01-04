@@ -47,7 +47,7 @@ class PickStrategyCardButtonHandler {
                     ActionCardHelper.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
                     game.setStoredValue("Public Disgrace", "");
                     String msg = player.getRepresentationUnfogged() +
-                        "\n> Picked: " + Helper.getSCRepresentation(game, scpick);
+                        " picked " + Helper.getSCRepresentation(game, scpick) + ".";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),

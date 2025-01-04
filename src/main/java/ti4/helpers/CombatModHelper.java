@@ -265,30 +265,31 @@ public class CombatModHelper {
                 if (unitsByQuantity.size() == 1) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).getFirst();
                     meetsCondition = unitByQuantity.getValue() == 2
-                        && !"ff".equals(unitByQuantity.getKey().getAsyncId());
+                        && !"fighter".equalsIgnoreCase(unitByQuantity.getKey().getBaseType());
                 }
-                if (unitsByQuantity.size() == 2) {
+                else if (unitsByQuantity.size() == 2) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).get(0);
                     Entry<UnitModel, Integer> unitByQuantity2 = new ArrayList<>(unitsByQuantity.entrySet()).get(1);
                     String baseType1 = unitByQuantity.getKey().getBaseType();
                     String baseType2 = unitByQuantity2.getKey().getBaseType();
                     if (baseType1.equalsIgnoreCase("fighter") || baseType2.equalsIgnoreCase("fighter")) {
-                        if (baseType1.equalsIgnoreCase("fighter")) {
+                        if (!baseType1.equalsIgnoreCase("fighter")) {
                             meetsCondition = unitByQuantity.getValue() == 2;
                         } else {
                             meetsCondition = unitByQuantity2.getValue() == 2;
                         }
-                    } else if (baseType1.equalsIgnoreCase("flagship") && baseType2.equalsIgnoreCase("flagship")) {
+                    } else if ((baseType1.equalsIgnoreCase("flagship") || baseType1.equalsIgnoreCase("lady")) 
+                        && (baseType2.equalsIgnoreCase("flagship") || baseType2.equalsIgnoreCase("lady"))) {
                         meetsCondition = true;
                     }
                 }
-                if (unitsByQuantity.size() == 3) {
+                else if (unitsByQuantity.size() == 3) {
                     List<Entry<UnitModel, Integer>> entries = new ArrayList<>(unitsByQuantity.entrySet());
                     meetsCondition = entries.stream()
                         .limit(3)
                         .allMatch(entry -> {
                             String baseType = entry.getKey().getBaseType();
-                            return baseType.equalsIgnoreCase("fighter") || baseType.equalsIgnoreCase("flagship");
+                            return baseType.equalsIgnoreCase("fighter") || baseType.equalsIgnoreCase("flagship") || baseType.equalsIgnoreCase("lady");
                         });
                 }
             }

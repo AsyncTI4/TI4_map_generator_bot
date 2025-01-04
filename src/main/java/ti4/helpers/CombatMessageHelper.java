@@ -158,7 +158,7 @@ public class CombatMessageHelper {
             holderName = planetModel.getName();
         }
 
-        String combatTypeName = StringUtils.capitalize(holderName) + " Combat";
+        String combatTypeName = StringUtils.capitalize(holderName) + " combat";
         if (rollType != CombatRollType.combatround) {
             combatTypeName = rollType.getValue();
             if (holderPlanet != null) {
@@ -179,9 +179,9 @@ public class CombatMessageHelper {
             }
             game.setStoredValue(combatName, "" + round);
             if (game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-                combatTypeName = combatTypeName + " (Thalnos Reroll for Round #" + round + ")";
+                combatTypeName = combatTypeName + " (Thalnos reroll for round #" + round + ")";
             } else {
-                combatTypeName = combatTypeName + " (Round #" + round + ")";
+                combatTypeName = combatTypeName + " (round #" + round + ")";
                 if (game.getStoredValue("solagent").equalsIgnoreCase(player.getFaction())) {
                     game.setStoredValue("solagent", "");
                 }

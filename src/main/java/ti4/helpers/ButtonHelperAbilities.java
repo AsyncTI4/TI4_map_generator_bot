@@ -578,7 +578,7 @@ public class ButtonHelperAbilities {
         if (buttonID.split("_")[2].equalsIgnoreCase("no")) {
             removeOmenDie(game, die);
         }
-        String msg = player.getRepresentationUnfogged() + " used an Omen die with the number " + die;
+        String msg = player.getRepresentationUnfogged() + " used an **Omen** die with the number " + die + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue();
     }
@@ -586,13 +586,13 @@ public class ButtonHelperAbilities {
     public static void rollOmenDiceAtStartOfStrat(Game game, Player myko) {
         game.setStoredValue("OmenDice", "");
         StringBuilder msg = new StringBuilder(
-            myko.getRepresentationUnfogged() + " rolled 4 omen dice and rolled the following numbers: ");
+            myko.getRepresentationUnfogged() + " rolled 4 **Omen** dice and rolled the following numbers:");
         for (int x = 0; x < 4; x++) {
             Die d1 = new Die(6);
-            msg.append(d1.getResult()).append(" ");
+            msg.append(" ").append(d1.getResult());
             addOmenDie(game, d1.getResult());
         }
-        MessageHelper.sendMessageToChannel(myko.getCorrectChannel(), msg.toString());
+        MessageHelper.sendMessageToChannel(myko.getCorrectChannel(), msg.append(".").toString());
     }
 
     @ButtonHandler("pillage_")
@@ -616,8 +616,6 @@ public class ButtonHelperAbilities {
             buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         } else {
-            MessageChannel channel1 = pillaged.getCorrectChannel();
-            MessageChannel channel2 = player.getCorrectChannel();
             String pillagerMessage = player.getRepresentationUnfogged() + " you **Pillage**'d, so your trade goods have gone from "
                 + player.getTg() + " to "
                 + (player.getTg() + 1) + ".";
@@ -633,13 +631,17 @@ public class ButtonHelperAbilities {
                 pillaged.setTg(pillaged.getTg() - 1);
             }
             player.setTg(player.getTg() + 1);
-            MessageHelper.sendMessageToChannel(channel2, pillagerMessage);
-            MessageHelper.sendMessageToChannel(channel1, pillagedMessage);
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pillagerMessage);
+                MessageHelper.sendMessageToChannel(pillaged.getCorrectChannel(), pillagedMessage);
+            } else {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), pillagerMessage + "\n" + pillagedMessage);
+            }
             if (player.hasUnexhaustedLeader("mentakagent")) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("FFCC_" + player.getFaction() + "_" + "exhaustAgent_mentakagent_" + pillaged.getFaction(), "Use Mentak Agent", FactionEmojis.Mentak));
                 buttons.add(Buttons.red("deleteButtons", "Done"));
-                MessageHelper.sendMessageToChannelWithButtons(channel2,
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     "Wanna use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An, the Mentak" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " Agent?", buttons);
             }
             for (Player p2 : game.getRealPlayers()) {

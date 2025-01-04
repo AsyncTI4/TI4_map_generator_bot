@@ -1,5 +1,8 @@
 package ti4.listeners;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import net.dv8tion.jda.api.entities.Member;
@@ -10,6 +13,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.executors.ExecutorManager;
+import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.message.BotLogger;
 import ti4.service.SusSlashCommandService;
@@ -19,6 +23,8 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private static final long DELAY_THRESHOLD_MILLISECONDS = 1500;
 
+    private static final List<String> SLASHCOMMANDS_WITH_MODALS = Arrays.asList(Constants.ADD_TILE_LIST, Constants.ADD_TILE_LIST_RANDOM);
+
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
@@ -26,7 +32,9 @@ public class SlashCommandListener extends ListenerAdapter {
             return;
         }
 
-        event.getInteraction().deferReply().queue();
+        if (!isModalCommand(event)) {
+            event.getInteraction().deferReply().queue();
+        }
 
         queue(event);
     }
@@ -46,7 +54,9 @@ public class SlashCommandListener extends ListenerAdapter {
                 command.preExecute(event);
                 command.execute(event);
                 command.postExecute(event);
-                event.getHook().deleteOriginal().queue();
+                if (!isModalCommand(event)) {
+                    event.getHook().deleteOriginal().queue();
+                }
             } catch (Exception e) {
                 String messageText = "Error trying to execute command: " + command.getName();
                 String errorMessage = ExceptionUtils.getMessage(e);
@@ -71,6 +81,10 @@ public class SlashCommandListener extends ListenerAdapter {
                 DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (processingRuntime > eventDelay ? "😲" : "");
             BotLogger.log(message);
         }
+    }
+
+    private static boolean isModalCommand(SlashCommandInteractionEvent event) {
+        return SLASHCOMMANDS_WITH_MODALS.contains(event.getInteraction().getSubcommandName());
     }
 
     private static void logSlashCommand(SlashCommandInteractionEvent event) {

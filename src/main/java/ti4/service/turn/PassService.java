@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
+import ti4.helpers.DiscordantStarsHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -65,6 +66,9 @@ public class PassService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
+        
+        DiscordantStarsHelper.checkKjalengardMechs(event, player, game);
+
         EndTurnService.pingNextPlayer(event, game, player, true);
         ButtonHelper.updateMap(game, event, "End of Turn (PASS) " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + player.getFactionEmoji());
     }

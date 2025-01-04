@@ -213,7 +213,7 @@ public class EndTurnService {
         if (game.isShowBanners()) {
             BannerGenerator.drawPhaseBanner("status", game.getRound(), game.getActionsChannel());
         }
-        String message = "Please score objectives, " + game.getPing() + ".";
+        String messageText = "Please score objectives, " + game.getPing() + ".";
 
         game.setPhaseOfGame("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
@@ -255,10 +255,11 @@ public class EndTurnService {
             actionRows.add(ActionRow.of(partition));
         }
         MessageCreateData messageObject = new MessageCreateBuilder()
-            .addContent(message)
+            .addContent(messageText)
             .addComponents(actionRows).build();
 
-        gameChannel.sendMessage(messageObject).queue();
+        gameChannel.sendMessage(messageObject).queue(message ->
+            GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.STATUS_SCORING, game.getLastModifiedDate()));
 
         int maxVP = 0;
         for (Player player : game.getRealPlayers()) {
@@ -296,7 +297,8 @@ public class EndTurnService {
                     pnOwner.setPromissoryNote(pn);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pnOwner.getFactionEmoji() + " " + pnModel.getName() + " was returned");
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                        "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing() + ".");
                 }
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
@@ -349,12 +351,12 @@ public class EndTurnService {
                 }
             }
             if (scorables.size() == 0) {
-                message = player.getRepresentation() + ", the bot does not believe that you can score any public objectives.";
+                messageText = player.getRepresentation() + ", the bot does not believe that you can score any public objectives.";
             } else {
-                message = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following public objectives: ";
-                message += String.join(", ", scorables);
+                messageText = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following public objectives: ";
+                messageText += String.join(", ", scorables);
             }
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
 
             int count = 0;
             StringBuilder message3a = new StringBuilder(player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following secret objectives:");
