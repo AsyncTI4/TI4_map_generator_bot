@@ -48,7 +48,7 @@ public class SecretObjectiveInfoService {
         if (player.getSecretsUnscored().isEmpty()) return;
 
         // SCORE/DISCARD BUTTONS
-        String secretMsg = "Please use these button if you with to score or discard a secret objective.";
+        String secretMsg = "Use these buttons to score or discard a secret objective.";
         List<Button> buttons = new ArrayList<>();
         Button scoreB = Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
         Button discardB = Buttons.red("get_so_discard_buttons", "Discard A Secret Objective");
@@ -75,7 +75,7 @@ public class SecretObjectiveInfoService {
             for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
                 SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
                 sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _")
-                    .append(soModel.getName()).append("_ `(").append(Helper.leftpad("" + so.getValue(), 3)).append(")`\n");
+                    .append(soModel.getName()).append("_ `(").append(so.getValue()).append(")`\n");
             }
         }
         sb.append("\n");

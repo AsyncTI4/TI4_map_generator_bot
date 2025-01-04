@@ -253,6 +253,7 @@ public class StartCombatService {
 
         if (isGroundCombat && !game.isFowMode()) {
             List<Button> autoButtons = new ArrayList<>();
+            boolean thalnos = false;
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 if (!uH.getName().equalsIgnoreCase(unitHolderName)) {
                     continue;
@@ -267,10 +268,20 @@ public class StartCombatService {
                     Button automate = Buttons.green("automateGroundCombat_" + playersWithGF.get(0).getFaction() + "_" + playersWithGF.get(1).getFaction() + "_" + unitHolderName + "_unconfirmed", "Automate Combat For " + Helper.getPlanetRepresentation(unitHolderName, game));
                     autoButtons.add(automate);
                 }
+                for(Player player : playersWithGF){
+                    if (player.hasRelic("thalnos")){
+                        thalnos = true;
+                    }
+                }
             }
             if (!autoButtons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(threadChannel, "You may automate the entire combat if neither side has action cards or fancy tricks. Press this button to do so, and it will ask your opponent to confirm. Note that PDS fire and BOMBARDMENT are NOT part of combat and will not be automated.", autoButtons);
+                if (thalnos){
+                    MessageHelper.sendMessageToChannel(threadChannel, "One of you may have The Crown of Thalnos and thus not wish to automate the combat");
+                }
             }
+            
+            
         }
         // DS Lanefir ATS Armaments
         if ((player1.hasTech("dslaner") && player1.getAtsCount() > 0) || (player2.hasTech("dslaner") && player2.getAtsCount() > 0)) {
