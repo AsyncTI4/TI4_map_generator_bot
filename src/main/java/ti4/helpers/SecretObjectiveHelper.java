@@ -205,45 +205,48 @@ public class SecretObjectiveHelper {
         }
         currentSecrets.removeAll(game.getSoToPoList());
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(game.getName()).append("\n");
-        sb.append("Unscored Action Phase Secrets: ").append("\n");
-        int x = 1;
+        sb.append("__Game: ").append(game.getName()).append("__\n");
+        sb.append("__Unscored Action Phase Secrets__:\n");
+        int index = 1;
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Action Phase")) {
-                sb.append(x).append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id));
-                x++;
+                SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
+                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _").append(soModel.getName())
+                    .append("_ - ").append(soModel.getPhase()).append(" Phase\n> ").append(soModel.getText()).append("\n");
             }
         }
-        x = 1;
-        sb.append("\n").append("Unscored Status Phase Secrets: ").append("\n");
+        index = 1;
+        sb.append("\n").append("__Unscored Status Phase Secrets__:\n");
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Status Phase")) {
-                appendSecretObjectiveRepresentation(game, sb, id, x);
-                x++;
+                SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
+                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _").append(soModel.getName())
+                    .append("_ - ").append(soModel.getPhase()).append(" Phase\n> ").append(soModel.getText()).append("\n").append(getSecretObjectiveProgress(game, id));
             }
         }
-        x = 1;
+        index = 1;
         sb.append("\n").append("Unscored Agenda Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Agenda Phase")) {
-                appendSecretObjectiveRepresentation(game, sb, id, x);
-                x++;
+                SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
+                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _").append(soModel.getName())
+                    .append("_ - ").append(soModel.getPhase()).append(" Phase\n> ").append(soModel.getText()).append("\n").append(getSecretObjectiveProgress(game, id));
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
-    private static void appendSecretObjectiveRepresentation(Game game, StringBuilder sb, String id, int x) {
-        if (ListPlayerInfoService.getObjectiveThreshold(id, game) > 0) {
-            sb.append(x).append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id));
-            sb.append("> ");
-            for (Player player : game.getRealPlayers()) {
-                sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player))
-                    .append("/").append(ListPlayerInfoService.getObjectiveThreshold(id, game)).append(" ");
-            }
-            sb.append("\n");
-        } else {
-            sb.append(x).append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id));
+    private static String getSecretObjectiveProgress(Game game, String id) {
+        int threshold = ListPlayerInfoService.getObjectiveThreshold(id, game);
+        if (threshold == 0) {
+            return "";
         }
+        StringBuilder sb = new StringBuilder("> ");
+        for (Player player : game.getRealPlayers()) {
+            sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player))
+                .append("/").append(threshold).append(" ");
+        }
+        sb.append("\n");
+        return sb.toString();
     }
 }

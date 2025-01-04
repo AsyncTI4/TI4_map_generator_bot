@@ -828,13 +828,13 @@ public class ExploreService {
             Collections.sort(discard);
             Integer discardCount = discard.size();
 
-            info.append(ExploreEmojis.getTraitEmoji(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DECK** (")
-                .append(deckCount).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
-            info.append(listNames(deck, true, fullText)).append("\n");
+            info.append("__").append(currentType.substring(0,1).toUpperCase()).append(currentType.substring(1)).append(" exploration deck__ (")
+                .append(deckCount).append(" - ").append(formatPercent.format(deckDrawChance)).append(")\n");
+            info.append(listNames(deck, true, fullText, ExploreEmojis.getTraitEmoji(currentType).toString())).append("\n");
 
-            info.append(ExploreEmojis.getTraitEmoji(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (")
+            info.append("__").append(currentType.substring(0,1).toUpperCase()).append(currentType.substring(1)).append(" exploration discards__ (")
                 .append(discardCount).append(")\n");
-            info.append(listNames(discard, false, fullText));
+            info.append(listNames(discard, false, fullText, ExploreEmojis.getTraitEmoji(currentType).toString()));
 
             if (types.indexOf(currentType) != types.size() - 1) {
                 info.append("​"); // add a zero width space at the end to cement newlines between sets of explores
@@ -849,33 +849,37 @@ public class ExploreService {
         }
     }
 
-    private static String listNames(List<String> deck, boolean showPercents, boolean showFullText) {
+    private static String listNames(List<String> deck, boolean showPercents, boolean showFullText, String emoji) {
         int deckCount = deck.size();
         double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
         NumberFormat formatPercent = NumberFormat.getPercentInstance();
         formatPercent.setMaximumFractionDigits(1);
 
-        StringBuilder sb = new StringBuilder();
         if (deck.isEmpty()) {
-            sb.append("> there is nothing here\n");
+            return "> There are no cards here.\n";
         }
+        StringBuilder sb = new StringBuilder();
 
         Map<String, List<ExploreModel>> explores = deck.stream().map(Mapper::getExplore).filter(Objects::nonNull)
             .collect(Collectors.groupingBy(ExploreModel::getName));
         List<Map.Entry<String, List<ExploreModel>>> orderedExplores = explores.entrySet().stream()
             .sorted(Comparator.comparingInt(e -> 15 - e.getValue().size())).toList();
+        int index = 1;
         for (Map.Entry<String, List<ExploreModel>> entry : orderedExplores) {
             String exploreName = entry.getKey();
             List<String> ids = entry.getValue().stream().map(ExploreModel::getId).toList();
 
             if (showFullText) {
-                sb.append("> ").append(exploreName).append("\n").append(entry.getValue().getFirst().getText()).append(" [").append(String.join(", ", ids)).append("]");
+                sb.append(index++).append("\\. ").append(emoji).append(" _").append(exploreName).append("_ (`").append(String.join("`, `", ids)).append("`)");
+                if (showPercents && ids.size() > 1) {
+                    sb.append(" - ").append(formatPercent.format(deckDrawChance * ids.size()));
+                }
+                sb.append("\n> ").append(entry.getValue().getFirst().getText().replace("\n", "\n> "));
             } else {
-                sb.append("> ").append(exploreName).append(" [").append(String.join(", ", ids)).append("]");
-            }
-
-            if (showPercents && ids.size() > 1) {
-                sb.append(" _").append(formatPercent.format(deckDrawChance * ids.size())).append("_");
+                sb.append("1. ").append(emoji).append(" _").append(exploreName).append("_ (`").append(String.join("`, `", ids)).append("`)");
+                if (showPercents && ids.size() > 1) {
+                    sb.append(" - ").append(formatPercent.format(deckDrawChance * ids.size()));
+                }
             }
             sb.append("\n");
         }

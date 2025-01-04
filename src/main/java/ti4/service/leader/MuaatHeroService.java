@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 public class MuaatHeroService {
 
     public static void secondHalfOfNovaSeed(Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
-        String message1 = "Moments before disaster in game " + game.getName();
+        String message1 = "Moments before disaster in game " + game.getName() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, message1);
 
         //Remove all other players units from the tile in question
@@ -37,8 +37,8 @@ public class MuaatHeroService {
         game.setTile(novaTile);
 
         String message2 = tile.getRepresentation() +
-            " has been nova seeded by " +
-            player.getRepresentation();
+            " has been _Nova Seed_'d by " +
+            player.getRepresentation() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, novaTile, 1, message2);
 
         if (player.hasLeaderUnlocked("muaathero")) {
@@ -46,9 +46,9 @@ public class MuaatHeroService {
             StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
             boolean purged = player.removeLeader(playerLeader);
             if (purged) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Adjudicator Ba'al, the Muaat hero, has been purged");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Adjudicator Ba'al, the Muaat hero, has been purged.");
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Adjudicator Ba'al, the Muaat hero, was not purged - something went wrong");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Adjudicator Ba'al, the Muaat hero, was not purged - something went wrong.");
             }
         }
     }

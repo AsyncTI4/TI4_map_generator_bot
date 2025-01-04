@@ -245,7 +245,8 @@ public class StartTurnService {
                 sendReminder = true;
             }
         }
-        sb.append("You currently have ").append(player.getStrategicCC()).append(" command tokens in your strategy pool.");
+        sb.append("You currently have ").append(player.getStrategicCC()).append(" command token")
+            .append(player.getStrategicCC() == 1 ? "" : "s").append(" in your strategy pool.");
         return sendReminder ? sb.toString() : null;
     }
 
@@ -415,8 +416,8 @@ public class StartTurnService {
         if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
             sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
         }
-        sb.append("You currently have ").append(player.getStrategicCC())
-            .append(" command tokens in your strategy pool.");
+        sb.append("You currently have ").append(player.getStrategicCC()).append(" command token")
+            .append(player.getStrategicCC() == 1 ? "" : "s").append(" in your strategy pool.");
         if (!player.hasFollowedSC(sc)) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 sb.toString());
