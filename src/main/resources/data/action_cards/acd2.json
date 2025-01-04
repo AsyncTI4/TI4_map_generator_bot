@@ -4,7 +4,7 @@
     "name": "Ancient Trade Routes",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "Choose up to 2 other players. You and each of those players gain 2 commodities.\nDuring this turn, treat those players as if they were your neighbors.",
+    "text": "Choose up to 2 other players. You and each of those players gain 2 commodities. During this turn, treat those players as if they were your neighbors.",
     "flavorText": "\"Stationmaster,\" Kier said nervously, \"these routes have been dead for centuries.\" Artuno smirked. \"See to it that they are reinstated, then. The Memoria will accompany you if necessary.\"",
     "source": "action_deck_2"
   },
@@ -84,8 +84,8 @@
     "alias": "blackmail",
     "name": "Blackmail",
     "phase": "Agenda",
-    "window": "Before another player casts votes",
-    "text": "That player must cast at least 1 vote for an outcome of your choice or give you 1 random promissory note from their hand.",
+    "window": "After an agenda is revealed",
+    "text": "Choose another player. That player may give you 1 random promissory note from their hand; otherwise, they must cast at least 1 vote for an outcome of your choice during this agenda, if able.",
     "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
     "source": "action_deck_2"
   },
@@ -184,7 +184,7 @@
     "name": "Covert Operation",
     "phase": "Action",
     "window": "After you move ships into the active system",
-    "text": "Remove up to 2 of your ships or ground forces from systems that do not contain 1 of your command tokens and place them in the space area of the active system.",
+    "text": "Remove 1 of your ships or ground forces from a system that does not contain 1 of your command tokens and place that unit in the space area of the active system.",
     "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
     "source": "action_deck_2"
   },
@@ -720,6 +720,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "refabrication",
+    "name": "Refabrication",
+    "phase": "Any",
+    "window": "After 1 or more of your ships are destroyed",
+    "text": "For each of those ships, you may produce 1 ship of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 4.",
+    "flavorText": "As the Van Hauge VI left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers.\"",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "rehashed_debates",
     "name": "Rehashed Debates",
     "phase": "Agenda",
@@ -742,7 +751,7 @@
     "name": "Relay Connection",
     "phase": "Action",
     "window": "After 1 of your units uses PRODUCTION to produce a ship in a system",
-    "text": "Produce 1 ship of that type in any number of other systems that contain 1 of your units with PRODUCTION; reduce the combined cost of those units by 2.",
+    "text": "Produce 1 ship of that type in any number of other systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
     "flavorText": "His engineers broke into celebration as Umbat called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
     "source": "action_deck_2"
   },
@@ -768,7 +777,7 @@
     "alias": "renegotiation_acd2",
     "name": "Renegotiation",
     "phase": "Any",
-    "window": "After another player plays 1 of your promissory notes",
+    "window": "After another player resolves an effect of 1 of your promissory notes",
     "text": "That player must give you 1 action card and 1 promissory note from their hand.",
     "flavorText": "The Creuss merchants were overwhelmed by the bazaar's wares: wonders from every corner of the galaxy, akin to magic for these curious folk. Gila knew her claws had dug in. She would ensure their every desire was fulfilled, even if they could not afford the price.",
     "source": "action_deck_2"
@@ -900,15 +909,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "sister_ship",
-    "name": "Sister Ship",
-    "phase": "Any",
-    "window": "After 1 of your non-fighter ships is destroyed",
-    "text": "Produce 1 ship of that type in a different system that contains 1 of your units with PRODUCTION; reduce the cost of that ship by up to 4.",
-    "flavorText": "The production of the Van Hauge VI was completed in record time. As it left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers. You have done us all proud.\"",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "skilled_retreat1_acd2",
     "name": "Skilled Retreat",
     "phase": "Action",
@@ -1012,7 +1012,7 @@
     "name": "Syndicate",
     "phase": "Action",
     "window": "Action",
-    "text": "Reveal a number of cards from the top of the action card deck equal to the number of players. Each player draws 1 of those cards of your choice. During this turn, you can exchange action cards as part of transactions.",
+    "text": "Reveal a number of cards from the top of the action card deck equal to the number of players. Each player takes 1 of those cards of your choice. During this turn, you can exchange action cards as part of transactions.",
     "flavorText": "\"What if I'm not ready?\" the operative asked, looking away. Harka squeezed her hand. \"Believe in me, who believes in you.\"",
     "source": "action_deck_2"
   },
