@@ -31,9 +31,9 @@ public class RelicHelper {
         for (int x = 0; x < advantage && x < relics.size(); x++) {
             RelicModel relicData = Mapper.getRelic(relics.get(x));
             buttons.add(Buttons.green("drawRelicAtPosition_" + x, relicData.getName()));
-            info.append(relicData.getName()).append(": ").append(relicData.getText()).append("\n");
+            info.append("_").append(relicData.getName()).append("_: ").append(relicData.getText()).append("\n");
         }
-        String msg = player.getRepresentationUnfogged() + ", please choose the relic that you wish to draw. The relic text is reproduced for your convenience";
+        String msg = player.getRepresentationUnfogged() + ", please choose the relic that you wish to draw. The relic text is reproduced for your convenience.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), info.toString());
     }
@@ -67,7 +67,7 @@ public class RelicHelper {
         player.addRelic(relicID);
         RelicModel relicModel = Mapper.getRelic(relicID);
 
-        String message = player.getRepresentation() + " drew a Relic:";
+        String message = player.getRepresentation() + " drew the _" + relicModel.getName() + "_ relic.";
         if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
         }
@@ -168,13 +168,13 @@ public class RelicHelper {
         formatPercent.setMaximumFractionDigits(1);
         StringBuilder text;
         if (allRelics.isEmpty()) {
-            text = new StringBuilder("**RELIC DECK IS EMPTY**");
+            text = new StringBuilder("There are no more cards in the relic deck.");
         } else {
-            text = new StringBuilder(ExploreEmojis.Relic.toString()).append(" **RELICS REMAINING IN DECK** (").append(deckCount).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
+            text = new StringBuilder("__Relics remaining in deck__ (").append(deckCount).append(" - ").append(formatPercent.format(deckDrawChance)).append("):");
             Collections.sort(allRelics);
             for (String relicId : allRelics) {
                 String relicName = Mapper.getRelic(relicId).getName();
-                text.append("- ").append(relicName).append("\n");
+                text.append("\n1. ").append(ExploreEmojis.Relic.toString()).append(" _").append(relicName).append("_");
             }
         }
 

@@ -32,7 +32,7 @@ class RelicPurge extends GameStateSubcommand {
         player.removeRelic(relicId);
         player.removeExhaustedRelic(relicId);
         RelicModel relicData = Mapper.getRelic(relicId);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " purged relic Relic:\n" + ExploreEmojis.Relic + " __**" + relicData.getName() + "**__\n> " + relicData.getText() + "\n");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " purged the relic __" + relicData.getName() + "__\n> " + relicData.getText());
         RelicInfoService.sendRelicInfo(getGame(), player, event);
     }
 }

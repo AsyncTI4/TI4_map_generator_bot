@@ -297,7 +297,8 @@ public class EndTurnService {
                     pnOwner.setPromissoryNote(pn);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pnOwner.getFactionEmoji() + " " + pnModel.getName() + " was returned");
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                        "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing() + ".");
                 }
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {

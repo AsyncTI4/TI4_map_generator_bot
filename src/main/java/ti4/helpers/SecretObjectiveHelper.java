@@ -17,6 +17,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -61,14 +62,21 @@ public class SecretObjectiveHelper {
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
                     List<String> playerFragments = player.getFragments();
                     List<String> fragmentsToPurge = new ArrayList<>(playerFragments);
+                    String message2 = player.getRepresentation() + " purged";
                     for (String fragid : fragmentsToPurge) {
                         player.removeFragment(fragid);
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                        switch (fragid)
+                        {
+                            case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message2 += " " + ExploreEmojis.CFrag;
+                            case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->  message2 += " " + ExploreEmojis.HFrag;
+                            case "irf1", "irf2", "irf3", "irf4", "irf5" ->  message2 += " " + ExploreEmojis.IFrag;
+                            case "urf1", "urf2", "urf3" ->  message2 += " " + ExploreEmojis.UFrag;
+                            default ->  message2 += " " + fragid;
+                        }
                     }
-
                     CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
-
-                    String message2 = player.getRepresentation() + " purged fragments: " + fragmentsToPurge;
+                    message2 += " relic fragments.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
                 } else {
                     String finChecker = player.getFinsFactionCheckerPrefix();
@@ -197,45 +205,48 @@ public class SecretObjectiveHelper {
         }
         currentSecrets.removeAll(game.getSoToPoList());
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(game.getName()).append("\n");
-        sb.append("Unscored Action Phase Secrets: ").append("\n");
-        int x = 1;
+        sb.append("__Game: ").append(game.getName()).append("__\n");
+        sb.append("__Unscored Action Phase Secrets__:\n");
+        int index = 1;
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Action Phase")) {
-                sb.append(x).append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id));
-                x++;
+                SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
+                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _").append(soModel.getName())
+                    .append("_ - ").append(soModel.getPhase()).append(" Phase\n> ").append(soModel.getText()).append("\n");
             }
         }
-        x = 1;
-        sb.append("\n").append("Unscored Status Phase Secrets: ").append("\n");
+        index = 1;
+        sb.append("\n").append("__Unscored Status Phase Secrets__:\n");
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Status Phase")) {
-                appendSecretObjectiveRepresentation(game, sb, id, x);
-                x++;
+                SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
+                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _").append(soModel.getName())
+                    .append("_ - ").append(soModel.getPhase()).append(" Phase\n> ").append(soModel.getText()).append("\n").append(getSecretObjectiveProgress(game, id));
             }
         }
-        x = 1;
+        index = 1;
         sb.append("\n").append("Unscored Agenda Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Agenda Phase")) {
-                appendSecretObjectiveRepresentation(game, sb, id, x);
-                x++;
+                SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
+                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _").append(soModel.getName())
+                    .append("_ - ").append(soModel.getPhase()).append(" Phase\n> ").append(soModel.getText()).append("\n").append(getSecretObjectiveProgress(game, id));
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
-    private static void appendSecretObjectiveRepresentation(Game game, StringBuilder sb, String id, int x) {
-        if (ListPlayerInfoService.getObjectiveThreshold(id, game) > 0) {
-            sb.append(x).append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id));
-            sb.append("> ");
-            for (Player player : game.getRealPlayers()) {
-                sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player))
-                    .append("/").append(ListPlayerInfoService.getObjectiveThreshold(id, game)).append(" ");
-            }
-            sb.append("\n");
-        } else {
-            sb.append(x).append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id));
+    private static String getSecretObjectiveProgress(Game game, String id) {
+        int threshold = ListPlayerInfoService.getObjectiveThreshold(id, game);
+        if (threshold == 0) {
+            return "";
         }
+        StringBuilder sb = new StringBuilder("> ");
+        for (Player player : game.getRealPlayers()) {
+            sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player))
+                .append("/").append(threshold).append(" ");
+        }
+        sb.append("\n");
+        return sb.toString();
     }
 }

@@ -210,9 +210,14 @@ public class PlayStrategyCardService {
                         }
                         if (p3.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
                             String message3 = "Heads up, " + p3.getRepresentationUnfogged()
-                                + ", **Trade** has just been played and this is a reminder that hold the _Trade Agreement_ of "
-                                + p2.getColor() + ". If you work out a deal with the **Trade** holder,"
-                                + " they may force the player to replenish commodities, and then you will be prompted to play the _Trade Agreemnt_. ";
+                                + ", **Trade** has just been played and this is a reminder that you hold the _Trade Agreement_ of "
+                                + p2.getColor() + ". ";
+                                if (p3 == player) {
+                                    message3 += "If you force that player to replenish commodities, then you will be prompted to play the _Trade Agreemnt_.";
+                                } else {
+                                    message3 += "If you work out a deal with the **Trade** holder,"
+                                        + " they may force the player to replenish commodities, and then you will be prompted to play the _Trade Agreemnt_.";
+                                }
                             MessageHelper.sendMessageToChannel(p3.getCardsInfoThread(), message3);
                         }
                     }
