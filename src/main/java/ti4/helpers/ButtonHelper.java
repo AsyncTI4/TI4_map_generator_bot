@@ -5777,7 +5777,7 @@ public class ButtonHelper {
                     player.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                         .getRepresentation()
-                        + ", you had infantry II to be revived, but the bot couldn't any planets you control own in your home system to place them on, so per the rules they now disappear into the ether.");
+                        + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
 
                 }
             }
