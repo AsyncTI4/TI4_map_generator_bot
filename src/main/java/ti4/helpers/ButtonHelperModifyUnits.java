@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -491,10 +492,9 @@ public class ButtonHelperModifyUnits {
 
             mentakHero = null;
         }
-        boolean usedDuraniumAlready = !player.hasTech("da") || spaceCannonOffence;
-        StringBuilder duraniumMsgBuilder = new StringBuilder();
 
-        if (!usedDuraniumAlready) {
+        Map<UnitKey, Integer> repairableUnitsByUnitKey = new TreeMap<>(new ShipRepairComparator());
+        if (player.hasTech("da") && !spaceCannonOffence) {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
@@ -507,8 +507,7 @@ public class ButtonHelperModifyUnits {
 
                 // If the unit is damaged, add its name to duranium message  
                 if (damagedUnits > 0) {
-                    duraniumMsgBuilder.append(unitKey.unitName());
-                    usedDuraniumAlready = false; // Mark that we can use Duranium  
+                    repairableUnitsByUnitKey.put(unitKey, damagedUnits);
                 }
             }
         }
@@ -534,6 +533,7 @@ public class ButtonHelperModifyUnits {
 
                 if (min > 0) {
                     hits -= min * (player.hasTech("nes") ? 2 : 1); // Adjust hits based on technology  
+                    repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value += min);
 
                     // Message building based on condition  
                     if (!justSummarizing) {
@@ -572,6 +572,7 @@ public class ButtonHelperModifyUnits {
 
                 if (unitModel.getSustainDamage() && min > 0 && !stuffNotToSustain.contains(unitModel.getBaseType().toLowerCase())) {
                     hits -= min * (player.hasTech("nes") ? 2 : 1);
+                    repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value += min);
 
                     if (!justSummarizing) {
                         msg.append("> Sustained ").append(min).append(" ").append(unitModel.getUnitEmoji()).append("\n");
@@ -620,6 +621,7 @@ public class ButtonHelperModifyUnits {
                 int min = Math.min(effectiveUnits, hits);
                 if (isNraShenanigans && player.getUnitsOwned().contains("naaz_mech_space") && unitName.equalsIgnoreCase("mech") && min > 0) {
                     hits -= min;
+                    repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value -= min);
                     if (!justSummarizing) {
                         var unit = new ParsedUnit(unitKey, min, unitHolder.getName());
                         RemoveUnitService.removeUnit(event, tile, game, unit);
@@ -656,6 +658,7 @@ public class ButtonHelperModifyUnits {
                 // Handle general case of destroying units  
                 if (unitName.equalsIgnoreCase(thingToHit) && min > 0) {
                     hits -= min;
+                    repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value -= min);
                     if (!justSummarizing) {
                         var unit = new ParsedUnit(unitKey, min, unitHolder.getName());
                         RemoveUnitService.removeUnit(event, tile, game, unit);
@@ -704,9 +707,10 @@ public class ButtonHelperModifyUnits {
             }
         }
 
-        // Repair units with Duranium Armor if not already used  
-        if (!usedDuraniumAlready) {
-            for (Map.Entry<UnitKey, Integer> unitEntry : new HashMap<>(unitHolder.getUnits()).entrySet()) {
+        // Repair units with Duranium Armor if repairable units still exist
+        repairableUnitsByUnitKey.values().removeIf(value -> value == 0);
+        if (!repairableUnitsByUnitKey.isEmpty()) {
+            for (Map.Entry<UnitKey, Integer> unitEntry : repairableUnitsByUnitKey.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey) || unitEntry.getValue() <= 0)
                     continue;
@@ -716,9 +720,7 @@ public class ButtonHelperModifyUnits {
                     continue;
 
                 int damagedUnits = unitHolder.getUnitDamage() != null ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0) : 0;
-                String unitName = unitKey.unitName();
-
-                if (damagedUnits > 0 && duraniumMsgBuilder.toString().contains(unitName) && unitModel.getIsShip()) {
+                if (damagedUnits > 0 && unitModel.getIsShip()) {
                     if (!justSummarizing) {
                         msg.append("> Repaired 1 ").append(unitModel.getUnitEmoji()).append(" due to _Duranium Armor_\n");
                         tile.removeUnitDamage("space", unitKey, 1);
