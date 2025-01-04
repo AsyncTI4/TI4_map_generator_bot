@@ -515,7 +515,7 @@ public class StartCombatService {
                 if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !ButtonHelper.isLawInPlay(game, "articles_war")
                     || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_1", player, tile)
                     || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_2", player, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use ANTI-FIGHTER BARRAGE against " + player.getFactionEmojiOrColor() + " due to their mech power");
+                    MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use ANTI-FIGHTER BARRAGE against " + player.getFactionEmojiOrColor() + " due to their mech power.");
                 }
             }
         }
