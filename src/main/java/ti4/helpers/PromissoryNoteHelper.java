@@ -56,6 +56,7 @@ public class PromissoryNoteHelper {
         int index = 1;
         Map<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
+        List<String> genericPromissoryNotes = Mapper.getColorPromissoryNoteIDs(game, player.getColor());
         int pnCount = promissoryNotes.size() + promissoryNotesInPlayArea.size();
         if (promissoryNotes == null) {
             return sb.toString();
@@ -75,7 +76,10 @@ public class PromissoryNoteHelper {
                         if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
                         sb.append(ColorEmojis.getColorEmoji(pnOwner.getColor()));
                     }
-                    sb.append("`(").append(Helper.leftpad("" + pn.getValue(), 2)).append(")`\n> ").append(pnModel.getText()).append("\n");
+                    sb.append("`(").append(Helper.leftpad("" + pn.getValue(), 2)).append(")`\n");
+                    if (pnOwner != player || !genericPromissoryNotes.contains(pn.getKey())) {
+                        sb.append("> ").append(pnModel.getText()).append("\n");
+                    }
                 }
             }
 

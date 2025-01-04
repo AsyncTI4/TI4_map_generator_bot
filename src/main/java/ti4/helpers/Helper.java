@@ -865,12 +865,16 @@ public class Helper {
 
             }
         }
-        if (game.getCurrentAgendaInfo().contains("Secret") && Mapper.getSecretObjectivesJustNames().get(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction())) != null) {
+        String outcome = game.getStoredValue("latestOutcomeVotedFor" + player.getFaction());
+        if (game.getCurrentAgendaInfo().contains("Secret") && Mapper.getSecretObjectivesJustNames().get(outcome) != null) {
             msg.append("For a total of **").append(votes).append("** vote").append(votes == 1 ? "" : "s").append(" on the outcome \"_")
-                .append(Mapper.getSecretObjectivesJustNames().get(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction()))).append("\"_.");
+                .append(Mapper.getSecretObjectivesJustNames().get(outcome)).append("_\".");
+        } else if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
+            msg.append("For a total of **").append(votes).append("** vote").append(votes == 1 ? "" : "s").append(" on the outcome \"**")
+                .append(Helper.getSCName(Integer.parseInt(outcome), game)).append("**\".");
         } else {
             msg.append("For a total of **").append(votes).append("** vote").append(votes == 1 ? "" : "s").append(" on the outcome \"")
-                .append(StringUtils.capitalize(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction()))).append("\".");
+                .append(StringUtils.capitalize(outcome)).append("\".");
         }
         if (justVoteTotal) {
             return "" + votes;

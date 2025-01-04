@@ -260,7 +260,11 @@ public class AgendaHelper {
     public static void exhaustPlanetsForVotingVersion2(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String outcome = buttonID.substring(buttonID.indexOf("_") + 1);
         String voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome)
-            + ". Click buttons to exhaust planets and use abilities for votes";
+            + ". Click buttons to exhaust planets and use abilities for votes.";
+        if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
+            voteMessage = "Chose to vote for **" + Helper.getSCName(Integer.parseInt(outcome), game)
+                + "**. Click buttons to exhaust planets and use abilities for votes.";
+        }
         game.setLatestOutcomeVotedFor(outcome);
         game.setStoredValue("latestOutcomeVotedFor" + player.getFaction(), outcome);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,
@@ -589,7 +593,11 @@ public class AgendaHelper {
         game.setPhaseOfGame("agendaEnd");
         game.setActivePlayerID(null);
         StringBuilder message = new StringBuilder();
-        message.append(game.getPing()).append(", the current winner is \"").append(StringUtils.capitalize(winner)).append("\".\n");
+        String formattedWinner = StringUtils.capitalize(winner);
+        if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
+            formattedWinner = "**" + Helper.getSCName(Integer.parseInt(winner), game) + "**";
+        }
+        message.append(game.getPing()).append(", the current winner is \"").append(formattedWinner).append("\".\n");
         if (!"action_deck_2".equals(game.getAcDeckID())) {
             handleShenanigans(game, winner);
             message.append("When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.");
@@ -1944,8 +1952,8 @@ public class AgendaHelper {
 
                     } else if (!game.isHomebrewSCMode()
                         && game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
-                        summaryBuilder.append(CardEmojis.getSCFrontFromInteger(Integer.parseInt(outcome))).append(" ")
-                            .append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary)
+                        summaryBuilder.append(CardEmojis.getSCFrontFromInteger(Integer.parseInt(outcome))).append(" **")
+                            .append(Helper.getSCName(Integer.parseInt(outcome), game)).append("**: ").append(totalVotes).append(". (").append(outcomeSummary)
                             .append(")\n");
                     } else {
                         summaryBuilder.append(outcome).append(": ").append(totalVotes).append(". (")
@@ -2250,6 +2258,9 @@ public class AgendaHelper {
             }
             String outcome = buttonID.substring(buttonID.indexOf("_") + 1);
             String voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome);
+            if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
+                voteMessage = "Chose to vote for **" + Helper.getSCName(Integer.parseInt(outcome), game) + "**";
+            }
             game.setStoredValue("latestOutcomeVotedFor" + player.getFaction(), outcome);
             game.setLatestOutcomeVotedFor(outcome);
             MessageHelper.sendMessageToChannel(event.getChannel(), voteMessage);

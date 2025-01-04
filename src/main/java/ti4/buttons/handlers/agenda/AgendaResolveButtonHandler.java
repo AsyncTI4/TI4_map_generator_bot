@@ -955,7 +955,7 @@ class AgendaResolveButtonHandler {
                         case "2" -> scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
                         case "3" -> scButtons.add(Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", CardEmojis.ActionCard));
                         case "4" -> {
-                            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
+                            scButtons.add(Buttons.green("construction_spacedock", "Place 1 Space Dock", UnitEmojis.spacedock));
                             scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
                         }
                         case "5" -> scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
@@ -966,8 +966,9 @@ class AgendaResolveButtonHandler {
                             scButtons.add(Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
                         }
                     }
+                    scButtons.add(Buttons.blue("sc_no_follow_" + winner, "Not Following"));
                     MessageHelper.sendMessageToChannelWithButtons(actionsChannel,
-                        "You may use this button to resolve the secondary.", scButtons);
+                        "You may use these button to resolve the secondary ability of **" + Helper.getSCName(Integer.parseInt(winner), game) + "**.", scButtons);
                 }
             }
         }
@@ -1024,7 +1025,10 @@ class AgendaResolveButtonHandler {
         } else if (!riders.isEmpty()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), ridSum);
         }
-        String resMes = "Resolving vote for " + StringUtils.capitalize(winner) + ".";
+        String resMes = "Resolving vote for \"" + StringUtils.capitalize(winner) + "\".";
+        if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
+            resMes = "Resolving vote for \"**" + Helper.getSCName(Integer.parseInt(winner), game) + "**\".";
+        }
         String voteMessage = "Click the buttons for next steps after you're done resolving Riders.";
         String agendaCount = game.getStoredValue("agendaCount");
         int aCount;
