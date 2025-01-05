@@ -619,14 +619,15 @@
     },
     {
         "alias": "ah",
-        "name": "Aerie Holo\n-lattice",
+        "name": "Aerie Hololattice",
         "types": [
             "CYBERNETIC"
         ],
         "requirements": "Y",
         "faction": "argent",
         "source": "pok",
-        "text": "Other players cannot move ships through systems that contain your structures.\nEach planet that contains 1 or more of your structures gains the PRODUCTION 1 ability as if it were a unit."
+        "text": "Other players cannot move ships through systems that contain your structures.\nEach planet that contains 1 or more of your structures gains the PRODUCTION 1 ability as if it were a unit.",
+        "shortName": "Aerie Holo\n-lattice"
     },
     {
         "alias": "nes",
