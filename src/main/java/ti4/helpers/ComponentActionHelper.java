@@ -346,7 +346,7 @@ public class ComponentActionHelper {
                     Tile tile = tiles.getFirst();
                     List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
                     AddUnitService.addUnits(event, tile, game, p1.getColor(), "cruiser");
-                    successMessage = successMessage + "Produced 1 " + UnitEmojis.cruiser + " in tile "
+                    successMessage += "Produced 1 " + UnitEmojis.cruiser + " in tile "
                         + tile.getRepresentationForButtons(game, p1) + ".";
                     MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
                     String message = "Use buttons to end turn or do another action";
@@ -359,7 +359,7 @@ public class ComponentActionHelper {
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, FactionEmojis.Muaat + " " + UnitEmojis.flagship + "The Inferno");
                     List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
-                    successMessage = successMessage + "Please add units manually.";
+                    successMessage += "Please add units manually.";
                     MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
                     String message = "Use buttons to end turn or do another action";
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -468,10 +468,10 @@ public class ComponentActionHelper {
                 List<Button> purgeFragButtons = new ArrayList<>();
                 int numToBeat = 2 - p1.getUrf();
                 if (game.isAgeOfExplorationMode()) {
-                    numToBeat = numToBeat - 1;
+                    numToBeat -= 1;
                 }
                 if ((p1.hasAbility("fabrication") || p1.getPromissoryNotes().containsKey("bmf"))) {
-                    numToBeat = numToBeat - 1;
+                    numToBeat -= 1;
                     if (p1.getPromissoryNotes().containsKey("bmf") && game.getPNOwner("bmf") != p1) {
                         Button transact = Buttons.blue(finChecker + "resolvePNPlay_bmfNotHand", "Play Black Market Forgery");
                         purgeFragButtons.add(transact);
@@ -561,12 +561,12 @@ public class ComponentActionHelper {
                 "Invalid relic or player does not have specified relic: `" + relicID + "`");
             return;
         }
-        String purgeOrExhaust = "Purged";
+        String purgeOrExhaust = "purged";
         List<String> juniorRelics = List.of("titanprototype", "absol_jr");
         if (juniorRelics.contains(relicID)) { // EXHAUST THE RELIC
             List<Button> buttons2 = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "jrResolution", null);
             player.addExhaustedRelic(relicID);
-            purgeOrExhaust = "Exhausted";
+            purgeOrExhaust = "exhausted";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                 "Use buttons to decide who to use JR-XS455-O on.", buttons2);
 
@@ -589,13 +589,13 @@ public class ComponentActionHelper {
         }
 
         RelicModel relicModel = Mapper.getRelic(relicID);
-        String message = player.getFactionEmoji() + " " + purgeOrExhaust + ": " + relicModel.getName();
+        String message = player.getRepresentationNoPing() + " " + purgeOrExhaust + " _" + relicModel.getName() + "_.";
         MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
 
         // SPECIFIC HANDLING //TODO: Move this shite to RelicPurge
         switch (relicID) {
             case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, event);
-            case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(event);
+            case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(event, player, game);
             case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> ButtonHelperRelics.offerNanoforgeButtons(player, game, event);
             case "decrypted_cartoglyph" -> DiscordantStarsHelper.drawBlueBackTiles(event, game, player, 3);
             case "throne_of_the_false_emperor" -> {

@@ -511,11 +511,11 @@ public class StartPhaseService {
         Button passOnAbilities;
         if (custodiansTaken) {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Agenda");
-            message2 = message2 + "This is the moment when you should resolve: \n- _Political Stability_ \n- _Ancient Burial Sites_ \n- _Maw of Worlds_ \n- The Oracle, the Naalu hero\n- _The Crown of Emphidia_\n"
+            message2 += "This is the moment when you should resolve: \n- _Political Stability_ \n- _Ancient Burial Sites_ \n- _Maw of Worlds_ \n- The Oracle, the Naalu hero\n- _The Crown of Emphidia_\n"
                 + "Please click the \"Ready For Agenda\" button once you are done resolving these or if you decline to do so.";
         } else {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Strategy Phase");
-            message2 = message2 + "This is the moment when you should resolve: \n-_ Political Stability_ \n- _Summit_ \n- _Manipulate Investments_\n"
+            message2 += "This is the moment when you should resolve: \n-_ Political Stability_ \n- _Summit_ \n- _Manipulate Investments_\n"
                 + "Please click the \"Ready For Strategy Phase\" button once you are done resolving these or if you decline to do so.";
         }
         List<Button> buttons = new ArrayList<>();

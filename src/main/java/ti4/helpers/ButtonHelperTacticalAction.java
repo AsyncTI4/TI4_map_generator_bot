@@ -207,7 +207,7 @@ public class ButtonHelperTacticalAction {
         }
         int amount = Integer.parseInt(rest.charAt(0) + "");
         if (rest.contains("_reverse")) {
-            amount = amount * -1;
+            amount *= -1;
             rest = rest.replace("_reverse", "");
         }
         rest = rest.substring(1);
@@ -246,8 +246,8 @@ public class ButtonHelperTacticalAction {
             RemoveUnitService.removeUnit(event, game.getTileByPosition(pos), game, unitParsed, buttonLabel.toLowerCase().contains("damaged"));
         }
         if (buttonLabel.toLowerCase().contains("damaged")) {
-            unitName = unitName + "damaged";
-            rest = rest + "damaged";
+            unitName += "damaged";
+            rest += "damaged";
         }
         if (currentSystem.containsKey(rest)) {
             game.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
@@ -789,7 +789,7 @@ public class ButtonHelperTacticalAction {
                     + unit.toLowerCase().replaceAll("[ ']", "") + damagedMsg.replace(" ", "") + "_reverse";
                 String blabel = "Undo move of " + x + " " + damagedMsg + unitkey;
                 if (!"".equalsIgnoreCase(planet)) {
-                    blabel = blabel + " from " + Helper.getPlanetRepresentation(planet.toLowerCase(), game);
+                    blabel += " from " + Helper.getPlanetRepresentation(planet.toLowerCase(), game);
                 }
                 UnitType unitType = Units.findUnitType(AliasHandler.resolveUnit(unitkey.toLowerCase().replace(" ", "")));
                 Button validTile2 = Buttons.green(bID, blabel, unitType.getUnitTypeEmoji());

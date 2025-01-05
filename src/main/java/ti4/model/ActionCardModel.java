@@ -42,7 +42,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getRepresentationJustName() {
-        return CardEmojis.ActionCard + "_" + name + "_ (" + phase + " Phase)";
+        return CardEmojis.ActionCard + "_" + name + "_";
     }
 
     public String getRepresentationJustText() {

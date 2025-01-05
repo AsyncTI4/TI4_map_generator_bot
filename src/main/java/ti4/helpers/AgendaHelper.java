@@ -261,7 +261,11 @@ public class AgendaHelper {
     public static void exhaustPlanetsForVotingVersion2(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String outcome = buttonID.substring(buttonID.indexOf("_") + 1);
         String voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome)
-            + ". Click buttons to exhaust planets and use abilities for votes";
+            + ". Click buttons to exhaust planets and use abilities for votes.";
+        if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
+            voteMessage = "Chose to vote for **" + Helper.getSCName(Integer.parseInt(outcome), game)
+                + "**. Click buttons to exhaust planets and use abilities for votes.";
+        }
         game.setLatestOutcomeVotedFor(outcome);
         game.setStoredValue("latestOutcomeVotedFor" + player.getFaction(), outcome);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,
@@ -450,7 +454,7 @@ public class AgendaHelper {
                 if ("empty".equalsIgnoreCase(existingData)) {
                     existingData = identifier + "_" + votes;
                 } else {
-                    existingData = existingData + ";" + identifier + "_" + votes;
+                    existingData += ";" + identifier + "_" + votes;
                 }
                 game.setCurrentAgendaVote(winner, existingData);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
@@ -590,7 +594,11 @@ public class AgendaHelper {
         game.setPhaseOfGame("agendaEnd");
         game.setActivePlayerID(null);
         StringBuilder message = new StringBuilder();
-        message.append(game.getPing()).append(", the current winner is \"").append(StringUtils.capitalize(winner)).append("\".\n");
+        String formattedWinner = StringUtils.capitalize(winner);
+        if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
+            formattedWinner = "**" + Helper.getSCName(Integer.parseInt(winner), game) + "**";
+        }
+        message.append(game.getPing()).append(", the current winner is \"").append(formattedWinner).append("\".\n");
         if (!"action_deck_2".equals(game.getAcDeckID())) {
             handleShenanigans(game, winner);
             message.append("When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.");
@@ -730,7 +738,7 @@ public class AgendaHelper {
         if ("empty".equalsIgnoreCase(existingData)) {
             existingData = identifier + "_" + rider;
         } else {
-            existingData = existingData + ";" + identifier + "_" + rider;
+            existingData += ";" + identifier + "_" + rider;
         }
         game.setCurrentAgendaVote(choice, existingData);
 
@@ -907,7 +915,7 @@ public class AgendaHelper {
                 nextInLine = getNextInLine(nextInLine, getVotingOrder(game), game);
                 realIdentity = nextInLine.getRepresentationUnfogged();
                 voteInfo = getVoteTotal(nextInLine, game);
-                counter = counter + 1;
+                counter += 1;
             }
 
             String pFaction = StringUtils.capitalize(nextInLine.getFaction());
@@ -1221,9 +1229,9 @@ public class AgendaHelper {
                             String msg = identity + " due to having a winning _Imperial Rider_, you have scored a victory point. Huzzah.\n";
                             int poIndex;
                             poIndex = game.addCustomPO(Constants.IMPERIAL_RIDER, 1);
-                            msg = msg + "Custom public objective _Imperial Rider_ has been added.\n";
+                            msg += "Custom public objective _Imperial Rider_ has been added.\n";
                             game.scorePublicObjective(winningR.getUserID(), poIndex);
-                            msg = msg + winningR.getRepresentation() + " scored _Imperial Rider_.\n";
+                            msg += winningR.getRepresentation() + " scored _Imperial Rider_.\n";
                             MessageHelper.sendMessageToChannel(channel, msg);
                             Helper.checkEndGame(game, winningR);
 
@@ -1657,7 +1665,7 @@ public class AgendaHelper {
                 Button button = Buttons.gray("exhaustForVotes_planet_" + planet, planetNameProper + " (" + voteAmount + ")", PlanetEmojis.getPlanetEmoji(planet));
                 planetButtons.add(button);
             }
-            totalPlanetVotes = totalPlanetVotes + voteAmount;
+            totalPlanetVotes += voteAmount;
         }
         if (player.hasAbility("zeal")) {
             int numPlayers = 0;
@@ -1945,8 +1953,8 @@ public class AgendaHelper {
 
                     } else if (!game.isHomebrewSCMode()
                         && game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
-                        summaryBuilder.append(CardEmojis.getSCFrontFromInteger(Integer.parseInt(outcome))).append(" ")
-                            .append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary)
+                        summaryBuilder.append(CardEmojis.getSCFrontFromInteger(Integer.parseInt(outcome))).append(" **")
+                            .append(Helper.getSCName(Integer.parseInt(outcome), game)).append("**: ").append(totalVotes).append(". (").append(outcomeSummary)
                             .append(")\n");
                     } else {
                         summaryBuilder.append(outcome).append(": ").append(totalVotes).append(". (")
@@ -2251,6 +2259,9 @@ public class AgendaHelper {
             }
             String outcome = buttonID.substring(buttonID.indexOf("_") + 1);
             String voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome);
+            if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
+                voteMessage = "Chose to vote for **" + Helper.getSCName(Integer.parseInt(outcome), game) + "**";
+            }
             game.setStoredValue("latestOutcomeVotedFor" + player.getFaction(), outcome);
             game.setLatestOutcomeVotedFor(outcome);
             MessageHelper.sendMessageToChannel(event.getChannel(), voteMessage);
@@ -2703,7 +2714,7 @@ public class AgendaHelper {
         List<Player> orderList = getVotingOrder(game);
         int votes = 0;
         for (Player player : orderList) {
-            votes = votes + getTotalVoteCount(game, player);
+            votes += getTotalVoteCount(game, player);
         }
         StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: "
             + (Boolean.parseBoolean(game.getFowOption(FowConstants.HIDE_TOTAL_VOTES)) ? "???" : votes));

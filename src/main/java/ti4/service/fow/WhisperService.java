@@ -66,7 +66,7 @@ public class WhisperService {
                     game.setStoredValue(key, "1");
                 } else {
                     int num = Integer.parseInt(whisperHistory);
-                    num = num + 1;
+                    num += 1;
                     game.setStoredValue(key, "" + num);
                     if ((num == 5 || num == 10)) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is sending whisper #" + num + " of this turn to " + player_.getFactionEmoji());

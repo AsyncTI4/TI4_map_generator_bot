@@ -794,15 +794,15 @@ public class MapGenerator implements AutoCloseable {
                     graphics.setColor(Color.RED);
                     if (player.getNeighbouringPlayers().isEmpty()) {
                         graphics.drawString("No Neighbors", x + 9 + xSpacer, y + 125 + yDelta);
-                        xSpacer = xSpacer + 115;
+                        xSpacer += 115;
                     } else {
                         graphics.drawString("Neighbors: ", x + 9 + xSpacer, y + 125 + yDelta);
-                        xSpacer = xSpacer + 115;
+                        xSpacer += 115;
                         for (Player p2 : player.getNeighbouringPlayers()) {
                             String faction2 = p2.getFaction();
                             if (faction2 != null) {
                                 DrawingUtil.drawPlayerFactionIconImage(graphics, p2, x + xSpacer, y + 125 + yDelta - 20, 26, 26);
-                                xSpacer = xSpacer + 26;
+                                xSpacer += 26;
                             }
                         }
                     }
@@ -4226,7 +4226,7 @@ public class MapGenerator implements AutoCloseable {
                             y + tokenDeltaY - (count / 3) * 90,
                             hideFactionIcon, scale);
                         tokenDeltaY += 30;
-                        count = count + 1;
+                        count += 1;
                     }
                 }
 

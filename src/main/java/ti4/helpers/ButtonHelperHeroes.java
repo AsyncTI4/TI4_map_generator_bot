@@ -108,7 +108,7 @@ public class ButtonHelperHeroes {
                 if (!"space".equalsIgnoreCase(unitHolder.getName())) {
                     end = " from " + Helper.getPlanetRepresentation(unitHolder.getName(), game);
                 }
-                totalUndamagedUnits = totalUndamagedUnits - damagedUnits;
+                totalUndamagedUnits -= damagedUnits;
                 if (totalUndamagedUnits > 0) {
                     buttons.add(Buttons.green("argentHeroStep4_" + pos1 + "_" + origin.getPosition() + "_"
                         + unitHolder.getName() + "_" + unitName, "1 " + unitName + end));
@@ -554,7 +554,7 @@ public class ButtonHelperHeroes {
                     attachment.equals(Constants.CYBERNETIC) ||
                     attachment.equals(Constants.BIOTIC) ||
                     attachment.equals(Constants.WEAPON))) {
-                    attachment = attachment + "stat";
+                    attachment += "stat";
                 }
             }
         }
@@ -1431,11 +1431,11 @@ public class ButtonHelperHeroes {
         if ("people".equalsIgnoreCase(policy)) {
             if (player.hasAbility("policy_the_people_connect")) {
                 player.removeAbility("policy_the_people_connect");
-                msg = msg + "removed _Policy - The People: Connect ➕_ and added _Policy - The People: Control ➖_.";
+                msg += "removed _Policy - The People: Connect ➕_ and added _Policy - The People: Control ➖_.";
                 player.addAbility("policy_the_people_control");
             } else if (player.hasAbility("policy_the_people_control")) {
                 player.removeAbility("policy_the_people_control");
-                msg = msg + "removed _Policy - The People: Control ➖_ and added _Policy - The People: Connect ➕_.";
+                msg += "removed _Policy - The People: Control ➖_ and added _Policy - The People: Connect ➕_.";
                 player.addAbility("policy_the_people_connect");
             }
         }
@@ -1456,7 +1456,7 @@ public class ButtonHelperHeroes {
         if ("economy".equalsIgnoreCase(policy)) {
             if (player.hasAbility("policy_the_economy_empower")) {
                 player.removeAbility("policy_the_economy_empower");
-                msg = msg + "removed _Policy - The Economy: Empower ➕_";
+                msg += "removed _Policy - The Economy: Empower ➕_";
                 player.addAbility("policy_the_economy_exploit");
                 player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
                 msg = msg
@@ -1464,9 +1464,9 @@ public class ButtonHelperHeroes {
             } else if (player.hasAbility("policy_the_economy_exploit")) {
                 player.removeAbility("policy_the_economy_exploit");
                 player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
-                msg = msg + "removed _Policy - The Economy: Exploit ➖_";
+                msg += "removed _Policy - The Economy: Exploit ➖_";
                 player.addAbility("policy_the_economy_empower");
-                msg = msg + " and added _Policy - The Economy: Empower ➕_.";
+                msg += " and added _Policy - The Economy: Empower ➕_.";
             }
         }
         player.removeOwnedUnitByID("olradin_mech");
@@ -1813,7 +1813,7 @@ public class ButtonHelperHeroes {
 
         String msg = player.getRepresentation(false, true) + " sent ";
         if ("tg".equalsIgnoreCase(tgOrComm)) {
-            msg = msg + " 1 trade good to " + vaden.getRepresentation(false, true) + " as a result of playing Putriv Sirvonsk, the Vaden Hero.";
+            msg += " 1 trade good to " + vaden.getRepresentation(false, true) + " as a result of playing Putriv Sirvonsk, the Vaden Hero.";
             if (player.getTg() > 0) {
                 vaden.setTg(vaden.getTg() + 1);
                 player.setTg(player.getTg() - 1);
@@ -1824,7 +1824,7 @@ public class ButtonHelperHeroes {
             }
         } else {
             if ("comms".equalsIgnoreCase(tgOrComm)) {
-                msg = msg + " 2 commodities to " + vaden.getRepresentation(false, true) + " as a result of playing Putriv Sirvonsk, the Vaden Hero.";
+                msg += " 2 commodities to " + vaden.getRepresentation(false, true) + " as a result of playing Putriv Sirvonsk, the Vaden Hero.";
                 if (player.getCommodities() > 1) {
                     vaden.setTg(vaden.getTg() + 2);
                     player.setCommodities(player.getCommodities() - 2);

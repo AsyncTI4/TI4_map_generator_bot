@@ -179,9 +179,9 @@ public class CombatMessageHelper {
             }
             game.setStoredValue(combatName, "" + round);
             if (game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-                combatTypeName = combatTypeName + " (Thalnos reroll for round #" + round + ")";
+                combatTypeName += " (Thalnos reroll for round #" + round + ")";
             } else {
-                combatTypeName = combatTypeName + " (round #" + round + ")";
+                combatTypeName += " (round #" + round + ")";
                 if (game.getStoredValue("solagent").equalsIgnoreCase(player.getFaction())) {
                     game.setStoredValue("solagent", "");
                 }

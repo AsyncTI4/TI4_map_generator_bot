@@ -123,7 +123,7 @@ public class ButtonHelperActionCards {
                     Button validTile2 = Buttons.red(buttonID, "Remove A Damaged " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
-                totalUnits = totalUnits - damagedUnits;
+                totalUnits -= damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Buttons.red(
                         finChecker + "scuttleOn_" + tile.getPosition() + "_" + unitName + "_" + tgAlready,
@@ -176,7 +176,7 @@ public class ButtonHelperActionCards {
                     Button validTile2 = Buttons.red(buttonID, "Destroy A Damaged " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
-                totalUnits = totalUnits - damagedUnits;
+                totalUnits -= damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Buttons.red(finChecker + "luckyShotOn_" + tile.getPosition() + "_" + unitName
                         + "_" + unitKey.getColor(), "Destroy " + x + " " + prettyName, unitKey.unitEmoji());
@@ -290,7 +290,7 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
         if (tgAlready > 0) {
-            tgAlready = tgAlready + (int) removedUnit.getCost();
+            tgAlready += (int) removedUnit.getCost();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getFactionEmoji() + " trade goods increased by " + tgAlready + " (" + player.getTg() + "->"
                     + (player.getTg() + tgAlready) + ").");
@@ -298,7 +298,7 @@ public class ButtonHelperActionCards {
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAgents.resolveArtunoCheck(player, tgAlready);
         } else {
-            tgAlready = tgAlready + (int) removedUnit.getCost();
+            tgAlready += (int) removedUnit.getCost();
             buttons.add(Buttons.green("startToScuttleAUnit_" + tgAlready, "Scuttle Another Unit"));
             buttons.add(Buttons.red("endScuttle_" + tgAlready, "Finished Scuttling"));
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
@@ -1370,10 +1370,10 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveRefitTroops")
     public static void resolveRefitTroops(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game));
+        List<Button> buttons = new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, "refit"));
         String message = player.getRepresentationUnfogged() + ", use buttons to replace 1 infantry with 1 mech.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        List<Button> buttons2 = new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game));
+        List<Button> buttons2 = new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, "refit"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons2);
         ButtonHelper.deleteMessage(event);
     }

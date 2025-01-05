@@ -53,7 +53,7 @@ public class EndTurnService {
         List<Player> unpassedPlayers = game.getRealPlayers().stream().filter(p -> !p.isPassed()).toList();
         int maxSC = Collections.max(game.getSCList()) + 1;
         if (ButtonHelper.getKyroHeroSC(game) != 1000) {
-            maxSC = maxSC + 1;
+            maxSC += 1;
         }
         for (int i = 1; i <= maxSC; i++) {
             int scCheck = (startingInitiative + i) % maxSC;
