@@ -1110,7 +1110,7 @@ public class ActionCardHelper {
         if (buttons.size() > 75) {
             buttons.add(75, Buttons.red("deleteButtons_3", "Delete These Buttons"));
         }
-        String msg = player.getRepresentationUnfogged() + ", use buttons to grab an action card from the discard pile.";
+        String msg = player.getRepresentationUnfogged() + ", use buttons to retrieve an action card from the discard pile.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -1122,7 +1122,7 @@ public class ActionCardHelper {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        String msg2 = player.getRepresentationUnfogged() + " grabbed _" + Mapper.getActionCard(acID).getName() + "_ from the discard pile.";
+        String msg2 = player.getRepresentationUnfogged() + " retrieved _" + Mapper.getActionCard(acID).getName() + "_ from the action card discard pile.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
 
         ActionCardHelper.sendActionCardInfo(game, player, event);

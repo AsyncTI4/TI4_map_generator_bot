@@ -6183,11 +6183,19 @@ public class ButtonHelper {
         }
     }
 
-    public static void offerCodexButtons(GenericInteractionCreateEvent event) {
+    public static void offerCodexButtons(GenericInteractionCreateEvent event, Player player, Game game) {
         Button codex1 = Buttons.green("codexCardPick_1", "Card #1");
         Button codex2 = Buttons.green("codexCardPick_2", "Card #2");
         Button codex3 = Buttons.green("codexCardPick_3", "Card #3");
-        String message = "Use buttons to select which action cards you wish to grab from the discard pile.";
+        String message = "Use buttons to select which action cards you wish to retrieve from the discard pile.";
+        int acCountLimit = getACLimit(game, player);
+        int acCountPlayer = player.getAc();
+        if (acCountPlayer + 3 > acCountLimit)
+        {
+            message += " After retrieving the 3 action cards, you will be over your action card hand limit of " 
+                + acCountLimit + " cards; you will need to discard " + (acCountPlayer + 3 - acCountLimit)
+                + " card" + (acCountPlayer + 3 - acCountLimit == 1 ? "" : "s") + ".";
+        }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
             List.of(codex1, codex2, codex3));
     }

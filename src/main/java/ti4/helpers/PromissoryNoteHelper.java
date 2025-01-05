@@ -69,7 +69,7 @@ public class PromissoryNoteHelper {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn.getKey());
                     sb.append(index++).append("\\. ").append(CardEmojis.PN).append("  _").append(pnModel.getName()).append("_ ");
                     Player pnOwner = game.getPNOwner(pn.getKey());
-                    if (pnOwner == player && !game.isFrankenGame()) {
+                    if (false && pnOwner == player && !game.isFrankenGame()) {
                         sb.append("✋");
                     } else {
                         if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());

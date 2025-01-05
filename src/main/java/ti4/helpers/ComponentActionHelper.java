@@ -561,12 +561,12 @@ public class ComponentActionHelper {
                 "Invalid relic or player does not have specified relic: `" + relicID + "`");
             return;
         }
-        String purgeOrExhaust = "Purged";
+        String purgeOrExhaust = "purged";
         List<String> juniorRelics = List.of("titanprototype", "absol_jr");
         if (juniorRelics.contains(relicID)) { // EXHAUST THE RELIC
             List<Button> buttons2 = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "jrResolution", null);
             player.addExhaustedRelic(relicID);
-            purgeOrExhaust = "Exhausted";
+            purgeOrExhaust = "exhausted";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                 "Use buttons to decide who to use JR-XS455-O on.", buttons2);
 
@@ -589,13 +589,13 @@ public class ComponentActionHelper {
         }
 
         RelicModel relicModel = Mapper.getRelic(relicID);
-        String message = player.getFactionEmoji() + " " + purgeOrExhaust + ": " + relicModel.getName();
+        String message = player.getRepresentationNoPing() + " " + purgeOrExhaust + " _" + relicModel.getName() + "_.";
         MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
 
         // SPECIFIC HANDLING //TODO: Move this shite to RelicPurge
         switch (relicID) {
             case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, event);
-            case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(event);
+            case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(event, player, game);
             case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> ButtonHelperRelics.offerNanoforgeButtons(player, game, event);
             case "decrypted_cartoglyph" -> DiscordantStarsHelper.drawBlueBackTiles(event, game, player, 3);
             case "throne_of_the_false_emperor" -> {
