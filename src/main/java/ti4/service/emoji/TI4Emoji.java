@@ -77,7 +77,7 @@ public interface TI4Emoji {
         List<TI4Emoji> symbols = new ArrayList<>(symbols());
         Random seed = messageID == null ? ThreadLocalRandom.current() : new Random(messageID.hashCode());
         Collections.shuffle(symbols, seed);
-        value = value % symbols.size();
+        value %= symbols.size();
         return symbols.get(value);
     }
 

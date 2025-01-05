@@ -48,10 +48,10 @@ class ListTurnStats extends GameStateSubcommand {
         long total = totalMillis / numTurns;
         long millis = total % 1000;
 
-        total = total / 1000; //total seconds (truncates)
+        total /= 1000; //total seconds (truncates)
         long seconds = total % 60;
 
-        total = total / 60; //total minutes (truncates)
+        total /= 60; //total minutes (truncates)
         long minutes = total % 60;
         long hours = total / 60; //total hours (truncates)
 

@@ -176,7 +176,7 @@ public class ButtonHelperAgents {
                     Button validTile2 = Buttons.red(buttonID, "Remove A Damaged " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
-                totalUnits = totalUnits - damagedUnits;
+                totalUnits -= damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Buttons.red(finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitName,
                         "Remove " + x + " " + prettyName, unitKey.unitEmoji());
@@ -1005,7 +1005,7 @@ public class ButtonHelperAgents {
                     buttonRow.remove(buttonIndex);
                 }
                 if (!buttonRow.isEmpty()) {
-                    buttons = buttons + buttonRow.size();
+                    buttons += buttonRow.size();
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }

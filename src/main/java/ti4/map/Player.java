@@ -1218,10 +1218,10 @@ public class Player {
         }
         int targetToHit = 3 - frontier;
         if (hasAbility("fabrication") || getPromissoryNotes().containsKey("bmf")) {
-            targetToHit = targetToHit - 1;
+            targetToHit -= 1;
         }
         if (getGame().isAgeOfExplorationMode()) {
-            targetToHit = targetToHit - 1;
+            targetToHit -= 1;
         }
         if (haz >= targetToHit || cult >= targetToHit || ind >= targetToHit) {
             enough = true;
@@ -1722,7 +1722,7 @@ public class Player {
 
     public void addAllianceMember(String color) {
         if (!"null".equals(color)) {
-            allianceMembers = allianceMembers + color;
+            allianceMembers += color;
         }
     }
 
@@ -2814,7 +2814,7 @@ public class Player {
     public float getTotalResourceValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkValuesOfUnits(this, tile, type);
+            count += ButtonHelper.checkValuesOfUnits(this, tile, type);
         }
         return count;
     }
@@ -2823,7 +2823,7 @@ public class Player {
     public int getTotalHPValueOfUnits(String type) {
         int count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkHPOfUnits(this, tile, type);
+            count += ButtonHelper.checkHPOfUnits(this, tile, type);
         }
         return count;
     }
@@ -2832,7 +2832,7 @@ public class Player {
     public float getTotalCombatValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkCombatValuesOfUnits(this, tile, type);
+            count += ButtonHelper.checkCombatValuesOfUnits(this, tile, type);
         }
         return Math.round(count * 10) / (float) 10.0;
     }
@@ -2841,7 +2841,7 @@ public class Player {
     public float getTotalUnitAbilityValueOfUnits() {
         float count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkUnitAbilityValuesOfUnits(this, getGame(), tile);
+            count += ButtonHelper.checkUnitAbilityValuesOfUnits(this, getGame(), tile);
         }
         return Math.round(count * 10) / (float) 10.0;
     }

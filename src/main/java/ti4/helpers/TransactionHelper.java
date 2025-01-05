@@ -425,7 +425,7 @@ public class TransactionHelper {
         }
         switch (thingToTrans) {
             case "TGs" -> {
-                message = message + " Click the amount of trade goods you wish to " + requestOrOffer + ".";
+                message += " Click the amount of trade goods you wish to " + requestOrOffer + ".";
                 for (int x = 1; x < p1.getTg() + 1; x++) {
                     Button transact = Buttons.green(
                         "offerToTransact_TGs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + x, "" + x);
@@ -433,7 +433,7 @@ public class TransactionHelper {
                 }
             }
             case "Comms" -> {
-                message = message + " Click the amount of commodities you wish to " + requestOrOffer + ".";
+                message += " Click the amount of commodities you wish to " + requestOrOffer + ".";
                 for (int x = 1; x < p1.getCommodities() + 1; x++) {
                     Button transact = Buttons.green(
                         "offerToTransact_Comms_" + p1.getFaction() + "_" + p2.getFaction() + "_" + x, "" + x);
@@ -442,7 +442,7 @@ public class TransactionHelper {
 
             }
             case "ClearDebt" -> {
-                message = message + " Click the amount of debt you wish to " + requestOrOffer + " cleared.";
+                message += " Click the amount of debt you wish to " + requestOrOffer + " cleared.";
                 for (int x = 1; x < p1.getDebtTokenCount(p2.getColor()) + 1; x++) {
                     Button transact = Buttons.green(
                         "offerToTransact_ClearDebt_" + p1.getFaction() + "_" + p2.getFaction() + "_" + x,
@@ -452,7 +452,7 @@ public class TransactionHelper {
 
             }
             case "SendDebt" -> {
-                message = message + " Click the amount of debt you wish to " + requestOrOffer + ".";
+                message += " Click the amount of debt you wish to " + requestOrOffer + ".";
                 for (int x = 1; x < 6; x++) {
                     Button transact = Buttons.green(
                         "offerToTransact_SendDebt_" + p1.getFaction() + "_" + p2.getFaction() + "_" + x, "" + x);
@@ -461,7 +461,7 @@ public class TransactionHelper {
 
             }
             case "shipOrders" -> {
-                message = message + " Click the _Axis Order_ you wish to " + requestOrOffer + ".";
+                message += " Click the _Axis Order_ you wish to " + requestOrOffer + ".";
                 for (String shipOrder : ButtonHelper.getPlayersShipOrders(p1)) {
                     Button transact = Buttons.green(
                         "offerToTransact_shipOrders_" + p1.getFaction() + "_" + p2.getFaction() + "_" + shipOrder,
@@ -471,7 +471,7 @@ public class TransactionHelper {
 
             }
             case "starCharts" -> {
-                message = message + " Click the _Star Chart_ you wish to " + requestOrOffer + ".";
+                message += " Click the _Star Chart_ you wish to " + requestOrOffer + ".";
                 for (String shipOrder : ButtonHelper.getPlayersStarCharts(p1)) {
                     Button transact = Buttons.green(
                         "offerToTransact_starCharts_" + p1.getFaction() + "_" + p2.getFaction() + "_" + shipOrder,
@@ -480,7 +480,7 @@ public class TransactionHelper {
                 }
             }
             case "Planets" -> {
-                message = message + " Click the planet you wish to " + requestOrOffer + ".";
+                message += " Click the planet you wish to " + requestOrOffer + ".";
                 for (String planet : p1.getPlanetsAllianceMode()) {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
                         continue;
@@ -495,7 +495,7 @@ public class TransactionHelper {
 
             }
             case "AlliancePlanets" -> {
-                message = message + " Click the planet you wish to " + requestOrOffer + ".";
+                message += " Click the planet you wish to " + requestOrOffer + ".";
                 for (String planet : p1.getPlanets()) {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
                         continue;
@@ -515,7 +515,7 @@ public class TransactionHelper {
             }
             case "ACs" -> {
                 if (requesting) {
-                    message = message + player.getRepresentation(false, false)
+                    message += player.getRepresentation(false, false)
                         + " Click the number of action cards you wish to request."
                         + " Since action cards are private info, you will have to discuss with other other player to explain which action cards you wish to transact;"
                         + " these buttons will just make sure that the player is offered buttons to send them.";
@@ -527,7 +527,7 @@ public class TransactionHelper {
                         stuffToTransButtons.add(transact);
                     }
                 } else {
-                    message = message + player.getRepresentation(false, false)
+                    message += player.getRepresentation(false, false)
                         + " Click the __green__ button that indicates the action card you wish to " + requestOrOffer + ".";
                     for (String acShortHand : p1.getActionCards().keySet()) {
                         Button transact = Buttons.green(
@@ -596,7 +596,7 @@ public class TransactionHelper {
                     + " (and you may only perform one transaction with each other player on a turn).";
             }
             case "Frags" -> {
-                message = message + " Click the number of relic fragments you wish to " + requestOrOffer + ".";
+                message += " Click the number of relic fragments you wish to " + requestOrOffer + ".";
                 for (int x = 1; x <= p1.getCrf(); x++) {
                     Button transact = Buttons.blue(
                         "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_CRF" + x, "Cultural Fragments (x" + x + ")");
@@ -913,7 +913,7 @@ public class TransactionHelper {
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
                     p2.clearDebt(p1, amount);
-                    message2 = message2 + "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident + ".";
+                    message2 += "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident + ".";
                 }
             }
             case "Comms" -> {
@@ -938,7 +938,7 @@ public class TransactionHelper {
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
                     p2.clearDebt(p1, amount);
-                    message2 = message2 + "\n" + ident2 + " cleared " + amount + " debt token" + (amount == 1 ? "" : "s") + " owned by " + ident + ".";
+                    message2 += "\n" + ident2 + " cleared " + amount + " debt token" + (amount == 1 ? "" : "s") + " owned by " + ident + ".";
                 }
             }
             case "WashComms" -> {

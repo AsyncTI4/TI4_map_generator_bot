@@ -1403,7 +1403,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             acID = acID.split("_")[0];
             List<Button> scButtons = new ArrayList<>();
             scButtons.add(Buttons.green("resolveReverse_" + actionCardTitle,
-                "Pick up " + actionCardTitle + " from the discard"));
+                "Pick Up " + actionCardTitle + " From The Discard"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation() + ", after checking for Sabos, use buttons to resolve _Reverse Engineer_.", scButtons);
         }
@@ -1449,7 +1449,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             if (event.getMessage().getContentRaw().contains("Net gain")) {
                 boolean cyber = false;
                 int netGain = ButtonHelper.checkNetGain(player, shortCCs);
-                finalCCs = finalCCs + ". Net command token gain was " + netGain;
+                finalCCs += ". Net command token gain was " + netGain;
                 for (String pn : player.getPromissoryNotes().keySet()) {
                     if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
                         cyber = true;
@@ -1460,16 +1460,16 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                         int properGain = 2;
                         String reasons = "";
                         if (player.hasAbility("versatile")) {
-                            properGain = properGain + 1;
+                            properGain += 1;
                             reasons = "**Versatile** ";
                         }
                         if (player.hasTech("hm")) {
-                            properGain = properGain + 1;
-                            reasons = reasons + "_Hyper Metabolism_ ";
+                            properGain += 1;
+                            reasons += "_Hyper Metabolism_ ";
                         }
                         if (cyber) {
-                            properGain = properGain + 1;
-                            reasons = reasons + "_Cybernetic Enhancements_ ";
+                            properGain += 1;
+                            reasons += "_Cybernetic Enhancements_ ";
                         }
                         if (netGain < properGain && netGain != 1) {
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -2562,16 +2562,16 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 int properGain = 2;
                 String reasons = "";
                 if (player.hasAbility("versatile")) {
-                    properGain = properGain + 1;
+                    properGain += 1;
                     reasons = "**Versatile** ";
                 }
                 if (player.hasTech("hm")) {
-                    properGain = properGain + 1;
-                    reasons = reasons + "_Hypermetabolism_ ";
+                    properGain += 1;
+                    reasons += "_Hypermetabolism_ ";
                 }
                 if (cyber) {
-                    properGain = properGain + 1;
-                    reasons = reasons + "_Cybernetic Enhancements_ ";
+                    properGain += 1;
+                    reasons += "_Cybernetic Enhancements_ ";
                 }
                 if (properGain > 2) {
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Heads up " + player.getRepresentationUnfogged()

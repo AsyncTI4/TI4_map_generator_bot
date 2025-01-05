@@ -37,7 +37,7 @@ class ReviseLaw extends GameStateSubcommand {
         String message = "Law revised";
         if (playerWasElected && player != null) {
             optionText = player.getFaction();
-            message = message + " with " + player.getColor() + " as the elected color.";
+            message += " with " + player.getColor() + " as the elected color.";
         } else {
             optionText = event.getOption(Constants.ELECTED, null, OptionMapping::getAsString);
         }

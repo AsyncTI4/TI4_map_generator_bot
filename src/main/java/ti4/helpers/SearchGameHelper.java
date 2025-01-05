@@ -99,10 +99,10 @@ public class SearchGameHelper {
 
         long total = totalMillis / numTurns;
 
-        total = total / 1000; //total seconds (truncates)
+        total /= 1000; //total seconds (truncates)
         long seconds = total % 60;
 
-        total = total / 60; //total minutes (truncates)
+        total /= 60; //total minutes (truncates)
         long minutes = total % 60;
         long hours = total / 60; //total hours (truncates)
         return String.format("%02dh:%02dm:%02ds", hours, minutes, seconds);

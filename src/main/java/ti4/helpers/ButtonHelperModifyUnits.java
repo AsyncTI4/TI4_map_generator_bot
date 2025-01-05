@@ -88,7 +88,7 @@ public class ButtonHelperModifyUnits {
             }
             int totalUnits = unitEntry.getValue() - damagedUnits;
             if (unitModel.getSustainDamage()) {
-                sustains = sustains + totalUnits;
+                sustains += totalUnits;
             }
         }
         return sustains;
@@ -117,7 +117,7 @@ public class ButtonHelperModifyUnits {
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("fighter") && min > 0) {
                     msg.append("> Destroyed ").append(min).append(" ").append(UnitEmojis.fighter).append("\n");
-                    hits = hits - min;
+                    hits -= min;
                     var unit = new ParsedUnit(unitKey, min, unitHolder.getName());
                     RemoveUnitService.removeUnit(event, tile, game, unit, true);
 
@@ -159,7 +159,7 @@ public class ButtonHelperModifyUnits {
                 int min = Math.min(totalUnits, hits);
                 if (unitModel.getSustainDamage() && min > 0 && unitModel.getIsShip()) {
                     msg.append("> Made ").append(min).append(" ").append(unitModel.getUnitEmoji()).append(" sustained\n");
-                    hits = hits - min;
+                    hits -= min;
                     tile.addUnitDamage("space", unitKey, min);
                 }
             }
@@ -616,7 +616,7 @@ public class ButtonHelperModifyUnits {
                 int damagedUnits = unitHolder.getUnitDamage() != null ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0) : 0;
                 int effectiveUnits = totalUnits;
                 if (isRemainingSustains) {
-                    effectiveUnits = effectiveUnits - damagedUnits;
+                    effectiveUnits -= damagedUnits;
                 }
                 int min = Math.min(effectiveUnits, hits);
                 if (isNraShenanigans && player.getUnitsOwned().contains("naaz_mech_space") && unitName.equalsIgnoreCase("mech") && min > 0) {
@@ -1049,7 +1049,7 @@ public class ButtonHelperModifyUnits {
                     Button validTile2 = Buttons.red(buttonID, "Damaged " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
-                totalUnits = totalUnits - damagedUnits;
+                totalUnits -= damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Buttons.red(finChecker + "hitOpponent_" + tile.getPosition() + "_" + unitName
                         + "_" + unitKey.getColor() + "_" + exo, prettyName, unitKey.unitEmoji());
@@ -1460,7 +1460,7 @@ public class ButtonHelperModifyUnits {
             }
             String editedMessage = event.getMessage().getContentRaw();
             if (editedMessage.contains("Produced")) {
-                editedMessage = editedMessage + "\n " + successMessage;
+                editedMessage += "\n " + successMessage;
             } else {
                 editedMessage = playerRep + " " + successMessage;
             }

@@ -247,7 +247,7 @@ public class ListPlayerInfoService {
                     }
                 }
                 if (player.hasAbility("privileged_citizenry")) {
-                    counter = counter + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false);
+                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false);
                 }
                 return counter;
             }
@@ -281,7 +281,7 @@ public class ListPlayerInfoService {
             case "monument", "golden_age" -> {
                 int x = Helper.getPlayerResourcesAvailable(player, game) + player.getTg() + comms;
                 if (player.hasTech("mc")) {
-                    x = x + player.getTg() + comms;
+                    x += player.getTg() + comms;
                 }
                 return x;
             }
@@ -328,7 +328,7 @@ public class ListPlayerInfoService {
                 int forResources = Math.min(3, Helper.getPlayerResourcesAvailable(player, game));
                 int forInfluence = Math.min(3, Helper.getPlayerInfluenceAvailable(player, game));
                 if (player.hasTech("mc")) {
-                    leftOverTg = leftOverTg * 2;
+                    leftOverTg *= 2;
                 }
                 return forTG + leftOverTg + forInfluence + forResources;
             }
@@ -370,7 +370,7 @@ public class ListPlayerInfoService {
             case "sway_council", "manipulate_law" -> {
                 int x = Helper.getPlayerInfluenceAvailable(player, game) + player.getTg() + comms;
                 if (player.hasTech("mc")) {
-                    x = x + player.getTg() + comms;
+                    x += player.getTg() + comms;
                 }
                 return x;
             }
@@ -399,7 +399,7 @@ public class ListPlayerInfoService {
                 int forResources = Math.min(6, Helper.getPlayerResourcesAvailable(player, game));
                 int forInfluence = Math.min(6, Helper.getPlayerInfluenceAvailable(player, game));
                 if (player.hasTech("mc")) {
-                    leftOverTg = leftOverTg * 2;
+                    leftOverTg *= 2;
                 }
                 return forTG + leftOverTg + forInfluence + forResources;
             }
@@ -480,14 +480,14 @@ public class ListPlayerInfoService {
             case "hrm" -> { // 12 resources
                 int resources = 0;
                 for (String planet : player.getPlanets()) {
-                    resources = resources + Helper.getPlanetResources(planet, game);
+                    resources += Helper.getPlanetResources(planet, game);
                 }
                 return resources;
             }
             case "eh" -> { // 12 influence
                 int influence = 0;
                 for (String planet : player.getPlanets()) {
-                    influence = influence + Helper.getPlanetInfluence(planet, game);
+                    influence += Helper.getPlanetInfluence(planet, game);
                 }
                 return influence;
             }
@@ -581,7 +581,7 @@ public class ListPlayerInfoService {
                         continue;
                     }
                     if (!Mapper.getTech(nekroTech).getFaction().orElse("").isEmpty()) {
-                        count = count + 1;
+                        count += 1;
                     }
 
                 }
