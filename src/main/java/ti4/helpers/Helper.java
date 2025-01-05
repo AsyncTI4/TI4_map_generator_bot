@@ -562,7 +562,7 @@ public class Helper {
         planetID = planetID.replace("-", "");
         Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
-            return planetID + " bot error. Tell fin";
+            return "Unable to find planet unitholder for "+planetID;
         }
         boolean containsDMZ = unitHolder.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
         if (containsDMZ) {
@@ -967,7 +967,7 @@ public class Helper {
                 Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg.append("> ");
                 if (unitHolder == null) {
-                    if (thing.contains("reduced comms")) {
+                    if (thing.contains("reduced commodities")) {
                         String comms = StringUtils.substringAfter(thing, "by ");
                         comms = StringUtils.substringBefore(comms, " (");
                         keleresAgent = Integer.parseInt(comms);

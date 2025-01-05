@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
@@ -95,23 +94,15 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
             }
             case "tarrock" -> {
-                if (!game.isFowMode() && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) < 0) {
                     String riderName = "Tarrock Ability";
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, player.getFinsFactionCheckerPrefix());
                     List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
                     MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), "Please select your target.", game, player, riderButtons);
                     MessageHelper.sendMessageToChannelWithPersistentReacts(game.getActionsChannel(), "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
-                } else {
-                    AgendaHelper.drawAgenda(1, game, player);
-                }
             }
             case "prism" -> {
-                if (!game.isFowMode() && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) > 0) {
-                    resolvePrismStep1(player, game);
-                } else {
-                    output = player.getFactionEmoji() + " choose a technology to return.";
-                    buttons.addAll(getNewPrismLoseTechOptions(player));
-                }
+                output = player.getFactionEmoji() + " choose a technology to return.";
+                buttons.addAll(getNewPrismLoseTechOptions(player));
             }
             case "echo" -> {
                 output = "Use buttons to place a frontier token in a system with no planets.\n-# Cannot yet place a double frontier token in a system, sorry.";
@@ -148,22 +139,5 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         return buttons;
     }
 
-    public static void resolvePrismStep1(Player player, Game game) {
-        List<Button> buttons = new ArrayList<>();
-        for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player) {
-                continue;
-            }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("prismStep2_" + p2.getFaction(), p2.getColor()));
-            } else {
-                Button button = Buttons.gray("prismStep2_" + p2.getFaction(), " ");
-                String factionEmojiString = p2.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                buttons.add(button);
-            }
-        }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged()
-            + ", tell the bot who you wish to force to give you a promissory note or action card.", buttons);
-    }
+
 }

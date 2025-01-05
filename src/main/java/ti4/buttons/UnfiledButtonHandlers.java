@@ -1,5 +1,7 @@
 package ti4.buttons;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -21,9 +27,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.helpers.ActionCardHelper;
@@ -91,8 +94,6 @@ import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
  */
@@ -146,9 +147,16 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("requestAllFollow_")
     public static void requestAllFollow(ButtonInteractionEvent event, Game game) {
+        if (game.getName().equalsIgnoreCase("fow273")) {
+            event.getMessage().reply(event.getUser().getAsMention()+" has requested that everyone resolve this strategy card before play continues." +
+            " Please do so as soon as you can. The active player should not take an action until this is done.")
+            .queue();
+        }
+        else{
         event.getMessage().reply(game.getPing() + ", someone has requested that everyone resolve this strategy card before play continues." +
             " Please do so as soon as you can. The active player should not take an action until this is done.")
             .queue();
+        }
     }
 
     @ButtonHandler("starChartsStep1_")
