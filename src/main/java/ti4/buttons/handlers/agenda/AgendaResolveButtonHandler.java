@@ -356,7 +356,7 @@ class AgendaResolveButtonHandler {
                     game.drawSecretObjective(player2.getUserID());
                     if (player2.hasAbility("plausible_deniability")) {
                         game.drawSecretObjective(player2.getUserID());
-                        message = message + " They drew a second secret objective due to **Plausible Deniability**.";
+                        message += " They drew a second secret objective due to **Plausible Deniability**.";
                     }
                     SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player2, event);
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
@@ -532,7 +532,7 @@ class AgendaResolveButtonHandler {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabalFSOwner,
                                     uH.getUnitCount(Units.UnitType.Mech, player.getColor()), "mech", event);
                             }
-                            count = count + uH.getUnitCount(Units.UnitType.Mech, player.getColor());
+                            count += uH.getUnitCount(Units.UnitType.Mech, player.getColor());
                             uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()),
                                 uH.getUnitCount(Units.UnitType.Mech, player.getColor()));
                         }
@@ -547,13 +547,13 @@ class AgendaResolveButtonHandler {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabalFSOwner,
                                     uH.getUnitCount(Units.UnitType.Infantry, player.getColor()), "infantry", event);
                             }
-                            count = count + uH.getUnitCount(Units.UnitType.Infantry, player.getColor());
+                            count += uH.getUnitCount(Units.UnitType.Infantry, player.getColor());
                             uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), player.getColorID()),
                                 uH.getUnitCount(Units.UnitType.Infantry, player.getColor()));
                         }
                         if (player.ownsUnit("titans_pds") || player.ownsUnit("titans_pds2")) {
                             if (uH.getUnitCount(Units.UnitType.Pds, player.getColor()) > 0) {
-                                count = count + uH.getUnitCount(Units.UnitType.Pds, player.getColor());
+                                count += uH.getUnitCount(Units.UnitType.Pds, player.getColor());
                                 uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), player.getColorID()),
                                     uH.getUnitCount(Units.UnitType.Pds, player.getColor()));
                             }
@@ -956,7 +956,7 @@ class AgendaResolveButtonHandler {
                         case "2" -> scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
                         case "3" -> scButtons.add(Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", CardEmojis.ActionCard));
                         case "4" -> {
-                            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
+                            scButtons.add(Buttons.green("construction_spacedock", "Place 1 Space Dock", UnitEmojis.spacedock));
                             scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
                         }
                         case "5" -> scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
@@ -967,9 +967,9 @@ class AgendaResolveButtonHandler {
                             scButtons.add(Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
                         }
                     }
-                    scButtons.add(Buttons.gray("generic_button_id_2", "Decline Secondary"));
+                    scButtons.add(Buttons.blue("sc_no_follow_" + winner, "Not Following"));
                     MessageHelper.sendMessageToChannelWithButtons(actionsChannel,
-                        "You may use this button to resolve the secondary.", scButtons);
+                        "You may use these button to resolve the secondary ability of **" + Helper.getSCName(Integer.parseInt(winner), game) + "**.", scButtons);
                 }
             }
         }
@@ -1026,7 +1026,10 @@ class AgendaResolveButtonHandler {
         } else if (!riders.isEmpty()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), ridSum);
         }
-        String resMes = "Resolving vote for " + StringUtils.capitalize(winner) + ".";
+        String resMes = "Resolving vote for \"" + StringUtils.capitalize(winner) + "\".";
+        if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
+            resMes = "Resolving vote for \"**" + Helper.getSCName(Integer.parseInt(winner), game) + "**\".";
+        }
         String voteMessage = "Click the buttons for next steps after you're done resolving Riders.";
         String agendaCount = game.getStoredValue("agendaCount");
         int aCount;

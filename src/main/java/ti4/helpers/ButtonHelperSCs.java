@@ -215,7 +215,7 @@ public class ButtonHelperSCs {
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    message = message + " Drew a second secret objective due to **Plausible Deniability**.";
+                    message += " Drew a second secret objective due to **Plausible Deniability**.";
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
                 break;
@@ -468,7 +468,7 @@ public class ButtonHelperSCs {
         if (!game.getStoredValue("ccLimit").isEmpty()) {
             limit = Integer.parseInt(game.getStoredValue("ccLimit"));
         }
-        message = message + "\nYou have " + (limit - ccCount) + " command tokens in your reinforcements that you could gain.";
+        message += "\nYou have " + (limit - ccCount) + " command tokens in your reinforcements that you could gain.";
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         } else {
@@ -564,6 +564,7 @@ public class ButtonHelperSCs {
         String lastchar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         int scNum = 1;
         boolean setStatus = true;
+        String suffix = "";
         try {
             scNum = Integer.parseInt(StringUtils.substringAfterLast(buttonID, "_"));
         } catch (NumberFormatException e) {
@@ -575,8 +576,9 @@ public class ButtonHelperSCs {
         }
         if (setStatus) {
             player.addFollowedSC(scNum, event);
+            suffix = " **" + Helper.getSCName(scNum, game) + "**";
         }
-        ReactionService.addReaction(event, game, player, "not following.");
+        ReactionService.addReaction(event, game, player, "is not following" + suffix + ".");
         String players = game.getStoredValue(messageID + "SCReacts");
 
         game.setStoredValue(messageID + "SCReacts", players.replace(player.getFaction(), ""));

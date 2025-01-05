@@ -339,12 +339,12 @@ public class CombatModHelper {
                     for (UnitModel unitM : unitsByQuantity.keySet()) {
                         if (unitM.getIsShip()) {
                             if (!unitM.getBaseType().equalsIgnoreCase("fighter")) {
-                                nonFighter = nonFighter + unitsByQuantity.get(unitM);
+                                nonFighter += unitsByQuantity.get(unitM);
                             }
-                            ships = ships + unitsByQuantity.get(unitM);
+                            ships += unitsByQuantity.get(unitM);
                         } else {
                             if (unitM.getBaseType().equalsIgnoreCase("infantry")) {
-                                infantry = infantry + unitsByQuantity.get(unitM);
+                                infantry += unitsByQuantity.get(unitM);
                             }
                         }
                     }
@@ -489,7 +489,7 @@ public class CombatModHelper {
                 default -> {
                 }
             }
-            value = value * multiplier * (double) scalingCount;
+            value *= multiplier * (double) scalingCount;
         }
         value = Math.floor(value); // to make sure eg +1 per 2 destroyer doesn't return 2.5 etc
         return (int) value;

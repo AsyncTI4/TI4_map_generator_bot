@@ -80,7 +80,7 @@ public class ButtonHelperRelics {
                 }
             }
             if (!exhaustedMessage.contains("Click the names")) {
-                exhaustedMessage = exhaustedMessage + ", " + msg;
+                exhaustedMessage += ", " + msg;
             } else {
                 exhaustedMessage = player.getRepresentation() + msg;
             }

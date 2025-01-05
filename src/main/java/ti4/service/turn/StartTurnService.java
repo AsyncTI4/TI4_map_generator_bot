@@ -86,7 +86,7 @@ public class StartTurnService {
         
         String buttonText = "Use buttons to do your turn. ";
         if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
-            buttonText = buttonText + "Your strategy card initiative number is " + player.getSCs().toArray()[0] + ".";
+            buttonText += "Your strategy card initiative number is " + player.getSCs().toArray()[0] + ".";
         }
         List<Button> buttons = getStartOfTurnButtons(player, game, false, event);
         MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel()
@@ -280,7 +280,7 @@ public class StartTurnService {
                     hadAnyUnplayedSCs = true;
                     String name = Helper.getSCName(SC, game);
                     if (game.getName().equalsIgnoreCase("pbd1000")) {
-                        name = name + "(" + SC + ")";
+                        name += "(" + SC + ")";
                     }
                     Button strategicAction = Buttons.green(finChecker + "strategicAction_" + SC, "Play " + name, CardEmojis.getSCFrontFromInteger(SC));
                     startButtons.add(strategicAction);
