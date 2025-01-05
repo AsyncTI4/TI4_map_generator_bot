@@ -29,7 +29,7 @@ class RemoveTitle extends Subcommand {
         String userId = event.getOption(Constants.PLAYER).getAsUser().getId();
         String title = event.getOption(Constants.TITLE).getAsString();
         game.setStoredValue("TitlesFor" + userId, game.getStoredValue("TitlesFor" + userId).replace(title, ""));
-
+        GameManager.save(game,"Title Removal");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Removed the title " + title + " in game " + game.getName());
     }
 }

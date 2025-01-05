@@ -36,8 +36,10 @@ public class TitlesHelper {
             }
             Arrays.stream(titlesForPlayer.split("_"))
                 .forEach(title -> {
-                    titles.merge(title, 1, Integer::sum);
-                    gameHistory.merge(title, game.getName(), (existing, newName) -> existing + ", " + newName);
+                    if (!title.isEmpty()) {  
+                        titles.merge(title, 1, Integer::sum);
+                        gameHistory.merge(title, game.getName(), (existing, newName) -> existing + ", " + newName);
+                    }
                 });
         }
 
