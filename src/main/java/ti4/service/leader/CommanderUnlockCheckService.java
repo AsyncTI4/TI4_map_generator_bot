@@ -177,7 +177,7 @@ public class CommanderUnlockCheckService {
             case "sol" -> {
                 int resources = 0;
                 for (String planet : player.getPlanets()) {
-                    resources = resources + Helper.getPlanetResources(planet, game);
+                    resources += Helper.getPlanetResources(planet, game);
                 }
                 if (resources > 11) {
                     shouldBeUnlocked = true;
@@ -186,7 +186,7 @@ public class CommanderUnlockCheckService {
             case "xxcha" -> {
                 int resources = 0;
                 for (String planet : player.getPlanets()) {
-                    resources = resources + Helper.getPlanetInfluence(planet, game);
+                    resources += Helper.getPlanetInfluence(planet, game);
                 }
                 if (resources > 11) {
                     shouldBeUnlocked = true;

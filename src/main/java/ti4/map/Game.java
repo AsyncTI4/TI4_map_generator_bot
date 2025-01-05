@@ -278,8 +278,8 @@ public class Game extends GameProperties {
                 continue;
             }
 
-            soNum = soNum + player.getSo();
-            soNum = soNum + player.getSoScored();
+            soNum += player.getSo();
+            soNum += player.getSoScored();
 
         }
         return soNum;
@@ -824,7 +824,7 @@ public class Game extends GameProperties {
         String existing = getPlayersWhoHitPersistentNoAfter();
         if (existing != null && !existing.isEmpty()) {
             if (existing.contains(faction + "_")) {
-                faction = faction + "_";
+                faction += "_";
             }
             existing = existing.replace(faction, "");
         }
@@ -835,7 +835,7 @@ public class Game extends GameProperties {
         String existing = getPlayersWhoHitPersistentNoWhen();
         if (existing != null && !existing.isEmpty()) {
             if (existing.contains(faction + "_")) {
-                faction = faction + "_";
+                faction += "_";
             }
             existing = existing.replace(faction, "");
         }
@@ -1234,8 +1234,8 @@ public class Game extends GameProperties {
 
     public void swapObjective(List<String> objectiveList, int place1, int place2) {
         if (!objectiveList.isEmpty()) {
-            place1 = place1 - 1;
-            place2 = place2 - 1;
+            place1 -= 1;
+            place2 -= 1;
             String id = objectiveList.get(place1);
             String id2 = objectiveList.get(place2);
             objectiveList.set(place1, id2);
@@ -1257,7 +1257,7 @@ public class Game extends GameProperties {
 
     public String peekAtObjective(List<String> objectiveList, int place) {
         if (!objectiveList.isEmpty()) {
-            place = place - 1;
+            place -= 1;
             return objectiveList.get(place);
         }
         return null;
@@ -1296,7 +1296,7 @@ public class Game extends GameProperties {
             while (revealedPublicObjectives.containsKey(id) && objectiveList.size() > 1 && counter > 0) {
                 id = objectiveList.getFirst();
                 objectiveList.remove(id);
-                counter = counter - 1;
+                counter -= 1;
             }
             addRevealedPublicObjective(id);
             for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
@@ -2571,7 +2571,7 @@ public class Game extends GameProperties {
             if (acID.contains("extra1")) {
                 acID = acID.replace("extra1", "extra2");
             } else {
-                acID = acID + "extra1";
+                acID += "extra1";
             }
         }
     }

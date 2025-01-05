@@ -63,7 +63,7 @@ public class ExploreService {
     public void explorePlanet(GenericInteractionCreateEvent event, Tile tile, String planetName, String drawColor, Player player, boolean NRACheck, Game game, int numExplores,
         boolean ownerShipOverride) {
         if (!player.getPlanetsAllianceMode().contains(planetName) && !ownerShipOverride) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not own this planet, thus cannot explore it.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not control this planet, thus cannot explore it.");
             return;
         }
         game.setStoredValue(player.getFaction() + "planetsExplored", game.getStoredValue(player.getFaction() + "planetsExplored") + planetName + "*");
@@ -484,7 +484,7 @@ public class ExploreService {
                 }
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    message = message + " Drew a second secret objective due to **Plausible Deniability**.";
+                    message += " Drew a second secret objective due to **Plausible Deniability**.";
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
                 MessageHelper.sendMessageToEventChannel(event, message);

@@ -114,9 +114,9 @@ public class RematchService {
         if (alreadyRematch.find()) {
             newGameName = newGameName.replace(alreadyRematch.group(), "");
             int prevMatch = Integer.parseInt(alreadyRematch.group("num"));
-            newGameName = newGameName + " Rematch #" + (prevMatch + 1);
+            newGameName += " Rematch #" + (prevMatch + 1);
         } else {
-            newGameName = newGameName + " Rematch #1";
+            newGameName += " Rematch #1";
         }
         newGame.setCustomName(newGameName);
         if (tableTalkChannel != null)

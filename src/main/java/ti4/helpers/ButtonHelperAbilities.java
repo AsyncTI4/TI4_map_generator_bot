@@ -524,7 +524,7 @@ public class ButtonHelperAbilities {
         String omenDice;
         if (!game.getStoredValue("OmenDice").isEmpty()) {
             omenDice = game.getStoredValue("OmenDice");
-            omenDice = omenDice + "_" + omenDie;
+            omenDice += "_" + omenDie;
             game.setStoredValue("OmenDice", omenDice);
         } else {
             game.setStoredValue("OmenDice", "" + omenDie);
@@ -622,11 +622,11 @@ public class ButtonHelperAbilities {
             String pillagedMessage = pillaged.getRepresentationUnfogged() + " you have been **Pillage**'d";
 
             if (pillaged.getCommodities() > 0 && checkedStatus.contains("checkedcomm")) {
-                pillagedMessage = pillagedMessage + ", so your commodities have gone from " + pillaged.getCommodities() + " to "
+                pillagedMessage += ", so your commodities have gone from " + pillaged.getCommodities() + " to "
                     + (pillaged.getCommodities() - 1) + ".";
                 pillaged.setCommodities(pillaged.getCommodities() - 1);
             } else {
-                pillagedMessage = pillagedMessage + ", so your trade goods have gone from " + pillaged.getTg() + " to "
+                pillagedMessage += ", so your trade goods have gone from " + pillaged.getTg() + " to "
                     + (pillaged.getTg() - 1) + ".";
                 pillaged.setTg(pillaged.getTg() - 1);
             }
@@ -741,8 +741,12 @@ public class ButtonHelperAbilities {
             buttons);
         event.getMessage().delete().queue();
     }
-
+    
     public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(Player player, Game game) {
+        return getPlanetPlaceUnitButtonsForMechMitosis(player, game, "mitosis");
+    }
+    
+    public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(Player player, Game game, String reason) {
         List<Button> planetButtons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -751,7 +755,7 @@ public class ButtonHelperAbilities {
 
                 if (numInf > 0) {
                     String buttonID = player.getFinsFactionCheckerPrefix() + "mitoMechPlacement_" + tile.getPosition() + "_"
-                        + unitHolder.getName();
+                        + unitHolder.getName() + "_" + reason;
                     if ("space".equalsIgnoreCase(unitHolder.getName())) {
                         planetButtons.add(Buttons.green(buttonID,
                             "Space Area of " + tile.getRepresentationForButtons(game, player)));
@@ -809,7 +813,7 @@ public class ButtonHelperAbilities {
                     Helper.getPlanetRepresentation(planetName, game)));
             } else {
                 if (planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG)) {
-                    coreCount = coreCount + 1;
+                    coreCount += 1;
                 }
             }
         }
@@ -1220,11 +1224,18 @@ public class ButtonHelperAbilities {
     public static void resolveMitosisMechPlacement(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         String uH = buttonID.split("_")[2];
+        String reason = buttonID.split("_")[3];
+        switch (reason) {
+            case "mitosis" -> reason = "**Mitosis**";
+            case "refit" -> reason = "__Refit Troops__";
+        }
         String successMessage;
         if ("space".equalsIgnoreCase(uH)) {
-            successMessage = player.getFactionEmojiOrColor() + " replaced 1 infantry with 1 mech in the space area of " + tile.getRepresentationForButtons(game, player) + " with **Mitosis**.";
+            successMessage = player.getFactionEmojiOrColor() + " replaced 1 infantry with 1 mech in the space area of "
+                + tile.getRepresentationForButtons(game, player) + " with " + reason + ".";
         } else {
-            successMessage = player.getFactionEmojiOrColor() + " replaced 1 infantry with 1 mech on " + Helper.getPlanetRepresentation(uH, game) + " with **Mitosis**.";
+            successMessage = player.getFactionEmojiOrColor() + " replaced 1 infantry with 1 mech on "
+                + Helper.getPlanetRepresentation(uH, game) + " with " + reason + ".";
         }
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), player.getColor());
         AddUnitService.addUnits(event, tile, game, player.getColor(), "mech " + uH.replace("space", ""));

@@ -85,7 +85,7 @@ public class ListTurnOrderService {
         }
         Integer max = Collections.max(game.getScTradeGoods().keySet());
         if (ButtonHelper.getKyroHeroSC(game) != 1000) {
-            max = max + 1;
+            max += 1;
         }
         for (int i = 1; i <= max; i++) {
             if (naaluSC != 0 && i == naaluSC) {

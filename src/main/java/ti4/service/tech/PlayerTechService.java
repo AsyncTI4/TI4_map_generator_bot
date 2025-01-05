@@ -56,7 +56,7 @@ public class PlayerTechService {
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
         String message = player.getRepresentation() + " added technology: " + Mapper.getTech(techID).getRepresentation(false) + ".";
         if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
-            message = message + "\nAutomatically added the Custodia Vigilia planet.";
+            message += "\nAutomatically added the Custodia Vigilia planet.";
         }
         CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn");
         MessageHelper.sendMessageToEventChannel(event, message);
@@ -307,11 +307,11 @@ public class PlayerTechService {
 
                 String message = player.getRepresentation() + " Rolled a " + d1.getResult() + " and will thus place a ";
                 if (d1.getResult() > 4) {
-                    message = message + "blue backed tile";
+                    message += "blue backed tile";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     DiscordantStarsHelper.drawBlueBackTiles(event, game, player, 1);
                 } else {
-                    message = message + "red backed tile";
+                    message += "red backed tile";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     DiscordantStarsHelper.drawRedBackTiles(event, game, player, 1);
                 }
@@ -439,7 +439,7 @@ public class PlayerTechService {
                         + " which allows you to produce 2 fighters/infantry that don't count towards the PRODUCTION limit";
                 }
                 if (val > 0 && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
-                    message2 = message2 + ". And reminder that you have _Prophecy of Ixth_ and should produce 2 fighters if you wish to keep it. Its removal is not automated.";
+                    message2 += ". And reminder that you have _Prophecy of Ixth_ and should produce 2 fighters if you wish to keep it. Its removal is not automated.";
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), generalMsg);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2 + ".");
@@ -482,7 +482,7 @@ public class PlayerTechService {
             }
             String buttonText = "Use buttons to do your turn. ";
             if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
-                buttonText = buttonText + "Your strategy card initiative number is " + player.getSCs().toArray()[0] + ".";
+                buttonText += "Your strategy card initiative number is " + player.getSCs().toArray()[0] + ".";
             }
             List<Button> buttons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);

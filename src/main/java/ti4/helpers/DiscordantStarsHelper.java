@@ -392,7 +392,7 @@ public class DiscordantStarsHelper {
                   .append(planet.getPlanetModel().getName())
                   .append(" due to Skald ")
                   .append(UnitEmojis.mech)
-                  .append(" being adjacent to a Glory token.\n");
+                  .append(" being adjacent to a **Glory** token.\n");
             }
         }
 

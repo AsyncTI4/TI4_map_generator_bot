@@ -1539,7 +1539,7 @@ public class TileGenerator {
 
                 int drawX = TILE_PADDING + x;
                 if (tokenPath.contains("mustache")) {
-                    drawX = drawX - 120;
+                    drawX -= 120;
                 }
                 int drawY = TILE_PADDING + y;
                 if (spaceTokenPositions.size() > index) {

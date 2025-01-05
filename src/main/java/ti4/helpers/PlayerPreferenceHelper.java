@@ -189,7 +189,7 @@ public class PlayerPreferenceHelper {
         if ("yes".equalsIgnoreCase(yesOrNo)) {
             stuffNotToSustain = stuffNotToSustain.replace(unit, "");
         } else {
-            stuffNotToSustain = stuffNotToSustain + unit;
+            stuffNotToSustain += unit;
         }
         if (stuffNotToSustain.isEmpty()) {
             stuffNotToSustain = "none";
