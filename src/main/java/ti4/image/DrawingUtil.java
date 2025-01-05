@@ -244,7 +244,7 @@ public class DrawingUtil {
 
         if (hideFactionIcon)
             return;
-        scale = scale * 0.50f;
+        scale *= 0.50f;
         BufferedImage factionImage = DrawingUtil.getPlayerFactionIconImageScaled(player, scale);
         if (factionImage == null)
             return;

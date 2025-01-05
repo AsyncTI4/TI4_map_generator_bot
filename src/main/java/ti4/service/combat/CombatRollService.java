@@ -405,7 +405,7 @@ public class CombatRollService {
             if (unitModel.getId().equalsIgnoreCase("jolnar_flagship")) {
                 for (DiceHelper.Die die : resultRolls) {
                     if (die.getResult() > 8) {
-                        hitRolls = hitRolls + 2;
+                        hitRolls += 2;
                     }
                 }
             }
@@ -422,7 +422,7 @@ public class CombatRollService {
             if (rollType == CombatRollType.combatround && (player.hasAbility("valor") || opponent.hasAbility("valor")) && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
                 for (DiceHelper.Die die : resultRolls) {
                     if (die.getResult() > 9) {
-                        hitRolls = hitRolls + 1;
+                        hitRolls += 1;
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
                             + " got an extra hit due to their **Valor** ability (it has been accounted for in the hit count).");
                     }
@@ -442,7 +442,7 @@ public class CombatRollService {
                 }
             }
             int misses = numRolls - hitRolls;
-            totalMisses = totalMisses + misses;
+            totalMisses += misses;
 
             if (misses > 0 && !extraRollsCount && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
                 extra.append(player.getFactionEmoji()).append(" destroyed ").append(misses).append(" of their own ").append(unitModel.getName()).append(misses == 1 ? "" : "s").append(" due to ").append(misses == 1 ? "a Thalnos miss" : "Thalnos misses");
@@ -587,14 +587,14 @@ public class CombatRollService {
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
         if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround && totalMisses > 0 && !game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-            result = result + "\n" + player.getFactionEmoji() + " You have _The Crown of Thalnos_ and may reroll " + (totalMisses == 1 ? "the miss" : "misses")
+            result += "\n" + player.getFactionEmoji() + " You have _The Crown of Thalnos_ and may reroll " + (totalMisses == 1 ? "the miss" : "misses")
                 + ", adding +1, at the risk of your " + (totalMisses == 1 ? "troop's life" : "troops' lives") + ".";
         }
         if (totalHits > 0 && CombatRollType.bombardment == rollType && player.hasTech("dszelir")) {
-            result = result + "\n" + player.getFactionEmoji() + " You have _Shard Volley_ and thus should produce an additional hit to the ones rolled above.";
+            result += "\n" + player.getFactionEmoji() + " You have _Shard Volley_ and thus should produce an additional hit to the ones rolled above.";
         }
         if (!extra.isEmpty()) {
-            result = result + "\n\n" + extra;
+            result += "\n\n" + extra;
         }
         if (game.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {
             game.setStoredValue("munitionsReserves", "");

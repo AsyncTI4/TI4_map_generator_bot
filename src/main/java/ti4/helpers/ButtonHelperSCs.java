@@ -215,7 +215,7 @@ public class ButtonHelperSCs {
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    message = message + " Drew a second secret objective due to **Plausible Deniability**.";
+                    message += " Drew a second secret objective due to **Plausible Deniability**.";
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
                 break;
@@ -468,7 +468,7 @@ public class ButtonHelperSCs {
         if (!game.getStoredValue("ccLimit").isEmpty()) {
             limit = Integer.parseInt(game.getStoredValue("ccLimit"));
         }
-        message = message + "\nYou have " + (limit - ccCount) + " command tokens in your reinforcements that you could gain.";
+        message += "\nYou have " + (limit - ccCount) + " command tokens in your reinforcements that you could gain.";
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         } else {

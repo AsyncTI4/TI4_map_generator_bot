@@ -356,7 +356,7 @@ class AgendaResolveButtonHandler {
                     game.drawSecretObjective(player2.getUserID());
                     if (player2.hasAbility("plausible_deniability")) {
                         game.drawSecretObjective(player2.getUserID());
-                        message = message + " They drew a second secret objective due to **Plausible Deniability**.";
+                        message += " They drew a second secret objective due to **Plausible Deniability**.";
                     }
                     SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player2, event);
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
@@ -532,7 +532,7 @@ class AgendaResolveButtonHandler {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabalFSOwner,
                                     uH.getUnitCount(Units.UnitType.Mech, player.getColor()), "mech", event);
                             }
-                            count = count + uH.getUnitCount(Units.UnitType.Mech, player.getColor());
+                            count += uH.getUnitCount(Units.UnitType.Mech, player.getColor());
                             uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()),
                                 uH.getUnitCount(Units.UnitType.Mech, player.getColor()));
                         }
@@ -547,13 +547,13 @@ class AgendaResolveButtonHandler {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabalFSOwner,
                                     uH.getUnitCount(Units.UnitType.Infantry, player.getColor()), "infantry", event);
                             }
-                            count = count + uH.getUnitCount(Units.UnitType.Infantry, player.getColor());
+                            count += uH.getUnitCount(Units.UnitType.Infantry, player.getColor());
                             uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), player.getColorID()),
                                 uH.getUnitCount(Units.UnitType.Infantry, player.getColor()));
                         }
                         if (player.ownsUnit("titans_pds") || player.ownsUnit("titans_pds2")) {
                             if (uH.getUnitCount(Units.UnitType.Pds, player.getColor()) > 0) {
-                                count = count + uH.getUnitCount(Units.UnitType.Pds, player.getColor());
+                                count += uH.getUnitCount(Units.UnitType.Pds, player.getColor());
                                 uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), player.getColorID()),
                                     uH.getUnitCount(Units.UnitType.Pds, player.getColor()));
                             }

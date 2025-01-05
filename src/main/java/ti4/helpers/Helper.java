@@ -91,9 +91,9 @@ public class Helper {
 
     public static int getCurrentHour() {
         long currentTime = System.currentTimeMillis();
-        currentTime = currentTime / 1000;
-        currentTime = currentTime % (60 * 60 * 24);
-        currentTime = currentTime / (60 * 60);
+        currentTime /= 1000;
+        currentTime %= (60 * 60 * 24);
+        currentTime /= (60 * 60);
         return (int) currentTime;
     }
 
@@ -221,7 +221,7 @@ public class Helper {
         List<Player> initiativeOrder = new ArrayList<>();
         Integer max = Collections.max(game.getScTradeGoods().keySet());
         if (ButtonHelper.getKyroHeroSC(game) != 1000) {
-            max = max + 1;
+            max += 1;
         }
         if (naaluSC != 0) {
             Player p3 = order.get(naaluSC);
@@ -258,7 +258,7 @@ public class Helper {
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    message = message + " Drew a second secret objective due to **Plausible Deniability**.";
+                    message += " Drew a second secret objective due to **Plausible Deniability**.";
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2,
@@ -842,9 +842,9 @@ public class Helper {
                 count = Integer.parseInt(thing.split("_")[1]);
             }
             if (flavor.contains("tg") && !flavor.contains("dsgh")) {
-                votes = votes + count * 2;
+                votes += count * 2;
             } else {
-                votes = votes + count;
+                votes += count;
             }
             msg.append("> ");
             switch (flavor) {
@@ -1164,7 +1164,7 @@ public class Helper {
                 UnitModel unitModel = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
                 int productionValue = unitModel.getProductionValue();
                 if ("fs".equals(unitModel.getAsyncId()) && player.ownsUnit("ghoti_flagship")) {
-                    productionValueTotal = productionValueTotal + player.getFleetCC();
+                    productionValueTotal += player.getFleetCC();
                 }
                 if (unitModel.getBaseType().equalsIgnoreCase("mech") && ButtonHelper.isLawInPlay(game, "articles_war")) {
                     productionValue = 0;
@@ -1178,32 +1178,32 @@ public class Helper {
                         }
                     }
                     if (ButtonHelper.isPlayerElected(game, player, "absol_minsindus")) {
-                        productionValue = productionValue + 4;
+                        productionValue += 4;
                     }
                 }
                 if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValue++;
                 }
-                productionValueTotal = productionValueTotal + productionValue * uH.getUnits().get(unit);
+                productionValueTotal += productionValue * uH.getUnits().get(unit);
             }
         }
         String planet = uH.getName();
         int planetUnitVal = 0;
         if (uH.getName().equals("space")) {
             if (tile.isSupernova() && player.hasTech("mr") && FoWHelper.playerHasUnitsInSystem(player, tile)) {
-                productionValueTotal = productionValueTotal + 5;
+                productionValueTotal += 5;
             }
         }
         if (!player.getPlanets().contains(uH.getName())) {
             return productionValueTotal;
         }
         if (Constants.MECATOLS.contains(planet) && player.hasTech("iihq") && player.controlsMecatol(true)) {
-            productionValueTotal = productionValueTotal + 3;
+            productionValueTotal += 3;
             planetUnitVal = 3;
         }
         for (String token : uH.getTokenList()) {
             if (token.contains("orbital_foundries") && planetUnitVal < 2) {
-                productionValueTotal = productionValueTotal + 2;
+                productionValueTotal += 2;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
@@ -1211,9 +1211,9 @@ public class Helper {
             }
 
             if (token.contains("automatons") && planetUnitVal < 3) {
-                productionValueTotal = productionValueTotal - planetUnitVal;
+                productionValueTotal -= planetUnitVal;
                 planetUnitVal = 3;
-                productionValueTotal = productionValueTotal + 3;
+                productionValueTotal += 3;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
@@ -1221,14 +1221,14 @@ public class Helper {
         }
         if (player.hasTech("ah") && planetUnitVal < 1 && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
             || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
-            productionValueTotal = productionValueTotal + 1;
+            productionValueTotal += 1;
             planetUnitVal = 1;
             if (player.hasRelic("boon_of_the_cerulean_god")) {
                 productionValueTotal++;
             }
         } else {
             if (player.hasTech("absol_ie") && planetUnitVal < 1 && player.getPlanets().contains(uH.getName())) {
-                productionValueTotal = productionValueTotal + 1;
+                productionValueTotal += 1;
                 planetUnitVal = 1;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
@@ -1238,7 +1238,7 @@ public class Helper {
                     && player.hasTech("dsbentg") && planetUnitVal < 1
                     && (!uH.getTokenList().isEmpty() || (Mapper.getPlanet(planet).getTechSpecialties() != null
                         && !Mapper.getPlanet(planet).getTechSpecialties().isEmpty()))) {
-                    productionValueTotal = productionValueTotal + 1;
+                    productionValueTotal += 1;
                     if (player.hasRelic("boon_of_the_cerulean_god")) {
                         productionValueTotal++;
                     }
@@ -1247,8 +1247,8 @@ public class Helper {
             }
         }
         if (player.getPlanets().contains(uH.getName()) && player.getLeader("nokarhero").map(Leader::isActive).orElse(false)) {
-            productionValueTotal = productionValueTotal + 3;
-            productionValueTotal = productionValueTotal - planetUnitVal;
+            productionValueTotal += 3;
+            productionValueTotal -= planetUnitVal;
             if (player.hasRelic("boon_of_the_cerulean_god")) {
                 productionValueTotal++;
             }
@@ -1311,7 +1311,7 @@ public class Helper {
                 + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd");
         }
         if (productionValueTotal > 0 && player.hasAbility("policy_the_environment_plunder")) {
-            productionValueTotal = productionValueTotal - 2;
+            productionValueTotal -= 2;
         }
         return productionValueTotal;
     }
@@ -1327,30 +1327,30 @@ public class Helper {
         for (String unit : producedUnits.keySet()) {
             String unit2 = unit.split("_")[0];
             if (unit.contains("gf")) {
-                numInf = numInf + producedUnits.get(unit);
+                numInf += producedUnits.get(unit);
             } else if (unit.contains("ff")) {
-                numFF = numFF + producedUnits.get(unit);
+                numFF += producedUnits.get(unit);
             } else {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
                 if (!"flagship".equalsIgnoreCase(removedUnit.getBaseType()) ||
                     !game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")) {
-                    cost = cost + (int) removedUnit.getCost() * producedUnits.get(unit);
+                    cost += (int) removedUnit.getCost() * producedUnits.get(unit);
                 }
-                totalUnits = totalUnits + producedUnits.get(unit);
+                totalUnits += producedUnits.get(unit);
             }
         }
         if (regulated) {
-            cost = cost + numInf + numFF;
+            cost += numInf + numFF;
         } else {
             if (player.ownsUnit("cymiae_infantry") || player.ownsUnit("cymiae_infantry2")) {
-                cost = cost + numInf;
+                cost += numInf;
             } else {
-                cost = cost + ((numInf + 1) / 2);
+                cost += ((numInf + 1) / 2);
             }
-            cost = cost + ((numFF + 1) / 2);
+            cost += ((numFF + 1) / 2);
         }
-        totalUnits = totalUnits + numInf + numFF;
+        totalUnits += numInf + numFF;
         if (wantCost) {
             return cost;
         } else {

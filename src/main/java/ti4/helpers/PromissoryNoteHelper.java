@@ -69,7 +69,7 @@ public class PromissoryNoteHelper {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn.getKey());
                     sb.append(index++).append("\\. ").append(CardEmojis.PN).append("  _").append(pnModel.getName()).append("_ ");
                     Player pnOwner = game.getPNOwner(pn.getKey());
-                    if (pnOwner == player) {
+                    if (pnOwner == player && !game.isFrankenGame()) {
                         sb.append("✋");
                     } else {
                         if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
@@ -473,7 +473,7 @@ public class PromissoryNoteHelper {
                 List<Button> purgeFragButtons = new ArrayList<>();
                 int numToBeat = 2 - player.getUrf();
 
-                numToBeat = numToBeat - 1;
+                numToBeat -= 1;
 
                 if (player.getCrf() > numToBeat) {
                     for (int x = numToBeat + 1; (x < player.getCrf() + 1 && x < 4); x++) {

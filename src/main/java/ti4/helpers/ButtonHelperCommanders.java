@@ -488,7 +488,7 @@ public class ButtonHelperCommanders {
                             continue;
                         }
                         if (!Mapper.getTech(AliasHandler.resolveTech(nekroTech)).getFaction().orElse("").isEmpty()) {
-                            count = count + 1;
+                            count += 1;
                         }
 
                     }

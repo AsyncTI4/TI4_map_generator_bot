@@ -238,7 +238,7 @@ public class ButtonHelperFactionSpecific {
                 buttons.add(validTile2);
             }
 
-            totalUnits = totalUnits - damagedUnits;
+            totalUnits -= damagedUnits;
             if (totalUnits > 0) {
                 String buttonID = "cavStep2_" + unitName;
                 String buttonText = unitKey.unitName();
@@ -1318,7 +1318,7 @@ public class ButtonHelperFactionSpecific {
         int amount;
         if (!game.getStoredValue("mykoMech").isEmpty()) {
             amount = Integer.parseInt(game.getStoredValue("mykoMech"));
-            amount = amount + 1;
+            amount += 1;
         } else {
             amount = 1;
         }
@@ -1329,7 +1329,7 @@ public class ButtonHelperFactionSpecific {
         int amount = 0;
         if (!game.getStoredValue("mykoMech").isEmpty()) {
             amount = Integer.parseInt(game.getStoredValue("mykoMech"));
-            amount = amount - 1;
+            amount -= 1;
         }
         if (amount < 0) {
             amount = 0;
@@ -1544,7 +1544,7 @@ public class ButtonHelperFactionSpecific {
             String msg2 = StringUtils.capitalize(deckType);
             if (game.getStoredValue("lastExpLookedAt" + player.getFaction() + deckType)
                 .equalsIgnoreCase(deck.getFirst())) {
-                msg2 = msg2 + " (Same as last time)";
+                msg2 += " (Same as last time)";
             }
             Button transact1 = Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_industrial", msg2);
             deckType = "hazardous";
@@ -1552,7 +1552,7 @@ public class ButtonHelperFactionSpecific {
             msg2 = StringUtils.capitalize(deckType);
             if (game.getStoredValue("lastExpLookedAt" + player.getFaction() + deckType)
                 .equalsIgnoreCase(deck.getFirst())) {
-                msg2 = msg2 + " (Same as last time)";
+                msg2 += " (Same as last time)";
             }
             Button transact2 = Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_hazardous", msg2);
             deckType = "cultural";
@@ -1560,7 +1560,7 @@ public class ButtonHelperFactionSpecific {
             msg2 = StringUtils.capitalize(deckType);
             if (game.getStoredValue("lastExpLookedAt" + player.getFaction() + deckType)
                 .equalsIgnoreCase(deck.getFirst())) {
-                msg2 = msg2 + " (Same as last time)";
+                msg2 += " (Same as last time)";
             }
             Button transact3 = Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_cultural", msg2);
             List<Button> buttons1 = new ArrayList<>();
@@ -2277,15 +2277,15 @@ public class ButtonHelperFactionSpecific {
             msg = "Tile was not suitable for the _Creuss IFF_.";
             if (player.getTg() > 0) {
                 player.setTg(player.getTg() - 1);
-                msg = msg + " You lost 1 trade good.";
+                msg += " You lost 1 trade good.";
             } else {
                 if (player.getTacticalCC() > 0) {
                     player.setTacticalCC(player.getTacticalCC() - 1);
-                    msg = msg + " You lost 1 command token from your tactic pool.";
+                    msg += " You lost 1 command token from your tactic pool.";
                 } else {
                     if (player.getFleetCC() > 0) {
                         player.setFleetCC(player.getFleetCC() - 1);
-                        msg = msg + " You lost 1 command token from your fleet pool.";
+                        msg += " You lost 1 command token from your fleet pool.";
                     }
                 }
             }

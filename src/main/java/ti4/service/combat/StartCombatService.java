@@ -275,10 +275,13 @@ public class StartCombatService {
                 }
             }
             if (!autoButtons.isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(threadChannel, "You may automate the entire combat if neither side has action cards or fancy tricks. Press this button to do so, and it will ask your opponent to confirm. Note that PDS fire and BOMBARDMENT are NOT part of combat and will not be automated.", autoButtons);
-                if (thalnos){
-                    MessageHelper.sendMessageToChannel(threadChannel, "One of you may have The Crown of Thalnos and thus not wish to automate the combat");
+                String automMessage = "You may automate the entire combat if neither side has action cards or fancy tricks."
+                    + " Press this button to do so, and it will ask your opponent to confirm."
+                    + " Note that SPACE CANNON and BOMBARDMENT are __not__ part of combat and will __not__ be automated.";
+                if (thalnos) {
+                    automMessage += " One of you may have __The Crown of Thalnos__, and thus not wish to automate the combat.";
                 }
+                MessageHelper.sendMessageToChannelWithButtons(threadChannel, automMessage, autoButtons);
             }
             
             

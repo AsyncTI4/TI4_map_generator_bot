@@ -454,7 +454,7 @@ public class AgendaHelper {
                 if ("empty".equalsIgnoreCase(existingData)) {
                     existingData = identifier + "_" + votes;
                 } else {
-                    existingData = existingData + ";" + identifier + "_" + votes;
+                    existingData += ";" + identifier + "_" + votes;
                 }
                 game.setCurrentAgendaVote(winner, existingData);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
@@ -738,7 +738,7 @@ public class AgendaHelper {
         if ("empty".equalsIgnoreCase(existingData)) {
             existingData = identifier + "_" + rider;
         } else {
-            existingData = existingData + ";" + identifier + "_" + rider;
+            existingData += ";" + identifier + "_" + rider;
         }
         game.setCurrentAgendaVote(choice, existingData);
 
@@ -915,7 +915,7 @@ public class AgendaHelper {
                 nextInLine = getNextInLine(nextInLine, getVotingOrder(game), game);
                 realIdentity = nextInLine.getRepresentationUnfogged();
                 voteInfo = getVoteTotal(nextInLine, game);
-                counter = counter + 1;
+                counter += 1;
             }
 
             String pFaction = StringUtils.capitalize(nextInLine.getFaction());
@@ -1229,9 +1229,9 @@ public class AgendaHelper {
                             String msg = identity + " due to having a winning _Imperial Rider_, you have scored a victory point. Huzzah.\n";
                             int poIndex;
                             poIndex = game.addCustomPO(Constants.IMPERIAL_RIDER, 1);
-                            msg = msg + "Custom public objective _Imperial Rider_ has been added.\n";
+                            msg += "Custom public objective _Imperial Rider_ has been added.\n";
                             game.scorePublicObjective(winningR.getUserID(), poIndex);
-                            msg = msg + winningR.getRepresentation() + " scored _Imperial Rider_.\n";
+                            msg += winningR.getRepresentation() + " scored _Imperial Rider_.\n";
                             MessageHelper.sendMessageToChannel(channel, msg);
                             Helper.checkEndGame(game, winningR);
 
@@ -1665,7 +1665,7 @@ public class AgendaHelper {
                 Button button = Buttons.gray("exhaustForVotes_planet_" + planet, planetNameProper + " (" + voteAmount + ")", PlanetEmojis.getPlanetEmoji(planet));
                 planetButtons.add(button);
             }
-            totalPlanetVotes = totalPlanetVotes + voteAmount;
+            totalPlanetVotes += voteAmount;
         }
         if (player.hasAbility("zeal")) {
             int numPlayers = 0;
@@ -2714,7 +2714,7 @@ public class AgendaHelper {
         List<Player> orderList = getVotingOrder(game);
         int votes = 0;
         for (Player player : orderList) {
-            votes = votes + getTotalVoteCount(game, player);
+            votes += getTotalVoteCount(game, player);
         }
         StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: "
             + (Boolean.parseBoolean(game.getFowOption(FowConstants.HIDE_TOTAL_VOTES)) ? "???" : votes));

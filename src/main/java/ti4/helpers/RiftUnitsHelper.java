@@ -97,7 +97,7 @@ public class RiftUnitsHelper {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             ident + " " + riftUnit(unitAsyncID + "damaged", tile, game, event, player, cabal));
                     }
-                    totalUnits = totalUnits - damagedUnits;
+                    totalUnits -= damagedUnits;
                     for (int x = 1; x < totalUnits + 1; x++) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             ident + " " + riftUnit(unitAsyncID, tile, game, event, player, cabal));
@@ -147,11 +147,11 @@ public class RiftUnitsHelper {
             msg = "A damaged " + msg;
         }
         if (d1.isSuccess()) {
-            msg = msg + " and survived. May you always be so lucky.";
+            msg += " and survived. May you always be so lucky.";
         } else {
             var parsedUnit = new ParsedUnit(unitKey);
             RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
-            msg = msg + " and failed. Condolences for your loss.";
+            msg += " and failed. Condolences for your loss.";
             if (cabal != null && cabal != player
                 && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
@@ -200,7 +200,7 @@ public class RiftUnitsHelper {
                             "Rift " + x + " damaged " + unitModel.getBaseType(), unitModel.getUnitEmoji());
                         buttons.add(validTile2);
                     }
-                    totalUnits = totalUnits - damagedUnits;
+                    totalUnits -= damagedUnits;
                     for (int x = 1; x < totalUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
                             finChecker + "riftUnit_" + tile.getPosition() + "_" + x + asyncID,

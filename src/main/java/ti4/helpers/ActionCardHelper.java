@@ -1122,7 +1122,7 @@ public class ActionCardHelper {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        String msg2 = player.getRepresentationUnfogged() + " grabbed " + Mapper.getActionCard(acID).getName() + " from the discard";
+        String msg2 = player.getRepresentationUnfogged() + " grabbed _" + Mapper.getActionCard(acID).getName() + "_ from the discard pile.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
 
         ActionCardHelper.sendActionCardInfo(game, player, event);
