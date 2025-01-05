@@ -1471,9 +1471,9 @@ public class ButtonHelperFactionSpecific {
                 continue;
             }
             String owner = game.getPNOwner("ra").getFaction().equalsIgnoreCase("jolnar") ? "Jol-Nar player" : "_Research Agreement_ owner";
-            String msg = p2.getRepresentationUnfogged() + " the " + owner + " has researched the technology _"
+            String msg = p2.getRepresentationUnfogged() + " the " + owner + " has researched the technology "
                 + Mapper.getTech(AliasHandler.resolveTech(tech)).getRepresentation(false)
-                + "_.\nUse the below button if you wish to play _Research Agreement_ to gain it.";
+                + ". Use the below button if you wish to play _Research Agreement_ to gain it.";
             Button transact = Buttons.green("resolvePNPlay_ra_" + AliasHandler.resolveTech(tech),
                 "Acquire " + Mapper.getTech(AliasHandler.resolveTech(tech)).getName());
             List<Button> buttons = new ArrayList<>();

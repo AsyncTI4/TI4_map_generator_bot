@@ -1025,14 +1025,14 @@ public class Helper {
                     res += 1;
                 }
                 if (thing.contains("aida")) {
-                    msg.append("> Exhausted _AI Development Algorithm_ ");
+                    msg.append("> Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
                     if (thing.contains("_")) {
                         res += ButtonHelper.getNumberOfUnitUpgrades(player);
                         msg.append(" for ").append(ButtonHelper.getNumberOfUnitUpgrades(player)).append(" resources ");
                     } else {
                         msg.append(" to ignore a prerequisite on a unit upgrade technology ");
                     }
-                    msg.append(TechEmojis.WarfareTech).append(".\n");
+                    msg.append(".\n");
                 }
                 if (thing.contains("commander") || thing.contains("Gledge Agent")) {
                     msg.append("> ").append(thing).append("\n");
@@ -1040,7 +1040,7 @@ public class Helper {
                     msg.append("> ").append(thing).append("\n");
                     res += 2;
                 } else if (thing.contains("Zealots Agent")) {
-                    msg.append("> ").append(thing).append("(Best Resources found were ").append(bestRes).append(")\n");
+                    msg.append("> ").append(thing).append("(Best resources found were ").append(bestRes).append(")\n");
                     inf += bestRes;
                 } else if (thing.contains("Agent")) {
                     msg.append("> ").append(thing).append("\n");
