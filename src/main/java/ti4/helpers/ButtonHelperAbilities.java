@@ -1370,7 +1370,9 @@ public class ButtonHelperAbilities {
         String planet = buttonID.split("_")[1];
         List<Button> options = new ArrayList<>();
         options.add(Buttons.green("indoctrinate_" + planet + "_infantry", "Indoctrinate 1 Infantry into 1 Infantry").withEmoji(UnitEmojis.infantry.asEmoji()));
-        options.add(Buttons.green("indoctrinate_" + planet + "_mech", "Indoctrinate 1 Infantry into 1 Mech").withEmoji(UnitEmojis.mech.asEmoji()));
+        if(player.hasUnit("yin_mech")){
+            options.add(Buttons.green("indoctrinate_" + planet + "_mech", "Indoctrinate 1 Infantry into 1 Mech").withEmoji(UnitEmojis.mech.asEmoji()));
+        }
         options.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
             player.getRepresentationUnfogged() + " use buttons to resolve **Indoctrination**.", options);

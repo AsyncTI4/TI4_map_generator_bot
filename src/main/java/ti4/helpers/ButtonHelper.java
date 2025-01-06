@@ -1219,14 +1219,19 @@ public class ButtonHelper {
         for (String tech : player.getExhaustedTechs()) {
             buttons.add(Buttons.green("biostimsReady_tech_" + tech, "Ready " + Mapper.getTechs().get(tech).getName()));
         }
-        for (String planet : player.getExhaustedPlanets()) {
-            if (absol || checkForTechSkips(game, planet)) {
-                buttons.add(Buttons.green("biostimsReady_planet_" + planet,
-                    "Ready " + Helper.getPlanetRepresentation(planet, game)));
+        String msg = "Use buttons to select a planet or technology to ready.";
+        if (!absol){
+            for (String planet : player.getExhaustedPlanets()) {
+                if (absol || checkForTechSkips(game, planet)) {
+                    buttons.add(Buttons.green("biostimsReady_planet_" + planet,
+                        "Ready " + Helper.getPlanetRepresentation(planet, game)));
+                }
             }
+        }else{
+            msg = "Use buttons to select a technology to ready.";
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            "Use buttons to select a planet or technology to ready.", buttons);
+            msg, buttons);
     }
 
     public static void celdauriRedTech(Player player, Game game, GenericInteractionCreateEvent event) {
@@ -2576,13 +2581,7 @@ public class ButtonHelper {
         if (player.hasTech("dsghotg") && tile == player.getHomeSystemTile()) {
             armadaValue += 3;
         }
-        int fleetCap = (player.getFleetCC()
-            + armadaValue
-            + player.getMahactCC().size()
-            + tile.getFleetSupplyBonusForPlayer(player)) * 2; // fleetCap is double to more easily deal with half-capacity, e.g., Naalu Fighter II
-        if (player.getLeader("letnevhero").map(Leader::isActive).orElse(false)) {
-            fleetCap += 1000;
-        }
+        
         int capacity = 0;
         int numInfNFightersNMechs = 0;
         int numOfCapitalShips = 0;
@@ -2591,7 +2590,13 @@ public class ButtonHelper {
         int numFighter2sFleet = 0;
         boolean capacityViolated = false;
         boolean fleetSupplyViolated = false;
-
+        int fleetCap = (player.getFleetCC()
+            + armadaValue
+            + player.getMahactCC().size()
+            + tile.getFleetSupplyBonusForPlayer(player)) * 2; // fleetCap is double to more easily deal with half-capacity, e.g., Naalu Fighter II
+            if (player.getLeader("letnevhero").map(Leader::isActive).orElse(false)) {
+                fleetCap += 1000;
+            }
         for (UnitHolder capChecker : tile.getUnitHolders().values()) {
             if (capChecker.getUnitCount(UnitType.CabalSpacedock, player.getColor()) > 0) {
                 String colorID = Mapper.getColorID(player.getColor());
@@ -2617,6 +2622,12 @@ public class ButtonHelper {
                         fightersIgnored += 6;
                     } else if (player.ownsUnit("cabal_spacedock2")) {
                         fightersIgnored += 12;
+                    } else if (player.ownsUnit("absol_cabal_spacedock2")) {
+                        fightersIgnored += 10;
+                        fleetCap += 2;
+                    } else if (player.ownsUnit("absol_spacedock2")) {
+                        fightersIgnored += 5;
+                        fleetCap += 2;
                     } else {
                         if (!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")) {
                             fightersIgnored += 3;
@@ -2625,6 +2636,7 @@ public class ButtonHelper {
                     }
                 }
             }
+            
             for (Player p2 : game.getRealPlayers()) {
                 if (player.getAllianceMembers().contains(p2.getFaction())) {
                     Map<UnitModel, Integer> unitsByQuantity2 = getAllUnits(capChecker, p2);
