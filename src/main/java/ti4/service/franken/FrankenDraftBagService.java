@@ -279,8 +279,9 @@ public class FrankenDraftBagService {
     public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event, boolean force) {
         List<Player> players = new ArrayList<>(game.getPlayers().values());
         int index = 1;
-        StringBuilder sb = new StringBuilder();
-        sb.append("Automatically setting players up as Franken factions:");
+        StringBuilder sb = new StringBuilder("Automatically setting players up as Franken factions:");
+        List<Integer> emojiNum = new ArrayList<>(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18));
+        Collections.shuffle(emojiNum);
         boolean skipped = false;
         for (Player player : players) {
             if (player.isRealPlayer() && !force) {
@@ -288,7 +289,7 @@ public class FrankenDraftBagService {
                 skipped = true;
                 continue;
             }
-            String faction = "franken" + index;
+            String faction = "franken" + (index <= 16 ? emojiNum.get(index - 1) : index);
             String tempHomeSystemLocation = String.valueOf(300 + index);
             if (!Mapper.isValidFaction(faction) || !PositionMapper.isTilePositionValid(tempHomeSystemLocation)) {
                 continue;

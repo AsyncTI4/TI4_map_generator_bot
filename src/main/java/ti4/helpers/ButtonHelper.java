@@ -4924,25 +4924,21 @@ public class ButtonHelper {
 
     public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event) {
         List<Player> players = new ArrayList<>(game.getPlayers().values());
-        int x = 1;
-        for (Player player : players) {
-            if (x < 9) {
-                switch (x) {
-                    case 1 -> MiltyService.secondHalfOfPlayerSetup(player, game, "black", "franken1", "201", event, false);
-                    case 2 -> MiltyService.secondHalfOfPlayerSetup(player, game, "green", "franken2", "202", event, false);
-                    case 3 -> MiltyService.secondHalfOfPlayerSetup(player, game, "purple", "franken3", "203", event, false);
-                    case 4 -> MiltyService.secondHalfOfPlayerSetup(player, game, "orange", "franken4", "204", event, false);
-                    case 5 -> MiltyService.secondHalfOfPlayerSetup(player, game, "pink", "franken5", "205", event, false);
-                    case 6 -> MiltyService.secondHalfOfPlayerSetup(player, game, "yellow", "franken6", "206", event, false);
-                    case 7 -> MiltyService.secondHalfOfPlayerSetup(player, game, "red", "franken7", "207", event, false);
-                    case 8 -> MiltyService.secondHalfOfPlayerSetup(player, game, "blue", "franken8", "208", event, false);
-                }
-            }
-            x++;
+        List<Integer> emojiNum = new ArrayList<>(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18));
+        Collections.shuffle(emojiNum);
+        List<String> colors = new ArrayList<>(List.of("black", "green", "purple", "orange", "pink", "yellow", "red", "blue"));
+        if (players.size() > 8)
+        {
+            colors = new ArrayList<>(List.of("black", "purple", "orange", "pink", "yellow", "red", "lightgray", "emerald", "lime", "navy", "teal", "tan"));
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "You have all been set up as Franken factions. These have similar zombie emojis as their default faction icon. "
-                + "You should personalize yours with `/franken set_faction_icon`. You may use any emoji the bot may use.");
+        Collections.shuffle(colors);
+        for (int i=0; i<players.size() && i<12; i++)
+        {
+            MiltyService.secondHalfOfPlayerSetup(players.get(i), game, colors.get(i), "franken"+emojiNum.get(i), "20"+(i+1), event, false);
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), (players.size() <= 12 ? "You have all" : "Twelve of you have")
+            + " been set up as Franken factions. These have zombie emojis as their default faction icon."
+            + " You may wish to personalize yours with `/franken set_faction_icon`. You may use any emoji the bot may use.");
     }
 
     public static List<Button> getFactionSetupButtons(Game game, String buttonID) {
