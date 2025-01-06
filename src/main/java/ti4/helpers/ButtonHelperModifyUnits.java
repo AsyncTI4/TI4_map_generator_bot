@@ -771,7 +771,7 @@ public class ButtonHelperModifyUnits {
             ButtonHelper.deleteTheOneButton(event);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " removed 1 " + unit + " from tile "
+            player.getRepresentationNoPing() + " removed 1 " + unit + " from tile "
                 + tile.getRepresentationForButtons(game, player) + " location: " + unitH);
     }
 
@@ -808,9 +808,10 @@ public class ButtonHelperModifyUnits {
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmojiOrColor() + " replaced " + pdsAmount + " PDS and " + sdAmount
+            player.getRepresentationNoPing() + " replaced " + pdsAmount + " PDS and " + sdAmount
                 + " space dock" + (sdAmount == 1 ? "" : "s") + " on "
-                + Helper.getPlanetRepresentation(uH.getName(), game) + " with their own units");
+                + Helper.getPlanetRepresentation(uH.getName(), game) + " with their own unit"
+                + (pdsAmount + sdAmount == 1 ? "" : "s") + ".");
 
     }
 
@@ -1749,7 +1750,7 @@ public class ButtonHelperModifyUnits {
         }
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmojiOrColor() + "Undid landing of " + amount + " " + unitName + " on " + planet);
+            player.getFactionEmojiOrColor() + " undid landing of " + amount + " " + unitName + " on " + planet + ".");
         event.getMessage().editMessage(event.getMessage().getContentRaw())
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
@@ -1973,7 +1974,8 @@ public class ButtonHelperModifyUnits {
             AddUnitService.addUnits(event, tile, game, player.getColor(), numff + " fighters");
         }
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
-        String msg = player.getFactionEmojiOrColor() + " Turned " + numff + " infantry into " + numff + " fighter" + (numff == 1 ? "" : "s") + " using the combat drone ability";
+        String msg = player.getFactionEmojiOrColor() + " turned " + numff + " infantry into " + numff + " fighter"
+            + (numff == 1 ? "" : "s") + " using Assault Machina, the Mirveda commander.";
         event.getMessage().editMessage(msg)
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
@@ -1987,7 +1989,8 @@ public class ButtonHelperModifyUnits {
             AddUnitService.addUnits(event, tile, game, player.getColor(), numff + " infantry");
         }
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
-        String msg = player.getFactionEmojiOrColor() + " Turned " + numff + " fighter" + (numff == 1 ? "" : "s") + " into " + numff + " infantry using the combat drone ability";
+        String msg = player.getFactionEmojiOrColor() + " turned " + numff + " fighter" + (numff == 1 ? "" : "s") + " into "
+            + numff + " infantry using their **Combat Drones** ability.";
         event.getMessage().editMessage(msg)
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
@@ -2205,7 +2208,7 @@ public class ButtonHelperModifyUnits {
         }
 
         String message = event.getMessage().getContentRaw();
-        String message2 = player.getFactionEmojiOrColor() + " removed " + amount + " " + unitName + " from " + planetName + " in tile "
+        String message2 = player.getRepresentationNoPing() + " removed " + amount + " " + unitName + " from " + planetName + " in tile "
             + tile.getRepresentationForButtons(game, player) + ".";
         assignType = "combat";
         if (!game.getStoredValue(player.getFaction() + "latestAssignHits").isEmpty()) {
@@ -2249,8 +2252,8 @@ public class ButtonHelperModifyUnits {
         }
         tile.removeUnitDamage(planetName, unitKey, amount);
         String message = event.getMessage().getContentRaw();
-        String message2 = player.getFactionEmojiOrColor() + " Repaired " + amount + " " + unitName + " from " + planetName + " in tile "
-            + tile.getRepresentationForButtons(game, player);
+        String message2 = player.getFactionEmojiOrColor() + " repaired " + amount + " " + unitName + " from " + planetName + " in tile "
+            + tile.getRepresentationForButtons(game, player) + ".";
         List<Button> systemButtons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, game, tile);
         event.getMessage().editMessage(message)
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();

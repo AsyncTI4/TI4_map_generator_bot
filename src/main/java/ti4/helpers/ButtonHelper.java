@@ -2742,7 +2742,7 @@ public class ButtonHelper {
         }
         String message = player.getRepresentationUnfogged();
         if (fleetSupplyViolated) {
-            message += " You are violating fleet pool limits in tile " + tile.getRepresentation()
+            message += ", you are violating fleet pool limits in tile " + tile.getRepresentation()
                 + ". Specifically, you have " + (player.getFleetCC() + player.getMahactCC().size())
                 + " command tokens in your fleet pool,"
                 + (fleetCap / 2 - player.getFleetCC() - player.getMahactCC().size() > 0 ?
