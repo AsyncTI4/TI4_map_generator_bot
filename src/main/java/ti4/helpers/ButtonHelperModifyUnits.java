@@ -1861,7 +1861,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.fogSafeEmoji() + " landed " + amount + " " + unitName + " on " + planet + ".");
         String oldMessage = event.getMessage().getContentRaw();
         if (space.getUnitCount(UnitType.Infantry, player.getColor()) < 1 && space.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
-            oldMessage = "Remember to click done landing troops if everything is landed correctly.";
+            oldMessage = "Remember to click \"Done Landing Troops\" if everything has landed correctly.";
         }
         MessageHelper.editMessageWithButtons(event, oldMessage, systemButtons);
     }

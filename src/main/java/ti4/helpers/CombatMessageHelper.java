@@ -161,6 +161,10 @@ public class CombatMessageHelper {
         String combatTypeName = StringUtils.capitalize(holderName) + " combat";
         if (rollType != CombatRollType.combatround) {
             combatTypeName = rollType.getValue();
+            if (rollType == CombatRollType.bombardment || rollType == CombatRollType.AFB)
+            {
+                combatTypeName = combatTypeName.toUpperCase();
+            }
             if (holderPlanet != null) {
                 combatTypeName += " on " + StringUtils.capitalize(holderName);
             }
