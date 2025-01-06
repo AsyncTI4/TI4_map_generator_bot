@@ -36,7 +36,7 @@ public class TitlesHelper {
             }
             Arrays.stream(titlesForPlayer.split("_"))
                 .forEach(title -> {
-                    if (!title.isEmpty()) {  
+                    if (!title.isEmpty() && !title.equalsIgnoreCase("**")) {  
                         titles.merge(title, 1, Integer::sum);
                         gameHistory.merge(title, game.getName(), (existing, newName) -> existing + ", " + newName);
                     }
