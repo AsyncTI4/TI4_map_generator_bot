@@ -81,72 +81,88 @@ public enum CardEmojis implements TI4Emoji {
 
     // Full Mentions
     public static String SC1Mention() {
-        return sc_1_1.toString()
-            + sc_1_2
-            + sc_1_3
-            + sc_1_4
-            + sc_1_5
-            + sc_1_6;
+        StringBuilder sb = new StringBuilder();
+        sb.append(sc_1_1)
+            .appendCodePoint(0x2060).append(sc_1_2)
+            .appendCodePoint(0x2060).append(sc_1_3)
+            .appendCodePoint(0x2060).append(sc_1_4)
+            .appendCodePoint(0x2060).append(sc_1_5)
+            .appendCodePoint(0x2060).append(sc_1_6);
+        return sb.toString();
     }
 
     public static String SC2Mention() {
-        return sc_2_1.toString()
-            + sc_2_2
-            + sc_2_3
-            + sc_2_4
-            + sc_2_5
-            + sc_2_6;
+        StringBuilder sb = new StringBuilder();
+        sb.append(sc_2_1)
+            .appendCodePoint(0x2060).append(sc_2_2)
+            .appendCodePoint(0x2060).append(sc_2_3)
+            .appendCodePoint(0x2060).append(sc_2_4)
+            .appendCodePoint(0x2060).append(sc_2_5)
+            .appendCodePoint(0x2060).append(sc_2_6);
+        return sb.toString();
     }
 
     public static String SC3Mention() {
-        return sc_3_1.toString()
-            + sc_3_2
-            + sc_3_3
-            + sc_3_4
-            + sc_3_5;
+        StringBuilder sb = new StringBuilder();
+        sb.append(sc_3_1)
+            .appendCodePoint(0x2060).append(sc_3_2)
+            .appendCodePoint(0x2060).append(sc_3_3)
+            .appendCodePoint(0x2060).append(sc_3_4)
+            .appendCodePoint(0x2060).append(sc_3_5);
+        return sb.toString();
     }
 
     public static String SC4Mention() {
-        return sc_4_1.toString()
-            + sc_4_2
-            + sc_4_3
-            + sc_4_4
-            + sc_4_5
-            + sc_4_6
-            + sc_4_7;
+        StringBuilder sb = new StringBuilder();
+        sb.append(sc_4_1)
+            .appendCodePoint(0x2060).append(sc_4_2)
+            .appendCodePoint(0x2060).append(sc_4_3)
+            .appendCodePoint(0x2060).append(sc_4_4)
+            .appendCodePoint(0x2060).append(sc_4_5)
+            .appendCodePoint(0x2060).append(sc_4_6)
+            .appendCodePoint(0x2060).append(sc_4_7);
+        return sb.toString();
     }
 
     public static String SC5Mention() {
-        return sc_5_1.toString()
-            + sc_5_2
-            + sc_5_3
-            + sc_5_4;
+        StringBuilder sb = new StringBuilder();
+        sb.append(sc_5_1)
+            .appendCodePoint(0x2060).append(sc_5_2)
+            .appendCodePoint(0x2060).append(sc_5_3)
+            .appendCodePoint(0x2060).append(sc_5_4);
+        return sb.toString();
     }
 
     public static String SC6Mention() {
-        return sc_6_1.toString()
-            + sc_6_2
-            + sc_6_3
-            + sc_6_4
-            + sc_6_5;
+        StringBuilder sb = new StringBuilder();
+        sb.append(sc_6_1)
+            .appendCodePoint(0x2060).append(sc_6_2)
+            .appendCodePoint(0x2060).append(sc_6_3)
+            .appendCodePoint(0x2060).append(sc_6_4)
+            .appendCodePoint(0x2060).append(sc_6_5);
+        return sb.toString();
     }
 
     public static String SC7Mention() {
-        return sc_7_1.toString()
-            + sc_7_2
-            + sc_7_3
-            + sc_7_4
-            + sc_7_5
-            + sc_7_6
-            + sc_7_7;
+        StringBuilder sb = new StringBuilder();
+        sb.append(sc_7_1)
+            .appendCodePoint(0x2060).append(sc_7_2)
+            .appendCodePoint(0x2060).append(sc_7_3)
+            .appendCodePoint(0x2060).append(sc_7_4)
+            .appendCodePoint(0x2060).append(sc_7_5)
+            .appendCodePoint(0x2060).append(sc_7_6)
+            .appendCodePoint(0x2060).append(sc_7_7);
+        return sb.toString();
     }
 
     public static String SC8Mention() {
-        return sc_8_1.toString()
-            + sc_8_2
-            + sc_8_3
-            + sc_8_4
-            + sc_8_5;
+        StringBuilder sb = new StringBuilder();
+        sb.append(sc_8_1)
+            .appendCodePoint(0x2060).append(sc_8_2)
+            .appendCodePoint(0x2060).append(sc_8_3)
+            .appendCodePoint(0x2060).append(sc_8_4)
+            .appendCodePoint(0x2060).append(sc_8_5);
+        return sb.toString();
     }
 
     @Override

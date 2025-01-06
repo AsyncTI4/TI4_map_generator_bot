@@ -7,6 +7,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
+import ti4.message.BotLogger;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.UnitModel;
@@ -42,7 +43,8 @@ public class FlagshipDraftItem extends DraftItem {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Cost: ");
-        sb.append(unit.getCost());
+        Float cost = unit.getCost();
+        sb.append(cost == cost.intValue() ? "" + cost.intValue() : "" + cost); // type shenanigans
         sb.append(" Combat: ");
         sb.append(unit.getCombatHitsOn());
         if (unit.getCombatDieCount() > 1) {
