@@ -127,10 +127,7 @@ public class StartTurnService {
             ButtonHelperFactionSpecific.resolveKolleccAbilities(player, game);
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, game);
 
-            game.setPingSystemCounter(0);
-            for (int x = 0; x < 10; x++) {
-                game.setTileAsPinged(x, null);
-            }
+            game.resetListOfTilesPinged();
         } else {
             //checkhere
             if (game.isShowBanners()) {
