@@ -1,7 +1,5 @@
 package ti4.map.manage;
 
-import static ti4.map.manage.GamePersistenceKeys.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -10,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,24 +27,50 @@ import javax.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import ti4.draft.BagDraft;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
+import ti4.json.ObjectMapperFactory;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
+import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
+import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
+import static ti4.map.manage.GamePersistenceKeys.ENDPLAYERINFO;
+import static ti4.map.manage.GamePersistenceKeys.ENDTILE;
+import static ti4.map.manage.GamePersistenceKeys.ENDTOKENS;
+import static ti4.map.manage.GamePersistenceKeys.ENDUNITDAMAGE;
+import static ti4.map.manage.GamePersistenceKeys.ENDUNITHOLDER;
+import static ti4.map.manage.GamePersistenceKeys.ENDUNITS;
+import static ti4.map.manage.GamePersistenceKeys.GAMEINFO;
+import static ti4.map.manage.GamePersistenceKeys.MAPINFO;
+import static ti4.map.manage.GamePersistenceKeys.PLANET_ENDTOKENS;
+import static ti4.map.manage.GamePersistenceKeys.PLANET_TOKENS;
+import static ti4.map.manage.GamePersistenceKeys.PLAYER;
+import static ti4.map.manage.GamePersistenceKeys.PLAYERINFO;
+import static ti4.map.manage.GamePersistenceKeys.TILE;
+import static ti4.map.manage.GamePersistenceKeys.TOKENS;
+import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
+import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
+import static ti4.map.manage.GamePersistenceKeys.UNITS;
 import ti4.message.BotLogger;
+import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
-
 @UtilityClass
 class GameLoadService {
 
