@@ -43,22 +43,11 @@ public class AddUnitService {
     }
 
     private static boolean isTileAlreadyPinged(Game game, Tile tile) {
-        for (int i = 0; i < 10; i++) {
-            String tilePinged = game.getListOfTilesPinged()[i];
-            if (tilePinged != null && tilePinged.equalsIgnoreCase(tile.getPosition())) {
-                return true;
-            }
-        }
-        return false;
+        return game.getListOfTilesPinged().contains(tile.getPosition());
     }
 
     private static void markTileAsPinged(Game game, Tile tile) {
-        for (int i = 0; i < 10; i++) {
-            if (game.getListOfTilesPinged()[i] == null) {
-                game.setTileAsPinged(i, tile.getPosition());
-                break;
-            }
-        }
+        game.setTileAsPinged(tile.getPosition());
     }
 
     private static void checkFleetCapacity(GenericInteractionCreateEvent event, Tile tile, String color, Game game) {

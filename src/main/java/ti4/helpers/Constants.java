@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -1104,6 +1104,7 @@ public class Constants {
     public static final String TECHNOLOGY_DECK = "technology_deck";
     public static final Object TECHNOLOGY = "technology";
     public static final String TECH_DECK_ID = "tech_deck_id";
+    public static final String PINGED_SYSTEMS = "pinged_systems";
     public static final String DRAW_BLUE_BACK_TILE = "draw_blue_back_tile";
     public static final String DRAW_RED_BACK_TILE = "draw_red_back_tile";
     public static final String ADD_OMEN_DIE = "add_omen_die";

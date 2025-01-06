@@ -2,12 +2,14 @@ package ti4.service.planet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -24,10 +26,13 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class AddPlanetService {
@@ -213,6 +218,26 @@ public class AddPlanetService {
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
+        }
+        if ((game.getPhaseOfGame().contains("agenda")
+            || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
+            && player.hasTech("absol_dxa") && !doubleCheck && !setup) {
+                String message = "";
+                if (tile != null && planet != null) {
+                    Set<String> tokenList = ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList();
+                    boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
+                    if (!containsDMZ) {
+                        AddUnitService.addUnits(event, tile, game, player.getColor(), "inf " + planet);
+                        message = player.getFactionEmoji() + ColorEmojis.getColorEmojiWithName(player.getColor()) + UnitEmojis.infantry
+                            + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planet)
+                            + " due to Absol's Daxcive, however this placement is __optional__.";
+                    } else {
+                        message = "Planet has the _Demilitarized Zone_ attached, so no infantry could be placed.";
+                    }
+                } else {
+                    message = "Tile was null, no infantry placed.";
+                }
+                MessageHelper.sendMessageToEventChannel(event, message); 
         }
 
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
