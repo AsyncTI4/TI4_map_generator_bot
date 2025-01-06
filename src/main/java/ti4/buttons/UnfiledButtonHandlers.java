@@ -1204,7 +1204,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String both = buttonID.replace("retreatUnitsFrom_", "");
         String pos1 = both.split("_")[0];
         String pos2 = both.split("_")[1];
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmojiOrColor() + " retreated all units in space to " + game.getTileByPosition(pos2).getRepresentationForButtons(game, player));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationNoPing() + " retreated all units in space to "
+            + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".");
         String message = player.getRepresentationUnfogged() + " Use below buttons to move any ground forces or conclude retreat.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatingGroundTroopsButtons(player, game, pos1, pos2));
         ButtonHelper.deleteMessage(event);
