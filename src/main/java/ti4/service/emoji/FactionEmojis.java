@@ -22,6 +22,7 @@ public enum FactionEmojis implements TI4Emoji {
     // Franken
     Franken1, Franken2, Franken3, Franken4, Franken5, Franken6, Franken7, Franken8, //
     Franken9, Franken10, Franken11, Franken12, Franken13, Franken14, Franken15, Franken16, //
+    Franken17, Franken18, //
     // Franken Emblems
     franken_aurilian_vanguard, franken_aelorian_clans, franken_dakari_hegemony, franken_durethian_shard, franken_elyndor_consortium, //
     franken_fal_kesh_covenant, franken_ghaldir_union, franken_helian_imperium, franken_jhoran_brotherhood, franken_kyrenic_republic, //
@@ -133,6 +134,8 @@ public enum FactionEmojis implements TI4Emoji {
             case "franken14" -> Franken14;
             case "franken15" -> Franken15;
             case "franken16" -> Franken16;
+            case "franken17" -> Franken17;
+            case "franken18" -> Franken18;
 
             case "echoes" -> echoes;
             case "enclave" -> enclave;

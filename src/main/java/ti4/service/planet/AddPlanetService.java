@@ -133,7 +133,7 @@ public class AddPlanetService {
                         !game.isACInDiscard("Reparations")) {
                         String msg = player_.getRepresentation()
                             + " has a window to play _Reparations_ for the taking of "
-                            + Mapper.getPlanet(planet).getName();
+                            + Mapper.getPlanet(planet).getName() + ".";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
                 }

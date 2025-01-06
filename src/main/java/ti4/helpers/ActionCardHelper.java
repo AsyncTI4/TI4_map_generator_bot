@@ -365,17 +365,23 @@ public class ActionCardHelper {
 
             if (Helper.isSaboAllowed(game, player)) {
                 MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
+            } else if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
+                StringBuilder noSabosMessage = new StringBuilder("> " + Helper.noSaboReason(game, player));
+                noSabosMessage.append("\n> A player may have access to _Instinct Training_, so watch out.");
+                noSabosMessage.append("\n> A player may have access to a Watcher (Empyrean mech), so 𝓌𝒶𝓉𝒸𝒽 out.");
+                MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage.toString());
             } else {
                 MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
                 StringBuilder noSabosMessage = new StringBuilder("> " + Helper.noSaboReason(game, player));
                 boolean it = false, watcher = false;
                 for (Player p : game.getRealPlayers()) {
                     if (p == player) continue;
-                    if (game.isFowMode() || (!it && p.hasTechReady("it"))) {
+                    if (!it && p.hasTechReady("it")) {
                         noSabosMessage.append("\n> A player may have access to _Instinct Training_, so watch out.");
                         it = true;
                     }
-                    if (game.isFowMode() || (!watcher && Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
+                    if (!watcher && Helper.getPlayerFromUnit(game, "empyrean_mech") != null) {
                         noSabosMessage.append("\n> A player may have access to a Watcher (Empyrean mech), so 𝓌𝒶𝓉𝒸𝒽 out.");
                         watcher = true;
                     }
