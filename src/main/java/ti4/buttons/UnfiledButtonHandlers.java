@@ -1,7 +1,5 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 
@@ -476,7 +475,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 MessageHelper
                     .sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                            + ", use buttons to discard 1 action card to explore a readied planet.",
+                            + ", use buttons to discard 2 action cards to explore a readied planet.",
                         absolPAButtons);
             }
         }
