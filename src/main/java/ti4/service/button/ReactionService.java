@@ -157,12 +157,12 @@ public class ReactionService {
 
     private static void handleAllPlayersReactingNoSabotage(Message message, Game game, GameMessageManager.GameMessage gameMessage) {
         Matcher acToReact = CARDS_PATTERN.matcher(message.getContentRaw());
-        String msg2 = "All players have indicated 'No Sabotage'" + (acToReact.find() ? " to " + acToReact.group(1) : "");
+        String msg2 = "All players have indicated \"No Sabotage\"" + (acToReact.find() ? " to " + acToReact.group(1) : "") + ".";
         if (!game.isFowMode() && gameMessage != null) {
             String factionToPing = gameMessage.factionsThatReacted().getFirst();
             Player playerToPing = game.getPlayerFromColorOrFaction(factionToPing);
             if (playerToPing != null) {
-                msg2 = playerToPing.getRepresentation() + " " + msg2;
+                msg2 = playerToPing.getRepresentation() + ", a" + msg2.substring(1);
             }
         }
         message.reply(msg2).queueAfter(1, TimeUnit.SECONDS);

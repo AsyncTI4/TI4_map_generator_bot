@@ -25,7 +25,7 @@ class RelicExhaust extends GameStateSubcommand {
         if (player.hasRelic(relicId)) {
             player.addExhaustedRelic(relicId);
             String relicName = Mapper.getRelic(relicId).getName();
-            MessageHelper.sendMessageToEventChannel(event, "Exhausted " + ExploreEmojis.Relic + " relic: " + relicName);
+            MessageHelper.sendMessageToEventChannel(event, player.getRepresentationNoPing() + " exhausted the relic _" + relicName + "_.");
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Invalid relic or player does not have specified relic");
         }

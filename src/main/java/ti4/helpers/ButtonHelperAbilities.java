@@ -1384,20 +1384,28 @@ public class ButtonHelperAbilities {
         String unit = buttonID.split("_")[2];
         Tile tile = game.getTileFromPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + planet);
+        String opponent = "their opponent's";
         for (Player p2 : game.getPlayers().values()) {
             if (p2.getColor() == null || p2 == player) {
                 continue; // fix indoctrinate vs neutral
             }
             if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet) && !player.getAllianceMembers().contains(p2.getFaction())) {
                 RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), "1 infantry " + planet);
+                opponent = p2.getRepresentationNoPing();
                 break;
             }
         }
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         CommanderUnlockCheckService.checkPlayer(player, "yin");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
-                + Helper.getPlanetRepresentation(planet, game) + " using **Indoctrination**.");
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
+                    + Helper.getPlanetRepresentation(planet, game) + " using **Indoctrination**.");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                player.getRepresentationNoPing() + " replaced 1 of " + opponent + " infantry with 1 " + unit + " on "
+                    + Helper.getPlanetRepresentation(planet, game) + " using **Indoctrination**.");
+        }
         options.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
             player.getRepresentationUnfogged() + ", please pay for **Indoctrination**.", options);

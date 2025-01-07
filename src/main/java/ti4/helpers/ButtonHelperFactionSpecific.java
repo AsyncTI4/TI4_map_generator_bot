@@ -1721,7 +1721,7 @@ public class ButtonHelperFactionSpecific {
         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 infantry " + planet);
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " replaced 1 of their infantry with 1 " + unit + " on "
+            player.getRepresentationNoPing() + " replaced 1 of their infantry with 1 " + unit + " on "
                 + Helper.getPlanetRepresentation(planet, game) + " using the mech's DEPLOY ability.");
         options.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -2244,17 +2244,26 @@ public class ButtonHelperFactionSpecific {
         String unit = "infantry";
         Tile tile = game.getTileFromPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + planet);
+        String opponent = "their opponent's";
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
                 continue;
             }
             if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet)) {
                 RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), "1 infantry " + planet);
+                opponent = p2.getRepresentationNoPing();
+                break;
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
-                + Helper.getPlanetRepresentation(planet, game) + " using _Greyfire Mutagen_.");
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
+                    + Helper.getPlanetRepresentation(planet, game) + " using _Greyfire Mutagen_.");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                player.getRepresentationNoPing() + " replaced 1 of " + opponent + " infantry with 1 " + unit + " on "
+                    + Helper.getPlanetRepresentation(planet, game) + " using _Greyfire Mutagen_.");
+        }
         event.getMessage().delete().queue();
     }
 

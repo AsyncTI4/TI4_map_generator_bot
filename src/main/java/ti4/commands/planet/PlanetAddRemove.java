@@ -53,7 +53,7 @@ abstract class PlanetAddRemove extends GameStateSubcommand {
         Set<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(OptionMapping::getAsString).map(s -> AliasHandler.resolvePlanet(StringUtils.substringBefore(s, " (").replace(" ", ""))).toList());
 
         Player player = getPlayer();
-        MessageHelper.sendMessageToEventChannel(event, getActionHeaderMessage(player) + ":");
+        MessageHelper.sendMessageToEventChannel(event, getActionHeaderMessage(player));
 
         for (String planetID : planetIDs) {
             parseParameter(event, player, planetID, getGame());
@@ -99,7 +99,7 @@ abstract class PlanetAddRemove extends GameStateSubcommand {
             case Constants.PLANET_REMOVE -> message + " removed planet(s):";
             case Constants.PLANET_EXHAUST -> message + " exhausted planet(s):";
             case Constants.PLANET_REFRESH -> message + " readied planet(s):";
-            case Constants.PLANET_EXHAUST_ABILITY -> message + " exhausted the legendary ability";
+            case Constants.PLANET_EXHAUST_ABILITY -> message + " exhausted the legendary ability:";
             case Constants.PLANET_REFRESH_ABILITY -> message + " readied the legendary ability:";
             default -> "";
         };

@@ -2742,7 +2742,7 @@ public class ButtonHelper {
         }
         String message = player.getRepresentationUnfogged();
         if (fleetSupplyViolated) {
-            message += " You are violating fleet pool limits in tile " + tile.getRepresentation()
+            message += ", you are violating fleet pool limits in tile " + tile.getRepresentation()
                 + ". Specifically, you have " + (player.getFleetCC() + player.getMahactCC().size())
                 + " command tokens in your fleet pool,"
                 + (fleetCap / 2 - player.getFleetCC() - player.getMahactCC().size() > 0 ?
@@ -3545,8 +3545,8 @@ public class ButtonHelper {
             String cardID = buttonID.split("_")[3];
             String planetName = buttonID.split("_")[4];
             Tile tile = game.getTileFromPlanet(planetName);
-            String messageText = player.getRepresentation() + " explored " + ExploreEmojis.getTraitEmoji(drawColor) + "Planet "
-                + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile " + tile.getPosition() + ")*:";
+            String messageText = player.getRepresentation() + " explored the planet " + ExploreEmojis.getTraitEmoji(drawColor)
+                + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile " + tile.getPosition() + ":";
             ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
             if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                 && game.getPhaseOfGame().contains("agenda")) {
