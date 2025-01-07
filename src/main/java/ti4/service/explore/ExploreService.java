@@ -88,7 +88,8 @@ public class ExploreService {
             ExploreModel exploreModelH = Mapper.getExplore(cardIDH);
             ExploreModel exploreModelI = Mapper.getExplore(cardIDI);
 
-            String reportMessage = player.getFactionEmoji() + " explored " + MiscEmojis.LegendaryPlanet + "**Garbozia** ability and found a **" + exploreModelC.getName() + "**, **" + exploreModelH.getName() + "** and a **" + exploreModelI.getName() + "**";
+            String reportMessage = player.getFactionEmoji() + " explored " + MiscEmojis.LegendaryPlanet + "Garbozia ability and found a _"
+                + exploreModelC.getName() + "_, _" + exploreModelH.getName() + "_ and a _" + exploreModelI.getName() + "_.";
             if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), reportMessage);
             } else {
@@ -100,7 +101,7 @@ public class ExploreService {
             Button resolveExploreI = Buttons.green("resolve_explore_" + cardIDI + "_" + planetName + "_distantSuns", exploreModelI.getName());
             List<Button> buttons = List.of(resolveExploreC, resolveExploreH, resolveExploreI);
             List<MessageEmbed> embeds = List.of(exploreModelC.getRepresentationEmbed(), exploreModelH.getRepresentationEmbed(), exploreModelI.getRepresentationEmbed());
-            String message = player.getRepresentation() + " please choose 1 Exploration card to resolve.";
+            String message = player.getRepresentation() + " please choose 1 exploration card to resolve.";
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
             return;
 
@@ -112,7 +113,7 @@ public class ExploreService {
                     if (player.hasTech("pfa")) { //Pre-Fab Arcologies
                         PlanetService.refreshPlanet(player, planetName);
                         MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
-                            planetName + " has been automatically readied because you have _Pre-Fab Arcologies_.");
+                            Mapper.getPlanet(planetName).getName() + " has been automatically readied because you have _Pre-Fab Arcologies_.");
                     }
                     String message = "Please decide whether or not to use your " + FactionEmojis.Naaz + "**Distant Suns** ability.";
                     Button resolveExplore1 = Buttons.green("distant_suns_accept_" + planetName + "_" + drawColor, "Choose from 2 Exploration Cards");
@@ -131,8 +132,8 @@ public class ExploreService {
                     ExploreModel exploreModel2 = Mapper.getExplore(cardID2);
 
                     // Report to common channel
-                    String reportMessage = player.getFactionEmoji() + " used their " + FactionEmojis.Naaz + "**Distant Suns** ability and found a **"
-                        + exploreModel1.getName() + "** and a **" + exploreModel2.getName() + "** on " + Helper.getPlanetRepresentationPlusEmoji(planetName);
+                    String reportMessage = player.getFactionEmoji() + " used their " + FactionEmojis.Naaz + "**Distant Suns** ability and found a _"
+                        + exploreModel1.getName() + "_ and a _" + exploreModel2.getName() + "_ on " + Helper.getPlanetRepresentationPlusEmoji(planetName) + ".";
                     if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(), reportMessage);
                     } else {
@@ -170,7 +171,7 @@ public class ExploreService {
         }
         String position_ = tile == null ? "none" : tile.getPosition();
         String messageText = player.getRepresentation() + " explored " + ExploreEmojis.getTraitEmoji(drawColor) +
-            "Planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile " + position_ + ")*:";
+            "Planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile " + position_ + ":";
         if (player.hasUnexhaustedLeader("lanefiragent")) {
             ExploreModel exploreModel = Mapper.getExplore(cardID);
             String name1 = exploreModel.getName();
@@ -211,7 +212,7 @@ public class ExploreService {
         ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
         if (player.hasTech("pfa")) { //Pre-Fab Arcologies
             PlanetService.refreshPlanet(player, planetName);
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), planetName + " has been automatically readied because you have _Pre-Fab Arcologies_.");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), Mapper.getPlanet(planetName).getName() + " has been automatically readied because you have _Pre-Fab Arcologies_.");
         }
         if (ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord", player, tile)) {
             AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planetName);
@@ -258,10 +259,10 @@ public class ExploreService {
         String planetName = info[1];
         Tile tile = game.getTileFromPlanet(planetName);
         String tileName = tile == null ? "no tile" : tile.getPosition();
-        String messageText = player.getRepresentation() + " explored " + "Planet "
-            + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile " + tileName + ")*:";
+        String messageText = player.getRepresentation() + " explored the planet "
+            + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile " + tileName + ":";
         if (buttonID.contains("_distantSuns")) {
-            messageText = player.getFactionEmoji() + " chose to resolve: ";
+            messageText = player.getRepresentationNoPing() + " chose to resolve _" + Mapper.getExplore(cardID).getName() + "_.";
         }
         resolveExplore(event, cardID, tile, planetName, messageText, player, game);
         ButtonHelper.deleteMessage(event);
@@ -408,10 +409,10 @@ public class ExploreService {
 
         // Specific Explore Handling
         switch (cardID) {
-            case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + ExploreEmojis.CFrag);
-            case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + ExploreEmojis.HFrag);
-            case "irf1", "irf2", "irf3", "irf4", "irf5" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + ExploreEmojis.IFrag);
-            case "urf1", "urf2", "urf3" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained " + ExploreEmojis.UFrag);
+            case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained a " + ExploreEmojis.CFrag + "fragment.");
+            case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained a " + ExploreEmojis.HFrag + "fragment.");
+            case "irf1", "irf2", "irf3", "irf4", "irf5" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained a " + ExploreEmojis.IFrag + "fragment.");
+            case "urf1", "urf2", "urf3" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained a " + ExploreEmojis.UFrag + "fragment.");
             case "ed1", "ed2" -> {
                 message = "_Enigmatic Device_ has been placed in play area.";
                 player.addRelic(Constants.ENIGMATIC_DEVICE);
@@ -536,9 +537,9 @@ public class ExploreService {
                     ButtonHelperAgents.resolveArtunoCheck(player, 1);
                 }
 
-                String exploredMessage = player.getRepresentation() + " explored " + ExploreEmojis.Cultural +
-                    "Planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(mirageID, game) +
-                    (tile == null ? "" : " *(tile " + tile.getPosition() + ")*:");
+                String exploredMessage = player.getRepresentation() + " explored the planet " + ExploreEmojis.Cultural
+                    + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(mirageID, game) +
+                    (tile == null ? "" : " in tile " + tile.getPosition() + ":");
                 MessageHelper.sendMessageToEventChannel(event, message);
                 resolveExplore(event, exploreID, tile, mirageID, exploredMessage, player, game);
             }
@@ -782,7 +783,7 @@ public class ExploreService {
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
             String cardID = game.drawExplore(Constants.FRONTIER);
-            String messageText = ExploreEmojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":";
+            String messageText = player.getRepresentation() + " explored the " + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
             ExploreService.resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {
@@ -799,7 +800,7 @@ public class ExploreService {
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
-            String messageText = ExploreEmojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":";
+            String messageText = player.getRepresentation() + " explored the " + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
             resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {

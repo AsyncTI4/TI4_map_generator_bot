@@ -344,7 +344,7 @@ public class ButtonHelperSCs {
             }
         }
 
-        ReactionService.addReaction(event, game, player, "Replenishing and washing");
+        ReactionService.addReaction(event, game, player, "replenishing and washing.");
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
 
@@ -693,8 +693,8 @@ public class ButtonHelperSCs {
         }
         boolean hasSchemingAbility = player.hasAbility("scheming");
         String message = hasSchemingAbility
-            ? "Drew 3 Action Cards (**Scheming**) - please discard 1 action card from your hand"
-            : "Drew 2 Action cards";
+            ? "drew 3 action cards (**Scheming**) - please discard 1 action card from your hand."
+            : "drew 2 action cards.";
         int count = hasSchemingAbility ? 3 : 2;
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
