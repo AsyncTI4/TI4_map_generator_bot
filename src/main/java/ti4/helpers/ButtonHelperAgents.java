@@ -1144,9 +1144,9 @@ public class ButtonHelperAgents {
                 String cardID = buttonID.split("_")[3];
                 String planetName = buttonID.split("_")[4];
                 Tile tile = game.getTileFromPlanet(planetName);
-                String messageText = player.getRepresentation() + " explored " + ExploreEmojis.getTraitEmoji(drawColor) +
-                    "Planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile "
-                    + tile.getPosition() + ")*:";
+                String messageText = player.getRepresentation() + " explored the planet " + ExploreEmojis.getTraitEmoji(drawColor)
+                    + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile "
+                    + tile.getPosition() + ":";
                 ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                     && game.getPhaseOfGame().contains("agenda")) {

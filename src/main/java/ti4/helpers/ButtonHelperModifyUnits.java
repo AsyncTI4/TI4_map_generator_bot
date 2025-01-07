@@ -502,17 +502,17 @@ public class ButtonHelperModifyUnits {
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null) continue;
 
-                // Get damaged units count  
+                // Get damaged units count
                 int damagedUnits = (unitHolder.getUnitDamage() != null) ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0) : 0;
 
-                // If the unit is damaged, add its name to duranium message  
+                // If the unit is damaged, add its name to duranium message
                 if (damagedUnits > 0) {
                     repairableUnitsByUnitKey.put(unitKey, damagedUnits);
                 }
             }
         }
 
-        // Process sustains if necessary  
+        // Process sustains if necessary
         if (numSustains > 0) {
             //just for dread 2s
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -526,16 +526,16 @@ public class ButtonHelperModifyUnits {
                 String unitName = unitKey.unitName();
                 if (!unitName.equalsIgnoreCase("dreadnought") || !player.hasUpgradedUnit("dn2")) continue;
 
-                // Get damaged units count  
+                // Get damaged units count
                 int damagedUnits = (unitHolder.getUnitDamage() != null) ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0) : 0;
                 int totalUnits = unitEntry.getValue() - damagedUnits;
                 int min = (player.hasTech("nes")) ? Math.min(totalUnits, (hits + 1) / 2) : Math.min(totalUnits, hits);
 
                 if (min > 0) {
-                    hits -= min * (player.hasTech("nes") ? 2 : 1); // Adjust hits based on technology  
+                    hits -= min * (player.hasTech("nes") ? 2 : 1); // Adjust hits based on technology
                     repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value += min);
 
-                    // Message building based on condition  
+                    // Message building based on condition
                     if (!justSummarizing) {
                         msg.append("> Sustained ").append(min).append(" ").append(unitModel.getUnitEmoji()).append("\n");
                         tile.addUnitDamage("space", unitKey, min);
@@ -547,7 +547,7 @@ public class ButtonHelperModifyUnits {
                     }
                 }
             }
-            // Second loop for non dread 2s  
+            // Second loop for non dread 2s
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
@@ -559,7 +559,7 @@ public class ButtonHelperModifyUnits {
 
                 if (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2")) continue;
 
-                // Get damaged units count  
+                // Get damaged units count
                 int damagedUnits = (unitHolder.getUnitDamage() != null) ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0) : 0;
                 int totalUnits = unitEntry.getValue() - damagedUnits;
                 int min = (player.hasTech("nes")) ? Math.min(totalUnits, (hits + 1) / 2) : Math.min(totalUnits, hits);
@@ -631,7 +631,7 @@ public class ButtonHelperModifyUnits {
                     } else {
                         msg.append("> Would destroy ").append(min).append(" ").append(unitModel.getUnitEmoji()).append("\n");
                     }
-                    continue; // Skip to the next unit  
+                    continue; // Skip to the next unit
                 } else if (isRemainingSustains && unitModel.getIsShip() && unitModel.getSustainDamage() && min > 0) {
                     String stuffNotToSustain = game.getStoredValue("stuffNotToSustainFor" + player.getFaction());
                     if (stuffNotToSustain.isEmpty()) {
@@ -640,7 +640,7 @@ public class ButtonHelperModifyUnits {
                     }
                     if (!stuffNotToSustain.contains(unitName.toLowerCase()) ||
                         (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2"))) {
-                        continue; // Skip to the next unit since these sustains are already handled  
+                        continue; // Skip to the next unit since these sustains are already handled
                     }
                     hits -= min;
                     if (player.hasTech("nes")) hits -= min;
@@ -652,10 +652,10 @@ public class ButtonHelperModifyUnits {
                         msg.append("> Would sustain ").append(min).append(" ").append(unitModel.getUnitEmoji()).append("\n");
                     }
 
-                    continue; // Skip to the next unit  
+                    continue; // Skip to the next unit
                 }
 
-                // Handle general case of destroying units  
+                // Handle general case of destroying units
                 if (unitName.equalsIgnoreCase(thingToHit) && min > 0) {
                     hits -= min;
                     repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value -= min);
@@ -678,7 +678,7 @@ public class ButtonHelperModifyUnits {
             }
         }
 
-        // Remove floating infantry and mechs if everything else is dead  
+        // Remove floating infantry and mechs if everything else is dead
         if (hits >= 0 && !FoWHelper.playerHasActualShipsInSystem(player, tile)) {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
@@ -923,7 +923,7 @@ public class ButtonHelperModifyUnits {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                     Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() 
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
                         + ", you must pay 1 influence" + (mechCount > 1 ? ", " + mechCount + " times," : "") +" due to "
                         + (mechCount == 1 ? "a" : mechCount) + " Omniopiare" + (mechCount == 1 ? "s" : "tis") + " (Keleres mech" + (mechCount == 1 ? "" : "s") + ").");
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -1684,7 +1684,7 @@ public class ButtonHelperModifyUnits {
                 orbFollowUp.add(Buttons.green("orbitalMechDrop_" + planetName, "Pay 3r for Mech?"));
                 orbFollowUp.add(Buttons.red("finishComponentAction_spitItOut", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() +
-                    " you can pay 3r to drop a mech on the planet too", orbFollowUp);
+                    ", you may pay 3 resources to drop a mech on the planet too", orbFollowUp);
             }
         }
 
@@ -1744,13 +1744,14 @@ public class ButtonHelperModifyUnits {
             game.getTileByPosition(pos).removeUnitDamage(planet, unitKey, amount);
         }
 
+        String planetName = ButtonHelper.getUnitHolderFromPlanetName(planet, game).getName();
         game.getTileByPosition(pos).removeUnit(planet, unitKey, amount);
         if (buttonLabel.toLowerCase().contains("damaged")) {
             unitName = "damaged " + unitName;
         }
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmojiOrColor() + " undid landing of " + amount + " " + unitName + " on " + planet + ".");
+            player.getFactionEmojiOrColor() + " undid landing of " + amount + " " + unitName + " on " + planetName + ".");
         event.getMessage().editMessage(event.getMessage().getContentRaw())
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
@@ -1848,9 +1849,10 @@ public class ButtonHelperModifyUnits {
         }
 
         AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " " + unitName + " " + planet);
+        String planetName = ButtonHelper.getUnitHolderFromPlanetName(planet, game).getName();
         if (buttonLabel.toLowerCase().contains("damaged")) {
             game.getTileByPosition(pos).removeUnitDamage("space", unitKey, amount);
-            game.getTileByPosition(pos).addUnitDamage(ButtonHelper.getUnitHolderFromPlanetName(planet, game).getName(), unitKey, amount);
+            game.getTileByPosition(pos).addUnitDamage(planetName, unitKey, amount);
         }
         if (buttonLabel.toLowerCase().contains("damaged")) {
             unitName = "damaged " + unitName;
@@ -1858,7 +1860,7 @@ public class ButtonHelperModifyUnits {
 
         game.getTileByPosition(pos).removeUnit("space", unitKey, amount);
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.fogSafeEmoji() + " landed " + amount + " " + unitName + " on " + planet + ".");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.fogSafeEmoji() + " landed " + amount + " " + unitName + " on " + planetName + ".");
         String oldMessage = event.getMessage().getContentRaw();
         if (space.getUnitCount(UnitType.Infantry, player.getColor()) < 1 && space.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
             oldMessage = "Remember to click \"Done Landing Troops\" if everything has landed correctly.";
@@ -2349,7 +2351,7 @@ public class ButtonHelperModifyUnits {
             + "Select which tile you would like to produce 1 ship in.", buttons);
 
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Used _Contractual Obligations_ to force " 
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Used _Contractual Obligations_ to force "
                 + targetPlayer.getRepresentationNoPing() + " to produce 1 ship.");
         }
         event.getMessage().delete().queue();
