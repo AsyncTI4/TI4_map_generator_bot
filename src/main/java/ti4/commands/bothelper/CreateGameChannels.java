@@ -128,6 +128,8 @@ class CreateGameChannels extends Subcommand {
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
 
         Game game = CreateGameService.createGameChannels(members, event, gameFunName, gameName, gameOwner, categoryChannel);
-        GameManager.save(game, "Created game channels");
+        if (game != null) {
+            GameManager.save(game, "Created game channels");
+        }
     }
 }
