@@ -64,8 +64,13 @@ public class FOWCombatThreadMirroring {
         Tile tile = game.getTileByPosition(systemPos);
 
         //Players to send real combat messages and accept messages from
+        Player p1 = game.getPlayerFromColorOrFaction(matchPattern(threadName, "(?<=-)([^-]+)(?=-vs-)"));
+        Player p2 = game.getPlayerFromColorOrFaction(matchPattern(threadName, "(?<=-vs-)([^-]+)(?=-)"));
         List<Player> playersWithUnits = ButtonHelper.getPlayersWithUnitsInTheSystem(game, tile);
         Set<Player> combatParticipants = new HashSet<>(playersWithUnits);
+        if (p1 != null) combatParticipants.add(p1);
+        if (p2 != null) combatParticipants.add(p2);
+
         if (game.isAllianceMode()) {
             for (Player p : playersWithUnits) {
                 if (!p.getAllianceMembers().isEmpty()) {
