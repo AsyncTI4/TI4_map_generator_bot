@@ -484,11 +484,8 @@ public class ButtonHelperActionCards {
             MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
             return;
         }
-        int oldTg = player.getTg();
-        player.setTg(oldTg + 1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmojiOrColor() + " gained 1 trade good due to _Forward Supply Base_ (" + oldTg
-                + "->" + player.getTg() + ").");
+            player.getRepresentationNoPing() + " gained 1 trade good due to _Forward Supply Base_ " + player.gainTG(1) + ".");
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), player.getFactionEmojiOrColor() + " gained 1 trade good due to _Forward Supply Base_.");
         }
@@ -499,7 +496,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("forwardSupplyBase")
     public static void resolveForwardSupplyBaseStep1(Player player, Game game, ButtonInteractionEvent event) {
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " gained 3 trade goods due to _Foward Supply Base_ (" + player.gainTG(3) + ").");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " gained 3 trade goods due to _Forward Supply Base_ " + player.gainTG(3) + ".");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 3);
         List<Button> buttons = new ArrayList<>();
