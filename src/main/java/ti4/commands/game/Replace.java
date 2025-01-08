@@ -1,6 +1,6 @@
 package ti4.commands.game;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -133,8 +133,8 @@ class Replace extends GameStateSubcommand {
             game.setActivePlayerID(replacementUser.getId());
         }
         Map<String, Player> playersById = game.getPlayers();
-        Map<String, Player> updatedPlayersById = new HashMap<>();
-        for (String userId: game.getPlayers().keySet()) {
+        Map<String, Player> updatedPlayersById = new LinkedHashMap<>();
+        for (String userId: playersById.keySet()) {
             if(userId.equalsIgnoreCase(oldPlayerUserId)) {
                 updatedPlayersById.put(replacedPlayer.getUserID(), replacedPlayer);
             }
