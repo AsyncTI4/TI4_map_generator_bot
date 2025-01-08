@@ -86,7 +86,7 @@ public class CreateGameService {
         }
     }
 
-    public static void createGameChannels(List<Member> members, GenericInteractionCreateEvent event, String gameFunName, String gameName, Member gameOwner, Category categoryChannel) {
+    public static Game createGameChannels(List<Member> members, GenericInteractionCreateEvent event, String gameFunName, String gameName, Member gameOwner, Category categoryChannel) {
         // SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
 
@@ -97,14 +97,14 @@ public class CreateGameService {
         if (!serverCanHostNewGame(guild)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
-            return;
+            return null;
         }
 
         // CHECK IF CATEGORY HAS ROOM
         if (categoryChannel.getChannels().size() > 48) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Category: **" + categoryChannel.getName()
                 + "** is full on server **" + guild.getName() + "**. Create a new category then try again.");
-            return;
+            return null;
         }
 
         // CHECK IF GUILD HAS ALL PLAYERS LISTED
@@ -183,7 +183,6 @@ public class CreateGameService {
             actionsChannel.getAsMention();
         MessageHelper.sendMessageToEventChannel(event, message);
 
-        GameManager.save(newGame, "Created game channels");
         reportNewGameCreated(newGame);
 
         presentSetupToPlayers(newGame);
@@ -202,6 +201,8 @@ public class CreateGameService {
             }
             manager.queue();
         }
+
+        return newGame;
     }
 
     private static void presentSetupToPlayers(Game game) {
