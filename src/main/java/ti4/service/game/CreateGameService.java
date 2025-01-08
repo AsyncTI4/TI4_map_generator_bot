@@ -159,17 +159,12 @@ public class CreateGameService {
         newGame.setMainChannelID(actionsChannel.getId());
 
         // CREATE BOT/MAP THREAD
-        try {
-            actionsChannel.createThreadChannel(newBotThreadName)
-                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
-                .queueAfter(1, TimeUnit.SECONDS, botThread -> {
-                    newGame.setBotMapUpdatesThreadID(botThread.getId());
-                    introductionToBotMapUpdatesThread(newGame);
-                    introductionForNewPlayers(newGame);
-                }, BotLogger::catchRestError);
-        } catch (Exception e) {
-            MessageHelper.sendMessageToChannel(newGame.getMainGameChannel(), "You will need to make your own bot-map-updates thread. Ping bothelper if you don't know how");
-        }
+        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
+            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+            .complete();
+        newGame.setBotMapUpdatesThreadID(botThread.getId());
+        introductionToBotMapUpdatesThread(newGame);
+        introductionForNewPlayers(newGame);
 
         // Create Cards Info Threads
         for (Player player : newGame.getPlayers().values()) {
@@ -193,7 +188,7 @@ public class CreateGameService {
             ThreadChannelManager manager = thread.getManager()
                 .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
-            if (thread.getName().toLowerCase().contains("tigl")) {
+            if (thread.getName().toLowerCase().contains("tigl") || newGame.getCustomName().toLowerCase().contains("tigl")) {
                 TIGLHelper.initializeTIGLGame(newGame);
             }
             if (missingMembers.isEmpty()) {
@@ -246,15 +241,15 @@ public class CreateGameService {
 
     private static void sendMessageAboutAggressionMetas(Game game) {
         String aggressionMsg = """
-                Strangers playing with eachother for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who don't share that meta.\
-                 Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line\
-                .\s
-                The conflict metas are loosely classified as the following:\s
-                - Friendly -- No early home system takes, only as destructive as the objectives require them to be, expects a person's four "slice" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one.\
+            Strangers playing with eachother for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who don't share that meta.\
+             Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line\
+            .\s
+            The conflict metas are loosely classified as the following:\s
+            - Friendly -- No early home system takes, only as destructive as the objectives require them to be, expects a person's four "slice" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one.\
 
-                - No Strong Preference -- Can handle a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2.\
+            - No Strong Preference -- Can handle a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2.\
 
-                - Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives don't necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system.\s""";
+            - Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives don't necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system.\s""";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("anonDeclare_Friendly", "Friendly"));
         buttons.add(Buttons.blue("anonDeclare_No Strong Preference", "No Strong Preference"));

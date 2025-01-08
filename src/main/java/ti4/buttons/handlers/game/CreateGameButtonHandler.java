@@ -95,7 +95,10 @@ class CreateGameButtonHandler {
             return;
         }
         event.getMessage().delete().queue();
-        CreateGameService.createGameChannels(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
+        game = CreateGameService.createGameChannels(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
+        if (game != null) {
+            GameManager.save(game, "Created game channels");
+        }
     }
 
     private static boolean isLockedFromCreatingGames(GenericInteractionCreateEvent event) {
