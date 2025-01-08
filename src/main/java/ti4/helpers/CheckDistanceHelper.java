@@ -20,7 +20,7 @@ public class CheckDistanceHelper {
         if (distances.get(tilePosition2) != null) {
             return distances.get(tilePosition2);
         }
-        return 100;
+        return countsRiftsAsNormal || !game.getTileByPosition(tilePosition1).isGravityRift(game) ? 100 : 99;
     }
 
     public static Map<String, Integer> getTileDistancesRelativeToAllYourUnlockedTiles(Game game, Player player) {
