@@ -689,6 +689,13 @@ public class TileGenerator {
                                     diceCountMirveda.add(model.getSpaceCannonHitsOn() - mod - tempMod);
                                 }
                             }
+                            if (sameTile && player.getPlanets().contains(unitHolder.getName()))
+                            {
+                                Planet planet = game.getPlanetsInfo().get(unitHolder.getName());
+                                for (int i = planet.getSpaceCannonDieCount(); i>0; i--) {
+                                    diceCount.add(planet.getSpaceCannonHitsOn() - mod);
+                                }
+                            }
                         }
                     }
 

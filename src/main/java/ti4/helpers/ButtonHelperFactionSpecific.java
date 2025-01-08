@@ -1529,7 +1529,8 @@ public class ButtonHelperFactionSpecific {
         List<String> deck = game.getExploreDeck(deckType);
         String topCard = deck.getFirst();
         ExploreModel top = Mapper.getExplore(topCard);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Discarded the top of the " + deckType + " deck. The discarded card was " + top.getName());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getRepresentation() + " discarded the top card of the " + deckType + " deck. The discarded card was _" + top.getName() + "_.");
         game.discardExplore(topCard);
         ButtonHelper.deleteTheOneButton(event);
     }

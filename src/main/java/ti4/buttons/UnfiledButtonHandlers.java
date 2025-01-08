@@ -332,7 +332,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void jrStructure(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String unit = buttonID.replace("jrStructure_", "");
         if (!"tg".equalsIgnoreCase(unit)) {
-            String message = player.getRepresentationUnfogged() + " Click the name of the planet you wish to put your unit on";
+            String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your structure on.";
             List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "placeOneNDone_dontskip");
             if (!game.isFowMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
