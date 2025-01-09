@@ -1,6 +1,6 @@
 [
     {
-        "alias": "CoW",
+        "alias": "sigma_cow",
         "name": "The Changer of Ways",
         "types": ["WARFARE"],
         "requirements": "RR",

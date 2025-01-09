@@ -33,6 +33,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -241,6 +242,29 @@ public class StartCombatService {
         }
         game.setStoredValue("solagent", "");
         game.setStoredValue("letnevagent", "");
+
+        // sigma homebrew
+        if (isSpaceCombat) {
+            Player nomad = null;
+            for (Player player : game.getRealPlayers()) {
+                if (player.hasTech("sigma_cow")) {
+                    nomad = player;
+                    break;
+                }
+            }
+            if (nomad != null) {
+                boolean sustain = false;
+                UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+                for (Units.UnitKey unit : space.getUnits().keySet()) {
+                    Player player = game.getPlayerFromColorOrFaction(unit.getColor());
+                    UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
+                    if (removedUnit.getIsShip() && removedUnit.getSustainDamage()) {
+                        MessageHelper.sendMessageToChannel(threadChannel, nomad.getRepresentation() + " may use _The Changer of Ways_.");
+                        break;
+                    }
+                }
+            }
+        }
 
         // AFB
         if (isSpaceCombat) {

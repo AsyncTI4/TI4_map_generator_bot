@@ -58,7 +58,7 @@ public class SecretObjectiveHelper {
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
-            if (entry.getKey().equalsIgnoreCase("dhw")) {
+            if (entry.getKey().equalsIgnoreCase("dhw")) { // destroy heretical works
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
                     List<String> playerFragments = player.getFragments();
                     List<String> fragmentsToPurge = new ArrayList<>(playerFragments);
@@ -99,11 +99,15 @@ public class SecretObjectiveHelper {
                             "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    Button transact2 = Buttons.green(finChecker + "deleteButtons", "Done purging");
+                    Button transact2 = Buttons.green(finChecker + "deleteButtons", "Done Purging");
                     purgeFragButtons.add(transact2);
 
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Purge 2 fragments please", purgeFragButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + ", please purge 2 relic fragments.", purgeFragButtons);
                 }
+            } else if (entry.getKey().equalsIgnoreCase("fsn")) { // form a spy network
+                String msg = player.getRepresentationUnfogged() + ", please discard 5 action cards.";
+                List<Button> buttons = ActionCardHelper.getDiscardActionCardButtonsWithSuffix(player, "retain");
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
         }
         if (event != null && channel.getName().equalsIgnoreCase(event.getChannel().getName())) {
