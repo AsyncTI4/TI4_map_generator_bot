@@ -1,5 +1,9 @@
 package ti4.commands.status;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -23,32 +27,42 @@ class ListDiceLuck extends GameStateSubcommand {
         }
 
         StringBuilder message = new StringBuilder();
-        message.append("**__Average dice luck in ").append(game.getName());
+        message.append("__Average dice luck in ").append(game.getName());
         if (!game.getCustomName().isEmpty()) {
             message.append(" - ").append(game.getCustomName());
         }
-        message.append("__**");
-
+        message.append("__");
+        
+        HashMap<String, Double> record = new HashMap<String, Double>();
         for (Player player : game.getPlayers().values()) {
             if (!player.isRealPlayer()) continue;
-            String turnString = playerAverageDiceLuck(player);
-            message.append("\n").append(turnString);
+            playerAverageDiceLuck(player, record);
+        }
+        ArrayList<String> lines = new ArrayList<>();
+        for (Map.Entry<String, Double> entry : record.entrySet()) {
+            lines.add(entry.getKey());
+        }
+        lines.sort((s1, s2) -> record.get(s2).compareTo(record.get(s1)));
+        for (String s: lines) {
+            message.append("\n").append(s);
         }
 
         MessageHelper.replyToMessage(event, message.toString());
     }
 
-    private String playerAverageDiceLuck(Player player) {
+    private static void playerAverageDiceLuck(Player player, HashMap<String, Double> record) {
         double expectedHits = player.getExpectedHitsTimes10() / 10.0;
         int actualHits = player.getActualHits();
         if (expectedHits == 0) {
-            return "> " + player.getUserName() + " has not rolled dice yet.";
+            record.put("> " + player.getUserName() + " has not rolled dice yet.", -1.0);
+            return;
         }
 
         double total = actualHits / expectedHits;
 
-        return "> " + player.getUserName() + ": `" +
+        record.put("> " + player.getUserName() + ": `" +
             String.format("%.2f", total) +
-            "` (" + actualHits + "/" + String.format("%.1f", expectedHits) + " actual/expected)";
+            "` (" + actualHits + "/" + String.format("%.1f", expectedHits) + " actual/expected)",
+            total);
     }
 }
