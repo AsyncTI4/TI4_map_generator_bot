@@ -62,6 +62,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedPlayer;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
@@ -5902,7 +5903,8 @@ public class ButtonHelper {
     }
 
     public static boolean isPlayerNew(String playerId) {
-        return GameManager.getManagedPlayer(playerId).getGames().size() <= 1;
+        ManagedPlayer managedPlayer = GameManager.getManagedPlayer(playerId);
+        return managedPlayer == null || managedPlayer.getGames().size() <= 1;
     }
 
     public static boolean anyoneHaveInPlayArea(Game game, String pnID) {
