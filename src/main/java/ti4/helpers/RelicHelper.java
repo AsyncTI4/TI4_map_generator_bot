@@ -140,7 +140,7 @@ public class RelicHelper {
 
         String p1 = sender.getRepresentation();
         String p2 = receiver.getRepresentation();
-        String fragString = count + " " + trait + " " + ExploreEmojis.getFragEmoji(trait) + " relic fragments";
+        String fragString = count + " " + trait + " " + ExploreEmojis.getFragEmoji(trait) + " relic fragment" + (count == 1 ? "" : "s");
         String message = p1 + " sent " + fragString + " to " + p2;
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
