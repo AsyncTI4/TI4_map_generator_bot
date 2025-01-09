@@ -19,7 +19,7 @@ public enum UnitEmojis implements TI4Emoji {
         return emojiString();
     }
     
-    public String getUnitEmoji(String unit) {
+    public static String getUnitEmoji(String unit) {
         switch (unit.toLowerCase()) {
             case "sd", "dock", "space dock", "spacedock":
                 return spacedock.toString();
