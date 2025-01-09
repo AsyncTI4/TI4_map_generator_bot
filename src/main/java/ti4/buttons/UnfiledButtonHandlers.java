@@ -1952,21 +1952,21 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("announceARetreat")
     public static void announceARetreat(ButtonInteractionEvent event, Player player, Game game) {
-        String msg = "# " + player.getFactionEmojiOrColor() + " announces a retreat";
+        String msg = player.getRepresentationNoPing() + " has announced a retreat.";
         if (game.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander")) {
-            msg += ". Since they have Jack Hallard, the Nokar commander, this means they may cancel 2 hits in this coming combat round.";
+            msg += " Since they have Jack Hallard, the Nokar commander, this means they may cancel 2 hits in this coming combat round.";
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-        if (game.getActivePlayer() != null && game.getActivePlayer() != player && game.getActivePlayer().hasAbility("cargo_raiders")) {
-            String combatName = "combatRoundTracker" + game.getActivePlayer().getFaction() + game.getActiveSystem() + "space";
-            if (game.getStoredValue(combatName).isEmpty()) {
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("pay1tgToAnnounceARetreat", "Pay 1 Trade Good"));
-                buttons.add(Buttons.red("deleteButtons", "I Don't Have to Pay"));
-                String raiders = player.getRepresentation() + " reminder that your opponent has the **Cargo Raiders** ability,"
-                    + " which means you might have to pay 1 trade good to announce a retreat if they choose.";
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), raiders, buttons);
-            }
+        String combatName = "combatRoundTracker" + game.getActivePlayer().getFaction() + game.getActiveSystem() + "space";
+        if (game.getActivePlayer() != null && game.getActivePlayer() != player && game.getActivePlayer().hasAbility("cargo_raiders")
+            && game.getStoredValue(combatName).isEmpty()) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("pay1tgToAnnounceARetreat", "Pay 1 Trade Good"));
+            buttons.add(Buttons.red("deleteButtons", "I Don't Have to Pay"));
+            String raiders = "\n" + player.getRepresentation() + ", a reminder that your opponent has the **Cargo Raiders** ability,"
+                + " which means you might have to pay 1 trade good to announce a retreat if they choose.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg + raiders, buttons);
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         }
     }
 
