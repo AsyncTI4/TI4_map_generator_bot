@@ -1027,10 +1027,11 @@ public class Helper {
                 if (thing.contains("aida")) {
                     msg.append("> Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
                     if (thing.contains("_")) {
-                        res += ButtonHelper.getNumberOfUnitUpgrades(player);
-                        msg.append(" for ").append(ButtonHelper.getNumberOfUnitUpgrades(player)).append(" resources ");
+                        int upgrades = ButtonHelper.getNumberOfUnitUpgrades(player);
+                        res += upgrades;
+                        msg.append(" for ").append(upgrades).append(" resource").append(upgrades == 1 ? "" : "s");
                     } else {
-                        msg.append(" to ignore a prerequisite on a unit upgrade technology ");
+                        msg.append(" to ignore a prerequisite on a unit upgrade technology");
                     }
                     msg.append(".\n");
                 }
