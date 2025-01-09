@@ -1312,13 +1312,18 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String acIndex = buttonID.replace("ac_discard_from_hand_", "");
         boolean stalling = false;
         boolean drawReplacement = false;
+        boolean retainButtons = false;
         if (acIndex.contains("stall")) {
             acIndex = acIndex.replace("stall", "");
             stalling = true;
         }
         if (acIndex.endsWith("redraw")) {
-            acIndex.replace("redraw", "");
+            acIndex = acIndex.replace("redraw", "");
             drawReplacement = true;
+        }
+        if (acIndex.endsWith("retain")) {
+            acIndex = acIndex.replace("retain", "");
+            retainButtons = true;
         }
 
         MessageChannel channel;
@@ -1365,7 +1370,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     ActionCardHelper.drawActionCards(game, player, 1, true);
                 }
                 ButtonHelper.checkACLimit(game, player);
-                ButtonHelper.deleteMessage(event);
+                if (!retainButtons) {
+                    ButtonHelper.deleteMessage(event);
+                } else {
+                    ButtonHelper.deleteTheOneButton(event, buttonID, false);
+                }
                 if (player.hasUnexhaustedLeader("cymiaeagent")) {
                     List<Button> buttons2 = new ArrayList<>();
                     Button hacanButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", FactionEmojis.cymiae);
@@ -2034,7 +2043,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("getDiscardButtonsACs")
     public static void getDiscardButtonsACs(Player player, Game game) {
-        String msg = player.getRepresentationUnfogged() + " use buttons to discard";
+        String msg = player.getRepresentationUnfogged() + " use buttons to discard an action card.";
         List<Button> buttons = ActionCardHelper.getDiscardActionCardButtons(player, false);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }

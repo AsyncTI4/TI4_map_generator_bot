@@ -177,7 +177,7 @@ public class ActionCardHelper {
 
     public static void sendDiscardActionCardButtons(Player player, boolean doingAction) {
         List<Button> buttons = getDiscardActionCardButtons(player, doingAction);
-        String msg = player.getRepresentationUnfogged() + " use buttons to discard";
+        String msg = player.getRepresentationUnfogged() + " use buttons to discard an action card.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
