@@ -1105,12 +1105,18 @@ public class ButtonHelperFactionSpecific {
 
         String unit = buttonID.split("_")[2];
         RemoveUnitService.removeUnits(event, cabal.getNomboxTile(), game, player.getColor(), unit);
-        MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(),
-            cabal.getRepresentationUnfogged() + " released 1 " + player.getFactionEmojiOrColor()
-                + " " + unit + " from prison");
-        if (cabal != player) {
+        if (cabal == player) {
+            MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(),
+                cabal.getRepresentationUnfogged() + ", you released 1 of your own " + unit + " from your prison.");
+        } else if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(),
+                cabal.getRepresentationUnfogged() + ", you released 1 " + player.getFactionEmojiOrColor()
+                    + " " + unit + " from your prison.");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " a " + unit + " of yours was released from prison.");
+                player.getRepresentationUnfogged() + ", a " + unit + " of yours has been released from prison.");
+        } else {
+            MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(),
+                cabal.getRepresentationUnfogged() + ", you released 1 " + unit + " from your prison and returned it to " + player.getRepresentationUnfogged() + ".");
         }
         if (!cabal.getNomboxTile().getUnitHolders().get("space").getUnits()
             .containsKey(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor()))) {

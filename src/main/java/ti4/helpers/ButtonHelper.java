@@ -1984,7 +1984,7 @@ public class ButtonHelper {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         String tileRep = tile.getRepresentationForButtons(game, player);
-        String ident = player.getFactionEmojiOrColor();
+        String ident = game.isFowMode() ? player.getFactionEmojiOrColor() : player.getRepresentationNoPing();
         String msg = ident + " removed command token from " + tileRep + ".";
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
@@ -2001,9 +2001,8 @@ public class ButtonHelper {
         if ("mahactCommander".equalsIgnoreCase(whatIsItFor)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " used Il Na Viroset, the Mahact Commander"
                 + " and spent a command token from their tactic pool (leaving them with " + (player.getTacticalCC() - 1) + " remaining)."
-                + " This ends their turn, but they may still resolve any \"end of turn\" abilities.");
+                + " This ends their turn, but they may still resolve any \"end of turn\" abilities.\n" + msg);
             player.setTacticalCC(player.getTacticalCC() - 1);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             List<Button> conclusionButtons = new ArrayList<>();
             Button endTurn = Buttons.red(finChecker + "turnEnd", "End Turn");
             conclusionButtons.add(endTurn);
