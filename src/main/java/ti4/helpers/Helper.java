@@ -1074,9 +1074,9 @@ public class Helper {
         } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
             msg.append("for a total spend of ").append(inf).append(" influence.");
         } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
-            msg.append("for a total spend of").append(res).append(" resources (counting influence as resources).");
+            msg.append("for a total spend of ").append(res).append(" resources (counting influence as resources).");
         } else {
-            msg.append("for a total spend of").append(res).append(" resources or ").append(inf).append(" influence.");
+            msg.append("for a total spend of ").append(res).append(" resources or ").append(inf).append(" influence.");
         }
         return msg.toString();
     }
@@ -1114,7 +1114,11 @@ public class Helper {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(un), player.getColor());
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
                 if (uniquePlace.equalsIgnoreCase(tilePos + "_" + planetOrSpace)) {
-                    localPlace.append("> ").append(producedUnits.get(unit)).append(" ").append(removedUnit.getUnitEmoji()).append("\n");
+                    if (producedUnits.get(unit) < 10) {
+                        localPlace.append("> ").append(removedUnit.getUnitEmoji().toString().repeat(producedUnits.get(unit))).append("\n");
+                    } else {
+                        localPlace.append("> ").append(producedUnits.get(unit)).append("x ").append(removedUnit.getUnitEmoji()).append("\n");
+                    }
                 }
             }
             msg.append(localPlace);

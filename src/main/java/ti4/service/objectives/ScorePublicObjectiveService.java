@@ -114,6 +114,12 @@ public class ScorePublicObjectiveService {
             || poName.toLowerCase().contains("hold vast reserves")) {
             String message2 = player.getRepresentationUnfogged()
                 + " Click the names of the planets you wish to exhaust to score the objective.";
+            if (player.hasLeaderUnlocked("xxchahero") && (poName.toLowerCase().contains("amass wealth") 
+                    || poName.toLowerCase().contains("hold vast reserves")))
+            {
+                message2 += "\n-# NB: Xxekir Grom , the Xxcha hero, will allow you to use the combined values of each planet for"
+                    + " __either__ the resource or influence requirement of this objective, but __not__ both.";
+            }
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
             Button DoneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
             buttons.add(DoneExhausting);

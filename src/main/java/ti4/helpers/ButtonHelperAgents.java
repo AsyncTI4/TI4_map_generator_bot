@@ -770,7 +770,7 @@ public class ButtonHelperAgents {
             String pos = posNPlanet.split("_")[0];
             String planetName = posNPlanet.split("_")[1];
             AddUnitService.addUnits(event, game.getTileByPosition(pos), game, player.getColor(), "2 gf " + planetName);
-            String successMessage = player.getFactionEmoji() + " placed 2 " + UnitEmojis.infantry + " on "
+            String successMessage = player.getFactionEmoji() + " placed " + UnitEmojis.infantry + UnitEmojis.infantry + " on "
                 + Helper.getPlanetRepresentation(planetName, game) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
         }

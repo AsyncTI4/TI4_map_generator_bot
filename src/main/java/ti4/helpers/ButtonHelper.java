@@ -2754,10 +2754,10 @@ public class ButtonHelper {
                 + " of that. ";
         }
         if (capacityViolated) {
-            message += " You are violating carrying capacity in tile " + tile.getRepresentation()
-                + ". Specifically, you have " + capacity
-                + " capacity, and you are trying to carry "
-                + (numInfNFightersNMechs - numFighter2s) + " things. ";
+            message += ", you are violating carrying capacity in tile " + tile.getRepresentation()
+                + ". Specifically, you have " + capacity + " capacity, and you are trying to carry " 
+                + (numInfNFightersNMechs - numFighter2s) + " thing" 
+                + (numInfNFightersNMechs - numFighter2s == 1 ? "" : "s") + " ). ";
         }
         if (capacityViolated || fleetSupplyViolated) {
             List<Button> buttons = new ArrayList<>();
