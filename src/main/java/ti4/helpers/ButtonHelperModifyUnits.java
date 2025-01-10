@@ -1467,7 +1467,7 @@ public class ButtonHelperModifyUnits {
             }
 
             if (editedMessage.contains("place 2 infantry")) {
-                successMessage = "Placed 2 " + UnitEmojis.infantry + " on "
+                successMessage = "Placed " + UnitEmojis.infantry + UnitEmojis.infantry + " on "
                     + Helper.getPlanetRepresentation(planetName, game) + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                 event.getMessage().delete().queue();
