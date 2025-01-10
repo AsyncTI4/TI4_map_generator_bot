@@ -1804,13 +1804,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
             case "pass_on_abilities" -> {
                 if (game.isCustodiansScored()) {
-                    Button flipAgenda = Buttons.blue("flip_agenda", "Press this to flip agenda");
+                    Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
                     List<Button> buttons = List.of(flipAgenda);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now",
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now,",
                         buttons);
                 } else {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), game.getPing()
-                        + " All players have indicated completion of status phase. Proceed to Strategy Phase.");
+                        + ", all players have indicated completion of status phase. Proceeding to Strategy Phase.");
                     StartPhaseService.startPhase(event, game, "strategy");
                 }
             }

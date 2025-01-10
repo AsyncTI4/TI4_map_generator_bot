@@ -81,20 +81,34 @@ public class ButtonHelperExplore {
         }
 
         String message = player.getRepresentation() + " purged";
-        for (String fragid : fragmentsToPurge) {
+        if (fragmentsToPurge.size() == 1) {
+            String fragid = fragmentsToPurge.get(0);
             player.removeFragment(fragid);
             game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
             switch (fragid)
             {
-                case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message += " " + ExploreEmojis.CFrag;
-                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->  message += " " + ExploreEmojis.HFrag;
-                case "irf1", "irf2", "irf3", "irf4", "irf5" ->  message += " " + ExploreEmojis.IFrag;
-                case "urf1", "urf2", "urf3" ->  message += " " + ExploreEmojis.UFrag;
+                case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message += "a " + ExploreEmojis.CFrag + "cultural";
+                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->  message += "a " + ExploreEmojis.HFrag + "hazardous";
+                case "irf1", "irf2", "irf3", "irf4", "irf5" ->  message += "an " + ExploreEmojis.IFrag + "industrial";
+                case "urf1", "urf2", "urf3" ->  message += "an " + ExploreEmojis.UFrag + "unknown";
                 default ->  message += " " + fragid;
             }
+            message += " relic fragment.";
+        } else {
+            for (String fragid : fragmentsToPurge) {
+                player.removeFragment(fragid);
+                game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                switch (fragid)
+                {
+                    case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message += ExploreEmojis.CFrag;
+                    case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->  message += ExploreEmojis.HFrag;
+                    case "irf1", "irf2", "irf3", "irf4", "irf5" ->  message += ExploreEmojis.IFrag;
+                    case "urf1", "urf2", "urf3" ->  message += ExploreEmojis.UFrag;
+                    default ->  message += " " + fragid;
+                }
+            }
+            message += " relic fragments.";
         }
-        
-        message += " relic fragments.";
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (!game.isFowMode() && event.getMessageChannel() instanceof ThreadChannel) {

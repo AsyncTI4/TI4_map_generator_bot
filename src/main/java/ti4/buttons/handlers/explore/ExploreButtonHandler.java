@@ -21,6 +21,7 @@ import ti4.service.PlanetService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
@@ -128,7 +129,7 @@ class ExploreButtonHandler {
             message = player.getRepresentation() + ", " + message + "Placed mech on" + Mapper.getPlanet(planet).getName();
         } else {
             AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "2 infantry " + planet);
-            message = player.getRepresentation() + ", " + message + "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
+            message = player.getRepresentation() + ", " + message + "Placed " + UnitEmojis.infantry + UnitEmojis.infantry + " on" + Mapper.getPlanet(planet).getName();
         }
         ReactionService.addReaction(event, game, player, message);
         ButtonHelper.deleteMessage(event);

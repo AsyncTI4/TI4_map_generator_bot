@@ -158,7 +158,7 @@ public class ButtonProcessor {
                 case "gain1tgFromCommander" -> UnfiledButtonHandlers.gain1tgFromCommander(event, player, game, mainGameChannel); // should be deprecated
                 case "decline_explore" -> UnfiledButtonHandlers.declineExplore(event, player, game, mainGameChannel);
                 case "resolveHarness" -> ButtonHelperStats.replenishComms(event, game, player, false);
-                case "pass_on_abilities" -> ReactionService.addReaction(event, game, player, " Is " + event.getButton().getLabel());
+                case "pass_on_abilities" -> ReactionService.addReaction(event, game, player, " is " + event.getButton().getLabel().toLowerCase() + ".");
                 case "lastMinuteDeliberation" -> UnfiledButtonHandlers.lastMinuteDeliberation(event, player, game, actionsChannel);
                 case "declinePDS" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationNoPing() + " officially declines to fire SPACE CANNON.");
                 case "searchMyGames" -> SearchGameHelper.searchGames(event.getUser(), event, false, false, false, true, false, true, false, false);

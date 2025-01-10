@@ -389,7 +389,8 @@ public class ButtonHelperCommanders {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "fighter");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " placed 1 fighter in " + tile.getRepresentation() + " using Sai Seravus, the Creuss commander");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " placed 1 fighter in "
+            + tile.getRepresentation() + " using Sai Seravus, the Creuss commander.");
     }
 
     @ButtonHandler("placeKhraskCommanderInf_")
