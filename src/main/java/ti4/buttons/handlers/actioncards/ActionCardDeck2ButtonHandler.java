@@ -394,11 +394,11 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveSideProject(Player player, Game game, ButtonInteractionEvent event) {
         String successMessage;
         if (player.getStrategicCC() > 0) {
-            successMessage = player.getFactionEmoji() + ", 1 command token has been removed from your strategy pool (" + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ").";
+            successMessage = player.getRepresentationNoPing() + ", 1 command token has been removed from your strategy pool (" + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ").";
             player.setStrategicCC(player.getStrategicCC() - 1);
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, CardEmojis.ActionCard + "Side Project");
         } else {
-            successMessage = player.getFactionEmoji() + " exhausted the _" + RelicHelper.sillySpelling() + "_.";
+            successMessage = player.getRepresentationNoPing() + " exhausted the _" + RelicHelper.sillySpelling() + "_.";
             player.addExhaustedRelic("emelpar");
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);

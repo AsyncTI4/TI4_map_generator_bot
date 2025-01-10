@@ -9,7 +9,7 @@ public enum ExploreEmojis implements TI4Emoji {
     Cultural, Industrial, Hazardous, Frontier,
 
     // Other
-    dmz, Relic;
+    dmz, Relic, LinkGet;
 
     public static TI4Emoji getTraitEmoji(String type) {
         return switch (type.toLowerCase()) {

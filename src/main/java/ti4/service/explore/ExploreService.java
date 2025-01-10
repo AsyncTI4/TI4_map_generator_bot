@@ -31,6 +31,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
@@ -406,13 +407,17 @@ public class ExploreService {
         message = "Card has been discarded. Resolve effects manually.";
         String planetName = Mapper.getPlanet(planetID) == null ? "`error?`" : Mapper.getPlanet(planetID).getName();
         Button decline = Buttons.red("decline_explore", "Decline Exploration");
+        String fragMessage = player.getFactionEmojiOrColor() + " gained a %s fragment.";
+        if (RandomHelper.isOneInX(100)) {
+            fragMessage = "%s\n" + ExploreEmojis.LinkGet;
+        }
 
         // Specific Explore Handling
         switch (cardID) {
-            case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained a " + ExploreEmojis.CFrag + "fragment.");
-            case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained a " + ExploreEmojis.HFrag + "fragment.");
-            case "irf1", "irf2", "irf3", "irf4", "irf5" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained a " + ExploreEmojis.IFrag + "fragment.");
-            case "urf1", "urf2", "urf3" -> MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " gained a " + ExploreEmojis.UFrag + "fragment.");
+            case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> MessageHelper.sendMessageToEventChannel(event, String.format(fragMessage, ExploreEmojis.CFrag));
+            case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> MessageHelper.sendMessageToEventChannel(event, String.format(fragMessage, ExploreEmojis.HFrag));
+            case "irf1", "irf2", "irf3", "irf4", "irf5" -> MessageHelper.sendMessageToEventChannel(event, String.format(fragMessage, ExploreEmojis.IFrag));
+            case "urf1", "urf2", "urf3" -> MessageHelper.sendMessageToEventChannel(event, String.format(fragMessage, ExploreEmojis.UFrag));
             case "ed1", "ed2" -> {
                 message = "_Enigmatic Device_ has been placed in play area.";
                 player.addRelic(Constants.ENIGMATIC_DEVICE);
@@ -778,12 +783,16 @@ public class ExploreService {
     }
 
     public static void expFront(GenericInteractionCreateEvent event, Tile tile, Game game, Player player) {
+        expFront(event, tile, game, player, false);
+    }
+
+    public static void expFront(GenericInteractionCreateEvent event, Tile tile, Game game, Player player, boolean force) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
-        if (space.getTokenList().contains(frontierFilename)) {
-            space.removeToken(frontierFilename);
+        if (space.getTokenList().contains(frontierFilename) || force) {
+            if (space.getTokenList().contains(frontierFilename)) { space.removeToken(frontierFilename); }
             String cardID = game.drawExplore(Constants.FRONTIER);
-            String messageText = player.getRepresentation() + " explored the " + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
+            String messageText = player.getRepresentation() + (force ? " force" : "") + " explored the " + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
             ExploreService.resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {
