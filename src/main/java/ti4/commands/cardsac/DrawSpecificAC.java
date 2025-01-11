@@ -21,9 +21,10 @@ class DrawSpecificAC extends GameStateSubcommand {
         var game = getGame();
         var player = getPlayer();
         String acId = event.getOption(Constants.AC_ID).getAsString();
-        game.drawSpecificActionCard(acId, player.getUserID());
-
         int currentAcCount = player.getAc();
+    
+        game.drawSpecificActionCard(acId, player.getUserID());
+        
         if (currentAcCount == player.getAc()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Card not drawn. It could be in someone's hand, or you could be using the wrong ID."
                 + " Remember, you need the word ID (i.e `scramble` for _Scramble Frequency_) and not the number ID. You may find the word ID with the `/search action_cards` command.");
