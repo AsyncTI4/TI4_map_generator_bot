@@ -113,7 +113,7 @@ public class ScorePublicObjectiveService {
             || poName.toLowerCase().contains("manipulate galactic law")
             || poName.toLowerCase().contains("hold vast reserves")) {
             String message2 = player.getRepresentationUnfogged()
-                + " Click the names of the planets you wish to exhaust to score the objective.";
+                + ", please choose the planets you wish to exhaust to score the objective.";
             if (player.hasLeaderUnlocked("xxchahero") && (poName.toLowerCase().contains("amass wealth") 
                     || poName.toLowerCase().contains("hold vast reserves")))
             {

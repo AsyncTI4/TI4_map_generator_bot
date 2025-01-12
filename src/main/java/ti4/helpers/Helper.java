@@ -1104,9 +1104,9 @@ public class Helper {
                 localPlace.append("And is producing units in ").append(tile.getRepresentationForButtons(game, player));
             }
             if ("space".equalsIgnoreCase(planetOrSpace2)) {
-                localPlace.append(" in the __space area__.\n");
+                localPlace.append(" in the space area.\n");
             } else {
-                localPlace.append(" on the __planet ").append(getPlanetRepresentation(planetOrSpace2, game)).append("__.\n");
+                localPlace.append(" on the planet ").append(getPlanetRepresentation(planetOrSpace2, game)).append(".\n");
             }
             for (String unit : producedUnits.keySet()) {
                 String tilePos = unit.split("_")[1];

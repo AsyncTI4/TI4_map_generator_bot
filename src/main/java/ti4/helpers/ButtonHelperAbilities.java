@@ -497,7 +497,7 @@ public class ButtonHelperAbilities {
         int count = Integer.parseInt(buttonID.split("_")[1]);
         game.drawActionCard(player.getUserID(), count - 1);
         ActionCardHelper.sendActionCardInfo(game, player, event);
-        String msg2 = player.getFactionEmoji() + " is choosing to resolve their **Autonetic Memory** ability.";
+        String msg2 = player.getRepresentationNoPing() + " is choosing to resolve their **Autonetic Memory** ability.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("autoneticMemoryStep3a", "Pick A Card From the Discard"));

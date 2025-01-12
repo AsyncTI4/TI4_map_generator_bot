@@ -61,7 +61,7 @@ public class PickStrategyCardService {
             }
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += player_.getRepresentationUnfogged() + " to pick strategy card.";
+                msgExtra += player_.getRepresentationUnfogged() + " is up to pick their strategy card.";
                 game.setPhaseOfGame("strategy");
                 privatePlayer = player_;
                 allPicked = false;
@@ -173,7 +173,7 @@ public class PickStrategyCardService {
         } else {
             if (!allPicked) {
                 game.updateActivePlayer(privatePlayer);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra + "\nUse buttons to pick your strategy card.", Helper.getRemainingSCButtons(game, privatePlayer));
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra, Helper.getRemainingSCButtons(game, privatePlayer));
                 game.setPhaseOfGame("strategy");
             } else {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);

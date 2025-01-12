@@ -463,7 +463,7 @@ public class PromissoryNoteHelper {
         }
         if ("dspnlane".equalsIgnoreCase(id)) {
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please use buttons to explore.", buttons);
         }
         if ("gift".equalsIgnoreCase(id)) {
             StartPhaseService.startActionPhase(event, game);

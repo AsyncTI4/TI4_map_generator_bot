@@ -59,7 +59,7 @@ class SCUnpick extends GameStateSubcommand {
             }
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += player_.getRepresentationUnfogged() + " To Pick Strategy Card.";
+                msgExtra += player_.getRepresentationUnfogged() + " is up to pick their strategy card.";
                 privatePlayer = player_;
                 allPicked = false;
                 break;
