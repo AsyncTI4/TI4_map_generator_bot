@@ -719,23 +719,18 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (techType.contains("allTechResearchable")) {
             techs = Helper.getAllTechOfAType(game, "propulsion", player, true);
             buttons = Helper.getTechButtons(techs, player, payType);
-            techs =Helper.getAllTechOfAType(game, "cybernetic", player, true);
+            techs = Helper.getAllTechOfAType(game, "cybernetic", player, true);
             buttons.addAll(Helper.getTechButtons(techs, player, payType));
-            techs =Helper.getAllTechOfAType(game, "biotic", player, true);
+            techs = Helper.getAllTechOfAType(game, "biotic", player, true);
             buttons.addAll(Helper.getTechButtons(techs, player, payType));
-            techs =Helper.getAllTechOfAType(game, "warfare", player, true);
+            techs = Helper.getAllTechOfAType(game, "warfare", player, true);
             buttons.addAll(Helper.getTechButtons(techs, player, payType));
-            techs =Helper.getAllTechOfAType(game, "unitupgrade", player, true);
+            techs = Helper.getAllTechOfAType(game, "unitupgrade", player, true);
             buttons.addAll(Helper.getTechButtons(techs, player, payType));
         }else{
             techs = Helper.getAllTechOfAType(game, techType, player);
             buttons = Helper.getTechButtons(techs, player, payType);
-            
         }
-        
-
-        
-        
 
         if (game.isComponentAction()) {
             buttons.add(Buttons.gray("acquireATech", "Get Other Technology"));
@@ -745,10 +740,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
         String message = player.getRepresentation() + ", please choose which technology you wish to get.";
         
-        if(!techType.contains("allTechResearchable")){
+        if (!techType.contains("allTechResearchable")){
             ButtonHelper.deleteMessage(event);
-        }else{
-            message += " The bot believes you capable of meeting the pre-reqs of the tech below.";
+        } else {
+            message += " The buttons shown correspond to technologies that the bot believes you meet the prerequisites for."
+                + " To get a technology that isn't shown, please use the \"Get Other Technology\" button.";
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         
