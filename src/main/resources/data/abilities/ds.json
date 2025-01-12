@@ -410,8 +410,9 @@
         "id": "starfall_gunnery",
         "name": "Starfall Gunnery",
         "faction": "kolume",
+        "permanentEffect": "During each of your actions, up to 3 of your non-fighter ships gain SPACE CANNON 8.",
         "window": "During movement, while you are not the active player",
-        "windowEffect": "You may only use 1 of your unit's SPACE CANNON. During each of your actions, up to 3 of your non-fighter ships gain SPACE CANNON 8.",
+        "windowEffect": "You may only use 1 of your unit's SPACE CANNON.",
         "source": "ds"
     },
     {
