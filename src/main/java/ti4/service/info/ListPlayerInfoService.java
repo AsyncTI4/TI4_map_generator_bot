@@ -2,6 +2,7 @@ package ti4.service.info;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import lombok.experimental.UtilityClass;
@@ -498,7 +499,8 @@ public class ListPlayerInfoService {
                 return player.getFragments().size(); // 2 frags
             }
             case "dfat" -> {
-                Tile tile = game.getTileFromPlanet("mallice");
+                Tile tile = Optional.ofNullable(game.getTileFromPlanet("mallice"))
+                    .orElseGet(() -> game.getTileFromPlanet("hexmallice"));
                 if (tile == null || !FoWHelper.playerHasUnitsInSystem(player, tile)) {
                     return 0;
                 } else {
