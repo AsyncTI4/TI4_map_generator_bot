@@ -739,7 +739,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("cymiaeHeroAutonetic")
     public static void cymiaeHeroAutonetic(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
-        String msg2 = player.getFactionEmoji() + " is choosing to resolve their **Autonetic Memory** ability.";
+        String msg2 = player.getRepresentationNoPing() + " is choosing to resolve their **Autonetic Memory** ability.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         buttons.add(Buttons.green("autoneticMemoryStep3a", "Pick Action Card From the Discard"));
         buttons.add(Buttons.blue("autoneticMemoryStep3b", "Drop 1 infantry"));
@@ -1458,7 +1458,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             if (event.getMessage().getContentRaw().contains("Net gain")) {
                 boolean cyber = false;
                 int netGain = ButtonHelper.checkNetGain(player, shortCCs);
-                finalCCs += ". Net command token gain was " + netGain;
+                finalCCs += ". You gained a net total of " + netGain + " command token" + (netGain == 1 ? "" : "s") + ".";
                 for (String pn : player.getPromissoryNotes().keySet()) {
                     if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
                         cyber = true;
@@ -1498,15 +1498,15 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
             if ("Done Redistributing Command Tokens".equalsIgnoreCase(buttonLabel)) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    playerRep + ", initial command tokens were " + shortCCs + ". Final command tokens allocation is " + finalCCs + ".");
+                    playerRep + ", your initial command token allocation was " + shortCCs + ". Your final command token allocation is " + finalCCs + ".");
             } else {
                 if ("leadership".equalsIgnoreCase(buttonID)) {
-                    String message = playerRep + ", initial command tokens were " + shortCCs + ". Final command tokens allocation is "
+                    String message = playerRep + ", your initial command token allocation was " + shortCCs + ". Your final command tokens allocation is "
                         + finalCCs + ".";
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, "leadership");
                 } else {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        playerRep + ", final command tokens allocation is " + finalCCs + ".");
+                        playerRep + ", your final command tokens allocation is " + finalCCs + ".");
                 }
 
             }

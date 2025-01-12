@@ -1066,12 +1066,12 @@ public class TransactionHelper {
                 CardsInfoService.sendVariousAdditionalButtons(game, p2);
                 if (sendSftT || sendAlliance)
                 {
-                    String text = sendSftT ? "**Support for the Throne** " : "**Alliance** ";
-                    message2 = p1.getRepresentation() + " sent " + text + " directly to the play area of " + ident2;
+                    String text = sendSftT ? "_Support for the Throne_" : "_Alliance_";
+                    message2 = p1.getRepresentation() + " sent " + text + " directly to the play area of " + ident2 + ".";
                 }
                 else
                 {
-                    message2 = p1.getRepresentation() + " sent a promissory note to the hand of " + ident2;
+                    message2 = p1.getRepresentation() + " sent a promissory note to the hand of " + ident2 + ".";
                 }
                 Helper.checkEndGame(game, p2);
             }
