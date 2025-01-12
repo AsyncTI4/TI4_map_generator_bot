@@ -410,6 +410,22 @@ public class Game extends GameProperties {
         }
         return Optional.ofNullable(winner);
     }
+    @JsonIgnore
+    public List<Player> getWinners() {
+        List<Player> winners = new ArrayList<>();
+        Player winner = getWinner().orElse(null);
+        if (winner != null) {
+            winners.add(winner);
+            if(winner.getAllianceMembers() != null) {
+                for (Player player : getRealPlayers()) {
+                    if (player.getAllianceMembers() != null && player.getAllianceMembers().contains(winner.getFaction())) {
+                        winners.add(player);
+                    }
+                }
+            }
+        }
+        return winners;
+    }
 
     private static Player getLowestInitiativePlayer(Player player1, Player player2) {
         if (Collections.min(player1.getSCs()) < Collections.min(player2.getSCs())) {

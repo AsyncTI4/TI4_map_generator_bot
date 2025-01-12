@@ -461,6 +461,10 @@ public class PromissoryNoteHelper {
         if ("spynet".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerSpyNetOptions(player);
         }
+        if ("dspnlane".equalsIgnoreCase(id)) {
+            List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
+        }
         if ("gift".equalsIgnoreCase(id)) {
             StartPhaseService.startActionPhase(event, game);
             //in case Naalu gets eliminated and the PN goes away
