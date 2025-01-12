@@ -2986,7 +2986,7 @@ public class ButtonHelper {
         List<Button> endButtons = new ArrayList<>();
 
         List<String> implementedLegendaryPlanets = List.of(
-                "mallice", "mirage", "hopesend", "primor", // PoK
+                "mallice", "hexmallice", "mirage", "hopesend", "primor", // PoK
                 "silence", "tarrock", "prism", "echo", "domna"); // DS
 
         for (String planet : implementedLegendaryPlanets) {
