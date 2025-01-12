@@ -247,9 +247,9 @@ public class AutoPingCron {
             return;
         }
 
-        String messageWhens = " please indicate no whens";
-        String messageAfters = " please indicate no afters";
         if (game.isFowMode()) {
+            String messageWhens = ", please indicate \"No Whens\".";
+            String messageAfters = ", please indicate \"No Afters\".";
             for (Player player : missingPlayersWhens) {
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
                     player.getRepresentationUnfogged() + messageWhens);
@@ -259,24 +259,24 @@ public class AutoPingCron {
                     player.getRepresentationUnfogged() + messageAfters);
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                "Sent reminder pings to players who have not yet reacted");
+                "Sent reminder pings to players who have not yet reacted.");
         } else {
-            StringBuilder messageWhensBuilder = new StringBuilder(" please indicate no whens");
+            StringBuilder messageBuilder = new StringBuilder();
             for (Player player : missingPlayersWhens) {
-                messageWhensBuilder.insert(0, player.getRepresentationUnfogged());
+                messageBuilder.append(player.getRepresentationUnfogged()).append(", ");
             }
-            messageWhens = messageWhensBuilder.toString();
             if (!missingPlayersWhens.isEmpty()) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageWhens);
+                messageBuilder.append("please indicate \"No Whens\".\n");
             }
 
-            StringBuilder messageAftersBuilder = new StringBuilder(" please indicate no afters");
             for (Player player : missingPlayersAfters) {
-                messageAftersBuilder.insert(0, player.getRepresentationUnfogged());
+                messageBuilder.append(player.getRepresentationUnfogged()).append(", ");
             }
-            messageAfters = messageAftersBuilder.toString();
             if (!missingPlayersAfters.isEmpty()) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageAfters);
+                messageBuilder.append("please indicate \"No Afters\".");
+            }
+            if (messageBuilder.length() > 0) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageBuilder.toString());
             }
         }
     }

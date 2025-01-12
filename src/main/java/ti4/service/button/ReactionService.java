@@ -140,13 +140,13 @@ public class ReactionService {
     }
 
     public static void handleAllPlayersReactingNoAfters(Message message, Game game) {
-        message.reply("All players have indicated 'No Afters'").queueAfter(100, TimeUnit.MILLISECONDS);
+        message.reply("All players have indicated \"No Afters\".").queueAfter(100, TimeUnit.MILLISECONDS);
         AgendaHelper.startTheVoting(game);
         GameMessageManager.remove(game.getName(), message.getId());
     }
 
     public static void handleAllPlayersReactingNoWhens(Message message, Game game) {
-        message.reply("All players have indicated 'No Whens'").queueAfter(100, TimeUnit.MILLISECONDS);
+        message.reply("All players have indicated \"No Whens\".").queueAfter(100, TimeUnit.MILLISECONDS);
         GameMessageManager.remove(game.getName(), message.getId());
     }
 
