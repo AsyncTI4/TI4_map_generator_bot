@@ -52,7 +52,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         List<Button> buttons2 = new ArrayList<>();
         switch (planet) {
             // Prophecy of Kings
-            case "mallice" -> {
+            case "mallice", "hexmallice" -> {
                 int commCount = player.getCommodities();
                 if (commCount == 0)
                 {

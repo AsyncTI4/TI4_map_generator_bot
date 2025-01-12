@@ -26,7 +26,7 @@ class AddTileRandom extends GameStateSubcommand {
     public AddTileRandom() {
         super(Constants.ADD_TILE_RANDOM, "Add random tile to map (empty tiles can be duplicates)", true, false);
         addOption(OptionType.STRING, Constants.POSITION, "Tile positions", true, true);
-        addOption(OptionType.STRING, Constants.RANDOM_TYPE, "Tile type (blue/red/hs/hl/any)", true, true);
+        addOption(OptionType.STRING, Constants.RANDOM_TYPE, "Tile type (B/R/HS/HL/BR)", true, true);
         addOption(OptionType.BOOLEAN, Constants.INCLUDE_ERONOUS_TILES, "Include Eronous tiles");
         addOption(OptionType.BOOLEAN, Constants.DRAW_ONLY, "Only draw, don't add to map");
     }

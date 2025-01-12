@@ -95,9 +95,6 @@ public class FOWCombatThreadMirroring {
             if (player != null && playerOther == player) {
                 continue;
             }
-            if (!tile.getRepresentationForButtons(game, playerOther).contains("(")) {
-                continue;
-            }
             MessageChannel pChannel = playerOther.getPrivateChannel();
             TextChannel pChan = (TextChannel) pChannel;
             if (pChan != null) {
@@ -121,7 +118,7 @@ public class FOWCombatThreadMirroring {
 
                 //Assign hit
                 else if (isBotMessage && isAssignHit(messageText)) {
-                    String assignedHits = matchPattern(messageText, "(?:Removed|Sustained)\\s+(.+?)(?:\\s+from|$)");
+                    String assignedHits = matchPattern(messageText, "(?i)(?:removed|sustained)\\s+(.+?)(?:\\s+from|$)");
                     newMessage += "Someone assigned hits to " + assignedHits;
                 }
                 
@@ -155,15 +152,15 @@ public class FOWCombatThreadMirroring {
     }
 
     private static boolean isCombatRoll(String messageText) {
-        return messageText.contains("rolls for") && messageText.contains("Total hits");
+        return messageText.toLowerCase().contains("rolls for") && messageText.toLowerCase().contains("total hits");
     }
 
     private static boolean isRetreat(String messageText) {
-        return messageText.contains("announces a retreat");
+        return messageText.toLowerCase().contains("has announced a retreat");
     }
 
     private static boolean isAssignHit(String messageText) {
-        return messageText.contains("Removed") || messageText.contains("Sustained");
+        return messageText.toLowerCase().contains("removed") || messageText.toLowerCase().contains("sustained");
     }
 
     private static String matchPattern(String input, String regex) {
