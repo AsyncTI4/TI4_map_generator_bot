@@ -63,6 +63,12 @@ public class StartPhaseService {
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
             // case "P1Special" -> new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", "1082164664844169256")).sendEvent();
             case "shuffleDecks" -> game.shuffleDecks();
+            case "agenda" -> {
+                Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
+                List<Button> buttons = List.of(flipAgenda);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please flip agenda now",
+                    buttons);
+            }
             case "publicObj" -> ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
             case "publicObjAll" -> ListPlayerInfoService.displayerScoringProgression(game, false, event.getMessageChannel(), "1");
             case "ixthian" -> AgendaHelper.rollIxthian(game, false);
