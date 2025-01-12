@@ -6326,9 +6326,9 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    @ButtonHandler("acquireATechWithSC_")
+    @ButtonHandler("acquireATechWithSC")
     public static void acquireATechWithSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        if (buttonID.contains("first")) {
+        if (buttonID.contains("first") || !buttonID.contains("_")) {
             acquireATechWithResources(player, game, event, true, true);
         } else {
             acquireATechWithResources(player, game, event, true, false);
@@ -6381,7 +6381,8 @@ public class ButtonHelper {
             if (first) {
                 ButtonHelperCommanders.yinCommanderSummary(player, game);
                 ButtonHelperCommanders.veldyrCommanderSummary(player, game);
-                UnfiledButtonHandlers.getAllTechOfType(event, player, "getAllTechOfType_allTechResearchable", game, player.getCardsInfoThread());
+                UnfiledButtonHandlers.getAllTechOfType(event, player, "getAllTechOfType_allTechResearchable", game,
+                        player.getCardsInfoThread());
                 return;
             }
         }
