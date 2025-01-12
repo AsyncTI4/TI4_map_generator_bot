@@ -544,7 +544,9 @@ public class ButtonHelperTacticalAction {
         }
         for (String pos : initialOffering) {
             Tile tile = game.getTileByPosition(pos);
-            buttons.add(Buttons.green("ringTile_" + pos, tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player)));
+            if(!game.isNaaluAgent() || !tile.isHomeSystem()){
+                buttons.add(Buttons.green("ringTile_" + pos, tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player)));
+            }
         }
         buttons.add(Buttons.gray("getTilesThisFarAway_" + (maxDistance + 1), "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
         if (Constants.prisonerOneId.equals(player.getUserID())) buttons.addAll(ButtonHelper.getPossibleRings(player, game)); //TODO: Add option for this

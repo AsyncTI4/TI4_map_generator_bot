@@ -72,7 +72,11 @@ public class SearchGameHelper {
         sb.append("**").append(game.getName()).append("**");
         sb.append(gameChannelLink);
         if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(playerAverageMapTurnLength(player)).append("`]");
-        if (game.getWinner().filter(winner -> winner.getUserID().equals(player.getUserID())).isPresent()) sb.append(" **👑WINNER👑**");
+        if (game.hasWinner()){
+            for(Player winner : game.getWinners()){
+                if (winner.getUserID().equals(player.getUserID())) sb.append(" **👑WINNER👑**");
+            }
+        }
         if (game.getActivePlayerID() != null && game.getActivePlayerID().equals(userID) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
         if (showSecondaries && !game.isHasEnded()) {
             List<String> secondaries = new ArrayList<>();

@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.apache.commons.lang3.StringUtils;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
 import ti4.map.GamesPage;
@@ -64,13 +65,15 @@ class PlayerWinPercentStatisticsService {
 
     private static void getPlayerWinPercent(Game game, Map<String, Integer> playerWinCount, Map<String, Integer> playerGameCount,
                                             Map<String, String> playerUserIdToUsername) {
-        Optional<Player> winner = game.getWinner();
-        if (winner.isEmpty()) {
+        Optional<Player> winnerP = game.getWinner();
+        if (winnerP.isEmpty()) {
             return;
         }
-        String winningUserId = winner.get().getUserID();
-        playerWinCount.put(winningUserId, 1 + playerWinCount.getOrDefault(winningUserId, 0));
-
+        for(Player winner : game.getWinners()) {
+            String winningUserId = winner.getUserID();
+            playerWinCount.put(winningUserId, 1 + playerWinCount.getOrDefault(winningUserId, 0));
+        }
+        
         game.getRealPlayers().forEach(player -> {
             String userId = player.getUserID();
             playerUserIdToUsername.put(userId, player.getUserName());

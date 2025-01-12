@@ -69,6 +69,7 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
@@ -2026,6 +2027,106 @@ public class Helper {
         return getTechButtons(techs, player, "normal");
     }
 
+    public static boolean isTechResearchable(TechnologyModel tech, Player player){
+        Game game = player.getGame();
+        String requirements = tech.getRequirements().orElse("");
+        int wilds = 0;
+        if(ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, false).contains(tech.getAlias())){
+            wilds++;
+        }
+        if(ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, true).contains(tech.getAlias())){
+           return true;
+        }
+        for(String techID : player.getTechs()){
+            TechnologyModel playerTech = Mapper.getTech(techID);
+            if(playerTech != null){
+                for(TechnologyType type : playerTech.getTypes()){
+                    if(type == TechnologyType.BIOTIC){
+                        requirements = requirements.replaceFirst("G", "");
+                    }
+                    if(type == TechnologyType.WARFARE){
+                        requirements = requirements.replaceFirst("R", "");
+                    }
+                    if(type == TechnologyType.PROPULSION){
+                        requirements = requirements.replaceFirst("B", "");
+                    }
+                    if(type == TechnologyType.CYBERNETIC){
+                        requirements = requirements.replaceFirst("Y", "");
+                    }
+                    if(type == TechnologyType.UNITUPGRADE && game.playerHasLeaderUnlockedOrAlliance(player, "kjalengardcommander")){
+                        wilds++;
+                    }
+                }
+            }
+        }
+        for(String planet : player.getPlanets()){
+            if(player.getExhaustedPlanets().contains(planet) && !(player.hasTech("pa") || player.hasTech("absol_pa"))){
+                continue;
+            }
+            if (ButtonHelper.checkForTechSkips(game, planet)) {
+                Planet unitHolder = game.getPlanetsInfo().get(planet);
+                Set<String> techTypes = unitHolder.getTechSpecialities();
+                for(String type : techTypes){
+                    if(game.playerHasLeaderUnlockedOrAlliance(player, "zealotscommander")){
+                        wilds++;
+                    }else{
+                        if(type.equalsIgnoreCase("propulsion")){
+                            requirements = requirements.replaceFirst("B", "");
+                            if(player.hasAbility("ancient_knowledge")){
+                                requirements = requirements.replaceFirst("B", "");
+                            }
+                        }
+                        if(type.equalsIgnoreCase("biotic")){
+                            requirements = requirements.replaceFirst("G", "");
+                            if(player.hasAbility("ancient_knowledge")){
+                                requirements = requirements.replaceFirst("G", "");
+                            }
+                        }
+                        if(type.equalsIgnoreCase("warfare")){
+                            requirements = requirements.replaceFirst("R", "");
+                            if(player.hasAbility("ancient_knowledge")){
+                                requirements = requirements.replaceFirst("R", "");
+                            }
+                        }
+                        if(type.equalsIgnoreCase("cybernetic")){
+                            requirements = requirements.replaceFirst("Y", "");
+                            if(player.hasAbility("ancient_knowledge")){
+                                requirements = requirements.replaceFirst("Y", "");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if(game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")){
+            requirements = requirements.replaceFirst("G", "");
+        }
+        if(game.playerHasLeaderUnlockedOrAlliance(player, "kollecccommander")){
+            requirements = requirements.replaceFirst("B", "");
+        }
+        if(game.playerHasLeaderUnlockedOrAlliance(player, "dihmohncommander")){
+            requirements = requirements.replaceFirst("R", "");
+        }
+        if(game.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")){
+            requirements = requirements.replaceFirst("Y", "");
+        }
+        //"augerscommander"
+        if(tech.getFirstType() == TechnologyType.UNITUPGRADE){
+            if(player.hasTechReady("aida") || player.hasTechReady("absol_aida")){
+                wilds++;
+            }
+        }else{
+            if(player.hasAbility("brilliant")){
+                wilds++;
+            }
+        }
+        if(player.hasRelicReady("prophetstears") || player.hasRelicReady("absol_prophetstears")){
+            wilds++;
+        }
+        
+        return requirements.length() <= wilds;
+    }
+
     public static List<Button> getTechButtons(List<TechnologyModel> techs, Player player, String buttonPrefixType) {
         List<Button> techButtons = new ArrayList<>();
 
@@ -2065,10 +2166,14 @@ public class Helper {
         }
         return techButtons;
     }
-
     public static List<TechnologyModel> getAllTechOfAType(Game game, String techType, Player player) {
+        return getAllTechOfAType(game, techType, player, false);
+    }
+
+    public static List<TechnologyModel> getAllTechOfAType(Game game, String techType, Player player, boolean hasToBeResearchable) {
         List<TechnologyModel> techs = new ArrayList<>();
         Mapper.getTechs().values().stream()
+            .filter(tech -> !hasToBeResearchable || isTechResearchable(tech, player))
             .filter(tech -> game.getTechnologyDeck().contains(tech.getAlias()))
             .filter(tech -> tech.isType(techType) || game.getStoredValue("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
             .filter(tech -> !player.getPurgedTechs().contains(tech.getAlias()))
