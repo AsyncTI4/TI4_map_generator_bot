@@ -154,31 +154,28 @@ public class ButtonHelperCommanders {
         }
         StringBuilder summary = new StringBuilder(player.getRepresentation() + " you could potentially use Brother Omar, the Yin Commander, to sacrifice 1 infantry"
         + " and ignore the prerequisites for these technologies (the bot did not check if you have the prerequisites otherwise):\n");
-        List<String> techsSummed = new ArrayList<>();
-        for (Player p2 : game.getRealPlayers()) {
-            for (String tech : p2.getTechs()) {
-                if (!player.getTechs().contains(tech) && !techsSummed.contains(tech)) {
-                    TechnologyModel model = Mapper.getTech(tech);
-                    if (model.getFaction().isPresent() || model.getFaction().isPresent() || model.getRequirements().isEmpty() || model.getRequirements().isEmpty()) {
-                        continue;
-                    }
-                    techsSummed.add(tech);
-                    summary.append(model.getRepresentation(false)).append("\n");
-                }
-            }
+        List<String> techsSummed = getVeldyrCommanderTechs(player, game, true);
+        for (String tech : techsSummed) {
+            TechnologyModel model = Mapper.getTech(tech);
+            summary.append(model.getRepresentation(false)).append("\n");
         }
         if (!techsSummed.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary.toString());
         }
     }
 
-    public static void veldyrCommanderSummary(Player player, Game game) {
-        if (!game.playerHasLeaderUnlockedOrAlliance(player, "veldyrcommander")) {
-            return;
-        }
-        StringBuilder summary = new StringBuilder(player.getRepresentation() + " you could potentially use Vera Khage, the Veldyr Commander,"
-            + " to ignore one prerequisite for these technologies (the bot did not check if you have the prerequisites otherwise):\n");
+    public static List<String> getVeldyrCommanderTechs(Player player, Game game, boolean yin){
         List<String> techsSummed = new ArrayList<>();
+        if(yin){
+            if (!game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
+                return techsSummed;
+            }
+        }
+        else{
+            if (!game.playerHasLeaderUnlockedOrAlliance(player, "veldyrcommander")) {
+                return techsSummed;
+            }
+        }
         for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)) {
             for (String tech : p2.getTechs()) {
                 if (!player.getTechs().contains(tech) && !techsSummed.contains(tech)) {
@@ -187,9 +184,22 @@ public class ButtonHelperCommanders {
                         continue;
                     }
                     techsSummed.add(tech);
-                    summary.append(model.getRepresentation(false)).append("\n");
                 }
             }
+        }
+        return techsSummed;
+    }
+
+    public static void veldyrCommanderSummary(Player player, Game game) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "veldyrcommander")) {
+            return;
+        }
+        StringBuilder summary = new StringBuilder(player.getRepresentation() + " you could potentially use Vera Khage, the Veldyr Commander,"
+            + " to ignore one prerequisite for these technologies (the bot did not check if you have the prerequisites otherwise):\n");
+        List<String> techsSummed = getVeldyrCommanderTechs(player, game, false);
+        for (String tech : techsSummed) {
+            TechnologyModel model = Mapper.getTech(tech);
+            summary.append(model.getRepresentation(false)).append("\n");
         }
         if (!techsSummed.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary.toString());

@@ -1,5 +1,7 @@
 package ti4.buttons;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 
@@ -700,6 +701,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("getAllTechOfType_")
     public static void getAllTechOfType(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        getAllTechOfType(event, player, buttonID, game, event.getMessageChannel());
+    }
+    public static void getAllTechOfType(ButtonInteractionEvent event, Player player, String buttonID, Game game, MessageChannel channel) {
         String techType = buttonID.replace("getAllTechOfType_", "");
         String payType = null;
         if (techType.contains("_")) {
@@ -707,24 +711,47 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             techType = split[0];
             payType = split[1];
         }
-        List<TechnologyModel> techs = Helper.getAllTechOfAType(game, techType, player);
-
+        List<TechnologyModel> techs;
         List<Button> buttons;
         if (payType == null) {
-            buttons = Helper.getTechButtons(techs, player);
-        } else {
-            buttons = Helper.getTechButtons(techs, player, payType);
+            payType = "normal";
         }
+        if (techType.contains("allTechResearchable")) {
+            techs = Helper.getAllTechOfAType(game, "propulsion", player, true);
+            buttons = Helper.getTechButtons(techs, player, payType);
+            techs =Helper.getAllTechOfAType(game, "cybernetic", player, true);
+            buttons.addAll(Helper.getTechButtons(techs, player, payType));
+            techs =Helper.getAllTechOfAType(game, "biotic", player, true);
+            buttons.addAll(Helper.getTechButtons(techs, player, payType));
+            techs =Helper.getAllTechOfAType(game, "warfare", player, true);
+            buttons.addAll(Helper.getTechButtons(techs, player, payType));
+            techs =Helper.getAllTechOfAType(game, "unitupgrade", player, true);
+            buttons.addAll(Helper.getTechButtons(techs, player, payType));
+        }else{
+            techs = Helper.getAllTechOfAType(game, techType, player);
+            buttons = Helper.getTechButtons(techs, player, payType);
+            
+        }
+        
+
+        
+        
 
         if (game.isComponentAction()) {
-            buttons.add(Buttons.gray("acquireATech", "Get Technology of a Different Type"));
+            buttons.add(Buttons.gray("acquireATech", "Get Other Technology"));
         } else {
-            buttons.add(Buttons.gray("acquireATechWithSC", "Get Technology of a Different Type"));
+            buttons.add(Buttons.gray("acquireATechWithSC_second", "Get Other Technology"));
         }
 
         String message = player.getRepresentation() + ", please choose which technology you wish to get.";
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-        ButtonHelper.deleteMessage(event);
+        
+        if(!techType.contains("allTechResearchable")){
+            ButtonHelper.deleteMessage(event);
+        }else{
+            message += " The bot believes you capable of meeting the pre-reqs of the tech below.";
+        }
+        MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+        
     }
 
     @ButtonHandler("autoneticMemoryStep3")
