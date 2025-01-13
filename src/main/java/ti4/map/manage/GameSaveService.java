@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -81,8 +82,8 @@ class GameSaveService {
         }
 
         Path gameFile = Storage.getGamePath(game.getName() + Constants.TXT);
-        try (FileChannel fileChannel = FileChannel.open(gameFile, StandardOpenOption.WRITE)) {
-            fileChannel.lock();
+        try (FileChannel fileChannel = FileChannel.open(gameFile, StandardOpenOption.WRITE);
+                FileLock fileLock = fileChannel.lock(0L, Long.MAX_VALUE, false)) {
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(gameFile.toFile()))) {
                 Map<String, Tile> tileMap = game.getTileMap();

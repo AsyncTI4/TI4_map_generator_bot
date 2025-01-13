@@ -3,6 +3,7 @@ package ti4.map.manage;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -112,8 +113,8 @@ class GameLoadService {
             BotLogger.log("Could not load map, map file does not exist: " + gameFile.getFileName());
             return null;
         }
-        try (FileChannel fileChannel = FileChannel.open(gameFile, StandardOpenOption.READ)) {
-            fileChannel.lock();
+        try (FileChannel fileChannel = FileChannel.open(gameFile, StandardOpenOption.READ);
+                FileLock fileLock = fileChannel.lock(0L, Long.MAX_VALUE, true)) {
 
             Game game = new Game();
             Iterator<String> gameFileLines = Files.readAllLines(gameFile, Charset.defaultCharset()).listIterator();
