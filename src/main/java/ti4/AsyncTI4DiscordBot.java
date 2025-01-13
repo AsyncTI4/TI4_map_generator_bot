@@ -53,6 +53,7 @@ import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
 import ti4.listeners.UserJoinServerListener;
+import ti4.listeners.UserLeaveServerListener;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -118,6 +119,7 @@ public class AsyncTI4DiscordBot {
             ModalListener.getInstance(),
             new SelectionMenuListener(),
             new UserJoinServerListener(),
+            new UserLeaveServerListener(),
             new AutoCompleteListener());
 
         try {
