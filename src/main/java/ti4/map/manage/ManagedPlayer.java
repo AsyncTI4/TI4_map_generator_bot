@@ -25,6 +25,7 @@ public class ManagedPlayer {
         if (!player.getUserID().equals(id)) {
             throw new IllegalArgumentException("Player " + player.getUserID() + " attempted merge with " + id);
         }
+        games.remove(game);
         games.add(game);
     }
 
