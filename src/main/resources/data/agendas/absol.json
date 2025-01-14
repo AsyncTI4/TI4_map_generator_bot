@@ -265,8 +265,8 @@
         "name": "Judicial Abolishment",
         "type": "Law",
         "target": "For/Against",
-        "text1": "At the start of the Agenda Phase, the speaker may spend 6 influence to discard any 1 law in play.",
-        "text2": "Reveal cards from the bottom of the agenda deck until a law is revealed. Put that law into play.  The player that cast the most votes \"Against\" is considered to have cast the most votes for that law and chooses what outcome is elected, if applicable.",
+        "text1": "For: At the start of the Agenda Phase, the speaker may spend 6 influence to discard any 1 law in play.",
+        "text2": "Against: Reveal cards from the bottom of the agenda deck until a law is revealed. Put that law into play.  The player that cast the most votes \"Against\" is considered to have cast the most votes for that law and chooses what outcome is elected, if applicable.",
         "source": "absol"
     },
     {
@@ -521,7 +521,7 @@
         "name": "Unconventional Measures",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Each player who voted \"For\" draws 2 action cards. Each player who voted \"Against\" places 1 command token.",
+        "text1": "For: Each player who voted \"For\" draws 2 action cards. Each player who voted \"Against\" gains 1 command token.",
         "text2": "Against: Each player who voted \"Against\" or abstained discards their action cards. The player that cast the most votes \"For\" chooses one strategy card to become exhausted.",
         "source": "absol"
     },
