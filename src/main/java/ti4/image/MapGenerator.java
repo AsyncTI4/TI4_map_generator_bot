@@ -4513,6 +4513,11 @@ public class MapGenerator implements AutoCloseable {
             case "spring" -> Color.decode("#cedd8e");
             case "ethereal" -> Color.decode("#31559e");
             case "orca" -> getColor("gray");
+            case "copper" -> Color.decode("#703a00");
+            case "plum" -> Color.decode("#975d8e");
+            case "peach" -> Color.decode("#dda38e");
+            case "rust" -> Color.decode("#853e3f");
+            case "tropical" -> Color.decode("#f8f46a");
             default -> Color.WHITE;
         };
     }
