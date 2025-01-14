@@ -124,10 +124,13 @@ public class GameManager {
     }
 
     static ManagedPlayer addOrMergePlayer(ManagedGame game, Player player) {
-        var managedPlayer = playerNameToManagedPlayer.computeIfAbsent(player.getUserID(), k -> new ManagedPlayer(game, player));
-        if (!managedPlayer.getGames().contains(game)) {
-            managedPlayer.merge(game, player);
+        var managedPlayer = playerNameToManagedPlayer.get(player.getUserID());
+        if (managedPlayer == null) {
+            managedPlayer = new ManagedPlayer(game, player);
+            playerNameToManagedPlayer.put(player.getUserID(), managedPlayer);
+            return managedPlayer;
         }
+        managedPlayer.addOrReplaceGame(game, player);
         return managedPlayer;
     }
 }
