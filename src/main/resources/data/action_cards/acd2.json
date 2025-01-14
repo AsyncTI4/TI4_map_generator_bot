@@ -18,6 +18,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "anti-gravity_platforms",
+    "name": "Anti-gravity Platforms",
+    "phase": "Action",
+    "window": "At the start of a ground combat",
+    "text": "Choose 1 of your ships in the active system to participate in this combat as if it were a ground force.",
+    "flavorText": "The battle seemed to freeze as the J.N.S. Hylarim entered low orbit, its shadow eclipsing the conflict—and the hopes of its enemies.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "armament_rider",
     "name": "Armament Rider",
     "phase": "Agenda",
@@ -78,15 +87,6 @@
     "window": "Action",
     "text": "Purge 3 relic fragments to gain 1 relic; you may spend any number of resources to reduce the number of relic fragments to be purged by 1 for every 3 resources spent.",
     "flavorText": "The black shard dripped with blood—some of it her own. What she had done, she did for the Federation. For all of humankind.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "blackmail",
-    "name": "Blackmail",
-    "phase": "Agenda",
-    "window": "After an agenda is revealed",
-    "text": "Choose another player. That player may give you 1 random promissory note from their hand; otherwise, they must cast at least 1 vote for an outcome of your choice during this agenda, if able.",
-    "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
     "source": "action_deck_2"
   },
   {
@@ -201,7 +201,7 @@
     "alias": "decisive_victory",
     "name": "Decisive Victory",
     "phase": "Action",
-    "window": "When only you have ships in the the active system at the end of the first round of a space combat",
+    "window": "When you win a space combat after the end of its first round",
     "text": "Remove your command token from that system.",
     "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
     "source": "action_deck_2"
@@ -309,7 +309,7 @@
     "alias": "discord",
     "name": "Discord",
     "phase": "Action",
-    "window": "When you perform a strategic action",
+    "window": "When a player performs a strategic action",
     "text": "Choose another player. If that player spends a command token during this strategic action, they must spend 1 additional token from their command sheet, if able.",
     "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their human minions had done well.",
     "source": "action_deck_2"
@@ -330,15 +330,6 @@
     "window": "When 1 or more of your units use PRODUCTION",
     "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods. [Note: These trade goods are available to be spent during this PRODUCTION.]",
     "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "energy_pulse",
-    "name": "Energy Pulse",
-    "phase": "Action",
-    "window": "After the \"Move Ships\" substep of a tactical action in a system that contains your units",
-    "text": "Choose 1 non-flagship unit in that system. That unit loses its printed abilities during this tactical action.",
-    "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
     "source": "action_deck_2"
   },
   {
@@ -528,6 +519,15 @@
     "window": "At the start of your turn",
     "text": "Either redistribute your command tokens or place 1 command token from your reinforcements in your fleet pool.",
     "flavorText": "Unlenn massaged his brow and shut off his holoscreen. The magnum opus on Lazax war theory at his fingertips, and yet... it was the most boring piece of literature he'd ever had the displeasure to read.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "malfunction",
+    "name": "Malfunction",
+    "phase": "Action",
+    "window": "After the \"Move Ships\" substep of a tactical action in a system that contains your units",
+    "text": "Choose 1 unit in that system. That unit loses its printed abilities during this tactical action.",
+    "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
     "source": "action_deck_2"
   },
   {
@@ -724,7 +724,7 @@
     "name": "Refabrication",
     "phase": "Any",
     "window": "After 1 or more of your ships are destroyed",
-    "text": "For each of those ships, you may produce 1 ship of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 4.",
+    "text": "For each of those ships, you may produce 1 ship of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 4.",
     "flavorText": "As the Van Hauge VI left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers.\"",
     "source": "action_deck_2"
   },
@@ -751,7 +751,7 @@
     "name": "Relay Connection",
     "phase": "Action",
     "window": "After 1 of your units uses PRODUCTION to produce a ship in a system",
-    "text": "Produce 1 ship of that type in any number of other systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
+    "text": "Produce 1 ship of that type in any number of other systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
     "flavorText": "His engineers broke into celebration as Umbat called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
     "source": "action_deck_2"
   },
@@ -806,7 +806,7 @@
     "phase": "Any",
     "window": "When another player plays an action card other than 'Sabotage'",
     "text": "Cancel that action card.",
-    "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked the Admiral to his core.",
+    "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
     "source": "action_deck_2"
   },
   {
