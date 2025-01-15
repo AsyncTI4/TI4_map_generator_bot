@@ -255,7 +255,7 @@ public class AgendaHelper {
     public static void erase1DebtTo(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String tgOrDebt = buttonID.split("_")[2];
-        int amount = tgOrDebt.endswith("3") ? 3 : 1;
+        int amount = tgOrDebt.endsWith("3") ? 3 : 1;
         tgOrDebt = tgOrDebt.replace("3", "");
         p2.clearDebt(player, amount);
         String msg = amount + " debt owed by " + player.getRepresentation() + " to " + p2.getRepresentation() + " was cleared. " + p2.getDebtTokenCount(player.getColor()) + " debt remains.";
@@ -747,9 +747,9 @@ public class AgendaHelper {
         if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
             cleanedChoice = Helper.getPlanetRepresentation(choice, game);
         }
-        String voteMessage = "Chose to put a " + rider + " on " + StringUtils.capitalize(cleanedChoice);
+        String voteMessage = "chose to put a " + rider + " on \"" + StringUtils.capitalize(cleanedChoice) + "\".";
         if (!game.isFowMode()) {
-            voteMessage = player.getFactionEmojiOrColor() + " " + voteMessage;
+            voteMessage = player.getRepresentationNoPing() + " " + voteMessage;
         }
         String identifier;
         if (game.isFowMode()) {
@@ -2389,10 +2389,10 @@ public class AgendaHelper {
                 }
             }
 
-            ReactionService.addReaction(event, game, player, true, true, "Playing " + riderName, riderName + " Played");
+            ReactionService.addReaction(event, game, player, true, true, "playing " + riderName, ".");
             PromissoryNoteHelper.resolvePNPlay(pnKey, player, game, event);
         } else {
-            ReactionService.addReaction(event, game, player, true, true, "Playing " + riderName, riderName + " Played");
+            ReactionService.addReaction(event, game, player, true, true, "playing " + riderName, ".");
 
             if (riderName.contains("Unity Algorithm")) {
                 player.exhaustTech("dsedyng");
@@ -2405,7 +2405,7 @@ public class AgendaHelper {
                     listVoteCount(game, game.getMainGameChannel());
                 }
             } else {
-                MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target", game, player, riderButtons);
+                MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target.", game, player, riderButtons);
                 if ("Keleres Xxcha Hero".equalsIgnoreCase(riderName)) {
                     Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
                     if (playerLeader != null) {
@@ -2421,7 +2421,7 @@ public class AgendaHelper {
                     }
                 }
             }
-            MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
+            MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate \"No Afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
         }
         // "dspnedyn"
         ButtonHelper.deleteMessage(event);
