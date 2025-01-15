@@ -18,6 +18,15 @@
         "hue": "PURPLE"
     },
     {
+        "alias": "tpl",
+        "name": "tropical",
+        "aliases": ["tpl"],
+        "textColor": "black",
+        "primaryColor": { "red": 255, "green": 178, "blue": 120 },
+        "secondaryColor": { "red": 89, "green": 255, "blue": 131 },
+        "hue": "GREEN"
+    },
+    {
         "alias": "tqs",
         "name": "turquoise",
         "aliases": ["tqs", "torq", "turquoise", "torquoise", "turq", "turquis"],
@@ -43,6 +52,15 @@
         "primaryColor": { "red": 230, "green": 0, "blue": 40 },
         "secondaryColor": { "red": 80, "green": 0, "blue": 20 },
         "hue": "RED"
+    },
+    {
+        "alias": "cpr",
+        "name": "copper",
+        "aliases": ["cpr"],
+        "textColor": "white",
+        "primaryColor": { "red": 229, "green": 134, "blue": 0 },
+        "secondaryColor": { "red": 79, "green": 40, "blue": 0 },
+        "hue": "ORANGE"
     },
     {
         "alias": "nvy",
