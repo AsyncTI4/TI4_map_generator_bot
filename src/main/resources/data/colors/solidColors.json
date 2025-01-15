@@ -80,6 +80,14 @@
         "hue": "BLUE"
     },
     {
+        "alias": "rst",
+        "name": "rust",
+        "aliases": ["rst"],
+        "textColor": "white",
+        "primaryColor": { "red": 140, "green": 66, "blue": 72 },
+        "hue": "RED"
+    },
+    {
         "alias": "bwn",
         "name": "brown",
         "aliases": ["bwn"],
@@ -110,6 +118,14 @@
         "textColor": "white",
         "primaryColor": { "red": 90, "green": 150, "blue": 100 },
         "hue": "GREEN"
+    },
+    {
+        "alias": "plm",
+        "name": "plum",
+        "aliases": ["plm"],
+        "textColor": "white",
+        "primaryColor": { "red": 150, "green": 90, "blue": 140 },
+        "hue": "PURPLE"
     },
     {
         "alias": "tea",
@@ -150,6 +166,14 @@
         "textColor": "black",
         "primaryColor": { "red": 219, "green": 231, "blue": 167 },
         "hue": "YELLOW"
+    },
+    {
+        "alias": "pch",
+        "name": "peach",
+        "aliases": ["pch"],
+        "textColor": "black",
+        "primaryColor": { "red": 232, "green": 184, "blue": 167 },
+        "hue": "ORANGE"
     },
     {
         "alias": "eth",
