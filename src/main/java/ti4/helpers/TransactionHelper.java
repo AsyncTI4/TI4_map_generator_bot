@@ -41,7 +41,7 @@ public class TransactionHelper {
         MessageChannel channel = p1.getCorrectChannel();
         if (game.getName().equalsIgnoreCase("pbd1000")) {
             channel = game.getTableTalkChannel();
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " have transacted.");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), p1.getRepresentation(false, false) + " and " + p2.getRepresentation(false, false) + " have transacted.");
         }
 
         String publicSummary = "A transaction has been ratified:\n" + buildTransactionOffer(p1, p2, game, true);

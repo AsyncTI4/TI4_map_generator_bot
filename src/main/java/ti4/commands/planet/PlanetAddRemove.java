@@ -93,7 +93,7 @@ abstract class PlanetAddRemove extends GameStateSubcommand {
     public abstract void doAction(GenericInteractionCreateEvent event, Player player, String techID, Game game);
 
     private String getActionHeaderMessage(Player player) {
-        String message = player.getRepresentation() + " ";
+        String message = player.getRepresentation();
         return switch (getName()) {
             case Constants.PLANET_ADD -> message + " added planet(s):";
             case Constants.PLANET_REMOVE -> message + " removed planet(s):";

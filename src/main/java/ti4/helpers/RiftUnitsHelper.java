@@ -95,12 +95,12 @@ public class RiftUnitsHelper {
                     }
                     for (int x = 1; x < damagedUnits + 1; x++) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                            ident + " " + riftUnit(unitAsyncID + "damaged", tile, game, event, player, cabal));
+                            "A " + ident + riftUnit(unitAsyncID + "damaged", tile, game, event, player, cabal));
                     }
                     totalUnits -= damagedUnits;
                     for (int x = 1; x < totalUnits + 1; x++) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                            ident + " " + riftUnit(unitAsyncID, tile, game, event, player, cabal));
+                            "A " + ident + riftUnit(unitAsyncID, tile, game, event, player, cabal));
                     }
                 }
             }
@@ -144,7 +144,7 @@ public class RiftUnitsHelper {
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
         String msg = unitKey.unitEmoji() + " in tile " + tile.getPosition() + " rolled a " + d1.getGreenDieIfSuccessOrRedDieIfFailure();
         if (damaged) {
-            msg = "A damaged " + msg;
+            msg = "damaged " + msg;
         }
         if (d1.isSuccess()) {
             msg += " and survived. May you always be so lucky.";
@@ -197,7 +197,7 @@ public class RiftUnitsHelper {
                     for (int x = 1; x < damagedUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
                             finChecker + "riftUnit_" + tile.getPosition() + "_" + x + asyncID + "damaged",
-                            "Rift " + x + " damaged " + unitModel.getBaseType(), unitModel.getUnitEmoji());
+                            "Rift " + x + " Damaged " + unitModel.getBaseType(), unitModel.getUnitEmoji());
                         buttons.add(validTile2);
                     }
                     totalUnits -= damagedUnits;
@@ -210,9 +210,9 @@ public class RiftUnitsHelper {
                 }
             }
         }
-        buttons.add(Buttons.gray(finChecker + "riftAllUnits_" + tile.getPosition(), "Rift all units"));
-        buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove", "Remove excess infantry/fighters"));
-        buttons.add(Buttons.red("doneRifting", "Done rifting units and removing excess capacity"));
+        buttons.add(Buttons.gray(finChecker + "riftAllUnits_" + tile.getPosition(), "Rift All Units"));
+        buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove", "Remove Transported Units"));
+        buttons.add(Buttons.red("doneRifting", "Done Rifting Units and Removing Transported Units"));
 
         return buttons;
     }
@@ -230,22 +230,20 @@ public class RiftUnitsHelper {
                     return;
                 }
             }
-            String msg = player.getRepresentation() + " if mallice was improperly unlocked during this action, you can use the button below to unflip it";
+            String msg = player.getRepresentation() + " if the wormhole nexus was improperly unlocked during this action, you can use the button below to unflip it.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("unflipMallice", "Unflip Mallice"));
-            buttons.add(Buttons.red("deleteButtons", "Leave it alone"));
+            buttons.add(Buttons.red("deleteButtons", "Leave It Alone"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
     }
 
     @ButtonHandler("getRiftButtons_")
     public static void offerRiftButtons(Player player, String buttonID, Game game) {
-        String ident = player.getFactionEmoji();
         String tilePosition = buttonID.replace("getRiftButtons_", "");
         Tile tile = game.getTileByPosition(tilePosition);
         MessageChannel channel = player.getCorrectChannel();
-        String msg = ident + " use buttons to rift units";
-        MessageHelper.sendMessageToChannel(channel, player.getFactionEmoji() + " is rifting some units");
+        String msg = player.getRepresentationNoPing() + " is rifting some units. Please use the the buttons to choose the units you wish to risk in the gravity rift.";
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, RiftUnitsHelper.getButtonsForRiftingUnitsInSystem(player, game, tile));
     }
 }
