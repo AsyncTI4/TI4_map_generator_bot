@@ -123,7 +123,7 @@
         "textColor": "white",
         "primaryColor": { "red": 6, "green": 175, "blue": 50 },
         "secondaryColor": { "red": 146, "green": 6, "blue": 186 },
-        "hue": "PRUPLE"
+        "hue": "PURPLE"
     },
     {
         "alias": "rbw",
