@@ -2729,6 +2729,23 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
         }
+        
+        UnitModel flagship = player.getUnitByBaseType("flagship");
+        if (flagship != null && flagship.getId().startsWith("sigma_")) {
+            Coord unitOffset = getUnitTechOffsets(flagship.getAsyncId(), false);
+            UnitKey unitKey = Mapper.getUnitKey(flagship.getAsyncId(), player.getColor());
+            drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
+            String pipsPath = "pa_leaders_pips_";
+            if (flagship.getId().endsWith("_1")) {
+                pipsPath += "i";
+            } else if (flagship.getId().endsWith("_2")) {
+                pipsPath += "ii";
+            } else if (flagship.getId().endsWith("_3")) {
+                pipsPath += "iii";
+            }
+            pipsPath += "_rdy.png";
+            drawPAImage(deltaX + x + unitOffset.x + 32, y + unitOffset.y + 37, pipsPath);
+        }
 
         boolean zealotsHeroPurged = game.getStoredValue("zealotsHeroPurged").equals("true");
         if (zealotsHeroPurged) {
@@ -4513,6 +4530,11 @@ public class MapGenerator implements AutoCloseable {
             case "spring" -> Color.decode("#cedd8e");
             case "ethereal" -> Color.decode("#31559e");
             case "orca" -> getColor("gray");
+            case "copper" -> Color.decode("#703a00");
+            case "plum" -> Color.decode("#975d8e");
+            case "peach" -> Color.decode("#dda38e");
+            case "rust" -> Color.decode("#853e3f");
+            case "tropical" -> Color.decode("#f8f46a");
             default -> Color.WHITE;
         };
     }

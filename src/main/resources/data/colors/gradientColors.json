@@ -18,6 +18,15 @@
         "hue": "PURPLE"
     },
     {
+        "alias": "tpl",
+        "name": "tropical",
+        "aliases": ["tpl"],
+        "textColor": "black",
+        "primaryColor": { "red": 255, "green": 178, "blue": 120 },
+        "secondaryColor": { "red": 89, "green": 255, "blue": 131 },
+        "hue": "GREEN"
+    },
+    {
         "alias": "tqs",
         "name": "turquoise",
         "aliases": ["tqs", "torq", "turquoise", "torquoise", "turq", "turquis"],
@@ -45,6 +54,15 @@
         "hue": "RED"
     },
     {
+        "alias": "cpr",
+        "name": "copper",
+        "aliases": ["cpr"],
+        "textColor": "white",
+        "primaryColor": { "red": 229, "green": 134, "blue": 0 },
+        "secondaryColor": { "red": 79, "green": 40, "blue": 0 },
+        "hue": "ORANGE"
+    },
+    {
         "alias": "nvy",
         "name": "navy",
         "aliases": ["nvy"],
@@ -70,6 +88,42 @@
         "primaryColor": { "red": 37, "green": 255, "blue": 47 },
         "secondaryColor": { "red": 0, "green": 90, "blue": 30 },
         "hue": "GREEN"
+    },
+    {
+        "alias": "wtm",
+        "name": "watermelon",
+        "aliases": ["wtm"],
+        "textColor": "white",
+        "primaryColor": { "red": 240, "green": 6, "blue": 6 },
+        "secondaryColor": { "red": 6, "green": 175, "blue": 50 },
+        "hue": "GREEN"
+    },
+    {
+        "alias": "vpw",
+        "name": "vapourwave",
+        "aliases": ["vpw", "vaporwave"],
+        "textColor": "white",
+        "primaryColor": { "red": 6, "green": 239, "blue": 240 },
+        "secondaryColor": { "red": 175, "green": 6, "blue": 131 },
+        "hue": "PURPLE"
+    },
+    {
+        "alias": "jpt",
+        "name": "jupiter",
+        "aliases": ["jpt"],
+        "textColor": "black",
+        "primaryColor": { "red": 6, "green": 75, "blue": 203 },
+        "secondaryColor": { "red": 240, "green": 180, "blue": 6 },
+        "hue": "BLUE"
+    },
+    {
+        "alias": "psn",
+        "name": "poison",
+        "aliases": ["psn"],
+        "textColor": "white",
+        "primaryColor": { "red": 6, "green": 175, "blue": 50 },
+        "secondaryColor": { "red": 146, "green": 6, "blue": 186 },
+        "hue": "PURPLE"
     },
     {
         "alias": "rbw",
