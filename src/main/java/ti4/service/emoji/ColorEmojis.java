@@ -8,7 +8,7 @@ public enum ColorEmojis implements TI4Emoji {
     // Colors
     black, bloodred, blue, brown, chocolate, chrome, rainbow, rose, emerald, ethereal, forest, gold, gray, green, lavender, //
     lightgray, lime, navy, orange, orca, petrol, pink, purple, red, spring, sunset, tan, teal, turquoise, yellow, //
-    copper, plum, peach, rust, tropical, //
+    copper, plum, peach, rust, tropical, jupiter, poison, vapourwave, watermelon, //
     splitbloodred, splitblue, splitchocolate, splitemerald, splitgold, splitgreen, splitlime, splitnavy, splitorange, //
     splitpetrol, splitpink, splitpurple, splitrainbow, splitred, splittan, splitteal, splitturquoise, splityellow, riftset; //
 
@@ -62,6 +62,10 @@ public enum ColorEmojis implements TI4Emoji {
             case "pch", "peach" -> peach + "**Peach**";
             case "rst", "rust" -> rust + "**Rust**";
             case "tpl", "tropical" -> tropical + "**Tropical**";
+            case "jpt", "jupiter" -> jupiter + "**Jupiter**";
+            case "psn", "poison" -> poison + "**Poison**";
+            case "vpw", "vapourwave" -> vapourwave + "**Vapourwave**";
+            case "wtm", "watermelon" -> watermelon + "**Watermelon**";
             case "orca" -> orca + "**Orca**";
             case "splitred" -> splitred + "**SplitRed**";
             case "splitblu", "splitblue" -> splitblue + "**SplitBlue**";
@@ -122,6 +126,10 @@ public enum ColorEmojis implements TI4Emoji {
             case "pch", "peach" -> peach;
             case "rst", "rust" -> rust;
             case "tpl", "tropical" -> tropical;
+            case "jpt", "jupiter" -> jupiter;
+            case "psn", "poison" -> poison;
+            case "vpw", "vapourwave" -> vapourwave;
+            case "wtm", "watermelon" -> watermelon;
             case "orca" -> orca;
             case "splitred" -> splitred;
             case "splitblu", "splitblue" -> splitblue;
