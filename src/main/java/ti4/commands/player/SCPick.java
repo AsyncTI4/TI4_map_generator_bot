@@ -32,6 +32,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.player.PlayerStatsService;
+import ti4.service.strategycard.PickStrategyCardService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
@@ -241,8 +242,8 @@ class SCPick extends GameStateSubcommand {
         } else {
             if (!allPicked) {
                 game.updateActivePlayer(privatePlayer);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra, Helper.getRemainingSCButtons(game, privatePlayer));
                 game.setPhaseOfGame("strategy");
+                PickStrategyCardService.checkForForcePickLastStratCard(event, privatePlayer, game, msgExtra);
             } else {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
                 if (game.isShowBanners()) {
