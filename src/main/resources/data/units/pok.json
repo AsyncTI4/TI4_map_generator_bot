@@ -48,6 +48,7 @@
         "combatDieCount": 1,
         "isGroundForce": true,
         "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/LetaniWarrior.webp"
     },
     {
         "id": "arborec_mech",
@@ -64,7 +65,8 @@
         "planetaryShield": true,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: When you would use your Mitosis faction ability you may replace 1 of your infantry with 1 mech from your reinforcements instead."
+        "ability": "DEPLOY: When you would use your Mitosis faction ability you may replace 1 of your infantry with 1 mech from your reinforcements instead.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheArborecMech.webp"
     },
     {
         "id": "argent_destroyer",
@@ -102,7 +104,8 @@
         "afbHitsOn": 6,
         "afbDieCount": 3,
         "isShip": true,
-        "ability": "When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system."
+        "ability": "When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/StrikeWingAlpha.webp"
     },
     {
         "id": "argent_flagship",
@@ -135,7 +138,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This unit does not count against capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values."
+        "ability": "This unit does not count against capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheArgentFlightMech.webp"
     },
     {
         "id": "cabal_flagship",
@@ -170,7 +174,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "When your infantry on this planet are destroyed, place them on your faction sheet; those units are captured."
+        "ability": "When your infantry on this planet are destroyed, place them on your faction sheet; those units are captured.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheVuilRaithCabalMech.webp"
     },
     {
         "id": "cabal_spacedock",
@@ -195,7 +200,8 @@
         "faction": "Cabal",
         "productionValue": 7,
         "isStructure": true,
-        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 12 fighters in this system do not count against your ships' capacity."
+        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 12 fighters in this system do not count against your ships' capacity.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/DimensionalTear.webp"
     },
     {
         "id": "empyrean_flagship",
@@ -228,7 +234,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "You may remove this unit from a system that contains or is adjacent to another player's units to cancel an action card played by that player."
+        "ability": "You may remove this unit from a system that contains or is adjacent to another player's units to cancel an action card played by that player.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheEmpyreanMech.webp"
     },
     {
         "id": "ghost_flagship",
@@ -261,7 +268,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After any player activates a system, you may remove this unit from the game board to place or move a Creuss wormhole token into this system."
+        "ability": "After any player activates a system, you may remove this unit from the game board to place or move a Creuss wormhole token into this system.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheGhostsOfCreussMech.webp"
     },
     {
         "id": "hacan_flagship",
@@ -294,7 +302,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This planet's card may be traded as part of a transaction; if you do, move all of your units from this planet to another planet you control."
+        "ability": "This planet's card may be traded as part of a transaction; if you do, move all of your units from this planet to another planet you control.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheEmiratesOfHacanMech.webp"
     },
     {
         "id": "jolnar_flagship",
@@ -327,7 +336,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Your infantry on this planet are not affected by your Fragile faction ability."
+        "ability": "Your infantry on this planet are not affected by your Fragile faction ability.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheUniversitiesOfJolNarMech.webp"
     },
     {
         "id": "l1z1x_dreadnought",
@@ -368,7 +378,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/SuperDreadnought.webp"
     },
     {
         "id": "l1z1x_flagship",
@@ -403,7 +414,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "While not participating in ground combat, this unit can use it's BOMBARDMENT ability on planets in its system as if it were a ship."
+        "ability": "While not participating in ground combat, this unit can use it's BOMBARDMENT ability on planets in its system as if it were a ship.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheL1z1xMindnetMech.webp"
     },
     {
         "id": "letnev_flagship",
@@ -438,7 +450,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: At the start of a round of ground combat, you may spend 2 resources to replace 1 of your infantry in that combat with 1 mech."
+        "ability": "DEPLOY: At the start of a round of ground combat, you may spend 2 resources to replace 1 of your infantry in that combat with 1 mech.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheBaronyOfLetnevMech.webp"
     },
     {
         "id": "mahact_flagship",
@@ -487,7 +500,8 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
+        "ability": "After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/CrimsonLegionnaire.webp"
     },
     {
         "id": "mahact_mech",
@@ -502,7 +516,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After a player whose command token is in your fleet pool activates this system, you may spend their token from your fleet pool to end their turn; they gain that token."
+        "ability": "After a player whose command token is in your fleet pool activates this system, you may spend their token from your fleet pool to end their turn; they gain that token.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheMahactGeneSorcerersMech.webp"
     },
     {
         "id": "mentak_flagship",
@@ -535,7 +550,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Other player's ground forces on this planet cannot use SUSTAIN DAMAGE."
+        "ability": "Other player's ground forces on this planet cannot use SUSTAIN DAMAGE.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheMentakCoalitionMech.webp"
     },
     {
         "id": "muaat_flagship",
@@ -598,7 +614,8 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability."
+        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/PrototypeWarSun.webp"
     },
     {
         "id": "muaat_mech",
@@ -613,7 +630,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "When you use your Star Forge faction ability in this system or an adjacent system, you may place 1 infantry from your reinforcements with this unit."
+        "ability": "When you use your Star Forge faction ability in this system or an adjacent system, you may place 1 infantry from your reinforcements with this unit.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheEmbersOfMuaatMech.webp"
     },
     {
         "id": "naalu_fighter",
@@ -646,7 +664,8 @@
         "isSpaceOnly": false,
         "combatHitsOn": 7,
         "combatDieCount": 1,
-        "ability": "This unit may move without being transported.\nEach fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
+        "ability": "This unit may move without being transported.\nEach fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/HybridCrystalFighter.webp"
     },
     {
         "id": "naalu_flagship",
@@ -694,7 +713,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Other players cannot use ANTI-FIGHTER BARRAGE against your units in this system."
+        "ability": "Other players cannot use ANTI-FIGHTER BARRAGE against your units in this system.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheNaaluCollectiveMech.webp"
     },
     {
         "id": "naaz_flagship",
@@ -727,7 +747,8 @@
         "combatDieCount": 2,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "If this unit is in the space area of the active system at the start of a space combat, flip this card."
+        "ability": "If this unit is in the space area of the active system at the start of a space combat, flip this card.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheNaazRokhaAllianceMech.webp"
     },
     {
         "id": "naaz_mech_space",
@@ -774,7 +795,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "During combat against an opponent who has an \"X\" or \"Y\" token on 1 or more of their technologies, apply +2 to the result of each of this unit's combat rolls."
+        "ability": "During combat against an opponent who has an \"X\" or \"Y\" token on 1 or more of their technologies, apply +2 to the result of each of this unit's combat rolls.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheNekroVirusMech.webp"
     },
     {
         "id": "nomad_flagship",
@@ -817,7 +839,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs."
+        "ability": "You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/Memoria.webp"
     },
     {
         "id": "cavalry1",
@@ -868,7 +891,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "While this unit is in a space area during combat, you may use its SUSTAIN DAMAGE ability to cancel a hit that is produced against your ships in this system."
+        "ability": "While this unit is in a space area during combat, you may use its SUSTAIN DAMAGE ability to cancel a hit that is produced against your ships in this system.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheNomadMech.webp"
     },
     {
         "id": "saar_flagship",
@@ -920,7 +944,8 @@
         "isStructure": true,
         "isPlanetOnly": false,
         "isSpaceOnly": true,
-        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed."
+        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/FloatingFactory.webp"
     },
     {
         "id": "saar_mech",
@@ -935,7 +960,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you gain control of a planet, you may spend 1 trade good to place 1 mech on that planet"
+        "ability": "DEPLOY: After you gain control of a planet, you may spend 1 trade good to place 1 mech on that planet",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheClanOfSaarMech.webp"
     },
     {
         "id": "sardakk_dreadnought",
@@ -976,7 +1002,8 @@
         "bombardDieCount": 2,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in the system."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/Exotrireme.webp"
     },
     {
         "id": "sardakk_flagship",
@@ -1009,7 +1036,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After this unit uses it's SUSTAIN DAMAGE ability during ground combat, it produces 1 hit against your opponent's ground forces on this planet."
+        "ability": "After this unit uses it's SUSTAIN DAMAGE ability during ground combat, it produces 1 hit against your opponent's ground forces on this planet.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/SardakkNorrMech.webp"
     },
     {
         "id": "sol_carrier",
@@ -1044,7 +1072,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/AdvancedCarrier.webp"
     },
     {
         "id": "sol_flagship",
@@ -1092,7 +1121,8 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
+        "ability": "After this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/SpecOps.webp"
     },
     {
         "id": "sol_mech",
@@ -1107,7 +1137,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you use your Orbital Drop faction ability, you may spend 3 resources to place 1 mech on that planet."
+        "ability": "DEPLOY: After you use your Orbital Drop faction ability, you may spend 3 resources to place 1 mech on that planet.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheFederationOfSolMech.webp"
     },
     {
         "id": "titans_cruiser",
@@ -1141,7 +1172,8 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "sustainDamage": true,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/SaturnEngine.webp"
     },
     {
         "id": "titans_flagship",
@@ -1174,7 +1206,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: When you would place a PDS on a planet, you may place 1 mech and 1 infantry on that planet instead."
+        "ability": "DEPLOY: When you would place a PDS on a planet, you may place 1 mech and 1 infantry on that planet instead.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheTitansOfUlMech.webp"
     },
     {
         "id": "titans_pds",
@@ -1214,7 +1247,8 @@
         "sustainDamage": true,
         "isStructure": true,
         "isGroundForce": true,
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems."
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/technologies/HelTitan.webp"
     },
     {
         "id": "winnu_flagship",
@@ -1247,7 +1281,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After you resolve a tactical action where you gained control of this planet, you may place 1 PDS or 1 Space Dock from your reinforcements on this planet."
+        "ability": "After you resolve a tactical action where you gained control of this planet, you may place 1 PDS or 1 Space Dock from your reinforcements on this planet.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheWinnuMech.webp"
     },
     {
         "id": "xxcha_flagship",
@@ -1286,7 +1321,8 @@
         "deepSpaceCannon": true,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems."
+        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheXxchaKingdomMech.webp"
     },
     {
         "id": "yin_flagship",
@@ -1319,7 +1355,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: When you use your Indoctrination faction ability, you may spend 1 additional influence to replace your opponent's unit with 1 mech instead of 1 infantry."
+        "ability": "DEPLOY: When you use your Indoctrination faction ability, you may spend 1 additional influence to replace your opponent's unit with 1 mech instead of 1 infantry.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheYinBrotherhoodMech.webp"
     },
     {
         "id": "yssaril_flagship",
@@ -1352,6 +1389,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you use your Stall Tactics faction ability, you may place 1 mech on a planet you control."
+        "ability": "DEPLOY: After you use your Stall Tactics faction ability, you may place 1 mech on a planet you control.",
+        "imageURL": "https://www.ti4ultimate.com/resources/images/en-US/leaders/TheYssarilTribesMech.webp"
     }
 ]
