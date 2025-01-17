@@ -135,6 +135,15 @@
         "hue": "GRAY"
     },
     {
+        "alias": "cqr",
+        "name": "checker",
+        "aliases": ["cqr", "chequer"],
+        "textColor": "black",
+        "primaryColor": { "red": 255, "green": 255, "blue": 255 },
+        "secondaryColor": { "red": 0, "green": 0, "blue": 0 },
+        "hue": "GRAY"
+    },
+    {
         "alias": "ero",
         "name": "riftset",
         "aliases": ["ero","riftset"],
