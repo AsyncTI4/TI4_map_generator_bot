@@ -60,6 +60,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private Boolean isMonument;
     private Boolean isGroundForce;
     private Boolean isShip;
+    private Boolean isSpaceOnly;
+    private Boolean isPlanetOnly;
     private String ability;
     private String unlock; // for Flagshipping homebrew
     private String homebrewReplacesID;
@@ -354,7 +356,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private String getAFBText() {
-        if (getAfbDieCount() >= 1) {
+        if (getAfbDieCount() == 1) {
+            return "ANTI-FIGHTER BARRAGE " + getAfbHitsOn() + "\n";
+        } else if (getAfbDieCount() >= 2) {
             return "ANTI-FIGHTER BARRAGE " + getAfbHitsOn() + " (x" + getAfbDieCount() + ")\n";
         }
         return "";
@@ -370,7 +374,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private String getSpaceCannonText() {
-        if (getSpaceCannonDieCount() >= 1) {
+        if (getSpaceCannonDieCount() == 1) {
+            return "SPACE CANNON " + getSpaceCannonHitsOn() + "\n";
+        } else  if (getSpaceCannonDieCount() >= 2) {
             return "SPACE CANNON " + getSpaceCannonHitsOn() + " (x" + getSpaceCannonDieCount() + ")\n";
         }
         return "";
@@ -451,6 +457,14 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public boolean getIsShip() {
         return Optional.ofNullable(isShip).orElse(false);
+    }
+
+    public boolean getIsSpaceOnly() {
+        return Optional.ofNullable(isSpaceOnly).orElse(getIsShip());
+    }
+
+    public boolean getIsPlanetOnly() {
+        return Optional.ofNullable(isPlanetOnly).orElse(getIsStructure());
     }
 
     public Optional<String> getUpgradesFromUnitId() {

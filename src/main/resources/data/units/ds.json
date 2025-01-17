@@ -1134,6 +1134,8 @@
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": false,
         "isStructure": true,
+        "isPlanetOnly": false,
+        "isSpaceOnly": true,
         "ability": "This unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed."
     },
     {
@@ -1153,6 +1155,8 @@
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": false,
         "isStructure": true,
+        "isPlanetOnly": false,
+        "isSpaceOnly": true,
         "ability": "This unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed."
     },
     {
