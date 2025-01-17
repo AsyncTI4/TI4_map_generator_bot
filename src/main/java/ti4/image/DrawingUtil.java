@@ -274,7 +274,7 @@ public class DrawingUtil {
 
     public static String getBlackWhiteFileSuffix(String colorID) {
         Set<String> lightColors = Set.of("ylw", "org", "pnk", "tan", "crm", "sns", "tqs", "gld", "lme", "lvn", "rse",
-            "spr", "tea", "lgy", "eth", "pch", "tpl");
+            "spr", "tea", "lgy", "eth", "pch", "tpl", "cqr");
         if (lightColors.contains(colorID)) {
             return "_blk.png";
         }

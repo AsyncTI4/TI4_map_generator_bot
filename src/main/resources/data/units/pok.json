@@ -626,6 +626,7 @@
         "capacityUsed": 1,
         "cost": 0.5,
         "isShip": true,
+        "isSpaceOnly": false,
         "combatHitsOn": 8,
         "combatDieCount": 1
     },
@@ -642,6 +643,7 @@
         "capacityUsed": 1,
         "cost": 0.5,
         "isShip": true,
+        "isSpaceOnly": false,
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "ability": "This unit may move without being transported.\nEach fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
@@ -899,6 +901,8 @@
         "productionValue": 5,
         "capacityValue": 4,
         "isStructure": true,
+        "isPlanetOnly": false,
+        "isSpaceOnly": true,
         "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed."
     },
     {
@@ -914,6 +918,8 @@
         "productionValue": 7,
         "capacityValue": 5,
         "isStructure": true,
+        "isPlanetOnly": false,
+        "isSpaceOnly": true,
         "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed."
     },
     {

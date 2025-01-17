@@ -594,7 +594,7 @@ public class ActionCardHelper {
             if (actionCardTitle.contains("Infiltrate")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveInfiltrateStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg, "planet")
-                    + " Warning, this will not work if the player has already removed their structures", codedButtons);
+                    + " Warning, this will not work if the player has already removed their structures.", codedButtons);
             }
             
             if (actionCardTitle.contains("Emergency Repairs")) {
@@ -847,7 +847,7 @@ public class ActionCardHelper {
             
             if (actionCardTitle.contains("Manipulate Investments")) {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, player.getRepresentation() 
-                    + ", a reminder that you should how you are distributing the trade goods now, before other players choose whether they will Sabo.", codedButtons);
+                    + ", a reminder that you should declare how you are distributing the trade goods now, before other players choose whether they will Sabo.", codedButtons);
             }
             
             targetMsg = player.getRepresentation() + ", a reminder that you should declare which %s you are targeting now, before other players choose whether they will Sabo.";

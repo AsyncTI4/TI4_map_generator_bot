@@ -260,16 +260,16 @@ public class AgendaHelper {
         p2.clearDebt(player, amount);
         String msg = amount + " debt owed by " + player.getRepresentation() + " to " + p2.getRepresentation() + " was cleared. " + p2.getDebtTokenCount(player.getColor()) + " debt remains.";
         if (tgOrDebt.equalsIgnoreCase("tg")) {
-            player.setCommodities(player.getCommodities() - amount);
+            player.setTg(player.getTg() - amount);
             p2.setTg(p2.getTg() + amount);
-            msg = player.getRepresentation(false, false) + " sent " + amount + " commodi" + (amount == 1 ? "y" : "ies") 
+            msg = player.getRepresentation(false, false) + " sent " + amount + " trade good" + (amount == 1 ? "" : "s") 
                 + " to " + p2.getRepresentation(false, false) + ".\n" + msg;
             ButtonHelperAbilities.pillageCheck(p2, game);
             ButtonHelperAbilities.pillageCheck(player, game);
         } else if (tgOrDebt.equalsIgnoreCase("comm")) {
-            player.setTg(player.getTg() - amount);
+            player.setCommodities(player.getCommodities() - amount);
             p2.setTg(p2.getTg() + amount);
-            msg = player.getRepresentation(false, false) + " sent " + amount + " trade good" + (amount == 1 ? "" : "s") 
+            msg = player.getRepresentation(false, false) + " sent " + amount + " commodit" + (amount == 1 ? "y" : "ies") 
                 + " to " + p2.getRepresentation(false, false) + ".\n" + msg;
             ButtonHelperAbilities.pillageCheck(p2, game);
             ButtonHelperAbilities.pillageCheck(player, game);
