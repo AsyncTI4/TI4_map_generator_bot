@@ -864,7 +864,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/pok/memoria_2.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/pok/memoria_2.png?raw=true"
     },
     {
         "id": "cavalry1",

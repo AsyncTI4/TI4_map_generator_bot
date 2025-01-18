@@ -30,7 +30,7 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "isShip": true,
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/cruiser_2.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/cruiser_2.jpg?raw=true"
     },
     {
         "id": "carrier",
@@ -64,7 +64,7 @@
         "combatHitsOn": 9,
         "combatDieCount": 1,
         "isShip": true,
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/carrier_2.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/carrier_2.jpg?raw=true"
     },
     {
         "id": "destroyer",
@@ -100,7 +100,7 @@
         "afbHitsOn": 6,
         "afbDieCount": 3,
         "isShip": true,
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/destroyer_2.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/destroyer_2.jpg?raw=true"
     },
     {
         "id": "dreadnought",
@@ -143,7 +143,7 @@
         "canBeDirectHit": false,
         "isShip": true,
         "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/dreadnought_2.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/dreadnought_2.jpg?raw=true"
     },
     {
         "id": "fighter",
@@ -175,7 +175,7 @@
         "combatDieCount": 1,
         "isShip": true,
         "ability": "This unit may move without being transported.\nFighters in excess of your ships' capacity count against your fleet pool.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/fighter_2.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/fighter_2.jpg?raw=true"
     },
     {
         "id": "flagship",
@@ -223,7 +223,7 @@
         "combatDieCount": 1,
         "isGroundForce": true,
         "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/infantry_2.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/infantry_2.jpg?raw=true"
     },
     {
         "id": "pds",
@@ -253,7 +253,7 @@
         "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems.",
         "planetaryShield": true,
         "isStructure": true,
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/pds_2.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/pds_2.jpg?raw=true"
     },
     {
         "id": "spacedock",
@@ -282,7 +282,7 @@
         "basicProduction": "res",
         "capacityValue": 3,
         "isStructure": true,
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/spacedock_2.jpg?raw=true",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/spacedock_2.jpg?raw=true",
         "ability": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity."
     },
     {
@@ -313,7 +313,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other player's units in this system lose PLANETARY SHIELD.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/warsun.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/warsun.jpg?raw=true"
     },
     {
         "id": "mech",
