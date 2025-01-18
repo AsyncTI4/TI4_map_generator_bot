@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -83,22 +82,22 @@ class GameSaveService {
         }
 
         Path gameFile = Storage.getGamePath(game.getName() + Constants.TXT);
-        try (FileChannel fileChannel = FileChannel.open(gameFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-                FileLock fileLock = fileChannel.lock();
-                BufferedWriter writer = new BufferedWriter(Channels.newWriter(fileChannel, Charset.defaultCharset()))) {
+        try (FileChannel fileChannel = FileChannel.open(gameFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
+            fileChannel.lock(); // lock will be closed when writer is closed
+            try (BufferedWriter writer = new BufferedWriter(Channels.newWriter(fileChannel, Charset.defaultCharset()))) {
+                Map<String, Tile> tileMap = game.getTileMap();
+                writer.write(game.getOwnerID());
+                writer.write(System.lineSeparator());
+                writer.write(game.getOwnerName());
+                writer.write(System.lineSeparator());
+                writer.write(game.getName());
+                writer.write(System.lineSeparator());
+                saveGameInfo(writer, game);
 
-            Map<String, Tile> tileMap = game.getTileMap();
-            writer.write(game.getOwnerID());
-            writer.write(System.lineSeparator());
-            writer.write(game.getOwnerName());
-            writer.write(System.lineSeparator());
-            writer.write(game.getName());
-            writer.write(System.lineSeparator());
-            saveGameInfo(writer, game);
-
-            for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
-                Tile tile = tileEntry.getValue();
-                saveTile(writer, tile);
+                for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
+                    Tile tile = tileEntry.getValue();
+                    saveTile(writer, tile);
+                }
             }
         } catch (IOException e) {
             BotLogger.log("Could not save map: " + game.getName(), e);

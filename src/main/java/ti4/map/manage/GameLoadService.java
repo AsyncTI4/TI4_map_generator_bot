@@ -5,7 +5,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -116,8 +115,8 @@ class GameLoadService {
             return null;
         }
         try (FileChannel fileChannel = FileChannel.open(gameFile, StandardOpenOption.READ)) {
-            try (FileLock fileLock = fileChannel.lock(0, Long.MAX_VALUE, true);
-                    BufferedReader reader = new BufferedReader(Channels.newReader(fileChannel, Charset.defaultCharset()))) {
+            fileChannel.lock(0, Long.MAX_VALUE, true); // lock will be closed when reader is closed
+            try (BufferedReader reader = new BufferedReader(Channels.newReader(fileChannel, Charset.defaultCharset()))) {
                 Game game = new Game();
                 Iterator<String> gameFileLines = reader.lines().toList().listIterator();
                 game.setOwnerID(gameFileLines.next());
