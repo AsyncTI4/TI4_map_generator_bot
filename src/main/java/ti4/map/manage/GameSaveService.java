@@ -1,20 +1,19 @@
 package ti4.map.manage;
 
+import static ti4.map.manage.GamePersistenceKeys.*;
+
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -36,27 +35,6 @@ import ti4.message.BotLogger;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.milty.MiltyDraftManager;
 
-import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
-import static ti4.map.manage.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDTILE;
-import static ti4.map.manage.GamePersistenceKeys.ENDTOKENS;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITDAMAGE;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITS;
-import static ti4.map.manage.GamePersistenceKeys.GAMEINFO;
-import static ti4.map.manage.GamePersistenceKeys.MAPINFO;
-import static ti4.map.manage.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.map.manage.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.map.manage.GamePersistenceKeys.PLAYER;
-import static ti4.map.manage.GamePersistenceKeys.PLAYERINFO;
-import static ti4.map.manage.GamePersistenceKeys.TILE;
-import static ti4.map.manage.GamePersistenceKeys.TOKENS;
-import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
-import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
-import static ti4.map.manage.GamePersistenceKeys.UNITS;
-
 @UtilityClass
 class GameSaveService {
 
@@ -75,31 +53,30 @@ class GameSaveService {
             BotLogger.log("Error adding transient attachment tokens for game " + game.getName(), e);
         }
 
+        //Ugly fix to update seen tiles data for fog since doing it in 
+        //MapGenerator/TileGenerator won't save changes anymore
         if (game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 FoWHelper.updateFog(game, player);
             }
         }
 
-        Path gameFile = Storage.getGamePath(game.getName() + Constants.TXT);
-        try (FileChannel fileChannel = FileChannel.open(gameFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
-            fileChannel.lock(); // lock will be closed when writer is closed
-            try (BufferedWriter writer = new BufferedWriter(Channels.newWriter(fileChannel, Charset.defaultCharset()))) {
-                Map<String, Tile> tileMap = game.getTileMap();
-                writer.write(game.getOwnerID());
-                writer.write(System.lineSeparator());
-                writer.write(game.getOwnerName());
-                writer.write(System.lineSeparator());
-                writer.write(game.getName());
-                writer.write(System.lineSeparator());
-                saveGameInfo(writer, game);
+        File gameFile = Storage.getGameFile(game.getName() + Constants.TXT);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(gameFile))) {
+            Map<String, Tile> tileMap = game.getTileMap();
+            writer.write(game.getOwnerID());
+            writer.write(System.lineSeparator());
+            writer.write(game.getOwnerName());
+            writer.write(System.lineSeparator());
+            writer.write(game.getName());
+            writer.write(System.lineSeparator());
+            saveGameInfo(writer, game);
 
-                for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
-                    Tile tile = tileEntry.getValue();
-                    saveTile(writer, tile);
-                }
+            for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
+                Tile tile = tileEntry.getValue();
+                saveTile(writer, tile);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             BotLogger.log("Could not save map: " + game.getName(), e);
             return false;
         }
