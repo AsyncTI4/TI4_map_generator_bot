@@ -185,7 +185,7 @@
         "isGroundForce": true,
         "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home.",
         "homebrewReplacesID": "infantry2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/infantry_2.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/infantry_2.jpg?raw=true"
     },
     {
         "id": "absol_pds2",
@@ -202,7 +202,7 @@
         "planetaryShield": true,
         "isStructure": true,
         "homebrewReplacesID": "pds2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/pds_2.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/pds_2.jpg?raw=true"
     },
     {
         "id": "absol_fighter2",
@@ -220,7 +220,7 @@
         "isShip": true,
         "ability": "This unit may move without being transported.\nFighters in excess of your ships' capacity count against your fleet pool.",
         "homebrewReplacesID": "fighter2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/fighter_2.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/fighter_2.jpg?raw=true"
     },
     {
         "id": "absol_destroyer2",
@@ -258,7 +258,7 @@
         "combatDieCount": 1,
         "isShip": true,
         "homebrewReplacesID": "cruiser2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/cruiser_2.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/cruiser_2.jpg?raw=true"
     },
     {
         "id": "absol_carrier2",
@@ -276,7 +276,7 @@
         "combatDieCount": 1,
         "isShip": true,
         "homebrewReplacesID": "carrier2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/carrier_2.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/carrier_2.jpg?raw=true"
     },
     {
         "id": "absol_dreadnought2",
@@ -299,7 +299,7 @@
         "isShip": true,
         "homebrewReplacesID": "dreadnought2",
         "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/dreadnought_2.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/dreadnought_2.jpg?raw=true"
     },
     {
         "id": "absol_warsun",
@@ -360,7 +360,7 @@
         "isGroundForce": true,
         "ability": "After this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
         "homebrewReplacesID": "sol_infantry2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/SpecOpsII.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/SpecOpsII.png?raw=true"
     },
     {
         "id": "absol_sardakk_dreadnought2",
@@ -450,7 +450,7 @@
         "isShip": true,
         "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.\nThis unit cannot be destroyed by \"Direct Hit\" action cards.",
         "homebrewReplacesID": "muaat_warsun2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/PrototypeWarSunII.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/PrototypeWarSunII.png?raw=true"
     },
     {
         "id": "absol_saar_spacedock2",
@@ -468,7 +468,7 @@
         "isStructure": true,
         "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.\n1 non-fighter ship in this system does not count against your fleet pool.",
         "homebrewReplacesID": "saar_spacedock2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/FloatingFactoryII.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/FloatingFactoryII.png?raw=true"
     },
     {
         "id": "absol_arborec_infantry2",
@@ -487,7 +487,7 @@
         "isGroundForce": true,
         "ability": "After this unit is destroyed, place the unit on this card. At the start of your next turn, for every 2 units that are on this card, place 1 on a planet you control.",
         "homebrewReplacesID": "arborec_infantry2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/LetaniWarriorII.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/LetaniWarriorII.png?raw=true"
     },
     {
         "id": "absol_titans_pds2",
@@ -552,7 +552,7 @@
         "isShip": true,
         "ability": "When this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able.\nWhen this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system.",
         "homebrewReplacesID": "argent_destroyer2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/StrikeWingAlphaII.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/StrikeWingAlphaII.png?raw=true"
     },
     {
         "id": "absol_cabal_spacedock2",
@@ -568,7 +568,7 @@
         "isStructure": true,
         "ability": "PRODUCTION 7. This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 10 fighters in this system do not count against your ships' capacity. 1 non-fighter ship in this system does not count against your fleet pool.",
         "homebrewReplacesID": "cabal_spacedock2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/DimensionalTearII.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/DimensionalTearII.png?raw=true"
     },
     {
         "id": "absol_cabal_spacedock2Alt",
@@ -606,7 +606,7 @@
         "isShip": true,
         "ability": "You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs.",
         "homebrewReplacesID": "nomad_flagship2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/MemoriaII.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/MemoriaII.png?raw=true"
     },
     {
         "id": "absol_mahact_infantry2",
@@ -624,6 +624,6 @@
         "isGroundForce": true,
         "ability": "After this unit is destroyed, gain 2 commodities or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet that contains 1 of your structures.",
         "homebrewReplacesID": "mahact_infantry2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/CrimsonLegionnaireII.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/CrimsonLegionnaireII.png?raw=true"
     }
 ]
