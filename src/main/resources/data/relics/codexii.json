@@ -3,7 +3,7 @@
         "alias": "dynamiscore",
         "name": "Dynamis Core",
         "text": "While this card is in your play area, your commodity value is increased by 2.\nACTION: Purge this card to gain trade goods equal to your printed commodity value+2.",
-        "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/dynamis_core.jpg",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/dynamis_core.jpg",
         "source": "codex2",
         "flavourText": "*Dart and Tai stood, mesmerized by the swirling mass. Neither had any idea what it was, but both were fairly sure they were about to retire.*"
     },
@@ -11,7 +11,7 @@
         "alias": "titanprototype",
         "name": "JR-XS455-O",
         "text": "ACTION: Exhaust this agent and choose a player, that player may spend 3 resources to place a structure on a planet they control. If they do not, they gain 1 trade good.",
-        "imageURL": "https://static.wikia.nocookie.net/twilight-imperium-4/images/6/63/JRXS455-O.png",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/jrxs4550.jpg",
         "source": "codex2",
         "shortName": "JR-\nXS455-O"
     },
@@ -19,7 +19,7 @@
         "alias": "nanoforge",
         "name": "Nanoforge",
         "text": "ACTION: Attach this card to a non-legendary, non-home planet you control, its resource and influence values are increased by 2 and it is a legendary planet. This action cannot be performed once attached.",
-        "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/nanoforge.jpg",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/nanoforge.jpg",
         "source": "codex2",
         "flavourText": "*Intended to bring prosperity, the forge was twisted into an instrument of war.*",
         "shortName": "Nano-\nForge"
