@@ -238,7 +238,7 @@
         "bombardDieCount": 2,
         "unlock": "UNLOCK: produce 3 BOMBARDMENT hits during 1 invasion.",
         "homebrewReplacesID": "l1z1x_flagship",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/l1z1x_1a.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/lizix_1a.png?raw=true"
     },
     {
         "id": "sigma_l1z1x_flagship_2",
@@ -259,7 +259,7 @@
         "bombardHitsOn": 6,
         "bombardDieCount": 4,
         "unlock": "UNLOCK: produce 6 BOMBARDMENT hits during 1 invasion.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/l1z1x_2a.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/lizix_2a.png?raw=true"
     },
     
     {
@@ -537,7 +537,7 @@
         "ability": "Apply +1 to the result of each of your other ship's combat rolls in this system.",
         "unlock": "UNLOCK: Produce 4 hits during 1 round of combat.",
         "homebrewReplacesID": "sardakk_flagship",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/sardakk_1a.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/norr_1a.png?raw=true"
     },
     {
         "id": "sigma_norr_flagship_2",
@@ -556,7 +556,7 @@
         "isShip": true,
         "ability": "Apply +1 to the result of each of your unit's combat and ability rolls in this system.",
         "unlock": "UNLOCK: Produce 8 hits during 1 round of combat.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/sardakk_2a.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/norr_2a.png?raw=true"
     },
     
     {
@@ -702,7 +702,7 @@
         "ability": "You treat this system as if it contained a delta wormhole.\nDuring movement, this ship may move before or after your other ships.\nThis ship does not roll for gravity rifts.",
         "unlock": "UNLOCK: Have ships in systems that collectively contain a total of 4 or more wormholes.",
         "homebrewReplacesID": "ghost_flagship",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/ghost_1a.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/creuss_1a.png?raw=true"
     },
     {
         "id": "sigma_creuss_flagship_2",
@@ -721,7 +721,7 @@
         "isShip": true,
         "ability": "You treat this system as if it contained a delta wormhole.\nDuring movement, this ship may move before or after your other ships.\nThis ship does not roll for gravity rifts.\nYou may move this ship to an adjacent system at the start of a space combat there.",
         "unlock": "UNLOCK: Have ships in systems that collectively contain a total of 6 or more wormholes.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/ghost_2a.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/creuss_2a.png?raw=true"
     },
     
     {
@@ -900,7 +900,7 @@
         "ability": "When you capture a unit in this system, also capture a fighter or infantry token from the supply.\nWhen you produce this ship, you may return 24 fighters and/or infantry tokens instead of spending resources.",
         "unlock": "When you capture another player's unit, place 1 of that player's control tokens on this card.\nUNLOCK: Have 4 of 1 player's control tokens on this card.",
         "homebrewReplacesID": "cabal_flagship",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/cabal_1a.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/vuilraith_1a.png?raw=true"
     },
     {
         "id": "sigma_vuilraith_flagship_2",
@@ -919,7 +919,7 @@
         "isShip": true,
         "ability": "When another unit is destroyed in this system, including your own, capture it, then capture a fighter or infantry token from the supply.\nWhen you produce this ship, you may return 16 fighters and/or infantry tokens instead of spending resources.",
         "unlock": "When you capture another player's unit, place 1 of that player's control tokens on this card.\nUNLOCK: Have 12 of 1 player's control tokens on this card.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/cabal_2a.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/vuilraith_2a.png?raw=true"
     },
     
     {
@@ -940,7 +940,7 @@
         "ability": "DEPLOY: After you activate a system that contains 1 of your PDS, you may replace that PDS with this ship.",
         "unlock": "UNLOCK: Control 2 attachments amongst planets you control.",
         "homebrewReplacesID": "titans_flagship",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/titans_1a.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/ul_1a.png?raw=true"
     },
     {
         "id": "sigma_ul_flagship_2",
@@ -959,7 +959,7 @@
         "isShip": true,
         "ability": "When this ship is destroyed, place a ship with a cost of 4 or less from your reinforcements in this system.\nDEPLOY: After you activate a system that contains 1 of your PDS, you may replace that PDS with this ship.",
         "unlock": "UNLOCK: Control 5 attachments amongst planets you control.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/titans_2a.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/ul_2a.png?raw=true"
     },
     
     {
@@ -1020,7 +1020,7 @@
         "ability": "Apply +1 to the result of each of your mech's combat rolls in this system.",
         "unlock": "UNLOCK: You purge a relic fragment or an exploration deck is depleted.",
         "homebrewReplacesID": "naaz_flagship",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/naaz_1a.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/naazrokha_1a.png?raw=true"
     },
     {
         "id": "sigma_naazrokha_flagship_2",
@@ -1039,7 +1039,7 @@
         "isShip": true,
         "ability": "Your mechs in this system roll 1 additional die during combat.\nWhen you win a combat in this system, you may repair 1 participating unit.",
         "unlock": "When you purge a relic fragment, or when an exploration deck is depleted, place the corresponding trait token on this card.\nUNLOCK: have 3 tokens on this card.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/naaz_2a.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/naazrokha_2a.png?raw=true"
     },
     
     {
