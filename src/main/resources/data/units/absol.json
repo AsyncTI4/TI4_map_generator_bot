@@ -185,7 +185,7 @@
         "isGroundForce": true,
         "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home.",
         "homebrewReplacesID": "infantry2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/infantry_2.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/infantry_2.png?raw=true"
     },
     {
         "id": "absol_pds2",
@@ -202,7 +202,7 @@
         "planetaryShield": true,
         "isStructure": true,
         "homebrewReplacesID": "pds2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/pds_2.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/pds_2.png?raw=true"
     },
     {
         "id": "absol_fighter2",
@@ -220,7 +220,7 @@
         "isShip": true,
         "ability": "This unit may move without being transported.\nFighters in excess of your ships' capacity count against your fleet pool.",
         "homebrewReplacesID": "fighter2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/fighter_2.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/fighter_2.png?raw=true"
     },
     {
         "id": "absol_destroyer2",
@@ -258,7 +258,7 @@
         "combatDieCount": 1,
         "isShip": true,
         "homebrewReplacesID": "cruiser2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/cruiser_2.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/cruiser_2.png?raw=true"
     },
     {
         "id": "absol_carrier2",
@@ -276,7 +276,7 @@
         "combatDieCount": 1,
         "isShip": true,
         "homebrewReplacesID": "carrier2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/carrier_2.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/carrier_2.png?raw=true"
     },
     {
         "id": "absol_dreadnought2",
@@ -299,7 +299,7 @@
         "isShip": true,
         "homebrewReplacesID": "dreadnought2",
         "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/tech/generic/dreadnought_2.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/dreadnought_2.png?raw=true"
     },
     {
         "id": "absol_warsun",
