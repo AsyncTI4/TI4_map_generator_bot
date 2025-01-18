@@ -1481,7 +1481,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             if (event.getMessage().getContentRaw().contains("Net gain")) {
                 boolean cyber = false;
                 int netGain = ButtonHelper.checkNetGain(player, shortCCs);
-                finalCCs += ". You gained a net total of " + netGain + " command token" + (netGain == 1 ? "" : "s") + ".";
+                finalCCs += ". You gained a net total of " + netGain + " command token" + (netGain == 1 ? "" : "s");
                 for (String pn : player.getPromissoryNotes().keySet()) {
                     if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
                         cyber = true;
