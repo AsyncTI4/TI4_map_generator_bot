@@ -32,6 +32,6 @@
         "sustainDamage": true,
         "isGroundForce": true,
         "ability": "Other players must spend 1 influence to commit ground forces to the planet that contains this unit.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/omniopiares.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/omniopiares.jpg?raw=true"
     }
 ]
