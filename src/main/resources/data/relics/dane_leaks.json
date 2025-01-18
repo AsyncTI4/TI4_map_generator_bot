@@ -4,6 +4,7 @@
         "name": "The Silver Flame",
         "text": "ACTION: Roll 1 die and purge this card; if the result is a 10, gain 1 victory point. Otherwise, remove all of your units from the galaxy and you are eliminated.\nThe Silver Flame may be exchanged as part of a transaction.",
         "source": "dane_leaks",
-        "flavourText": "*Ank-Syl Siven flared, bright red briefly overtaking blue. \"Would I lie to you?\" The flame pulsed, suspended in the air before him. Was it real? Or just an illusion?*"
+        "flavourText": "*Ank-Syl Siven flared, bright red briefly overtaking blue. \"Would I lie to you?\" The flame pulsed, suspended in the air before him. Was it real? Or just an illusion?*",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/misc_homebrew/the_silver_flame.png"
     }
 ]
