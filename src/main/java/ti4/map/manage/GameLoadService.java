@@ -1,10 +1,14 @@
 package ti4.map.manage;
 
-import java.io.File;
+import javax.annotation.Nullable;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,16 +27,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nullable;
-
-import org.jetbrains.annotations.NotNull;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -48,6 +48,10 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
+import ti4.model.BorderAnomalyHolder;
+import ti4.model.TemporaryCombatModifierModel;
+
 import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
 import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
 import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
@@ -68,9 +72,6 @@ import static ti4.map.manage.GamePersistenceKeys.TOKENS;
 import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
 import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
 import static ti4.map.manage.GamePersistenceKeys.UNITS;
-import ti4.message.BotLogger;
-import ti4.model.BorderAnomalyHolder;
-import ti4.model.TemporaryCombatModifierModel;
 @UtilityClass
 class GameLoadService {
 
@@ -81,16 +82,15 @@ class GameLoadService {
             return pathStream.parallel()
                 .filter(path -> path.toString().toLowerCase().endsWith(".txt"))
                 .map(path -> {
-                    File file = path.toFile();
                     try {
-                        Game game = readGame(file);
+                        Game game = readGame(path);
                         if (game == null || game.getName() == null) {
-                            BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
+                            BotLogger.log("Could not load game. Game or game name is null: " + path.getFileName());
                             return null;
                         }
                         return new ManagedGame(game);
                     } catch (Exception e) {
-                        BotLogger.log("Could not load game: " + file.getName(), e);
+                        BotLogger.log("Could not load game: " + path.getFileName(), e);
                     }
                     return null;
                 })
@@ -104,87 +104,87 @@ class GameLoadService {
 
     @Nullable
     public static Game load(String gameName) {
-        File gameFile = Storage.getGameFile(gameName + Constants.TXT);
-        if (!gameFile.exists()) {
-            return null;
-        }
+        Path gameFile = Storage.getGamePath(gameName + Constants.TXT);
         return readGame(gameFile);
     }
 
     @Nullable
-    private static Game readGame(@NotNull File gameFile) {
-        if (!gameFile.exists()) {
-            BotLogger.log("Could not load map, map file does not exist: " + gameFile.getAbsolutePath());
+    private static Game readGame(@NotNull Path gameFile) {
+        if (!Files.exists(gameFile)) {
+            BotLogger.log("Could not load map, map file does not exist: " + gameFile.getFileName());
             return null;
         }
-        try {
-            Game game = new Game();
-            Iterator<String> gameFileLines = Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()).listIterator();
-            game.setOwnerID(gameFileLines.next());
-            game.setOwnerName(gameFileLines.next());
-            game.setName(gameFileLines.next());
-            while (gameFileLines.hasNext()) {
-                String data = gameFileLines.next();
-                if (MAPINFO.equals(data)) {
-                    continue;
-                }
-                if (ENDMAPINFO.equals(data)) {
-                    break;
-                }
-
+        try (FileChannel fileChannel = FileChannel.open(gameFile, StandardOpenOption.READ)) {
+            fileChannel.lock(0, Long.MAX_VALUE, true); // lock will be closed when reader is closed
+            try (BufferedReader reader = new BufferedReader(Channels.newReader(fileChannel, Charset.defaultCharset()))) {
+                Game game = new Game();
+                Iterator<String> gameFileLines = reader.lines().toList().listIterator();
+                game.setOwnerID(gameFileLines.next());
+                game.setOwnerName(gameFileLines.next());
+                game.setName(gameFileLines.next());
                 while (gameFileLines.hasNext()) {
-                    data = gameFileLines.next();
-                    if (GAMEINFO.equals(data)) {
+                    String data = gameFileLines.next();
+                    if (MAPINFO.equals(data)) {
                         continue;
                     }
-                    if (ENDGAMEINFO.equals(data)) {
+                    if (ENDMAPINFO.equals(data)) {
                         break;
                     }
-                    try {
-                        readGameInfo(game, data);
-                    } catch (Exception e) {
-                        BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.", e);
-                        return null;
-                    }
-                }
 
-                while (gameFileLines.hasNext()) {
-                    String tmpData = gameFileLines.next();
-                    if (PLAYERINFO.equals(tmpData)) {
-                        continue;
-                    }
-                    if (ENDPLAYERINFO.equals(tmpData)) {
-                        break;
-                    }
-                    Player player = null;
                     while (gameFileLines.hasNext()) {
-                        data = tmpData != null ? tmpData : gameFileLines.next();
-                        tmpData = null;
-                        if (PLAYER.equals(data)) {
-                            player = game.addPlayer(gameFileLines.next(), gameFileLines.next());
+                        data = gameFileLines.next();
+                        if (GAMEINFO.equals(data)) {
                             continue;
                         }
-                        if (ENDPLAYER.equals(data)) {
+                        if (ENDGAMEINFO.equals(data)) {
                             break;
                         }
-                        readPlayerInfo(player, data, game);
+                        try {
+                            readGameInfo(game, data);
+                        } catch (Exception e) {
+                            BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.", e);
+                            return null;
+                        }
+                    }
+
+                    while (gameFileLines.hasNext()) {
+                        String tmpData = gameFileLines.next();
+                        if (PLAYERINFO.equals(tmpData)) {
+                            continue;
+                        }
+                        if (ENDPLAYERINFO.equals(tmpData)) {
+                            break;
+                        }
+                        Player player = null;
+                        while (gameFileLines.hasNext()) {
+                            data = tmpData != null ? tmpData : gameFileLines.next();
+                            tmpData = null;
+                            if (PLAYER.equals(data)) {
+                                player = game.addPlayer(gameFileLines.next(), gameFileLines.next());
+                                continue;
+                            }
+                            if (ENDPLAYER.equals(data)) {
+                                break;
+                            }
+                            readPlayerInfo(player, data, game);
+                        }
                     }
                 }
+                Map<String, Tile> tileMap = getTileMap(gameFileLines, game, gameFile);
+                if (tileMap == null) {
+                    BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
+                    return null;
+                }
+                game.setTileMap(tileMap);
+                return game;
             }
-            Map<String, Tile> tileMap = getTileMap(gameFileLines, game, gameFile);
-            if (tileMap == null) {
-                BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
-                return null;
-            }
-            game.setTileMap(tileMap);
-            return game;
         } catch (Exception e) {
-            BotLogger.log("Data read error: " + gameFile.getName(), e);
+            BotLogger.log("Data read error: " + gameFile.getFileName(), e);
             return null;
         }
     }
 
-    private static Map<String, Tile> getTileMap(Iterator<String> gameFileLines, Game game, File gameFile) {
+    private static Map<String, Tile> getTileMap(Iterator<String> gameFileLines, Game game, Path gameFile) {
         Map<String, Tile> tileMap = new HashMap<>();
         try {
             while (gameFileLines.hasNext()) {
@@ -268,7 +268,7 @@ class GameLoadService {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("Data read error: " + gameFile.getName(), e);
+            BotLogger.log("Data read error: " + gameFile.getFileName(), e);
             return null;
         }
         return tileMap;
