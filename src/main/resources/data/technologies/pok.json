@@ -130,7 +130,7 @@
         "requirements": "GGG",
         "source": "codex1",
         "text": "After 1 or more of your units use BOMBARDMENT against a planet, if at least 1 of your opponent's infantry was destroyed, you may destroy all of your opponent's infantry on that planet.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/x89_bacterial_weapon.omega.jpg?raw=true",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/x89_bacterial_weapon_omega.jpg?raw=true",
         "initials": "X89",
         "shortName": "X-89 Bact. Weapon"
     },
@@ -192,7 +192,7 @@
         "requirements": "R",
         "source": "codex1",
         "text": "At the start of ground combat on a planet that contains 1 or more of your structures, you may produce 1 hit and assign it to 1 of your opponent's ground forces.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/magen_defense_grid.omega.jpg?raw=true",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/magen_defense_grid_omega.jpg?raw=true",
         "initials": "MDG",
         "shortName": "Magen Def. Grid"
     },
@@ -759,7 +759,7 @@
         "faction": "muaat",
         "source": "base",
         "text": "Your ships can move into supernovas.\nEach supernova that contains 1 or more of your units gains the PRODUCTION 5 ability as if it were 1 of your units.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/magmus_reactor.omega.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/magmus_reactor_omega.jpg?raw=true"
     },
     {
         "alias": "pm",
@@ -809,7 +809,7 @@
         "faction": "ghost",
         "source": "base",
         "text": "ACTION: Exhaust this card to place or move a Creuss wormhole token into either a system that contains a planet you control or a non-home system that does not contain another player's ships.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/wormhole_generator.omega.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/wormhole_generator_omega.jpg?raw=true"
     },
     {
         "alias": "ds",
@@ -1005,7 +1005,7 @@
         "source": "base",
         "text": "After you produce units, place up to 2 infantry from your reinforcements on any planet you control or in any space area that contains 1 or more of your ships.",
         "shortName": "Yin Spinner",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/yin_spinner.omega.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/yin_spinner_omega.jpg?raw=true"
     },
     {
         "alias": "ic",

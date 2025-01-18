@@ -700,7 +700,7 @@
         "source": "absol",
         "text": "Your ships can move into supernovas.\nEach supernova that contains 1 or more of your units gains the PRODUCTION 5 ability as if it were 1 of your units.",
         "homebrewReplacesID": "mr",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/magmus_reactor.omega.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/magmus_reactor_omega.jpg?raw=true"
     },
     {
         "alias": "absol_pws2",
@@ -726,7 +726,7 @@
         "source": "absol",
         "text": "After you produce units, place up to 2 infantry from your reinforcements on any planet you control or in any space area that contains 1 or more of your ships.",
         "homebrewReplacesID": "yso",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/yin_spinner.omega.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/yin_spinner_omega.jpg?raw=true"
     },
     {
         "alias": "absol_ic",
