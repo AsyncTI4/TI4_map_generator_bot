@@ -29,6 +29,7 @@ class SpinTilesInRings extends GameStateSubcommand {
       } else {
           if (!SpinRingsHelper.validateSpinSettings(customSpins)) {
               MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Invalid spin settings: " + customSpins);
+              return;
           }
 
           SpinRingsHelper.spinRingsCustom(game, customSpins, flavourMsg);

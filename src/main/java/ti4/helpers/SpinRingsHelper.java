@@ -29,7 +29,7 @@ public class SpinRingsHelper {
                 return false;
             }
 
-            int smallestRing = 1;
+            int smallestRing = 99;
             for (String ringString : spinSettings[0].split(",")) {
                 int ring = parseInt(ringString);
                 if (ring <= 0) {
