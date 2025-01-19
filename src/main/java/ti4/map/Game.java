@@ -4017,7 +4017,7 @@ public class Game extends GameProperties {
             || isPromisesPromisesMode()
             || isFlagshippingMode()
             || isAllianceMode()
-            || isSpinMode()
+            || getSpinMode() != null && !"OFF".equalsIgnoreCase(getSpinMode())
             || isHomebrewSCMode()
             || isCommunityMode()
             || !checkAllDecksAreOfficial()
