@@ -156,8 +156,10 @@ class Replace extends GameStateSubcommand {
             }
 
             //Update private channel
-            String newPrivateChannelName = privateChannel.getName().replace(getNormalizedName(oldMember), getNormalizedName(newMember));
-            privateChannel.getManager().setName(newPrivateChannelName).queue();
+            if (oldMember != null) {
+                String newPrivateChannelName = privateChannel.getName().replace(getNormalizedName(oldMember), getNormalizedName(newMember));
+                privateChannel.getManager().setName(newPrivateChannelName).queue();
+            }
             privateChannel.getManager().putMemberPermissionOverride(newMember.getIdLong(), permission, 0)
                 .queue(success -> accessMessage(privateChannel, newMember));
 
@@ -166,18 +168,22 @@ class Replace extends GameStateSubcommand {
             if (cardsInfo != null) {
                 String newCardsInfoName = cardsInfo.getName().replace(oldPlayerUserName.replace("/", ""), replacedPlayer.getUserName().replace("/", ""));
                 cardsInfo.getManager().setName(newCardsInfoName).queue();
-                cardsInfo.removeThreadMember(oldMember).queue();
+                if (oldMember != null) {
+                    cardsInfo.removeThreadMember(oldMember).queue();
+                }
                 cardsInfo.addThreadMember(newMember).queue(success -> accessMessage(cardsInfo, newMember));
             }
 
             //Update private threads
-            for (ThreadChannel thread : game.getMainGameChannel().getThreadChannels()) {
-                if (thread.getThreadMember(oldMember) != null) {
-                    thread.removeThreadMember(oldMember).queue(success -> {
-                        thread.addThreadMember(newMember).queue(success2 -> {
-                            accessMessage(thread, newMember);
+            if (oldMember != null) {
+                for (ThreadChannel thread : game.getMainGameChannel().getThreadChannels()) {
+                    if (thread.getThreadMember(oldMember) != null) {
+                        thread.removeThreadMember(oldMember).queue(success -> {
+                            thread.addThreadMember(newMember).queue(success2 -> {
+                                accessMessage(thread, newMember);
+                            });
                         });
-                    });
+                    }
                 }
             }
         }
