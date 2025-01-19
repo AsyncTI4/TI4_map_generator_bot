@@ -103,7 +103,7 @@ public class StatusCleanupService {
         game.removeStoredValue("Coup");
         game.removeStoredValue("PublicExecution");
         game.setHasHadAStatusPhase(true);
-        if (game.getSpinMode() != null) {
+        if (game.getSpinMode() != null && "OFF".equalsIgnoreCase(game.getSpinMode())) {
             if ("ON".equalsIgnoreCase(game.getSpinMode())) {
                 SpinRingsHelper.spinRings(game);
             } else {
