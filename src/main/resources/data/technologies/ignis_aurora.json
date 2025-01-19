@@ -24,7 +24,7 @@
         "types": ["PROPULSION"],
         "requirements": "BB",
         "source": "ignis_aurora",
-        "text": "At the start of your turn you may exhaust this card to remove 1 of your command tokens from a system that does not contain a planet owned by another player or another player's units."
+        "text": "At the end of your turn you may exhaust this card to remove 1 of your command tokens from a system that does not contain a planet owned by another player or another player's units."
     },
     {
         "alias": "fabrilerealignment",
