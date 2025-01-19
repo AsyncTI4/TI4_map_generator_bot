@@ -47,8 +47,8 @@
         "startingFleet": "dn,cv,dd,2 ff,3 inf s,sd s",
         "commodities": 4,
         "factionTech": [
-            "stco",
-            "negr"
+            "thunderbirdii",
+            "nexusgrid"
         ],
         "startingTech": [
             "ff2"
@@ -75,12 +75,12 @@
             "cruiser",
             "carrier",
             "dreadnought",
-            "pbd2000_raven_flagship",
+            "raven_flagship",
             "infantry",
-            "pbd2000_raven_mech",
+            "raven_mech",
             "pds",
             "spacedock"
         ],
-        "source": "pbd2000"
+        "source": "ignisaurora"
     }
 ]
