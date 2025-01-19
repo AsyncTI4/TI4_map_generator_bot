@@ -230,7 +230,7 @@ public class BotLogger {
 
     public static void catchRestError(Throwable e) {
         // if it's ignored, it's not actionable. Simple
-        if (ignoredError(e)) return;
+        // if (ignoredError(e)) return;
 
         // Otherwise... maybe actionable!
 

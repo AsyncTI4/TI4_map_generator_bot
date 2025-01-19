@@ -126,7 +126,7 @@ public class ButtonProcessor {
         } else if (buttonID.startsWith("milty_")) {
             game.getMiltyDraftManager().doMiltyPick(event, game, buttonID, player);
         } else if (buttonID.startsWith("showMiltyDraft")) {
-            game.getMiltyDraftManager().repostDraftInformation(game);
+            game.getMiltyDraftManager().repostDraftInformation(event, game);
         } else if (player != null && buttonID.startsWith("miltyFactionInfo_")) {
             UnfiledButtonHandlers.miltyFactionInfo(player, buttonID, game);
         } else if (buttonID.startsWith("jmfA_") || buttonID.startsWith("jmfN_")) {

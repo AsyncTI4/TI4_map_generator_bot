@@ -361,6 +361,10 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.removeIf(Objects::isNull);
     }
 
+    public static String getBotId() {
+        return jda.getSelfUser().getId();
+    }
+
     public static boolean isReadyToReceiveCommands() {
         return GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, false);
     }
