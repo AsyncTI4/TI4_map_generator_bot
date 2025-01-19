@@ -430,7 +430,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.INJECT_RULES_LINKS + " " + game.isInjectRulesLinks());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SPIN_MODE + " " + game.isSpinMode());
+        writer.write(Constants.SPIN_MODE + " " + game.getSpinMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_UNIT_TAGS + " " + game.isShowUnitTags());
         writer.write(System.lineSeparator());

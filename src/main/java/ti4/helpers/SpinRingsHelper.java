@@ -1,42 +1,100 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FowCommunicationThreadService;
 
 @UtilityClass
 public class SpinRingsHelper {
 
     private static final String CW = "cw";
     private static final String CCW = "ccw";
+    private static final String RND = "rnd";
 
-    public static void spinRingsCustom(Game game, SlashCommandInteractionEvent event) {
-        String[] customSpins = event.getOption(Constants.CUSTOM).getAsString().toLowerCase().split(" ");
-        List<Tile> tilesToSet = new ArrayList<>();
+    public static boolean validateSpinSettings(String customSpinSptring) {
+        List<String> customSpins = Arrays.asList(customSpinSptring.toLowerCase().split(" "));
         for (String spinString : customSpins) {
 
-            String[] spinSettings = spinString.split(":");
+            //Needs to have Ring:Direction:Steps  
+            String[] spinSettings = spinString.toLowerCase().split(":");
             if (spinSettings.length != 3) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Invalid spin settings: " + spinString);
-                return;
+                return false;
             }
 
-            int ring = parseInt(spinSettings[0]);
-            String direction = spinSettings[1];
-            int steps = parseInt(spinSettings[2]);
-            if (ring <= 0 || steps <= 0 || (!CW.equals(direction) && !CCW.equals(direction)) || steps > ring * 6 - 1) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Invalid spin settings: " + spinString);
-                return;
+            int smallestRing = 1;
+            for (String ringString : spinSettings[0].split(",")) {
+                int ring = parseInt(ringString);
+                if (ring <= 0) {
+                    return false;
+                }
+                smallestRing = ring < smallestRing ? ring : smallestRing;
             }
+
+            String direction = spinSettings[1];
+            if (!Arrays.asList(CW, CCW, RND).contains(direction)) {
+                return false;
+            }
+
+            //Step counts must be less than tiles in smallest ring
+            for (String stepsString : spinSettings[2].split(",")) {
+                int steps = parseInt(stepsString);
+                if (steps <= 0 || steps > smallestRing * 6 - 1) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /*
+     * Custom rotation with random support
+     * 
+     * Ring:Direction:Steps
+     * 1:cw:1 2:ccw:2
+     * 
+     * Or with random options
+     * 1,2:rnd:2,3 
+     * to spin ring 1 OR 2 to random direction for 2 OR 3 steps
+     * 
+     */
+    public static void spinRingsCustom(Game game, String customSpinString, String flavourMsg) {
+        List<String> customSpins = Arrays.asList(customSpinString.toLowerCase().split(" "));
+        StringBuffer sb = new StringBuffer(flavourMsg != null ? flavourMsg : "## Spun the rings");
+        List<Tile> tilesToSet = new ArrayList<>();
+
+        for (String spinString : customSpins) {
+            Random random = new Random();
+            String[] spinSettings = spinString.toLowerCase().split(":");
+
+            String[] ringOptions = spinSettings[0].split(",");
+            int ring = parseInt(ringOptions[random.nextInt(ringOptions.length)]);
+
+            String direction = spinSettings[1];
+            if (RND.equals(direction)) {
+                if (random.nextBoolean()) {
+                    direction = CW;
+                } else {
+                    direction = CCW;
+                }
+            }
+
+            String[] stepsOptions = spinSettings[2].split(",");
+            int steps = parseInt(stepsOptions[random.nextInt(stepsOptions.length)]);
 
             for (int x = 1; x < (ring * 6 + 1); x++) {
                 Tile tile = game.getTileByPosition(ring + (x < 10 ? "0" : "") + x);
+                if (tile == null) {
+                    continue;
+                }
+
                 int pos;
                 if (CW.equals(direction)) {
                     if ((x + steps) > (ring * 6)) {
@@ -53,15 +111,22 @@ public class SpinRingsHelper {
                 }
                 tile.setPosition(ring + (pos < 10 ? "0" : "") + pos);
                 tilesToSet.add(tile);
+                updateHomeSystem(game, tile);
             }
+            spunMessage(sb, ring, direction, steps);
         }
 
         for (Tile tile : tilesToSet) {
             game.setTile(tile);
         }
         game.rebuildTilePositionAutoCompleteList();
-        OptionMapping flavourMsg = event.getOption(Constants.MESSAGE);
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), flavourMsg != null ? flavourMsg.getAsString() : "## Spun the rings");
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString());
+
+        if (game.isFowMode()) {
+            for (Player player : game.getRealPlayers()) {
+                FowCommunicationThreadService.checkCommThreads(game, player);
+            }
+        }
     }
 
     private static int parseInt(String number) {
@@ -78,7 +143,7 @@ public class SpinRingsHelper {
     // - ring 3 cw three steps (except 6p map HS positions)
     public static void spinRings(Game game) {
         List<Tile> tilesToSet = new ArrayList<>();
-        //first ring
+
         for (int y = 1; y < 4; y++) {
             for (int x = 1; x < (y * 6 + 1); x++) {
                 if (y == 3 && (x - 1) % 3 == 0) {
@@ -90,6 +155,10 @@ public class SpinRingsHelper {
                 } else {
                     tile = game.getTileByPosition(y + "" + x);
                 }
+                if (tile == null) {
+                    continue;
+                } 
+
                 if (y == 2) {
                     if ((x - y) < 1) {
                         tile.setPosition(y + "" + ((x - y) + (y * 6)));
@@ -118,6 +187,28 @@ public class SpinRingsHelper {
             game.setTile(tile);
         }
         game.rebuildTilePositionAutoCompleteList();
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## Spun the rings");
+
+        StringBuffer sb = new StringBuffer("## Spun the rings");
+        spunMessage(sb, 1, CW, 1);
+        spunMessage(sb, 2, CCW, 2);
+        spunMessage(sb, 3, CW, 3);
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString());
+    }
+
+    private static void spunMessage(StringBuffer sb, int ring, String direction, int steps) {
+        sb.append("\n-# Ring ").append(ring).append(" ");
+        sb.append(direction.toUpperCase()).append(" for ");
+        sb.append(steps).append(" steps.");
+    }
+
+    private static void updateHomeSystem(Game game, Tile tile) {
+        if (!tile.isHomeSystem()) return;
+
+        for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
+            if (tile.getPosition().equals(player.getHomeSystemPosition())) {
+                player.setHomeSystemPosition(tile.getPosition());
+                return;
+            }
+        }
     }
 }
