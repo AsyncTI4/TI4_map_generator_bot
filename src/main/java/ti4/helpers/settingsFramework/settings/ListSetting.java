@@ -143,6 +143,7 @@ public class ListSetting<T> extends SettingInterface {
                 keys.addAll(itemsToAdd);
                 return null;
             } else {
+                if (itemsToAdd.isEmpty()) return null;
                 return "The items [" + String.join(",", itemsToAdd) + "] are already in the list.";
             }
         } else {
@@ -160,12 +161,13 @@ public class ListSetting<T> extends SettingInterface {
             }
             return "Could not complete action";
         } else if (event instanceof StringSelectInteractionEvent selectEvent) {
-            List<String> itemsToAdd = selectEvent.getValues();
-            if (CollectionUtils.containsAny(keys, itemsToAdd)) {
-                itemsToAdd.forEach(keys::remove);
+            List<String> itemsToRemove = selectEvent.getValues();
+            if (CollectionUtils.containsAny(keys, itemsToRemove)) {
+                itemsToRemove.forEach(keys::remove);
                 return null;
             } else {
-                return "The items [" + String.join(",", itemsToAdd) + "] are not in the list.";
+                if (itemsToRemove.isEmpty()) return null;
+                return "The items [" + String.join(",", itemsToRemove) + "] are not in the list.";
             }
         } else {
             return "Could not complete action. Invalid event?";

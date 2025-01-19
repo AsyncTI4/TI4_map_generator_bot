@@ -20,6 +20,7 @@ public class MapCommand implements ParentCommand {
         new ShowMapSetup(),
         new ShowMapString(),
         new SetMapTemplate(),
+        new PreviewMapTemplate(),
         new MoveTile(),
         new AddTileRandom(),
         new AddTileListRandom()

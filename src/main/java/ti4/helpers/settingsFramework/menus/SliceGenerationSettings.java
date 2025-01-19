@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
@@ -44,6 +45,7 @@ public class SliceGenerationSettings extends SettingsMenu {
 
     // This is handled fully manually as there's a lot of validation to do
     private String presetSlices = null;
+    @JsonIgnore
     private List<MiltyDraftSlice> parsedSlices;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -87,6 +89,10 @@ public class SliceGenerationSettings extends SettingsMenu {
             totalValue.initialize(json.get("totalValue"));
             extraWorms.initialize(json.get("extraWorms"));
             numLegends.initialize(json.get("numLegends"));
+
+            if (json.has("presetSlices")) {
+                setPresetSlices(json.get("presetSlices").asText(null));
+            }
         }
     }
 
@@ -115,8 +121,10 @@ public class SliceGenerationSettings extends SettingsMenu {
         List<Button> ls = new ArrayList<>(super.specialButtons());
         ls.add(Buttons.gray(idPrefix + "scpt2025quals", "SCPT 2025 Qualifiers", "<:scpt:1289722139750039634>"));
         ls.add(Buttons.gray(idPrefix + "scpt2025prelim", "SCPT 2025 Prelims", "<:scpt:1289722139750039634>"));
-        ls.add(Buttons.red(idPrefix + "richPreset", "Rich galaxy", MiscEmojis.tg));
-        ls.add(Buttons.red(idPrefix + "poorPreset", "Poor galaxy", MiscEmojis.comm));
+        if (parsedSlices.isEmpty()) {
+            ls.add(Buttons.red(idPrefix + "richPreset", "Rich galaxy", MiscEmojis.tg));
+            ls.add(Buttons.red(idPrefix + "poorPreset", "Poor galaxy", MiscEmojis.comm));
+        }
         ls.add(Buttons.blue(idPrefix + "presetSlices~MDL", "Use preset slices", MiltyDraftEmojis.sliceA));
         return ls;
     }
@@ -211,14 +219,13 @@ public class SliceGenerationSettings extends SettingsMenu {
         int players = 6;
         numSlices.setVal(players);
         numFactions.setVal(players);
-        
 
         List<List<String>> allSlices = new ArrayList<>();
         allSlices.add(new ArrayList<>(List.of("30,72,49,79,59", "29,66,50,80,31", "70,36,40,67,63", "73,76,48,45,26", "74,69,47,41,61", "37,65,46,68,64")));
         allSlices.add(new ArrayList<>(List.of("28,19,25,43,47", "34,77,36,41,64", "37,60,39,50,67", "42,75,78,59,24", "76,66,40,62,44", "68,73,79,20,65", "46,71,63,31,26")));
         allSlices.add(new ArrayList<>(List.of("63,40,72,46,68", "45,64,34,62,49", "36,25,24,50,41", "48,22,66,79,32", "39,61,59,43,71", "42,26,73,78,21", "47,70,65,44,19")));
         allSlices.add(new ArrayList<>(List.of("33,62,41,25,32", "44,36,19,40,72", "45,70,35,64,78", "50,74,65,26,63", "69,21,23,79,49", "38,59,42,39,24")));
-        
+
         Collections.shuffle(allSlices);
         List<String> slices = allSlices.getFirst();
         Collections.shuffle(slices);
@@ -283,6 +290,10 @@ public class SliceGenerationSettings extends SettingsMenu {
     }
 
     private String setPresetSlices(String sliceString) {
+        if (sliceString == null || sliceString.isEmpty()) {
+            return null;
+        }
+
         List<ComponentSource> sources = new ArrayList<>();
         int players = 6;
         presetSlices = sliceString;
