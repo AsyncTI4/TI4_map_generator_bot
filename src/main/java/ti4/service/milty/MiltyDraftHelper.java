@@ -47,7 +47,7 @@ public class MiltyDraftHelper {
         MessageHelper.sendFileUploadToChannel(mainGameChannel, fileUpload);
     }
 
-    private static FileUpload generateImage(Game game) {
+    public static FileUpload generateImage(Game game) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         List<MiltyDraftSlice> slices = manager.getSlices();
         MapTemplateModel mapTemplate = Mapper.getMapTemplate(manager.getMapTemplate());
