@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.SpinRingsHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 
@@ -25,7 +26,7 @@ class CustomizationOptions extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").addChoices(verbChoices));
         addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Turn ON or OFF pings for exceeding component limits").addChoices(onOff));
         addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS, "Turn ON or OFF the bot leaving your faction react on msgs").addChoices(onOff));
-        addOptions(new OptionData(OptionType.STRING, Constants.SPIN_MODE, "Automatically spin inner three rings at status cleanup. ON or OFF").addChoices(onOff));
+        addOptions(new OptionData(OptionType.STRING, Constants.SPIN_MODE, "Automatically spin rings at status cleanup. ON for Fin logic, insert custom logic, OFF to turn off"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIGHT_FOG_MODE, "Retain sight on formerly seen tiles"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.RED_TAPE_MODE, "Reveal all objectives and diplo gets the power to pre-reveal"));
@@ -78,10 +79,10 @@ class CustomizationOptions extends GameStateSubcommand {
         OptionMapping shushing = event.getOption(Constants.SPIN_MODE);
         if (shushing != null) {
             String ccNP = shushing.getAsString();
-            if ("ON".equalsIgnoreCase(ccNP)) {
-                game.setSpinMode(true);
-            } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                game.setSpinMode(false);
+            if ("ON".equalsIgnoreCase(ccNP) || SpinRingsHelper.validateSpinSettings(ccNP)) {
+                game.setSpinMode(ccNP.toUpperCase());
+            } else {
+                game.setSpinMode("OFF");
             }
         }
 

@@ -824,7 +824,7 @@ class GameLoadService {
                 }
                 case Constants.SPIN_MODE -> {
                     try {
-                        boolean value = Boolean.parseBoolean(info);
+                        String value = "false".equalsIgnoreCase(info) ? "OFF" : info;
                         game.setSpinMode(value);
                     } catch (Exception e) {
                     }
