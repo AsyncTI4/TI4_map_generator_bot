@@ -988,7 +988,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "After you win a space combat in this system, you may have this ship become damaged to gain 1 command token.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/flagships/magistrate.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/flagships/magistrate.png?raw=true"
     },
     {
         "id": "kortali_mech",

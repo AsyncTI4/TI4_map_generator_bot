@@ -16,7 +16,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "After you activate this system, you may produce up to 5 units in this system.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/duha_menaimon.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/duha_menaimon.png?raw=true"
     },
     {
         "id": "arborec_infantry",
@@ -127,7 +127,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players cannot use space cannon against your ships in this system.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/quetzecoatl.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/quetzecoatl.png?raw=true"
     },
     {
         "id": "argent_mech",
@@ -164,7 +164,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Capture all other non-structure units that are destroyed in this system, including your own.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/the_terror_between.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/the_terror_between.png?raw=true"
     },
     {
         "id": "cabal_mech",
@@ -226,7 +226,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "After any player's unit in this system or an adjacent system uses SUSTAIN DAMAGE, you may spend 2 influence to repair that unit.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/dynamo.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/dynamo.png?raw=true"
     },
     {
         "id": "empyrean_mech",
@@ -261,7 +261,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "This ship's system contains a delta wormhole.\nDuring movement, this ship may move before or after your other ships.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/hil_colish.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/hil_colish.png?raw=true"
     },
     {
         "id": "ghost_mech",
@@ -296,7 +296,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "After you roll a die during a space combat in this system, you may spend 1 trade good to apply +1 to the result.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/wrath_of_kenara.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/wrath_of_kenara.png?raw=true"
     },
     {
         "id": "hacan_mech",
@@ -331,7 +331,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "When making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 2 additional hits.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/jns_hylarim.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/jns_hylarim.png?raw=true"
     },
     {
         "id": "jolnar_mech",
@@ -409,7 +409,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "During a space combat, hits produced by this ship and by your dreadnoughts in this system must be assigned to non-fighter ships if able.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/001.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/001.png?raw=true"
     },
     {
         "id": "l1z1x_mech",
@@ -448,7 +448,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other player's units in this system lose PLANETARY SHIELD.\nAt the start of each space combat round, repair this ship.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/arc_secundus.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/arc_secundus.png?raw=true"
     },
     {
         "id": "letnev_mech",
@@ -483,7 +483,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "During combat against an opponent whose command token is not in your fleet pool, apply +2 to the results of this unit's combat rolls.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/arvicon_rex.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/arvicon_rex.png?raw=true"
     },
     {
         "id": "mahact_infantry",
@@ -551,7 +551,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other player's ships in this system cannot use SUSTAIN DAMAGE.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/fourth_moon.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/fourth_moon.png?raw=true"
     },
     {
         "id": "mentak_mech",
@@ -586,7 +586,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "ACTION: Spend 1 token from your strategy pool to place 1 cruiser in this system.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/the_inferno.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/the_inferno.png?raw=true"
     },
     {
         "id": "muaat_warsun",
@@ -703,7 +703,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "During an invasion in this system, you may commit fighters to planets as if they were ground forces. After combat, return those units to the space area.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/matriarch.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/matriarch.png?raw=true"
     },
     {
         "id": "naalu_mech",
@@ -754,7 +754,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Your mechs in this system roll 1 additional die during combat.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/visz_el_vir.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/visz_el_vir.png?raw=true"
     },
     {
         "id": "naaz_mech",
@@ -804,7 +804,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "At the start of a space combat, choose any number of your ground forces in this system to participate in that combat as if they were ships.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/the_alastor.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/the_alastor.png?raw=true"
     },
     {
         "id": "nekro_mech",
@@ -842,7 +842,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/memoria.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/memoria.png?raw=true"
     },
     {
         "id": "nomad_flagship2",
@@ -937,7 +937,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/son_of_ragh.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/son_of_ragh.png?raw=true"
     },
     {
         "id": "saar_spacedock",
@@ -1050,7 +1050,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Apply +1 to the result of each of your other ship's combat rolls in this system.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/cmorran_norr.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/cmorran_norr.png?raw=true"
     },
     {
         "id": "sardakk_mech",
@@ -1122,7 +1122,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "At the end of the status phase, place 1 infantry from your reinforcements in this system's space area.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/genesis.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/genesis.png?raw=true"
     },
     {
         "id": "sol_infantry",
@@ -1225,7 +1225,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "DEPLOY: After you activate a system that contains 1 or more of your PDS, you may replace 1 of those PDS with this unit.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/ouranos.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/ouranos.png?raw=true"
     },
     {
         "id": "titans_mech",
@@ -1302,7 +1302,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "When this unit makes a combat roll, it rolls a number of dice (hit on a 7) equal to the number of your opponent's non-fighter ships in this system.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/salai_sai_corian.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/salai_sai_corian.png?raw=true"
     },
     {
         "id": "winnu_mech",
@@ -1340,7 +1340,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/loncara_ssodu.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/loncara_ssodu.png?raw=true"
     },
     {
         "id": "xxcha_mech",
@@ -1378,7 +1378,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "When this ship is destroyed, destroy all ships in this system.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/van_hauge.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/van_hauge.png?raw=true"
     },
     {
         "id": "yin_mech",
@@ -1413,7 +1413,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "This ship can move through systems that contain other player's ships.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/ysia_yssrila.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/ysia_yssrila.png?raw=true"
     },
     {
         "id": "yssaril_mech",
