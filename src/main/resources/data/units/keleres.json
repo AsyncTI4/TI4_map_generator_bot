@@ -16,7 +16,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players must spend 2 influence to activate the system that contains this ship.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/artemiris.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/artemiris.png?raw=true"
     },
     {
         "id": "keleres_mech",
