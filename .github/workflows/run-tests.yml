@@ -11,6 +11,7 @@ jobs:
       - name: check for invalid json files
         run: |
           ERROR_FOUND=0
+          EXPORT ERROR_FOUND
           find . -name "*.json" -print0 | while IFS= read -r -d $'\0' file; do
             if ! python -mjson.tool "$file" > /dev/null; then
               echo "INVALID $file" >&2
