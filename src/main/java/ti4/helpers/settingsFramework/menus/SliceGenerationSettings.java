@@ -121,7 +121,7 @@ public class SliceGenerationSettings extends SettingsMenu {
         List<Button> ls = new ArrayList<>(super.specialButtons());
         ls.add(Buttons.gray(idPrefix + "scpt2025quals", "SCPT 2025 Qualifiers", "<:scpt:1289722139750039634>"));
         ls.add(Buttons.gray(idPrefix + "scpt2025prelim", "SCPT 2025 Prelims", "<:scpt:1289722139750039634>"));
-        if (parsedSlices.isEmpty()) {
+        if (presetSlices == null) {
             ls.add(Buttons.red(idPrefix + "richPreset", "Rich galaxy", MiscEmojis.tg));
             ls.add(Buttons.red(idPrefix + "poorPreset", "Poor galaxy", MiscEmojis.comm));
         }
