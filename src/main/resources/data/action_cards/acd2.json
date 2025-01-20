@@ -1047,8 +1047,8 @@
     "alias": "void_path",
     "name": "Void Path",
     "phase": "Action",
-    "window": "After you activate a system",
-    "text": "Choose 1 system that does not contain planets. During this tactical action, you treat that system as if it contains each non-delta wormhole.",
+    "window": "At the start of your turn",
+    "text": "Choose 1 system that does not contain planets. During this turn, you treat that system as if it contains each non-delta wormhole.",
     "flavorText": "\"As we lack the form of your world, you will lack that of ours,\" Taivra said without tone. \"Let us hope you are better prepared for your first pilgrimage than we for ours.\"",
     "source": "action_deck_2"
   },
