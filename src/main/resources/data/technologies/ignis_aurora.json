@@ -31,7 +31,7 @@
         "name": "Nexus Grid",
         "types": ["PROPULSION"],
         "requirements": "BB",
-        "faction": "raven"
+        "faction": "raven",
         "source": "ignis_aurora",
         "text": "After you activate a system, you may exhaust this card to treat the active system as if it contains every type of wormhole."
     },
