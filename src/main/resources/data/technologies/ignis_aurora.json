@@ -27,6 +27,25 @@
         "text": "At the end of your turn you may exhaust this card to remove 1 of your command tokens from a system that does not contain a planet owned by another player or another player's units."
     },
     {
+        "alias": "nexusgrid",
+        "name": "Nexus Grid",
+        "types": ["PROPULSION"],
+        "requirements": "BB",
+        "faction": "raven",
+        "source": "ignis_aurora",
+        "text": "After you activate a system, you may exhaust this card to treat the active system as if it contains every type of wormhole."
+    },
+    {
+        "alias": "thunderbirdii",
+        "name": "Thunderbird II",
+        "types": ["UNITUPGRADE"],
+        "requirements": "RR",
+        "faction": "raven",
+        "baseUpgrade": "dd2",
+        "source": "ignis_aurora",
+        "text": "Cost 1, Combat 8, Move 3\nANTI-FIGHTER BARRAGE 6(x3)\n"
+    },
+    {
         "alias": "fabrilerealignment",
         "name": "Fibrile Realignment",
         "types": ["BIOTIC"],
