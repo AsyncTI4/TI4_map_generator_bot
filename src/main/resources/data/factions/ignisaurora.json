@@ -71,16 +71,16 @@
         ],
         "units": [
             "fighter",
-            "destroyer",
+            "raven_destroyer",
             "cruiser",
             "carrier",
             "dreadnought",
-            "pbd2000_raven_flagship",
+            "raven_flagship",
             "infantry",
-            "pbd2000_raven_mech",
+            "raven_mech",
             "pds",
             "spacedock"
         ],
-        "source": "pbd2000"
+        "source": "ignisaurora"
     }
 ]
