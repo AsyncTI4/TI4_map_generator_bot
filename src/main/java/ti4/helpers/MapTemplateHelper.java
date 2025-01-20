@@ -188,8 +188,10 @@ public class MapTemplateHelper {
             if (pos == null) continue;
 
             Tile toAdd = getTileFromTemplateTile(tile);
-            BufferedImage tileImg = generator.draw(toAdd, TileStep.Tile);
-            g2.drawImage(tileImg, pos.x + center.x - 100, pos.y + center.y - 100, null);
+            if (toAdd != null) {
+                BufferedImage tileImg = generator.draw(toAdd, TileStep.Tile);
+                g2.drawImage(tileImg, pos.x + center.x - 100, pos.y + center.y - 100, null);
+            }
         }
 
         return FileUploadService.createFileUpload(img, model.getAlias());
