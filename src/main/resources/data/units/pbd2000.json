@@ -29,6 +29,38 @@
         "isShip": true
     },
     {
+        "id": "pbd2000_raven_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Apparition (LEGACY)",
+        "faction": "Raven",
+        "source": "pbd2000",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "DEPLOY: During the commit ground forces step of your tactical action in a system that contains your ships, if you have no ground forces in the active system, you may spend 2 resources to place 1 mech on 1 planet in the system."
+    },
+    {
+        "id": "pbd2000_raven_flagship",
+        "baseType": "flagship",
+        "asyncId": "fs",
+        "name": "Big Bird (LEGACY)",
+        "faction": "Raven",
+        "source": "pbd2000",
+        "moveValue": 4,
+        "capacityValue": 3,
+        "capacityUsed": 1,
+        "cost": 8,
+        "combatHitsOn": 7,
+        "combatDieCount": 2,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true
+    },
+    {
         "id": "pbd2000_mentak_cruiser",
         "baseType": "cruiser",
         "asyncId": "ca",
