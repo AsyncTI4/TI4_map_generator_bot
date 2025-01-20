@@ -16,7 +16,7 @@ import ti4.model.MapTemplateModel;
 public class PreviewMapTemplate extends GameStateSubcommand {
 
     public PreviewMapTemplate() {
-        super("preview_map_template", "Preview a map template.", true, false);
+        super("preview_map_template", "Preview a map template.", false, false);
         addOption(OptionType.STRING, Constants.MAP_TEMPLATE, "Template to preview.", true, true);
     }
 
