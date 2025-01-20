@@ -39,7 +39,7 @@
             "spacedock"
         ],
         "source": "ignis_aurora"
-    },
+    },,
     {
         "alias": "raven",
         "factionName": "The Raven",
