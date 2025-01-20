@@ -9,8 +9,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
+import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
@@ -130,6 +133,17 @@ public class GameSettings extends SettingsMenu {
             case "preset444" -> preset444();
             default -> null;
         };
+        System.out.println("Game action: " + action);
+        if (action.startsWith("changeTemplate_")) {
+            if (event instanceof StringSelectInteractionEvent sEvent) {
+                FileUpload preview = null;
+                if (parent != null && parent instanceof MiltySettings mparent)
+                    preview = MapTemplateHelper.generateTemplatePreviewImage(event, mparent.getGame(), mapTemplate.getValue());
+                if (preview != null)
+                    sEvent.getHook().sendMessage("Here is a preview of the selected map template:")
+                        .addFiles(preview).setEphemeral(true).queue();
+            }
+        }
         return (error == null ? "success" : error);
     }
 

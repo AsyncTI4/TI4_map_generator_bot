@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.commands.GameStateSubcommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.MapTemplateHelper;
 import ti4.image.Mapper;
@@ -13,17 +13,18 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 
-public class PreviewMapTemplate extends GameStateSubcommand {
+public class PreviewMapTemplate extends Subcommand {
 
     public PreviewMapTemplate() {
-        super("preview_map_template", "Preview a map template.", true, false);
+        super("preview_map_template", "Preview a map template.");
         addOption(OptionType.STRING, Constants.MAP_TEMPLATE, "Template to preview.", true, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String mapTemplate = event.getOption(Constants.MAP_TEMPLATE, null, OptionMapping::getAsString);
-        postMapTemplate(event, mapTemplate, getGame());
+        Game game = new Game();
+        postMapTemplate(event, mapTemplate, game);
     }
 
     private void postMapTemplate(GenericInteractionCreateEvent event, String mapTemplate, Game game) {
