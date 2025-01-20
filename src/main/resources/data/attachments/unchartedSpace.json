@@ -1,21 +1,25 @@
 [
     {
         "id": "orbital_foundries",
+        "name": "Orbital Foundries",
         "imagePath": "attachment_orbital_foundries.png",
         "source": "uncharted_space"
     },
     {
         "id": "arcane_shield",
+        "name": "Arcane Shield Emitter",
         "imagePath": "attachment_arc_shield.png",
         "source": "uncharted_space"
     },
     {
         "id": "arcane_citadel",
+        "name": "Arcane Citadel",
         "imagePath": "attachment_arcane_citadel.png",
         "source": "uncharted_space"
     },
     {
         "id": "council_preserve",
+        "name": "Council Preserve",
         "imagePath": "attachment_council_preserve.png",
         "source": "uncharted_space"
     }
