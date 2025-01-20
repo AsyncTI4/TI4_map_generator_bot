@@ -23,6 +23,8 @@ import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
@@ -152,7 +154,7 @@ public class Mapper {
         }
     }
 
-    private static <T extends ModelInterface> void importJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target) {
+    private static <T extends ModelInterface> void importJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target) throws InvalidFormatException {
         String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
         objectMap.clear(); // Added to prevent duplicates when running Mapper.init() over and over with *ModelTest classes
 
@@ -162,6 +164,9 @@ public class Mapper {
             if (file.isFile() && file.getName().endsWith(".json")) {
                 try {
                     importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target);
+                } catch (InvalidFormatException e) {
+                    BotLogger.log("JSON File may be formatted incorrectly: " + jsonFolderName + "/" + file.getName(), e);
+                    throw e;
                 } catch (Exception e) {
                     BotLogger.log("Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e);
                 }
