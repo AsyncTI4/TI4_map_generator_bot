@@ -45,7 +45,7 @@
         "factionName": "The Raven",
         "homeSystem": "62",
         "startingFleet": "dn,cv,dd,2 ff,3 inf s,sd s",
-        "commodities": 4
+        "commodities": 4,
         "factionTech": [
             "thunderbirdii",
             "nexusgrid"
