@@ -10,17 +10,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: check for invalid json files
         run: |
-          ERROR_FOUND=0
           find . -name "*.json" -print0 | while IFS= read -r -d $'\0' file; do
             if ! python -mjson.tool "$file" > /dev/null; then
               echo "INVALID $file" >&2
-              ERROR_FOUND=1
-              export ERROR_FOUND
+              exit 1
             fi
           done
-          if [ "$ERROR_FOUND" -eq 1 ]; then
-            exit 1
-          fi
 
   ci:
     name: Run Tests On Pull Request
