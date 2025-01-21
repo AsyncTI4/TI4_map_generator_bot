@@ -22,7 +22,7 @@
     "name": "Anti-gravity Platforms",
     "phase": "Action",
     "window": "At the start of a ground combat",
-    "text": "Choose 1 of your ships in the active system to participate in this combat as if it were a ground force.",
+    "text": "Choose 1 of your non-fighter ships in the active system. That ship participates in the \"Roll Dice\" step of this combat as if it were a ground force on the planet.",
     "flavorText": "The battle seemed to freeze as the J.N.S. Hylarim entered low orbit, its shadow eclipsing the conflict—and the hopes of its enemies.",
     "source": "action_deck_2"
   },
