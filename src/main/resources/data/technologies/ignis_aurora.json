@@ -36,16 +36,6 @@
         "text": "After you activate a system, you may exhaust this card to treat the active system as if it contains every type of wormhole."
     },
     {
-        "alias": "thunderbirdii",
-        "name": "Thunderbird II",
-        "types": ["UNITUPGRADE"],
-        "requirements": "RR",
-        "faction": "raven",
-        "baseUpgrade": "dd2",
-        "source": "ignis_aurora",
-        "text": "Cost 1, Combat 8, Move 3\nANTI-FIGHTER BARRAGE 6(x3)\n"
-    },
-    {
         "alias": "fabrilerealignment",
         "name": "Fibrile Realignment",
         "types": ["BIOTIC"],
@@ -223,28 +213,6 @@
         "homebrewReplacesID": "pws2"
     },
     {
-        "alias": "baldrick_ac2",
-        "name": "Advanced Carrier II",
-        "types": ["UNITUPGRADE"],
-        "requirements": "GB",
-        "faction": "sol",
-        "baseUpgrade": "cv2",
-        "source": "ignis_aurora",
-        "text": "Cost 3, Combat 9, Move 2, Capacity 8\nSUSTAIN DAMAGE",
-        "homebrewReplacesID": "ac2"
-    },
-    {
-        "alias": "baldrick_sdn2",
-        "name": "Super Dreadnought II",
-        "types": ["UNITUPGRADE"],
-        "requirements": "RBY",
-        "faction": "l1z1x",
-        "baseUpgrade": "dn2",
-        "source": "ignis_aurora",
-        "text": "Cost 4, Combat 4, Move 2, Capacity 2\nSUSTAIN DAMAGE, BOMBARDMENT 4",
-        "homebrewReplacesID": "sdn2"
-    },
-    {
         "alias": "baldrick_cl2",
         "name": "Crimson Legionnaire II",
         "types": ["UNITUPGRADE"],
@@ -254,28 +222,6 @@
         "source": "ignis_aurora",
         "text": "Cost 1(x2), Combat 7\nAfter this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good.\nYou may produce 1 additional infantry for their cost. These infantry do not count against your PRODUCTION limit.",
         "homebrewReplacesID": "cl2"
-    },
-    {
-        "alias": "baldrick_hcf2",
-        "name": "Hybrid Crystal Fighter II",
-        "types": ["UNITUPGRADE"],
-        "requirements": "BY",
-        "faction": "naalu",
-        "baseUpgrade": "ff2",
-        "source": "ignis_aurora",
-        "text": "Cost 1(x2), Combat 7, Move 2\nThis unit may move without being transported.\nFighters in excess of your ships' capacity count as 1/2 of a ship against your fleet pool.",
-        "homebrewReplacesID": "hcf2"
-    },
-    {
-        "alias": "baldrick_exo2",
-        "name": "Exotrireme II",
-        "types": ["UNITUPGRADE"],
-        "requirements": "RBY",
-        "faction": "sardakk",
-        "baseUpgrade": "dn2",
-        "source": "ignis_aurora",
-        "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 4(x2)\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in this system.",
-        "homebrewReplacesID": "exo2"
     },
     {
         "alias": "baldrick_scc",
@@ -328,17 +274,6 @@
         "homebrewReplacesID": "is"
     },
     {
-        "alias": "baldrick_ht2",
-        "name": "Hel-Titan II",
-        "types": ["UNITUPGRADE"],
-        "requirements": "YR",
-        "faction": "titans",
-        "baseUpgrade": "pds2",
-        "source": "ignis_aurora",
-        "text": "Combat 6\nPLANETARY SHIELD, SPACE CANNON 6, SUSTAIN DAMAGE, PRODUCTION 1\nThis unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems.\nWhen your units use SPACE CANNON, at least half of the hits produced by those units (rounded up) must be assigned to non-fighter ships if able.",
-        "homebrewReplacesID": "ht2"
-    },
-    {
         "alias": "baldrick_ers",
         "name": "E-Res Siphons",
         "types": ["CYBERNETIC"],
@@ -347,42 +282,6 @@
         "source": "ignis_aurora",
         "text": "After another player activates a system that contains 1 or more of your ships, gain 3 trade goods.",
         "homebrewReplacesID": "ers"
-    },
-    {
-        "alias": "baldrick_dn2",
-        "name": "Dreadnought II",
-        "types": ["UNITUPGRADE"],
-        "requirements": "RBY",
-        "source": "ignis_aurora",
-        "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 5.",
-        "homebrewReplacesID": "dn2"
-    },
-    {
-        "alias": "baldrick_pds2",
-        "name": "PDS II",
-        "types": ["UNITUPGRADE"],
-        "requirements": "RY",
-        "source": "ignis_aurora",
-        "text": "PLANETARY SHIELD, DEEP SPACE CANNON 6\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.\nWhen your units use SPACE CANNON, at least half of the hits produced by those units (rounded up) must be assigned to non-fighter ships if able.",
-        "homebrewReplacesID": "pds2"
-    },
-    {
-        "alias": "baldrick_cv2",
-        "name": "Carrier II",
-        "types": ["UNITUPGRADE"],
-        "requirements": "GB",
-        "source": "ignis_aurora",
-        "text": "Cost 3, Combat 9, Move 2, Capacity 6",
-        "homebrewReplacesID": "cv2"
-    },
-    {
-        "alias": "baldrick_ff2",
-        "name": "Fighter II",
-        "types": ["UNITUPGRADE"],
-        "requirements": "BY",
-        "source": "ignis_aurora",
-        "text": "Cost 1(x2), Combat 8, Move 2\nThis unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
-        "homebrewReplacesID": "ff2"
     },
     {
         "alias": "baldrick_inf2",
