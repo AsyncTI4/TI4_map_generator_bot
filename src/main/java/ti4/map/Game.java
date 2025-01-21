@@ -62,6 +62,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
@@ -2876,7 +2877,9 @@ public class Game extends GameProperties {
         GameSettings settings = miltySettings.getGameSettings();
         setVp(settings.getPointTotal().getVal());
         setMaxSOCountPerPlayer(settings.getSecrets().getVal());
-        setCompetitiveTIGLGame(settings.getTigl().isVal());
+        if (settings.getTigl().isVal()) {
+            TIGLHelper.initializeTIGLGame(this);
+        }
         setAllianceMode(settings.getAlliance().isVal());
 
         if (settings.getMapTemplate().getValue().getAlias().equals("1pIsland")) {
