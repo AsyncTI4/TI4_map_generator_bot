@@ -9,13 +9,15 @@ import lombok.experimental.UtilityClass;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.map.Game;
+import ti4.map.GamesPage;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 
 @UtilityClass
-class MigrationHelper {
+public class MigrationHelper {
 
     public static boolean replaceTokens(Game game, Map<String, String> replacements) {
         boolean found = false;
@@ -108,5 +110,17 @@ class MigrationHelper {
         BotLogger.log(String.format("Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
         bag.Contents.remove(index);
         bag.Contents.add(index, newItem);
+    }
+
+    // manual migration code to convert blaheo to biaheo - remove after 2025-03
+    public static void fixBlaheo() {
+        GamesPage.consumeAllGames(MigrationHelper::fixBlaheo);
+    }
+
+    // manual migration code to convert blaheo to biaheo - remove after 2025-03
+    public static void fixBlaheo(Game game) {
+        if (game.getTileMap().values().stream().anyMatch(t -> t.getUnitHolders().keySet().contains("biaheo"))) {
+            GameManager.save(game, "Fixed Blaheo/Biaheo UnitHolder");
+        }
     }
 }
