@@ -1,22 +1,23 @@
 package ti4.settings.users;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserSettings {
 
     private String userId;
-    private Set<String> preferredColors;
+    private List<String> preferredColors;
     private int personalPingInterval;
     private boolean prefersDistanceBasedTacticalActions;
     private String afkHours;
@@ -29,8 +30,8 @@ public class UserSettings {
         this.userId = userId;
     }
 
-    public Set<String> getPreferredColors() {
-        return Objects.requireNonNullElse(preferredColors, Collections.emptySet());
+    public List<String> getPreferredColors() {
+        return Objects.requireNonNullElse(preferredColors, Collections.emptyList());
     }
 
     public void addAfkHour(String hour) {

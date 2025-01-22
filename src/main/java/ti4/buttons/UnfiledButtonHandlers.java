@@ -1984,7 +1984,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("announceARetreat")
     public static void announceARetreat(ButtonInteractionEvent event, Player player, Game game) {
-        String msg = player.getRepresentationNoPing() + " has announced a retreat.";
+        String msg = "## " + player.getRepresentationNoPing() + " has announced a retreat.";
         if (game.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander")) {
             msg += " Since they have Jack Hallard, the Nokar commander, this means they may cancel 2 hits in this coming combat round.";
         }
