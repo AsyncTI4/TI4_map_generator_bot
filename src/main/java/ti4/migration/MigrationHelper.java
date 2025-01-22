@@ -128,4 +128,20 @@ public class MigrationHelper {
         }
         return removed;
     }
+
+    public static boolean removeWekkersAbsolsPoliticalSecretsAgain(Game game) {
+        if ("g14".equals(game.getName())) {
+            return false;
+        }
+        boolean removed = false;
+        for (Player player : game.getPlayers().values()) {
+            for (String pn : new ArrayList<>(player.getPromissoryNotes().keySet())) {
+                if (pn.startsWith("wekkerabsol_")) {
+                    player.removePromissoryNote(pn);
+                    removed = true;
+                }
+            }
+        }
+        return removed;
+    }
 }

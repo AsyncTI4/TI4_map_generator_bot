@@ -45,6 +45,7 @@ public class DataMigrationManager {
     static {
         migrations = new HashMap<>();
         migrations.put("removeWekkersAbsolsPoliticalSecret_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecrets);
+        migrations.put("removeWekkersAbsolsPoliticalSecretAgain_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecretsAgain);
         //migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
