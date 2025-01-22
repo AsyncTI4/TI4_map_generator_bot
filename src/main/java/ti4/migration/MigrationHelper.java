@@ -1,5 +1,6 @@
 package ti4.migration;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -9,13 +10,15 @@ import lombok.experimental.UtilityClass;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.map.Game;
+import ti4.map.GamesPage;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 
 @UtilityClass
-class MigrationHelper {
+public class MigrationHelper {
 
     public static boolean replaceTokens(Game game, Map<String, String> replacements) {
         boolean found = false;
@@ -108,5 +111,33 @@ class MigrationHelper {
         BotLogger.log(String.format("Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
         bag.Contents.remove(index);
         bag.Contents.add(index, newItem);
+    }
+
+    // manual migration code to convert blaheo to biaheo - remove after 2025-03
+    public static void fixBlaheo() {
+        GamesPage.consumeAllGames(MigrationHelper::fixBlaheo);
+    }
+
+    // manual migration code to convert blaheo to biaheo - remove after 2025-03
+    public static void fixBlaheo(Game game) {
+        if (game.getTileMap().values().stream().anyMatch(t -> t.getUnitHolders().keySet().contains("biaheo"))) {
+            GameManager.save(game, "Fixed Blaheo/Biaheo UnitHolder");
+        }
+    }
+
+    public static boolean removeWekkersAbsolsPoliticalSecrets(Game game) {
+        if ("g14".equals(game.getName())) {
+            return false;
+        }
+        boolean removed = false;
+        for (Player player : game.getPlayers().values()) {
+            for (String ownedPN : new ArrayList<>(player.getPromissoryNotesOwned())) {
+                if (ownedPN.startsWith("wekkerabsol_")) {
+                    player.removeOwnedPromissoryNoteByID(ownedPN);
+                    removed = true;
+                }
+            }
+        }
+        return removed;
     }
 }
