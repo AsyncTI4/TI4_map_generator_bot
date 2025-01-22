@@ -113,18 +113,6 @@ public class MigrationHelper {
         bag.Contents.add(index, newItem);
     }
 
-    // manual migration code to convert blaheo to biaheo - remove after 2025-03
-    public static void fixBlaheo() {
-        GamesPage.consumeAllGames(MigrationHelper::fixBlaheo);
-    }
-
-    // manual migration code to convert blaheo to biaheo - remove after 2025-03
-    public static void fixBlaheo(Game game) {
-        if (game.getTileMap().values().stream().anyMatch(t -> t.getUnitHolders().keySet().contains("biaheo"))) {
-            GameManager.save(game, "Fixed Blaheo/Biaheo UnitHolder");
-        }
-    }
-
     public static boolean removeWekkersAbsolsPoliticalSecrets(Game game) {
         if ("g14".equals(game.getName())) {
             return false;

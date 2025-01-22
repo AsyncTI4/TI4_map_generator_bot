@@ -224,9 +224,6 @@ class GameLoadService {
                                     Helper.addMirageToTile(tile);
                                 } else if (!tile.isSpaceHolderValid(spaceHolder)) {
                                     BotLogger.log(game.getName() + ": Not valid space holder detected: " + spaceHolder);
-                                    if ("blaheo".equals(spaceHolder)) { // manual migration code to convert blaheo to biaheo - remove after 2025-03
-                                        spaceHolder = "biaheo";
-                                    }
                                 }
                             }
                             continue;
