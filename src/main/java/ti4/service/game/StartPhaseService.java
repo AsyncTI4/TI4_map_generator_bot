@@ -62,7 +62,7 @@ public class StartPhaseService {
             case "strategy" -> startStrategyPhase(event, game);
             case "voting", "agendaVoting" -> AgendaHelper.startTheVoting(game);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
-            case "P1Special" -> MigrationHelper.fixBlaheo(); // manual migration code to convert blaheo to biaheo - comment after 2025-03
+            // case "P1Special" -> MigrationHelper.fixBlaheo(); // manual migration code to convert blaheo to biaheo - comment after 2025-03
             case "shuffleDecks" -> game.shuffleDecks();
             case "agenda" -> {
                 Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
