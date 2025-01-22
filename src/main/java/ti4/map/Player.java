@@ -1751,7 +1751,7 @@ public class Player {
         if (getGame() != null && color != null && faction != null && Mapper.isValidColor(color)
             && Mapper.isValidFaction(faction)) {
             promissoryNotes.clear();
-            List<String> promissoryNotes = Mapper.getColorPromissoryNoteIDs(getGame(), color);
+            List<String> promissoryNotes = Mapper.getColorPromissoryNoteIDs(getGame(), color); //TODO: switch this to an explicit game.getPNSet() DeckModel
             for (String promissoryNote : promissoryNotes) {
                 if (promissoryNote.endsWith("_an") && hasAbility("hubris")) {
                     continue;
