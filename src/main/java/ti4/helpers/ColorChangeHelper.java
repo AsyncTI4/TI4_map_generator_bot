@@ -45,11 +45,8 @@ public class ColorChangeHelper {
             Map<String, Integer> promissoryNotesChanged = new LinkedHashMap<>();
             for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn.getKey());
-                if (!pnModel.isDupe()) {
+                if (!pnModel.isDupe() || game.getPNOwner(pn.getKey()) != player) {
                     promissoryNotesChanged.put(pn.getKey(), pn.getValue());
-                    continue;
-                }
-                if (game.getPNOwner(pn.getKey()) != player) {
                     continue;
                 }
                 PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
@@ -63,11 +60,8 @@ public class ColorChangeHelper {
             List<String> promissoryNotesInPlayAreaChanged = new ArrayList<>();
             for (String pn : promissoryNotesInPlayArea) {
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn);
-                if (!pnModel.isDupe()) {
+                if (!pnModel.isDupe() || game.getPNOwner(pn) != player) {
                     promissoryNotesInPlayAreaChanged.add(pn);
-                    continue;
-                }
-                if (game.getPNOwner(pn) != player) {
                     continue;
                 }
                 PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
