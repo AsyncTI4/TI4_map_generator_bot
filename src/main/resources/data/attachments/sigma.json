@@ -1,65 +1,76 @@
 [
     {
         "id": "sigma_senate_sanctuary",
+        "name": "Senate Sanctuary",
         "imagePath": "attachment_sigma_senate_sanctuary.png",
         "token": "sigma_senate_sanctuary",
         "source": "promises_promises"
     },
     {
         "id": "sigma_weirdway",
+        "name": "Weirdway",
         "imagePath": "attachment_sigma_weirdway.png",
         "token": "sigma_weirdway",
         "source": "promises_promises"
     },
     {
         "id": "sigma_ancient_hall",
+        "name": "Ancient Hall",
         "imagePath": "attachment_sigma_ancient_hall.png",
         "token": "sigma_ancient_hall",
         "source": "sigma"
     },
     {
         "id": "sigma_deserted_factories",
+        "name": "Deserted Factories",
         "imagePath": "attachment_sigma_deserted_factories.png",
         "token": "sigma_deserted_factories",
         "source": "sigma"
     },
     {
         "id": "sigma_unwelcoming",
+        "name": "Unwelcoming Fauna",
         "imagePath": "attachment_sigma_unwelcoming.png",
         "token": "sigma_unwelcoming",
         "source": "sigma"
     },
     {
         "id": "sigma_palace_diplomats",
+        "name": "Palace of the Diplomats",
         "imagePath": "attachment_sigma_palace_diplomats.png",
         "token": "sigma_palace_diplomats",
         "source": "sigma"
     },
     {
         "id": "sigma_palace_politicians",
+        "name": "Palace of the Politicians",
         "imagePath": "attachment_sigma_palace_politicians.png",
         "token": "sigma_palace_politicians",
         "source": "sigma"
     },
     {
         "id": "sigma_palace_architects",
+        "name": "Palace of the Architects",
         "imagePath": "attachment_sigma_palace_architects.png",
         "token": "sigma_palace_architects",
         "source": "sigma"
     },
     {
         "id": "sigma_palace_merchants",
+        "name": "Palace of the Merchants",
         "imagePath": "attachment_sigma_palace_merchants.png",
         "token": "sigma_palace_merchants",
         "source": "sigma"
     },
     {
         "id": "sigma_palace_admirals",
+        "name": "Palace of the Admirals",
         "imagePath": "attachment_sigma_palace_admirals.png",
         "token": "sigma_palace_admirals",
         "source": "sigma"
     },
     {
+        "name": "Palace of the Scientists",
         "id": "sigma_palace_scientists",
         "imagePath": "attachment_sigma_palace_scientists.png",
         "token": "sigma_palace_scientists",
@@ -67,6 +78,7 @@
     },
     {
         "id": "sigma_cyber",
+        "name": "Cybernetic Enhancements",
         "imagePath": "attachment_sigma_cyber.png",
         "token": "sigma_cyber",
         "resourcesModifier": 2,
