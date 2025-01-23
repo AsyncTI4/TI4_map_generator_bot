@@ -1623,7 +1623,11 @@ public class ButtonHelper {
             if (!unit.getColor().equals(player.getColor())) {
                 continue;
             }
-            UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
+            List<UnitModel> unitModels = player.getUnitsByAsyncID(unit.asyncID());
+            if (unitModels.isEmpty()) {
+                continue;
+            }
+            UnitModel removedUnit = unitModels.getFirst();
             if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff")) {
                 count += space.getUnits().get(unit);
             }
