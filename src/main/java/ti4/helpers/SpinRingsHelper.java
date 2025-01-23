@@ -46,7 +46,7 @@ public class SpinRingsHelper {
             //Step counts must be less than tiles in smallest ring
             for (String stepsString : spinSettings[2].split(",")) {
                 int steps = parseInt(stepsString);
-                if (steps <= 0 || steps > smallestRing * 6 - 1) {
+                if (steps < 0 || steps > smallestRing * 6 - 1) {
                     return false;
                 }
             }
@@ -89,29 +89,31 @@ public class SpinRingsHelper {
             String[] stepsOptions = spinSettings[2].split(",");
             int steps = parseInt(stepsOptions[random.nextInt(stepsOptions.length)]);
 
-            for (int x = 1; x < (ring * 6 + 1); x++) {
-                Tile tile = game.getTileByPosition(ring + (x < 10 ? "0" : "") + x);
-                if (tile == null) {
-                    continue;
-                }
+            if (steps > 0) {
+                for (int x = 1; x < (ring * 6 + 1); x++) {
+                    Tile tile = game.getTileByPosition(ring + (x < 10 ? "0" : "") + x);
+                    if (tile == null) {
+                        continue;
+                    }
 
-                int pos;
-                if (CW.equals(direction)) {
-                    if ((x + steps) > (ring * 6)) {
-                        pos = (x + steps) % (ring * 6);
+                    int pos;
+                    if (CW.equals(direction)) {
+                        if ((x + steps) > (ring * 6)) {
+                            pos = (x + steps) % (ring * 6);
+                        } else {
+                            pos = x + steps;
+                        }
                     } else {
-                        pos = x + steps;
+                        if ((x - steps) < 1) {
+                            pos = (x - steps) + (ring * 6);
+                        } else {
+                            pos = x - steps;
+                        }
                     }
-                } else {
-                    if ((x - steps) < 1) {
-                        pos = (x - steps) + (ring * 6);
-                    } else {
-                        pos = x - steps;
-                    }
+                    tile.setPosition(ring + (pos < 10 ? "0" : "") + pos);
+                    tilesToSet.add(tile);
+                    updateHomeSystem(game, tile);
                 }
-                tile.setPosition(ring + (pos < 10 ? "0" : "") + pos);
-                tilesToSet.add(tile);
-                updateHomeSystem(game, tile);
             }
             spunMessage(sb, ring, direction, steps);
         }

@@ -28,7 +28,6 @@ class RemoveTile extends GameStateSubcommand {
         for (String position : positions) {
             if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Tile position `" + position + "` is not valid");
-                return;
             }
             game.removeTile(position);
         }

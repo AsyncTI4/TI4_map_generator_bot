@@ -13,6 +13,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.SpinRingsHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.message.MessageHelper;
 
 class CustomizationOptions extends GameStateSubcommand {
 
@@ -79,10 +80,11 @@ class CustomizationOptions extends GameStateSubcommand {
         OptionMapping shushing = event.getOption(Constants.SPIN_MODE);
         if (shushing != null) {
             String ccNP = shushing.getAsString();
-            if ("ON".equalsIgnoreCase(ccNP) || SpinRingsHelper.validateSpinSettings(ccNP)) {
+            if ("ON".equalsIgnoreCase(ccNP) || "OFF".equalsIgnoreCase(ccNP) || SpinRingsHelper.validateSpinSettings(ccNP)) {
                 game.setSpinMode(ccNP.toUpperCase());
+                MessageHelper.replyToMessage(event, "Spin mode set to `" + ccNP + "`");
             } else {
-                game.setSpinMode("OFF");
+                MessageHelper.replyToMessage(event, "Invalid spin settings: " + ccNP);
             }
         }
 
