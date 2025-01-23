@@ -4,9 +4,9 @@
         "name": "Baldricks Ignis Aurora Techs",
         "type": "technology",
         "description": "All techs for Ignis Aurora",
-        "cardIDs": ["baldrick_amd","baldrick_gd","baldrick_fl","baldrick_lwd","baldrick_nm","baldrick_dxa","baldrick_hm","baldrick_x89","baldrick_ps","da","asc","st","baldrick_td","ie","baldrick_ws","baldrick_sd2","baldrick_l4","cm","baldrick_pws2","qdn","baldrick_ac2","baldrick_sdn2","mc","baldrick_hcf2","vax","baldrick_exo2","cr2","baldrick_scc","baldrick_lgf","it","mi","baldrick_bio","nes","ffac2","mr","pm","baldrick_so2","wg","ds","baldrick_is","so","ng","vay","vpw","baldrick_ers","baldrick_dn2","dd2","baldrick_pds2","baldrick_cv2","baldrick_ff2","baldrick_inf2","baldrick_htp","nf","yso","baldrick_ic","tp",
+        "cardIDs": ["baldrick_amd","baldrick_gd","baldrick_fl","baldrick_lwd","baldrick_nm","baldrick_dxa","baldrick_hm","baldrick_x89","baldrick_ps","da","asc","st","baldrick_td","ie","baldrick_ws","baldrick_sd2","baldrick_l4","cm","baldrick_pws2","qdn","mc","vax","cr2","baldrick_scc","baldrick_lgf","it","mi","baldrick_bio","nes","ffac2","mr","pm","baldrick_so2","wg","ds","baldrick_is","so","ng","vay","vpw","baldrick_ers","dd2","baldrick_pds2","baldrick_inf2","baldrick_htp","nf","yso","baldrick_ic","tp",
                     "det","sr","baldrick_bs","aida","sar","sdn","baldrick_pi","swa2","as","baldrick_cl2","pfa","m2","se2","ah","vw","gr","sc","tcs","baldrick_ht2","vtx","iihq","asn",
-                    "ciqineqreceptors","gjenspecterii","stellarcorridors","fabrilerealignment","precisiontargeting","syntheticreclamation","leviathaneruptor"
+                    "ciqineqreceptors","gjenspecterii","stellarcorridors","fabrilerealignment","precisiontargeting","syntheticreclamation","leviathaneruptor","murmuration"
         ],
         "source": "ignis_aurora"
     },
