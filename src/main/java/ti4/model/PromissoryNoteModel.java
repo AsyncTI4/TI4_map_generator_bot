@@ -30,10 +30,10 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     private String homebrewReplacesID;
     private String imageURL;
     private List<String> searchTags = new ArrayList<>();
-    private boolean dupe = false;
+    private PromissoryNoteModel sourcePNModel; // used for duped promissory notes, to know their source
 
     public boolean isDupe() {
-        return dupe;
+        return sourcePNModel != null;
     }
 
     public boolean isColorable() {
@@ -57,7 +57,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         pn.setText(newText);
         pn.setHomebrewReplacesID(this.homebrewReplacesID);
         pn.setSearchTags(new ArrayList<>(searchTags));
-        pn.setDupe(true);
+        pn.setSourcePNModel(this);
         return pn;
     }
 
