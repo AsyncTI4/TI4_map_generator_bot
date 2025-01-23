@@ -10,8 +10,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import ti4.image.Mapper;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 
 @Data
@@ -201,6 +204,19 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         }
         sb.append(getSource().emoji());
         return sb.toString();
+    }
+
+    public String getTextFormatted(Game game) {
+        String formattedText = getText();
+        formattedText = formattedText.replace("\n", "\n> ");
+        StringBuilder replaceText = new StringBuilder();
+        Player pnOwner = game.getPNOwner(getID());
+        if (pnOwner != null && pnOwner.isRealPlayer()) {
+            if (!game.isFowMode()) replaceText.append(pnOwner.getFactionEmoji()); // add Owner's Faction Emoji
+            replaceText.append(pnOwner.getColor());
+            formattedText = formattedText.replaceAll(pnOwner.getColor(), replaceText.toString());
+        }
+        return formattedText;
     }
 
     public boolean isNotWellKnown() {

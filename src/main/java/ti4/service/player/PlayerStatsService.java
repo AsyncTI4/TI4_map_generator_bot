@@ -28,7 +28,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 public class PlayerStatsService {
 
     public String getPlayersCurrentStatsText(Player player, Game game) {
-        StringBuilder sb = new StringBuilder(player.getFactionEmoji() + " player's current stats:\n");
+        StringBuilder sb = new StringBuilder(player.getRepresentationNoPing() + "'s current stats:\n");
 
         sb.append("> VP: ").append(player.getTotalVictoryPoints());
         sb.append("      ").append(MiscEmojis.getTGorNomadCoinEmoji(game)).append(player.getTg());
