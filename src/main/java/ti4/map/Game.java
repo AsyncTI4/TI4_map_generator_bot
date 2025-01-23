@@ -60,6 +60,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper;
@@ -411,13 +412,14 @@ public class Game extends GameProperties {
         }
         return Optional.ofNullable(winner);
     }
+
     @JsonIgnore
     public List<Player> getWinners() {
         List<Player> winners = new ArrayList<>();
         Player winner = getWinner().orElse(null);
         if (winner != null) {
             winners.add(winner);
-            if(winner.getAllianceMembers() != null) {
+            if (winner.getAllianceMembers() != null) {
                 for (Player player : getRealPlayers()) {
                     if (player.getAllianceMembers() != null && player.getAllianceMembers().contains(winner.getFaction())) {
                         winners.add(player);
@@ -453,15 +455,17 @@ public class Game extends GameProperties {
     public List<String> getListOfTilesPinged() {
         return listOfTilePinged;
     }
+
     public void resetListOfTilesPinged() {
         listOfTilePinged = new ArrayList<>();
     }
+
     public void setListOfTilesPinged(List<String> listOfTile) {
         listOfTilePinged = listOfTile;
     }
 
     public void setTileAsPinged(String tileName) {
-       listOfTilePinged.add(tileName);
+        listOfTilePinged.add(tileName);
     }
 
     @Override
@@ -3426,8 +3430,10 @@ public class Game extends GameProperties {
         List<String> missingPromissoryNotes = new ArrayList<>(allOwnedPromissoryNotes);
         missingPromissoryNotes.removeAll(allPromissoryNotes);
         if (!missingPromissoryNotes.isEmpty()) {
-            BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `"
-                + missingPromissoryNotes + "`");
+            BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `" + missingPromissoryNotes + "`");
+            for (Player player : getPlayers().values()) {
+                PromissoryNoteHelper.checkAndAddPNs(this, player);
+            }
         }
     }
 

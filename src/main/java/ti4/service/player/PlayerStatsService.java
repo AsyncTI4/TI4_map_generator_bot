@@ -65,6 +65,7 @@ public class PlayerStatsService {
         sb.append("> Imperia Command Tokens: `").append(player.getMahactCC()).append("`\n");
         sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
         sb.append("> Owned Promissory Notes: `").append(player.getPromissoryNotesOwned()).append("`\n");
+        sb.append("> Player Area Promissory Notes: `").append(player.getPromissoryNotesInPlayArea()).append("`\n");
         sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
         sb.append("> Alliance Members: ").append(player.getAllianceMembers().replace(player.getFaction(), "")).append("\n");
         sb.append("> Followed SCs: `").append(player.getFollowedSCs().toString()).append("`\n");

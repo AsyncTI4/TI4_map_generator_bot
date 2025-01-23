@@ -117,10 +117,8 @@ public class PromissoryNoteHelper {
         promissoryNotes.removeAll(game.getPurgedPN());
 
         // Any remaining PNs are missing from the game and can be re-added to the player's hand
-        if (!promissoryNotes.isEmpty()) {
-            for (String promissoryNote : promissoryNotes) {
-                player.setPromissoryNote(promissoryNote);
-            }
+        for (String promissoryNote : promissoryNotes) {
+            player.setPromissoryNote(promissoryNote);
         }
     }
 

@@ -59,7 +59,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         pn.setPlayImmediately(this.playImmediately);
         pn.setAttachment(this.attachment);
         pn.setSource(this.source);
-        String newText = getText().replace("<color>", newColor.getName());
+        String newText = getText().replace("<color>", "<" + newColor.getName() + ">");
         pn.setText(newText);
         pn.setHomebrewReplacesID(this.homebrewReplacesID);
         pn.setSearchTags(new ArrayList<>(searchTags));
@@ -214,7 +214,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         if (pnOwner != null && pnOwner.isRealPlayer()) {
             if (!game.isFowMode()) replaceText.append(pnOwner.getFactionEmoji()); // add Owner's Faction Emoji
             replaceText.append(pnOwner.getColor());
-            formattedText = formattedText.replaceAll(pnOwner.getColor(), replaceText.toString());
+            formattedText = formattedText.replaceAll("<" + pnOwner.getColor() + ">", replaceText.toString());
         }
         return formattedText;
     }
