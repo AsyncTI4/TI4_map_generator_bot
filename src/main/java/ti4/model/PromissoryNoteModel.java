@@ -32,6 +32,9 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     private List<String> searchTags = new ArrayList<>();
     private PromissoryNoteModel sourcePNModel; // used for duped promissory notes, to know their source
 
+    /**
+     * @return true if this is duplicated from a generic colour promissory note
+     */
     public boolean isDupe() {
         return sourcePNModel != null;
     }
@@ -43,7 +46,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     @Override
     public PromissoryNoteModel duplicateAndSetColor(ColorModel newColor) {
         PromissoryNoteModel pn = new PromissoryNoteModel();
-        pn.setAlias(this.alias.replaceAll("<color>", newColor.getName()));
+        pn.setAlias(this.alias.replace("<color>", newColor.getName()));
         pn.setName(this.name);
         pn.setShortName(this.shortName);
         pn.setShrinkName(this.shrinkName);
@@ -53,7 +56,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         pn.setPlayImmediately(this.playImmediately);
         pn.setAttachment(this.attachment);
         pn.setSource(this.source);
-        String newText = getText().replaceAll("<color>", newColor.getName());
+        String newText = getText().replace("<color>", newColor.getName());
         pn.setText(newText);
         pn.setHomebrewReplacesID(this.homebrewReplacesID);
         pn.setSearchTags(new ArrayList<>(searchTags));
@@ -67,6 +70,10 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
             && (faction != null || color != null)
             && text != null
             && source != null;
+    }
+
+    public String getID() {
+        return getAlias();
     }
 
     public String getShortName() {

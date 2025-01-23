@@ -13,6 +13,7 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
+import ti4.model.PromissoryNoteModel;
 
 @UtilityClass
 public class ColorChangeHelper {
@@ -37,32 +38,40 @@ public class ColorChangeHelper {
 
         Map<String, Player> players = game.getPlayers();
         for (Player playerInfo : players.values()) {
+
+            // Promissory Notes In Hands
             Map<String, Integer> promissoryNotes = playerInfo.getPromissoryNotes();
 
             Map<String, Integer> promissoryNotesChanged = new LinkedHashMap<>();
             for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
-                String key = pn.getKey();
-                Integer value = pn.getValue();
-                String newKey = key;
-
-                if (key.startsWith(oldColorKey)) {
-                    newKey = key.replace(oldColorKey, newColorKey);
+                PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn.getKey());
+                if (!pnModel.isDupe()) {
+                    promissoryNotesChanged.put(pn.getKey(), pn.getValue());
+                    continue;
                 }
-                promissoryNotesChanged.put(newKey, value);
+                PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
+                String newPNModelID = genericPNModel.getID().replace("<color>", newColorID);
+
+                promissoryNotesChanged.put(newPNModelID, pn.getValue());
             }
             playerInfo.setPromissoryNotes(promissoryNotesChanged);
 
+            // Promissory Notes In Play Areas
             List<String> promissoryNotesInPlayArea = playerInfo.getPromissoryNotesInPlayArea();
             List<String> promissoryNotesInPlayAreaChanged = new ArrayList<>();
             for (String pn : promissoryNotesInPlayArea) {
-                String newKey = pn;
-                if (pn.startsWith(oldColorKey)) {
-                    newKey = pn.replace(oldColorKey, newColorKey);
+                PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn);
+                if (!pnModel.isDupe()) {
+                    promissoryNotesInPlayAreaChanged.add(pn);
+                    continue;
                 }
-                promissoryNotesInPlayAreaChanged.add(newKey);
+                PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
+                String newPNModelID = genericPNModel.getID().replace("<color>", newColorID);
+                promissoryNotesInPlayAreaChanged.add(newPNModelID);
             }
             playerInfo.setPromissoryNotesInPlayArea(promissoryNotesInPlayAreaChanged);
 
+            // Mahact/Edict CCs
             List<String> mahactCC = new ArrayList<>(playerInfo.getMahactCC());
             for (String cc : mahactCC) {
                 if (cc.equals(oldColor)) {
@@ -72,6 +81,7 @@ public class ColorChangeHelper {
                 }
             }
 
+            // Debt Tokens
             Map<String, Integer> debtTokens = new LinkedHashMap<>(playerInfo.getDebtTokens());
             for (String color : debtTokens.keySet()) {
                 if (color.equals(oldColor)) {
@@ -82,14 +92,18 @@ public class ColorChangeHelper {
             }
         }
 
+        // Player's Owned Promissory Notes
         Set<String> ownedPromissoryNotes = player.getPromissoryNotesOwned();
         Set<String> ownedPromissoryNotesChanged = new HashSet<>();
         for (String pn : ownedPromissoryNotes) {
-            String newKey = pn;
-            if (pn.startsWith(oldColorKey)) {
-                newKey = pn.replace(oldColorKey, newColorKey);
+            PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn);
+            if (!pnModel.isDupe()) {
+                ownedPromissoryNotesChanged.add(pn);
+                continue;
             }
-            ownedPromissoryNotesChanged.add(newKey);
+            PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
+            String newPNModelID = genericPNModel.getID().replace("<color>", newColorID);
+            ownedPromissoryNotesChanged.add(newPNModelID);
         }
         player.setPromissoryNotesOwned(ownedPromissoryNotesChanged);
 
