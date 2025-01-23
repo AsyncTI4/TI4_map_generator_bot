@@ -199,7 +199,7 @@ public class Helper {
 
     public static void giveMeBackMyAgendaButtons(Game game) {
         List<Button> proceedButtons = new ArrayList<>();
-        String msg = "Press this button if the last player forgot to react, but verbally said \"No Whens or Afters\".";
+        String msg = "Press this button if the last player forgot to react, but verbally said \"no whens\"/\"no afters\".";
         proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting And Start The Voting For Everyone"));
         proceedButtons.add(Buttons.blue("transaction", "Transaction"));
         proceedButtons.add(Buttons.red("eraseMyVote", "Erase My Vote And Have Me Vote Again"));

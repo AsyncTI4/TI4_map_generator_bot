@@ -2669,7 +2669,7 @@ public class AgendaHelper {
             proceedButtons.add(Buttons.red("autoresolve_manual", "Skip Straight To Resolution"));
         } else {
             listVoteCount(game, channel);
-            msg = "Press this button if the last player forgot to react, but verbally said no whens/afters";
+            msg = "Press this button if the last player forgot to react, but verbally said \"no whens\"/\"no afters\".";
             proceedButtons.add(Buttons.red("proceedToVoting", "Skip waiting and start the voting for everyone"));
             proceedButtons.add(Buttons.blue("transaction", "Transaction"));
             proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
