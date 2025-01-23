@@ -61,8 +61,6 @@ class GameSaveService {
             }
         }
 
-        game.checkPromissoryNotes();
-
         File gameFile = Storage.getGameFile(game.getName() + Constants.TXT);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(gameFile))) {
             Map<String, Tile> tileMap = game.getTileMap();

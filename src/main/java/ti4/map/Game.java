@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -72,6 +72,7 @@ import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
@@ -3434,6 +3435,7 @@ public class Game extends GameProperties {
             for (Player player : getPlayers().values()) {
                 PromissoryNoteHelper.checkAndAddPNs(this, player);
             }
+            GameManager.save(this, "Added missing promissory notes to players' hands: " + missingPromissoryNotes);
         }
     }
 
