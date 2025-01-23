@@ -35,7 +35,7 @@ class SetPreferredColourList extends Subcommand {
         colors.removeAll(badColours);
 
         var userSettings = UserSettingsManager.get(event.getUser().getId());
-        userSettings.setPreferredColors(new HashSet<>(colors));
+        userSettings.setPreferredColors(colors);
         UserSettingsManager.save(userSettings);
 
         StringBuilder sb = new StringBuilder();

@@ -436,8 +436,9 @@ public class StartCombatService {
             int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, null, true);
             if (player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    msg + ", this is a reminder that if you win the combat, and you lose " + (capitalShips == 3 ? "no" : "at most " + (capitalShips - 3))
-                    + " non-fighter ship" + (capitalShips == 4 ? "" : "s") + ", you could score _Demonstrate Your Power_.");
+                    msg + ", this is a reminder that if you win the combat (or otherwise keep ships in the active system), and you lose "
+                    + (capitalShips == 3 ? "no" : "at most " + (capitalShips - 3)) + " non-fighter ship"
+                    + (capitalShips == 4 ? "" : "s") + ", you could score _Demonstrate Your Power_.");
             }
 
             if ((player.hasAbility("edict") || player.hasAbility("imperia"))
