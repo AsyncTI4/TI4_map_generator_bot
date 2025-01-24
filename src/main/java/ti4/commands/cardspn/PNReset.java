@@ -31,7 +31,7 @@ class PNReset extends GameStateSubcommand {
                 game.removePurgedPN(promissoryNote);
             }
         }
-        PromissoryNoteHelper.checkAndAddPNs(game, player);
+        game.checkPromissoryNotes();
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, true, event);
         MessageHelper.sendMessageToEventChannel(event, "Promissory note information sent.");
     }
