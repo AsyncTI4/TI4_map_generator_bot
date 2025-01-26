@@ -18,6 +18,7 @@ public class Constants {
     public static final String bltId = "757405214398480486";
     public static final String gedsDeadId = "586504147746947090";
     public static final String sigmaId = "214326507458396161";
+    public static final String bambamId = "487030345812672523";
     public static final List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
 
     // Server IDs
