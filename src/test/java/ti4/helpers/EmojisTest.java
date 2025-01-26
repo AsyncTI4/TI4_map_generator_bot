@@ -19,8 +19,6 @@ public class EmojisTest extends BaseTi4Test {
 
     @Test
     void testEmojis() {
-        beforeAll();
-
         List<String> emojiEnumNames = TI4Emoji.allEmojiEnums().stream().map(TI4Emoji::name).toList();
         List<String> emojiFileNames = ApplicationEmojiService.enumerateEmojiFilesRecursive()
             .map(EmojiFileData::new).map(EmojiFileData::getName).toList();

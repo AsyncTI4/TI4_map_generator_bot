@@ -52,4 +52,20 @@ public final class StringHelper {
         output = output.replace("667fin", ",");
         return output.replace("\r", "");
     }
+
+    public static String nextId(String id) {
+        if (id.isBlank()) return "a";
+
+        int index = id.length() - 1;
+        char currentChar = id.charAt(index);
+        id = (index == 0) ? "" : id.substring(0, index);
+
+        if (currentChar >= 'a' && currentChar < 'z')
+            return id + String.valueOf((char) (currentChar + 1));
+        if (currentChar == 'z') {
+            return nextId(id) + "a";
+        }
+        return "a".repeat(id.length() + 1);
+    }
+
 }

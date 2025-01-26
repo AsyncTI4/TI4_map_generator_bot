@@ -12,7 +12,10 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.image.Mapper;
+import ti4.buttons.Buttons;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
@@ -20,6 +23,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.SourceEmojis;
 
 // This is a sub-menu
 @Getter
@@ -109,5 +113,45 @@ public class PlayerFactionSettings extends SettingsMenu {
             if (m.getGame().getPlayers().size() != gamePlayers.getAllValues().size())
                 gamePlayers.setAllValues(m.getGame().getPlayers());
         }
+    }
+
+    @Override
+    public List<Button> specialButtons() {
+        String idPrefix = menuAction + "_" + navId() + "_";
+        List<Button> ls = new ArrayList<>(super.specialButtons());
+
+        if (parent != null && parent instanceof MiltySettings ms) {
+            if (ms.getSourceSettings().getDiscoStars().isVal())
+                ls.add(Buttons.red(idPrefix + "dsFactionsOnly", "Only DS Factions", SourceEmojis.DiscordantStars));
+        }
+        return ls;
+    }
+
+    @Override
+    public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
+        String error = switch (action) {
+            case "dsFactionsOnly" -> prioritizeDSFactions();
+            default -> null;
+        };
+
+        return (error == null ? "success" : error);
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // Specific Implementation
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    private String prioritizeDSFactions() {
+        if (parent != null && parent instanceof MiltySettings ms) {
+            if (!ms.getSourceSettings().getDiscoStars().isVal())
+                return "Discordant stars is not enabled";
+
+            List<String> newKeys = new ArrayList<>();
+            for (FactionModel model : priFactions.getAllValues().values()) {
+                if (model.getSource() == ComponentSource.ds)
+                    newKeys.add(model.getAlias());
+            }
+            priFactions.setKeys(newKeys);
+        }
+        return null;
     }
 }

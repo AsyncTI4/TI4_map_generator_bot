@@ -514,12 +514,8 @@ public class MiltyDraftManager {
 
     private static MessageRetrieveAction getMessages(GenericInteractionCreateEvent event) {
         if (event == null) return null;
-        if (event instanceof ButtonInteractionEvent bEvent) {
-            return bEvent.getMessageChannel().getHistoryBefore(bEvent.getMessage().getIdLong() + 1, 40);
-        } else {
-            long id = event.getIdLong() + 1;
-            return event.getMessageChannel().getHistoryBefore(id, 50);
-        }
+        long latest = event.getMessageChannel().getLatestMessageIdLong();
+        return event.getMessageChannel().getHistoryBefore(latest + 1, 100);
     }
 
     private static boolean messageIsSliceImg(Message m, Game game) {
@@ -539,10 +535,14 @@ public class MiltyDraftManager {
 
         try {
             action.queue(history -> {
+                boolean notfirst = false;
                 for (Message m : history.getRetrievedHistory()) {
                     String txt = m.getContentRaw();
                     if (txt.endsWith(" is up to draft!")) {
-                        m.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                        if (notfirst)
+                            m.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                        else
+                            notfirst = true;
                     }
                 }
             }, BotLogger::catchRestError);

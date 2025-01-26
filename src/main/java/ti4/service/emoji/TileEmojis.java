@@ -1,5 +1,9 @@
 package ti4.service.emoji;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import ti4.image.TileHelper;
@@ -209,6 +213,12 @@ public enum TileEmojis implements TI4Emoji {
             case "d123" -> d123;
             default -> getTileBackEmojiFromTileID(tileID);
         };
+    }
+
+    public static TI4Emoji randomVoid() {
+        List<TI4Emoji> voids = new ArrayList<>(List.of(Void_46, Void_47, Void_48, Void_49, Void_50, Void_77, Void_78));
+        Collections.shuffle(voids);
+        return voids.getFirst();
     }
 
     @Nullable
