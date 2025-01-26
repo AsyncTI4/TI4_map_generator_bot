@@ -36,6 +36,7 @@ import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.ColorableModelInterface;
 import ti4.model.DeckModel;
 import ti4.model.EmbeddableModel;
 import ti4.model.ExploreModel;
@@ -786,7 +787,7 @@ public class AutoCompleteProvider {
             case Constants.SEARCH_ACTION_CARDS -> options = searchModels(event, Mapper.getActionCards().values(), source);
             case Constants.SEARCH_SECRET_OBJECTIVES -> options = searchModels(event, Mapper.getSecretObjectives().values(), source);
             case Constants.SEARCH_PUBLIC_OBJECTIVES -> options = searchModels(event, Mapper.getPublicObjectives().values(), source);
-            case Constants.SEARCH_PROMISSORY_NOTES -> options = searchModels(event, Mapper.getPromissoryNotes().values().stream().filter(m -> !m.isDupe()).toList(), source);
+            case Constants.SEARCH_PROMISSORY_NOTES -> options = searchModels(event, Mapper.getPromissoryNotes().values(), source);
             case Constants.SEARCH_DECKS -> options = searchModels(event, Mapper.getDecks().values(), source);
         }
         event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList())).queue();
@@ -978,6 +979,7 @@ public class AutoCompleteProvider {
         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
         return models.stream()
             .filter(model -> model.search(enteredValue, source))
+            .filter(model -> (model instanceof ColorableModelInterface cm) ? !cm.isDupe() : true)
             .limit(25)
             .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))
             .toList();
