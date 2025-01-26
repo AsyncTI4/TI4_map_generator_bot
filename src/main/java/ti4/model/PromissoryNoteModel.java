@@ -10,8 +10,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import ti4.image.Mapper;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 
 @Data
@@ -30,10 +33,13 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     private String homebrewReplacesID;
     private String imageURL;
     private List<String> searchTags = new ArrayList<>();
-    private boolean dupe = false;
+    private PromissoryNoteModel sourcePNModel; // used for duped promissory notes, to know their source
 
+    /**
+     * @return true if this is duplicated from a generic colour promissory note
+     */
     public boolean isDupe() {
-        return dupe;
+        return sourcePNModel != null;
     }
 
     public boolean isColorable() {
@@ -43,7 +49,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     @Override
     public PromissoryNoteModel duplicateAndSetColor(ColorModel newColor) {
         PromissoryNoteModel pn = new PromissoryNoteModel();
-        pn.setAlias(this.alias.replaceAll("<color>", newColor.getName()));
+        pn.setAlias(this.alias.replace("<color>", newColor.getName()));
         pn.setName(this.name);
         pn.setShortName(this.shortName);
         pn.setShrinkName(this.shrinkName);
@@ -53,11 +59,11 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         pn.setPlayImmediately(this.playImmediately);
         pn.setAttachment(this.attachment);
         pn.setSource(this.source);
-        String newText = getText().replaceAll("<color>", newColor.getName());
+        String newText = getText().replace("<color>", "<" + newColor.getName() + ">");
         pn.setText(newText);
         pn.setHomebrewReplacesID(this.homebrewReplacesID);
         pn.setSearchTags(new ArrayList<>(searchTags));
-        pn.setDupe(true);
+        pn.setSourcePNModel(this);
         return pn;
     }
 
@@ -67,6 +73,10 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
             && (faction != null || color != null)
             && text != null
             && source != null;
+    }
+
+    public String getID() {
+        return getAlias();
     }
 
     public String getShortName() {
@@ -194,6 +204,19 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         }
         sb.append(getSource().emoji());
         return sb.toString();
+    }
+
+    public String getTextFormatted(Game game) {
+        String formattedText = getText();
+        formattedText = formattedText.replace("\n", "\n> ");
+        StringBuilder replaceText = new StringBuilder();
+        Player pnOwner = game.getPNOwner(getID());
+        if (pnOwner != null && pnOwner.isRealPlayer()) {
+            if (!game.isFowMode()) replaceText.append(pnOwner.getFactionEmoji()); // add Owner's Faction Emoji
+            replaceText.append(pnOwner.getColor());
+            formattedText = formattedText.replaceAll("<" + pnOwner.getColor() + ">", replaceText.toString());
+        }
+        return formattedText;
     }
 
     public boolean isNotWellKnown() {

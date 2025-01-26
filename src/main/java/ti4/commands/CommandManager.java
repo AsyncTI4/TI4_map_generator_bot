@@ -42,6 +42,7 @@ import ti4.commands.tokens.AddTokenCommand;
 import ti4.commands.tokens.RemoveAllCC;
 import ti4.commands.tokens.RemoveCCCommand;
 import ti4.commands.tokens.RemoveTokenCommand;
+import ti4.commands.transaction.Transaction;
 import ti4.commands.uncategorized.AllInfoCommand;
 import ti4.commands.uncategorized.CardsInfoCommand;
 import ti4.commands.uncategorized.SelectionBoxDemoCommand;
@@ -79,6 +80,7 @@ public class CommandManager {
         new AddUnitDamage(),
         new RemoveUnitDamage(),
         new RemoveAllUnitDamage(),
+        new Transaction(),
 
         new MapCommand(),
         new HelpCommand(),
