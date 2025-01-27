@@ -378,16 +378,26 @@ public class PlayStrategyCardService {
                     else {
                         StringBuilder neighborsMsg = new StringBuilder("__Are__ neighbors with the **Trade** holder:");
                         StringBuilder notNeighborsMsg = new StringBuilder("__Not__ neighbors with the **Trade** holder:");
+                        boolean anyNeighbours = false;
+                        boolean allNeighbours = true;
                         for (Player p2 : game.getRealPlayers()) {
                             if (player != p2) {
                                 if (player.getNeighbouringPlayers().contains(p2)) {
                                     neighborsMsg.append(" ").append(p2.getFactionEmoji());
+                                    anyNeighbours = true;
                                 } else {
                                     notNeighborsMsg.append(" ").append(p2.getFactionEmoji());
+                                    allNeighbours = false;
                                 }
                             }
                         }
-                        MessageHelper.sendMessageToChannel(m5, neighborsMsg + "\n" + notNeighborsMsg);
+                        if (allNeighbours) {
+                            MessageHelper.sendMessageToChannel(m5, "The **Trade** player is neighbors with __all__ other players.");
+                        } else if (!anyNeighbours) {
+                            MessageHelper.sendMessageToChannel(m5, "The **Trade** player is neighbors with __no__ other players.");
+                        } else {
+                            MessageHelper.sendMessageToChannel(m5, neighborsMsg + "\n" + notNeighborsMsg);
+                        }
                     }
                 }
             });
