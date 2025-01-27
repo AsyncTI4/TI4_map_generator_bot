@@ -245,23 +245,19 @@ public class StartCombatService {
 
         // sigma homebrew
         if (isSpaceCombat) {
-            Player nomad = null;
-            for (Player player : game.getRealPlayers()) {
-                if (player.hasTech("sigma_cow")) {
-                    nomad = player;
+            boolean sustain = false;
+            UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+            for (Units.UnitKey unit : space.getUnits().keySet()) {
+                Player player = game.getPlayerFromColorOrFaction(unit.getColor());
+                UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
+                if (removedUnit.getIsShip() && removedUnit.getSustainDamage()) {
+                    sustain = true;
                     break;
                 }
             }
-            if (nomad != null) {
-                boolean sustain = false;
-                UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
-                for (Units.UnitKey unit : space.getUnits().keySet()) {
-                    Player player = game.getPlayerFromColorOrFaction(unit.getColor());
-                    UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
-                    if (removedUnit.getIsShip() && removedUnit.getSustainDamage()) {
-                        MessageHelper.sendMessageToChannel(threadChannel, nomad.getRepresentation() + " may use _The Changer of Ways_.");
-                        break;
-                    }
+            for (Player player : game.getRealPlayers()) {
+                if (sustain && player.hasTech("sigma_cow")) {
+                    MessageHelper.sendMessageToChannel(threadChannel, player.getRepresentation() + " may use _The Changer of Ways_.");
                 }
             }
         }
@@ -440,8 +436,9 @@ public class StartCombatService {
             int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, null, true);
             if (player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    msg + ", this is a reminder that if you win the combat, and you lose " + (capitalShips == 3 ? "no" : "at most " + (capitalShips - 3))
-                    + " non-fighter ship" + (capitalShips == 4 ? "" : "s") + ", you could score _Demonstrate Your Power_.");
+                    msg + ", this is a reminder that if you win the combat (or otherwise keep ships in the active system), and you lose "
+                    + (capitalShips == 3 ? "no" : "at most " + (capitalShips - 3)) + " non-fighter ship"
+                    + (capitalShips == 4 ? "" : "s") + ", you could score _Demonstrate Your Power_.");
             }
 
             if ((player.hasAbility("edict") || player.hasAbility("imperia"))

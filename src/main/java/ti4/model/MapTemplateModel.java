@@ -2,9 +2,13 @@ package ti4.model;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.Data;
+import ti4.helpers.Helper;
 import ti4.image.PositionMapper;
 
 @Data
@@ -98,5 +102,18 @@ public class MapTemplateModel implements ModelInterface {
             size = Math.max(size, Math.max(p.x + 345, p.y + 300));
         }
         return size;
+    }
+
+    public int numRings() {
+        String highestPosition = getTemplateTiles().stream().map(MapTemplateTile::getPos)
+            .filter(Helper::isInteger)
+            .max(Comparator.comparingInt(Integer::parseInt))
+            .orElse(null);
+        if (highestPosition == null) return 0;
+
+        String firstTwoDigits = StringUtils.left(highestPosition, highestPosition.length() - 2);
+
+        if (!Helper.isInteger(firstTwoDigits)) return 0;
+        return Integer.parseInt(firstTwoDigits);
     }
 }

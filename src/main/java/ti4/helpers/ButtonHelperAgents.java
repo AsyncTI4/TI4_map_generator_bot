@@ -395,8 +395,9 @@ public class ButtonHelperAgents {
         if ("nomadagentartuno".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-            playerLeader.setTgCount(Integer.parseInt(rest.split("_")[1]));
-            String messageText = player.getRepresentation() + " placed " + rest.split("_")[1] + " " + MiscEmojis.getTGorNomadCoinEmoji(game)
+            Integer tgCount = Integer.parseInt(rest.split("_")[1]);
+            playerLeader.setTgCount(tgCount);
+            String messageText = player.getRepresentation() + " placed " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
                 + " on top of " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, messageText);
         }
@@ -1718,7 +1719,7 @@ public class ButtonHelperAgents {
         ButtonHelperStats.gainComms(event, game, player, commGain, false, true);
         ButtonHelperStats.gainTGs(event, game, player, tgGain, true);
 
-        String msg = player.getFactionEmojiOrColor() + " gained " + tgGain + " trade goods" + (tgGain == 1 ? "" : "s") + " (" + oldTg + "->"
+        String msg = player.getFactionEmojiOrColor() + " gained " + tgGain + " trade good" + (tgGain == 1 ? "" : "s") + " (" + oldTg + "->"
             + player.getTg() + ") and " + commGain + " commodit" + (commGain == 1 ? "y" : "ies") + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "C.O.O. Mgur, the Bentor" + (bentor.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
 
@@ -1983,7 +1984,7 @@ public class ButtonHelperAgents {
         if (player.hasUnexhaustedLeader("nomadagentartuno")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("exhaustAgent_nomadagentartuno_" + tg,
-                "Exhaust Artuno the Betrayer With " + tg + " Trade Goods" + (tg == 1 ? "" : "s")));
+                "Exhaust Artuno the Betrayer With " + tg + " Trade Good" + (tg == 1 ? "" : "s")));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentationUnfogged()

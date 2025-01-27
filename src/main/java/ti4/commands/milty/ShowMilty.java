@@ -17,6 +17,6 @@ class ShowMilty extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         MiltyDraftManager manager = game.getMiltyDraftManager();
-        manager.repostDraftInformation(game);
+        manager.repostDraftInformation(event, game);
     }
 }

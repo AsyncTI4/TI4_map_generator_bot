@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -60,8 +60,10 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
@@ -70,6 +72,7 @@ import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
+import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
@@ -410,13 +413,14 @@ public class Game extends GameProperties {
         }
         return Optional.ofNullable(winner);
     }
+
     @JsonIgnore
     public List<Player> getWinners() {
         List<Player> winners = new ArrayList<>();
         Player winner = getWinner().orElse(null);
         if (winner != null) {
             winners.add(winner);
-            if(winner.getAllianceMembers() != null) {
+            if (winner.getAllianceMembers() != null) {
                 for (Player player : getRealPlayers()) {
                     if (player.getAllianceMembers() != null && player.getAllianceMembers().contains(winner.getFaction())) {
                         winners.add(player);
@@ -452,15 +456,17 @@ public class Game extends GameProperties {
     public List<String> getListOfTilesPinged() {
         return listOfTilePinged;
     }
+
     public void resetListOfTilesPinged() {
         listOfTilePinged = new ArrayList<>();
     }
+
     public void setListOfTilesPinged(List<String> listOfTile) {
         listOfTilePinged = listOfTile;
     }
 
     public void setTileAsPinged(String tileName) {
-       listOfTilePinged.add(tileName);
+        listOfTilePinged.add(tileName);
     }
 
     @Override
@@ -2876,7 +2882,9 @@ public class Game extends GameProperties {
         GameSettings settings = miltySettings.getGameSettings();
         setVp(settings.getPointTotal().getVal());
         setMaxSOCountPerPlayer(settings.getSecrets().getVal());
-        setCompetitiveTIGLGame(settings.getTigl().isVal());
+        if (settings.getTigl().isVal()) {
+            TIGLHelper.initializeTIGLGame(this);
+        }
         setAllianceMode(settings.getAlliance().isVal());
 
         if (settings.getMapTemplate().getValue().getAlias().equals("1pIsland")) {
@@ -3423,8 +3431,11 @@ public class Game extends GameProperties {
         List<String> missingPromissoryNotes = new ArrayList<>(allOwnedPromissoryNotes);
         missingPromissoryNotes.removeAll(allPromissoryNotes);
         if (!missingPromissoryNotes.isEmpty()) {
-            BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `"
-                + missingPromissoryNotes + "`");
+            BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `" + missingPromissoryNotes + "`");
+            for (Player player : getPlayers().values()) {
+                PromissoryNoteHelper.checkAndAddPNs(this, player);
+            }
+            GameManager.save(this, "Added missing promissory notes to players' hands: " + missingPromissoryNotes);
         }
     }
 
@@ -4017,7 +4028,7 @@ public class Game extends GameProperties {
             || isPromisesPromisesMode()
             || isFlagshippingMode()
             || isAllianceMode()
-            || isSpinMode()
+            || getSpinMode() != null && !"OFF".equalsIgnoreCase(getSpinMode())
             || isHomebrewSCMode()
             || isCommunityMode()
             || !checkAllDecksAreOfficial()

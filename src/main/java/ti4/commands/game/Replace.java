@@ -134,11 +134,10 @@ class Replace extends GameStateSubcommand {
         }
         Map<String, Player> playersById = game.getPlayers();
         Map<String, Player> updatedPlayersById = new LinkedHashMap<>();
-        for (String userId: playersById.keySet()) {
-            if(userId.equalsIgnoreCase(oldPlayerUserId)) {
+        for (String userId : playersById.keySet()) {
+            if (userId.equalsIgnoreCase(oldPlayerUserId)) {
                 updatedPlayersById.put(replacedPlayer.getUserID(), replacedPlayer);
-            }
-            else {
+            } else {
                 updatedPlayersById.put(userId, playersById.get(userId));
             }
         }
@@ -147,7 +146,7 @@ class Replace extends GameStateSubcommand {
         //UPDATE FOW PERMISSIONS
         if (game.isFowMode()) {
             long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-            TextChannel privateChannel = (TextChannel)replacedPlayer.getPrivateChannel();
+            TextChannel privateChannel = (TextChannel) replacedPlayer.getPrivateChannel();
 
             PermissionOverride oldOverride = privateChannel.getMemberPermissionOverrides().stream()
                 .filter(override -> override.getMember().equals(oldMember)).findFirst().orElse(null);
@@ -156,8 +155,10 @@ class Replace extends GameStateSubcommand {
             }
 
             //Update private channel
-            String newPrivateChannelName = privateChannel.getName().replace(getNormalizedName(oldMember), getNormalizedName(newMember));
-            privateChannel.getManager().setName(newPrivateChannelName).queue();
+            if (oldMember != null) {
+                String newPrivateChannelName = privateChannel.getName().replace(getNormalizedName(oldMember), getNormalizedName(newMember));
+                privateChannel.getManager().setName(newPrivateChannelName).queue();
+            }
             privateChannel.getManager().putMemberPermissionOverride(newMember.getIdLong(), permission, 0)
                 .queue(success -> accessMessage(privateChannel, newMember));
 
@@ -166,18 +167,22 @@ class Replace extends GameStateSubcommand {
             if (cardsInfo != null) {
                 String newCardsInfoName = cardsInfo.getName().replace(oldPlayerUserName.replace("/", ""), replacedPlayer.getUserName().replace("/", ""));
                 cardsInfo.getManager().setName(newCardsInfoName).queue();
-                cardsInfo.removeThreadMember(oldMember).queue();
+                if (oldMember != null) {
+                    cardsInfo.removeThreadMember(oldMember).queue();
+                }
                 cardsInfo.addThreadMember(newMember).queue(success -> accessMessage(cardsInfo, newMember));
             }
 
             //Update private threads
-            for (ThreadChannel thread : game.getMainGameChannel().getThreadChannels()) {
-                if (thread.getThreadMember(oldMember) != null) {
-                    thread.removeThreadMember(oldMember).queue(success -> {
-                        thread.addThreadMember(newMember).queue(success2 -> {
-                            accessMessage(thread, newMember);
+            if (oldMember != null) {
+                for (ThreadChannel thread : game.getMainGameChannel().getThreadChannels()) {
+                    if (thread.getThreadMember(oldMember) != null) {
+                        thread.removeThreadMember(oldMember).queue(success -> {
+                            thread.addThreadMember(newMember).queue(success2 -> {
+                                accessMessage(thread, newMember);
+                            });
                         });
-                    });
+                    }
                 }
             }
         }
@@ -191,7 +196,7 @@ class Replace extends GameStateSubcommand {
         game.getMiltyDraftManager().replacePlayer(oldPlayerUserId, replacedPlayer.getUserID());
 
         if (game.getMiltyDraftManager().getDraftIndex() < game.getMiltyDraftManager().getDraftOrder().size()) {
-            game.getMiltyDraftManager().repostDraftInformation(game);
+            game.getMiltyDraftManager().repostDraftInformation(event, game);
         }
 
         String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: " + replacementUser.getName();
@@ -203,7 +208,7 @@ class Replace extends GameStateSubcommand {
     }
 
     private void accessMessage(MessageChannel channel, Member member) {
-        MessageHelper.sendMessageToChannel(channel, 
+        MessageHelper.sendMessageToChannel(channel,
             "Access to " + channel.getName() + " granted for " + member.getAsMention());
     }
 

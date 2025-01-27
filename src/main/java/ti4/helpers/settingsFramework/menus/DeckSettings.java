@@ -12,7 +12,6 @@ import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
 import ti4.model.DeckModel;
-import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardSetModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -39,9 +38,8 @@ public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private ChoiceSetting<DeckModel> deckChoice(String id, String name, DeckModel.DeckType deckType, TI4Emoji emoji) {
+    private ChoiceSetting<DeckModel> deckChoice(String id, String name, String defaultDeck, DeckModel.DeckType deckType, TI4Emoji emoji) {
         List<DeckModel> decks = Mapper.getDecks().values().stream().filter(deck -> deck.getType() == deckType).toList();
-        String defaultDeck = decks.stream().filter(x -> x.getSource() == ComponentSource.pok).findFirst().map(DeckModel::getAlias).orElse("");
 
         ChoiceSetting<DeckModel> choice = new ChoiceSetting<>(id, name, defaultDeck);
         choice.setEmoji(emoji);
@@ -54,14 +52,30 @@ public class DeckSettings extends SettingsMenu {
         super("decks", "Card Decks", "Manually adjust which decks your game will use. This should be automatic, for the most part", parent);
 
         // Initialize deck settings to default values
-        stage1 = deckChoice("Stg1Deck", "Stage 1 Deck", DeckModel.DeckType.PUBLIC_STAGE_1_OBJECTIVE, CardEmojis.Public1);
-        stage2 = deckChoice("Stg2Deck", "Stage 2 Deck", DeckModel.DeckType.PUBLIC_STAGE_2_OBJECTIVE, CardEmojis.Public2);
-        secrets = deckChoice("SecretDeck", "Secrets Deck", DeckModel.DeckType.SECRET_OBJECTIVE, CardEmojis.SecretObjective);
-        actionCards = deckChoice("ACs", "Action Card Deck", DeckModel.DeckType.ACTION_CARD, CardEmojis.ActionCard);
-        agendas = deckChoice("Agendas", "Agenda Deck", DeckModel.DeckType.AGENDA, CardEmojis.Agenda);
-        techs = deckChoice("Techs", "Technology Deck", DeckModel.DeckType.TECHNOLOGY, TechEmojis.NonUnitTechSkip);
-        relics = deckChoice("Relics", "Relic Deck", DeckModel.DeckType.RELIC, ExploreEmojis.Relic);
-        explores = deckChoice("Explores", "Explore Decks", DeckModel.DeckType.EXPLORE, ExploreEmojis.Frontier);
+        stage1 = deckChoice("Stg1Deck", "Stage 1 Deck", "public_stage_1_objectives_pok",
+            DeckModel.DeckType.PUBLIC_STAGE_1_OBJECTIVE, CardEmojis.Public1);
+
+        stage2 = deckChoice("Stg2Deck", "Stage 2 Deck", "public_stage_2_objectives_pok",
+            DeckModel.DeckType.PUBLIC_STAGE_2_OBJECTIVE, CardEmojis.Public2);
+
+        secrets = deckChoice("SecretDeck", "Secrets Deck", "secret_objectives_pok",
+            DeckModel.DeckType.SECRET_OBJECTIVE, CardEmojis.SecretObjective);
+
+        actionCards = deckChoice("ACs", "Action Card Deck", "action_cards_pok",
+            DeckModel.DeckType.ACTION_CARD, CardEmojis.ActionCard);
+
+        agendas = deckChoice("Agendas", "Agenda Deck", "agendas_pok",
+            DeckModel.DeckType.AGENDA, CardEmojis.Agenda);
+
+        techs = deckChoice("Techs", "Technology Deck", "techs_pok",
+            DeckModel.DeckType.TECHNOLOGY, TechEmojis.NonUnitTechSkip);
+
+        relics = deckChoice("Relics", "Relic Deck", "relics_pok",
+            DeckModel.DeckType.RELIC, ExploreEmojis.Relic);
+
+        explores = deckChoice("Explores", "Explore Decks", "explores_pok",
+            DeckModel.DeckType.EXPLORE, ExploreEmojis.Frontier);
+
         //scenarios = deckChoice("Scenarios", "Scenario Deck", "scenario", null);
 
         // Initialize strat cards to default values
@@ -72,7 +86,7 @@ public class DeckSettings extends SettingsMenu {
 
         // Get the correct JSON node for initialization if applicable.
         // Add additional names here to support new generated JSON as needed.
-        if (json != null && json.has("deckSettings")) json = json.get("deckSettings");
+        if (json != null && json.has("decks")) json = json.get("decks");
 
         // Verify this is the correct JSON node and continue initialization
         List<String> historicIDs = new ArrayList<>(List.of("decks"));

@@ -25,6 +25,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.player.PlayerStatsService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
@@ -61,7 +62,7 @@ public class PickStrategyCardService {
             }
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += player_.getRepresentationUnfogged() + " to pick strategy card.";
+                msgExtra += player_.getRepresentationUnfogged() + " is up to pick their strategy card.";
                 game.setPhaseOfGame("strategy");
                 privatePlayer = player_;
                 allPicked = false;
@@ -173,8 +174,8 @@ public class PickStrategyCardService {
         } else {
             if (!allPicked) {
                 game.updateActivePlayer(privatePlayer);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra + "\nUse buttons to pick your strategy card.", Helper.getRemainingSCButtons(game, privatePlayer));
                 game.setPhaseOfGame("strategy");
+                checkForForcePickLastStratCard(event, privatePlayer, game, msgExtra);
             } else {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
                 if (game.isShowBanners()) {
@@ -228,6 +229,36 @@ public class PickStrategyCardService {
                         p2.getRepresentationUnfogged() + " you have the opportunity to use _Imperial Arbiter_.", buttons);
                 }
             }
+        }
+    }
+
+    public static void checkForForcePickLastStratCard(GenericInteractionCreateEvent event, Player privatePlayer, Game game, String msgExtra){
+        List<Button> scButtons = Helper.getRemainingSCButtons(game, privatePlayer);
+        if (scButtons.size() == 1){ // if there is only one SC left to pick (4p/8p games), force pick last SC
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), privatePlayer.getRepresentation() + 
+                ", you have only one available Strategy Card to pick. Bot will force pick for you.");
+            int unpickedStrategyCard = 0;
+            for (Integer sc : game.getSCList()) {
+                if (sc <= 0)
+                    continue; // some older games have a 0 in the list of SCs
+                boolean held = false;
+                for (Player p : game.getPlayers().values()) {
+                    if (p == null || p.getFaction() == null) {
+                        continue;
+                    }
+                    if (p.getSCs() != null && p.getSCs().contains(sc) && !game.isFowMode()) {
+                        held = true;
+                        break;
+                    }
+                }
+                if (held)
+                    continue;
+                unpickedStrategyCard = sc;
+            }    
+            PlayerStatsService.secondHalfOfPickSC(event, game, privatePlayer, unpickedStrategyCard);
+            secondHalfOfSCPick(event, privatePlayer, game, unpickedStrategyCard);
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra, scButtons);
         }
     }
 }

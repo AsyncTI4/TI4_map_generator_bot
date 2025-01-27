@@ -1,5 +1,8 @@
 package ti4.helpers;
 
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -8,8 +11,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.image.Mapper;
+import ti4.image.PositionMapper;
+import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
+import ti4.image.TileStep;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -17,6 +24,7 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
+import ti4.service.image.FileUploadService;
 import ti4.service.map.AddTileListService;
 import ti4.service.map.AddTileService;
 import ti4.service.milty.MiltyDraftManager;
@@ -89,14 +97,33 @@ public class MapTemplateHelper {
         return null;
     }
 
+    private static Tile getTileFromTemplateTile(MapTemplateTile tile) {
+        List<String> backupColors = Arrays.asList("red", "blue", "yellow", "emerald", "lavender", "petrol", "chocolate",
+            "ethereal", "forest", "gold", "green", "grey", "navy", "spring", "teal", "black", "lightgrey", "rainbow",
+            "turquoise", "lightbrown", "orange", "pink", "sunset", "bloodred", "brown", "chrome", "purple", "rose", "white", "tan");
+
+        String tileID = null;
+        if (tile.getStaticTileId() != null)
+            tileID = tile.getStaticTileId();
+        else if (tile.getPlayerNumber() != null) {
+            String color = backupColors.get(tile.getPlayerNumber());
+            if (tile.getMiltyTileIndex() != null) {
+                tileID = color + (tile.getMiltyTileIndex() + 1);
+            } else if (tile.getHome() != null) {
+                tileID = color + "blank";
+            }
+        }
+        if (tileID != null) {
+            tileID = AliasHandler.resolveTile(tileID);
+            return new Tile(tileID, tile.getPos());
+        }
+        return null;
+    }
+
     public static void buildPartialMapFromMiltyData(Game game, GenericInteractionCreateEvent event, String mapTemplate) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
         List<Player> players = manager.getPlayers().stream().map(game::getPlayer).toList();
-
-        List<String> backupColors = Arrays.asList("red", "blue", "yellow", "emerald", "lavender", "petrol", "chocolate",
-            "ethereal", "forest", "gold", "green", "grey", "navy", "spring", "teal", "black", "lightgrey", "rainbow",
-            "turquoise", "lightbrown", "orange", "pink", "sunset", "bloodred", "brown", "chrome", "purple", "rose", "white", "tan");
         boolean somethingHappened = false;
         // fill in draft tiles for all players
         for (Player p : players) {
@@ -125,20 +152,8 @@ public class MapTemplateHelper {
                         somethingHappened = true;
                     }
                 } else if (tile.getPos() != null && gameTile == null) {
-                    String tileID = null;
-                    if (tile.getStaticTileId() != null)
-                        tileID = tile.getStaticTileId();
-                    else if (tile.getPlayerNumber() != null) {
-                        String color = backupColors.get(tile.getPlayerNumber());
-                        if (tile.getMiltyTileIndex() != null) {
-                            tileID = color + (tile.getMiltyTileIndex() + 1);
-                        } else if (tile.getHome() != null) {
-                            tileID = color + "blank";
-                        }
-                    }
-                    if (tileID != null) {
-                        tileID = AliasHandler.resolveTile(tileID);
-                        Tile toAdd = new Tile(tileID, tile.getPos());
+                    Tile toAdd = getTileFromTemplateTile(tile);
+                    if (toAdd != null) {
                         game.setTile(toAdd);
                         somethingHappened = true;
                     }
@@ -154,5 +169,31 @@ public class MapTemplateHelper {
         if (somethingHappened) {
             ButtonHelper.updateMap(game, event);
         }
+    }
+
+    public static FileUpload generateTemplatePreviewImage(GenericInteractionCreateEvent event, Game game, MapTemplateModel model) {
+        TileGenerator generator = new TileGenerator(game, event, DisplayType.all);
+
+        int rings = model.numRings();
+        int size = (rings * 2 + 1) * 300 + 200;
+        BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = img.createGraphics();
+
+        Point mr = PositionMapper.getTilePosition("000");
+        if (mr == null) mr = new Point(0, 0);
+        Point center = new Point(size / 2 - 173 - mr.x, size / 2 - 150 - mr.y);
+
+        for (MapTemplateTile tile : model.getTemplateTiles()) {
+            Point pos = PositionMapper.getTilePosition(tile.getPos());
+            if (pos == null) continue;
+
+            Tile toAdd = getTileFromTemplateTile(tile);
+            if (toAdd != null) {
+                BufferedImage tileImg = generator.draw(toAdd, TileStep.Tile);
+                g2.drawImage(tileImg, pos.x + center.x - 100, pos.y + center.y - 100, null);
+            }
+        }
+
+        return FileUploadService.createFileUpload(img, model.getAlias());
     }
 }

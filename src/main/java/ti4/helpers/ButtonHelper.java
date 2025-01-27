@@ -823,7 +823,7 @@ public class ButtonHelper {
         }
 
         if (!player.hasAbility("autonetic_memory")) {
-            message = " drew " + amount + " action cards." + message;
+            message = " drew " + amount + " action card" + (amount == 1 ? "" : "s") + "." + message;
         }
 
         ActionCardHelper.sendActionCardInfo(game, player, event);
@@ -1623,7 +1623,11 @@ public class ButtonHelper {
             if (!unit.getColor().equals(player.getColor())) {
                 continue;
             }
-            UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
+            List<UnitModel> unitModels = player.getUnitsByAsyncID(unit.asyncID());
+            if (unitModels.isEmpty()) {
+                continue;
+            }
+            UnitModel removedUnit = unitModels.getFirst();
             if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff")) {
                 count += space.getUnits().get(unit);
             }
@@ -2058,7 +2062,7 @@ public class ButtonHelper {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         String tileRep = tile.getRepresentationForButtons(game, player);
-        String ident = player.getFactionEmojiOrColor();
+        String ident = game.isFowMode() ? player.getFactionEmojiOrColor() : player.getRepresentationNoPing();
         String msg = ident + " removed command token from " + tileRep + ".";
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
@@ -2080,7 +2084,6 @@ public class ButtonHelper {
                             + (player.getTacticalCC() - 1) + " remaining)."
                             + " This ends their turn, but they may still resolve any \"end of turn\" abilities.");
             player.setTacticalCC(player.getTacticalCC() - 1);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             List<Button> conclusionButtons = new ArrayList<>();
             Button endTurn = Buttons.red(finChecker + "turnEnd", "End Turn");
             conclusionButtons.add(endTurn);
@@ -2986,7 +2989,7 @@ public class ButtonHelper {
         List<Button> endButtons = new ArrayList<>();
 
         List<String> implementedLegendaryPlanets = List.of(
-                "mallice", "mirage", "hopesend", "primor", // PoK
+                "mallice", "hexmallice", "mirage", "hopesend", "primor", // PoK
                 "silence", "tarrock", "prism", "echo", "domna"); // DS
 
         for (String planet : implementedLegendaryPlanets) {
@@ -6220,29 +6223,34 @@ public class ButtonHelper {
     }
 
     public static String getListOfStuffAvailableToSpend(Player player, Game game, boolean production) {
+        int resourcesAvailable = 0;
         StringBuilder youCanSpend = new StringBuilder("You have available to you to spend: ");
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         if (planets.isEmpty()) {
             youCanSpend.append(" No readied planets ");
         } else {
-            for (String planet : planets) {
-                youCanSpend.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game))
-                        .append(", ");
+            for (String planetName : planets) {
+                Planet planet = game.getPlanetsInfo().get(planetName);
+                youCanSpend.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game)).append(", ");
+                resourcesAvailable += planet.getResources();
+                resourcesAvailable += player.hasLeaderUnlocked("xxchahero") ? planet.getInfluence() : 0;
             }
         }
         if (!game.getPhaseOfGame().contains("agenda")) {
-            youCanSpend.append("and ").append(player.getTg()).append(" trade good")
-                    .append(player.getTg() == 1 ? "" : "s").append(".");
+            youCanSpend.append("and ").append(player.getTg()).append(" trade good").append(player.getTg() == 1 ? "" : "s").append(".");
+            resourcesAvailable += (player.hasTech("mc") ? 2 : 1) * player.getTg();
         }
         if (production) {
             if (player.hasTech("st")) {
                 youCanSpend.append(" You also have " + TechEmojis.CyberneticTech + "_Sarween Tools_.");
+                resourcesAvailable += 1;
             }
             if (player.hasTechReady("aida")) {
-                youCanSpend.append(" You also have ").append(TechEmojis.WarfareTech)
-                        .append("_AI Development Algorithm_ for ")
-                        .append(ButtonHelper.getNumberOfUnitUpgrades(player)).append(" resources.");
+                youCanSpend.append(" You also have ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ for ")
+                    .append(ButtonHelper.getNumberOfUnitUpgrades(player)).append(" resources.");
+                resourcesAvailable += ButtonHelper.getNumberOfUnitUpgrades(player);
             }
+            youCanSpend.append(" As such, you may spend up to ").append(resourcesAvailable).append(" during the PRODUCTION.");
         }
         return youCanSpend.toString();
     }

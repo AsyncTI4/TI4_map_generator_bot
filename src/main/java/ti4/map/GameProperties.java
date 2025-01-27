@@ -107,7 +107,7 @@ public class GameProperties {
     private @ExportableField boolean redTapeMode;
     private @ExportableField boolean homebrew;
     private @ExportableField boolean homebrewSCMode;
-    private @ExportableField boolean spinMode;
+    private @ExportableField String spinMode = "OFF";
     private @ExportableField boolean fastSCFollowMode;
     private @ExportableField boolean extraSecretMode;
     private @ExportableField boolean votcMode;

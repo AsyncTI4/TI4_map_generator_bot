@@ -15,7 +15,7 @@ public class SetMapTemplate extends GameStateSubcommand {
 
     public SetMapTemplate() {
         super("set_map_template", "Set the template for the map.", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.MAP_TEMPLATE, "Template for the map.").setRequired(true).setAutoComplete(true));
+        addOption(OptionType.STRING, Constants.MAP_TEMPLATE, "Template for the map.", true, true);
         addOption(OptionType.BOOLEAN, "transform", "True to attempt to transform the current map to the new map template.");
     }
 

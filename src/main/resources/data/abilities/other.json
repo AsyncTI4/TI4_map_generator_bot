@@ -15,6 +15,27 @@
         "source": "ignis_aurora"
     },
     {
+        "id": "voidmaker",
+        "name": "Voidmaker",
+        "faction": "raven",
+        "permanentEffect": "Each system that contains no planets and which contains 1 or more of your units gains the PRODUCTION 4 ability as if it were 1 of your units.",
+        "source": "ignis_aurora"
+    },
+    {
+        "id": "impairment",
+        "name": "impairment",
+        "faction": "raven",
+        "permanentEffect": "When spending planets for resources, subtract 1 from the value of each planet that you spend.",
+        "source": "ignis_aurora"
+    },
+    {
+        "id": "tachyonpulse",
+        "name": "tachyonpulse",
+        "faction": "raven",
+        "permanentEffect": "After you activate a system, you may choose to ignore 1 or more anomaly effects during the movement step of this tactical action.",
+        "source": "ignis_aurora"
+    },
+    {
         "id": "council_patronage",
         "name": "Council Patronage",
         "faction": "keleres",

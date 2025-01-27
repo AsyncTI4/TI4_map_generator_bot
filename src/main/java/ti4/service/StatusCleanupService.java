@@ -103,8 +103,12 @@ public class StatusCleanupService {
         game.removeStoredValue("Coup");
         game.removeStoredValue("PublicExecution");
         game.setHasHadAStatusPhase(true);
-        if (game.isSpinMode()) {
-            SpinRingsHelper.spinRings(game);
+        if (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode())) {
+            if ("ON".equalsIgnoreCase(game.getSpinMode())) {
+                SpinRingsHelper.spinRings(game);
+            } else {
+                SpinRingsHelper.spinRingsCustom(game, game.getSpinMode(), null);
+            }
         }
         if (!game.isFowMode() && game.getTableTalkChannel() != null) {
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
