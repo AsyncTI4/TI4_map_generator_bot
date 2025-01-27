@@ -37,14 +37,15 @@ public class SwapFactionService {
             player.setDummy(false);
             swapperPlayer.setDummy(true);
         }
+
+        String before = "> **Before:** " + swapperPlayer.getRepresentation() + " & " + removedPlayer.getRepresentation() + "\n";
         swapperPlayer.setUserName(removedPlayer.getUserName());
         swapperPlayer.setUserID(removedPlayer.getUserID());
         player.setUserName(addedUser.getName());
         player.setUserID(addedUser.getId());
+        String after = "> **After:** " + swapperPlayer.getRepresentation() + " & " + removedPlayer.getRepresentation() + "\n";
 
-        String message = "Users have swapped factions:\n" + "> **Before:** " + swapperPlayer.getRepresentation() + " & " +
-            removedPlayer.getRepresentation() + "\n" + "> **After:** " + swapperPlayer.getRepresentation() + " & " +
-            removedPlayer.getRepresentation() + "\n";
+        String message = "Users have swapped factions:\n" + before + after;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
     }
 }

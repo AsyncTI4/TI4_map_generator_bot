@@ -3,7 +3,7 @@
         "alias": "dominusorb",
         "name": "Dominus Orb",
         "text": "Before you move units during a tactical action, you may purge this card to move and transport units that are in systems that contain 1 of your command tokens.",
-        "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/dominus_orb.jpg",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/dominus_orb.jpg?raw=true",
         "source": "pok",
         "flavourText": "*Goldos hoisted the ivory orb at the head of their army. At once, the weariness that filled the bodies and minds of each soldier vanished. They strode forth as if fresh from a week's rest.*"
     },
@@ -11,7 +11,7 @@
         "alias": "mawofworlds",
         "name": "Maw of Worlds",
         "text": "At the start of the agenda phase, you may purge this card and exhaust all of your planets to gain any 1 technology.",
-        "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/maw_of_worlds.jpg",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/maw_of_worlds.jpg?raw=true",
         "source": "pok",
         "flavourText": "*No larger than a carrier, the spherical lattice held a captive singularity at its heart. As they dumped the planet's entire energy grid into its core, the black hole began to spin, the complex logic-circuitry along the lattice slowly coming to life.*"
     },
@@ -19,7 +19,7 @@
         "alias": "emelpar",
         "name": "Scepter of Emelpar",
         "text": "When you would spend a token from your strategy pool, you may exhaust this card to spend a token from your reinforcements instead.",
-        "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/scepter_of_emelpar.jpg",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/scepter_of_emelpar.jpg?raw=true",
         "source": "pok",
         "flavourText": "*As the hilt began to fuse with the flesh of her hand, she worried that she should set the scepter aside. But the whispered suggestions in her mind were too valuable and insightful to seriously consider such a rash and illogical act.*"
     },
@@ -27,7 +27,7 @@
         "alias": "shard",
         "name": "Shard of the Throne",
         "text": "When you gain this card, gain 1 victory point, when you lose this card, lose 1 victory point. When a player gains control of a legendary planet you control or a planet you control in your home system, that player gains this card.",
-        "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/shard_of_the_throne.jpg",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/shard_of_the_throne.jpg?raw=true",
         "source": "pok",
         "flavourText": "*\"What power does a broken piece of the Throne of Emperors hold? To me, none. But to everyone else...\"*"
     },
@@ -35,7 +35,7 @@
         "alias": "stellarconverter",
         "name": "Stellar Converter",
         "text": "ACTION: Choose 1 non-home, non-legendary planet other than Mecatol Rex in a system that is adjacent to 1 or more of your units that have BOMBARDMENT, destroy all units on that planet and purge its attachments and its planet card. Then, place the destroyed planet token on that planet and purge this card. [Note: You cannot choose a planet that you control]",
-        "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/stellar_converter.jpg",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/stellar_converter.jpg?raw=true",
         "source": "pok",
         "flavourText": "*A power great enough to envelop a star, such that its energies might be concentrated… and scattered.*"
     },
@@ -43,7 +43,7 @@
         "alias": "codex",
         "name": "The Codex",
         "text": "ACTION: Purge this card to take up to 3 action cards of your choice from the action card discard pile.",
-        "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/the_codex.jpg",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/the_codex.jpg?raw=true",
         "source": "pok",
         "flavourText": "*No single tome could contain the collected knowledge of millennia of rulers. Thus, the last Emperor built a massive cruiser, its holds bulging with crystal info-matrices. It roams the outer reaches of the Mecatol system, awaiting a summons that will never come.*"
     },
@@ -51,7 +51,7 @@
         "alias": "emphidia",
         "name": "The Crown of Emphidia",
         "text": "After you perform a tactical action, you may exhaust this card to explore 1 planet you control. At the end of the status phase, if you control the \"Tomb of Emphidia,\" you may purge this card to gain 1 victory point.",
-        "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/the_crown_of_emphidia.jpg",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/the_crown_of_emphidia.jpg?raw=true",
         "source": "pok",
         "flavourText": "*The machines of the forgotten throne-world could only be controlled through the data-impulses of the black-barbed crown.*",
         "shrinkName": true
@@ -60,7 +60,7 @@
         "alias": "thalnos",
         "name": "The Crown of Thalnos",
         "text": "During each combat round, this card's owner may reroll any number of their dice, applying +1 to the results, any units that reroll dice but do not produce at least 1 hit are destroyed.",
-        "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/the_crown_of_thalnos.jpg",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/the_crown_of_thalnos.jpg?raw=true",
         "source": "pok",
         "flavourText": "*A cloud of satellites spewed from the dreadnought's hull, drifting into a halo around the vessel. The battle seemed to pause for one long moment, before the drones' weapons flared, unleashing beams of energy in all directions.*"
     },
@@ -68,7 +68,7 @@
         "alias": "obsidian",
         "name": "The Obsidian",
         "text": "When you gain this card, draw 1 secret objective. You can have 1 additional scored or unscored secret objective.",
-        "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/the_obsidian.jpg",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/the_obsidian.jpg?raw=true",
         "source": "pok",
         "flavourText": "*The inky blackness of the blade evoked feelings of discomfort and nausea in all who saw it. All but Sharsiss. It whispered to him promises of power. Promises of a reckoning that would see the Collective unmade. \"Good,\" he thought. \"Let them burn.\"*"
     },
@@ -76,7 +76,7 @@
         "alias": "prophetstears",
         "name": "The Prophet's Tears",
         "text": "When you research a technology, you may exhaust this card to ignore 1 prerequisite or draw 1 action card.",
-        "imageURL": "https://raw.githubusercontent.com/TI4-Online/TI4-TTPG/refs/heads/main/prebuild/Textures/en/card/relic/the_prophets_tears.jpg",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/the_prophets_tears.jpg?raw=true",
         "source": "pok",
         "flavourText": "*\"So you're going to drink a vial of murky liquid we found in a stasis vault on a dead world because you think it's the concentrated genetic essence of an entire species' most brilliant minds...and you think* I'm *being irrational?\"*",
         "shortName": "Prophet's\nTears"

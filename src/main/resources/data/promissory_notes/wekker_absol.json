@@ -1,0 +1,11 @@
+[
+    {
+        "alias": "wekkerabsol_<color>_ps",
+        "name": "Wekker's Absol's Political Secret",
+        "color": "<color>",
+        "playArea": false,
+        "source": "cpti",
+        "text": "When you cast votes: You may exhaust up to 3 of the <color> player's planets as if you controlled them instead.\nThen return this card to the <color> player.",
+        "homebrewReplacesID": "<color>_ps"
+    }
+]

@@ -31,8 +31,14 @@ public class ExhaustLeaderService {
         if (tgCount != null) {
             StringBuilder sb = new StringBuilder();
             leader.setTgCount(tgCount);
-            sb.append("\n").append(tgCount).append(MiscEmojis.getTGorNomadCoinEmoji(game))
-                .append(" was placed on top of the leader");
+            String leaderName = leaderModel.getName();
+            if ("nomadagentartuno".equals(leaderModel.getID())) {
+                leaderName = "Artuno the Betrayer, a Nomad agent";
+            } else if ("nomadagentartuno".equals(leaderModel.getID())) {
+                leaderName = "Clever Clever Artuno the Betrayer, a Nomad/Yssaril agent";
+            }
+            sb.append(tgCount).append(" trade good").append(tgCount == 1 ? "" : "s")
+                .append(" were placed on top of ").append(leaderName).append(".");
             if (leader.getTgCount() != tgCount) {
                 sb.append(" *(").append(tgCount).append(MiscEmojis.getTGorNomadCoinEmoji(game)).append(" total)*\n");
             }

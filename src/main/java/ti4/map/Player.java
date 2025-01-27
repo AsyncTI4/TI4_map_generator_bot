@@ -562,6 +562,11 @@ public class Player {
         TextChannel actionsChannel = game.getMainGameChannel();
         if (game.isFowMode() || game.isCommunityMode()) {
             actionsChannel = (TextChannel) getPrivateChannel();
+
+            if (isGM()) {
+                List<TextChannel> channels = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true);
+                actionsChannel = channels.isEmpty() ? null : channels.getFirst();
+            }
         }
         if (actionsChannel == null) {
             actionsChannel = game.getMainGameChannel();
@@ -1746,7 +1751,7 @@ public class Player {
         if (getGame() != null && color != null && faction != null && Mapper.isValidColor(color)
             && Mapper.isValidFaction(faction)) {
             promissoryNotes.clear();
-            List<String> promissoryNotes = Mapper.getColorPromissoryNoteIDs(getGame(), color);
+            List<String> promissoryNotes = Mapper.getColorPromissoryNoteIDs(getGame(), color); //TODO: switch this to an explicit game.getPNSet() DeckModel
             for (String promissoryNote : promissoryNotes) {
                 if (promissoryNote.endsWith("_an") && hasAbility("hubris")) {
                     continue;
@@ -2866,7 +2871,6 @@ public class Player {
     public String getNextAvailableColorIgnoreCurrent() {
         Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
         String color = UserSettingsManager.get(getUserID()).getPreferredColors().stream()
-            .filter(c -> getGame().getUnusedColorsPreferringBase().stream().anyMatch(col -> col.getName().equals(c)))
             .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
             .findFirst()
             .orElse(getGame().getUnusedColorsPreferringBase().stream().filter(nonExclusive).findFirst().map(ColorModel::getName).orElse(null));
@@ -3055,5 +3059,10 @@ public class Player {
     public void clearDebt(Player player, int count) {
         String clearedPlayerColor = player.getColor();
         removeDebtTokens(clearedPlayerColor, count);
+    }
+
+    @JsonIgnore
+    public boolean isGM() {
+        return getGame().getPlayersWithGMRole().contains(this);
     }
 }

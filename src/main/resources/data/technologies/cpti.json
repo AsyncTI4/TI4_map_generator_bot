@@ -1,0 +1,66 @@
+[
+  {
+    "alias": "pyrrhic_generation",
+    "name": "Pyrrhic Generation",
+    "types": ["BIOTIC"],
+    "requirements": "GG",
+    "source": "cpti",
+    "text": "ACTION: Exhaust this card to purge 1 units from your reinforcements. Then, place 1 unit of the same type from your reinforcements into a system that contains your units and no other player's ships.\n\nACTION: Exhaust this card to purge 1 of your leaders. Then, draw 1 relic."
+  },
+  {
+    "alias": "epigenetic_perfection",
+    "name": "Epigenetic Perfection",
+    "types": ["BIOTIC"],
+    "requirements": "GGG",
+    "source": "cpti",
+    "text": "After you resolve a technology that instructs you to draw, gain, or place a component, you may draw/gain/place an additional component of that type from it's deck or supply following that technology's restrictions."
+  },
+  {
+    "alias": "heavy_rifle_hard_points",
+    "name": "Heavy Rifle Hard Points",
+    "types": ["WARFARE"],
+    "requirements": "RR",
+    "source": "cpti",
+    "text": "While in space, each of your ground forces gain ANTI-FIGHTER BARRAGE 8.\n\nAfter you use one or more ships' SUSTAIN DAMAGE abilities during a round combat, you may use your units ANTI-FIGHTER BARRAGE abilities in that system."
+  },
+  {
+    "alias": "diverse_strategems",
+    "name": "Diverse Strategems",
+    "types": ["WARFARE"],
+    "requirements": "RRR",
+    "source": "cpti",
+    "text": "Before rolling dice during combat, you may exhaust this card to choose 1 of your units of each type. Those units roll an additional die.\n\nIf you have no units of a type left in your reinforcements, apply -1 to the combat value of each of your units of that type."
+  },
+  {
+    "alias": "ultrafine_satellite_array",
+    "name": "Ultrafine Satellite Array",
+    "types": ["CYBERNETIC"],
+    "requirements": "YY",
+    "source": "cpti",
+    "text": "When you explore a planet, you may draw your card from the top the that deck's discard pile instead.\n\nACTION: Exhaust this card to explore each planet you control that contains one of your units with PLANETARY SHIELD."
+  },
+  {
+    "alias": "terradesic_dividends",
+    "name": "Terradesic Dividends",
+    "types": ["CYBERNETIC"],
+    "requirements": "YYY",
+    "source": "cpti",
+    "text": "After an objective is revealed, you may exhaust any number of planets to gain trade goods equal to 1 less than their combined resource or combined influence values."
+  },
+  {
+    "alias": "quantum_transport",
+    "name": "Quantum Transport",
+    "types": ["PROPULSION"],
+    "requirements": "BB",
+    "source": "cpti",
+    "text": "Apply +2 to each of your units capacity values that have one.\n\nAfter you transport infrantry or fighters, you may exhaust this card to replace any of those units with an infantry or fighter."
+  },
+  {
+    "alias": "vacuum_transposition",
+    "name": "Vacuum Transposition",
+    "types": ["PROPULSION"],
+    "requirements": "BBB",
+    "source": "cpti",
+    "text": "After you produce units, you may exhaust this card to move those units into a system containing your units and no planets.\n\nAfter you perform your Hero's ability, place 1 frontier token in each system that contains your ships and no planets."
+  }
+]

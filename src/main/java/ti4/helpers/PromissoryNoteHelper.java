@@ -16,15 +16,12 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
-import ti4.model.Source;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.unit.AddUnitService;
@@ -42,7 +39,7 @@ public class PromissoryNoteHelper {
     public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
         checkAndAddPNs(game, player);
         game.checkPromissoryNotes();
-        String headerText = player.getRepresentationUnfogged() + " Heads up, someone used some command";
+        String headerText = player.getRepresentationUnfogged() + " Heads up, someone refreshed your Promissory Notes.";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendPromissoryNoteInfo(game, player, longFormat);
     }
@@ -51,40 +48,32 @@ public class PromissoryNoteHelper {
         StringBuilder sb = new StringBuilder();
 
         //PROMISSORY NOTES
-        sb.append("__Promissory notes in your hand__:").append("\n");
+        sb.append("### __Promissory notes in your hand__:").append("\n");
         int index = 1;
         Map<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
         List<String> genericPromissoryNotes = Mapper.getColorPromissoryNoteIDs(game, player.getColor());
-        int pnCount = promissoryNotes.size() + promissoryNotesInPlayArea.size();
-        if (promissoryNotes == null) {
-            return sb.toString();
-        }
 
         if (promissoryNotes.isEmpty()) {
-            return "__Promissory notes__:\n> None";
+            return "## __Promissory notes__:\n> None";
         } else {
             for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn.getKey());
                     sb.append(index++).append("\\. ").append(CardEmojis.PN).append("  _").append(pnModel.getName()).append("_ ");
                     Player pnOwner = game.getPNOwner(pn.getKey());
-                    if (false && pnOwner == player && !game.isFrankenGame()) {
-                        sb.append("✋");
-                    } else {
-                        if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
-                        sb.append(ColorEmojis.getColorEmoji(pnOwner.getColor()));
-                    }
-                    sb.append("`(").append(Helper.leftpad("" + pn.getValue(), 2)).append(")`\n");
+                    if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
+                    sb.append(ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
+                    sb.append(" `(").append(pn.getValue()).append(")`\n");
                     if (longFormat || pnOwner != player || !genericPromissoryNotes.contains(pn.getKey())) {
-                        sb.append("> ").append(pnModel.getText()).append("\n");
+                        sb.append("> ").append(pnModel.getTextFormatted(game)).append("\n");
                     }
                 }
             }
 
             if (!excludePlayArea) {
                 //PLAY AREA PROMISSORY NOTES
-                sb.append("\n").append("__Promissory notes in your play area__:").append("\n");
+                sb.append("\n").append("### __Promissory notes in your play area__:").append("\n");
                 if (promissoryNotesInPlayArea.isEmpty()) {
                     sb.append("> None");
                 } else {
@@ -97,51 +86,14 @@ public class PromissoryNoteHelper {
                                 sb.append("✋");
                             } else {
                                 if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
-                                sb.append(ColorEmojis.getColorEmoji(pnOwner.getColor()));
+                                sb.append(ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
                             }
-                            sb.append("`(").append(Helper.leftpad("" + pn.getValue(), 2)).append(")`\n> ").append(pnModel.getText()).append("\n");
+                            sb.append(" `(").append(pn.getValue()).append(")`\n> ").append(pnModel.getTextFormatted(game)).append("\n");
                         }
                     }
                 }
             }
         }
-        return sb.toString();
-    }
-
-    public static String getPromissoryNoteRepresentation(Game game, String pnID) {
-        return getPromissoryNoteRepresentation(game, pnID, true);
-    }
-
-    public static String getPromissoryNoteRepresentation(Game game, String pnID, boolean longFormat) {
-        PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pnID);
-        if (pnModel == null) {
-            String error = "Could not find representation for promissory note with ID `" + pnID + "`";
-            BotLogger.log(error);
-            return error;
-        }
-        String pnName = pnModel.getName();
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(CardEmojis.PN);
-        if (pnModel.getFaction().isPresent()) sb.append(FactionEmojis.getFactionIcon(pnModel.getFaction().get()));
-        sb.append("__**").append(pnName).append("**__");
-        sb.append(pnModel.getSource().emoji());
-        sb.append("   ");
-
-        String pnText = pnModel.getText();
-        Player pnOwner = game.getPNOwner(pnID);
-        if (pnOwner != null && pnOwner.isRealPlayer()) {
-            if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
-            sb.append(ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
-            pnText = pnText.replaceAll(pnOwner.getColor(), ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
-        }
-
-        if (longFormat ||
-            Mapper.isValidFaction(pnModel.getFaction().orElse("").toLowerCase()) ||
-            (pnModel.getSource() != Source.ComponentSource.base && pnModel.getSource() != Source.ComponentSource.pok)) {
-            sb.append("      ").append(pnText);
-        }
-        sb.append("\n");
         return sb.toString();
     }
 
@@ -165,10 +117,8 @@ public class PromissoryNoteHelper {
         promissoryNotes.removeAll(game.getPurgedPN());
 
         // Any remaining PNs are missing from the game and can be re-added to the player's hand
-        if (!promissoryNotes.isEmpty()) {
-            for (String promissoryNote : promissoryNotes) {
-                player.setPromissoryNote(promissoryNote);
-            }
+        for (String promissoryNote : promissoryNotes) {
+            player.setPromissoryNote(promissoryNote);
         }
     }
 
@@ -463,7 +413,7 @@ public class PromissoryNoteHelper {
         }
         if ("dspnlane".equalsIgnoreCase(id)) {
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please use buttons to explore.", buttons);
         }
         if ("gift".equalsIgnoreCase(id)) {
             StartPhaseService.startActionPhase(event, game);
@@ -577,6 +527,6 @@ public class PromissoryNoteHelper {
         targetPlayer.setPromissoryNote(promissoryNoteId);
         sendPromissoryNoteInfo(game, targetPlayer, false);
 
-        MessageHelper.sendMessageToChannel(targetPlayer.getCardsInfoThread(), "# " + targetPlayer.getRepresentation() + " you gained the promissory note _" + Mapper.getPromissoryNote(promissoryNoteId).getName() +"_.");
+        MessageHelper.sendMessageToChannel(targetPlayer.getCardsInfoThread(), "# " + targetPlayer.getRepresentation() + " you gained the promissory note _" + Mapper.getPromissoryNote(promissoryNoteId).getName() + "_.");
     }
 }

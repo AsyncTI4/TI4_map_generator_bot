@@ -77,7 +77,7 @@ class Info extends GameStateSubcommand {
         sb.append("Map Template: `").append(game.getMapTemplateID()).append("`").append("\n");
         if (!privateGame || game.isHasEnded()) {
             sb.append("Map String: `").append(game.getMapString()).append("`").append("\n");
-            sb.append("Hex Summary: `").append(game.getHexSummary()).append("`").append("\n");
+            sb.append("Hex Summary: ` ").append(game.getHexSummary()).append("`").append("\n");
         } else {
             sb.append("Map String: Cannot show map string for private games").append("\n");
         }
@@ -121,6 +121,7 @@ class Info extends GameStateSubcommand {
         if (game.getActionsChannel() != null) sb.append("Actions Channel: ").append(game.getActionsChannel().getAsMention()).append("\n");
         if (game.getBotMapUpdatesThread() != null) sb.append("Bot Map Thread: ").append(game.getBotMapUpdatesThread().getAsMention()).append("\n");
         if (game.getLaunchPostThread() != null) sb.append("Launch Post Thread: ").append(game.getLaunchPostThread().getAsMention()).append("\n");
+        if (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode())) sb.append("Spin Mode: ").append(game.getSpinMode()).append("\n");
         if (game.isFowMode()) {
             sb.append("FoW Options:");
             for (Map.Entry<String, String> entry : game.getFowOptions().entrySet()) {

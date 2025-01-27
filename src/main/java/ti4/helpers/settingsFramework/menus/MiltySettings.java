@@ -62,8 +62,8 @@ public class MiltySettings extends SettingsMenu {
         gameSettings = new GameSettings(game, json, this);
         sourceSettings = new SourceSettings(game, json, this);
         //frankenSettings = new FrankenSettings(game, json, this);
-        sliceSettings = new SliceGenerationSettings(game, json, this);
         playerSettings = new PlayerFactionSettings(game, json, this);
+        sliceSettings = new SliceGenerationSettings(game, json, this);
 
         if (json != null && json.has("messageId")) {
             this.setMessageId(json.get("messageId").asText(null));
@@ -118,7 +118,7 @@ public class MiltySettings extends SettingsMenu {
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
     public enum DraftingMode {
-        none, milty, franken, twilightfalls;
+        none, milty, franken;
 
         public String show() {
             return switch (this) {

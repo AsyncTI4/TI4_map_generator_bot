@@ -44,6 +44,8 @@ public class DataMigrationManager {
     private static final Map<String, Function<Game, Boolean>> migrations;
     static {
         migrations = new HashMap<>();
+        migrations.put("removeWekkersAbsolsPoliticalSecret_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecrets);
+        migrations.put("removeWekkersAbsolsPoliticalSecretAgain_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecretsAgain);
         //migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
@@ -53,7 +55,7 @@ public class DataMigrationManager {
 
         try {
             Map<String, Optional<LocalDate>> migrationNamesToCutoffDates = migrations.entrySet().stream()
-                    .collect(Collectors.toMap(Entry::getKey, entry -> getMigrationForGamesBeforeDate(entry.getKey())));
+                .collect(Collectors.toMap(Entry::getKey, entry -> getMigrationForGamesBeforeDate(entry.getKey())));
 
             for (Entry<String, Function<Game, Boolean>> entry : migrations.entrySet()) {
                 LocalDate migrationCutoffDate = migrationNamesToCutoffDates.get(entry.getKey()).orElse(null);
@@ -61,8 +63,8 @@ public class DataMigrationManager {
 
                 var migratedGames = migrateGames(GameManager.getManagedGames(), entry.getKey(), entry.getValue(), migrationCutoffDate);
                 migrationNamesToAppliedGameNames
-                        .computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
-                        .addAll(migratedGames);
+                    .computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
+                    .addAll(migratedGames);
             }
         } catch (Exception e) {
             BotLogger.log("Issue running migrations:", e);
@@ -83,21 +85,22 @@ public class DataMigrationManager {
             return Optional.of(LocalDate.parse(migrationDateString, MIGRATION_DATE_FORMATTER));
         } catch (Exception e) {
             BotLogger.log(String.format(
-                    "Migration needs a name ending in _DDMMYY (eg 251223 for 25th dec, 2023) (migration name: %s)", migrationDateString), e);
+                "Migration needs a name ending in _DDMMYY (eg 251223 for 25th dec, 2023) (migration name: %s)", migrationDateString), e);
         }
         return Optional.empty();
     }
 
     private static List<String> migrateGames(List<ManagedGame> games, String migrationName, Function<Game, Boolean> migrationMethod,
-                                             LocalDate migrationForGamesBeforeDate) {
+        LocalDate migrationForGamesBeforeDate) {
         List<String> migrationsApplied = new ArrayList<>();
         for (var managedGame : games) {
-            if (managedGame.isHasEnded())  continue;
+            if (managedGame.isHasEnded()) continue;
 
             LocalDate mapCreatedOn = null;
             try {
                 mapCreatedOn = LocalDate.parse(managedGame.getCreationDate(), MAP_CREATED_ON_FORMAT);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             if (mapCreatedOn == null || mapCreatedOn.isAfter(migrationForGamesBeforeDate)) {
                 continue;

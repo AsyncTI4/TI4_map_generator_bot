@@ -89,7 +89,7 @@ public class ButtonHelperStats {
         } else {
             player.setCommodities(player.getCommodities() + amt);
             message += " gained " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " (" + initComm + "->" + player.getCommoditiesRepresentation() + ").";
-            fogMessage = "Gained " + amt + " commodi" + (amt == 1 ? "y" : "ies") + " (" + initComm + "->" + player.getCommoditiesRepresentation() + ").";
+            fogMessage = "Gained " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " (" + initComm + "->" + player.getCommoditiesRepresentation() + ").";
         }
         int finalComm = player.getCommodities();
 

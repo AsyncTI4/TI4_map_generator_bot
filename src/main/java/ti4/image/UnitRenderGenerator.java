@@ -19,6 +19,7 @@ import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.MapGenerator;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -118,8 +119,8 @@ public class UnitRenderGenerator {
 
             unitTypeCounts.putIfAbsent(unitKey.getUnitType(), 0);
 
+            float scale = (bulkUnitCount != null && bulkUnitCount > 9) ? 1.2f : 1.0f;
             try {
-                float scale = (bulkUnitCount != null && bulkUnitCount > 9) ? 1.2f : 1.0f;
                 unitImage = scale == 1.0f ? ImageHelper.read(unitPath) : ImageHelper.readScaled(unitPath, scale);
 
             } catch (Exception e) {
@@ -132,6 +133,7 @@ public class UnitRenderGenerator {
             Integer unitDamageCount = unitDamage.get(unitKey);
             BufferedImage decal = getUnitDecal(player, unitKey);
             BufferedImage spoopy = getSpoopyImage(unitKey, player);
+            UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
 
             // Contains pre-computed values common to this 'unit class'
             // (e.g. all fighters, all infantry, all mechs, etc.)
@@ -150,6 +152,12 @@ public class UnitRenderGenerator {
                 ImagePosition imagePos = calculateImagePosition(posCtx, position);
                 int imageX = imagePos.x();
                 int imageY = imagePos.y();
+                
+                if ((isSpace && unitModel.getIsPlanetOnly()) || (!isSpace && unitModel.getIsSpaceOnly())) {
+                    String badPath = resourceHelper.getPositionFile("badpos_" + unitKey.asyncID() + ".png");
+                    BufferedImage badPositionImage = scale == 1.0f ? ImageHelper.read(badPath) : ImageHelper.readScaled(badPath, scale);;
+                    tileGraphics.drawImage(badPositionImage, imageX-5, imageY-5, null);
+                }
 
                 tileGraphics.drawImage(unitImage, imageX, imageY, null);
 
@@ -183,7 +191,11 @@ public class UnitRenderGenerator {
                         case "black" -> Color.BLACK;
                         default -> Color.WHITE;
                     };
-                    drawBulkUnitCount(tileGraphics, bulkUnitCount, groupUnitColor, imagePos); // TODO: can only show two player's Fighter/Infantry
+                    Color groupUnitStroke = switch (Mapper.getColor(unitKey.getColorID()).getTextColor()) {
+                        case "black" -> Color.WHITE;
+                        default -> Color.BLACK;
+                    };
+                    drawBulkUnitCount(tileGraphics, bulkUnitCount, groupUnitColor, groupUnitStroke, imagePos); // TODO: can only show two player's Fighter/Infantry
                 }
 
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
@@ -303,14 +315,13 @@ public class UnitRenderGenerator {
             unitTokenPosition);
     }
 
-    private void drawBulkUnitCount(Graphics g, int count, Color color, ImagePosition imagePos) {
+    private void drawBulkUnitCount(Graphics g, int count, Color color, Color stroke, ImagePosition imagePos) {
         g.setFont(count > 9 ? Storage.getFont28() : Storage.getFont24());
-        g.setColor(color);
-
         int offsetX = numberPositionPoint.x + (count > 9 ? 5 : 0);
         int offsetY = numberPositionPoint.y + (count > 9 ? 5 : 0);
-
-        g.drawString(Integer.toString(count), imagePos.x() + offsetX, imagePos.y() + offsetY);
+        BasicStroke strokeWidth = new BasicStroke(4.0f);
+        DrawingUtil.superDrawString((Graphics2D) g, Integer.toString(count), imagePos.x() + offsetX, imagePos.y() + offsetY, color,
+            MapGenerator.HorizontalAlign.Left, MapGenerator.VerticalAlign.Bottom, strokeWidth, stroke);
     }
 
     private void drawDamageIcon(Point unitPos, ImagePosition imagePos, BufferedImage unitImage,

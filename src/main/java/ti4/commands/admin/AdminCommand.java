@@ -18,6 +18,7 @@ public class AdminCommand implements ParentCommand {
                     new DisableBot(),
                     new ReloadMapperObjects(),
                     new RestoreGame(),
+                    new ReloadGame(),
                     new CardsInfoForPlayer(),
                     new UpdateThreadArchiveTime())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));

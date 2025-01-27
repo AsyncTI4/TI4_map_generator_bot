@@ -147,8 +147,8 @@
         "type": "Event",
         "category": "event",
         "categoryDescription": "permanent",
-        "text": "The player with the highest combined resources/influence gains Hester's Belt. If multiple player are tied, roll for possession (highest roll wins).",
-        "mapText": "DEAL WITH MANUALLY OR NEEDS SPECIAL IMPLEMENTATION",
+        "text": "The player with the highest combined resources/influence gains Hester's Belt. If multiple player are tied, roll for possession (highest roll wins). /nHester's Belt: At the end of the status phase, the owner of the belt may score 1 public objective if they qualify for it, draw 1 secret objective, or gain 2 command tokens. /nIf another player wins a combat against the owner of this card, they gain the card.",
+        "mapText": "Owner may score 1 PO, draw 1 SO, or gain 2 CCs (end of status phase)",
         "source": "ignis_aurora"
     },
     {

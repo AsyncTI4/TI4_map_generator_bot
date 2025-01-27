@@ -16,7 +16,8 @@
         "isShip": true,
         "ability": "At the start of a space combat in this system, you may place 1 fighter in this system.\nAt the start of a ground combat in this system, you may place 1 infantry on that planet if you have not placed a unit with this ship's ability this action.",
         "unlock": "UNLOCK: Win a ground combat.",
-        "homebrewReplacesID": "sol_flagship"
+        "homebrewReplacesID": "sol_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/sol_1a.png?raw=true"
     },
     {
         "id": "sigma_sol_flagship_2",
@@ -34,7 +35,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "At the start of a space combat in this system, place 1 fighter in this system.\nAt the start of a ground combat in this system, place 1 infantry on that planet.",
-        "unlock": "UNLOCK: Win a ground combat on a legendary planet, Mecatol Rex, or in a home system."
+        "unlock": "UNLOCK: Win a ground combat on a legendary planet, Mecatol Rex, or in a home system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/sol_2a.png?raw=true"
     },
     
     {
@@ -54,7 +56,8 @@
         "isShip": true,
         "ability": "Other players cannot cancel more than 1 hit with SUSTAIN DAMAGE during each space combat round in this system.",
         "unlock": "When you resolve your Pillage faction ability, place 1 control token on this card.\nUNLOCK: have 6 control tokens on this card.",
-        "homebrewReplacesID": "mentak_flagship"
+        "homebrewReplacesID": "mentak_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/mentak_1a.png?raw=true"
     },
     {
         "id": "sigma_mentak_flagship_2",
@@ -72,7 +75,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players' ships in or adjacent to this system cannot use SUSTAIN DAMAGE.",
-        "unlock": "When you resolve your Pillage faction ability, place 1 control token on this card.\nUNLOCK: have 12 control tokens on this card."
+        "unlock": "When you resolve your Pillage faction ability, place 1 control token on this card.\nUNLOCK: have 12 control tokens on this card.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/mentak_2a.png?raw=true"
     },
     
     {
@@ -92,7 +96,8 @@
         "isShip": true,
         "ability": "When this ship is destroyed during a space combat, produce 3 hits against your opponent's ships in the active system.",
         "unlock": "After 1 of your units is destroyed, place 1 control token on this card.\nUNLOCK: Have 4 control tokens on this card.",
-        "homebrewReplacesID": "yin_flagship"
+        "homebrewReplacesID": "yin_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/yin_1a.png?raw=true"
     },
     {
         "id": "sigma_yin_flagship_2",
@@ -110,7 +115,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "When a hit is produced against your units in this system, you may assign that hit to any of your units in this system, regardless of type.\nWhen this ship is destroyed, destroy all ships in this system.",
-        "unlock": "After 1 of your units is destroyed, place 1 control token on this card.\nUNLOCK: Have 12 control tokens on this card."
+        "unlock": "After 1 of your units is destroyed, place 1 control token on this card.\nUNLOCK: Have 12 control tokens on this card.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/yin_a.png?raw=true"
     },
     
     {
@@ -130,7 +136,8 @@
         "isShip": true,
         "ability": "ACTION: Spend 1 token from your strategy pool to place ships with a combined cost of 2 or less in this system.",
         "unlock": "UNLOCK: Have a war sun in or adjacent to a system that contains a supernova.",
-        "homebrewReplacesID": "muaat_flagship"
+        "homebrewReplacesID": "muaat_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/muaat_1a.png?raw=true"
     },
     {
         "id": "sigma_muaat_flagship_2",
@@ -148,7 +155,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "When 1 of your war suns in this system would be destroyed, you may damage or destroy this ship instead.\nACTION: Spend 1 token from your strategy pool to place ships with a combined cost of 2 or less in this or adjacent systems.",
-        "unlock": "UNLOCK: Have 2 of your war suns in or adjacent to the system that contains The Inferno I"
+        "unlock": "UNLOCK: Have 2 of your war suns in or adjacent to the system that contains The Inferno I",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/muaat_2a.png?raw=true"
     },
     {
         "id": "sigma_muaat_mech",
@@ -164,7 +172,8 @@
         "sustainDamage": true,
         "isGroundForce": true,
         "ability": "When you use your Star Forge faction ability in this or an adjacent system, or use the component action of your flagship when it is in this or an adjacent system, you may place 1 infantry from your reinforcements with this unit.",
-        "homebrewReplacesID": "muaat_mech"
+        "homebrewReplacesID": "muaat_mech",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/muaat_mech.png?raw=true"
     },
     
     {
@@ -185,7 +194,8 @@
         "ability": "",
         "productionValue": 4,
         "unlock": "UNLOCK: During the production step of a tactical action, produce 8 units.",
-        "homebrewReplacesID": "arborec_flagship"
+        "homebrewReplacesID": "arborec_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/arborec_1a.png?raw=true"
     },
     {
         "id": "sigma_arborec_flagship_2",
@@ -204,7 +214,8 @@
         "isShip": true,
         "ability": "When you produce fighters or infantry in this system, you may produce 1 additional unit for their cost.",
         "productionValue": 12,
-        "unlock": "UNLOCK: During the production step of a tactical action, produce 12 units."
+        "unlock": "UNLOCK: During the production step of a tactical action, produce 12 units.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/arborec_2a.png?raw=true"
     },
     
     {
@@ -226,7 +237,8 @@
         "bombardHitsOn": 6,
         "bombardDieCount": 2,
         "unlock": "UNLOCK: produce 3 BOMBARDMENT hits during 1 invasion.",
-        "homebrewReplacesID": "l1z1x_flagship"
+        "homebrewReplacesID": "l1z1x_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/lizix_1a.png?raw=true"
     },
     {
         "id": "sigma_l1z1x_flagship_2",
@@ -246,7 +258,8 @@
         "ability": "Hits produced by this ship and by your dreadnoughts in or adjacent to this system must be assigned to non-fighter ships if able, and cannot be canceled.",
         "bombardHitsOn": 6,
         "bombardDieCount": 4,
-        "unlock": "UNLOCK: produce 6 BOMBARDMENT hits during 1 invasion."
+        "unlock": "UNLOCK: produce 6 BOMBARDMENT hits during 1 invasion.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/lizix_2a.png?raw=true"
     },
     
     {
@@ -266,7 +279,8 @@
         "isShip": true,
         "ability": "When this ship makes a combat roll, it rolls a number of dice equal to the number of your opponent's non-fighter ships in this system.",
         "unlock": "UNLOCK: Win a combat in the Mecatol Rex system.",
-        "homebrewReplacesID": "winnu_flagship"
+        "homebrewReplacesID": "winnu_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/winnu_1a.png?raw=true"
     },
     {
         "id": "sigma_winnu_flagship_2",
@@ -284,7 +298,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "When this ship makes a combat roll, it rolls a number of dice equal to the number of ships your opponent had in the active system at the start of the space combat.",
-        "unlock": "UNLOCK: Control Mecatol Rex and 2 legendary planets."
+        "unlock": "UNLOCK: Control Mecatol Rex and 2 legendary planets.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/winnu_2a.png?raw=true"
     },
     
     {
@@ -304,7 +319,8 @@
         "isShip": true,
         "ability": "At the start of a space combat, choose any number of your ground forces in the space area of this system to participate in that combat as though they were fighters.",
         "unlock": "UNLOCK: When you would gain a technology from a player with their Flagship I unlocked using 1 of your faction abilities, you may instead unlock this unit.",
-        "homebrewReplacesID": "nekro_flagship"
+        "homebrewReplacesID": "nekro_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/nekro_1a.png?raw=true"
     },
     {
         "id": "sigma_nekro_flagship_2",
@@ -322,7 +338,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "If you own each non-faction technology owned by your opponent, apply +2 to the result of this unit's combat rolls.\nAt the start of a space combat, choose any number of your ground forces in this system to participate in that combat as though they were ships.",
-        "unlock": "UNLOCK: When you would gain a technology from a player with their Flagship II unlocked using 1 of your faction abilities, you may instead unlock this unit."
+        "unlock": "UNLOCK: When you would gain a technology from a player with their Flagship II unlocked using 1 of your faction abilities, you may instead unlock this unit.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/nekro_2a.png?raw=true"
     },
     
     {
@@ -342,7 +359,8 @@
         "isShip": true,
         "ability": "Other players cannot use ANTI-FIGHTER BARRAGE against your units in this system.",
         "unlock": "UNLOCK: Have 8 fighters on the game board.",
-        "homebrewReplacesID": "naalu_flagship"
+        "homebrewReplacesID": "naalu_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/naalu_1a.png?raw=true"
     },
     {
         "id": "sigma_naalu_flagship_2",
@@ -360,7 +378,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players cannot use ANTI-FIGHTER BARRAGE against your units in this system.\nDuring an invasion in this system, you may commit fighters to planets as though they were ground forces. When combat ends, return those units to the space area.",
-        "unlock": "UNLOCK: Have 20 fighters on the game board."
+        "unlock": "UNLOCK: Have 20 fighters on the game board.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/naalu_2a.png?raw=true"
     },
     {
         "id": "sigma_naalu_mech",
@@ -376,7 +395,8 @@
         "sustainDamage": true,
         "isGroundForce": true,
         "ability": "Only this unit rolls combat dice during the first round of ground combat on this planet.\nWhen another player activates this system, place 1 infantry on this planet.",
-        "homebrewReplacesID": "naalu_mech"
+        "homebrewReplacesID": "naalu_mech",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/naalu_mech.png?raw=true"
     },
     
     {
@@ -396,7 +416,8 @@
         "isShip": true,
         "ability": "At the start of each space combat round in this system, repair this ship.",
         "unlock": "When 1 of your opponent's non-fighter ships is destroyed during space combat, place a number of control tokens on this card equal to that ship's cost.\nUNLOCK: Have 8 control tokens on this card.",
-        "homebrewReplacesID": "letnev_flagship"
+        "homebrewReplacesID": "letnev_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/letnev_1a.png?raw=true"
     },
     {
         "id": "sigma_letnev_flagship_2",
@@ -414,7 +435,8 @@
         "canBeDirectHit": false,
         "isShip": true,
         "ability": "At the start of each space combat round in this system, repair this ship, then place 1 fighter for every 8 resources in the combined cost of your non-fighter ships in this system.\nThis unit cannot be destroyed by \"Direct Hit\" action cards.",
-        "unlock": "When 1 of your opponent's non-fighter ships is destroyed during space combat, place a number of control tokens on this card equal to that ship's cost.\nUNLOCK: Have 20 control tokens on this card."
+        "unlock": "When 1 of your opponent's non-fighter ships is destroyed during space combat, place a number of control tokens on this card equal to that ship's cost.\nUNLOCK: Have 20 control tokens on this card.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/letnev_2a.png?raw=true"
     },
     
     {
@@ -434,7 +456,8 @@
         "isShip": true,
         "ability": "During your actions, this ship may transport structures as though they were ground forces; they lose all abilities and attributes until the end of the action. If any of your PDS are in the space area of a system at the end of the action, they are destroyed.",
         "unlock": "UNLOCK: Participate in a space combat in a system containing 1 or more of your space docks.",
-        "homebrewReplacesID": "saar_flagship"
+        "homebrewReplacesID": "saar_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/saar_1a.png?raw=true"
     },
     {
         "id": "sigma_saar_flagship_2",
@@ -452,7 +475,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "During your actions, this ship may transport structures as though they were ground forces; they lose all abilities and attributes until the end of the action. If any of your PDS are in the space area of a system at the end of the action, they are destroyed.",
-        "unlock": "UNLOCK: 1 of your structures is destroyed."
+        "unlock": "UNLOCK: 1 of your structures is destroyed.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/saar_2a.png?raw=true"
     },
     
     {
@@ -472,7 +496,8 @@
         "isShip": true,
         "ability": "When this ship produces a hit with a combat roll, it gains 1 additional combat dice for this round of combat; roll that dice immediately.",
         "unlock": "UNLOCK: Control a planet with a technology speciality.",
-        "homebrewReplacesID": "jolnar_flagship"
+        "homebrewReplacesID": "jolnar_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/jolnar_1a.png?raw=true"
     },
     {
         "id": "sigma_jolnar_flagship_2",
@@ -490,7 +515,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "When this ship produces a hit with a combat roll, it gains 1 additional combat dice for this round of combat; roll that dice immediately.",
-        "unlock": "If you control a planet with a technology speciality, or own 4 technologies of 1 color, place the technology token of the corresponding color on this card.\nUNLOCK: Have 4 tokens on this card."
+        "unlock": "If you control a planet with a technology speciality, or own 4 technologies of 1 color, place the technology token of the corresponding color on this card.\nUNLOCK: Have 4 tokens on this card.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/jolnar_2a.png?raw=true"
     },
     
     {
@@ -510,7 +536,8 @@
         "isShip": true,
         "ability": "Apply +1 to the result of each of your other ship's combat rolls in this system.",
         "unlock": "UNLOCK: Produce 4 hits during 1 round of combat.",
-        "homebrewReplacesID": "sardakk_flagship"
+        "homebrewReplacesID": "sardakk_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/norr_1a.png?raw=true"
     },
     {
         "id": "sigma_norr_flagship_2",
@@ -528,7 +555,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Apply +1 to the result of each of your unit's combat and ability rolls in this system.",
-        "unlock": "UNLOCK: Produce 8 hits during 1 round of combat."
+        "unlock": "UNLOCK: Produce 8 hits during 1 round of combat.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/norr_2a.png?raw=true"
     },
     
     {
@@ -550,7 +578,8 @@
         "spaceCannonHitsOn": 5,
         "spaceCannonDieCount": 2,
         "unlock": "When you perform the primary or secondary ability of a strategy card, place the corresponding token on this card.\nUNLOCK: Have 4 tokens on this card.",
-        "homebrewReplacesID": "xxcha_flagship"
+        "homebrewReplacesID": "xxcha_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/xxcha_1a.png?raw=true"
     },
     {
         "id": "sigma_xxcha_flagship_2",
@@ -571,7 +600,8 @@
         "spaceCannonHitsOn": 5,
         "spaceCannonDieCount": 4,
         "deepSpaceCannon": true,
-        "unlock": "When you perform the primary or secondary ability of a strategy card, place the corresponding token on this card.\nUNLOCK: Have 8 tokens on this card."
+        "unlock": "When you perform the primary or secondary ability of a strategy card, place the corresponding token on this card.\nUNLOCK: Have 8 tokens on this card.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/xxcha_2a.png?raw=true"
     },
     
     {
@@ -591,7 +621,8 @@
         "isShip": true,
         "ability": "This ship can move through systems that contain other player's ships.",
         "unlock": "UNLOCK: See an unscored secret objective belonging to another player.",
-        "homebrewReplacesID": "yssaril_flagship"
+        "homebrewReplacesID": "yssaril_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/yssaril_1a.png?raw=true"
     },
     {
         "id": "sigma_yssaril_flagship_2",
@@ -609,7 +640,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "This ship can move through systems that contain other player's units, and ignores the movement effects of anomalies.",
-        "unlock": "UNLOCK: Gain control of a planet in a system that is not adjacent to another planet you control or any of your units."
+        "unlock": "UNLOCK: Gain control of a planet in a system that is not adjacent to another planet you control or any of your units.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/yssaril_2a.png?raw=true"
     },
     
     {
@@ -629,7 +661,8 @@
         "isShip": true,
         "ability": "You may spend any number of trade goods to cancel 1 hit each, produced against your units in this system; the player that produced the hit gains the trade good.",
         "unlock": "When you resolve a transaction with another player, place 1 of their control tokens on this card.\nUNLOCK: Have a control token from each other player on this card.",
-        "homebrewReplacesID": "hacan_flagship"
+        "homebrewReplacesID": "hacan_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/hacan_1a.png?raw=true"
     },
     {
         "id": "sigma_hacan_flagship_2",
@@ -647,7 +680,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "You may spend any number of trade goods to cancel up to 3 hits each, all produced by the same player against your units in this system; that player gains the trade good.",
-        "unlock": "When you resolve a transaction with another player, place 1 of their control tokens on this card.\nUNLOCK: Have 6 control tokens for each other player in the game on this card."
+        "unlock": "When you resolve a transaction with another player, place 1 of their control tokens on this card.\nUNLOCK: Have 6 control tokens for each other player in the game on this card.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/hacan_2a.png?raw=true"
     },
     
     {
@@ -667,7 +701,8 @@
         "isShip": true,
         "ability": "You treat this system as if it contained a delta wormhole.\nDuring movement, this ship may move before or after your other ships.\nThis ship does not roll for gravity rifts.",
         "unlock": "UNLOCK: Have ships in systems that collectively contain a total of 4 or more wormholes.",
-        "homebrewReplacesID": "ghost_flagship"
+        "homebrewReplacesID": "ghost_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/creuss_1a.png?raw=true"
     },
     {
         "id": "sigma_creuss_flagship_2",
@@ -685,7 +720,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "You treat this system as if it contained a delta wormhole.\nDuring movement, this ship may move before or after your other ships.\nThis ship does not roll for gravity rifts.\nYou may move this ship to an adjacent system at the start of a space combat there.",
-        "unlock": "UNLOCK: Have ships in systems that collectively contain a total of 6 or more wormholes."
+        "unlock": "UNLOCK: Have ships in systems that collectively contain a total of 6 or more wormholes.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/creuss_2a.png?raw=true"
     },
     
     {
@@ -705,7 +741,8 @@
         "isShip": true,
         "ability": "During a combat against a player without a command token in your fleet pool, apply +1 to the result of this unit's combat rolls.",
         "unlock": "UNLOCK: Have 1 Support For The Throne in your play area.",
-        "homebrewReplacesID": "mahact_flagship"
+        "homebrewReplacesID": "mahact_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/mahact_1a.png?raw=true"
     },
     {
         "id": "sigma_mahact_flagship_2",
@@ -723,7 +760,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "During a combat against a player without a command token in your fleet pool, apply +2 to the result of this unit's combat rolls.\nWhen you win a combat in this system, place 1 command token from your opponent's reinforcements in this system.",
-        "unlock": "UNLOCK: Have 2 Supports Fors Thes Thrones in your play area."
+        "unlock": "UNLOCK: Have 2 Supports Fors Thes Thrones in your play area.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/mahact_2a.png?raw=true"
     },
     
     {
@@ -745,7 +783,8 @@
         "afbHitsOn": 8,
         "afbDieCount": 2,
         "unlock": "This unit is unlocked at the start of the game.",
-        "homebrewReplacesID": "nomad_flagship"
+        "homebrewReplacesID": "nomad_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/nomad_1a.png?raw=true"
     },
     {
         "id": "sigma_nomad_flagship_2",
@@ -765,7 +804,8 @@
         "ability": "You may treat this unit as though it were adjacent to systems that contain 1 or more of your mechs.",
         "afbHitsOn": 6,
         "afbDieCount": 3,
-        "unlock": "UNLOCK: When you would score a public objective or draw a secret objective, you may instead unlock the Memoria II."
+        "unlock": "UNLOCK: When you would score a public objective or draw a secret objective, you may instead unlock the Memoria II.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/nomad_2a.png?raw=true"
     },
     {
         "id": "sigma_nomad_flagship_3",
@@ -786,7 +826,8 @@
         "afbHitsOn": 4,
         "afbDieCount": 4,
         "productionValue": 1,
-        "unlock": "UNLOCK: With the Memoria II unlocked, when you would score a public objective or draw a secret objective, you may instead unlock the Memoria III."
+        "unlock": "UNLOCK: With the Memoria II unlocked, when you would score a public objective or draw a secret objective, you may instead unlock the Memoria III.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/nomad_3a.png?raw=true"
     },
     {
         "id": "sigma_cavalry_1",
@@ -858,7 +899,8 @@
         "isShip": true,
         "ability": "When you capture a unit in this system, also capture a fighter or infantry token from the supply.\nWhen you produce this ship, you may return 24 fighters and/or infantry tokens instead of spending resources.",
         "unlock": "When you capture another player's unit, place 1 of that player's control tokens on this card.\nUNLOCK: Have 4 of 1 player's control tokens on this card.",
-        "homebrewReplacesID": "cabal_flagship"
+        "homebrewReplacesID": "cabal_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/vuilraith_1a.png?raw=true"
     },
     {
         "id": "sigma_vuilraith_flagship_2",
@@ -876,7 +918,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "When another unit is destroyed in this system, including your own, capture it, then capture a fighter or infantry token from the supply.\nWhen you produce this ship, you may return 16 fighters and/or infantry tokens instead of spending resources.",
-        "unlock": "When you capture another player's unit, place 1 of that player's control tokens on this card.\nUNLOCK: Have 12 of 1 player's control tokens on this card."
+        "unlock": "When you capture another player's unit, place 1 of that player's control tokens on this card.\nUNLOCK: Have 12 of 1 player's control tokens on this card.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/vuilraith_2a.png?raw=true"
     },
     
     {
@@ -896,7 +939,8 @@
         "isShip": true,
         "ability": "DEPLOY: After you activate a system that contains 1 of your PDS, you may replace that PDS with this ship.",
         "unlock": "UNLOCK: Control 2 attachments amongst planets you control.",
-        "homebrewReplacesID": "titans_flagship"
+        "homebrewReplacesID": "titans_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/ul_1a.png?raw=true"
     },
     {
         "id": "sigma_ul_flagship_2",
@@ -914,7 +958,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "When this ship is destroyed, place a ship with a cost of 4 or less from your reinforcements in this system.\nDEPLOY: After you activate a system that contains 1 of your PDS, you may replace that PDS with this ship.",
-        "unlock": "UNLOCK: Control 5 attachments amongst planets you control."
+        "unlock": "UNLOCK: Control 5 attachments amongst planets you control.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/ul_2a.png?raw=true"
     },
     
     {
@@ -934,7 +979,8 @@
         "isShip": true,
         "ability": "When any player's unit in this system with the SUSTAIN DAMAGE ability becomes damaged, you may spend 3 influence to repair that unit; it cannot be destroyed by a \"Direct Hit\" action card triggered by that use of SUSTAIN DAMAGE.",
         "unlock": "UNLOCK: Explore a frontier token adjacent to another player's home system.",
-        "homebrewReplacesID": "empyrean_flagship"
+        "homebrewReplacesID": "empyrean_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/empyrean_1a.png?raw=true"
     },
     {
         "id": "sigma_empyrean_flagship_2",
@@ -952,7 +998,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "When any player's unit in this system or an adjacent system with the SUSTAIN DAMAGE ability becomes damaged, you may spend 1 influence to repair that unit; it cannot be destroyed by a \"Direct Hit\" action card triggered by that use of SUSTAIN DAMAGE.",
-        "unlock": "UNLOCK: Purge a frontier exploration card.\nACTION: Purge an unknown relic fragment."
+        "unlock": "UNLOCK: Purge a frontier exploration card.\nACTION: Purge an unknown relic fragment.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/empyrean_2a.png?raw=true"
     },
     
     {
@@ -972,7 +1019,8 @@
         "isShip": true,
         "ability": "Apply +1 to the result of each of your mech's combat rolls in this system.",
         "unlock": "UNLOCK: You purge a relic fragment or an exploration deck is depleted.",
-        "homebrewReplacesID": "naaz_flagship"
+        "homebrewReplacesID": "naaz_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/naazrokha_1a.png?raw=true"
     },
     {
         "id": "sigma_naazrokha_flagship_2",
@@ -990,7 +1038,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Your mechs in this system roll 1 additional die during combat.\nWhen you win a combat in this system, you may repair 1 participating unit.",
-        "unlock": "When you purge a relic fragment, or when an exploration deck is depleted, place the corresponding trait token on this card.\nUNLOCK: have 3 tokens on this card."
+        "unlock": "When you purge a relic fragment, or when an exploration deck is depleted, place the corresponding trait token on this card.\nUNLOCK: have 3 tokens on this card.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/naazrokha_2a.png?raw=true"
     },
     
     {
@@ -1010,7 +1059,8 @@
         "isShip": true,
         "ability": "Other players apply -2 to the result of each dice roll when they use SPACE CANNON against your ships in this system.",
         "unlock": "When you destroy a unit using a unit ability, place a control token on this card.\nUNLOCK: Have 4 control tokens on this card.",
-        "homebrewReplacesID": "argent_flagship"
+        "homebrewReplacesID": "argent_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/argent_1a.png?raw=true"
     },
     {
         "id": "sigma_argent_flagship_2",
@@ -1028,7 +1078,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "When using SPACE CANNON, other players apply -2 and you apply +2 to the result of each die roll against units in adjacent systems, and other players apply -3 and you apply +3 to the result of each die roll against units in this system.",
-        "unlock": "When you destroy a unit using a unit ability, place a control token on this card.\nUNLOCK: Have 12 control tokens on this card."
+        "unlock": "When you destroy a unit using a unit ability, place a control token on this card.\nUNLOCK: Have 12 control tokens on this card.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/argent_2a.png?raw=true"
     },
     
     {
@@ -1048,7 +1099,8 @@
         "isShip": true,
         "ability": "Other players must spend 2 influence to activate this system.",
         "unlock": "UNLOCK: Give another player 3 commodities and/or trade goods when resolving a transaction.",
-        "homebrewReplacesID": "keleres_flagship"
+        "homebrewReplacesID": "keleres_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/keleres_1a.png?raw=true"
     },
     {
         "id": "sigma_keleresa_flagship_2",
@@ -1066,7 +1118,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players must spend 4 influence to activate this system. When they do, gain 1 command token from this system or your reinforcements.",
-        "unlock": "UNLOCK: With the Artemiris I unlocked, give another player 6 commodities and/or trade goods when resolving a transaction."
+        "unlock": "UNLOCK: With the Artemiris I unlocked, give another player 6 commodities and/or trade goods when resolving a transaction.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/keleres_2a.png?raw=true"
     },
     {
         "id": "sigma_keleresm_flagship_1",
@@ -1085,7 +1138,8 @@
         "isShip": true,
         "ability": "Other players must spend 2 influence to activate the system that contains this ship.",
         "unlock": "UNLOCK: Give another player 4 commodities or trade goods when resolving a transaction.",
-        "homebrewReplacesID": "keleres_flagship"
+        "homebrewReplacesID": "keleres_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/keleres_1a.png?raw=true"
     },
     {
         "id": "sigma_keleresm_flagship_2",
@@ -1103,7 +1157,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players must spend 4 influence to activate the system that contains this ship. When they do, gain 1 command token from this system or your reinforcements.",
-        "unlock": "UNLOCK: With the Artemiris I unlocked, give another player 8 commodities or trade goods when resolving a transaction."
+        "unlock": "UNLOCK: With the Artemiris I unlocked, give another player 8 commodities or trade goods when resolving a transaction.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/keleres_2a.png?raw=true"
     },
     {
         "id": "sigma_keleresx_flagship_1",
@@ -1122,7 +1177,8 @@
         "isShip": true,
         "ability": "Other players must spend 2 influence to activate the system that contains this ship.",
         "unlock": "UNLOCK: Give another player 4 commodities or trade goods when resolving a transaction.",
-        "homebrewReplacesID": "keleres_flagship"
+        "homebrewReplacesID": "keleres_flagship",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/keleres_1a.png?raw=true"
     },
     {
         "id": "sigma_keleresx_flagship_1_flagship_2",
@@ -1140,7 +1196,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players must spend 4 influence to activate the system that contains this ship. When they do, gain 1 command token from this system or your reinforcements.",
-        "unlock": "UNLOCK: With the Artemiris I unlocked, give another player 8 commodities or trade goods when resolving a transaction."
+        "unlock": "UNLOCK: With the Artemiris I unlocked, give another player 8 commodities or trade goods when resolving a transaction.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/flagshipping/keleres_2a.png?raw=true"
     }
 
 ]

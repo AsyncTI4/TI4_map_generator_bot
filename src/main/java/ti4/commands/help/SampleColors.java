@@ -61,7 +61,7 @@ class SampleColors extends Subcommand {
             stroke = new BasicStroke(3.0f);
         }
 
-        int left = ThreadLocalRandom.current().nextInt(PAGEWIDTH - 5 * DREADWIDTH);
+        int left = ThreadLocalRandom.current().nextInt(PAGEWIDTH - 7 * DREADWIDTH);
         int top = ThreadLocalRandom.current().nextInt(PAGEHIGHT - 2 * hues.size() * DREADTEXHIGHT);
         int right = left;
         int bottom = top + 2 * hues.size() * DREADTEXHIGHT;

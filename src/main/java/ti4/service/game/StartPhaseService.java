@@ -20,6 +20,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.migration.MigrationHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GameLaunchThreadHelper;
@@ -61,7 +62,7 @@ public class StartPhaseService {
             case "strategy" -> startStrategyPhase(event, game);
             case "voting", "agendaVoting" -> AgendaHelper.startTheVoting(game);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
-            // case "P1Special" -> new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", "1082164664844169256")).sendEvent();
+            // case "P1Special" -> MigrationHelper.fixBlaheo(); // manual migration code to convert blaheo to biaheo - comment after 2025-03
             case "shuffleDecks" -> game.shuffleDecks();
             case "agenda" -> {
                 Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
@@ -132,18 +133,14 @@ public class StartPhaseService {
         }
         for (Player player2 : game.getRealPlayers()) {
             String id = "sigma_machinations";
-            if (player2.getPromissoryNotesInPlayArea().contains(id))
-            {
+            if (player2.getPromissoryNotesInPlayArea().contains(id)) {
                 player2.removePromissoryNote(id);
                 Player nomad = game.getPNOwner(id);
                 nomad.setPromissoryNote(id);
-                if (game.isFowMode())
-                {
+                if (game.isFowMode()) {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), "_Machinations_ has been returned to its owner.");
                     MessageHelper.sendMessageToChannel(nomad.getCardsInfoThread(), "_Machinations_ has been returned to you.");
-                }
-                else
-                {
+                } else {
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), player2.getRepresentationNoPing()
                         + " has returned _Machinations_ to " + nomad.getRepresentationNoPing() + ".");
                 }
@@ -212,21 +209,16 @@ public class StartPhaseService {
                         exhausted.add(Helper.getPlanetRepresentation(planet, game));
                     }
                 }
-                if (exhausted.size() >= 2)
-                {
+                if (exhausted.size() >= 2) {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                         ", because _New Constitution_ resolved \"Against\", " +
-                        String.join(", ", exhausted.subList(0, exhausted.size()-1)) + " and "
+                        String.join(", ", exhausted.subList(0, exhausted.size() - 1)) + " and "
                         + exhausted.getLast() + " have been exhausted.");
-                }
-                else if (exhausted.size() == 1)
-                {
+                } else if (exhausted.size() == 1) {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                         ", because _New Constitution_ resolved \"Against\", "
                         + exhausted.getFirst() + " has been exhausted.");
-                }
-                else
-                {
+                } else {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                         ", though _New Constitution_ resolved \"Against\"," +
                         " you control no planets in your home system to exhaust.");
@@ -248,15 +240,12 @@ public class StartPhaseService {
                         exhausted.add(Helper.getPlanetRepresentation(planet, game));
                     }
                 }
-                if (exhausted.size() >= 2)
-                {
+                if (exhausted.size() >= 2) {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                         ", because _Arms Reduction_ resolved \"Against\", " +
-                        String.join(", ", exhausted.subList(0, exhausted.size()-1)) + " and "
+                        String.join(", ", exhausted.subList(0, exhausted.size() - 1)) + " and "
                         + exhausted.getLast() + " have been exhausted.");
-                }
-                else if (exhausted.size() == 1)
-                {
+                } else if (exhausted.size() == 1) {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                         ", because _Arms Reduction_ resolved \"Against\", "
                         + exhausted.getFirst() + " has been exhausted.");
@@ -300,21 +289,16 @@ public class StartPhaseService {
                             exhausted.add(Helper.getPlanetRepresentation(planet, game));
                         }
                     }
-                    if (exhausted.size() >= 2)
-                    {
+                    if (exhausted.size() >= 2) {
                         MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                             ", because you voted \"Against\" on _Representative Government_, " +
-                            String.join(", ", exhausted.subList(0, exhausted.size()-1)) + " and "
+                            String.join(", ", exhausted.subList(0, exhausted.size() - 1)) + " and "
                             + exhausted.getLast() + " have been exhausted.");
-                    }
-                    else if (exhausted.size() == 1)
-                    {
+                    } else if (exhausted.size() == 1) {
                         MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                             ", because you voted \"Against\" on _Representative Government_, "
                             + exhausted.getFirst() + " has been exhausted.");
-                    }
-                    else
-                    {
+                    } else {
                         MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
                             ", though you voted \"Against\" on  _Representative Government_," +
                             " you have no cultural planets to exhaust.");
@@ -536,8 +520,7 @@ public class StartPhaseService {
             .addContent(message2)
             .addComponents(ActionRow.of(buttons)).build();
 
-        game.getMainGameChannel().sendMessage(messageObject).queue(message ->
-            GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate()));
+        game.getMainGameChannel().sendMessage(messageObject).queue(message -> GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate()));
 
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
     }
@@ -590,7 +573,7 @@ public class StartPhaseService {
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(nextPlayer, game, event, msgExtra, fail, success);
-            msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
+            msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
                 + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             game.updateActivePlayer(nextPlayer);
 
@@ -618,7 +601,7 @@ public class StartPhaseService {
             if (game.isShowBanners()) {
                 BannerGenerator.drawFactionBanner(nextPlayer);
             }
-            String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
+            String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
                 + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             Player nextNextPlayer = EndTurnService.findNextUnpassedPlayer(game, nextPlayer);
             if (nextNextPlayer == nextPlayer) {

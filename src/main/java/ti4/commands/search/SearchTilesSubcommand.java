@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
@@ -27,6 +28,7 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
     private static final String WITH_GRAVITY_RIFT = "with_gravity_rift";
     private static final String WITH_NEBULA = "with_nebula";
     private static final String WITH_SUPERNOVA = "with_supernova";
+    private static final String WITH_LEGENDARIES = "with_legendary_planets";
 
     public SearchTilesSubcommand() {
         super(Constants.SEARCH_TILES, "List all tiles");
@@ -40,7 +42,8 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
             new OptionData(OptionType.BOOLEAN, WITH_ASTEROID, "True: Include only tiles with asteroid fields; False: exclude tiles with asteroid fields"),
             new OptionData(OptionType.BOOLEAN, WITH_GRAVITY_RIFT, "True: Include only tiles with gravity rifts; False: exclude tiles with gravity rifts"),
             new OptionData(OptionType.BOOLEAN, WITH_NEBULA, "True: Include only tiles with nebulas; False: exclude tiles with nebulas"),
-            new OptionData(OptionType.BOOLEAN, WITH_SUPERNOVA, "True: Include only tiles with supernovas; False: exclude tiles with supernovas")
+            new OptionData(OptionType.BOOLEAN, WITH_SUPERNOVA, "True: Include only tiles with supernovas; False: exclude tiles with supernovas"),
+            new OptionData(OptionType.BOOLEAN, WITH_LEGENDARIES, "True: Include only tiles with legendary planets; False: exclude tiles with legendary planets")
         );
     }
 
@@ -58,6 +61,7 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
         Boolean with_grifts = event.getOption(WITH_GRAVITY_RIFT, null, OptionMapping::getAsBoolean);
         Boolean with_nebula = event.getOption(WITH_NEBULA, null, OptionMapping::getAsBoolean);
         Boolean with_supernova = event.getOption(WITH_SUPERNOVA, null, OptionMapping::getAsBoolean);
+        Boolean with_legendaries = event.getOption(WITH_LEGENDARIES, null, OptionMapping::getAsBoolean);
 
         List<Entry<TileModel, MessageEmbed>> tileEmbeds = new ArrayList<>();
         if (TileHelper.isValidTile(searchString)) {
@@ -75,6 +79,7 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
                 .filter(tile -> with_grifts == null || with_grifts == tile.isGravityRift())
                 .filter(tile -> with_nebula == null || with_nebula == tile.isNebula())
                 .filter(tile -> with_supernova == null || with_supernova == tile.isSupernova())
+                .filter(tile -> with_legendaries == null || tile.getPlanets().stream().map(Mapper::getPlanet).anyMatch(planet -> planet.isLegendary() == with_legendaries))
                 .sorted(Comparator.comparing(TileModel::getId))
                 .map(tile -> Map.entry(tile, tile.getRepresentationEmbed(includeAliases)))
                 .forEach(tileEmbeds::add);

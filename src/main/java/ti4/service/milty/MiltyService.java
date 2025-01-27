@@ -160,7 +160,7 @@ public class MiltyService {
         if (specs.presetSlices != null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
             specs.presetSlices.forEach(draftManager::addSlice);
-            draftManager.repostDraftInformation(game);
+            draftManager.repostDraftInformation(event, game);
         } else {
             event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
                 boolean slicesCreated = generateSlices(event, draftManager, specs);
@@ -171,7 +171,7 @@ public class MiltyService {
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 } else {
-                    draftManager.repostDraftInformation(game);
+                    draftManager.repostDraftInformation(event, game);
                     game.setPhaseOfGame("miltydraft");
                     GameManager.save(game, "Milty");
                 }

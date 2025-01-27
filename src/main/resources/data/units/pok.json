@@ -15,7 +15,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After you activate this system, you may produce up to 5 units in this system."
+        "ability": "After you activate this system, you may produce up to 5 units in this system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/duha_menaimon.png?raw=true"
     },
     {
         "id": "arborec_infantry",
@@ -30,7 +31,8 @@
         "cost": 0.5,
         "combatHitsOn": 8,
         "combatDieCount": 1,
-        "isGroundForce": true
+        "isGroundForce": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/faction/letani_warrior.jpg?raw=true"
     },
     {
         "id": "arborec_infantry2",
@@ -47,7 +49,8 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
+        "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/letani_warrior_2.jpg?raw=true"
     },
     {
         "id": "arborec_mech",
@@ -64,7 +67,8 @@
         "planetaryShield": true,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: When you would use your Mitosis faction ability you may replace 1 of your infantry with 1 mech from your reinforcements instead."
+        "ability": "DEPLOY: When you would use your Mitosis faction ability you may replace 1 of your infantry with 1 mech from your reinforcements instead.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/letani_behemoth.jpg?raw=true"
     },
     {
         "id": "argent_destroyer",
@@ -82,7 +86,8 @@
         "combatDieCount": 1,
         "afbHitsOn": 9,
         "afbDieCount": 2,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/faction/strike_wing_alpha.jpg?raw=true"
     },
     {
         "id": "argent_destroyer2",
@@ -102,7 +107,8 @@
         "afbHitsOn": 6,
         "afbDieCount": 3,
         "isShip": true,
-        "ability": "When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system."
+        "ability": "When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/strike_wing_alpha_2.jpg?raw=true"
     },
     {
         "id": "argent_flagship",
@@ -120,7 +126,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other players cannot use space cannon against your ships in this system."
+        "ability": "Other players cannot use space cannon against your ships in this system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/quetzecoatl.png?raw=true"
     },
     {
         "id": "argent_mech",
@@ -135,7 +142,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This unit does not count against capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values."
+        "ability": "This unit does not count against capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/aerie_sentinel.jpg?raw=true"
     },
     {
         "id": "cabal_flagship",
@@ -155,7 +163,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Capture all other non-structure units that are destroyed in this system, including your own."
+        "ability": "Capture all other non-structure units that are destroyed in this system, including your own.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/the_terror_between.png?raw=true"
     },
     {
         "id": "cabal_mech",
@@ -170,7 +179,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "When your infantry on this planet are destroyed, place them on your faction sheet; those units are captured."
+        "ability": "When your infantry on this planet are destroyed, place them on your faction sheet; those units are captured.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/reanimator.jpg?raw=true"
     },
     {
         "id": "cabal_spacedock",
@@ -182,7 +192,8 @@
         "faction": "Cabal",
         "productionValue": 5,
         "isStructure": true,
-        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 6 fighters in this system do not count against your ships' capacity."
+        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 6 fighters in this system do not count against your ships' capacity.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/faction/dimensional_tear.jpg?raw=true"
     },
     {
         "id": "cabal_spacedock2",
@@ -195,7 +206,8 @@
         "faction": "Cabal",
         "productionValue": 7,
         "isStructure": true,
-        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 12 fighters in this system do not count against your ships' capacity."
+        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 12 fighters in this system do not count against your ships' capacity.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/dimensional_tear_2.jpg?raw=true"
     },
     {
         "id": "empyrean_flagship",
@@ -213,7 +225,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After any player's unit in this system or an adjacent system uses SUSTAIN DAMAGE, you may spend 2 influence to repair that unit."
+        "ability": "After any player's unit in this system or an adjacent system uses SUSTAIN DAMAGE, you may spend 2 influence to repair that unit.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/dynamo.png?raw=true"
     },
     {
         "id": "empyrean_mech",
@@ -228,7 +241,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "You may remove this unit from a system that contains or is adjacent to another player's units to cancel an action card played by that player."
+        "ability": "You may remove this unit from a system that contains or is adjacent to another player's units to cancel an action card played by that player.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/watcher.jpg?raw=true"
     },
     {
         "id": "ghost_flagship",
@@ -246,7 +260,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "This ship's system contains a delta wormhole.\nDuring movement, this ship may move before or after your other ships."
+        "ability": "This ship's system contains a delta wormhole.\nDuring movement, this ship may move before or after your other ships.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/hil_colish.png?raw=true"
     },
     {
         "id": "ghost_mech",
@@ -261,7 +276,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After any player activates a system, you may remove this unit from the game board to place or move a Creuss wormhole token into this system."
+        "ability": "After any player activates a system, you may remove this unit from the game board to place or move a Creuss wormhole token into this system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/icarus_drive.jpg?raw=true"
     },
     {
         "id": "hacan_flagship",
@@ -279,7 +295,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After you roll a die during a space combat in this system, you may spend 1 trade good to apply +1 to the result."
+        "ability": "After you roll a die during a space combat in this system, you may spend 1 trade good to apply +1 to the result.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/wrath_of_kenara.png?raw=true"
     },
     {
         "id": "hacan_mech",
@@ -294,7 +311,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This planet's card may be traded as part of a transaction; if you do, move all of your units from this planet to another planet you control."
+        "ability": "This planet's card may be traded as part of a transaction; if you do, move all of your units from this planet to another planet you control.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/pride_of_kenara.jpg?raw=true"
     },
     {
         "id": "jolnar_flagship",
@@ -312,7 +330,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 2 additional hits."
+        "ability": "When making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 2 additional hits.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/jns_hylarim.png?raw=true"
     },
     {
         "id": "jolnar_mech",
@@ -327,7 +346,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Your infantry on this planet are not affected by your Fragile faction ability."
+        "ability": "Your infantry on this planet are not affected by your Fragile faction ability.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/shield_paling.jpg?raw=true"
     },
     {
         "id": "l1z1x_dreadnought",
@@ -347,7 +367,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/faction/superdreadnought.jpg?raw=true"
     },
     {
         "id": "l1z1x_dreadnought2",
@@ -368,7 +389,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/superdreadnought_2.jpg?raw=true"
     },
     {
         "id": "l1z1x_flagship",
@@ -386,7 +408,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During a space combat, hits produced by this ship and by your dreadnoughts in this system must be assigned to non-fighter ships if able."
+        "ability": "During a space combat, hits produced by this ship and by your dreadnoughts in this system must be assigned to non-fighter ships if able.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/001.png?raw=true"
     },
     {
         "id": "l1z1x_mech",
@@ -403,7 +426,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "While not participating in ground combat, this unit can use it's BOMBARDMENT ability on planets in its system as if it were a ship."
+        "ability": "While not participating in ground combat, this unit can use it's BOMBARDMENT ability on planets in its system as if it were a ship.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/annihilator.jpg?raw=true"
     },
     {
         "id": "letnev_flagship",
@@ -423,7 +447,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other player's units in this system lose PLANETARY SHIELD.\nAt the start of each space combat round, repair this ship."
+        "ability": "Other player's units in this system lose PLANETARY SHIELD.\nAt the start of each space combat round, repair this ship.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/arc_secundus.png?raw=true"
     },
     {
         "id": "letnev_mech",
@@ -438,7 +463,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: At the start of a round of ground combat, you may spend 2 resources to replace 1 of your infantry in that combat with 1 mech."
+        "ability": "DEPLOY: At the start of a round of ground combat, you may spend 2 resources to replace 1 of your infantry in that combat with 1 mech.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/dunlain_reaper.jpg?raw=true"
     },
     {
         "id": "mahact_flagship",
@@ -456,7 +482,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During combat against an opponent whose command token is not in your fleet pool, apply +2 to the results of this unit's combat rolls."
+        "ability": "During combat against an opponent whose command token is not in your fleet pool, apply +2 to the results of this unit's combat rolls.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/arvicon_rex.png?raw=true"
     },
     {
         "id": "mahact_infantry",
@@ -471,7 +498,8 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good."
+        "ability": "After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/faction/crimson_legionnaire.jpg?raw=true"
     },
     {
         "id": "mahact_infantry2",
@@ -487,7 +515,8 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
+        "ability": "After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/crimson_legionnaire_2.jpg?raw=true"
     },
     {
         "id": "mahact_mech",
@@ -502,7 +531,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After a player whose command token is in your fleet pool activates this system, you may spend their token from your fleet pool to end their turn; they gain that token."
+        "ability": "After a player whose command token is in your fleet pool activates this system, you may spend their token from your fleet pool to end their turn; they gain that token.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/starlancer.jpg?raw=true"
     },
     {
         "id": "mentak_flagship",
@@ -520,7 +550,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other player's ships in this system cannot use SUSTAIN DAMAGE."
+        "ability": "Other player's ships in this system cannot use SUSTAIN DAMAGE.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/fourth_moon.png?raw=true"
     },
     {
         "id": "mentak_mech",
@@ -535,7 +566,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Other player's ground forces on this planet cannot use SUSTAIN DAMAGE."
+        "ability": "Other player's ground forces on this planet cannot use SUSTAIN DAMAGE.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/moll_terminus.jpg?raw=true"
     },
     {
         "id": "muaat_flagship",
@@ -553,7 +585,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "ACTION: Spend 1 token from your strategy pool to place 1 cruiser in this system."
+        "ability": "ACTION: Spend 1 token from your strategy pool to place 1 cruiser in this system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/the_inferno.png?raw=true"
     },
     {
         "id": "muaat_warsun",
@@ -575,7 +608,8 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability."
+        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/faction/prototype_war_sun.jpg?raw=true"
     },
     {
         "id": "muaat_warsun2",
@@ -598,7 +632,8 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability."
+        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/prototype_war_sun_2.jpg?raw=true"
     },
     {
         "id": "muaat_mech",
@@ -613,7 +648,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "When you use your Star Forge faction ability in this system or an adjacent system, you may place 1 infantry from your reinforcements with this unit."
+        "ability": "When you use your Star Forge faction ability in this system or an adjacent system, you may place 1 infantry from your reinforcements with this unit.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/ember_colossus.jpg?raw=true"
     },
     {
         "id": "naalu_fighter",
@@ -626,8 +662,10 @@
         "capacityUsed": 1,
         "cost": 0.5,
         "isShip": true,
+        "isSpaceOnly": false,
         "combatHitsOn": 8,
-        "combatDieCount": 1
+        "combatDieCount": 1,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/faction/hybrid_crystal_fighter.jpg?raw=true"
     },
     {
         "id": "naalu_fighter2",
@@ -642,9 +680,11 @@
         "capacityUsed": 1,
         "cost": 0.5,
         "isShip": true,
+        "isSpaceOnly": false,
         "combatHitsOn": 7,
         "combatDieCount": 1,
-        "ability": "This unit may move without being transported.\nEach fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
+        "ability": "This unit may move without being transported.\nEach fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/hybrid_crystal_fighter_2.jpg?raw=true"
     },
     {
         "id": "naalu_flagship",
@@ -662,7 +702,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During an invasion in this system, you may commit fighters to planets as if they were ground forces. After combat, return those units to the space area."
+        "ability": "During an invasion in this system, you may commit fighters to planets as if they were ground forces. After combat, return those units to the space area.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/matriarch.png?raw=true"
     },
     {
         "id": "naalu_mech",
@@ -677,7 +718,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "During combat against an opponent who has at least 1 relic fragment, apply +2 to the results of this unit's combat rolls."
+        "ability": "During combat against an opponent who has at least 1 relic fragment, apply +2 to the results of this unit's combat rolls.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/iconoclast.jpg?raw=true"
     },
     {
         "id": "naalu_mech_omega",
@@ -692,7 +734,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Other players cannot use ANTI-FIGHTER BARRAGE against your units in this system."
+        "ability": "Other players cannot use ANTI-FIGHTER BARRAGE against your units in this system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/iconoclast_omega.jpg?raw=true"
     },
     {
         "id": "naaz_flagship",
@@ -710,7 +753,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Your mechs in this system roll 1 additional die during combat."
+        "ability": "Your mechs in this system roll 1 additional die during combat.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/visz_el_vir.png?raw=true"
     },
     {
         "id": "naaz_mech",
@@ -725,7 +769,8 @@
         "combatDieCount": 2,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "If this unit is in the space area of the active system at the start of a space combat, flip this card."
+        "ability": "If this unit is in the space area of the active system at the start of a space combat, flip this card.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/eidolon.jpg?raw=true"
     },
     {
         "id": "naaz_mech_space",
@@ -739,7 +784,8 @@
         "combatHitsOn": 8,
         "combatDieCount": 2,
         "isShip": true,
-        "ability": "If this unit is in the space area of the active system, it is also a ship.\nAt the end of a space battle in the active system, flip this card."
+        "ability": "If this unit is in the space area of the active system, it is also a ship.\nAt the end of a space battle in the active system, flip this card.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/eidolon_zgrav.jpg?raw=true"
     },
     {
         "id": "nekro_flagship",
@@ -757,7 +803,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "At the start of a space combat, choose any number of your ground forces in this system to participate in that combat as if they were ships."
+        "ability": "At the start of a space combat, choose any number of your ground forces in this system to participate in that combat as if they were ships.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/the_alastor.png?raw=true"
     },
     {
         "id": "nekro_mech",
@@ -772,7 +819,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "During combat against an opponent who has an \"X\" or \"Y\" token on 1 or more of their technologies, apply +2 to the result of each of this unit's combat rolls."
+        "ability": "During combat against an opponent who has an \"X\" or \"Y\" token on 1 or more of their technologies, apply +2 to the result of each of this unit's combat rolls.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/mordred.jpg?raw=true"
     },
     {
         "id": "nomad_flagship",
@@ -793,7 +841,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs."
+        "ability": "You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/memoria.png?raw=true"
     },
     {
         "id": "nomad_flagship2",
@@ -815,7 +864,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs."
+        "ability": "You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/memoria_2.jpg?raw=true"
     },
     {
         "id": "cavalry1",
@@ -866,7 +916,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "While this unit is in a space area during combat, you may use its SUSTAIN DAMAGE ability to cancel a hit that is produced against your ships in this system."
+        "ability": "While this unit is in a space area during combat, you may use its SUSTAIN DAMAGE ability to cancel a hit that is produced against your ships in this system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/quantum_manipulator.jpg?raw=true"
     },
     {
         "id": "saar_flagship",
@@ -885,7 +936,8 @@
         "afbDieCount": 4,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/son_of_ragh.png?raw=true"
     },
     {
         "id": "saar_spacedock",
@@ -899,7 +951,10 @@
         "productionValue": 5,
         "capacityValue": 4,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed."
+        "isPlanetOnly": false,
+        "isSpaceOnly": true,
+        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/faction/floating_factory.jpg?raw=true"
     },
     {
         "id": "saar_spacedock2",
@@ -914,7 +969,10 @@
         "productionValue": 7,
         "capacityValue": 5,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed."
+        "isPlanetOnly": false,
+        "isSpaceOnly": true,
+        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/floating_factory_2.jpg?raw=true"
     },
     {
         "id": "saar_mech",
@@ -929,7 +987,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you gain control of a planet, you may spend 1 trade good to place 1 mech on that planet"
+        "ability": "DEPLOY: After you gain control of a planet, you may spend 1 trade good to place 1 mech on that planet",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/scavenger_zeta.jpg?raw=true"
     },
     {
         "id": "sardakk_dreadnought",
@@ -949,7 +1008,8 @@
         "bombardDieCount": 2,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/faction/exotrireme.jpg?raw=true"
     },
     {
         "id": "sardakk_dreadnought2",
@@ -970,7 +1030,8 @@
         "bombardDieCount": 2,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in the system."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/exotrireme_2.jpg?raw=true"
     },
     {
         "id": "sardakk_flagship",
@@ -988,7 +1049,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Apply +1 to the result of each of your other ship's combat rolls in this system."
+        "ability": "Apply +1 to the result of each of your other ship's combat rolls in this system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/cmorran_norr.png?raw=true"
     },
     {
         "id": "sardakk_mech",
@@ -1003,7 +1065,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After this unit uses it's SUSTAIN DAMAGE ability during ground combat, it produces 1 hit against your opponent's ground forces on this planet."
+        "ability": "After this unit uses it's SUSTAIN DAMAGE ability during ground combat, it produces 1 hit against your opponent's ground forces on this planet.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/valkyrie_exoskeleton.jpg?raw=true"
     },
     {
         "id": "sol_carrier",
@@ -1019,7 +1082,8 @@
         "cost": 3,
         "combatHitsOn": 9,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/faction/advanced_carrier.jpg?raw=true"
     },
     {
         "id": "sol_carrier2",
@@ -1038,7 +1102,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/advanced_carrier_2.jpg?raw=true"
     },
     {
         "id": "sol_flagship",
@@ -1056,7 +1121,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "At the end of the status phase, place 1 infantry from your reinforcements in this system's space area."
+        "ability": "At the end of the status phase, place 1 infantry from your reinforcements in this system's space area.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/genesis.png?raw=true"
     },
     {
         "id": "sol_infantry",
@@ -1070,7 +1136,8 @@
         "cost": 0.5,
         "combatHitsOn": 7,
         "combatDieCount": 1,
-        "isGroundForce": true
+        "isGroundForce": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/faction/spec_ops.jpg?raw=true"
     },
     {
         "id": "sol_infantry2",
@@ -1086,7 +1153,8 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
+        "ability": "After this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/spec_ops_2.jpg?raw=true"
     },
     {
         "id": "sol_mech",
@@ -1101,7 +1169,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you use your Orbital Drop faction ability, you may spend 3 resources to place 1 mech on that planet."
+        "ability": "DEPLOY: After you use your Orbital Drop faction ability, you may spend 3 resources to place 1 mech on that planet.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/zs_thunderbolt_m2.jpg?raw=true"
     },
     {
         "id": "titans_cruiser",
@@ -1117,7 +1186,8 @@
         "cost": 2,
         "combatHitsOn": 7,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/faction/saturn_engine.jpg?raw=true"
     },
     {
         "id": "titans_cruiser2",
@@ -1135,7 +1205,8 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "sustainDamage": true,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/saturn_engine_2.jpg?raw=true"
     },
     {
         "id": "titans_flagship",
@@ -1153,7 +1224,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "DEPLOY: After you activate a system that contains 1 or more of your PDS, you may replace 1 of those PDS with this unit."
+        "ability": "DEPLOY: After you activate a system that contains 1 or more of your PDS, you may replace 1 of those PDS with this unit.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/ouranos.png?raw=true"
     },
     {
         "id": "titans_mech",
@@ -1168,7 +1240,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: When you would place a PDS on a planet, you may place 1 mech and 1 infantry on that planet instead."
+        "ability": "DEPLOY: When you would place a PDS on a planet, you may place 1 mech and 1 infantry on that planet instead.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/hecatoncheires.jpg?raw=true"
     },
     {
         "id": "titans_pds",
@@ -1187,7 +1260,8 @@
         "sustainDamage": true,
         "isStructure": true,
         "isGroundForce": true,
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported."
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/faction/heltitan.jpg?raw=true"
     },
     {
         "id": "titans_pds2",
@@ -1208,7 +1282,8 @@
         "sustainDamage": true,
         "isStructure": true,
         "isGroundForce": true,
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems."
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/heltitan_2.jpg?raw=true"
     },
     {
         "id": "winnu_flagship",
@@ -1226,7 +1301,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this unit makes a combat roll, it rolls a number of dice (hit on a 7) equal to the number of your opponent's non-fighter ships in this system."
+        "ability": "When this unit makes a combat roll, it rolls a number of dice (hit on a 7) equal to the number of your opponent's non-fighter ships in this system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/salai_sai_corian.png?raw=true"
     },
     {
         "id": "winnu_mech",
@@ -1241,7 +1317,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After you resolve a tactical action where you gained control of this planet, you may place 1 PDS or 1 Space Dock from your reinforcements on this planet."
+        "ability": "After you resolve a tactical action where you gained control of this planet, you may place 1 PDS or 1 Space Dock from your reinforcements on this planet.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/reclaimer.jpg?raw=true"
     },
     {
         "id": "xxcha_flagship",
@@ -1262,7 +1339,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems."
+        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/loncara_ssodu.png?raw=true"
     },
     {
         "id": "xxcha_mech",
@@ -1280,7 +1358,8 @@
         "deepSpaceCannon": true,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems."
+        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/indomitus.jpg?raw=true"
     },
     {
         "id": "yin_flagship",
@@ -1298,7 +1377,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this ship is destroyed, destroy all ships in this system."
+        "ability": "When this ship is destroyed, destroy all ships in this system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/van_hauge.png?raw=true"
     },
     {
         "id": "yin_mech",
@@ -1313,7 +1393,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: When you use your Indoctrination faction ability, you may spend 1 additional influence to replace your opponent's unit with 1 mech instead of 1 infantry."
+        "ability": "DEPLOY: When you use your Indoctrination faction ability, you may spend 1 additional influence to replace your opponent's unit with 1 mech instead of 1 infantry.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/moyins_ashes.jpg?raw=true"
     },
     {
         "id": "yssaril_flagship",
@@ -1331,7 +1412,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "This ship can move through systems that contain other player's ships."
+        "ability": "This ship can move through systems that contain other player's ships.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/flagships/ysia_yssrila.png?raw=true"
     },
     {
         "id": "yssaril_mech",
@@ -1346,6 +1428,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you use your Stall Tactics faction ability, you may place 1 mech on a planet you control."
+        "ability": "DEPLOY: After you use your Stall Tactics faction ability, you may place 1 mech on a planet you control.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/blackshade_infiltrator.jpg?raw=true"
     }
 ]

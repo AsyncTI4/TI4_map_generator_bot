@@ -150,13 +150,14 @@ public class MessageListener extends ListenerAdapter {
         }
 
         String messageLowerCase = messageText.toLowerCase();
-        if (messageLowerCase.startsWith("tofutureme")) {
+        String receivingColorOrFaction = StringUtils.substringBetween(messageLowerCase, "to", " ");
+
+        if ("futureme".equals(receivingColorOrFaction)) {
             whisperToFutureMe(event, game, sender);
             GameManager.save(game, "Whisper to future by " + sender.getUserName());
             return true;
         }
 
-        String receivingColorOrFaction = StringUtils.substringBetween(messageLowerCase, "to", " ");
         boolean future = receivingColorOrFaction.startsWith("future");
         receivingColorOrFaction = receivingColorOrFaction.replaceFirst("future", "");
         if (receivingColorOrFaction.isEmpty()) {
@@ -201,6 +202,7 @@ public class MessageListener extends ListenerAdapter {
         String futureMsgKey = "futureMessageFor_" + receiver.getFaction() + "_" + sender.getFaction();
         game.setStoredValue(futureMsgKey, game.getStoredValue(futureMsgKey) + "\n\n" + messageContent);
         MessageHelper.sendMessageToChannel(event.getChannel(), sender.getFactionEmoji() + " sent someone else a future message");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(sender, "You sent a future message to " + receiver.getRepresentationNoPing() + ":\n>>> " + messageContent);
         event.getMessage().delete().queue();
     }
 
@@ -213,6 +215,7 @@ public class MessageListener extends ListenerAdapter {
         }
         game.setStoredValue("futureMessageFor" + player.getFaction(), previousThoughts + messageContent);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, "You sent yourself a future message:\n>>> " + messageContent);
         event.getMessage().delete().queue();
     }
 

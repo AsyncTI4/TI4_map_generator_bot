@@ -373,7 +373,7 @@ public class ExploreService {
                     tile.addToken(attachmentFilename, planetID);
                     game.purgeExplore(ogID);
                     AttachmentModel aModel = Mapper.getAttachmentInfo(attachment);
-                    message = "Attachment " + aModel.getName() + " added to " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game);
+                    message = "Attachment _" + aModel.getName() + "_ added to " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".";
                     CommanderUnlockCheckService.checkPlayer(player, "sol", "xxcha");
                 }
             }

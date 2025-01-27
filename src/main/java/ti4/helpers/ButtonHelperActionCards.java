@@ -418,7 +418,7 @@ public class ButtonHelperActionCards {
             sb.append(card.textRepresentation()).append(System.lineSeparator());
             String cardType = card.getResolution();
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
-                sb.append(player.getRepresentationUnfogged()).append(" gained a relic fragment.");
+                sb.append(player.getRepresentationUnfogged()).append(" gained a relic fragment.\n");
                 player.addFragment(cardID);
                 game.purgeExplore(cardID);
             }

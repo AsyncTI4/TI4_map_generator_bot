@@ -39,7 +39,6 @@ abstract class PNAddRemove extends GameStateSubcommand {
 
         doAction(player, pnIDs, event);
         game.checkPromissoryNotes();
-        PromissoryNoteHelper.checkAndAddPNs(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false, event);
     }
 

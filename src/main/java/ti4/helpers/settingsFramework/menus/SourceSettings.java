@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
-import ti4.helpers.settingsFramework.menus.MiltySettings.DraftingMode;
+
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
@@ -87,29 +87,6 @@ public class SourceSettings extends SettingsMenu {
     @Override
     public List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<>();
-
-        // Over-Validation for Twilight Falls
-        if (parent instanceof MiltySettings milty && milty.getDraftMode().getValue() == DraftingMode.twilightfalls) {
-            codexes.setVal(false);
-            discoStars.setVal(false);
-            absol.setVal(false);
-            miltymod.setVal(false);
-
-            codexes.setDisabled(true);
-            discoStars.setDisabled(true);
-            absol.setDisabled(true);
-            miltymod.setDisabled(true);
-            if (getDescription().size() == 1)
-                getDescription().add("\n - Note: These sources will only be used to determine tiles on the map.");
-        } else {
-            codexes.setDisabled(false);
-            discoStars.setDisabled(false);
-            absol.setDisabled(false);
-            miltymod.setDisabled(false);
-            while (getDescription().size() > 1)
-                getDescription().remove(1);
-        }
-
         // Add settings to the list. Any marked 'disabled' will not show
         ls.add(base);
         ls.add(pok);
@@ -121,7 +98,6 @@ public class SourceSettings extends SettingsMenu {
         ls.add(eronous);
         // ls.add(cryypter);
         return ls;
-
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
