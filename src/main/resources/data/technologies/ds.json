@@ -287,7 +287,7 @@
         "requirements": "BBB",
         "faction": "gledge",
         "source": "ds",
-        "text": "During movement, you may increase the move value of each of your units not transporting fighters or infantry by 1.",
+        "text": "During movement, you may increase the move value of each of your non-fighter ships not transporting any fighters or infantry by 1.",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/lightning_drives.png?raw=true"
     },
     {
