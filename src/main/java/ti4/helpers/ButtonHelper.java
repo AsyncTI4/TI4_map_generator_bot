@@ -2081,8 +2081,8 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     ident + " used Il Na Viroset, the Mahact Commander"
                             + " and spent a command token from their tactic pool (leaving them with "
-                            + (player.getTacticalCC() - 1) + " remaining)."
-                            + " This ends their turn, but they may still resolve any \"end of turn\" abilities.");
+                            + (player.getTacticalCC() - 1) + " remaining) to remove their command token from " + tile.getRepresentationForButtons(game, player)
+                            + ". This ends their turn, but they may still resolve any \"end of turn\" abilities.");
             player.setTacticalCC(player.getTacticalCC() - 1);
             List<Button> conclusionButtons = new ArrayList<>();
             Button endTurn = Buttons.red(finChecker + "turnEnd", "End Turn");
