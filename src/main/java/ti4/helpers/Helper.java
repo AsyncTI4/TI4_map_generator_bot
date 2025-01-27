@@ -184,6 +184,30 @@ public class Helper {
         return player;
     }
 
+    public static List<Player> getPlayersFromTech(Game game, String tech) {
+        if (tech == null || Mapper.getTech(tech) == null)
+            return Collections.emptyList();
+        List<Player> players = new ArrayList<>();
+        for (Player player : game.getPlayers().values()) {
+            if (player.isRealPlayer() && player.hasTech(tech)) {
+                players.add(player);
+            }
+        }
+        return players;
+    }
+
+    public static List<Player> getPlayersFromReadyTech(Game game, String tech) {
+        if (tech == null || Mapper.getTech(tech) == null)
+            return Collections.emptyList();
+        List<Player> players = new ArrayList<>();
+        for (Player player : game.getPlayers().values()) {
+            if (player.isRealPlayer() && player.hasTechReady(tech)) {
+                players.add(player);
+            }
+        }
+        return players;
+    }
+
     // TODO: (Jazz): This method *should* include base game + pok tiles (+ DS tiles if and only if DS mode is set)
     //     - Once the bot is using milty draft settings, we can make this accurately pull in tiles
     //     - from every source available to the active game
@@ -2034,6 +2058,9 @@ public class Helper {
         if(ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, false).contains(tech.getAlias())){
             wilds++;
         }
+        if(player.getPurgedTechs().contains(tech.getAlias())){
+            return false;
+        }
         if(ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, true).contains(tech.getAlias())){
            return true;
         }
@@ -2116,7 +2143,7 @@ public class Helper {
                 wilds++;
             }
         }else{
-            if(player.hasAbility("brilliant")){
+            if(player.hasAbility("analytical")){
                 wilds++;
             }
         }
