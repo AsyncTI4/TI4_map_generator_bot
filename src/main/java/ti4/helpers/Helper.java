@@ -2034,6 +2034,9 @@ public class Helper {
         if(ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, false).contains(tech.getAlias())){
             wilds++;
         }
+        if(player.getPurgedTechs().contains(tech.getAlias())){
+            return false;
+        }
         if(ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, true).contains(tech.getAlias())){
            return true;
         }
@@ -2116,7 +2119,7 @@ public class Helper {
                 wilds++;
             }
         }else{
-            if(player.hasAbility("brilliant")){
+            if(player.hasAbility("analytical")){
                 wilds++;
             }
         }

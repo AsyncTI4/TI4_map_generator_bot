@@ -265,7 +265,7 @@
         "requirements": "BBB",
         "faction": "gledge",
         "source": "ds",
-        "text": "During movement, you may increase the move value of each of your units not transporting fighters or infantry by 1."
+        "text": "During movement, you may increase the move value of each of your non-fighter ships not transporting any fighters or infantry by 1."
     },
     {
         "alias": "dsgledpds",
