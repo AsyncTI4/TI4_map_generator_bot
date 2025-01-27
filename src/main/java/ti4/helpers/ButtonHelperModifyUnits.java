@@ -1737,6 +1737,7 @@ public class ButtonHelperModifyUnits {
         if (buttonLabel.toLowerCase().contains("damaged")) {
             unitName = unitName.replace("damaged", "");
         }
+        game.setActiveSystem(pos);
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColor());
         AddUnitService.addUnits(event, game.getTileByPosition(pos), game, player.getColor(), amount + " " + unitName);
         if (buttonLabel.toLowerCase().contains("damaged")) {
@@ -1821,6 +1822,7 @@ public class ButtonHelperModifyUnits {
         }
         boolean doesUnitExist = true;
         Tile tile = game.getTileByPosition(pos);
+        game.setActiveSystem(pos);
         UnitHolder space = tile.getSpaceUnitHolder();
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColor());
         if (space.getUnitCount(unitKey.getUnitType(), player.getColor()) < amount) {
