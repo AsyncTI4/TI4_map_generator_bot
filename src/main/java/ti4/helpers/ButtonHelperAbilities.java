@@ -1227,7 +1227,7 @@ public class ButtonHelperAbilities {
         String reason = buttonID.split("_")[3];
         switch (reason) {
             case "mitosis" -> reason = "**Mitosis**";
-            case "refit" -> reason = "__Refit Troops__";
+            case "refit" -> reason = "_Refit Troops_";
         }
         String successMessage;
         if ("space".equalsIgnoreCase(uH)) {
