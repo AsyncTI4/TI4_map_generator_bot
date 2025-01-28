@@ -378,7 +378,9 @@ public class TransactionHelper {
         "Behind Door #" + ThreadLocalRandom.current().nextInt(1, 3) + ": A Goat!",
         "A Runcible Spoon",
         "_Nullam Rem Natam_",
-        "A Jubba Cloak");
+        "A Jubba Cloak",
+        "The Pretence That Your Secrets Are Unscorable",
+        "Double Nothing");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
