@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +10,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -15,8 +20,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.DiceHelper.Die;
@@ -43,8 +46,8 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.explore.ExploreService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -55,8 +58,6 @@ import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperFactionSpecific {
 
@@ -111,6 +112,22 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             "Click how many trade goods you wish to spend.", buttons);
         PlayerTechService.deleteTheOneButtonIfButtonEvent(event);
+    }
+
+    @ButtonHandler("warStoriesFrontier_")
+    public static void warStoriesFrontier(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String pos = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()+" is using their war stories ability to explore the frontier deck in the active system.");
+        Tile tile = game.getTileByPosition(pos);
+        ExploreService.expFront(event, tile, game, player, true);
+        event.getMessage().delete().queue();
+    }
+    @ButtonHandler("warStoriesPlanetExplore")
+    public static void warStoriesPlanetExplore(Player player, Game game,  ButtonInteractionEvent event) {
+        List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),player.getRepresentation()+" is using their war stories ability to explore a planet they control.");
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation()+" Please use buttons to explore a planet you control.", buttons);
+        event.getMessage().delete().queue();
     }
 
     @ButtonHandler("resolveVadenMech_")
@@ -805,6 +822,25 @@ public class ButtonHelperFactionSpecific {
         options.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
             player.getRepresentationUnfogged() + " pay 3r for the mech", options);
+    }
+
+    @ButtonHandler("rohdhnaDeploy_")
+    public static void rohdhnaDeploy(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        
+        if (!planet.equalsIgnoreCase("space")){
+            AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 mech " + planet);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getFactionEmoji() + " deployed 1 mech on "
+                + Helper.getPlanetRepresentation(planet, game) + ".");
+        }else{
+            Tile tile = game.getTileByPosition(buttonID.split("_")[2]);
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 mech ");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getFactionEmoji() + " deployed 1 mech in the space area of "
+                    + tile.getRepresentation() + ".");
+        }
+        event.getMessage().delete().queue();
     }
 
     @ButtonHandler("raghsCallStepOne_")
@@ -2546,7 +2582,8 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("rohdhnaRecycle_")
     public static void resolveRohDhnaRecycle(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String unitName = buttonID.split("_")[1];
-        RemoveUnitService.removeUnits(event, game.getTileByPosition(game.getActiveSystem()), game, player.getColor(), "1 " + unitName);
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 " + unitName);
         UnitModel unit = Mapper.getUnit(unitName);
         int toGain = (int) unit.getCost() - 1;
 
@@ -2556,6 +2593,24 @@ public class ButtonHelperFactionSpecific {
 
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, toGain);
+
+        if(player.hasAbility("rohdhna_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4){
+            List<Button> buttons = new ArrayList<>();
+            for(UnitHolder unitHolder : tile.getUnitHolders().values()){
+                String id = "rohdhnaDeploy_" + unitHolder.getName()+"_"+tile.getPosition();
+                String label;
+                if(unitHolder.getName().equalsIgnoreCase("space")){
+                    label = "Deploy Mech in space";
+                }else{
+                    label = "Deploy Mech on " + Helper.getPlanetRepresentation(unitHolder.getName(), game);
+                    if(!player.getPlanetsAllianceMode().contains(unitHolder.getName())){
+                        continue;
+                    }
+                }
+                buttons.add(Buttons.green(id, label, FactionEmojis.rohdhna));
+            }
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),player.getRepresentation()+" you can deploy a mech on a planet you control or the space area", buttons);
+        }
 
         event.getMessage().delete().queue();
     }
