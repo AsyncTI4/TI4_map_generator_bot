@@ -129,7 +129,16 @@
         "alias": "rbw",
         "name": "rainbow",
         "aliases": ["rbw"],
-        "textColor": "white",
+        "textColor": "black",
+        "primaryColor": { "red": 255, "green": 0, "blue": 0 },
+        "secondaryColor": { "red": 0, "green": 255, "blue": 0 },
+        "hue": "GRAY"
+    },
+    {
+        "alias": "ptb",
+        "name": "paintball",
+        "aliases": ["paintball"],
+        "textColor": "black",
         "primaryColor": { "red": 255, "green": 0, "blue": 0 },
         "secondaryColor": { "red": 0, "green": 255, "blue": 0 },
         "hue": "GRAY"
