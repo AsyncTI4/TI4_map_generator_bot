@@ -26,8 +26,9 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.green("bestowTitleStep1_A Kind Soul", "A Kind Soul"));
             buttons.add(Buttons.green("bestowTitleStep1_A Good Ally", "A Good Ally"));
             buttons.add(Buttons.green("bestowTitleStep1_A Mahact Puppet Master", "A Mahact Puppet Master"));
+            buttons.add(Buttons.green("bestowTitleStep1_Intergalactic Bard", "Intergalactic Bard"));
 
-            buttons.add(Buttons.blue("bestowTitleStep1_Lightning Fast", "Lightning Fast"));
+           // buttons.add(Buttons.blue("bestowTitleStep1_Lightning Fast", "Lightning Fast"));
             buttons.add(Buttons.blue("bestowTitleStep1_Fortune Favored", "Fortune Favored"));
             buttons.add(Buttons.blue("bestowTitleStep1_Possesses Cursed Dice", "Possesses Cursed Dice"));
             buttons.add(Buttons.blue("bestowTitleStep1_A Great Hollywooder", "A Great Hollywooder"));
@@ -36,18 +37,20 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.blue("bestowTitleStep1_A Master Diplomat", "A Master Diplomat"));
             buttons.add(Buttons.blue("bestowTitleStep1_Hard To Kill", "Hard To Kill"));
             buttons.add(Buttons.blue("bestowTitleStep1_Shard Fumbler", "Shard Fumbler"));
+            buttons.add(Buttons.blue("bestowTitleStep1_Rules Master", "Rules Master"));
             buttons.add(Buttons.gray("bestowTitleStep1_Observer", "Observer"));
 
             buttons.add(Buttons.red("bestowTitleStep1_A Sneaky One", "A Sneaky One"));
             buttons.add(Buttons.red("bestowTitleStep1_You Made Me Mad", "You Made Me Mad"));
             buttons.add(Buttons.red("bestowTitleStep1_A Vuil'Raith In Xxcha Clothing", "A Vuil'Raith In Xxcha Clothing"));
-            buttons.add(Buttons.red("bestowTitleStep1_Space Risker", "Space Risker"));
+            //buttons.add(Buttons.red("bestowTitleStep1_Space Risker", "Space Risker"));
             buttons.add(Buttons.red("bestowTitleStep1_A Warlord", "A Warlord"));
-            buttons.add(Buttons.red("bestowTitleStep1_Traitor", "Traitor"));
-            buttons.add(Buttons.red("bestowTitleStep1_Saltshaker", "Saltshaker"));
+            buttons.add(Buttons.red("bestowTitleStep1_Word Breaker", "Word Breaker"));
+            buttons.add(Buttons.red("bestowTitleStep1_One To Be Feared", "One To Be Feared"));
+            buttons.add(Buttons.red("bestowTitleStep1_Spice Bringer", "Spice Bringer"));
 
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Tiles here", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Titles here", buttons);
         }
     }
 
