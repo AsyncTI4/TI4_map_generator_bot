@@ -140,6 +140,7 @@ public class AutoCompleteProvider {
                         put("BLUE", "Blues");
                         put("PURPLE", "Purples");
                         put("PINK", "Pinks");
+                        put("MULTI", "Multi-Colours");
                         put("ALL", "ALL COLOURS");
                     }
                 };
