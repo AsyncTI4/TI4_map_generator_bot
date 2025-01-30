@@ -670,7 +670,7 @@ public class TransactionHelper {
             player.addTransactionItem("sending" + sender + "_receiving" + receiver + "_" + item + "_" + extraDetail);
         }
 
-        if ((item.equalsIgnoreCase("tgs") || item.equalsIgnoreCase("Comms")) && p2.getDebtTokenCount(p1.getColor()) > 0 && !p1.hasAbility("binding_debts")) {
+        if ((item.equalsIgnoreCase("tgs") || item.equalsIgnoreCase("Comms")) && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("binding_debts")) {
             int amount = Math.min(p2.getDebtTokenCount(p1.getColor()), Integer.parseInt(extraDetail));
             player.addTransactionItem("sending" + receiver + "_receiving" + sender + "_ClearDebt_" + amount);
         }

@@ -318,7 +318,7 @@ public class AutoCompleteProvider {
             }
             case Constants.SPECIFIC_PHASE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var phases = List.of("strategy", "voting", "statusScoring", "statusHomework", "action", "agendaResolve", "playerSetup", "ixthian","agenda");
+                var phases = List.of("strategy", "voting", "statusScoring", "statusHomework", "action", "agendaResolve", "playerSetup","setupHomebrew", "ixthian","agenda");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(phases, enteredValue);
                 event.replyChoices(options).queue();
             }
