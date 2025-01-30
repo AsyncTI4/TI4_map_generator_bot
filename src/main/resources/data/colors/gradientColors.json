@@ -137,11 +137,20 @@
     {
         "alias": "ptb",
         "name": "paintball",
-        "aliases": ["paintball"],
+        "aliases": ["ptb"],
         "textColor": "black",
         "primaryColor": { "red": 255, "green": 0, "blue": 0 },
         "secondaryColor": { "red": 0, "green": 255, "blue": 0 },
         "hue": "GRAY"
+    },
+    {
+        "alias": "wsp",
+        "name": "wasp",
+        "aliases": ["wsp"],
+        "textColor": "black",
+        "primaryColor": { "red": 245, "green": 245, "blue": 6 },
+        "secondaryColor": { "red": 0, "green": 0, "blue": 0 },
+        "hue": "YELLOW"
     },
     {
         "alias": "cqr",
