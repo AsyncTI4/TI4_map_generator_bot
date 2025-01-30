@@ -1228,7 +1228,7 @@ public class ButtonHelperHeroes {
         }
         else
         {
-            message2 = p1.getRepresentation() + " sent a promissory note to the hand of " + ident2;
+            message2 = p1.getRepresentation() + " sent a promissory note to the hand of " + ident2 + ".";
         }
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2);
         if (game.isFowMode()) {

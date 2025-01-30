@@ -41,14 +41,14 @@ class SampleColors extends Subcommand {
         int LINEHEIGHT = 12;
         Font bigFont = Storage.getFont12();
         Font smallFont = Storage.getFont8();
-        int PAGEWIDTH = 1280;
-        int PAGEHIGHT = 1655;
+        int PAGEWIDTH = 1600;
+        int PAGEHIGHT = 2400;
         BasicStroke stroke = new BasicStroke(2.0f);
 
         OptionMapping input = event.getOption(Constants.HUE);
         List<String> hues = new ArrayList<>();
         if (input == null || input.getAsString().equals("ALL") || input.getAsString().isEmpty()) {
-            hues = Arrays.asList("RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK");
+            hues = Arrays.asList("RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK", "MULTI1", "MULTI2");
         } else {
             SPACING = 12;
             DREADWIDTH = 77 + 2 * SPACING;
@@ -57,11 +57,18 @@ class SampleColors extends Subcommand {
             LINEHEIGHT = 20;
             bigFont = Storage.getFont16();
             smallFont = Storage.getFont12();
-            hues.add(input.getAsString());
+            if (input.getAsString().equals("MULTI"))
+            {
+                hues = Arrays.asList("MULTI1", "MULTI2");
+            }
+            else
+            {
+                hues.add(input.getAsString());
+            }
             stroke = new BasicStroke(3.0f);
         }
 
-        int left = ThreadLocalRandom.current().nextInt(PAGEWIDTH - 7 * DREADWIDTH);
+        int left = ThreadLocalRandom.current().nextInt(PAGEWIDTH - 6 * DREADWIDTH);
         int top = ThreadLocalRandom.current().nextInt(PAGEHIGHT - 2 * hues.size() * DREADTEXHIGHT);
         int right = left;
         int bottom = top + 2 * hues.size() * DREADTEXHIGHT;
