@@ -18,6 +18,24 @@
         "hue": "PURPLE"
     },
     {
+        "alias": "mgm",
+        "name": "magma",
+        "aliases": ["mgm"],
+        "textColor": "white",
+        "primaryColor": { "red": 240, "green": 6, "blue": 6 },
+        "secondaryColor": { "red": 245, "green": 245, "blue": 6 },
+        "hue": "RED"
+    },
+    {
+        "alias": "gcr",
+        "name": "glacier",
+        "aliases": ["gcr"],
+        "textColor": "white",
+        "primaryColor": { "red": 5, "green": 240, "blue": 240 },
+        "secondaryColor": { "red": 5, "green": 5, "blue": 245 },
+        "hue": "BLUE"
+    },
+    {
         "alias": "tpl",
         "name": "tropical",
         "aliases": ["tpl"],
