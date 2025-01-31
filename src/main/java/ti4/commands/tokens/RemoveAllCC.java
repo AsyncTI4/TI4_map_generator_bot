@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateCommand;
 import ti4.helpers.Constants;
 import ti4.map.Tile;
+import ti4.message.MessageHelper;
 
 public class RemoveAllCC extends GameStateCommand {
 
@@ -34,8 +35,12 @@ public class RemoveAllCC extends GameStateCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        for (Tile tile : getGame().getTileMap().values()) {
-            tile.removeAllCC();
+        if ("YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
+            for (Tile tile : getGame().getTileMap().values()) {
+                tile.removeAllCC();
+            }
+        } else {
+            MessageHelper.replyToMessage(event, "Must confirm with YES");
         }
     }
 }

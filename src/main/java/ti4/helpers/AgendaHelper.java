@@ -748,9 +748,8 @@ public class AgendaHelper {
             cleanedChoice = Helper.getPlanetRepresentation(choice, game);
         }
         String voteMessage = "chose to put a " + rider + " on \"" + StringUtils.capitalize(cleanedChoice) + "\".";
-        if (!game.isFowMode()) {
-            voteMessage = player.getRepresentationNoPing() + " " + voteMessage;
-        }
+        voteMessage = !game.isFowMode() ? player.getRepresentationNoPing() + " " + voteMessage : StringUtils.capitalize(voteMessage);
+
         String identifier;
         if (game.isFowMode()) {
             identifier = player.getColor();

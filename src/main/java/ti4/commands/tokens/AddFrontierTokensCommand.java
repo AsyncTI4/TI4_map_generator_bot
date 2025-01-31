@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateCommand;
 import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
 import ti4.service.explore.AddFrontierTokensService;
 
 public class AddFrontierTokensCommand extends GameStateCommand {
@@ -34,6 +35,10 @@ public class AddFrontierTokensCommand extends GameStateCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        AddFrontierTokensService.addFrontierTokens(event, getGame());
+        if ("YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
+            AddFrontierTokensService.addFrontierTokens(event, getGame());
+        } else {
+            MessageHelper.replyToMessage(event, "Must confirm with YES");
+        }
     }
 }
