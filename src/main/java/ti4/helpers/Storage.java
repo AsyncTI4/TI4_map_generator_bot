@@ -234,7 +234,7 @@ public class Storage {
         Font tiFont = null;
         String resource = getResourcePath();
         if (resource == null) return null;
-        File file = new File(resource + "/font/SLIDER.TTF");
+        File file = new File(resource + "/font/Slider_TI4.ttf");
         try (InputStream inputStream = new FileInputStream(file)) {
             tiFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
             tiFont = tiFont.deriveFont(size);
