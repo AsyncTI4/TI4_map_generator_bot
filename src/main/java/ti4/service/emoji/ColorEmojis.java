@@ -8,7 +8,7 @@ public enum ColorEmojis implements TI4Emoji {
     // Colors
     black, bloodred, blue, brown, chocolate, chrome, rainbow, sherbet, rose, emerald, ethereal, forest, gold, gray, green, lavender, //
     lightgray, lime, navy, orange, orca, petrol, pink, purple, red, spring, sunset, tan, teal, turquoise, yellow, //
-    copper, plum, peach, rust, tropical, jupiter, poison, vapourwave, watermelon, checker, paintball, wasp, //
+    copper, plum, peach, rust, tropical, jupiter, poison, vapourwave, watermelon, checker, paintball, wasp, magma, glacier, //
     splitbloodred, splitblue, splitchocolate, splitemerald, splitgold, splitgreen, splitlime, splitnavy, splitorange, //
     splitpetrol, splitpink, splitpurple, splitrainbow, splitred, splittan, splitteal, splitturquoise, splityellow, riftset; //
 
@@ -43,6 +43,8 @@ public enum ColorEmojis implements TI4Emoji {
             case "frs", "forest" -> forest + "**Forest**";
             case "crm", "chrome" -> chrome + "**Chrome**";
             case "sns", "sunset" -> sunset + "**Sunset**";
+            case "mgm", "magma" -> magma + "**Magma**";
+            case "gcr", "glacier" -> glacier + "**Glacier**";
             case "tqs", "turquoise" -> turquoise + "**Turquoise**";
             case "gld", "gold" -> gold + "**Gold**";
             case "lgy", "lightgray" -> lightgray + "**LightGray**";
@@ -111,6 +113,8 @@ public enum ColorEmojis implements TI4Emoji {
             case "frs", "forest" -> forest;
             case "crm", "chrome" -> chrome;
             case "sns", "sunset" -> sunset;
+            case "mgm", "magma" -> magma;
+            case "gcr", "glacier" -> glacier;
             case "tqs", "turquoise" -> turquoise;
             case "gld", "gold" -> gold;
             case "lgy", "lightgray" -> lightgray;
