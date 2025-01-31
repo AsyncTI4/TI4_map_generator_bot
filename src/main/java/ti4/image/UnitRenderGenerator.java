@@ -320,7 +320,7 @@ public class UnitRenderGenerator {
         int offsetX = numberPositionPoint.x + (count > 9 ? 5 : 0);
         int offsetY = numberPositionPoint.y + (count > 9 ? 5 : 0);
         BasicStroke strokeWidth = new BasicStroke(4.0f);
-        DrawingUtil.superDrawString((Graphics2D) g, Integer.toString(count), imagePos.x() + offsetX, imagePos.y() + offsetY, color,
+        DrawingUtil.superDrawString((Graphics2D) g, count == 1 ? " 1" : Integer.toString(count), imagePos.x() + offsetX, imagePos.y() + offsetY, color,
             MapGenerator.HorizontalAlign.Left, MapGenerator.VerticalAlign.Bottom, strokeWidth, stroke);
     }
 
