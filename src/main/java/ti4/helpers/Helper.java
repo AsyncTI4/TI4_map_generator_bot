@@ -581,6 +581,10 @@ public class Helper {
         return PlanetEmojis.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
     }
 
+    public static String getPlanetName(String planetID) {
+        return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planetID));
+    }
+
     public static String getPlanetRepresentation(String planetID, Game game) {
         planetID = planetID.toLowerCase().replace(" ", "");
         planetID = planetID.replace("'", "");
