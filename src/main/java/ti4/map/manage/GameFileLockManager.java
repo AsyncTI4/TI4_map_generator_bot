@@ -12,6 +12,16 @@ class GameFileLockManager {
         return locks.computeIfAbsent(gameName, k -> new ReentrantReadWriteLock());
     }
 
+    public static void wrapWithWriteLock(String gameName, Runnable runnable) {
+        ReentrantReadWriteLock lock = GameFileLockManager.getLock(gameName);
+        lock.writeLock().lock();
+        try {
+            runnable.run();
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
     public static <T> T wrapWithWriteLock(String gameName, Supplier<T> supplier) {
         ReentrantReadWriteLock lock = GameFileLockManager.getLock(gameName);
         lock.writeLock().lock();
