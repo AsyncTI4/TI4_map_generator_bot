@@ -22,6 +22,16 @@ class GameFileLockManager {
         }
     }
 
+    public static <T> T wrapWithWriteLock(String gameName, Supplier<T> supplier) {
+        ReentrantReadWriteLock lock = GameFileLockManager.getLock(gameName);
+        lock.writeLock().lock();
+        try {
+            return supplier.get();
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
     public static void wrapWithReadLock(String gameName, Runnable runnable) {
         ReentrantReadWriteLock lock = getLock(gameName);
         lock.readLock().lock();
@@ -32,13 +42,13 @@ class GameFileLockManager {
         }
     }
 
-    public static <T> T wrapWithWriteLock(String gameName, Supplier<T> supplier) {
-        ReentrantReadWriteLock lock = GameFileLockManager.getLock(gameName);
-        lock.writeLock().lock();
+    public static <T> T wrapWithReadLock(String gameName, Supplier<T> supplier) {
+        ReentrantReadWriteLock lock = getLock(gameName);
+        lock.readLock().lock();
         try {
             return supplier.get();
         } finally {
-            lock.writeLock().unlock();
+            lock.readLock().unlock();
         }
     }
 }
