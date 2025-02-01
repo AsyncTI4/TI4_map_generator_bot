@@ -57,12 +57,13 @@ import static ti4.map.manage.GamePersistenceKeys.UNITS;
 class GameSaveService {
 
     public static boolean save(Game game, String reason) {
-        return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> lockAndSave(game, reason));
+        return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
+            game.setLatestCommand(Objects.requireNonNullElse(reason, "Command Unknown"));
+            return save(game);
+        });
     }
 
-    private static boolean lockAndSave(Game game, String reason) {
-        game.setLatestCommand(Objects.requireNonNullElse(reason, "Command Unknown"));
-
+    private static boolean save(Game game) {
         try {
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
             DiscordantStarsHelper.checkGardenWorlds(game);
