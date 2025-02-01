@@ -6,9 +6,9 @@ import ti4.model.ColorModel;
 public enum ColorEmojis implements TI4Emoji {
 
     // Colors
-    black, bloodred, blue, brown, chocolate, chrome, rainbow, rose, emerald, ethereal, forest, gold, gray, green, lavender, //
+    black, bloodred, blue, brown, chocolate, chrome, rainbow, sherbet, rose, emerald, ethereal, forest, gold, gray, green, lavender, //
     lightgray, lime, navy, orange, orca, petrol, pink, purple, red, spring, sunset, tan, teal, turquoise, yellow, //
-    copper, plum, peach, rust, tropical, jupiter, poison, vapourwave, watermelon, checker, paintball, //
+    copper, plum, peach, rust, tropical, jupiter, poison, vapourwave, watermelon, checker, paintball, wasp, magma, glacier, //
     splitbloodred, splitblue, splitchocolate, splitemerald, splitgold, splitgreen, splitlime, splitnavy, splitorange, //
     splitpetrol, splitpink, splitpurple, splitrainbow, splitred, splittan, splitteal, splitturquoise, splityellow, riftset; //
 
@@ -43,6 +43,8 @@ public enum ColorEmojis implements TI4Emoji {
             case "frs", "forest" -> forest + "**Forest**";
             case "crm", "chrome" -> chrome + "**Chrome**";
             case "sns", "sunset" -> sunset + "**Sunset**";
+            case "mgm", "magma" -> magma + "**Magma**";
+            case "gcr", "glacier" -> glacier + "**Glacier**";
             case "tqs", "turquoise" -> turquoise + "**Turquoise**";
             case "gld", "gold" -> gold + "**Gold**";
             case "lgy", "lightgray" -> lightgray + "**LightGray**";
@@ -56,6 +58,7 @@ public enum ColorEmojis implements TI4Emoji {
             case "spr", "spring" -> spring + "**Spring**";
             case "chk", "chocolate" -> chocolate + "**Chocolate**";
             case "rbw", "rainbow" -> rainbow + "**Rainbow**";
+            case "sbt", "sherbet" -> sherbet + "**Sherbet**";
             case "eth", "ethereal" -> ethereal + "**Ethereal**";
             case "cpr", "copper" -> copper + "**Copper**";
             case "plm", "plum" -> plum + "**Plum**";
@@ -66,8 +69,9 @@ public enum ColorEmojis implements TI4Emoji {
             case "psn", "poison" -> poison + "**Poison**";
             case "vpw", "vapourwave" -> vapourwave + "**Vapourwave**";
             case "wtm", "watermelon" -> watermelon + "**Watermelon**";
-            case "cqr", "checker" -> checker + "**checker**";
-            case "ptb", "paintball" -> paintball + "**paintball**";
+            case "wsp", "wasp" -> wasp + "**Wasp**";
+            case "cqr", "checker" -> checker + "**Checker**";
+            case "ptb", "paintball" -> paintball + "**Paintball**";
             case "orca" -> orca + "**Orca**";
             case "splitred" -> splitred + "**SplitRed**";
             case "splitblu", "splitblue" -> splitblue + "**SplitBlue**";
@@ -109,6 +113,8 @@ public enum ColorEmojis implements TI4Emoji {
             case "frs", "forest" -> forest;
             case "crm", "chrome" -> chrome;
             case "sns", "sunset" -> sunset;
+            case "mgm", "magma" -> magma;
+            case "gcr", "glacier" -> glacier;
             case "tqs", "turquoise" -> turquoise;
             case "gld", "gold" -> gold;
             case "lgy", "lightgray" -> lightgray;
@@ -122,6 +128,7 @@ public enum ColorEmojis implements TI4Emoji {
             case "spr", "spring" -> spring;
             case "chk", "chocolate" -> chocolate;
             case "rbw", "rainbow" -> rainbow;
+            case "sbt", "sherbet" -> sherbet;
             case "eth", "ethereal" -> ethereal;
             case "cpr", "copper" -> copper;
             case "plm", "plum" -> plum;
@@ -132,6 +139,7 @@ public enum ColorEmojis implements TI4Emoji {
             case "psn", "poison" -> poison;
             case "vpw", "vapourwave" -> vapourwave;
             case "wtm", "watermelon" -> watermelon;
+            case "wsp", "wasp" -> wasp;
             case "cqr", "checker" -> checker;
             case "ptb", "paintball" -> paintball;
             case "orca" -> orca;

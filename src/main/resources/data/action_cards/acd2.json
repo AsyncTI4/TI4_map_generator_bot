@@ -436,8 +436,8 @@
     "name": "Frontier Rider",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, explore up to 2 frontier tokens on the game board.",
-    "flavorText": "The document in Acamar's hand described a treatise written long before the fall of the Lazax. With the Mahact's return, finding this detailed analysis of the Lazax's greatest victories was imperative.",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, replenish your commodities and explore a frontier token on the game board.",
+    "flavorText": "Acamar held up the partial transcription of a legendary Lazax war treatise. With the return of their ancient enemy, finding the full document was imperative.",
     "source": "action_deck_2"
   },
   {

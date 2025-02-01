@@ -748,9 +748,8 @@ public class AgendaHelper {
             cleanedChoice = Helper.getPlanetRepresentation(choice, game);
         }
         String voteMessage = "chose to put a " + rider + " on \"" + StringUtils.capitalize(cleanedChoice) + "\".";
-        if (!game.isFowMode()) {
-            voteMessage = player.getRepresentationNoPing() + " " + voteMessage;
-        }
+        voteMessage = !game.isFowMode() ? player.getRepresentationNoPing() + " " + voteMessage : StringUtils.capitalize(voteMessage);
+
         String identifier;
         if (game.isFowMode()) {
             identifier = player.getColor();
@@ -908,10 +907,10 @@ public class AgendaHelper {
             while ((voteInfo[0] < 1
                     || game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction()) || !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty())
                     && counter < game.getRealPlayers().size()) {
-                String skippedMessage = nextInLine.getRepresentation(true, false) + "You are being skipped because the bot thinks you can't vote.";
+                String skippedMessage = nextInLine.getRepresentation(true, false) + ", you are being skipped because the bot thinks you can't vote.";
                 if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
                     skippedMessage = realIdentity
-                        + "You are being skipped because you told the bot you wanted to preset an abstain";
+                        + ", you are being skipped because you told the bot you wanted to preset an abstention.";
                     game.setStoredValue("Abstain On Agenda", game
                         .getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();

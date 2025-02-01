@@ -117,7 +117,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("warStoriesFrontier_")
     public static void warStoriesFrontier(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()+" is using their war stories ability to explore the frontier deck in the active system.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " is using their **War Stories** ability to explore the frontier deck in the active system.");
         Tile tile = game.getTileByPosition(pos);
         ExploreService.expFront(event, tile, game, player, true);
         event.getMessage().delete().queue();
@@ -125,8 +125,8 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("warStoriesPlanetExplore")
     public static void warStoriesPlanetExplore(Player player, Game game,  ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),player.getRepresentation()+" is using their war stories ability to explore a planet they control.");
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation()+" Please use buttons to explore a planet you control.", buttons);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),player.getRepresentation() + " is using their **War Stories** ability to explore a planet they control.");
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", please use buttons to explore a planet you control.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -2609,7 +2609,7 @@ public class ButtonHelperFactionSpecific {
                 }
                 buttons.add(Buttons.green(id, label, FactionEmojis.rohdhna));
             }
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),player.getRepresentation()+" you can deploy a mech on a planet you control or the space area", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),player.getRepresentation() + ", you may deploy a mech on a planet you control or the space area.", buttons);
         }
 
         event.getMessage().delete().queue();
