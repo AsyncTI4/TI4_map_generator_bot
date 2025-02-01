@@ -184,6 +184,30 @@ public class Helper {
         return player;
     }
 
+    public static List<Player> getPlayersFromTech(Game game, String tech) {
+        if (tech == null || Mapper.getTech(tech) == null)
+            return Collections.emptyList();
+        List<Player> players = new ArrayList<>();
+        for (Player player : game.getPlayers().values()) {
+            if (player.isRealPlayer() && player.hasTech(tech)) {
+                players.add(player);
+            }
+        }
+        return players;
+    }
+
+    public static List<Player> getPlayersFromReadyTech(Game game, String tech) {
+        if (tech == null || Mapper.getTech(tech) == null)
+            return Collections.emptyList();
+        List<Player> players = new ArrayList<>();
+        for (Player player : game.getPlayers().values()) {
+            if (player.isRealPlayer() && player.hasTechReady(tech)) {
+                players.add(player);
+            }
+        }
+        return players;
+    }
+
     // TODO: (Jazz): This method *should* include base game + pok tiles (+ DS tiles if and only if DS mode is set)
     //     - Once the bot is using milty draft settings, we can make this accurately pull in tiles
     //     - from every source available to the active game
@@ -199,7 +223,7 @@ public class Helper {
 
     public static void giveMeBackMyAgendaButtons(Game game) {
         List<Button> proceedButtons = new ArrayList<>();
-        String msg = "Press this button if the last player forgot to react, but verbally said \"No Whens or Afters\".";
+        String msg = "Press this button if the last player forgot to react, but verbally said \"no whens\"/\"no afters\".";
         proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting And Start The Voting For Everyone"));
         proceedButtons.add(Buttons.blue("transaction", "Transaction"));
         proceedButtons.add(Buttons.red("eraseMyVote", "Erase My Vote And Have Me Vote Again"));
@@ -555,6 +579,10 @@ public class Helper {
     public static String getPlanetRepresentationPlusEmoji(String planet) {
         String planetProper = Mapper.getPlanetRepresentations().get(planet);
         return PlanetEmojis.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
+    }
+
+    public static String getPlanetName(String planetID) {
+        return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planetID));
     }
 
     public static String getPlanetRepresentation(String planetID, Game game) {
@@ -2034,6 +2062,9 @@ public class Helper {
         if(ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, false).contains(tech.getAlias())){
             wilds++;
         }
+        if(player.getPurgedTechs().contains(tech.getAlias())){
+            return false;
+        }
         if(ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, true).contains(tech.getAlias())){
            return true;
         }
@@ -2116,7 +2147,7 @@ public class Helper {
                 wilds++;
             }
         }else{
-            if(player.hasAbility("brilliant")){
+            if(player.hasAbility("analytical")){
                 wilds++;
             }
         }

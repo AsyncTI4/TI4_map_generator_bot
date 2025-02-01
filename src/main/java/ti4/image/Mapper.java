@@ -239,6 +239,9 @@ public class Mapper {
                     if (!"agendas_absol".equals(game.getAgendaDeckID()) && pn.getAlias().endsWith("_ps") && pn.getSource() == ComponentSource.absol) {
                         continue;
                     }
+                    if (pn.getAlias().startsWith("wekkerabsol_") && !"g14".equals(game.getName())) {
+                        continue;
+                    }
                     pnList.add(pn.getAlias());
                 }
             }

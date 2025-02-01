@@ -29,7 +29,6 @@ public class CardsInfoCommand extends GameStateCommand {
         Game game = getGame();
         Player player = getPlayer();
         game.checkPromissoryNotes();
-        PromissoryNoteHelper.checkAndAddPNs(game, player);
         CardsInfoService.sendCardsInfo(game, player, event);
     }
 }

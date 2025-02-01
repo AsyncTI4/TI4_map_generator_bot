@@ -594,7 +594,7 @@ public class ButtonHelperCommanders {
             }
             Planet planetReal = (Planet) planetUnit;
             String planetId = planetReal.getName();
-            String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
+            String planetName = Helper.getPlanetName(planetId);
 
             for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
                 Tile tile2 = game.getTileByPosition(pos2);
@@ -615,15 +615,15 @@ public class ButtonHelperCommanders {
                         numInf = planetUnit2.getUnitCount(UnitType.Infantry, colorID);
                     }
                     String planetId2 = planetReal2.getName();
-                    String planetRepresentation2 = Helper.getPlanetRepresentation(planetId2, game);
+                    String planetName2 = Helper.getPlanetName(planetId2);
                     if (numInf > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         String id = "sardakkcommander_infantry_" + planetId + "_" + planetId2;
-                        String label = "Commit 1 infantry from " + planetRepresentation2 + " to " + planetRepresentation;
+                        String label = "1 Infantry From " + planetName2 + " To " + planetName + " With G'hom Sek'kus";
                         buttons.add(Buttons.green(id, label, FactionEmojis.Sardakk));
                     }
                     if (numMechs > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         String id = "sardakkcommander_mech_" + planetId + "_" + planetId2;
-                        String label = "Commit 1 mech from " + planetRepresentation2 + " to " + planetRepresentation;
+                        String label = "1 Mech From " + planetName2 + " To " + planetName + " With G'hom Sek'kus";
                         buttons.add(Buttons.blue(id, label, FactionEmojis.Sardakk));
                     }
                 }

@@ -47,7 +47,6 @@ class Swap extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Only game players can swap with a player.");
             return;
         }
-        String message = "";
         OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
         OptionMapping addOption = event.getOption(Constants.TARGET_PLAYER);
         if (removeOption != null && addOption != null) {
@@ -61,12 +60,16 @@ class Swap extends GameStateSubcommand {
                 MessageHelper.replyToMessage(event, "Could not find faction/player to swap");
                 return;
             }
+            if (swapperPlayer == removedPlayer) {
+                MessageHelper.replyToMessage(event, "The same faction was entered for both parameters");
+                return;
+            }
             User addedUser = addOption.getAsUser();
             SwapFactionService.secondHalfOfSwap(game, swapperPlayer, removedPlayer, addedUser, event);
+            MessageHelper.sendMessageToPlayerCardsInfoThread(swapperPlayer, swapperPlayer.getRepresentationUnfogged());
+            MessageHelper.sendMessageToPlayerCardsInfoThread(removedPlayer, removedPlayer.getRepresentationUnfogged());
         } else {
             MessageHelper.replyToMessage(event, "Specify player to swap");
-            return;
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 }

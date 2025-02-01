@@ -6,7 +6,7 @@
         "textColor": "black",
         "primaryColor": { "red": 104, "green": 180, "blue": 238 },
         "secondaryColor": { "red": 228, "green": 175, "blue": 30 },
-        "hue": "YELLOW"
+        "hue": "MULTI2"
     },
     {
         "alias": "sns",
@@ -16,6 +16,24 @@
         "primaryColor": { "red": 120, "green": 129, "blue": 255 },
         "secondaryColor": { "red": 255, "green": 90, "blue": 132 },
         "hue": "PURPLE"
+    },
+    {
+        "alias": "mgm",
+        "name": "magma",
+        "aliases": ["mgm"],
+        "textColor": "white",
+        "primaryColor": { "red": 240, "green": 6, "blue": 6 },
+        "secondaryColor": { "red": 245, "green": 245, "blue": 6 },
+        "hue": "RED"
+    },
+    {
+        "alias": "gcr",
+        "name": "glacier",
+        "aliases": ["gcr"],
+        "textColor": "white",
+        "primaryColor": { "red": 5, "green": 240, "blue": 240 },
+        "secondaryColor": { "red": 5, "green": 5, "blue": 245 },
+        "hue": "BLUE"
     },
     {
         "alias": "tpl",
@@ -96,7 +114,7 @@
         "textColor": "white",
         "primaryColor": { "red": 240, "green": 6, "blue": 6 },
         "secondaryColor": { "red": 6, "green": 175, "blue": 50 },
-        "hue": "GREEN"
+        "hue": "MULTI2"
     },
     {
         "alias": "vpw",
@@ -105,7 +123,7 @@
         "textColor": "white",
         "primaryColor": { "red": 6, "green": 239, "blue": 240 },
         "secondaryColor": { "red": 175, "green": 6, "blue": 131 },
-        "hue": "PURPLE"
+        "hue": "MULTI2"
     },
     {
         "alias": "jpt",
@@ -114,7 +132,7 @@
         "textColor": "black",
         "primaryColor": { "red": 6, "green": 75, "blue": 203 },
         "secondaryColor": { "red": 240, "green": 180, "blue": 6 },
-        "hue": "BLUE"
+        "hue": "MILTI2"
     },
     {
         "alias": "psn",
@@ -123,22 +141,49 @@
         "textColor": "white",
         "primaryColor": { "red": 6, "green": 175, "blue": 50 },
         "secondaryColor": { "red": 146, "green": 6, "blue": 186 },
-        "hue": "PURPLE"
+        "hue": "MULTI2"
     },
     {
         "alias": "rbw",
         "name": "rainbow",
         "aliases": ["rbw"],
-        "textColor": "white",
+        "textColor": "black",
         "primaryColor": { "red": 255, "green": 0, "blue": 0 },
         "secondaryColor": { "red": 0, "green": 255, "blue": 0 },
-        "hue": "GRAY"
+        "hue": "MULTI1"
+    },
+    {
+        "alias": "sbt",
+        "name": "sherbet",
+        "aliases": ["sbt"],
+        "textColor": "black",
+        "primaryColor": { "red": 255, "green": 0, "blue": 0 },
+        "secondaryColor": { "red": 0, "green": 255, "blue": 0 },
+        "hue": "MULTI1"
+    },
+    {
+        "alias": "ptb",
+        "name": "paintball",
+        "aliases": ["ptb"],
+        "textColor": "black",
+        "primaryColor": { "red": 255, "green": 0, "blue": 0 },
+        "secondaryColor": { "red": 0, "green": 255, "blue": 0 },
+        "hue": "MULTI1"
+    },
+    {
+        "alias": "wsp",
+        "name": "wasp",
+        "aliases": ["wsp"],
+        "textColor": "black",
+        "primaryColor": { "red": 245, "green": 245, "blue": 6 },
+        "secondaryColor": { "red": 0, "green": 0, "blue": 0 },
+        "hue": "YELLOW"
     },
     {
         "alias": "cqr",
         "name": "checker",
         "aliases": ["cqr", "chequer"],
-        "textColor": "black",
+        "textColor": "white",
         "primaryColor": { "red": 255, "green": 255, "blue": 255 },
         "secondaryColor": { "red": 0, "green": 0, "blue": 0 },
         "hue": "GRAY"

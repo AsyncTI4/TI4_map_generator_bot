@@ -273,9 +273,7 @@ public class DrawingUtil {
     }
 
     public static String getBlackWhiteFileSuffix(String colorID) {
-        Set<String> lightColors = Set.of("ylw", "org", "pnk", "tan", "crm", "sns", "tqs", "gld", "lme", "lvn", "rse",
-            "spr", "tea", "lgy", "eth", "pch", "tpl", "cqr");
-        if (lightColors.contains(colorID)) {
+        if (Mapper.getColor(colorID).getTextColor().equalsIgnoreCase("black")) {
             return "_blk.png";
         }
         return "_wht.png";

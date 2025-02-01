@@ -28,7 +28,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 public class PlayerStatsService {
 
     public String getPlayersCurrentStatsText(Player player, Game game) {
-        StringBuilder sb = new StringBuilder(player.getFactionEmoji() + " player's current stats:\n");
+        StringBuilder sb = new StringBuilder(player.getRepresentationNoPing() + "'s current stats:\n");
 
         sb.append("> VP: ").append(player.getTotalVictoryPoints());
         sb.append("      ").append(MiscEmojis.getTGorNomadCoinEmoji(game)).append(player.getTg());
@@ -65,6 +65,7 @@ public class PlayerStatsService {
         sb.append("> Imperia Command Tokens: `").append(player.getMahactCC()).append("`\n");
         sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
         sb.append("> Owned Promissory Notes: `").append(player.getPromissoryNotesOwned()).append("`\n");
+        sb.append("> Player Area Promissory Notes: `").append(player.getPromissoryNotesInPlayArea()).append("`\n");
         sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
         sb.append("> Alliance Members: ").append(player.getAllianceMembers().replace(player.getFaction(), "")).append("\n");
         sb.append("> Followed SCs: `").append(player.getFollowedSCs().toString()).append("`\n");
@@ -132,10 +133,10 @@ public class PlayerStatsService {
             tg += tgCount;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                + " from picking " + Helper.getSCName(scNumber, game));
+                + " from picking " + Helper.getSCName(scNumber, game) + ".");
             if (game.isFowMode()) {
                 String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
-                    + " trade good" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game);
+                    + " trade good" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game) + ".";
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);

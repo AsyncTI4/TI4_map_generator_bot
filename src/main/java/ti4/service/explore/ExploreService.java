@@ -290,7 +290,7 @@ public class ExploreService {
         }
 
         MessageEmbed exploreEmbed = exploreModel.getRepresentationEmbed();
-        MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), messageText, exploreEmbed);
+        MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), messageText, exploreEmbed);
 
         String message = null;
 
@@ -373,7 +373,7 @@ public class ExploreService {
                     tile.addToken(attachmentFilename, planetID);
                     game.purgeExplore(ogID);
                     AttachmentModel aModel = Mapper.getAttachmentInfo(attachment);
-                    message = "Attachment " + aModel.getName() + " added to " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game);
+                    message = "Attachment _" + aModel.getName() + "_ added to " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".";
                     CommanderUnlockCheckService.checkPlayer(player, "sol", "xxcha");
                 }
             }
@@ -388,7 +388,7 @@ public class ExploreService {
                         List<Button> buttonIon = new ArrayList<>();
                         buttonIon.add(Buttons.gray("addIonStorm_alpha_" + tile.getPosition(), "Place an Alpha", MiscEmojis.CreussAlpha));
                         buttonIon.add(Buttons.green("addIonStorm_beta_" + tile.getPosition(), "Place a Beta", MiscEmojis.CreussBeta));
-                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttonIon);
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttonIon);
                     } else {
                         tile.addToken(tokenFilename, Constants.SPACE);
                         message = "Token `" + token + "` added to tile " + tile.getAutoCompleteName() + ".";
@@ -797,10 +797,10 @@ public class ExploreService {
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
             }
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No frontier token in given system.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No frontier token in given system.");
         }
     }
 

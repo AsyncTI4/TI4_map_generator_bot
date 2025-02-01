@@ -378,7 +378,9 @@ public class TransactionHelper {
         "Behind Door #" + ThreadLocalRandom.current().nextInt(1, 3) + ": A Goat!",
         "A Runcible Spoon",
         "_Nullam Rem Natam_",
-        "A Jubba Cloak");
+        "A Jubba Cloak",
+        "The Pretence That Your Secrets Are Unscorable",
+        "Double Nothing");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
@@ -668,7 +670,7 @@ public class TransactionHelper {
             player.addTransactionItem("sending" + sender + "_receiving" + receiver + "_" + item + "_" + extraDetail);
         }
 
-        if ((item.equalsIgnoreCase("tgs") || item.equalsIgnoreCase("Comms")) && p2.getDebtTokenCount(p1.getColor()) > 0 && !p1.hasAbility("binding_debts")) {
+        if ((item.equalsIgnoreCase("tgs") || item.equalsIgnoreCase("Comms")) && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("binding_debts")) {
             int amount = Math.min(p2.getDebtTokenCount(p1.getColor()), Integer.parseInt(extraDetail));
             player.addTransactionItem("sending" + receiver + "_receiving" + sender + "_ClearDebt_" + amount);
         }

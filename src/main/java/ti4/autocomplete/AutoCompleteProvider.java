@@ -36,6 +36,7 @@ import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.ColorableModelInterface;
 import ti4.model.DeckModel;
 import ti4.model.EmbeddableModel;
 import ti4.model.ExploreModel;
@@ -139,6 +140,7 @@ public class AutoCompleteProvider {
                         put("BLUE", "Blues");
                         put("PURPLE", "Purples");
                         put("PINK", "Pinks");
+                        put("MULTI", "Multi-Colours");
                         put("ALL", "ALL COLOURS");
                     }
                 };
@@ -316,7 +318,7 @@ public class AutoCompleteProvider {
             }
             case Constants.SPECIFIC_PHASE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var phases = List.of("strategy", "voting", "statusScoring", "statusHomework", "action", "agendaResolve", "playerSetup", "ixthian","agenda");
+                var phases = List.of("strategy", "voting", "statusScoring", "statusHomework", "action", "agendaResolve", "playerSetup","setupHomebrew", "ixthian","agenda");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(phases, enteredValue);
                 event.replyChoices(options).queue();
             }
@@ -978,6 +980,7 @@ public class AutoCompleteProvider {
         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
         return models.stream()
             .filter(model -> model.search(enteredValue, source))
+            .filter(model -> (model instanceof ColorableModelInterface cm) ? !cm.isDupe() : true)
             .limit(25)
             .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))
             .toList();

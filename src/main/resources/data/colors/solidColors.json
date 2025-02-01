@@ -2,6 +2,7 @@
     {
         "alias": "lgy",
         "name": "lightgray",
+        "displayName": "LightGray",
         "aliases": ["lgy", "lightgrey", "white", "W"],
         "textColor": "black",
         "primaryColor": { "red": 206, "green": 206, "blue": 206 },

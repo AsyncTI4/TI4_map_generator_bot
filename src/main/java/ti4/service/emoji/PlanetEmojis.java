@@ -334,6 +334,8 @@ public enum PlanetEmojis implements TI4Emoji {
             case "ynnis" -> Ynnis;
             case "zhgen" -> Zhgen;
 
+            case "space" -> TileEmojis.randomVoid();
+
             default -> SemLore; // SemLore default is vaguely important
         };
     }
