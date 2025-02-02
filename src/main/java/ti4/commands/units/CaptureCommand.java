@@ -12,6 +12,7 @@ public class CaptureCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
                     new AddCaptureUnits(),
+                    new FixRemoveCaptureUnits(),
                     new RemoveCaptureUnits())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
