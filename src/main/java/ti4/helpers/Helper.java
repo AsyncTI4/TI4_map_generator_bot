@@ -1503,7 +1503,7 @@ public class Helper {
             unitButtons.add(ff2Button);
         }
 
-        if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff) && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
+        if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff) && !"arboHeroBuild".equalsIgnoreCase(warfareNOtherstuff) && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
             && !"sling".equalsIgnoreCase(warfareNOtherstuff) && !warfareNOtherstuff.contains("integrated")
             && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
 

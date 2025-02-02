@@ -273,7 +273,7 @@
         "name": "Suldhan Wraeg",
         "title": "Shrouded Advisor",
         "abilityWindow": "When a player would use 1 unit's non-PRODUCTION unit ability in a system that contains or is adjacent to an anomaly:",
-        "abilityText": "You may exhaust this card to prevent that unit from using that unit ability.",
+        "abilityText": "You may exhaust this card to prevent that unit from using that unit ability. [Note: Mech and flagship powers are not unit abilities]",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
