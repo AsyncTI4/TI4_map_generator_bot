@@ -826,6 +826,7 @@ public class ButtonHelperModifyUnits {
             Tile tile = game.getTileByPosition(pos2);
             if (pos1.equalsIgnoreCase(pos2) || (!Mapper.getFrontierTileIds().contains(tile.getTileID()) && tile.getPlanetUnitHolders().isEmpty() && tile.getUnitHolders().size() != 2)) {
                 continue; // TODO: Can we name the second half of this boolean to make it clear what it is doing?
+                // Pretty sure it's skipping over hyperlanes and the like
             }
             if (canRetreatTo(game, player, tile, skilled)) {
                 buttons.add(Buttons.gray(finChecker + "retreatUnitsFrom_" + pos1 + "_" + pos2 + skilledS,
@@ -844,10 +845,10 @@ public class ButtonHelperModifyUnits {
         if (skilledRetreat) {
             return true;
         }
-        if (FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
-            return false;
+        if(FoWHelper.playerIsInSystem(game, tile, player, false)){
+            return true;
         }
-        return FoWHelper.playerIsInSystem(game, tile, player, false) || player.hasTech("det") || player.hasTech("absol_det");
+        return !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game) && (player.hasTech("det") || player.hasTech("absol_det"));
     }
 
     public static List<Button> getRetreatingGroundTroopsButtons(Player player, Game game, String pos1, String pos2) {

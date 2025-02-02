@@ -689,7 +689,12 @@ public class StartCombatService {
         }
 
         if (p1.hasTechReady("sc") || (!game.isFowMode() && p2.hasTechReady("sc"))) {
-            buttons.add(Buttons.green("applytempcombatmod__" + "tech" + "__" + "sc", "Use Supercharge", FactionEmojis.Naaz));
+            if(p1.hasTechReady("sc")){
+                buttons.add(Buttons.green(p1.getFinsFactionCheckerPrefix()+"applytempcombatmod__" + "tech" + "__" + "sc", "Use Supercharge", FactionEmojis.Naaz));
+            }
+            if(!game.isFowMode() && p2.hasTechReady("sc")){
+                buttons.add(Buttons.green(p2.getFinsFactionCheckerPrefix()+"applytempcombatmod__" + "tech" + "__" + "sc", "Use Supercharge", FactionEmojis.Naaz));
+            }
         }
 
         Player ghemina = Helper.getPlayerFromUnlockedLeader(game, "gheminaagent");
@@ -1036,7 +1041,7 @@ public class StartCombatService {
         return """
             ## Steps for Space Combat:
             > 1. End of movement abilities (**Foresight**, _Stymie_, etc.)
-            > 2. Space Cannon Defence
+            > 2. Space Cannon Offense
             > 3. Start of Combat (_Skilled Retreat_, _Morale Boost_, etc.)
             > 4. Anti-Fighter Barrage
             > 5. Declare Retreats (including _Rout_)

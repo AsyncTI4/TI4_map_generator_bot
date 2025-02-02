@@ -2785,7 +2785,9 @@ public class ButtonHelper {
                     } else {
                         numInfNFightersNMechs += unit.getCapacityUsed() * unitsByQuantity.get(unit);
                     }
-                    unitTypesCounted.add(unit.getBaseType());
+                    if(unitsByQuantity.get(unit) > 0){
+                        unitTypesCounted.add(unit.getBaseType());
+                    }
 
                 } else {
                     if (unit.getIsShip()) {
