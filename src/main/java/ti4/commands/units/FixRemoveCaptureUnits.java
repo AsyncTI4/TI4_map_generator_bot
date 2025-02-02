@@ -17,7 +17,7 @@ import ti4.service.unit.ParsedUnit;
 class FixRemoveCaptureUnits extends GameStateSubcommand {
 
     public FixRemoveCaptureUnits() {
-        super(Constants.REMOVE_UNITS, "Release captured units", true, true);
+        super("fix_remove_units", "Release captured units", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit' Eg. 2 infantry, carrier, 2 fighter, mech").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color for unit").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color capturing (default you)").setAutoComplete(true));
