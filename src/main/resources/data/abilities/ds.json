@@ -563,7 +563,7 @@
         "id": "celestial_guides",
         "name": "Celestial Guides",
         "faction": "nivyn",
-        "permanentEffect": "Your units do not roll for gravity rifts. You may ignore the movement effects of anomalies in systems that are adjacent to 1 or more structures you control.",
+        "permanentEffect": "Your units do not roll for gravity rifts. You may ignore the movement effects of anomalies in systems that contain or are adjacent to 1 or more of your structures.",
         "source": "ds"
     },
     {

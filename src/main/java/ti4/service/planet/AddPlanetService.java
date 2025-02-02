@@ -175,6 +175,9 @@ public class AddPlanetService {
                 if (p != null && p.getFactionHomeworld() != null
                     && !player.hasLeader(p.getFactionHomeworld() + "commander")) {
                     String leaderID = p.getFactionHomeworld() + "commander";
+                    if(leaderID.toLowerCase().contains("keleres")){
+                        leaderID = "kelerescommander";
+                    }
                     player.addLeader(leaderID);
                     game.addFakeCommander(leaderID);
                     UnlockLeaderService.unlockLeader(leaderID, game, player);
