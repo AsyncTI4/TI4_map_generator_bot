@@ -1569,7 +1569,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")
                     && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)
-                    && !buttonID.contains("integrated")) {
+                    && !buttonID.contains("integrated")&& !buttonID.contains("generic")) {
                     ButtonHelperCommanders.titansCommanderUsage(event, game, player);
                 }
                 if (player.hasTechReady("dsbenty")

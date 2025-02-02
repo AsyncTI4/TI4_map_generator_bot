@@ -130,6 +130,13 @@ public class DiscordantStarsHelper {
         if (hasAbility) {
             resolveEnvironmentPreserveAbility(player, planetModel, game);
             resolveEconomyEmpowerAbility(player, planetModel);
+            for (String type : ButtonHelper.getTypeOfPlanet(game, planet)) {
+                switch (type) {
+                    case "industrial" -> {
+                        resolveEconomyExploitAbility(player, planetModel, game);
+                    }
+                }
+            }
             resolvePeopleConnectAbility(player, planetModel, game);
             return;
         }

@@ -618,7 +618,7 @@ public class ButtonHelperCommanders {
                     String planetName2 = Helper.getPlanetName(planetId2);
                     if (numInf > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         String id = "sardakkcommander_infantry_" + planetId + "_" + planetId2;
-                        String label = "1 Infantry From " + planetName2 + " To " + planetName + " With G'hom Sek'kus";
+                        String label = "1 Inf From " + planetName2 + " To " + planetName + " With G'hom Sek'kus";
                         buttons.add(Buttons.green(id, label, FactionEmojis.Sardakk));
                     }
                     if (numMechs > 0 && !planetId.equalsIgnoreCase(planetId2)) {
