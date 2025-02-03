@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -1645,9 +1644,14 @@ public class ButtonHelper {
             if (!unit.getColor().equals(player.getColor())) {
                 continue;
             }
-            UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
-            if (removedUnit.getIsShip()) {
-                count += space.getUnits().get(unit);
+            if(!player.getUnitsByAsyncID(unit.asyncID()).isEmpty()){
+                UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
+                if (removedUnit.getIsShip()) {
+                    count += space.getUnits().get(unit);
+                }
+            }
+            else{
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()+" you have no unitModel for the unit "+unit.unitName()+" in tile "+tile.getPosition());
             }
         }
         return count;

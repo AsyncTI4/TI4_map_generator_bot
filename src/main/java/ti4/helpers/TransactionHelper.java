@@ -588,10 +588,14 @@ public class TransactionHelper {
                         }
                         PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
                         Player owner = game.getPNOwner(pnShortHand);
-                        Button transact = Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand),
+                        if(owner != null){
+                            Button transact = Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand),
                             promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
-
-                        stuffToTransButtons.add(transact);
+                            stuffToTransButtons.add(transact);
+                        }else{
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()+" you have a PN with a null owner. It's number ID is "+p1.getPromissoryNotes().get(pnShortHand)+" and its letter ID is "+pnShortHand);
+                        }
+                        
                     }
                 }
                 message += "\nReminder that, unlike other things, you may only send a player 1 promissory note in each transaction"
