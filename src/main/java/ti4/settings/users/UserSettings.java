@@ -23,6 +23,7 @@ public class UserSettings {
     private String afkHours;
     private LocalDateTime lockedFromCreatingGamesUntil;
     private boolean pingOnNextTurn;
+    private boolean showTransactables;
 
     UserSettings() {} // needed for ObjectMapper
 

@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -98,8 +97,6 @@ import ti4.service.unit.AddUnitService;
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
  */
 public class UnfiledButtonHandlers { // TODO: move all of these methods to a better location, closer to the original button call and/or other related code
-
-    private static final Pattern CARDS_PATTERN = Pattern.compile("Card\\s(.*?):");
 
     @ButtonHandler("declareUse_")
     public static void declareUse(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
@@ -2143,17 +2140,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void gainCC(ButtonInteractionEvent event, Player player, Game game) {
         String message = "";
 
-        String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
-            + ". Use buttons to gain command tokens.";
-        game.setStoredValue("originalCCsFor" + player.getFaction(),
-            player.getCCRepresentation());
+        String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
+        game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
 
         ReactionService.addReaction(event, game, player, message);
-        if (!event.getMessage().getContentRaw().contains("fragment")) {
-            ButtonHelper.deleteMessage(event);
-        }
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("run_status_cleanup")

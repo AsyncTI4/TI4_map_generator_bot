@@ -75,6 +75,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.user.AFKService;
+import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 
 public class Player {
@@ -2860,6 +2861,11 @@ public class Player {
     }
 
     @JsonIgnore
+    public UserSettings getUserSettings() {
+        return UserSettingsManager.get(getUserID());
+    }
+
+    @JsonIgnore
     public String getNextAvailableColour() {
         if (getColor() != null && !getColor().equals("null")) {
             return getColor();
@@ -2870,7 +2876,7 @@ public class Player {
     @JsonIgnore
     public String getNextAvailableColorIgnoreCurrent() {
         Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
-        String color = UserSettingsManager.get(getUserID()).getPreferredColors().stream()
+        String color = getUserSettings().getPreferredColors().stream()
             .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
             .findFirst()
             .orElse(getGame().getUnusedColorsPreferringBase().stream().filter(nonExclusive).findFirst().map(ColorModel::getName).orElse(null));
