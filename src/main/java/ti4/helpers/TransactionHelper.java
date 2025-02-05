@@ -88,7 +88,7 @@ public class TransactionHelper {
                                 case "generic" -> {
                                     List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, receiver, sender);
                                     String message = sender.getRepresentationUnfogged()
-                                        + "Please select the promissory note you would like to send.";
+                                        + ", please choose the promissory note you wish to send.";
                                     MessageHelper.sendMessageToChannelWithButtons(sender.getCardsInfoThread(), message, stuffToTransButtons);
                                 }
                                 default -> resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
@@ -597,7 +597,9 @@ public class TransactionHelper {
                             promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
                             stuffToTransButtons.add(transact);
                         }else{
-                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()+" you have a PN with a null owner. It's number ID is "+p1.getPromissoryNotes().get(pnShortHand)+" and its letter ID is "+pnShortHand);
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                                player.getRepresentation() + ", you have a promissory note with a null owner. Its number ID is `" 
+                                + p1.getPromissoryNotes().get(pnShortHand) + "` and its letter ID is " + pnShortHand + "`.");
                         }
                         
                     }
