@@ -9,6 +9,32 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 
 public class ExploreHelper {
+    
+    public static boolean checkForMech(String planetName, Game game, Player player) {
+        Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
+        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        String colorID = Mapper.getColorID(player.getColor());
+        UnitKey mechKey = Mapper.getUnitKey("mf", colorID);
+        if (unitHolder.getUnits() != null) {
+            if (unitHolder.getUnits().get(mechKey) != null) {
+                return unitHolder.getUnits().get(mechKey) > 0;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean checkForInf(String planetName, Game game, Player player) {
+        Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
+        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        String colorID = Mapper.getColorID(player.getColor());
+        UnitKey infKey = Mapper.getUnitKey("gf", colorID);
+        if (unitHolder.getUnits() != null) {
+            if (unitHolder.getUnits().get(infKey) != null) {
+                return unitHolder.getUnits().get(infKey) > 0;
+            }
+        }
+        return false;
+    }
 
     public static String checkForMechOrRemoveInf(String planetName, Game game, Player player) {
         String message;

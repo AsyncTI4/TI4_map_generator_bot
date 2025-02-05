@@ -644,7 +644,7 @@ public class ButtonHelperTacticalAction {
         List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(game, player);
         if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !game.isL1Hero()) {
             String msg = player.getRepresentationUnfogged() + ", you can use buttons to resolve " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "I48S, the L1Z1Z " + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + "agent, if you so wish.";
+                + "I48S, the L1Z1Z" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, if you so wish.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, button3);
         }
         

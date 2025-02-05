@@ -2261,11 +2261,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     public static void declineExplore(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
-        ReactionService.addReaction(event, game, player, "Declined Exploration");
+        ReactionService.addReaction(event, game, player, "declined exploration card.");
         ButtonHelper.deleteMessage(event);
         if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
             String pF = player.getFactionEmoji();
-            MessageHelper.sendMessageToChannel(mainGameChannel, pF + " declined exploration.");
+            MessageHelper.sendMessageToChannel(mainGameChannel, pF + " declined exploration card.");
         }
     }
 
