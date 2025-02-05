@@ -11,6 +11,7 @@
             "Spend 1 token from your strategy pool to draw 2 secret objectives, select 1 and shuffle the other in the secret objectives deck."
         ],
         "colourHexCode": "#752b90",
+        "botSCAutomationID": "pok8imperial",
         "source": "other"
     }
 ]
