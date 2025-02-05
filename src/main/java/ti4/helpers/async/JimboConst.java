@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.image.TileHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
+import ti4.model.TileModel.TileBack;
 
 // Jazz's Interactive Map Builder
 public class JimboConst {
@@ -78,9 +79,9 @@ public class JimboConst {
         // sort by source, then by alias
         List<TileModel> allTilesSorted = TileHelper.getAllTileModels().stream().sorted(comp).toList();
 
-        blueTiles = allTilesSorted.stream().filter(t -> "0b".equals(t.getAlias()) || "blue".equals(t.getTileBack())).toList();
-        redTiles = allTilesSorted.stream().filter(t -> "0r".equals(t.getAlias()) || "red".equals(t.getTileBack())).toList();
-        greenTiles = allTilesSorted.stream().filter(t -> "0g".equals(t.getAlias()) || "green".equals(t.getTileBack())).toList();
+        blueTiles = allTilesSorted.stream().filter(t -> "0b".equals(t.getAlias()) || TileBack.BLUE.equals(t.getTileBack())).toList();
+        redTiles = allTilesSorted.stream().filter(t -> "0r".equals(t.getAlias()) || TileBack.RED.equals(t.getTileBack())).toList();
+        greenTiles = allTilesSorted.stream().filter(t -> "0g".equals(t.getAlias()) || TileBack.GREEN.equals(t.getTileBack())).toList();
         hyperlaneTiles = allTilesSorted.stream().filter(t -> t.getName() != null && t.getName().equalsIgnoreCase("hyperlane")).toList();
         draftTiles = allTilesSorted.stream().filter(TileHelper::isDraftTile).toList();
         otherTiles = new ArrayList<>();

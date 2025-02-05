@@ -1,7 +1,7 @@
 [
     {
         "alias": "pi_abs",
-        "name": "Ancieant Burial Sites",
+        "name": "Ancient Burial Sites",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
         "text": "Choose 1 player. Exhaust each cultural planet owned by that player.",
