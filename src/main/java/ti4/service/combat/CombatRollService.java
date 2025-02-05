@@ -424,7 +424,7 @@ public class CombatRollService {
                     if (die.getResult() > 9) {
                         hitRolls += 1;
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
-                            + " got an extra hit due to their **Valor** ability (it has been accounted for in the hit count).");
+                            + " got an extra hit due to the **Valor** ability (it has been accounted for in the hit count).");
                     }
                 }
             }
