@@ -1058,9 +1058,9 @@ public class Helper {
                     if (thing.contains("_")) {
                         int upgrades = ButtonHelper.getNumberOfUnitUpgrades(player);
                         res += upgrades;
-                        msg.append(" for ").append(upgrades).append(" resource").append(upgrades == 1 ? "" : "s");
+                        msg.append("for ").append(upgrades).append(" resource").append(upgrades == 1 ? "" : "s");
                     } else {
-                        msg.append(" to ignore a prerequisite on a unit upgrade technology");
+                        msg.append("to ignore a prerequisite on a unit upgrade technology");
                     }
                     msg.append(".\n");
                 }
