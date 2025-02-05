@@ -189,6 +189,24 @@
         "hue": "GRAY"
     },
     {
+        "alias": "pld",
+        "name": "plaid",
+        "aliases": ["pld", "plaid"],
+        "textColor": "white",
+        "primaryColor": { "red": 240, "green": 6, "blue": 6 },
+        "secondaryColor": { "red": 50, "green": 50, "blue": 50 },
+        "hue": "RED"
+    },
+    {
+        "alias": "hqn",
+        "name": "harlequin",
+        "aliases": ["hqn", "harlequin"],
+        "textColor": "white",
+        "primaryColor": { "red": 6, "green": 175, "blue": 50 },
+        "secondaryColor": { "red": 5, "green": 45, "blue": 176 },
+        "hue": "MULTI2"
+    },
+    {
         "alias": "ero",
         "name": "riftset",
         "aliases": ["ero","riftset"],
