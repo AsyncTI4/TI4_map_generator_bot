@@ -155,7 +155,7 @@ public class UnitRenderGenerator {
                 int imageY = imagePos.y();
                 
                 if (containsDMZ || (isSpace && unitModel.getIsPlanetOnly()) || (!isSpace && unitModel.getIsSpaceOnly())) {
-                    String badPath = resourceHelper.getPositionFile("badpos_" + unitKey.asyncID() + ".png");
+                    String badPath = resourceHelper.getPositionFile("badpos_" + (bulkUnitCount != null ? "tkn_" : "") + unitKey.asyncID() + ".png");
                     BufferedImage badPositionImage = scale == 1.0f ? ImageHelper.read(badPath) : ImageHelper.readScaled(badPath, scale);;
                     tileGraphics.drawImage(badPositionImage, imageX-5, imageY-5, null);
                 }
