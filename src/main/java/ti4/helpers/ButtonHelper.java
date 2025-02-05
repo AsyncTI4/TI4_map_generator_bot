@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,7 +18,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -775,7 +776,7 @@ public class ButtonHelper {
     public static void drawStatusACs(Game game, Player player, ButtonInteractionEvent event) {
         if (game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
             ReactionService.addReaction(event, game, player, true, false,
-                    "It seems you already drew your action cards for this status phase. As such, I will not deal you more. Please draw manually if this is a mistake.");
+                    "It seems you already drew your action cards for this status phase, so I will not deal you more. Please draw manually if this is a mistake.");
             return;
         }
         String message = "";
@@ -815,8 +816,8 @@ public class ButtonHelper {
                         + " However, as _Minister of Policy_ triggers __after__ strategy cards are returned, this means you can't play _Political Stability_ this round.");
             } else if (!hadPoliticalStability && player.getActionCards().containsKey("stability")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
-                        + ", you drew _Political Stability_ off of your regular action card draw, and __not__ from _Minister of Policy_."
-                        + " As such, you are free to play _Political Stability_ this round.");
+                        + ", you drew _Political Stability_ off of your regular action card draw, and __not__ from _Minister of Policy_, "
+                        + "so you can play _Political Stability_ this round.");
             }
             amount += 1;
         }
@@ -6293,6 +6294,10 @@ public class ButtonHelper {
                 youCanSpend.append(" You also have ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ for ")
                     .append(ButtonHelper.getNumberOfUnitUpgrades(player)).append(" resources.");
                 resourcesAvailable += ButtonHelper.getNumberOfUnitUpgrades(player);
+            }
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")) {
+                youCanSpend.append(" You also have Titans commander..");
+                resourcesAvailable += 1;
             }
             youCanSpend.append(" As such, you may spend up to ").append(resourcesAvailable).append(" during the PRODUCTION.");
         }
