@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import java.awt.image.BufferedImage;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,9 +15,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
+import ti4.image.TransactionGenerator;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -27,6 +31,7 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.image.FileUploadService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
@@ -412,9 +417,8 @@ public class TransactionHelper {
         String receiverFaction = buttonID.split("_")[2];
         Player p1 = game.getPlayerFromColorOrFaction(senderFaction);
         Player p2 = game.getPlayerFromColorOrFaction(receiverFaction);
-        if (p2 == null) {
-            return;
-        }
+        if (p1 == null || p2 == null) return;
+
         boolean requesting = (p1 != player);
         Player opposing = p2;
         if (player == p2) {
@@ -566,7 +570,7 @@ public class TransactionHelper {
                                 promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
                         } else {
                             stuffToTransButtons.add(Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + pnShortHand.replace("_", "fin9"),
-                            promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
+                                promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
                         }
 
                     }
@@ -643,6 +647,7 @@ public class TransactionHelper {
         String extraDetail = buttonID.split("_")[4];
         Player p1 = game.getPlayerFromColorOrFaction(sender);
         Player p2 = game.getPlayerFromColorOrFaction(receiver);
+        if (p1 == null || p2 == null) return;
         if (item.equalsIgnoreCase("washComms")) {
             int oldP1Comms = p1.getCommodities();
             int newP1Comms = 0;
@@ -685,10 +690,10 @@ public class TransactionHelper {
             opposing = p1;
         }
         String message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
-            + "\n## Click something else that you wish to __request from__ " + p1.getRepresentation(false, false);
+            + "### Click something else that you wish to __request from__ " + p1.getRepresentation(false, false);
         if (p1 == player) {
             message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
-                + "\n## Click something else that you wish to __offer to__ " + p2.getRepresentation(false, false);
+                + "### Click something else that you wish to __offer to__ " + p2.getRepresentation(false, false);
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
@@ -700,27 +705,48 @@ public class TransactionHelper {
         String receiver = buttonID.split("_")[2];
         Player p1 = game.getPlayerFromColorOrFaction(sender);
         Player p2 = game.getPlayerFromColorOrFaction(receiver);
+        if (p1 == null || p2 == null) return;
         Player opposing = p2;
         if (player == p2) {
             opposing = p1;
         }
         String message = "Current transaction offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
-            + "\n## Click something that you wish to __request from__ " + p1.getRepresentation(false, false);
+            + "### Click something that you wish to __request from__ " + p1.getRepresentation(false, false);
         if (p1 == player) {
             message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
-                + "\n## Click something that you wish to __offer to__ " + p1.getRepresentation(false, false);
+                + "### Click something that you wish to __offer to__ " + p2.getRepresentation(false, false);
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
     }
 
+    private static boolean sendMemeInsteadOfText(ButtonInteractionEvent event, Game game) {
+        if (game.getName().startsWith("test"))
+            return true;
+        if (event.getTimeCreated().getMonth() == Month.APRIL && event.getTimeCreated().getDayOfMonth() == 1)
+            return true;
+        return RandomHelper.isOneInX(1000);
+    }
+
     @ButtonHandler("sendOffer_")
     public static void sendOffer(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p2 == null) return;
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " sent a transaction offer to " + p2.getRepresentationNoPing() + ".");
         if (game.getTableTalkChannel() != null) {
-            String offerMessage = "Trade offer from " + player.getRepresentationNoPing() + " to " + p2.getRepresentationNoPing() + ":\n" + TransactionHelper.buildTransactionOffer(player, p2, game, true);
-            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), offerMessage);
+            boolean sentMeme = false;
+            if (sendMemeInsteadOfText(event, game)) {
+                BufferedImage tradeOfferMeme = TransactionGenerator.drawTradeOfferMeme(game, player, p2);
+                if (tradeOfferMeme != null) {
+                    FileUpload upload = FileUploadService.createFileUpload(tradeOfferMeme, "trade_offer");
+                    MessageHelper.sendFileUploadToChannel(game.getTableTalkChannel(), upload);
+                    sentMeme = true;
+                }
+            }
+            if (!sentMeme) {
+                String offerMessage = "Trade offer from " + player.getRepresentationNoPing() + " to " + p2.getRepresentationNoPing() + ":\n" + TransactionHelper.buildTransactionOffer(player, p2, game, true);
+                MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), offerMessage);
+            }
         }
 
         List<Button> buttons = new ArrayList<>();
@@ -908,6 +934,8 @@ public class TransactionHelper {
         String factionToTrans = buttonID.substring(0, buttonID.indexOf("_"));
         String amountToTrans = buttonID.substring(buttonID.indexOf("_") + 1);
         Player p2 = game.getPlayerFromColorOrFaction(factionToTrans);
+        if (p1 == null || p2 == null) return;
+
         String message2 = "";
         String ident = p1.getRepresentation();
         String ident2 = p2.getRepresentation();
@@ -1072,13 +1100,10 @@ public class TransactionHelper {
                 CardsInfoService.sendVariousAdditionalButtons(game, p1);
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
                 CardsInfoService.sendVariousAdditionalButtons(game, p2);
-                if (sendSftT || sendAlliance)
-                {
+                if (sendSftT || sendAlliance) {
                     String text = sendSftT ? "_Support for the Throne_" : "_Alliance_";
                     message2 = p1.getRepresentation() + " sent " + text + " directly to the play area of " + ident2 + ".";
-                }
-                else
-                {
+                } else {
                     message2 = p1.getRepresentation() + " sent a promissory note to the hand of " + ident2 + ".";
                 }
                 Helper.checkEndGame(game, p2);
@@ -1321,6 +1346,8 @@ public class TransactionHelper {
     @ButtonHandler("acceptOffer_")
     public static void acceptOffer(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p1 == null) return;
+
         if (buttonID.split("_").length > 2) {
             String offerNum = buttonID.split("_")[2];
             String key = "offerFrom" + p1.getFaction() + "To" + player.getFaction();
@@ -1369,6 +1396,11 @@ public class TransactionHelper {
             List<Button> buttons = TransactionHelper.getStuffToTransButtonsOld(game, player, p2);
             if (!game.isFowMode() && game.isNewTransactionMethod()) {
                 buttons = TransactionHelper.getStuffToTransButtonsNew(game, player, player, p2);
+                if (player.getUserSettings().isShowTransactables() && buttonID.startsWith("transactWith_")) {
+                    BufferedImage image = TransactionGenerator.drawTransactableStuffImage(game, player, p2);
+                    FileUpload upload = FileUploadService.createFileUpload(image, "transactable_items");
+                    MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), upload);
+                }
             }
             String message = player.getRepresentation(true, false) + ", please choose what you wish to transact with " + p2.getRepresentation(false, false) + ".";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
