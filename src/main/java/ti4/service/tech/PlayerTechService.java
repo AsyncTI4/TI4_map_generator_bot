@@ -169,13 +169,13 @@ public class PlayerTechService {
             case "td", "absol_td" -> // Transit Diodes
                 ButtonHelper.resolveTransitDiodesStep1(game, player);
             case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
-                Button gainCC = Buttons.green(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain Command Tokens");
+                Button gainCC = Buttons.green(player.getFinsFactionCheckerPrefix() + "gain_CCdeletethismessage", "Gain Command Tokens");
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getFactionEmojiOrColor() + " use button to gain 1 command token.", List.of(gainCC));
             }
             case "absol_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain Command Tokens"));
+                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "gain_CCdeletethismessage", "Gain Command Tokens"));
                 if (player.getStrategicCC() > 0) {
                     for (Leader leader : player.getLeaders()) {
                         if (leader.isExhausted() && leader.getId().contains("agent")) {

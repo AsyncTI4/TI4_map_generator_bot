@@ -40,7 +40,7 @@ public class Buttons {
     public static final Button REFRESH_TECH_INFO = green(Constants.REFRESH_TECH_INFO, "Technology Info");
     public static final Button REFRESH_PLANET_INFO = green(Constants.REFRESH_PLANET_INFO, "Planet Info", PlanetEmojis.SemLor);
 
-    public static final Button OFFER_PING_OPTIONS_BUTTON = Buttons.gray("playerPref_personalPingInterval", "Change Personal Ping Interval");
+    public static final Button OFFER_PING_OPTIONS_BUTTON = Buttons.gray("playerPref_personalPingInterval", "Personal Ping Interval");
 
     public static final List<Button> REFRESH_INFO_BUTTONS = List.of(
         REFRESH_AC_INFO,

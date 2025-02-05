@@ -9,8 +9,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -57,6 +55,9 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                 default -> "";
             };
         }
+
+        public static final List<TechnologyType> mainFour = List.of(PROPULSION, BIOTIC, CYBERNETIC, WARFARE);
+        public static final List<TechnologyType> mainFive = List.of(PROPULSION, BIOTIC, CYBERNETIC, WARFARE, UNITUPGRADE);
     }
 
     public boolean isValid() {
