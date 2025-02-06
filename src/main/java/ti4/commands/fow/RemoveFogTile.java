@@ -1,5 +1,8 @@
 package ti4.commands.fow;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -7,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.image.PositionMapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -32,11 +36,14 @@ class RemoveFogTile extends GameStateSubcommand {
             return;
         }
 
-        String[] positions = positionMapping.replace(" ", "").split(",");
+        List<String> positions = Helper.getListFromCSV(positionMapping);
+        if ("ALL".equals(positionMapping)) {
+            positions = new ArrayList<>(targetPlayer.getFogTiles().keySet());
+        }
+
         for (String position : positions) {
             if (!PositionMapper.isTilePositionValid(position)) {
-                MessageHelper.replyToMessage(event, "Tile position is not allowed");
-                return;
+                MessageHelper.replyToMessage(event, "Tile position '" + position + "' is invalid");
             }
 
             //remove the custom tile from the player
