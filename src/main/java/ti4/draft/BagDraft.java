@@ -3,6 +3,7 @@ package ti4.draft;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
@@ -148,7 +149,7 @@ public abstract class BagDraft {
         if (owner.getName().contains("pbd100") || owner.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
-        ThreadChannelAction threadAction = actionsChannel
+        ThreadChannelAction threadAction = ((TextChannel) player.getCorrectChannel())
             .createThreadChannel(threadName, isPrivateChannel)
             .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
         if (isPrivateChannel) {
@@ -168,7 +169,7 @@ public abstract class BagDraft {
     }
 
     private ThreadChannel findExistingBagChannel(Player player, String threadName) {
-        TextChannel actionsChannel = owner.getActionsChannel();
+        TextChannel actionsChannel = (TextChannel) player.getCorrectChannel();
         //ATTEMPT TO FIND BY ID
         String bagInfoThread = player.getBagInfoThreadID();
         try {
