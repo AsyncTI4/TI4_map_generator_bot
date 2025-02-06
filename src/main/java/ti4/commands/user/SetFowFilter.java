@@ -1,4 +1,4 @@
-package ti4.commands.fow;
+package ti4.commands.user;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -9,11 +9,11 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-class SetFogFilter extends GameStateSubcommand {
+class SetFowFilter extends GameStateSubcommand {
 
-    public SetFogFilter() {
-        super(Constants.SET_FOG_FILTER, "Set the color of the fog tiles for your view of the map.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FOG_FILTER, "How you want the tile to be labeled").setAutoComplete(true).setRequired(true));
+    public SetFowFilter() {
+        super(Constants.SET_FOG_FILTER, "Set the color of the fow tiles for your view of the map.", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.FOG_FILTER, "Color of the filter").setAutoComplete(true).setRequired(true));
     }
 
     @Override

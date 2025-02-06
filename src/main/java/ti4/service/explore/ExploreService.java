@@ -676,8 +676,16 @@ public class ExploreService {
             case "exp1", "exp2", "exp3" -> {
                 message = player.getRepresentation() + ", please resolve _Expedition_:\n-# You have ";
                 message += ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID);
-                Button readyPlanet = Buttons.green("resolveExpedition_" + planetID, "Ready " + Helper.getPlanetRepresentation(planetID, game) + " by removing 1 infantry from or having mech on planet.");
-                List<Button> buttons = List.of(readyPlanet, decline);
+                List<Button> buttons = new ArrayList<>();
+                if (ExploreHelper.checkForMech(planetID, game, player)) {
+                    buttons.add(Buttons.green("resolveExpeditionMech_" + planetID,
+                        "Ready " + Helper.getPlanetRepresentation(planetID, game) + " With A Mech There").withEmoji(UnitEmojis.mech.asEmoji()));
+                }
+                if (ExploreHelper.checkForInf(planetID, game, player)) {
+                    buttons.add(Buttons.green("resolveExpeditionInf_" + planetID,
+                        "Ready " + Helper.getPlanetRepresentation(planetID, game) + " By Removing 1 Infantry There").withEmoji(UnitEmojis.infantry.asEmoji()));
+                }
+                buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
             case "frln1", "frln2", "frln3" -> {
@@ -689,38 +697,78 @@ public class ExploreService {
             case "cm1", "cm2", "cm3" -> {
                 message = player.getRepresentation() + ", please resolve _Core Mine_:\n-# You have ";
                 message += ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID);
-                Button gainTG = Buttons.green("resolveCoreMine_" + planetID, "Gain 1 Trade Good by Removing Infantry or Having Mech on " + planetName, MiscEmojis.tg);
-                List<Button> buttons = List.of(gainTG, decline);
+                List<Button> buttons = new ArrayList<>();
+                if (ExploreHelper.checkForMech(planetID, game, player)) {
+                    buttons.add(Buttons.green("resolveCoreMineMech_" + planetID,
+                        "Gain a Trade Good With A Mech On " + planetName).withEmoji(UnitEmojis.mech.asEmoji()));
+                }
+                if (ExploreHelper.checkForInf(planetID, game, player)) {
+                    buttons.add(Buttons.green("resolveCoreMineInf_" + planetID,
+                        "Gain a Trade Good By Removing 1 Infantry On " + planetName).withEmoji(UnitEmojis.infantry.asEmoji()));
+                }
+                buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
             case "vfs1", "vfs2", "vfs3" -> {
                 message = player.getRepresentation() + ", please resolve _Volatile Fuel Source_:\n-# Your current command tokens are " + player.getCCRepresentation() + ".";
                 message += " and you have " + ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID);
-                Button gainCC = Buttons.green("resolveVolatile_" + planetID, "Remove 1 Infantry or Have a mech on " + planetName + " to Gain a Command Token");
-                List<Button> buttons = List.of(gainCC, decline);
+                List<Button> buttons = new ArrayList<>();
+                if (ExploreHelper.checkForMech(planetID, game, player)) {
+                    buttons.add(Buttons.green("resolveVolatileMech_" + planetID,
+                        "Gain a Command Token With A Mech On " + planetName).withEmoji(UnitEmojis.mech.asEmoji()));
+                }
+                if (ExploreHelper.checkForInf(planetID, game, player)) {
+                    buttons.add(Buttons.green("resolveVolatileInf_" + planetID,
+                        "Gain a Command Token By Removing 1 Infantry On " + planetName).withEmoji(UnitEmojis.infantry.asEmoji()));
+                }
+                buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
             case "warforgeruins" -> {
                 message = player.getRepresentation() + ", please resolve _War Forge Ruins_:\n-# You have ";
                 message += ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID);
-                Button ruinsInf = Buttons.green("ruins_" + planetID + "_2inf", "Remove 1 Infantry or Have a Mech on " + planetName + " to Place 2 Infantry Here");
-                Button ruinsMech = Buttons.green("ruins_" + planetID + "_mech", "Remove 1 Infantry or Have a Mech on " + planetName + " to Place Mech Here");
-                List<Button> buttons = List.of(ruinsInf, ruinsMech, decline);
+                List<Button> buttons = new ArrayList<>();
+                if (ExploreHelper.checkForMech(planetID, game, player)) {
+                    buttons.add(Buttons.green("resolveRuinsMech_" + planetID + "_mech",
+                        "Place A Mech With A Mech On " + planetName).withEmoji(UnitEmojis.mech.asEmoji()));
+                    buttons.add(Buttons.blue("resolveRuinsMech_" + planetID + "_2inf",
+                        "Place 2 Infantry With A Mech On " + planetName).withEmoji(UnitEmojis.mech.asEmoji()));
+                }
+                if (ExploreHelper.checkForInf(planetID, game, player)) {
+                    buttons.add(Buttons.green("resolveRuinsInf_" + planetID + "_mech",
+                        "Place A Mech By Removing 1 Infantry On " + planetName).withEmoji(UnitEmojis.infantry.asEmoji()));
+                    buttons.add(Buttons.blue("resolveRuinsInf_" + planetID + "_2inf",
+                        "Place 2 Infantry By Removing 1 Infantry On " + planetName).withEmoji(UnitEmojis.infantry.asEmoji()));
+                }
+                buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
             case "seedyspaceport" -> {
-                List<Button> buttons = new ArrayList<>();
                 message = player.getRepresentation() + ", please resolve _Seedy Spaceport_:\n-# You have " + ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID);
+                List<Button> buttons = new ArrayList<>();
+                boolean checkForMech = ExploreHelper.checkForMech(planetID, game, player);
+                boolean checkForInf = ExploreHelper.checkForInf(planetID, game, player);
                 for (Leader leader : player.getLeaders()) {
-                    if (leader.isExhausted() && leader.getId().contains("agent")) {
+                    if (leader.getId().contains("agent")) {
                         LeaderModel leaderM = Mapper.getLeader(leader.getId());
-                        buttons.add(Buttons.green(
-                            "seedySpace_" + leader.getId() + "_" + planetID,
-                            "Remove 1 Infantry or Have a Mech on " + planetName + " to Ready " + leaderM.getName(),
-                            leaderM.getLeaderEmoji()));
+                        if (checkForMech) {
+                            buttons.add(Buttons.green("resolveSeedySpaceMech_" + leader.getId() + "_" + planetID,
+                                "Ready " + leaderM.getName() + " With A Mech On " + planetName).withEmoji(UnitEmojis.mech.asEmoji()));
+                        }
+                        if (checkForInf) {
+                            buttons.add(Buttons.green("resolveSeedySpaceInf_" + leader.getId() + "_" + planetID,
+                                "Ready " + leaderM.getName() + " By Removing 1 Infantry On " + planetName).withEmoji(UnitEmojis.infantry.asEmoji()));
+                        }
                     }
                 }
-                buttons.add(Buttons.blue("seedySpace_AC_" + planetID, "Remove 1 Infantry or Have a Mech on " + planetName + " to Draw 1 Action Card"));
+                if (checkForMech) {
+                    buttons.add(Buttons.blue("resolveSeedySpaceMech_AC_" + planetID,
+                        "Draw 1 Action Card With A Mech On " + planetName).withEmoji(UnitEmojis.mech.asEmoji()));
+                }
+                if (checkForInf) {
+                    buttons.add(Buttons.blue("resolveSeedySpaceInf_AC_" + planetID,
+                        "Draw 1 Action Card By Removing 1 Infantry On " + planetName).withEmoji(UnitEmojis.infantry.asEmoji()));
+                }
                 buttons.add(decline);
 
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);

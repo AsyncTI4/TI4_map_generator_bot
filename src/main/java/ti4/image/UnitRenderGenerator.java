@@ -93,6 +93,7 @@ public class UnitRenderGenerator {
 
     public void render() {
         boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
+        boolean containsDMZ = unitHolder.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
         if (isSpace && displayType == DisplayType.shipless) return;
 
         BufferedImage unitImage;
@@ -153,8 +154,8 @@ public class UnitRenderGenerator {
                 int imageX = imagePos.x();
                 int imageY = imagePos.y();
                 
-                if ((isSpace && unitModel.getIsPlanetOnly()) || (!isSpace && unitModel.getIsSpaceOnly())) {
-                    String badPath = resourceHelper.getPositionFile("badpos_" + unitKey.asyncID() + ".png");
+                if (containsDMZ || (isSpace && unitModel.getIsPlanetOnly()) || (!isSpace && unitModel.getIsSpaceOnly())) {
+                    String badPath = resourceHelper.getPositionFile("badpos_" + (bulkUnitCount != null ? "tkn_" : "") + unitKey.asyncID() + ".png");
                     BufferedImage badPositionImage = scale == 1.0f ? ImageHelper.read(badPath) : ImageHelper.readScaled(badPath, scale);;
                     tileGraphics.drawImage(badPositionImage, imageX-5, imageY-5, null);
                 }

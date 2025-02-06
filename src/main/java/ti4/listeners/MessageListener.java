@@ -150,7 +150,7 @@ public class MessageListener extends ListenerAdapter {
         }
 
         String messageLowerCase = messageText.toLowerCase();
-        String receivingColorOrFaction = StringUtils.substringBetween(messageLowerCase, "to", " ");
+        String receivingColorOrFaction = StringUtils.substringBetween(messageLowerCase, "to", " ").replaceAll("[^a-zA-Z0-9]+$", "");
 
         if ("futureme".equals(receivingColorOrFaction)) {
             whisperToFutureMe(event, game, sender);

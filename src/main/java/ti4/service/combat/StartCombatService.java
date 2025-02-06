@@ -1052,7 +1052,7 @@ public class StartCombatService {
     private static String getGroundCombatIntroMessage() {
         return """
             ## Steps for Invasion:
-            > 1. Start of invasion abilities (_Tekklar Legtion_, _Blitz_, _Bunker_, etc.)
+            > 1. Start of invasion abilities (_Tekklar Legion_, _Blitz_, _Bunker_, etc.)
             > 2. Bombardment
             > 3. Commit Ground Forces
             > 4. After commit window (_Parley_, _Ghost Squad_, etc.)
