@@ -65,7 +65,7 @@ public class PlayHeroService {
             || "kolumehero".equals(playerLeader.getId())) {
             playerLeader.setLocked(false);
             playerLeader.setActive(true);
-            sb.append("\nLeader will be PURGED after status cleanup");
+            sb.append("\nLeader will be purged after status cleanup.");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
             if ("zealotshero".equals(playerLeader.getId())) {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),

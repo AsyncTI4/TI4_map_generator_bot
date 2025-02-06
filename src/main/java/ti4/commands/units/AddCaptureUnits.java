@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.service.unit.ParseUnitService;
@@ -38,7 +39,7 @@ class AddCaptureUnits extends GameStateSubcommand {
             // fighters and infantry are added as your own color
             if (parsedUnit.getUnitKey().getUnitType().equals(Units.UnitType.Fighter) ||
                     parsedUnit.getUnitKey().getUnitType().equals(Units.UnitType.Infantry)) {
-                Units.UnitKey unitKey = new Units.UnitKey(parsedUnit.getUnitKey().getUnitType(), getPlayer().getColor());
+                Units.UnitKey unitKey = Mapper.getUnitKey(parsedUnit.getUnitKey().getUnitType().toString(), getPlayer().getColor());
                 parsedUnit = new ParsedUnit(unitKey, parsedUnit.getCount(), "space");
             }
             tile.addUnit("space", parsedUnit.getUnitKey(), parsedUnit.getCount());

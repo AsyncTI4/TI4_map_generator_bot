@@ -568,8 +568,8 @@ public class MapGenerator implements AutoCloseable {
                     int topOfName = y + 10;
 
                     StringBuilder userName = new StringBuilder();
-                    if (!game.hideUserNames() && game.getGuild() != null) {
-                        Member member = game.getGuild().getMemberById(teammateID);
+                    if (!game.hideUserNames()) {
+                        Member member = game.getGuild() != null ? game.getGuild().getMemberById(teammateID) : null;
                         if (member == null) {
                             member = AsyncTI4DiscordBot.guildPrimary.getMemberById(teammateID);
                         }

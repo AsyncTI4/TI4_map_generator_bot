@@ -1079,7 +1079,7 @@ public class ButtonHelperAbilities {
                 + playerIdent
                 + ". Please check this is a valid **Pillage** opportunity, and use buttons to resolve.";
             buttons.add(Buttons.red(finChecker + "pillage_" + player.getColor() + "_unchecked",
-                "Pillage " + player.getFlexibleDisplayName()));
+                "Pillage " + (game.isFowMode() ? playerIdent : player.getFlexibleDisplayName())));
             buttons.add(Buttons.green(finChecker + "deleteButtons", "Decline Pillage Window"));
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
@@ -1227,7 +1227,7 @@ public class ButtonHelperAbilities {
         String reason = buttonID.split("_")[3];
         switch (reason) {
             case "mitosis" -> reason = "**Mitosis**";
-            case "refit" -> reason = "__Refit Troops__";
+            case "refit" -> reason = "_Refit Troops_";
         }
         String successMessage;
         if ("space".equalsIgnoreCase(uH)) {

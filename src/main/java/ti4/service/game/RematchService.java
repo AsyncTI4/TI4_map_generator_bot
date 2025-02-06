@@ -20,6 +20,8 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.RegexHelper;
+import ti4.helpers.StringHelper;
+import ti4.helpers.TIGLHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
@@ -36,15 +38,7 @@ public class RematchService {
 
     public static void secondHalfOfRematch(GenericInteractionCreateEvent event, Game game) {
         String name = game.getName();
-        int charValue = name.charAt(name.length() - 1);
-        String present = name.substring(name.length() - 1);
-        String next = String.valueOf((char) (charValue + 1));
-        String newName;
-        if (ButtonHelper.isNumeric(present)) {
-            newName = name + "b";
-        } else {
-            newName = name.substring(0, name.length() - 1) + next;
-        }
+        String newName = newGameName(name);
 
         Guild guild = game.getGuild();
         Role gameRole = null;
@@ -101,7 +95,7 @@ public class RematchService {
         Game newGame = CreateGameService.createNewGame(newName, gameOwner);
         // ADD PLAYERS
         for (Player player : game.getPlayers().values()) {
-            if (!player.getFaction().equals("neutral"))
+            if (player.getFaction()!= null && !player.getFaction().equals("neutral") && !player.getFaction().equalsIgnoreCase("null"))
                 newGame.addPlayer(player.getUserID(), player.getUserName());
         }
         newGame.setPlayerCountForMap(newGame.getPlayers().size());
@@ -169,9 +163,38 @@ public class RematchService {
         buttons2.add(Buttons.red("deleteButtons", "No Homebrew"));
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, "If you plan to have a supported homebrew mode in this game, " +
             "please indicate so with these buttons", buttons2);
+        if (game.isCompetitiveTIGLGame())
+            TIGLHelper.initializeTIGLGame(newGame);
         GameManager.save(newGame, "Rematch");
         if (event instanceof ButtonInteractionEvent event2) {
             event2.getMessage().delete().queue();
         }
     }
+
+    private static Pattern gameNamePattern = Pattern.compile("(?<prefix>[a-zA-Z]+[0-9]+)(?<rematchId>[a-z]*)");
+
+    public static String newGameName(String oldName) {
+        Matcher matcher = gameNamePattern.matcher(oldName);
+        if (matcher.matches()) {
+            String prefix = matcher.group("prefix");
+            String existingRematch = matcher.group("rematchId");
+            String newRematchId = "b";
+
+            if (existingRematch != null && !existingRematch.isBlank())
+                newRematchId = StringHelper.nextId(existingRematch);
+            return prefix + newRematchId;
+        }
+
+        // old formula if the regex fails
+        int charValue = oldName.charAt(oldName.length() - 1);
+        String present = oldName.substring(oldName.length() - 1);
+        String next = String.valueOf((char) (charValue + 1));
+
+        if (ButtonHelper.isNumeric(present)) {
+            return oldName + "b";
+        } else {
+            return oldName.substring(0, oldName.length() - 1) + next;
+        }
+    }
+
 }

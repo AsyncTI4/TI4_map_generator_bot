@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -19,6 +21,7 @@ import ti4.helpers.Storage;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.model.ColorModel;
+import ti4.service.emoji.TI4Emoji;
 
 @UtilityClass
 public class DrawingUtil {
@@ -42,8 +45,16 @@ public class DrawingUtil {
      * @param outlineSize use global variable "strokeX" where X = outline size e.g. stroke1 for 1px outline
      * @param outlineColor
      */
-    public static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, MapGenerator.HorizontalAlign horizontalAlignment, MapGenerator.VerticalAlign verticalAlignment,
-        Stroke outlineSize, Color outlineColor) {
+    public static void superDrawString(
+        Graphics2D g,
+        String txt,
+        int x,
+        int y,
+        Color textColor,
+        MapGenerator.HorizontalAlign horizontalAlignment,
+        MapGenerator.VerticalAlign verticalAlignment,
+        Stroke outlineSize,
+        Color outlineColor) {
         if (txt == null) return;
 
         int width = g.getFontMetrics().stringWidth(txt);
@@ -273,9 +284,7 @@ public class DrawingUtil {
     }
 
     public static String getBlackWhiteFileSuffix(String colorID) {
-        Set<String> lightColors = Set.of("ylw", "org", "pnk", "tan", "crm", "sns", "tqs", "gld", "lme", "lvn", "rse",
-            "spr", "tea", "lgy", "eth", "pch", "tpl", "cqr");
-        if (lightColors.contains(colorID)) {
+        if (Mapper.getColor(colorID).getTextColor().equalsIgnoreCase("black")) {
             return "_blk.png";
         }
         return "_wht.png";
@@ -377,5 +386,48 @@ public class DrawingUtil {
         } catch (Exception e) {
             BotLogger.log("Could not display player's faction icon image", e);
         }
+    }
+
+    public static void drawEmoji(Graphics2D g2, TI4Emoji emoji, int x, int y, int size) {
+        g2.drawImage(ImageHelper.readEmojiImageScaled(emoji, size), x, y, null);
+    }
+
+    public static int width(Graphics2D g, String str) {
+        int w = 0;
+        if (str != null && !str.isBlank())
+            w = g.getFontMetrics().stringWidth(str);
+        return w;
+    }
+
+    public static List<String> layoutText(Graphics2D g2, String inputText, int maxWidth) {
+        List<String> initialSplit = new ArrayList<>(Arrays.asList(inputText.split("[\\n\n]")));
+        List<String> finalSplit = new ArrayList<>();
+        for (String lineCheck : initialSplit) {
+            String line = lineCheck.trim(); // idk maybe it matters
+            int width = width(g2, line);
+            if (width > maxWidth) {
+                int iter = 0;
+                while (iter++ < 10) {
+                    int splitSpace = 0;
+                    int nextSpace = line.indexOf(" ");
+                    while (width(g2, line.substring(0, nextSpace).trim()) < maxWidth) {
+                        splitSpace = nextSpace;
+                        nextSpace = line.indexOf(" ", splitSpace + 1);
+                        if (nextSpace == -1)
+                            break;
+                    }
+                    finalSplit.add(line.substring(0, splitSpace).trim());
+                    line = line.substring(splitSpace).trim();
+
+                    if (width(g2, line) < maxWidth) {
+                        finalSplit.add(line);
+                        break;
+                    }
+                }
+            } else {
+                finalSplit.add(line);
+            }
+        }
+        return finalSplit;
     }
 }

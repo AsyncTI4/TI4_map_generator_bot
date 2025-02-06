@@ -33,9 +33,8 @@ class Replace extends GameStateSubcommand {
 
     public Replace() {
         super(Constants.REPLACE, "Replace player in game", true, false);
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player being replaced @playerName"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction being replaced").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Replacement player @playerName"));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLAYER_FACTION, "Player being replaced").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Replacement player @playerName"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setAutoComplete(true));
     }
 
@@ -59,24 +58,13 @@ class Replace extends GameStateSubcommand {
             return;
         }
 
-        OptionMapping replacedPlayerFactionOption = event.getOption(Constants.FACTION_COLOR);
-        OptionMapping replacedPlayerOption = event.getOption(Constants.PLAYER);
-        if (replacedPlayerFactionOption == null && replacedPlayerOption == null) {
-            MessageHelper.replyToMessage(event, "Specify player to remove.");
-            return;
-        }
-
-        Player replacedPlayer = CommandHelper.getPlayerFromEvent(game, event);
+        Player replacedPlayer = CommandHelper.getPlayerFromReplaceEvent(game, event);
         if (replacedPlayer == null) {
-            if (replacedPlayerOption != null) {
-                MessageHelper.replyToMessage(event, "Could not find the player to be replaced, try using the faction/color option.");
-            } else {
-                MessageHelper.replyToMessage(event, "Could not find the specified faction/color, try using the player option.");
-            }
+            MessageHelper.replyToMessage(event, "Could not find the player to replace. Please try again, and if the problem persists contact `@Bothelper`.");
             return;
         }
 
-        OptionMapping replacementPlayerOption = event.getOption(Constants.PLAYER2);
+        OptionMapping replacementPlayerOption = event.getOption(Constants.PLAYER);
         if (replacementPlayerOption == null) {
             MessageHelper.replyToMessage(event, "Specify player to be replaced.");
             return;
@@ -84,7 +72,7 @@ class Replace extends GameStateSubcommand {
 
         User replacementUser = replacementPlayerOption.getAsUser();
         Player possibleSpectatorToRemove = game.getPlayer(replacementUser.getId());
-        if (possibleSpectatorToRemove != null && possibleSpectatorToRemove.getFaction() != null) {
+        if (possibleSpectatorToRemove != null && possibleSpectatorToRemove.getFaction() != null && !possibleSpectatorToRemove.getFaction().equalsIgnoreCase("null")) {
             MessageHelper.replyToMessage(event, "Specify player that is **__not__** in the game to be the replacement");
             return;
         } else if (possibleSpectatorToRemove != null) {
@@ -125,6 +113,7 @@ class Replace extends GameStateSubcommand {
         replacedPlayer.setUserName(replacementUser.getName());
         replacedPlayer.setTotalTurnTime(0);
         replacedPlayer.setNumberTurns(0);
+        replacedPlayer.removeTeamMateID(oldPlayerUserId);
         if (oldPlayerUserId.equals(game.getSpeakerUserID())) {
             game.setSpeakerUserID(replacementUser.getId());
         }

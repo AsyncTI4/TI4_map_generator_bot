@@ -6,11 +6,16 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateCommand;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
@@ -77,8 +82,23 @@ public class MoveUnits extends GameStateCommand {
         RemoveUnitService.removeUnits(event, tileFrom, game, color, fromUnitList, prioritizeDamaged);
 
         String toUnitList = event.getOption(Constants.UNIT_NAMES_TO).getAsString();
-        AddUnitService.addUnits(event, tileTo, game, color, toUnitList);
 
+
+        UnitHolder space = tileTo.getUnitHolders().get("space");
+        boolean doesTileHaveFloatingGF = false;
+        if(space != null && getPlayer().getColor() != null){
+            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0 || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
+        }
+        AddUnitService.addUnits(event, tileTo, game, color, toUnitList);
+        if(space != null && getPlayer().getColor() != null && !doesTileHaveFloatingGF && ButtonHelper.getOtherPlayersWithShipsInTheSystem(getPlayer(), game, tileTo).isEmpty()){
+            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0 || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
+            if(doesTileHaveFloatingGF){
+                List<Button> buttons = ButtonHelper.getLandingTroopsButtons(getPlayer(), game, event, tileTo);
+                Button concludeMove = Buttons.red(getPlayer().getFinsFactionCheckerPrefix() + "deleteButtons", "Done Landing Troops");
+                buttons.add(concludeMove);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), getPlayer().getRepresentation()+" you can use these buttons to land troops if necessary",buttons);
+            }
+        }
         StartCombatService.combatCheck(game, event, tileTo);
         UnitCommandHelper.handleCcUseOption(event, tileTo, color, game);
         UnitCommandHelper.handleGenerateMapOption(event, game);

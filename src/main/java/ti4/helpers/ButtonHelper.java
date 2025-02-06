@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -776,7 +775,7 @@ public class ButtonHelper {
     public static void drawStatusACs(Game game, Player player, ButtonInteractionEvent event) {
         if (game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
             ReactionService.addReaction(event, game, player, true, false,
-                    "It seems you already drew your action cards for this status phase. As such, I will not deal you more. Please draw manually if this is a mistake.");
+                    "It seems you already drew your action cards for this status phase, so I will not deal you more. Please draw manually if this is a mistake.");
             return;
         }
         String message = "";
@@ -816,8 +815,8 @@ public class ButtonHelper {
                         + " However, as _Minister of Policy_ triggers __after__ strategy cards are returned, this means you can't play _Political Stability_ this round.");
             } else if (!hadPoliticalStability && player.getActionCards().containsKey("stability")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
-                        + ", you drew _Political Stability_ off of your regular action card draw, and __not__ from _Minister of Policy_."
-                        + " As such, you are free to play _Political Stability_ this round.");
+                        + ", you drew _Political Stability_ off of your regular action card draw, and __not__ from _Minister of Policy_, "
+                        + "so you can play _Political Stability_ this round.");
             }
             amount += 1;
         }
@@ -1645,9 +1644,14 @@ public class ButtonHelper {
             if (!unit.getColor().equals(player.getColor())) {
                 continue;
             }
-            UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
-            if (removedUnit.getIsShip()) {
-                count += space.getUnits().get(unit);
+            if(!player.getUnitsByAsyncID(unit.asyncID()).isEmpty()){
+                UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
+                if (removedUnit.getIsShip()) {
+                    count += space.getUnits().get(unit);
+                }
+            }
+            else{
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()+" you have no unitModel for the unit "+unit.unitName()+" in tile "+tile.getPosition());
             }
         }
         return count;
@@ -2081,8 +2085,8 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     ident + " used Il Na Viroset, the Mahact Commander"
                             + " and spent a command token from their tactic pool (leaving them with "
-                            + (player.getTacticalCC() - 1) + " remaining)."
-                            + " This ends their turn, but they may still resolve any \"end of turn\" abilities.");
+                            + (player.getTacticalCC() - 1) + " remaining) to remove their command token from " + tile.getRepresentationForButtons(game, player)
+                            + ". This ends their turn, but they may still resolve any \"end of turn\" abilities.");
             player.setTacticalCC(player.getTacticalCC() - 1);
             List<Button> conclusionButtons = new ArrayList<>();
             Button endTurn = Buttons.red(finChecker + "turnEnd", "End Turn");
@@ -2785,7 +2789,9 @@ public class ButtonHelper {
                     } else {
                         numInfNFightersNMechs += unit.getCapacityUsed() * unitsByQuantity.get(unit);
                     }
-                    unitTypesCounted.add(unit.getBaseType());
+                    if(unitsByQuantity.get(unit) > 0){
+                        unitTypesCounted.add(unit.getBaseType());
+                    }
 
                 } else {
                     if (unit.getIsShip()) {
@@ -2838,8 +2844,25 @@ public class ButtonHelper {
             }
         }
         String message = player.getRepresentationUnfogged();
+        boolean structuresViolated = false;
+
+        if(combatOnHolder.getUnitCount(UnitType.Spacedock, player) > 0){
+            if (!(player.hasUnit("absol_saar_spacedock") || player.hasUnit("saar_spacedock") || player.hasTech("ffac2")
+            || player.hasTech("absol_ffac2"))) {
+                structuresViolated = true;
+            }
+        }
+        if(combatOnHolder.getUnitCount(UnitType.Pds, player) > 0){
+            if (!(player.ownsUnit("mirveda_pds") || player.ownsUnit("mirveda_pds2"))) {
+                structuresViolated = true;
+            }
+        }
+        if (structuresViolated) {
+            message += ", you have a floating structure in tile " + tile.getRepresentation()
+                    + ". You can place the structure on the ground using the modify units button (present in your cards info), and remove the floating structure using the same button";
+        }
         if (fleetSupplyViolated) {
-            message += ", you are violating fleet pool limits in tile " + tile.getRepresentation()
+            message += ", you are violating fleet pool limits in the tile " + tile.getRepresentation()
                     + ". Specifically, you have " + (player.getFleetCC() + player.getMahactCC().size())
                     + " command tokens in your fleet pool,"
                     + (fleetCap / 2 - player.getFleetCC() - player.getMahactCC().size() > 0 ? "plus the ability to hold"
@@ -2855,7 +2878,7 @@ public class ButtonHelper {
                     + (numInfNFightersNMechs - numFighter2s) + " thing"
                     + (numInfNFightersNMechs - numFighter2s == 1 ? "" : "s") + " ). ";
         }
-        if (capacityViolated || fleetSupplyViolated) {
+        if (capacityViolated || fleetSupplyViolated || structuresViolated) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove",
                     "Remove Units in " + tile.getRepresentationForButtons(game, player)));
@@ -4069,7 +4092,7 @@ public class ButtonHelper {
     public static List<Button> moveAndGetLandingTroopsButtons(Player player, Game game, ButtonInteractionEvent event) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
-        List<Button> buttons = new ArrayList<>();
+
         Map<String, Integer> displacedUnits = game.getMovedUnitsFromCurrentActivation();
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         Tile tile = game.getTileByPosition(game.getActiveSystem());
@@ -4079,45 +4102,67 @@ public class ButtonHelper {
 
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice.");
-            return buttons;
+            return new ArrayList<Button>();
         }
+        if(game.isNaaluAgent() || player == game.getActivePlayer()){
+            if (!game.isNaaluAgent() && !game.isL1Hero() && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
+                    && game.getStoredValue("vaylerianHeroActive").isEmpty()) {
+                if (!game.getStoredValue("absolLux").isEmpty()) {
+                    player.setTacticalCC(player.getTacticalCC() + 1);
+                }
+                int cc = player.getTacticalCC();
+                cc -= 1;
+                player.setTacticalCC(cc);
+                CommandCounterHelper.addCC(event, player.getColor(), tile, true);
+            }
+            String thingToAdd = "box";
+            for (String unit : displacedUnits.keySet()) {
+                int amount = displacedUnits.get(unit);
+                if (unit.contains("damaged")) {
+                    unit = unit.replace("damaged", "");
+                }
+                if ("box".equalsIgnoreCase(thingToAdd)) {
+                    thingToAdd = amount + " " + unit;
+                } else {
+                    thingToAdd += ", " + amount + " " + unit;
+                }
+            }
+            if (!"box".equalsIgnoreCase(thingToAdd)) {
+                AddUnitService.addUnits(event, tile, game, player.getColor(), thingToAdd);
+            }
+            for (String unit : displacedUnits.keySet()) {
+                int amount = displacedUnits.get(unit);
+                if (unit.contains("damaged")) {
+                    unit = unit.replace("damaged", "");
+                    String colorID = Mapper.getColorID(player.getColor());
+                    UnitKey unitID = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), colorID);
+                    tile.addUnitDamage("space", unitID, amount);
+                }
+            }
 
-        if (!game.isNaaluAgent() && !game.isL1Hero() && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                && game.getStoredValue("vaylerianHeroActive").isEmpty()) {
-            if (!game.getStoredValue("absolLux").isEmpty()) {
-                player.setTacticalCC(player.getTacticalCC() + 1);
-            }
-            int cc = player.getTacticalCC();
-            cc -= 1;
-            player.setTacticalCC(cc);
-            CommandCounterHelper.addCC(event, player.getColor(), tile, true);
+            game.resetCurrentMovedUnitsFrom1TacticalAction();
         }
-        String thingToAdd = "box";
-        for (String unit : displacedUnits.keySet()) {
-            int amount = displacedUnits.get(unit);
-            if (unit.contains("damaged")) {
-                unit = unit.replace("damaged", "");
-            }
-            if ("box".equalsIgnoreCase(thingToAdd)) {
-                thingToAdd = amount + " " + unit;
-            } else {
-                thingToAdd += ", " + amount + " " + unit;
-            }
+        List<Button> buttons = ButtonHelper.getLandingTroopsButtons(player, game, event, tile);
+        Button concludeMove;
+        if(player == game.getActivePlayer()){
+            concludeMove =Buttons.red(finChecker + "doneLanding_" + tile.getPosition(), "Done Landing Troops");
+        }else{
+            concludeMove = Buttons.red(finChecker + "deleteButtons", "Done Resolving");
         }
-        if (!"box".equalsIgnoreCase(thingToAdd)) {
-            AddUnitService.addUnits(event, tile, game, player.getColor(), thingToAdd);
-        }
-        for (String unit : displacedUnits.keySet()) {
-            int amount = displacedUnits.get(unit);
-            if (unit.contains("damaged")) {
-                unit = unit.replace("damaged", "");
-                String colorID = Mapper.getColorID(player.getColor());
-                UnitKey unitID = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), colorID);
-                tile.addUnitDamage("space", unitID, amount);
-            }
-        }
+        buttons.add(concludeMove);
+        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost");
 
-        game.resetCurrentMovedUnitsFrom1TacticalAction();
+        return buttons;
+    }
+
+
+    public static List<Button> getLandingTroopsButtons(Player player, Game game, GenericInteractionCreateEvent event, Tile tile) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+
+        List<Button> buttons = new ArrayList<>();
+        Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+  
+
         String colorID = Mapper.getColorID(player.getColor());
         UnitType inf = UnitType.Infantry;
         UnitType mech = UnitType.Mech;
@@ -4336,12 +4381,11 @@ public class ButtonHelper {
                         "Roll BOMBARDMENT"));
             }
         }
-        Button concludeMove = Buttons.red(finChecker + "doneLanding_" + tile.getPosition(), "Done Landing Troops");
-        buttons.add(concludeMove);
-        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost");
 
         return buttons;
     }
+
+
 
     public static String putInfWithMechsForStarforge(String pos, String successMessage, Game game, Player player,
             ButtonInteractionEvent event) {
@@ -6249,6 +6293,10 @@ public class ButtonHelper {
                 youCanSpend.append(" You also have ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ for ")
                     .append(ButtonHelper.getNumberOfUnitUpgrades(player)).append(" resources.");
                 resourcesAvailable += ButtonHelper.getNumberOfUnitUpgrades(player);
+            }
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")) {
+                youCanSpend.append(" You also have Titans commander..");
+                resourcesAvailable += 1;
             }
             youCanSpend.append(" As such, you may spend up to ").append(resourcesAvailable).append(" during the PRODUCTION.");
         }

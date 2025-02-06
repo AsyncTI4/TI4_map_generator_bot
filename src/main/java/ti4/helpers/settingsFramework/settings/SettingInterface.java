@@ -84,6 +84,10 @@ public abstract class SettingInterface {
     }
 
     public void setEmoji(TI4Emoji emoji) {
-        setEmoji(emoji.toString());
+        if (emoji == null) {
+            this.emoji = null;
+        } else {
+            setEmoji(emoji.toString());
+        }
     }
 }

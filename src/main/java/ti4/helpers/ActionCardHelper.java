@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -305,7 +307,7 @@ public class ActionCardHelper {
         if (player.isPassed() && activePlayerID != null) {
             Player activePlayer = game.getPlayer(activePlayerID);
             if (activePlayer != null && activePlayer.hasTech("tp")) {
-                return "You are passed and the active player owns _Transparasteel Plating_, preventing you from playing action cards. As such, the action card command has been cancelled.";
+                return "You are passed and the active player owns _Transparasteel Plating_, preventing you from playing action cards.";
             }
         }
         if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) != player) {
@@ -886,7 +888,7 @@ public class ActionCardHelper {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, introMsg
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, removeRepresentationIfFOW(introMsg, player, game)
                         + " A reminder that you should declare which outcome you are predicting now,"
                         + " before other players choose whether they will Sabo.", game, player, riderButtons);
                 }
@@ -983,10 +985,11 @@ public class ActionCardHelper {
     }
 
     private static void sendResolveMsgToMainChannel(String message, List<Button> buttons, Player player, Game game) {
-        if (game.isFowMode()) {
-            message = message.replace(player.getRepresentation(), "");
-        }
-        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), removeRepresentationIfFOW(message, player, game), buttons);
+    }
+
+    private static String removeRepresentationIfFOW(String message, Player player, Game game) {
+        return game.isFowMode() ? StringUtils.capitalize(message.replace(player.getRepresentation() + ",", "").trim()) : message;
     }
 
     public static String playAC(GenericInteractionCreateEvent event, Game game, Player player, String value, MessageChannel channel) {

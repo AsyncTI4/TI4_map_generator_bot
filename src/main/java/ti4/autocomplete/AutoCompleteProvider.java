@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,6 +37,7 @@ import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.ColorableModelInterface;
 import ti4.model.DeckModel;
 import ti4.model.EmbeddableModel;
 import ti4.model.ExploreModel;
@@ -139,6 +141,7 @@ public class AutoCompleteProvider {
                         put("BLUE", "Blues");
                         put("PURPLE", "Purples");
                         put("PINK", "Pinks");
+                        put("MULTI", "Multi-Colours");
                         put("ALL", "ALL COLOURS");
                     }
                 };
@@ -316,7 +319,7 @@ public class AutoCompleteProvider {
             }
             case Constants.SPECIFIC_PHASE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var phases = List.of("strategy", "voting", "statusScoring", "statusHomework", "action", "agendaResolve", "playerSetup", "ixthian","agenda");
+                var phases = List.of("strategy", "voting", "statusScoring", "statusHomework", "action", "agendaResolve", "playerSetup", "setupHomebrew", "ixthian", "agenda");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(phases, enteredValue);
                 event.replyChoices(options).queue();
             }
@@ -661,6 +664,19 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.PLAYER_FACTION -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase().trim();
+
+                Function<Player, String> getDisp = p -> game.isFowMode() ? p.getUserName() : p.getAutoCompleteRepresentation();
+                List<Command.Choice> options = game.getPlayers().values().stream()
+                    .filter(p -> getDisp.apply(p).toLowerCase().contains(enteredValue))
+                    .limit(25)
+                    .map(p -> new Command.Choice(getDisp.apply(p), p.getUserID()))
+                    .toList();
+                event.replyChoices(options).queue();
+            }
             case Constants.FACTION_COLOR, Constants.TARGET_FACTION_OR_COLOR -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
@@ -786,7 +802,7 @@ public class AutoCompleteProvider {
             case Constants.SEARCH_ACTION_CARDS -> options = searchModels(event, Mapper.getActionCards().values(), source);
             case Constants.SEARCH_SECRET_OBJECTIVES -> options = searchModels(event, Mapper.getSecretObjectives().values(), source);
             case Constants.SEARCH_PUBLIC_OBJECTIVES -> options = searchModels(event, Mapper.getPublicObjectives().values(), source);
-            case Constants.SEARCH_PROMISSORY_NOTES -> options = searchModels(event, Mapper.getPromissoryNotes().values().stream().filter(m -> !m.isDupe()).toList(), source);
+            case Constants.SEARCH_PROMISSORY_NOTES -> options = searchModels(event, Mapper.getPromissoryNotes().values(), source);
             case Constants.SEARCH_DECKS -> options = searchModels(event, Mapper.getDecks().values(), source);
         }
         event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList())).queue();
@@ -852,8 +868,8 @@ public class AutoCompleteProvider {
         Game game = GameManager.getManagedGame(gameName).getGame();
         Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-        Map<String, Integer> techs = new HashMap<>(player.getEvents());
-        List<Command.Choice> options = techs.entrySet().stream()
+        Map<String, Integer> events = new HashMap<>(player.getEvents());
+        List<Command.Choice> options = events.entrySet().stream()
             .filter(entry -> entry.getKey().contains(enteredValue))
             .limit(25)
             .map(entry -> new Command.Choice(entry.getValue() + " " + entry.getKey(), entry.getValue()))
@@ -875,6 +891,7 @@ public class AutoCompleteProvider {
         List<String> explores = game.getAllExplores();
         List<Command.Choice> options = explores.stream()
             .map(Mapper::getExplore)
+            .filter(Objects::nonNull)
             .filter(e -> e.search(enteredValue))
             .limit(25)
             .sorted(Comparator.comparing(ExploreModel::getAutoCompleteName))
@@ -978,6 +995,7 @@ public class AutoCompleteProvider {
         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
         return models.stream()
             .filter(model -> model.search(enteredValue, source))
+            .filter(model -> (model instanceof ColorableModelInterface cm) ? !cm.isDupe() : true)
             .limit(25)
             .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))
             .toList();

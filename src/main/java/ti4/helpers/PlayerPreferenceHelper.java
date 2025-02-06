@@ -12,6 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
+import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -21,12 +22,16 @@ public class PlayerPreferenceHelper {
     @ButtonHandler("offerPlayerPref")
     public static void offerPlayerPreferences(Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.gray("playerPref_autoSaboReact", "Change Auto No-Sabo React Time", CardEmojis.ActionCard));
-        buttons.add(Buttons.gray("playerPref_afkTimes", "Change AFK Times"));
-        buttons.add(Buttons.gray("playerPref_tacticalAction", "Change Distance-Based Tactical Action Preference"));
-        buttons.add(Buttons.gray("playerPref_autoNoWhensAfters", "Change Auto No Whens/Afters React", CardEmojis.Agenda));
+        buttons.add(Buttons.gray("playerPref_autoSaboReact", "Auto No-Sabo React Time", CardEmojis.ActionCard));
+        buttons.add(Buttons.gray("playerPref_afkTimes", "AFK Times"));
+        buttons.add(Buttons.gray("playerPref_tacticalAction", "Distance-Based Tactical Action Preference"));
+        buttons.add(Buttons.gray("playerPref_autoNoWhensAfters", "Auto No Whens/Afters React", CardEmojis.Agenda));
         buttons.add(Buttons.OFFER_PING_OPTIONS_BUTTON);
-        buttons.add(Buttons.gray("playerPref_directHitManagement", "Tell The Bot What Units Not To Risk Direct Hit On"));
+        buttons.add(Buttons.gray("playerPref_directHitManagement", "Units to Risk Direct Hit"));
+        if (player.getUserSettings().isShowTransactables())
+            buttons.add(Buttons.gray("playerPref_hideTransactables", "Stop showing player areas start of transaction"));
+        else
+            buttons.add(Buttons.gray("playerPref_showTransactables", "Show player areas start of transaction"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " Choose the thing you wish to change", buttons);
     }
 
@@ -55,6 +60,18 @@ public class PlayerPreferenceHelper {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
             case "directHitManagement" -> offerDirectHitManagementOptions(game, player);
+            case "showTransactables" -> {
+                UserSettings settings = player.getUserSettings();
+                settings.setShowTransactables(true);
+                UserSettingsManager.save(settings);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
+            }
+            case "hideTransactables" -> {
+                UserSettings settings = player.getUserSettings();
+                settings.setShowTransactables(false);
+                UserSettingsManager.save(settings);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
+            }
         }
         ButtonHelper.deleteMessage(event);
     }
