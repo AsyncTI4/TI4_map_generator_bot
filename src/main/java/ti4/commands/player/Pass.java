@@ -24,6 +24,6 @@ class Pass extends GameStateSubcommand {
             return;
         }
 
-        PassService.passPlayerForRound(event, game, player);
+        PassService.passPlayerForRound(event, game, player, false);
     }
 }
