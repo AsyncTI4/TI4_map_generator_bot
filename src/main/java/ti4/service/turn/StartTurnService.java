@@ -177,7 +177,7 @@ public class StartTurnService {
         }
 
         if (goingToPass) {
-            PassService.passPlayerForRound(event, game, nextPlayer, true);
+            PassService.passPlayerForRound(event, game, player, true);
         }
     }
 
