@@ -1,4 +1,4 @@
-package ti4.commands.fow;
+package ti4.commands.map;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -24,12 +24,12 @@ class AddAdjacencyOverride extends GameStateSubcommand {
         String primaryTile = event.getOption(Constants.PRIMARY_TILE).getAsString().toLowerCase();
         int direction;
         switch (event.getOption(Constants.PRIMARY_TILE_DIRECTION).getAsString().toLowerCase()) {
-            case "north" -> direction = 0;
-            case "northeast" -> direction = 1;
-            case "southeast" -> direction = 2;
-            case "south" -> direction = 3;
-            case "southwest" -> direction = 4;
-            case "northwest" -> direction = 5;
+            case "n", "north" -> direction = 0;
+            case "ne", "northeast" -> direction = 1;
+            case "se", "southeast" -> direction = 2;
+            case "s", "south" -> direction = 3;
+            case "sw", "southwest" -> direction = 4;
+            case "nw", "northwest" -> direction = 5;
             default -> direction = -1;
         }
 

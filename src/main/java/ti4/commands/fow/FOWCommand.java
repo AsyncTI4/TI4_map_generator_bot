@@ -11,19 +11,11 @@ import ti4.helpers.Constants;
 public class FOWCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new AddCustomAdjacentTile(),
-                    new AddAdjacencyOverride(),
-                    new AddAdjacencyOverrideList(),
                     new AddFogTile(),
+                    new RemoveFogTile(),
                     new CheckChannels(),
                     new PingActivePlayer(),
                     new PingSystem(),
-                    new RemoveAdjacencyOverride(),
-                    new RemoveAllAdjacencyOverrides(),
-                    new RemoveFogTile(),
-                    new RemoveCustomAdjacentTile(),
-                    new RemoveAllCustomAdjacentTiles(),
-                    new SetFogFilter(),
                     new Whisper(),
                     new Announce(),
                     new FOWOptions(),
