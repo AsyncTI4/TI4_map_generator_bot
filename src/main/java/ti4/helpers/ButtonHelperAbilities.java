@@ -1079,7 +1079,7 @@ public class ButtonHelperAbilities {
                 + playerIdent
                 + ". Please check this is a valid **Pillage** opportunity, and use buttons to resolve.";
             buttons.add(Buttons.red(finChecker + "pillage_" + player.getColor() + "_unchecked",
-                "Pillage " + player.getFlexibleDisplayName()));
+                "Pillage " + (game.isFowMode() ? playerIdent : player.getFlexibleDisplayName())));
             buttons.add(Buttons.green(finChecker + "deleteButtons", "Decline Pillage Window"));
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
