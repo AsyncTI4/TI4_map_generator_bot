@@ -2681,7 +2681,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("passForRound")
     public static void passForRound(ButtonInteractionEvent event, Player player, Game game) {
-        PassService.passPlayerForRound(event, game, player);
+        PassService.passPlayerForRound(event, game, player, false);
         ButtonHelper.deleteMessage(event);
     }
 
