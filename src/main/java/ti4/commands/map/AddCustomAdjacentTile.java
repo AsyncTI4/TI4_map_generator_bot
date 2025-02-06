@@ -1,7 +1,6 @@
-package ti4.commands.fow;
+package ti4.commands.map;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
@@ -32,9 +32,7 @@ class AddCustomAdjacentTile extends GameStateSubcommand {
             return;
         }
 
-        adjacentTiles = adjacentTiles.replace(" ", "");
-        String[] tilesSplit = adjacentTiles.split(",");
-        List<String> tiles = Arrays.asList(tilesSplit);
+        List<String> tiles = Helper.getListFromCSV(adjacentTiles);
         Game game = getGame();
         game.addCustomAdjacentTiles(primaryTile, tiles);
         OptionMapping twoWayOption = event.getOption(Constants.TWO_WAY);

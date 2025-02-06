@@ -19,7 +19,7 @@ class RemoveFogTile extends GameStateSubcommand {
 
     public RemoveFogTile() {
         super(Constants.REMOVE_FOG_TILE, "Remove Fog of War tiles from the map.", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile positions on map").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile positions on map or ALL to remove all fog tiles").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to remove from").setRequired(true).setAutoComplete(true));
     }
 
@@ -44,6 +44,7 @@ class RemoveFogTile extends GameStateSubcommand {
         for (String position : positions) {
             if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Tile position '" + position + "' is invalid");
+                continue;
             }
 
             //remove the custom tile from the player

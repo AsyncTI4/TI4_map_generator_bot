@@ -23,7 +23,12 @@ public class MapCommand implements ParentCommand {
         new PreviewMapTemplate(),
         new MoveTile(),
         new AddTileRandom(),
-        new AddTileListRandom()
+        new AddTileListRandom(),
+        new AddCustomAdjacentTile(),
+        new AddAdjacencyOverride(),
+        new AddAdjacencyOverrideList(),
+        new RemoveAdjacencyOverride(),
+        new RemoveCustomAdjacentTile()
     ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
 
