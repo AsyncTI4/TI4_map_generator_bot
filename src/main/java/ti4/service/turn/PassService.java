@@ -17,14 +17,14 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class PassService {
 
-    public static void passPlayerForRound(GenericInteractionCreateEvent event, Game game, Player player, boolean autoPass) {
+    public static void passPlayerForRound(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setPassed(true);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
             ButtonHelperCommanders.olradinCommanderStep1(player, game);
         }
 
-        String text = player.getRepresentation(true, false) + " has passed " + (autoPass ? " (preset)." : ".");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
+        String text = player.getRepresentation(true, false) + " has passed.";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
         if (player.hasTech("absol_aida")) {
             String msg = player.getRepresentation() + " since you have _AI Development Algorithm_, you may research 1 unit upgrade now for 6 influence.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -37,7 +37,7 @@ public class PassService {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String message2 = player.getRepresentation() + ", you would research a unit upgrade technology, but because of **Propagation**, you instead gain 3 command tokens."
                     + " Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
         }
@@ -62,11 +62,11 @@ public class PassService {
             }
             if (player.getCommodities() > oldComm) {
                 String msg = player.getRepresentation() + " since you have _Applied Biothermics_, you gained 1 commodity for each passed player"
-                    + " (commodities went from " + oldComm + " -> " + player.getCommodities() + ").";
+                + " (commodities went from " + oldComm + " -> " + player.getCommodities() + ").";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
-
+        
         DiscordantStarsHelper.checkKjalengardMechs(event, player, game);
 
         EndTurnService.pingNextPlayer(event, game, player, true);
