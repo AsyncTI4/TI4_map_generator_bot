@@ -8,7 +8,7 @@ public enum ColorEmojis implements TI4Emoji {
     // Colors
     black, bloodred, blue, brown, chocolate, chrome, rainbow, sherbet, rose, emerald, ethereal, forest, gold, gray, green, lavender, //
     lightgray, lime, navy, orange, orca, petrol, pink, purple, red, spring, sunset, tan, teal, turquoise, yellow, //
-    copper, plum, peach, rust, tropical, jupiter, poison, vapourwave, watermelon, checker, paintball, wasp, magma, glacier, //
+    copper, plum, peach, rust, tropical, jupiter, poison, vapourwave, watermelon, checker, paintball, wasp, magma, glacier, plaid, harlequin, //
     splitbloodred, splitblue, splitchocolate, splitemerald, splitgold, splitgreen, splitlime, splitnavy, splitorange, //
     splitpetrol, splitpink, splitpurple, splitrainbow, splitred, splittan, splitteal, splitturquoise, splityellow, riftset; //
 
@@ -71,6 +71,8 @@ public enum ColorEmojis implements TI4Emoji {
             case "wtm", "watermelon" -> watermelon + "**Watermelon**";
             case "wsp", "wasp" -> wasp + "**Wasp**";
             case "cqr", "checker" -> checker + "**Checker**";
+            case "pld", "plaid" -> plaid + "**Plaid**";
+            case "hqn", "harlequin" -> harlequin + "**Harlequin**";
             case "ptb", "paintball" -> paintball + "**Paintball**";
             case "orca" -> orca + "**Orca**";
             case "splitred" -> splitred + "**SplitRed**";
@@ -141,6 +143,8 @@ public enum ColorEmojis implements TI4Emoji {
             case "wtm", "watermelon" -> watermelon;
             case "wsp", "wasp" -> wasp;
             case "cqr", "checker" -> checker;
+            case "pld", "plaid" -> plaid;
+            case "hqn", "harlequin" -> harlequin;
             case "ptb", "paintball" -> paintball;
             case "orca" -> orca;
             case "splitred" -> splitred;

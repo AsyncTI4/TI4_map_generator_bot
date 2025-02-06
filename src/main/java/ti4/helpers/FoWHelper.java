@@ -26,7 +26,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.map.manage.GameManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
@@ -927,13 +926,13 @@ public class FoWHelper {
             if (senderVisible) {
                 sb.append(sendingPlayer.getRepresentation());
             } else {
-                sb.append("???");
+                sb.append("Someone");
             }
             sb.append(" sent ").append(transactedObject).append(" to ");
             if (receiverVisible) {
                 sb.append(receivingPlayer.getRepresentation());
             } else {
-                sb.append("???");
+                sb.append("someone");
             }
 
             String message = sb.toString();
