@@ -4605,6 +4605,17 @@ public class ButtonHelper {
                         if (!game.getStoredValue("baldrickGDboost").isEmpty()) {
                             moveValue += 1;
                         }
+                        for (UnitHolder uhPlanet : activeSystem.getPlanetUnitHolders()) {
+                            if (player.getPlanets().contains(uhPlanet.getName())) {
+                                continue;
+                            }
+                            for (String attachment : uhPlanet.getTokenList()) {
+                                if (attachment.contains("sigma_weirdway")) {
+                                    moveValue -= 1;
+                                    break;
+                                }
+                            }
+                        }
 
                         if (distance > moveValue && distance < 90) {
                             if (player.hasTech("gd")) {
