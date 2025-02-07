@@ -58,6 +58,28 @@ public class CommandHelper {
         return true;
     }
 
+    /**
+     * Supported inputs include:
+     * <ul>
+     * <li>id: 228999251328368640
+     * <li>username: Jazzxhands
+     * <li>autocomplete: No Color / No Faction / Jazzxhands
+     * </ul>
+     */
+    @Nullable
+    public static Player getPlayerFromReplaceEvent(Game game, GenericCommandInteractionEvent event) {
+        String nameOrID = event.getOption(Constants.PLAYER_FACTION).getAsString();
+        int replaceIndex = nameOrID.lastIndexOf(" / ");
+        String name = nameOrID.substring(replaceIndex < 0 ? 0 : replaceIndex + 3);
+
+        for (Player player : game.getPlayers().values()) {
+            if (player.getUserID().equals(nameOrID) || player.getUserName().equals(name)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
     @Nullable
     public static Player getPlayerFromEvent(Game game, GenericCommandInteractionEvent event) {
         OptionMapping playerOption = event.getOption(Constants.PLAYER);

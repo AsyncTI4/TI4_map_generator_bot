@@ -307,7 +307,7 @@ public class ActionCardHelper {
         if (player.isPassed() && activePlayerID != null) {
             Player activePlayer = game.getPlayer(activePlayerID);
             if (activePlayer != null && activePlayer.hasTech("tp")) {
-                return "You are passed and the active player owns _Transparasteel Plating_, preventing you from playing action cards. As such, the action card command has been cancelled.";
+                return "You are passed and the active player owns _Transparasteel Plating_, preventing you from playing action cards.";
             }
         }
         if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) != player) {

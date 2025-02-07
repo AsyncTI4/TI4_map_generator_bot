@@ -48,6 +48,9 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.message.BotLogger;
+import ti4.model.BorderAnomalyHolder;
+import ti4.model.TemporaryCombatModifierModel;
 
 import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
 import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
@@ -69,6 +72,7 @@ import static ti4.map.manage.GamePersistenceKeys.TOKENS;
 import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
 import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
 import static ti4.map.manage.GamePersistenceKeys.UNITS;
+
 @UtilityClass
 class GameLoadService {
 
@@ -213,17 +217,17 @@ class GameLoadService {
                     if (ENDUNITHOLDER.equals(tmpData)) {
                         break;
                     }
-                    String spaceHolder = null;
+                    String unitHolderName = null;
                     while (gameFileLines.hasNext()) {
                         String data = tmpData != null ? tmpData : gameFileLines.next();
                         tmpData = null;
                         if (UNITS.equals(data)) {
-                            spaceHolder = gameFileLines.next().toLowerCase();
+                            unitHolderName = gameFileLines.next().toLowerCase();
                             if (tile != null) {
-                                if (Constants.MIRAGE.equals(spaceHolder)) {
+                                if (Constants.MIRAGE.equals(unitHolderName)) {
                                     Helper.addMirageToTile(tile);
-                                } else if (!tile.isSpaceHolderValid(spaceHolder)) {
-                                    BotLogger.log(game.getName() + ": Not valid space holder detected: " + spaceHolder);
+                                } else if (!tile.isSpaceHolderValid(unitHolderName)) {
+                                    BotLogger.log(game.getName() + ": Not valid unitholder detected: " + unitHolderName);
                                 }
                             }
                             continue;
@@ -231,7 +235,7 @@ class GameLoadService {
                         if (ENDUNITS.equals(data)) {
                             break;
                         }
-                        readUnit(tile, data, spaceHolder);
+                        readUnit(tile, data, unitHolderName);
                     }
 
                     while (gameFileLines.hasNext()) {
@@ -242,7 +246,7 @@ class GameLoadService {
                         if (ENDUNITDAMAGE.equals(data)) {
                             break;
                         }
-                        readUnitDamage(tile, data, spaceHolder);
+                        readUnitDamage(tile, data, unitHolderName);
                     }
 
                     while (gameFileLines.hasNext()) {
@@ -253,7 +257,7 @@ class GameLoadService {
                         if (PLANET_ENDTOKENS.equals(data)) {
                             break;
                         }
-                        readPlanetTokens(tile, data, spaceHolder);
+                        readPlanetTokens(tile, data, unitHolderName);
                     }
                 }
 
@@ -387,20 +391,17 @@ class GameLoadService {
                         int pnghrs = Integer.parseInt(info);
                         game.setAutoPing(pnghrs != 0);
                         game.setAutoPingSpacer(pnghrs);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.CURRENT_AGENDA_INFO -> {
                     try {
                         game.setCurrentAgendaInfo(info);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.CURRENT_ACDRAWSTATUS_INFO -> {
                     try {
                         game.setCurrentACDrawStatusInfo(info);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
 
                 case Constants.LAST_ACTIVE_PLAYER_CHANGE -> {
@@ -408,8 +409,7 @@ class GameLoadService {
                         long millis = Long.parseLong(info);
                         Date lastChange = new Date(millis);
                         game.setLastActivePlayerChange(lastChange);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.PLAYER_COUNT_FOR_MAP -> {
                     try {
@@ -607,344 +607,295 @@ class GameLoadService {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setCompetitiveTIGLGame(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.HACK_ELECTION_STATUS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setHasHackElectionBeenPlayed(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.CC_N_PLASTIC_LIMIT -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setCcNPlasticLimit(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.BOT_FACTION_REACTS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setBotFactionReacts(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.HAS_HAD_A_STATUS_PHASE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setHasHadAStatusPhase(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.BOT_SHUSHING -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setBotShushing(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.COMMUNITY_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setCommunityMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.ALLIANCE_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setAllianceMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.FOW_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setFowMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case "fow_hide_names" -> { // TODO REMOVE THIS AFTER ONE SAVE/LOAD GAMES
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         if (value)
                             game.setFowOption("hide_player_names", info);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.NAALU_AGENT -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setNaaluAgent(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.L1_HERO -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setL1Hero(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.NOMAD_COIN -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setNomadCoin(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.FAST_SC_FOLLOW -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setFastSCFollowMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.QUEUE_SO -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setQueueSO(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.SHOW_BUBBLES -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setShowBubbles(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.TRANSACTION_METHOD -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setNewTransactionMethod(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.SHOW_GEARS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setShowGears(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.SHOW_BANNERS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setShowBanners(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.SHOW_HEX_BORDERS -> game.setHexBorderStyle(info);
                 case Constants.HOMEBREW_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setHomebrew(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.PURGED_FRAGMENTS -> {
                     try {
                         int value = Integer.parseInt(info);
                         game.setNumberOfPurgedFragments(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.TEMPORARY_PING_DISABLE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setTemporaryPingDisable(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.DOMINUS_ORB -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setDominusOrb(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.COMPONENT_ACTION -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setComponentAction(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.JUST_PLAYED_COMPONENT_AC -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setJustPlayedComponentAC(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.BASE_GAME_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setBaseGameMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.LIGHT_FOG_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setLightFogMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.CPTI_EXPLORE_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setCptiExploreMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.RED_TAPE_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setRedTapeMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.HOMEBREW_SC_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setHomebrewSCMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.INJECT_RULES_LINKS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setInjectRulesLinks(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.SPIN_MODE -> {
                     try {
                         String value = "false".equalsIgnoreCase(info) ? "OFF" : info;
                         game.setSpinMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.SHOW_UNIT_TAGS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setShowUnitTags(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.SHOW_OWNED_PNS_IN_PLAYER_AREA -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setShowOwnedPNsInPlayerArea(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.STRAT_PINGS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setStratPings(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.TEXT_SIZE -> {
                     try {
                         game.setTextSize(info);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.ABSOL_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setAbsolMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.VOTC_MODE, "cryypter_mode" -> { //TODO: Remove "cryypter_mode" option if found in prod after Nov 2024
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setVotcMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.PROMISES_PROMISES -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setPromisesPromisesMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.FLAGSHIPPING -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setFlagshippingMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.MILTYMOD_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setMiltyModMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.SHOW_MAP_SETUP -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setShowMapSetup(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.DISCORDANT_STARS_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setDiscordantStarsMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.VERBOSITY -> {
                     try {
                         game.setOutputVerbosity(info);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.BETA_TEST_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setTestBetaFeaturesMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.AGE_OF_EXPLORATION_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setAgeOfExplorationMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.MINOR_FACTIONS_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setMinorFactionsMode(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.SHOW_FULL_COMPONENT_TEXT -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setShowFullComponentTextEmbeds(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.GAME_HAS_ENDED -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setHasEnded(value);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.CREATION_DATE -> game.setCreationDate(info);
                 case Constants.ROUND -> {
@@ -986,8 +937,7 @@ class GameLoadService {
                     try {
                         int count = Integer.parseInt(info);
                         game.setMapImageGenerationCount(count);
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.FOW_GM_IDS -> game.setFogOfWarGMIDs(Helper.getListFromCSV(info));
                 case Constants.RUN_DATA_MIGRATIONS -> {
@@ -1001,8 +951,7 @@ class GameLoadService {
                 case Constants.BAG_DRAFT -> {
                     try {
                         game.setBagDraft(BagDraft.GenerateDraft(info, game));
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
                 case Constants.MILTY_DRAFT_MANAGER -> game.setMiltyDraftString(info); // We will parse this later
                 case Constants.MILTY_DRAFT_SETTINGS -> game.setMiltyJson(info); // We will parse this later
@@ -1176,7 +1125,7 @@ class GameLoadService {
                 case Constants.PROMISSORY_NOTES_OWNED -> player.setPromissoryNotesOwned(new HashSet<>(Helper.getSetFromCSV(tokenizer.nextToken())));
                 case Constants.PROMISSORY_NOTES_PLAY_AREA -> player.setPromissoryNotesInPlayArea(getCardList(tokenizer.nextToken()));
                 case Constants.UNITS_OWNED -> player.setUnitsOwned(new HashSet<>(Helper.getSetFromCSV(tokenizer.nextToken())));
-                case Constants.PLANETS -> player.setPlanets(getCardList(tokenizer.nextToken().replace("exhausted", "").replace("refreshed", "").replace("blaheo","biaheo")));
+                case Constants.PLANETS -> player.setPlanets(getCardList(tokenizer.nextToken().replace("exhausted", "").replace("refreshed", "").replace("blaheo", "biaheo")));
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));

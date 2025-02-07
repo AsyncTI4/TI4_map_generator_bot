@@ -101,7 +101,8 @@ public class Units {
     public enum UnitType {
         Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), CabalSpacedock("csd"), Monument("monument"), // ground based
         Fighter("ff"), Destroyer("dd"), Cruiser("ca"), Carrier("cv"), Dreadnought("dn"), Flagship("fs"), Warsun("ws"), //ships
-        PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"), Lady("lady"), Cavalry("cavalry"); //relics
+        PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"), Lady("lady"), Cavalry("cavalry"), //relics
+        StarfallPds("starfallpds");
 
         @Getter
         public final String value;
@@ -114,7 +115,7 @@ public class Units {
             return switch (this) {
                 case Infantry -> "Infantry";
                 case Mech -> "Mech";
-                case Pds -> "PDS";
+                case Pds, StarfallPds -> "PDS";
                 case Spacedock, CabalSpacedock -> "Space Dock";
                 case Fighter -> "Fighter";
                 case Destroyer -> "Destroyer";
@@ -135,7 +136,7 @@ public class Units {
             return switch (this) {
                 case Infantry -> "infantry";
                 case Mech -> "mech";
-                case Pds -> "pds";
+                case Pds, StarfallPds -> "pds";
                 case Spacedock, CabalSpacedock -> "spacedock";
                 case Fighter -> "fighter";
                 case Destroyer -> "destroyer";
@@ -156,7 +157,7 @@ public class Units {
             return switch (this) {
                 case Infantry -> UnitEmojis.infantry;
                 case Mech -> UnitEmojis.mech;
-                case Pds -> UnitEmojis.pds;
+                case Pds, StarfallPds -> UnitEmojis.pds;
                 case Spacedock, CabalSpacedock -> UnitEmojis.spacedock;
                 case PlenaryOrbital -> UnitEmojis.PlenaryOrbital;
                 case Fighter -> UnitEmojis.fighter;

@@ -95,7 +95,7 @@ public class RematchService {
         Game newGame = CreateGameService.createNewGame(newName, gameOwner);
         // ADD PLAYERS
         for (Player player : game.getPlayers().values()) {
-            if (!player.getFaction().equals("neutral"))
+            if (player.getFaction()!= null && !player.getFaction().equals("neutral") && !player.getFaction().equalsIgnoreCase("null"))
                 newGame.addPlayer(player.getUserID(), player.getUserName());
         }
         newGame.setPlayerCountForMap(newGame.getPlayers().size());
