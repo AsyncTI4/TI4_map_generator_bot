@@ -49,7 +49,6 @@ import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -2221,7 +2220,9 @@ public class Helper {
         for (TechnologyModel tech : techs) {
             boolean addTech = true;
             if (tech.isUnitUpgrade()) {
-                for (String factionTech : player.getNotResearchedFactionTechs()) {
+                List<String> researchedTechs = player.getTechs();
+                researchedTechs.addAll(player.getNotResearchedFactionTechs());
+                for (String factionTech : researchedTechs) {
                     TechnologyModel fTech = Mapper.getTech(factionTech);
                     if (fTech != null && !fTech.getAlias().equalsIgnoreCase(tech.getAlias())
                         && fTech.isUnitUpgrade()
