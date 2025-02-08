@@ -261,7 +261,7 @@
         "sustainDamage": true,
         "isGroundForce": true,
         "ability": "When this unit is destroyed, you may place 1 infantry from your reinforcements on this planet.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/mechs/minuteman.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/mechs/nauplius.png?raw=true"
     },
     {
         "id": "cymiae_flagship",
