@@ -237,7 +237,6 @@ class ExploreButtonHandler {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         tile.removeUnit(planetID, infKey, 1);
         
-        PlanetService.refreshPlanet(player, planetID);
         String message = player.getRepresentation() + " is removing an infantry to resolve _Core Mine_. "
             + " Gained 1 trade good " + player.gainTG(1, true) + ".";
         ButtonHelperAgents.resolveArtunoCheck(player, 1);

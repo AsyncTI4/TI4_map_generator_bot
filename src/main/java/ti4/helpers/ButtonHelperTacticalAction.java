@@ -594,6 +594,17 @@ public class ButtonHelperTacticalAction {
                     message += "\n" + player_.getRepresentation() + " has units in the system.";
                 }
             }
+            for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
+                if (player.getPlanets().contains(planet.getName())) {
+                    continue;
+                }
+                for (String attachment : planet.getTokenList()) {
+                    if (attachment.contains("sigma_weirdway")) {
+                        message += "\nSystem contains the Weirdway; applying -1 to the move value of your ships.";
+                        break;
+                    }
+                }
+            }
         } else {
             List<Player> playersAdj = FoWHelper.getAdjacentPlayers(game, pos, true);
             for (Player player_ : playersAdj) {
