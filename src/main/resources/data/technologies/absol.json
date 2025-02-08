@@ -1010,14 +1010,14 @@
     },
     {
         "alias": "absol_iihq",
-        "name": "I.I.H.Q.",
+        "name": "I.I.H.Q. Modernization",
         "types": [
             "CYBERNETIC"
         ],
         "requirements": "Y",
         "faction": "keleres",
         "source": "absol",
-        "text": "You are neighbors with all players that have units or control planets in or adjacent to the Mecatol Rex system.\nGain the Custodia Vigilia planet card and its legendary planet ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it.",
+        "text": "You are neighbors with all players that have units or control planets in or adjacent to the Mecatol Rex system.\nGain the Custodia Vigilia planet card and its legendary planet ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it.\n\n[Custodia Vigilia is a 2/3 legendary planet with the ability:\nWhile you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3.\nGain 2 command tokens when another player scores Custodians VP using Imperial Primary.]",
         "homebrewReplacesID": "iihq",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/iihq_modernization.jpg?raw=true"
     },
