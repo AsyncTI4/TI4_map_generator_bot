@@ -154,6 +154,9 @@ public class CardsInfoService {
             buttons.add(Buttons.red("revealTrapStep1", "Reveal a Trap"));
             buttons.add(Buttons.gray("removeTrapStep1", "Remove a Trap"));
         }
+        if(player.hasTech("absol_vw")){
+            buttons.add(Buttons.gray("resolveExp_Look_frontier", "Top Of Frontier Deck",FactionEmojis.Empyrean));
+        }
 
         if (player.hasAbility("divination") && !ButtonHelperAbilities.getAllOmenDie(game).isEmpty()) {
             StringBuilder omenDice = new StringBuilder();

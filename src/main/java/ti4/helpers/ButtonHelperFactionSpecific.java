@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +11,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.jetbrains.annotations.NotNull;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -1553,7 +1554,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "The top card of the " + traitNameWithEmoji + " exploration deck has been sent to " + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
         } else {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " looked at top card of the " 
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true,false) + " looked at top card of the " 
                 + traitNameWithEmoji + " exploration deck. The card has been sent to their `#cards-info` thread.");
         }
 
