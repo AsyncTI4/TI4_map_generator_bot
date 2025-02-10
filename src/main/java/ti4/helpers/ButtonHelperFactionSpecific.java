@@ -1554,7 +1554,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "The top card of the " + traitNameWithEmoji + " exploration deck has been sent to " + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
         } else {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " looked at top card of the " 
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true,false) + " looked at top card of the " 
                 + traitNameWithEmoji + " exploration deck. The card has been sent to their `#cards-info` thread.");
         }
 
@@ -2634,7 +2634,7 @@ public class ButtonHelperFactionSpecific {
     public static void quash(ButtonInteractionEvent event, Player player, Game game) {
         int stratCC = player.getStrategicCC();
         player.setStrategicCC(stratCC - 1);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             "The agenda has been **Quash**'d. " + player.getRepresentationUnfogged()
             + " has spent a command token from their strategy pool (" + stratCC + " -> " + (stratCC - 1) +").");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Quash");

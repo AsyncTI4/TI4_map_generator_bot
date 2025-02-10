@@ -2,6 +2,7 @@ package ti4.cron;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import static java.util.function.Predicate.not;
 
 import lombok.experimental.UtilityClass;
 import ti4.image.Mapper;
@@ -15,8 +16,6 @@ import ti4.message.GameMessageType;
 import ti4.model.ActionCardModel;
 import ti4.service.button.ReactionService;
 
-import static java.util.function.Predicate.not;
-
 @UtilityClass
 public class AgendaPhaseAutoReactCron {
 
@@ -24,7 +23,8 @@ public class AgendaPhaseAutoReactCron {
     private static final int RUNS_PER_HOUR = 60 / SCHEDULED_PERIOD_MINUTES;
 
     public static void register() {
-        CronManager.schedulePeriodically(AgendaPhaseAutoReactCron.class, AgendaPhaseAutoReactCron::autoReact, 5, SCHEDULED_PERIOD_MINUTES, TimeUnit.MINUTES);
+       CronManager.schedulePeriodically(AgendaPhaseAutoReactCron.class, AgendaPhaseAutoReactCron::autoReact, 5, SCHEDULED_PERIOD_MINUTES, TimeUnit.MINUTES);
+       
     }
 
     private static void autoReact() {
@@ -43,16 +43,16 @@ public class AgendaPhaseAutoReactCron {
     }
 
     private static void automaticallyReactToWhensAndAfters(Game game) {
-        if (!"agendawaiting".equals(game.getPhaseOfGame())) {
-            return;
-        }
-        for (Player player : game.getRealPlayers()) {
-            if (!shouldRandomlyReact(player)) {
-                continue;
-            }
-            handleWhens(game, player);
-            handleAfters(game, player);
-        }
+        // if (!"agendawaiting".equals(game.getPhaseOfGame())) {
+        //     return;
+        // }
+        // for (Player player : game.getRealPlayers()) {
+        //     if (!shouldRandomlyReact(player)) {
+        //         continue;
+        //     }
+        //     handleWhens(game, player);
+        //     handleAfters(game, player);
+        // }
     }
 
     private static boolean shouldRandomlyReact(Player player) {
@@ -94,6 +94,9 @@ public class AgendaPhaseAutoReactCron {
         }
         return false;
     }
+
+    
+    
 
     private static void handleAfters(Game game, Player player) {
         var aftersMessage = GameMessageManager.getOne(game.getName(), GameMessageType.AGENDA_AFTER);

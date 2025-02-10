@@ -1867,7 +1867,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "The top card of the " + ExploreEmojis.Relic + " relic deck has been sent to " + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
         } else {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " looked at top card of the " 
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true,false) + " looked at top card of the " 
                 + ExploreEmojis.Relic + " relic deck. The card has been sent to their `#cards-info` thread.");
         }
 
