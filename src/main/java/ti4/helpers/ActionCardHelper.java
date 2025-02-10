@@ -23,7 +23,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.GenericCardModel;
@@ -882,7 +881,7 @@ public class ActionCardHelper {
 
             if (actionCardWindow.contains("After an agenda is revealed")) {
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate \"No Afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
+                //MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate \"No Afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
                 AutoPingMetadataManager.delayPing(game.getName());
 
                 String finChecker = "FFCC_" + player.getFaction() + "_";
@@ -911,11 +910,11 @@ public class ActionCardHelper {
             }
             if (actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto")) {
                 AutoPingMetadataManager.delayPing(game.getName());
-                List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
-                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate \"No Whens\" again.", game, whenButtons, GameMessageType.AGENDA_WHEN);
-                List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel,
-                    "Please indicate \"No Afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
+                // List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
+                // MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate \"No Whens\" again.", game, whenButtons, GameMessageType.AGENDA_WHEN);
+                // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+                // MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel,
+                //     "Please indicate \"No Afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
             }
             
             if ("Action".equalsIgnoreCase(actionCardWindow)) {
@@ -1009,7 +1008,7 @@ public class ActionCardHelper {
                 String actionCardName = Mapper.getActionCard(ac.getKey()).getName();
                 if (actionCardName != null) {
                     actionCardName = actionCardName.toLowerCase();
-                    if (actionCardName.contains(value)) {
+                    if (actionCardName.contains(value) || ac.getKey().equalsIgnoreCase(value)) {
                         if (foundSimilarName && !cardName.equals(actionCardName)) {
                             return "Multiple cards with similar name founds, please use ID";
                         }

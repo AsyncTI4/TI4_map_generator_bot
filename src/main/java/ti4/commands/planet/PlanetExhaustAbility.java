@@ -15,7 +15,6 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
@@ -97,8 +96,8 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                     String riderName = "Tarrock Ability";
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, player.getFinsFactionCheckerPrefix());
                     List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-                    MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), "Please select your target.", game, player, riderButtons);
-                    MessageHelper.sendMessageToChannelWithPersistentReacts(game.getActionsChannel(), "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
+                    MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation()+" Please select your target.", game, player, riderButtons);
+                    //MessageHelper.sendMessageToChannelWithPersistentReacts(game.getActionsChannel(), "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
             }
             case "prism" -> {
                 output = player.getFactionEmoji() + " choose a technology to return.";
