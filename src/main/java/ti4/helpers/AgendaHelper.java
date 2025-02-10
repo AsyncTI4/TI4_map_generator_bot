@@ -474,6 +474,9 @@ public class AgendaHelper {
                             case "ac"->{
                                 ActionCardHelper.playAC(event, game, player, after, game.getMainGameChannel());
                             }
+                            case "agenda"->{
+                                autoResolve(event, player, "autoresolve_manualcommittee", game);
+                            }
                         }
                         for(Player p2: game.getRealPlayers()){
                             if(!game.getStoredValue("queuedAftersLockedFor"+p2.getFaction()).isEmpty()){
@@ -2788,12 +2791,12 @@ public class AgendaHelper {
         if (result.contains("manual")) {
             if (result.contains("committee")) {
                 if (game.isACInDiscard("Confounding") && game.isACInDiscard("Confusing")) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor()
+                    MessageHelper.sendMessageToChannel(game.getActionsChannel(), player.getFactionEmojiOrColor()
                         + " has chosen to discard _Committee Formation_ to choose the winner."
                         + " Note that \"afters\" may be played before this occurs."
                         + " _Confounding Legal Text_ and/or _Confounding Legal Text_ would be playable, but they're both in the discard pile.");
                 } else {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor()
+                    MessageHelper.sendMessageToChannel(game.getActionsChannel(), player.getFactionEmojiOrColor()
                         + " has chosen to discard _Committee Formation_ to choose the winner."
                         + " Note that \"afters\" may be played before this occurs, and that _Confounding Legal Text_ and/or _Confounding Legal Text_ may still be played."
                         + " You should probably wait and confirm no Legal Texts before resolving.");
@@ -2821,7 +2824,7 @@ public class AgendaHelper {
             String resMessage3 = "Please select the winner.";
             List<Button> deadlyActionRow3 = getAgendaButtons(null, game, "agendaResolution");
             deadlyActionRow3.add(Buttons.red("resolveWithNoEffect", "Resolve With No Result"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), resMessage3, deadlyActionRow3);
+            MessageHelper.sendMessageToChannelWithButtons(game.getActionsChannel(), resMessage3, deadlyActionRow3);
         }
         ButtonHelper.deleteMessage(event);
     }
