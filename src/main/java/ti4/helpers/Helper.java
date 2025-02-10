@@ -2220,7 +2220,8 @@ public class Helper {
         for (TechnologyModel tech : techs) {
             boolean addTech = true;
             if (tech.isUnitUpgrade()) {
-                List<String> researchedTechs = player.getTechs();
+                List<String> researchedTechs = new ArrayList<>();
+                researchedTechs.addAll(player.getTechs());
                 researchedTechs.addAll(player.getNotResearchedFactionTechs());
                 for (String factionTech : researchedTechs) {
                     TechnologyModel fTech = Mapper.getTech(factionTech);
