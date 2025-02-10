@@ -33,6 +33,8 @@ public class StatusCleanupService {
                 unitHolder.removeAllUnitDamage();
             }
         }
+        game.removeStoredValue("galacticThreatUsed");
+        game.removeStoredValue("conspiratorsUsed");
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
         for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             sc.setValue(false);

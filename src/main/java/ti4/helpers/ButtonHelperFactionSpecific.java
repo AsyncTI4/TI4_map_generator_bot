@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.jetbrains.annotations.NotNull;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -2634,7 +2633,7 @@ public class ButtonHelperFactionSpecific {
     public static void quash(ButtonInteractionEvent event, Player player, Game game) {
         int stratCC = player.getStrategicCC();
         player.setStrategicCC(stratCC - 1);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             "The agenda has been **Quash**'d. " + player.getRepresentationUnfogged()
             + " has spent a command token from their strategy pool (" + stratCC + " -> " + (stratCC - 1) +").");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Quash");

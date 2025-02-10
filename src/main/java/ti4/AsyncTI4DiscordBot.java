@@ -1,6 +1,5 @@
 package ti4;
 
-import javax.imageio.ImageIO;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,6 +7,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
+
+import org.reflections.Reflections;
+import static org.reflections.scanners.Scanners.SubTypes;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -20,12 +27,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import ti4.commands.CommandManager;
-import ti4.cron.AgendaPhaseAutoReactCron;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CronManager;
 import ti4.cron.EndOldGamesCron;
@@ -63,8 +65,6 @@ import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
-
-import static org.reflections.scanners.Scanners.SubTypes;
 
 public class AsyncTI4DiscordBot {
 
@@ -232,7 +232,7 @@ public class AsyncTI4DiscordBot {
         LogButtonRuntimeStatisticsCron.register();
         TechSummaryCron.register();
         SabotageAutoReactCron.register();
-        AgendaPhaseAutoReactCron.register();
+        //AgendaPhaseAutoReactCron.register();  Disabled due to new afters/whens handling
         FastScFollowCron.register();
 
         // BOT IS READY
