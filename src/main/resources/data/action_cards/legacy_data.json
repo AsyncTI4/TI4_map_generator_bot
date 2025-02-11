@@ -405,15 +405,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "smuggler_routes",
-        "name": "Smuggler Routes",
-        "phase": "Status",
-        "window": "At the start of the status phase",
-        "text": "Choose 1 revealed public objective. During this status phase, each time a player scores that objective, you may move 1 of your non-fighter ships to an adjacent system that does not contain another player's ships to gain 1 trade good.",
-        "flavorText": "Greg looked to the skies longingly, \"I wanna be where the Mentak are. I wanna see - wanna see 'em raidin'.\"",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "shock_troops_legacy",
         "name": "Shock Troops",
         "phase": "Action",

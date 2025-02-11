@@ -58,7 +58,7 @@
     "name": "Artifact Hunters",
     "phase": "Action",
     "window": "Action",
-    "text": "Explore 1 planet you control; if the resolved card is a relic fragment, you may spend 5 influence and purge that relic fragment to gain 1 relic.",
+    "text": "Explore 1 planet you control; if the resolved card is a relic fragment, you may spend 4 trade goods to purge that relic fragment and gain 1 relic.",
     "flavorText": "\"This is...\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
     "source": "action_deck_2"
   },
@@ -85,7 +85,7 @@
     "name": "Black Market Raid",
     "phase": "Action",
     "window": "Action",
-    "text": "Purge 3 relic fragments to gain 1 relic; you may spend any number of resources to reduce the number of relic fragments to be purged by 1 for every 3 resources spent.",
+    "text": "Purge 3 of your relic fragments to gain 1 relic; you may spend any number of resources to reduce the number of relic fragments to be purged by 1 for every 3 resources spent.",
     "flavorText": "The black shard dripped with blood—some of it her own. What she had done, she did for the Federation. For all of humankind.",
     "source": "action_deck_2"
   },
@@ -102,8 +102,8 @@
     "alias": "bounty",
     "name": "Bounty",
     "phase": "Action",
-    "window": "After you destroy 1 or more of another player's units",
-    "text": "Gain a number of trade goods equal to half of the combined cost of those units, rounded up. [Note: This can be played after a round of combat, as assigning hits/destruction happens simultaneously.]",
+    "window": "After 1 of your opponent's units with a cost of 2 or more is destroyed",
+    "text": "Gain 4 trade goods.",
     "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'ula screamed from behind her gag as she watched him reroute the ship toward Arcturus.",
     "source": "action_deck_2"
   },
@@ -355,7 +355,7 @@
     "name": "Field Test",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "Choose 1 technology in your technology deck. During this turn, treat that technology as if you own it.",
+    "text": "Choose 1 technology in your technology deck. Treat that technology as if you own it until the end of your turn.",
     "flavorText": "Another jolt from the machine surged through Rin's limbs. It no longer bothered her. She was changing. Not just mentally, but physically as well.",
     "source": "action_deck_2"
   },
@@ -508,7 +508,7 @@
     "name": "Lazax Cache",
     "phase": "Action",
     "window": "At the end of your turn",
-    "text": "Exhaust 1 non-home planet you control other than Mecatol Rex to gain trade goods equal to the combined value of its resources and influence.",
+    "text": "Exhaust 1 non-home planet you control other than Mecatol Rex. Then, gain trade goods equal to that planet's combined resource and influence values.",
     "flavorText": "The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but Berekar knew they were the coin required to reclaim their home.",
     "source": "action_deck_2"
   },
@@ -724,7 +724,7 @@
     "name": "Refabrication",
     "phase": "Any",
     "window": "After 1 of your non-fighter ships is destroyed",
-    "text": "Produce 1 ship of that type in a different system that contains 1 of your units with PRODUCTION; reduce the cost of that ship by up to 4.",
+    "text": "Produce 1 ship of that type in a different system that contains 1 of your units with PRODUCTION; reduce the cost of the produced ship by up to 4.",
     "flavorText": "The production of the Van Hauge VI was completed in record time. As it left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers. You have done us all proud.\"",
     "source": "action_deck_2"
   },
@@ -750,7 +750,7 @@
     "alias": "relay_connection",
     "name": "Relay Connection",
     "phase": "Action",
-    "window": "After 1 of your units uses PRODUCTION to produce a ship in a system",
+    "window": "After you produce a ship in a system",
     "text": "Produce 1 ship of that type in any number of other systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
     "flavorText": "His engineers broke into celebration as Umbat called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
     "source": "action_deck_2"
@@ -945,11 +945,11 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "smuggler_routes_acd2",
+    "alias": "smuggler_routes",
     "name": "Smuggler Routes",
     "phase": "Action",
     "window": "Action",
-    "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this movement. [Note: You can transport units during this movement.]",
+    "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this action. [Note: You can transport units during this movement.]",
     "flavorText": "Greg closed his book, a tale of the Passage of Tears, with a sigh. As he looked to the sky and imagined the space beyond—a place he had never been—he quietly sang in tune with the Symphony, \"I wanna be where the Mentak are. I wanna see—wanna see 'em raidin'.\"",
     "source": "action_deck_2"
   },
@@ -976,7 +976,7 @@
     "name": "Stasis Haul",
     "phase": "Action",
     "window": "After you activate a system",
-    "text": "During this tactical action, apply +2 to the capacity value of 1 of your ships and gain commodities equal to the number of different systems that ship moves into or through.",
+    "text": "During this tactical action, apply +2 to the capacity value of 1 of your ships and gain 1 commodity for each different system it moves into or through.",
     "flavorText": "The cargo ships blasted out of the planet's gravity field. Vast space and time lay before them. For all, it meant the promise of new life; for some, it would mean death.",
     "source": "action_deck_2"
   },
@@ -994,7 +994,7 @@
     "name": "Stranded Ship",
     "phase": "Action",
     "window": "Action",
-    "text": "Place 1 cruiser from your reinforcements in a system that does not contain planets and does not contain other players' units.",
+    "text": "Place 1 cruiser from your reinforcements in a system that does not contain planets or other players' units.",
     "flavorText": "\"To be clear,\" Tai said flatly, \"you knew this ship had no weapons, no fuel, and a faulty navigation when you purchased it. And yet,\"—he gestured—\"here we are.\"",
     "source": "action_deck_2"
   },
@@ -1021,7 +1021,7 @@
     "name": "Tomb Raiders",
     "phase": "Action",
     "window": "Action",
-    "text": "For each exploration deck, look at the top card of that deck; if it is a relic fragment, gain that card.",
+    "text": "Gain 2 commodities and reveal the top card of each exploration deck; gain any relic fragments that you reveal and discard the rest.",
     "flavorText": "As her hostages hurled insults, S'ula began to laugh. \"This artifact was the property of countless civilizations. You thought its journey would end with yours?\"",
     "source": "action_deck_2"
   },
