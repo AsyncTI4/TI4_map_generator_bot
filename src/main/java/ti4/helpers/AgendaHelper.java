@@ -197,7 +197,7 @@ public class AgendaHelper {
         String when = buttonID.replace("queueWhen_","");
         game.setStoredValue("queuedWhens", game.getStoredValue("queuedWhens")+player.getFaction()+"_");
         game.setStoredValue("queuedWhensFor"+player.getFaction(), when);
-        String msg = "Successfully queued \'"+event.getButton().getLabel()+"\'. You can use this button to unqueue it/pass on whens";
+        String msg = "Successfully queued \'" + event.getButton().getLabel() + "\'. You can use this button to unqueue it/pass on \"whens\".";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On Whens"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -210,12 +210,12 @@ public class AgendaHelper {
         String after = buttonID.replace("queueAfter_","");
         game.setStoredValue("queuedAfters", game.getStoredValue("queuedAfters")+player.getFaction()+"_");
         game.setStoredValue("queuedAftersFor"+player.getFaction(), after);
-        String msg = "Successfully queued \'"+event.getButton().getLabel()+"\'. You can use this button to unqueue it/pass on afters";
+        String msg = "Successfully queued \'"+event.getButton().getLabel()+"\'. You can use this button to unqueue it/pass on \"afters\".";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On Afters"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
 
-        msg = "By default, your queued after will be cancelled if someone before you plays an after. If you want it to play regardless of others actions, press this button";
+        msg = "By default, your queued \"after\" will be cancelled if someone before you plays an \"after\". If you want it to play regardless of others actions, press this button.";
         buttons = new ArrayList<>();
         buttons.add(Buttons.blue("lockAftersIn", "Play Regardless of Others"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -226,7 +226,7 @@ public class AgendaHelper {
     public static void lockAftersIn(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         game.setStoredValue("queuedAftersLockedFor"+player.getFaction(),"Yes");
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Your after will now play regardless if other people also play afters before you");
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Your after will now play regardless if another player also plays an \"after\" before you.");
     }
 
     public static List<String> getPossibleAfterNames(Player player) {
@@ -267,7 +267,7 @@ public class AgendaHelper {
             names.add("Unity Algorithm");
         }
         if(ButtonHelper.isPlayerElected(player.getGame(), player, "committee")) {
-            names.add("Committee Formation (Technically resolves after all Afters)");
+            names.add("Committee Formation (technically resolves after all afters)");
         }
         return names;
     }
@@ -321,19 +321,19 @@ public class AgendaHelper {
                 continue;
             }
             List<String> whens = getPossibleWhenNames(player);
-            String msg = player.getRepresentation() + " now is the time to decide whether or not you will play a when. If you do"
-            +" the bot will queue your when to play in the proper order (after those before you in speaker order decline). You can currently"
-            +" play "+whens.size()+" whens.";
+            String msg = player.getRepresentation() + " now is the time to decide whether or not you will play a \"when\". If you do,"
+            +" the bot will queue your \"when\" to play in the proper order (after those before you in speaker order decline). You may currently"
+            +" play "+whens.size()+" \"whens\".";
             if(!whens.isEmpty()){
-                msg += "\nThe possible whens are the following:";
+                msg += "\nThe possible \"whens\" you may play are:";
                 for(String when : whens){
                     msg +="\n"+when;
                 }
             }
             List<Button> buttons = new ArrayList<>();
 
-            buttons.add(Buttons.gray("queueAWhen", "Play A When"));
-            buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On Whens"));
+            buttons.add(Buttons.gray("queueAWhen", "Play A \"When\""));
+            buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"Whens\""));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
     }
@@ -351,7 +351,7 @@ public class AgendaHelper {
                 if(!factionsThatHavePassedOnWhens.contains(player.getFaction())){
                     String factionsThatHaveQueuedAWhen = game.getStoredValue("queuedWhens");
                     if(!factionsThatHaveQueuedAWhen.contains(player.getFaction())){
-                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "This is a nudge that the when queue is currently waiting on you");
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "This is a nudge that the \"when\" queue is currently waiting on you.");
                         int num = 0;
                         for(Player p2: game.getRealPlayers()){
                             if(game.getStoredValue("queuedWhens").contains(p2.getFaction()) || game.getStoredValue("declinedWhens").contains(p2.getFaction())){
@@ -359,7 +359,7 @@ public class AgendaHelper {
                             }
                             num++;
                         }
-                        MessageHelper.sendMessageToChannel(game.getActionsChannel(),"The game is currently waiting on "+num+" people to decide on whens");
+                        MessageHelper.sendMessageToChannel(game.getActionsChannel(),"The game is currently waiting on "+num+" people to decide on \"whens\".");
                         return; //The person up has not yet decided whether to queue or not queue a When
                     }else{
                         game.setStoredValue("queuedWhens", game.getStoredValue("queuedWhens").replace(player.getFaction()+"_",""));
@@ -388,7 +388,7 @@ public class AgendaHelper {
                     }
                 }
             }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# All players have passed on whens");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# All players have passed on \"whens\".");
             game.setStoredValue("whensResolved","Yes");
             resolveAfterQueue(event, game);
         }
@@ -411,7 +411,7 @@ public class AgendaHelper {
                 if(!factionsThatHavePassedOnWhens.contains(player.getFaction())){
                     String factionsThatHaveQueuedAWhen = game.getStoredValue("queuedAfters");
                     if(!factionsThatHaveQueuedAWhen.contains(player.getFaction())){
-                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "This is a nudge that the after queue is currently waiting on you");
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "This is a nudge that the \"after\" queue is currently waiting on you.");
                         int num = 0;
                         for(Player p2: game.getRealPlayers()){
                             if(game.getStoredValue("queuedAfters").contains(p2.getFaction()) || game.getStoredValue("declinedAfters").contains(p2.getFaction())){
@@ -419,7 +419,7 @@ public class AgendaHelper {
                             }
                             num++;
                         }
-                        MessageHelper.sendMessageToChannel(game.getActionsChannel(),"The game is currently waiting on "+num+" people to decide on afters");
+                        MessageHelper.sendMessageToChannel(game.getActionsChannel(),"The game is currently waiting on "+num+" people to decide on \"afters\".");
                         return; //The person up has not yet decided whether to queue or not queue an after
                     }else{
                         game.setStoredValue("queuedAfters", game.getStoredValue("queuedAfters").replace(player.getFaction()+"_",""));
@@ -445,7 +445,7 @@ public class AgendaHelper {
                                     }else{
                                         riderButtons = getAgendaButtons("Radiance", game, player.getFinsFactionCheckerPrefix());
                                     }
-                                    MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation()+" Please select your target.", game, player, riderButtons);
+                                    MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation() + ", please select your target.", game, player, riderButtons);
                                 }
                             }
                             case "pn"->{
@@ -457,7 +457,7 @@ public class AgendaHelper {
                             case "tech"->{
                                 player.exhaustTech("dsedyng");
                                 riderButtons = getAgendaButtons("Edyn Unity Algorithm", game, player.getFinsFactionCheckerPrefix());
-                                MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation()+" Please select your target.", game, player, riderButtons);
+                                MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation() + ", please select your target.", game, player, riderButtons);
                             }
                             case "leader"->{
                                 Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
@@ -469,7 +469,7 @@ public class AgendaHelper {
                                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message + " - Odlynn Myrr, the Keleres (Xxcha) hero, has been purged.");
                                 }
                                 riderButtons = getAgendaButtons("Keleres Xxcha Hero", game, player.getFinsFactionCheckerPrefix());
-                                MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation()+" Please select your target.", game, player, riderButtons);
+                                MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation() + ", please select your target.", game, player, riderButtons);
                             }
                             case "ac"->{
                                 ActionCardHelper.playAC(event, game, player, after, game.getMainGameChannel());
@@ -492,19 +492,19 @@ public class AgendaHelper {
                                     continue;
                                 }
                                 List<String> afters = getPossibleAfterNames(p2);
-                                String msg = p2.getRepresentation() + "due to the recent playing of an after, you are now being asked to decide whether or not you will play an after."
+                                String msg = p2.getRepresentation() + "due to the recent playing of an \"after\", you are now being asked to decide whether or not you will play an \"after\"."
                                 +" You can currently"
-                                +" play "+afters.size()+" afters.";
+                                +" play "+afters.size()+" \"afters\".";
                                 if(!afters.isEmpty()){
-                                    msg += "\nThe possible afters are the following:";
+                                    msg += "\nThe possible \"afters\" are the following:";
                                     for(String after2 : afters){
                                         msg +="\n"+after2;
                                     }
                                 }
                                 List<Button> buttons = new ArrayList<>();
 
-                                buttons.add(Buttons.gray("queueAnAfter", "Play An After"));
-                                buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On Afters"));
+                                buttons.add(Buttons.gray("queueAnAfter", "Play An \"After\""));
+                                buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"Afters\""));
                                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                             }
                         }
@@ -512,7 +512,7 @@ public class AgendaHelper {
                     }
                 }
             }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# All players have passed on afters. Voting will now begin");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# All players have passed on \"afters\". Voting will now begin.");
             game.setStoredValue("aftersResolved","Yes");
             startTheVoting(game);
         }
@@ -522,14 +522,14 @@ public class AgendaHelper {
     public static void queueAWhen(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         List<Button> buttons = getPossibleWhenButtons(player);
         if(buttons.isEmpty()){
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "The bot knows of no whens that you can play."+
-            " If this is a bug or unimplemented ability, please report it in the bot-bugs-and-feature-requests channel");
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "The bot knows of no \"whens\" that you can play."+
+            " If this is a bug or unimplemented ability, please report it in the `#bot-bugs-and-feature-requests` channel.");
             return;
         }
         buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On Whens"));
         game.setStoredValue("declinedWhens",game.getStoredValue("declinedWhens").replace(player.getFaction()+"_", ""));
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You can use these buttons to queue a when", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You can use these buttons to queue a \"when\".", buttons);
     }
 
     @ButtonHandler("declineToQueueAWhen")
@@ -539,14 +539,14 @@ public class AgendaHelper {
         resolveWhenQueue(event, game);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red("queueAWhen", "Play A When"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You have declined to queue a when. You can change your mind with this button", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You have declined to queue a \"when\". You can change your mind with this button.", buttons);
         event.getMessage().delete().queue();
         List<String> afters = getPossibleAfterNames(player);
-        String msg = player.getRepresentation() + " now is the time to decide whether or not you will play an after. If you do"
-        +" the bot will queue your after to play in the proper order (after those before you in speaker order decline). You can currently"
-        +" play "+afters.size()+" afters.";
+        String msg = player.getRepresentation() + " now is the time to decide whether or not you will play an \"after\". If you do,"
+        +" the bot will queue your after to play in the proper order (after those before you in speaker order decline). You may currently"
+        +" play "+afters.size()+" \"afters\".";
         if(!afters.isEmpty()){
-            msg += "\nThe possible afterss are the following:";
+            msg += "\nThe possible \"afters\" you may play are:";
             for(String after : afters){
                 msg +="\n"+after;
             }
@@ -562,21 +562,21 @@ public class AgendaHelper {
     public static void queueAnAfter(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         List<Button> buttons = getPossibleAferButtons(player);
         if(buttons.isEmpty()){
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "The bot knows of no after that you can play."+
-            " If this is a bug or unimplemented ability, please report it in the bot-bugs-and-feature-requests channel");
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "The bot knows of no \"after\" that you can play."+
+            " If this is a bug or unimplemented ability, please report it in the `#bot-bugs-and-feature-requests` channel.");
             return;
         }
         buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On Afters"));
         game.setStoredValue("queuedAftersLockedFor"+player.getFaction(),"");
         game.setStoredValue("declinedAfters",game.getStoredValue("declinedAfters").replace(player.getFaction()+"_", ""));
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You can use these buttons to queue an after", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You can use these buttons to queue an \"after\".", buttons);
     }
     @ButtonHandler("unlockQueuedAfters")
     public static void unlockQueuedAfters(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         game.setStoredValue("queuedAftersLockedFor"+player.getFaction(),"");
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You will now be asked to decide again if someone else plays an after");
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You will now be asked to decide again if someone else plays an \"after\".");
     }
 
     @ButtonHandler("declineToQueueAnAfter")
@@ -584,14 +584,14 @@ public class AgendaHelper {
         game.setStoredValue("queuedAfters", game.getStoredValue("queuedAfters").replace(player.getFaction()+"_",""));
         game.setStoredValue("declinedAfters", game.getStoredValue("declinedAfters")+player.getFaction()+"_");
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.red("queueAnAfter", "Play An After"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You have declined to queue an after. You can change your mind with this button", buttons);
+        buttons.add(Buttons.red("queueAnAfter", "Play An \"After\""));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You have declined to queue an \"after\". You can change your mind with this button.", buttons);
         game.setStoredValue("queuedAftersLockedFor"+player.getFaction(),"Yes");
         if(!getPossibleAfterNames(player).isEmpty()){
             buttons = new ArrayList<>();
             buttons.add(Buttons.red("unlockQueuedAfters", "Be Asked Again")); //Code This Button
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You will not be asked again by default if someone else plays an after. You can change that "+
-            " and be asked to decide on afters again when someone else presses an after by pressing this button", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You will not be asked again by default if someone else plays an \"after\". You can change that "+
+            " and be asked to decide on afters again when someone else plays an \"after\" by pressing this button.", buttons);
         }
         event.getMessage().delete().queue();
         offerPreVote(player);
@@ -2022,7 +2022,7 @@ public class AgendaHelper {
             if (!player.getPromissoryNotes().containsKey(player.getColor() + "_ps")
                 && player.getPromissoryNotesOwned().contains(player.getColor() + "_ps")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
-                    + " this is a reminder that you don't currently hold your _Political Secret_. Any whens or afters that you queue will be automatically cancelled if it is played by another player.");
+                    + " this is a reminder that you don't currently hold your _Political Secret_. Any \"whens\" or \"afters\" that you queue will be automatically cancelled if it is played by another player.");
             }
         }
     }
