@@ -283,11 +283,11 @@ public class PromissoryNoteHelper {
             if (game.playerHasLeaderUnlockedOrAlliance(owner, "xxchacommander")) {
                 MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), owner.getRepresentationUnfogged()
                     + ", due to a play of your _Political Secret_, you can't play action cards or use the abilities on your faction sheet."
-                    + " You have also been automatically passed on whens/afters");
+                    + " You have also been automatically passed on \"whens\" and \"afters\".");
             } else {
                 MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), owner.getRepresentationUnfogged()
                     + ", due to a play of your _Political Secret_, you will be unable to vote in agenda."
-                    + " You have also been automatically passed on whens/afters ");
+                    + " You have also been automatically passed on \"whens\" and \"afters\".");
             }
             game.setStoredValue("queuedWhens", game.getStoredValue("queuedWhens").replace(owner.getFaction()+"_",""));
             game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens")+owner.getFaction()+"_");
