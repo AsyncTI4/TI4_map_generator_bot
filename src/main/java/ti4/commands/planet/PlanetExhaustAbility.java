@@ -96,7 +96,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                     String riderName = "Tarrock Ability";
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, player.getFinsFactionCheckerPrefix());
                     List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-                    MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation()+" Please select your target.", game, player, riderButtons);
+                    MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation() + ", please select your target.", game, player, riderButtons);
                     //MessageHelper.sendMessageToChannelWithPersistentReacts(game.getActionsChannel(), "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
             }
             case "prism" -> {
