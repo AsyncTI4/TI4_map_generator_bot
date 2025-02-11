@@ -1021,7 +1021,7 @@
     "name": "Tomb Raiders",
     "phase": "Action",
     "window": "Action",
-    "text": "Gain 2 commodities and reveal the top card of each exploration deck; gain any relic fragments that you reveal and discard the rest.",
+    "text": "Gain 2 commodities. Then, reveal the top card of each exploration deck; gain any relic fragments that you reveal and discard the rest.",
     "flavorText": "As her hostages hurled insults, S'ula began to laugh. \"This artifact was the property of countless civilizations. You thought its journey would end with yours?\"",
     "source": "action_deck_2"
   },
