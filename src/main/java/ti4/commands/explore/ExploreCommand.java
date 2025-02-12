@@ -21,6 +21,7 @@ public class ExploreCommand implements ParentCommand {
                     new ExploreReset(),
                     new ExploreFrontier(),
                     new ExploreUse(),
+                    new ExploreShuffle(),
                     new ExploreLookAtTop())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
