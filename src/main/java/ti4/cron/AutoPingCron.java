@@ -232,7 +232,7 @@ public class AutoPingCron {
         return realIdentity + PING_MESSAGES.get(pingNumber - 1);
     }
 
-    private static void pingMissingAgendaPlayers(Game game) {
+    public static void pingMissingAgendaPlayers(Game game) {
         // List<Player> missingPlayersWhens = GameMessageManager.getOne(game.getName(), GameMessageType.AGENDA_WHEN)
         //     .map(gameMessage -> ButtonHelper.getPlayersWhoHaventReacted(gameMessage.messageId(), game))
         //     .orElse(Collections.emptyList());
@@ -250,7 +250,7 @@ public class AutoPingCron {
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + ", this is a reminder to play (or pass on) your \"whens\".");
                 continue;
             }
-            if(!game.getStoredValue("queuedAfters").contains(p2.getFaction()) && !game.getStoredValue("declinedAfters").contains(p2.getFaction())){
+            if(!game.getStoredValue("queuedAfters").contains(p2.getFaction()) && !game.getStoredValue("declinedAfters").contains(p2.getFaction()) && !game.getStoredValue("queuedWhens").contains(p2.getFaction())){
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + ", this is a reminder to play (or pass on) your \"afters\".");
             }
         }

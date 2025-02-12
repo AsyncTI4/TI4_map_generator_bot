@@ -1,4 +1,4 @@
-package ti4.commands.admin;
+package ti4.commands.bothelper;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

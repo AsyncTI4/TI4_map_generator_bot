@@ -41,6 +41,7 @@ import ti4.buttons.UnfiledButtonHandlers;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
+import ti4.cron.AutoPingCron;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -516,6 +517,12 @@ public class AgendaHelper {
             game.setStoredValue("aftersResolved","Yes");
             startTheVoting(game);
         }
+    }
+    @ButtonHandler("pingNonresponders")
+    public static void pingNonresponders(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+        AutoPingCron.pingMissingAgendaPlayers(game);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true,false) + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters. They have been pinged in their private thread");
+
     }
 
     @ButtonHandler("queueAWhen")
@@ -2247,11 +2254,12 @@ public class AgendaHelper {
 
         listVoteCount(game, game.getMainGameChannel());
 
-        proceedButtons.add(Buttons.red("proceedToVoting", "Skip waiting and start the voting for everyone"));
+        proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
         proceedButtons.add(Buttons.blue("transaction", "Transaction"));
         proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
         proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
         proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
+        proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
 
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, proceedButtons);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), getSummaryOfVotes(game, true));
@@ -3153,11 +3161,12 @@ public class AgendaHelper {
         } else {
             listVoteCount(game, channel);
             msg = "Press this button if the last player forgot to react, but verbally said \"no whens\"/\"no afters\".";
-            proceedButtons.add(Buttons.red("proceedToVoting", "Skip waiting and start the voting for everyone"));
+            proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
             proceedButtons.add(Buttons.blue("transaction", "Transaction"));
             proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
             proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
             proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
+            proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, proceedButtons);
         if (cov) {
