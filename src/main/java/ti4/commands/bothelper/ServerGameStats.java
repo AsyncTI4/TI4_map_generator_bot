@@ -51,6 +51,7 @@ class ServerGameStats extends Subcommand {
         GameManager.getManagedGames().stream()
             .map(ManagedGame::getMainGameChannel)
             .filter(Objects::nonNull)
+            .distinct()
             .filter(channel -> channel.getParentCategory() != null && !channel.getParentCategory().getName().equals("The in-limbo PBD Archive"))
             .forEach(channel -> guildToGameCount.merge(channel.getGuild().getId(), 1, Integer::sum));
 
