@@ -157,6 +157,9 @@ public class CardsInfoService {
         if(player.hasTech("absol_vw")){
             buttons.add(Buttons.gray("resolveExp_Look_frontier", "Top Of Frontier Deck",FactionEmojis.Empyrean));
         }
+        if(game.getPhaseOfGame().toLowerCase().contains("agendawaiting")){
+            buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On Whens"));
+        }
 
         if (player.hasAbility("divination") && !ButtonHelperAbilities.getAllOmenDie(game).isEmpty()) {
             StringBuilder omenDice = new StringBuilder();
