@@ -5245,7 +5245,7 @@ public class ButtonHelper {
         if (strNum == null)
             return false;
         try {
-            Integer.parseInt(strNum);
+            Long.parseLong(strNum);
             return true;
         } catch (NumberFormatException nfe) {
             return false;

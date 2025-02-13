@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import ti4.commands.CommandManager;
 import ti4.cron.AutoPingCron;
+import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
 import ti4.cron.EndOldGamesCron;
 import ti4.cron.FastScFollowCron;
@@ -234,6 +235,7 @@ public class AsyncTI4DiscordBot {
         SabotageAutoReactCron.register();
         //AgendaPhaseAutoReactCron.register();  Disabled due to new afters/whens handling
         FastScFollowCron.register();
+        CloseLaunchThreadsCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
