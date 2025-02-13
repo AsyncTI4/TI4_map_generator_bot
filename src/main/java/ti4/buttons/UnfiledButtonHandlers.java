@@ -1078,7 +1078,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             if (playersWithSCs > 0) {
                 StatusCleanupService.runStatusCleanup(game);
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                    game.getPing() + " **Status Cleanup Run!**");
+                    "### " + game.getPing() + " **Status Cleanup Run!**");
             }
         }
 

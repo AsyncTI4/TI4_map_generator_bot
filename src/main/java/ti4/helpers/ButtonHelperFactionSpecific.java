@@ -1733,7 +1733,7 @@ public class ButtonHelperFactionSpecific {
         GenericInteractionCreateEvent event, boolean cabalAgent) {
         String msg = cabal.getRepresentationUnfogged() + " has failed to eat " + amount + " of the " + unit
             + "s owned by "
-            + player.getRepresentation() + " because they were blockaded. Womp Womp.";
+            + player.getRepresentationNoPing() + " because they were blockaded. Womp Womp.";
         String unitP = AliasHandler.resolveUnit(unit);
         if (unitP.contains("sd") || unitP.contains("pd")
             || (cabal.getAllianceMembers().contains(player.getFaction()) && !cabalAgent)) {
@@ -1741,7 +1741,7 @@ public class ButtonHelperFactionSpecific {
         }
         if (!isCabalBlockadedByPlayer(player, game, cabal)) {
             msg = cabal.getFactionEmoji() + " has **Devour**'d " + amount + " of the " + unit + "s owned by "
-                + player.getColor() + ". Chomp chomp.";
+                + player.getRepresentationNoPing() + ". Chomp chomp.";
             String color = player.getColor();
 
             if (unitP.contains("ff") || unitP.contains("gf")) {

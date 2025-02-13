@@ -36,8 +36,7 @@ class ChecksAndBalancesButtonHandler {
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
 
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), p2.getColor() + " was given " + Helper.getSCName(scpick, game));
-
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), p2.getRepresentationNoPing() + " was given " + Helper.getSCName(scpick, game));
         }
         event.getMessage().delete().queue();
         List<Button> buttons = getPlayerOptionsForChecksNBalances(player, game, scpick);
