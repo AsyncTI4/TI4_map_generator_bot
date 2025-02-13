@@ -494,6 +494,7 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYinBrotherhood_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYinBrotherhood_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheYinBrotherhood",
