@@ -1,5 +1,10 @@
 package ti4.commands.special;
 
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -14,23 +19,25 @@ class SwapTwoSystems extends GameStateSubcommand {
 
     public SwapTwoSystems() {
         super(Constants.SWAP_SYSTEMS, "Swap two systems", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from or RND").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to or RND").setRequired(true).setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
+        String from = event.getOption(Constants.TILE_NAME).getAsString();
+        String to = event.getOption(Constants.TILE_NAME_TO).getAsString();
 
-        Tile tileFrom = CommandHelper.getTile(event, game);
+        Tile tileFrom = "RND".equalsIgnoreCase(from) ? getRandomTile() : CommandHelper.getTile(event, game);
         if (tileFrom == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the tile you're moving from.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find tile: " + from);
             return;
         }
 
-        Tile tileTo = CommandHelper.getTile(event, game, event.getOption(Constants.TILE_NAME_TO).getAsString());
+        Tile tileTo = "RND".equalsIgnoreCase(to) ? getRandomTile() : CommandHelper.getTile(event, game, to);
         if (tileTo == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the tile you're moving to.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find tile: " + to);
             return;
         }
 
@@ -45,5 +52,20 @@ class SwapTwoSystems extends GameStateSubcommand {
         game.setTile(tileFrom);
 
         game.rebuildTilePositionAutoCompleteList();
+        MessageHelper.replyToMessage(event, "Swapped " + tileTo.getPosition() + " and " + tileFrom.getPosition());
+    }
+
+    private Tile getRandomTile() {
+        Set<String> EXCLUDED_POSITIONS = Set.of("tl", "tr", "bl", "br");
+        List<Tile> availableTiles = getGame().getTileMap().values().stream()
+                .filter(tile -> !EXCLUDED_POSITIONS.contains(tile.getPosition()))
+                .filter(tile -> !tile.getTileModel().isHyperlane())
+                .collect(Collectors.toList());
+
+        if (availableTiles.isEmpty()) {
+            return null; 
+        }
+
+        return availableTiles.get(new Random().nextInt(availableTiles.size()));
     }
 }
