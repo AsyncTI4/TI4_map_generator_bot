@@ -2,12 +2,15 @@ package ti4.service.fow;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
+import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
@@ -15,34 +18,45 @@ import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.StellarConverterService;
 import ti4.service.emoji.CardEmojis;
 
 /*
  * For Eronous to run fow300
  * 
- * Specifications:
+ * HOW TO RUN
+ * 1. Have Eronous in a FoW game
+ * 2. Run /game weird_game_setup riftset_mode: true
+ * 3. Setup any player as Cabal
  * 
- * Eronous is Cabal with color Riftset
- * When any unit fails rift throw, Eronous eats it
- * One additional Custom Strategy Card, Sacrifice
- * One additional agenda, Crucible Reallocation, removed from normal agenda draw but can be flipped with a button in every agenda phase
+ * SPECS:
+ * - When any unit fails rift throw, Cabal eats it
+ * - One additional Custom Strategy Card, 9. Sacrifice
+ * - One additional agenda, Crucible Reallocation
+ *   - Removed from the deck at setup. Can be flipped with a button in every agenda phase.
+ * - Custom frontier explore Unstable Rifts (tells player to ping GM to resolve)
+ *   - Recycles itself back to the deck instantly
+ * - /special swap_systems to support RANDOM options
+ * AFTER CUSTODIANS IS SCORED:
+ * - When concluding tactical action, tile has a 1/10 chance of having a gravity rift placed in it
+ * - Exploring a planet has 1/100 chance of Stellar Converting it
  * 
  * TODO
- * /special swap_systems to support RANDOM options
- * A way to see what _own_ units Cabal has captured
- 
- * These are in effect only after Custodians is taken:
- * Exploring a planet has 1/100 chance of Stellar Converting it
- * Custom frontier token explore which pings Eronous to do Cabal attack and recycles itself back to the deck
- * After you activate a tile it has a 1/10 chance of having a gravity rift placed in it if it doesn’t already have one.
- * After you activate a tile it has a 1/25 chance of placing Vortex token. These are adjacent to each other and you can go through them like wormholes
- * Change frontier token image to a special one
+  * A way to see what _own_ units Cabal has captured
+  * After you activate a tile it has a 1/25 chance of placing Vortex token. These are adjacent to each other and you can go through them like wormholes
+  * Change frontier token image to a special one after custodians is taken
   */
 public class RiftSetModeService {
     private static final String CRUCIBLE_PN = "crucible";
     private static final String CRUCIBLE_AGENDA = "riftset_crucible";
+    private static final String RIFTSET_INVASION_EXPLORE = "riftset_invasion";
+
+    private static final int CHANCE_TO_SPAWN_RIFT = 10;
+    //private static final int CHANCE_TO_SPAWN_VORTEX = 25;
+    private static final int CHANCE_TO_STELLAR_CONVERT = 101; //- Math.pow(roundNmbr, 2);
 
     public static boolean activate(GenericInteractionCreateEvent event, Game game) {
         if (game.getPlayer(Constants.eronousId) == null && AsyncTI4DiscordBot.guildFogOfWar != null) {
@@ -109,6 +123,41 @@ public class RiftSetModeService {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, winner, false);
         
         PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(CRUCIBLE_PN);
-        MessageHelper.sendMessageToChannel(winner.getPrivateChannel(), winner.getRepresentation(true, true) + ", you recieved " + CardEmojis.PN + pnModel.getName());
+        MessageHelper.sendMessageToChannel(winner.getCorrectChannel(), winner.getRepresentation(true, true) + ", you recieved " + CardEmojis.PN + pnModel.getName());
+    }
+
+    public static void resolveExplore(String exploreCardId, Player player, Game game) {
+        if (!isActive(game)) return;
+
+        if (RIFTSET_INVASION_EXPLORE.equals(exploreCardId)) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+                "**GM ping:** " + game.getPlayersWithGMRole().stream().map(p -> p.getPing()).collect(Collectors.joining(", ")) + " Unstable Rifts Event waiting for resolving!");
+            game.addExplore(RIFTSET_INVASION_EXPLORE);
+        }
+    }
+
+    public static void concludeTacticalAction(Player player, Game game, GenericInteractionCreateEvent event) {
+        if (!isActive(game) || !game.isCustodiansScored()) return;
+
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+
+        if (new Random().nextInt(CHANCE_TO_SPAWN_RIFT) == 0
+            && !tile.getTileModel().isGravityRift()
+            && !tile.hasCabalSpaceDockOrGravRiftToken()) {
+            AddTokenCommand.addToken(event, tile, "gravityrift", game);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A new Gravity Rift has formed in " + tile.getPosition());
+        }
+    }
+
+    public static boolean willPlanetGetStellarConverted(String planetName, Player player, Game game, GenericInteractionCreateEvent event) {
+        if (!isActive(game) || !game.isCustodiansScored()) return false;
+
+        if (new Random().nextInt(CHANCE_TO_STELLAR_CONVERT - (int)Math.pow(game.getRound(), 2)) == 0) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## While trying to explore the planet, you find something dark and dangerous...");
+            StellarConverterService.secondHalfOfStellar(game, planetName, event);
+            return true;
+        }
+
+        return false;
     }
 }
