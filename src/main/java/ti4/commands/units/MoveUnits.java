@@ -1,7 +1,6 @@
 package ti4.commands.units;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -41,23 +40,37 @@ public class MoveUnits extends GameStateCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile to move units from")
-                .setRequired(true)
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri")
-                .setRequired(true),
-            new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile to move units to")
-                .setAutoComplete(true)
-                .setRequired(true),
-            new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri")
-                .setRequired(true),
-            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.CC_USE, "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements")
-                .setAutoComplete(true),
-            new OptionData(OptionType.BOOLEAN, Constants.PRIORITIZE_DAMAGED, "Prioritize moving damaged units. Default false."),
-            new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")
-        );
+                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile to move units from")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(
+                                OptionType.STRING,
+                                Constants.UNIT_NAMES,
+                                "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri")
+                        .setRequired(true),
+                new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile to move units to")
+                        .setAutoComplete(true)
+                        .setRequired(true),
+                new OptionData(
+                                OptionType.STRING,
+                                Constants.UNIT_NAMES_TO,
+                                "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri")
+                        .setRequired(true),
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
+                        .setAutoComplete(true),
+                new OptionData(
+                                OptionType.STRING,
+                                Constants.CC_USE,
+                                "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements")
+                        .setAutoComplete(true),
+                new OptionData(
+                        OptionType.BOOLEAN,
+                        Constants.PRIORITIZE_DAMAGED,
+                        "Prioritize moving damaged units. Default false."),
+                new OptionData(
+                        OptionType.BOOLEAN,
+                        Constants.NO_MAPGEN,
+                        "'True' to not generate a map update with this command"));
     }
 
     @Override
@@ -70,7 +83,8 @@ public class MoveUnits extends GameStateCommand {
             return;
         }
 
-        Tile tileTo = CommandHelper.getTile(event, game, event.getOption(Constants.TILE_NAME_TO).getAsString());
+        Tile tileTo = CommandHelper.getTile(
+                event, game, event.getOption(Constants.TILE_NAME_TO).getAsString());
         if (tileTo == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the tile you're moving to.");
             return;
@@ -83,20 +97,29 @@ public class MoveUnits extends GameStateCommand {
 
         String toUnitList = event.getOption(Constants.UNIT_NAMES_TO).getAsString();
 
-
         UnitHolder space = tileTo.getUnitHolders().get("space");
         boolean doesTileHaveFloatingGF = false;
-        if(space != null && getPlayer().getColor() != null){
-            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0 || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
+        if (space != null && getPlayer().getColor() != null) {
+            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0
+                    || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
         }
         AddUnitService.addUnits(event, tileTo, game, color, toUnitList);
-        if(space != null && getPlayer().getColor() != null && !doesTileHaveFloatingGF && ButtonHelper.getOtherPlayersWithShipsInTheSystem(getPlayer(), game, tileTo).isEmpty()){
-            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0 || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
-            if(doesTileHaveFloatingGF){
+        if (space != null
+                && getPlayer().getColor() != null
+                && !doesTileHaveFloatingGF
+                && ButtonHelper.getOtherPlayersWithShipsInTheSystem(getPlayer(), game, tileTo)
+                        .isEmpty()) {
+            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0
+                    || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
+            if (doesTileHaveFloatingGF) {
                 List<Button> buttons = ButtonHelper.getLandingTroopsButtons(getPlayer(), game, event, tileTo);
-                Button concludeMove = Buttons.red(getPlayer().getFinsFactionCheckerPrefix() + "deleteButtons", "Done Landing Troops");
+                Button concludeMove =
+                        Buttons.red(getPlayer().getFinsFactionCheckerPrefix() + "deleteButtons", "Done Landing Troops");
                 buttons.add(concludeMove);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), getPlayer().getRepresentation()+" you can use these buttons to land troops if necessary",buttons);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getChannel(),
+                        getPlayer().getRepresentation() + " you can use these buttons to land troops if necessary",
+                        buttons);
             }
         }
         StartCombatService.combatCheck(game, event, tileTo);

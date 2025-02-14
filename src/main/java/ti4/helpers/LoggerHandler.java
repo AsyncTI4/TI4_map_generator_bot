@@ -9,7 +9,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-
 import ti4.ResourceHelper;
 
 public class LoggerHandler {
@@ -17,7 +16,7 @@ public class LoggerHandler {
     private static LoggerHandler loggerHandler;
 
     private LoggerHandler() {
-      String logFilePropertiesPath = ResourceHelper.getInstance().getDataFile("logging.properties");
+        String logFilePropertiesPath = ResourceHelper.getInstance().getDataFile("logging.properties");
 
         try (InputStream stream = new FileInputStream(logFilePropertiesPath)) {
             LogManager.getLogManager().readConfiguration(stream);

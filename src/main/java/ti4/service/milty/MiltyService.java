@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Function;
-
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -119,17 +118,19 @@ public class MiltyService {
         List<String> players = new ArrayList<>(specs.playerIDs);
         boolean staticOrder = specs.playerDraftOrder != null && !specs.playerDraftOrder.isEmpty();
         if (staticOrder) {
-            players = new ArrayList<>(specs.playerDraftOrder).stream()
-                .filter(p -> specs.playerIDs.contains(p)).toList();
+            players = new ArrayList<>(specs.playerDraftOrder)
+                    .stream().filter(p -> specs.playerIDs.contains(p)).toList();
         }
         initDraftOrder(draftManager, players, staticOrder);
 
         // initialize factions
         List<String> unbannedFactions = new ArrayList<>(Mapper.getFactions().stream()
-            .filter(f -> specs.factionSources.contains(f.getSource()))
-            .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
-            .filter(f -> !f.getAlias().contains("keleres") || f.getAlias().equals("keleresm")) // Limit the pool to only 1 keleres flavor
-            .map(FactionModel::getAlias).toList());
+                .filter(f -> specs.factionSources.contains(f.getSource()))
+                .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
+                .filter(f -> !f.getAlias().contains("keleres")
+                        || f.getAlias().equals("keleresm")) // Limit the pool to only 1 keleres flavor
+                .map(FactionModel::getAlias)
+                .toList());
         List<String> factionDraft = createFactionDraft(specs.numFactions, unbannedFactions, specs.priorityFactions);
         draftManager.setFactionDraft(factionDraft);
 
@@ -138,14 +139,17 @@ public class MiltyService {
         int blueTiles = draftManager.getBlue().size();
         int maxSlices = Math.min(redTiles / 2, blueTiles / 3);
         if (specs.numSlices > maxSlices) {
-            String msg = "Milty draft in this bot does not support " + specs.numSlices + " slices. You can enable DS to allow building additional slices";
-            msg += "\n> The options you have selected enable a maximum of `" + maxSlices + "` slices. [" + blueTiles + "blue/" + redTiles + "red]";
+            String msg = "Milty draft in this bot does not support " + specs.numSlices
+                    + " slices. You can enable DS to allow building additional slices";
+            msg += "\n> The options you have selected enable a maximum of `" + maxSlices + "` slices. [" + blueTiles
+                    + "blue/" + redTiles + "red]";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             return "Could not start milty draft, fix the error and try again";
         }
 
         String startMsg = "## Generating the milty draft!!";
-        startMsg += "\n - Also clearing out any tiles that may have already been on the map so that the draft will fill in tiles properly.";
+        startMsg +=
+                "\n - Also clearing out any tiles that may have already been on the map so that the draft will fill in tiles properly.";
         if (specs.numSlices == maxSlices) {
             startMsg += "\n - *You asked for the max number of slices, so this may take several seconds*";
         }
@@ -158,7 +162,8 @@ public class MiltyService {
         }
 
         if (specs.presetSlices != null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
             specs.presetSlices.forEach(draftManager::addSlice);
             draftManager.repostDraftInformation(event, game);
         } else {
@@ -197,7 +202,8 @@ public class MiltyService {
         draftManager.setPlayers(players);
     }
 
-    private static List<String> createFactionDraft(int factionCount, List<String> factions, List<String> firstFactions) {
+    private static List<String> createFactionDraft(
+            int factionCount, List<String> factions, List<String> firstFactions) {
         List<String> randomOrder = new ArrayList<>(firstFactions);
         Collections.shuffle(randomOrder);
         Collections.shuffle(factions);
@@ -215,7 +221,8 @@ public class MiltyService {
         return output;
     }
 
-    private static boolean generateSlices(GenericInteractionCreateEvent event, MiltyDraftManager draftManager, DraftSpec specs) {
+    private static boolean generateSlices(
+            GenericInteractionCreateEvent event, MiltyDraftManager draftManager, DraftSpec specs) {
         int sliceCount = specs.numSlices;
         boolean anomaliesCanTouch = specs.anomaliesCanTouch;
 
@@ -228,8 +235,7 @@ public class MiltyService {
         for (String pos1 : tilePositions) {
             List<Boolean> row = new ArrayList<>();
             List<String> adj = PositionMapper.getAdjacentTilePositions(pos1);
-            for (String pos2 : tilePositions)
-                row.add(adj.contains(pos2));
+            for (String pos2 : tilePositions) row.add(adj.contains(pos2));
             adjMatrix.add(row);
         }
 
@@ -240,10 +246,13 @@ public class MiltyService {
 
         List<MiltyDraftTile> allTiles = draftManager.getBlue();
         allTiles.addAll(draftManager.getRed());
-        int totalWHs = allTiles.stream().filter(tile -> tile.isHasAlphaWH() || tile.isHasBetaWH() || tile.isHasOtherWH()).toList().size();
+        int totalWHs = allTiles.stream()
+                .filter(tile -> tile.isHasAlphaWH() || tile.isHasBetaWH() || tile.isHasOtherWH())
+                .toList()
+                .size();
         int extraWHs = Math.min(totalWHs, sliceCount * 2);
-        if (specs.playerIDs.size() == 1) extraWHs = 0; //disable the behavior if there's only 1 player
-        if (specs.playerIDs.size() == 2) extraWHs = 4; //lessen the behavior if there's 2 players
+        if (specs.playerIDs.size() == 1) extraWHs = 0; // disable the behavior if there's only 1 player
+        if (specs.playerIDs.size() == 2) extraWHs = 4; // lessen the behavior if there's 2 players
         if (!specs.extraWHs) extraWHs = 0;
 
         List<MiltyDraftTile> blue = draftManager.getBlue();
@@ -266,16 +275,13 @@ public class MiltyService {
                 MiltyDraftSlice miltyDraftSlice = new MiltyDraftSlice();
                 List<MiltyDraftTile> tiles = new ArrayList<>();
 
-                for (int blues = 0; blues < bluePerPlayer; blues++)
-                    tiles.add(blue.get(blueIndex++));
-                for (int reds = 0; reds < redPerPlayer; reds++)
-                    tiles.add(red.get(redIndex++));
+                for (int blues = 0; blues < bluePerPlayer; blues++) tiles.add(blue.get(blueIndex++));
+                for (int reds = 0; reds < redPerPlayer; reds++) tiles.add(red.get(redIndex++));
 
                 Collections.shuffle(tiles);
                 List<Integer> ints = new ArrayList<>();
                 for (int k = 0; k < tiles.size(); k++)
-                    if (tiles.get(k).getTierList() == TierList.anomaly)
-                        ints.add(k + 1);
+                    if (tiles.get(k).getTierList() == TierList.anomaly) ints.add(k + 1);
                 if (!anomaliesCanTouch && ints.size() == 2) { // just skip this if there's more than 2 anomalies tbh
                     int turns = -4;
                     boolean tryagain = true;
@@ -292,8 +298,7 @@ public class MiltyService {
                             if (turns == 0) Collections.shuffle(tiles);
                             ints.clear();
                             for (int k = 0; k < tiles.size(); k++)
-                                if (tiles.get(k).getTierList() == TierList.anomaly)
-                                    ints.add(k + 1);
+                                if (tiles.get(k).getTierList() == TierList.anomaly) ints.add(k + 1);
                         }
                         turns++;
                     }
@@ -304,15 +309,24 @@ public class MiltyService {
                 int optInf = miltyDraftSlice.getOptimalInf();
                 int optRes = miltyDraftSlice.getOptimalRes();
                 int totalOptimal = miltyDraftSlice.getOptimalTotalValue();
-                if (optInf < specs.getMinInf() || optRes < specs.getMinRes() || totalOptimal < specs.getMinTot() || totalOptimal > specs.getMaxTot()) {
+                if (optInf < specs.getMinInf()
+                        || optRes < specs.getMinRes()
+                        || totalOptimal < specs.getMinTot()
+                        || totalOptimal > specs.getMaxTot()) {
                     addReason.apply("value");
                     break;
                 }
 
                 // if the slice has 2 alphas, or 2 betas, throw it out
-                int alphaWHs = (int) miltyDraftSlice.getTiles().stream().filter(MiltyDraftTile::isHasAlphaWH).count();
-                int betaWHs = (int) miltyDraftSlice.getTiles().stream().filter(MiltyDraftTile::isHasBetaWH).count();
-                int otherWHs = (int) miltyDraftSlice.getTiles().stream().filter(MiltyDraftTile::isHasOtherWH).count();
+                int alphaWHs = (int) miltyDraftSlice.getTiles().stream()
+                        .filter(MiltyDraftTile::isHasAlphaWH)
+                        .count();
+                int betaWHs = (int) miltyDraftSlice.getTiles().stream()
+                        .filter(MiltyDraftTile::isHasBetaWH)
+                        .count();
+                int otherWHs = (int) miltyDraftSlice.getTiles().stream()
+                        .filter(MiltyDraftTile::isHasOtherWH)
+                        .count();
                 if (alphaWHs > 1) {
                     addReason.apply("alpha");
                     break;
@@ -323,7 +337,9 @@ public class MiltyService {
                 }
                 whs += alphaWHs + betaWHs + otherWHs;
 
-                int sliceLegends = (int) miltyDraftSlice.getTiles().stream().filter(MiltyDraftTile::isLegendary).count();
+                int sliceLegends = (int) miltyDraftSlice.getTiles().stream()
+                        .filter(MiltyDraftTile::isLegendary)
+                        .count();
                 if (sliceLegends > 1) {
                     addReason.apply("legend");
                     break;
@@ -351,15 +367,24 @@ public class MiltyService {
         }
 
         long elapsed = System.nanoTime() - startTime;
-        boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
+        boolean debug =
+                GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         if (!slicesCreated || elapsed >= 10000000000L || debug) {
             StringBuilder sb = new StringBuilder();
             sb.append("Milty draft took a while... jazz, take a look:\n");
-            sb.append("`        Elapsed time:` ").append(DateTimeHelper.getTimeRepresentationNanoSeconds(elapsed)).append("\n");
-            sb.append("`           Quit time:` ").append(DateTimeHelper.getTimeRepresentationNanoSeconds(quitDiff)).append("\n");
+            sb.append("`        Elapsed time:` ")
+                    .append(DateTimeHelper.getTimeRepresentationNanoSeconds(elapsed))
+                    .append("\n");
+            sb.append("`           Quit time:` ")
+                    .append(DateTimeHelper.getTimeRepresentationNanoSeconds(quitDiff))
+                    .append("\n");
             sb.append("`    Number of cycles:` ").append(i).append("\n");
             for (Map.Entry<String, Integer> reason : reasons.entrySet()) {
-                sb.append("`").append(Helper.leftpad(reason.getKey(), 15)).append(" fail:` ").append(reason.getValue()).append("\n");
+                sb.append("`")
+                        .append(Helper.leftpad(reason.getKey(), 15))
+                        .append(" fail:` ")
+                        .append(reason.getValue())
+                        .append("\n");
             }
             BotLogger.log(event, sb.toString());
         }
@@ -386,7 +411,7 @@ public class MiltyService {
         Integer minTot = 9, maxTot = 13;
         Integer minLegend = 1, maxLegend = 2;
 
-        //other
+        // other
         List<MiltyDraftSlice> presetSlices = null;
 
         public DraftSpec(Game game) {
@@ -405,17 +430,27 @@ public class MiltyService {
         }
     }
 
-    public static void secondHalfOfPlayerSetup(Player player, Game game, String color, String faction, String positionHS, GenericInteractionCreateEvent event, boolean setSpeaker) {
+    public static void secondHalfOfPlayerSetup(
+            Player player,
+            Game game,
+            String color,
+            String faction,
+            String positionHS,
+            GenericInteractionCreateEvent event,
+            boolean setSpeaker) {
         Map<String, Player> players = game.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (color.equals(playerInfo.getColor())) {
                     String newColor = player.getNextAvailableColour();
-                    String message = "Player:" + playerInfo.getUserName() + " already uses color:" + color + " - changing color to " + newColor;
+                    String message = "Player:" + playerInfo.getUserName() + " already uses color:" + color
+                            + " - changing color to " + newColor;
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                     return;
                 } else if (faction.equals(playerInfo.getFaction())) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setup Failed - Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            "Setup Failed - Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
                     return;
                 }
             }
@@ -426,8 +461,9 @@ public class MiltyService {
         }
 
         if (player.isRealPlayer() && player.getSo() > 0) {
-            String message = player.getRepresentationNoPing() + "has secret objectives that would get lost to the void if they were setup again."
-                + " If they wish to change color, use `/player change_color`. If they wish to setup as another faction, they must discard their secret objective first.";
+            String message = player.getRepresentationNoPing()
+                    + "has secret objectives that would get lost to the void if they were setup again."
+                    + " If they wish to change color, use `/player change_color`. If they wish to setup as another faction, they must discard their secret objective first.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
             return;
@@ -447,13 +483,16 @@ public class MiltyService {
         }
 
         if (Source.ComponentSource.miltymod.equals(factionModel.getSource()) && !game.isMiltyModMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
             return;
         }
 
         // HOME SYSTEM
         if (!PositionMapper.isTilePositionValid(positionHS)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Tile position: `" + positionHS + "` is not valid. Stopping Setup.");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Tile position: `" + positionHS + "` is not valid. Stopping Setup.");
             return;
         }
 
@@ -523,7 +562,9 @@ public class MiltyService {
 
         if (setSpeaker) {
             game.setSpeakerUserID(player.getUserID());
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), MiscEmojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    MiscEmojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
         }
 
         // STARTING PNs
@@ -534,7 +575,8 @@ public class MiltyService {
         if (game.isBaseGameMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
             for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_an") && "Alliance".equals(Mapper.getPromissoryNote(pnID).getName())) {
+                if (pnID.endsWith("_an")
+                        && "Alliance".equals(Mapper.getPromissoryNote(pnID).getName())) {
                     player.removeOwnedPromissoryNoteByID(pnID);
                 }
             }
@@ -542,7 +584,9 @@ public class MiltyService {
         if (game.isAbsolMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
             for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_ps") && "Political Secret".equals(Mapper.getPromissoryNote(pnID).getName())) {
+                if (pnID.endsWith("_ps")
+                        && "Political Secret"
+                                .equals(Mapper.getPromissoryNote(pnID).getName())) {
                     player.removeOwnedPromissoryNoteByID(pnID);
                     player.addOwnedPromissoryNoteByID("absol_" + pnID);
                 }
@@ -569,8 +613,9 @@ public class MiltyService {
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             if (player.getFaction().contains("keleres")) {
                 Button getTech = Buttons.green("getKeleresTechOptions", "Get Keleres Technology Options");
-                String msg = player.getRepresentationUnfogged() + " after every other faction gets their starting technologies,"
-                    + " press this button to for Keleres to get their starting technologies.";
+                String msg = player.getRepresentationUnfogged()
+                        + " after every other faction gets their starting technologies,"
+                        + " press this button to for Keleres to get their starting technologies.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, getTech);
             } else {
                 // STARTING TECH OPTIONS
@@ -581,7 +626,9 @@ public class MiltyService {
                     if (!startingTechOptions.isEmpty()) {
                         for (String tech : game.getTechnologyDeck()) {
                             TechnologyModel model = Mapper.getTech(tech);
-                            boolean homebrewReplacesAnOption = model.getHomebrewReplacesID().map(startingTechOptions::contains).orElse(false);
+                            boolean homebrewReplacesAnOption = model.getHomebrewReplacesID()
+                                    .map(startingTechOptions::contains)
+                                    .orElse(false);
                             if (startingTechOptions.contains(model.getAlias()) || homebrewReplacesAnOption) {
                                 techs.add(model);
                             }
@@ -589,7 +636,8 @@ public class MiltyService {
                     }
 
                     List<Button> buttons = Helper.getTechButtons(techs, player, "nekro");
-                    String msg = player.getRepresentationUnfogged() + " use the buttons to choose your starting technology:";
+                    String msg =
+                            player.getRepresentationUnfogged() + " use the buttons to choose your starting technology:";
                     if (techs.isEmpty()) {
                         buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -611,47 +659,57 @@ public class MiltyService {
 
         if (player.hasAbility("diplomats")) {
             ButtonHelperAbilities.resolveFreePeopleAbility(game);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Set up **Free People** ability markers. " + player.getRepresentationUnfogged()
-                    + " any planet with a **Free People** token on it will show up as spendable in your various spends. Once spent, the token will be removed.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Set up **Free People** ability markers. " + player.getRepresentationUnfogged()
+                            + " any planet with a **Free People** token on it will show up as spendable in your various spends. Once spent, the token will be removed.");
         }
 
         if (player.hasAbility("private_fleet")) {
             String unitID = AliasHandler.resolveUnit("destroyer");
             player.setUnitCap(unitID, 12);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Set destroyer max to 12 for " + player.getRepresentation() + " due to the **Private Fleet** ability,");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Set destroyer max to 12 for " + player.getRepresentation()
+                            + " due to the **Private Fleet** ability,");
         }
         if (player.hasAbility("industrialists")) {
             String unitID = AliasHandler.resolveUnit("spacedock");
             player.setUnitCap(unitID, 4);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Set space dock max to 4 for " + player.getRepresentation() + " due to the **Industrialists** ability,");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Set space dock max to 4 for " + player.getRepresentation()
+                            + " due to the **Industrialists** ability,");
         }
         if (player.hasAbility("teeming")) {
             String unitID = AliasHandler.resolveUnit("dreadnought");
             player.setUnitCap(unitID, 7);
             unitID = AliasHandler.resolveUnit("mech");
             player.setUnitCap(unitID, 5);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
-                    + " due to the **Teeming** ability.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
+                            + " due to the **Teeming** ability.");
         }
-        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
-            player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
-                Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
+        if (player.hasAbility("necrophage")
+                && player.getCommoditiesTotal() < 5
+                && !player.getFaction().contains("franken")) {
+            player.setCommoditiesTotal(1
+                    + ButtonHelper.getNumberOfUnitsOnTheBoard(
+                            game, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
         if (player.hasAbility("oracle_ai")) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                    + " you may peek at the next objective in your `#cards-info` thread (by your promissory note). "
-                    + "This holds true for anyone with _Read the Fates_. Don't do this until after secret objectives are dealt and discarded.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + " you may peek at the next objective in your `#cards-info` thread (by your promissory note). "
+                            + "This holds true for anyone with _Read the Fates_. Don't do this until after secret objectives are dealt and discarded.");
         }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 
         if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                "Player: " + player.getRepresentation() + " has been set up");
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), "Player: " + player.getRepresentation() + " has been set up");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }
@@ -697,8 +755,8 @@ public class MiltyService {
             }
             Units.UnitKey unitID = Mapper.getUnitKey(unit, color);
             if (unitID == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Unit: " + unit + " is not valid and not supported.");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), "Unit: " + unit + " is not valid and not supported.");
                 continue;
             }
             if (unitInfoTokenizer.hasMoreTokens()) {

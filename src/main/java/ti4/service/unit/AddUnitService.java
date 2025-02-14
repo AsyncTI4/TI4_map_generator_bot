@@ -1,7 +1,6 @@
 package ti4.service.unit;
 
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
@@ -17,7 +16,8 @@ import ti4.service.planet.FlipTileService;
 @UtilityClass
 public class AddUnitService {
 
-    public static void addUnits(GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
+    public static void addUnits(
+            GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             tile.addUnit(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
@@ -29,7 +29,8 @@ public class AddUnitService {
         checkFleetCapacity(event, tile, color, game);
     }
 
-    private static void handleFogOfWar(GenericInteractionCreateEvent event, Tile tile, String color, Game game, String unitList) {
+    private static void handleFogOfWar(
+            GenericInteractionCreateEvent event, Tile tile, String color, Game game, String unitList) {
         if (!game.isFowMode()) return;
 
         if (isTileAlreadyPinged(game, tile)) return;

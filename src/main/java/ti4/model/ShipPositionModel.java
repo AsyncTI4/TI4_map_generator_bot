@@ -8,15 +8,32 @@ import java.util.stream.Collectors;
 
 public class ShipPositionModel {
     public enum ShipPosition {
-
-        TYPE01, TYPE02, TYPE03, TYPE04, TYPE05, TYPE06, TYPE07, TYPE08, TYPE09, TYPE10, TYPE11, TYPE12, TYPE13, TYPE14, TYPE15, TYPE16, TYPE17;
+        TYPE01,
+        TYPE02,
+        TYPE03,
+        TYPE04,
+        TYPE05,
+        TYPE06,
+        TYPE07,
+        TYPE08,
+        TYPE09,
+        TYPE10,
+        TYPE11,
+        TYPE12,
+        TYPE13,
+        TYPE14,
+        TYPE15,
+        TYPE16,
+        TYPE17;
 
         public String getPositions() {
             return switch (this) {
                 case TYPE01 -> "dd 208,83; ca 175,230; cv 100,225; dn 40,70; fs 145,3; ws 80,5; sd 250,190; mf 55,210; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
                 case TYPE02 -> "dd 126,138; ca 51,158; cv 186,80; dn 90,227; fs 207,5; ws 24,86; sd 164,5; mf 192,254; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
-                case TYPE03, TYPE06 -> "dd 44,196; ca 55,233; cv 124,129; dn 62,31; fs 115,222; ws 113,71; sd 122,5; mf 259,203; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
-                case TYPE04, TYPE17 -> "dd 200,75; ca 175,230; cv 100,225; dn 40,70; fs 135,10; ws 80,5; sd 250,190; mf 55,210; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
+                case TYPE03,
+                        TYPE06 -> "dd 44,196; ca 55,233; cv 124,129; dn 62,31; fs 115,222; ws 113,71; sd 122,5; mf 259,203; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
+                case TYPE04,
+                        TYPE17 -> "dd 200,75; ca 175,230; cv 100,225; dn 40,70; fs 135,10; ws 80,5; sd 250,190; mf 55,210; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
                 case TYPE05 -> "dd 126,138; ca 51,158; cv 186,80; dn 60,227; fs 207,5; ws 24,86; sd 164,5; mf 192,254; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
                 case TYPE07 -> "dd 115,25; ca 115,85; cv 180,115; dn 210,190; fs 40,85; ws 60,35; sd 210,245; mf 220,55; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
                 case TYPE08 -> "dd 140,80; ca 210,195; cv 60,210; dn 115,150; fs 20,110; ws 175,235; sd 130,255; mf 180,15; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
@@ -33,11 +50,19 @@ public class ShipPositionModel {
 
         public List<Point> getSpaceTokenLayout() {
             return switch (this) {
-                case TYPE01, TYPE10, TYPE04, TYPE17 -> List.of(new Point(195, 10), new Point(225, 75), new Point(225, 155), new Point(145, 205));
-                case TYPE02, TYPE05 -> List.of(new Point(180, 0), new Point(220, 60), new Point(45, 120), new Point(95, 170));
-                case TYPE03, TYPE06 -> List.of(new Point(250, 90), new Point(80, 10), new Point(135, 105), new Point(80, 185));
+                case TYPE01, TYPE10, TYPE04, TYPE17 -> List.of(
+                        new Point(195, 10), new Point(225, 75), new Point(225, 155), new Point(145, 205));
+                case TYPE02, TYPE05 -> List.of(
+                        new Point(180, 0), new Point(220, 60), new Point(45, 120), new Point(95, 170));
+                case TYPE03, TYPE06 -> List.of(
+                        new Point(250, 90), new Point(80, 10), new Point(135, 105), new Point(80, 185));
                 case TYPE07, TYPE11, TYPE12, TYPE13, TYPE14, TYPE15, TYPE16 -> null;
-                case TYPE08 -> List.of(new Point(190, 30), new Point(215, 110), new Point(185, 205), new Point(100, 90), new Point(60, 130));
+                case TYPE08 -> List.of(
+                        new Point(190, 30),
+                        new Point(215, 110),
+                        new Point(185, 205),
+                        new Point(100, 90),
+                        new Point(60, 130));
                 case TYPE09 -> List.of(new Point(195, 10), new Point(225, 50), new Point(305, 105), new Point(115, 40));
             };
         }
@@ -49,18 +74,18 @@ public class ShipPositionModel {
                 case TYPE08 -> new Point(132, 110); // empty and wormhole
                 case TYPE13 -> new Point(139, 186); // Eko
                 case TYPE14 -> new Point(152, 124); // Horace
-                
+
                 default -> null;
             };
         }
 
         public String getName() {
             return switch (this) {
-                // HS system layouts
+                    // HS system layouts
                 case TYPE01 -> "1-planet HS (Jord-Style)";
                 case TYPE02 -> "2-planet HS (Druaa-Style)";
                 case TYPE03 -> "3-planet HS (Cats & Birds)";
-                // Non-HS system layouts
+                    // Non-HS system layouts
                 case TYPE04 -> "Single planet, centered";
                 case TYPE05 -> "Starpoint-Style, plus Quann et al";
                 case TYPE06 -> "Rigels and Devils";
@@ -110,10 +135,8 @@ public class ShipPositionModel {
     public ShipPosition getTypeFromString(String type) {
         type = type.substring(0, 6);
         Map<String, ShipPosition> allTypes = Arrays.stream(ShipPosition.values())
-            .collect(Collectors.toMap(ShipPosition::toString, (shipPositionModel -> shipPositionModel)));
-        if (allTypes.containsKey(type.toLowerCase()))
-            return allTypes.get(type.toLowerCase());
+                .collect(Collectors.toMap(ShipPosition::toString, (shipPositionModel -> shipPositionModel)));
+        if (allTypes.containsKey(type.toLowerCase())) return allTypes.get(type.toLowerCase());
         return null;
     }
-
 }

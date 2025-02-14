@@ -13,7 +13,9 @@ class RemoveTitle extends Subcommand {
 
     public RemoveTitle() {
         super(Constants.REMOVE_TITLE, "Remove a title");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "The game name where the title was given").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "The game name where the title was given")
+                .setRequired(true)
+                .setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player @playername").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TITLE, "Title to Remove").setRequired(true));
     }
@@ -28,8 +30,10 @@ class RemoveTitle extends Subcommand {
         Game game = GameManager.getManagedGame(gameName).getGame();
         String userId = event.getOption(Constants.PLAYER).getAsUser().getId();
         String title = event.getOption(Constants.TITLE).getAsString();
-        game.setStoredValue("TitlesFor" + userId, game.getStoredValue("TitlesFor" + userId).replace(title, ""));
-        GameManager.save(game,"Title Removal");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Removed the title " + title + " in game " + game.getName());
+        game.setStoredValue(
+                "TitlesFor" + userId, game.getStoredValue("TitlesFor" + userId).replace(title, ""));
+        GameManager.save(game, "Title Removal");
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), "Removed the title " + title + " in game " + game.getName());
     }
 }

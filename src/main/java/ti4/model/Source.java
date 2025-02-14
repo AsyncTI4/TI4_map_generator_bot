@@ -9,19 +9,61 @@ public class Source {
     public enum ComponentSource {
 
         // official
-        base, pok, codex1, codex2, codex3,
+        base,
+        pok,
+        codex1,
+        codex2,
+        codex3,
 
-        //big homebrew
-        ds, absol, franken, uncharted_space, monuments,
+        // big homebrew
+        ds,
+        absol,
+        franken,
+        uncharted_space,
+        monuments,
 
         // lil homebrew
-        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral, lost_star_charts_of_ixth, flagshipping, promises_promises,
+        lazax,
+        action_deck_2,
+        action_deck_2_old,
+        keleresplus,
+        little_omega,
+        project_pi,
+        neutral,
+        lost_star_charts_of_ixth,
+        flagshipping,
+        promises_promises,
 
         // async homebrew
-        draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000, fow, dane_leaks,
+        draft,
+        admins,
+        pbd100,
+        pbd500,
+        pbd1000,
+        testsource,
+        pbd2000,
+        fow,
+        dane_leaks,
 
         // personal projs
-        somno, ignis_aurora, asteroid, cryypter, voice_of_the_council, cpti, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma, byz_agendas, memephilosopher,
+        somno,
+        ignis_aurora,
+        asteroid,
+        cryypter,
+        voice_of_the_council,
+        cpti,
+        oath_of_kings,
+        eronous,
+        miltymod,
+        luminous,
+        holytispoon,
+        salliance,
+        nomadfalcon,
+        unfulvio,
+        andcat,
+        sigma,
+        byz_agendas,
+        memephilosopher,
 
         // catchall
         other;
@@ -32,7 +74,7 @@ public class Source {
 
         /**
          * Converts a string identifier to the corresponding ComponentSource enum value.
-         * 
+         *
          * @param id the string identifier
          * @return the ComponentSource enum value, or null if not found
          */
@@ -67,24 +109,25 @@ public class Source {
         }
 
         public String emoji() {
-            TI4Emoji emoji = switch (this) {
-                case absol -> SourceEmojis.Absol;
-                case ds -> SourceEmojis.DiscordantStars;
-                case uncharted_space -> SourceEmojis.UnchartedSpace;
-                case eronous -> SourceEmojis.Eronous;
-                case admins -> FactionEmojis.AdminsFaction;
-                case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
-                case keleresplus -> SourceEmojis.KeleresPlus;
-                case project_pi -> SourceEmojis.ProjectPi;
-                case flagshipping -> SourceEmojis.Flagshipping;
-                case promises_promises -> SourceEmojis.PromisesPromises;
-                case miltymod -> SourceEmojis.MiltyMod;
-                case lazax -> FactionEmojis.Lazax;
-                case neutral -> FactionEmojis.Neutral;
-                case salliance -> SourceEmojis.StrategicAlliance;
-                case monuments -> SourceEmojis.Monuments;
-                default -> null;
-            };
+            TI4Emoji emoji =
+                    switch (this) {
+                        case absol -> SourceEmojis.Absol;
+                        case ds -> SourceEmojis.DiscordantStars;
+                        case uncharted_space -> SourceEmojis.UnchartedSpace;
+                        case eronous -> SourceEmojis.Eronous;
+                        case admins -> FactionEmojis.AdminsFaction;
+                        case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
+                        case keleresplus -> SourceEmojis.KeleresPlus;
+                        case project_pi -> SourceEmojis.ProjectPi;
+                        case flagshipping -> SourceEmojis.Flagshipping;
+                        case promises_promises -> SourceEmojis.PromisesPromises;
+                        case miltymod -> SourceEmojis.MiltyMod;
+                        case lazax -> FactionEmojis.Lazax;
+                        case neutral -> FactionEmojis.Neutral;
+                        case salliance -> SourceEmojis.StrategicAlliance;
+                        case monuments -> SourceEmojis.Monuments;
+                        default -> null;
+                    };
             return emoji == null ? "" : emoji.toString();
         }
 
@@ -105,5 +148,4 @@ public class Source {
             };
         }
     }
-
 }

@@ -1,7 +1,6 @@
 package ti4.buttons.handlers.objective;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -29,14 +28,17 @@ class SecretObjectiveButtonHandler {
 
         try {
             int soIndex = Integer.parseInt(soID);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " discarded a secret objective.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), player.getRepresentation() + " discarded a secret objective.");
             DiscardSecretService.discardSO(player, soIndex, game);
             if (drawReplacement) {
                 DrawSecretService.drawSO(event, game, player);
             }
         } catch (Exception e) {
             BotLogger.log(event, "Could not parse SO ID: " + soID, e);
-            event.getChannel().sendMessage("Could not parse secret objective ID: " + soID + ". Please discard manually.").queue();
+            event.getChannel()
+                    .sendMessage("Could not parse secret objective ID: " + soID + ". Please discard manually.")
+                    .queue();
             return;
         }
         ButtonHelper.deleteMessage(event);
@@ -45,10 +47,13 @@ class SecretObjectiveButtonHandler {
     @ButtonHandler("drawSpecificSO_")
     public static void drawSpecificSO(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String soID = buttonID.split("_")[1];
-        String publicMsg = game.getPing() + " this is notice that " + player.getFactionEmojiOrColor() + " is picking up a secret objective that they accidentally discarded.";
+        String publicMsg = game.getPing() + " this is notice that " + player.getFactionEmojiOrColor()
+                + " is picking up a secret objective that they accidentally discarded.";
         Map<String, Integer> secrets = game.drawSpecificSecretObjective(soID, player.getUserID());
         if (secrets == null) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Secret objective not retrieved, most likely because someone else has it in hand. Ping a bothelper to help.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    "Secret objective not retrieved, most likely because someone else has it in hand. Ping a bothelper to help.");
             return;
         }
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMsg);

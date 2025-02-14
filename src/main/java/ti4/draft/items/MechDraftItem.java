@@ -1,10 +1,9 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.model.DraftErrataModel;
@@ -47,9 +46,10 @@ public class MechDraftItem extends DraftItem {
         }
         if (unit.getAfbDieCount() > 0) {
             sb.append("ANTI-FIGHTER BARRAGE ")
-                .append(unit.getAfbHitsOn())
-                .append("x").append(unit.getAfbDieCount())
-                .append(" ");
+                    .append(unit.getAfbHitsOn())
+                    .append("x")
+                    .append(unit.getAfbDieCount())
+                    .append(" ");
         }
         if (unit.getProductionValue() > 0) {
             sb.append("PRODUCTION ");

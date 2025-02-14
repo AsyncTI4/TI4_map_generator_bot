@@ -1,7 +1,6 @@
 package ti4.commands.admin;
 
 import java.io.File;
-
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -18,8 +17,8 @@ class RestoreGame extends Subcommand {
     public RestoreGame() {
         super(Constants.RESTORE_GAME, "Restore a game by uploading a save file");
         addOptions(
-            new OptionData(OptionType.ATTACHMENT, Constants.SAVE_FILE, "Save file to reload").setRequired(true),
-            new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name to load to").setRequired(true));
+                new OptionData(OptionType.ATTACHMENT, Constants.SAVE_FILE, "Save file to reload").setRequired(true),
+                new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name to load to").setRequired(true));
     }
 
     @Override

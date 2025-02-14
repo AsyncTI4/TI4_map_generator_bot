@@ -3,7 +3,6 @@ package ti4.service.statistics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -14,7 +13,7 @@ public class LifeTimeRecordService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("getLifeTimeRecords", event, () -> getLifeTimeRecords(event)));
+                new StatisticsPipeline.StatisticsEvent("getLifeTimeRecords", event, () -> getLifeTimeRecords(event)));
     }
 
     private void getLifeTimeRecords(SlashCommandInteractionEvent event) {

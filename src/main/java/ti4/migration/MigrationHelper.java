@@ -5,16 +5,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.map.Game;
-import ti4.map.GamesPage;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 
 @UtilityClass
@@ -108,7 +105,8 @@ public class MigrationHelper {
     }
 
     public static void swapBagItem(DraftBag bag, int index, DraftItem newItem) {
-        BotLogger.log(String.format("Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
+        BotLogger.log(String.format(
+                "Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
         bag.Contents.remove(index);
         bag.Contents.add(index, newItem);
     }

@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-
 import lombok.Getter;
 import ti4.ResourceHelper;
 import ti4.image.Mapper;
@@ -26,8 +25,10 @@ public class AliasHandler {
 
     private static final Map<String, String> tilemapAliasList = new HashMap<>();
     private static final Map<String, String> unitAliasList = new HashMap<>();
+
     @Getter
     private static final Map<String, String> unitListForHelp = new HashMap<>();
+
     private static final Map<String, String> ccTokenAliasList = new HashMap<>();
     private static final Map<String, String> attachmentAliasList = new HashMap<>();
     private static final Map<String, String> tokenAliasList = new HashMap<>();
@@ -55,7 +56,8 @@ public class AliasHandler {
         readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
         readAliasFile("unit_alias.properties", unitListForHelp);
         readAliasFile("cc_token_alias.properties", ccTokenAliasList, "Could not read CC token alias file");
-        readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
+        readAliasFile(
+                "attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
         readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
         readAliasFile("faction_alias.properties", factionAliasList, "Could not read faction alias file");
         readAliasFile("tech_alias.properties", techAliasList, "Could not read tech alias file");
@@ -66,7 +68,10 @@ public class AliasHandler {
         readAliasFile("objective_alias.properties", objectiveAliasList, "Could not read objective alias file");
         readAliasFile("promissory_alias.properties", promissoryAliasList, "Could not read promissory alias file");
         readAliasFile("position_alias.properties", ttpgPositionAliasList, "Could not read TTPG position_alias file");
-        readAliasFile("ttpg_attachment_alias.properties", ttpgAttachmentAliasList, "Could not read TTPG attachment_alias file");
+        readAliasFile(
+                "ttpg_attachment_alias.properties",
+                ttpgAttachmentAliasList,
+                "Could not read TTPG attachment_alias file");
         readAliasFile("ttpg_token_alias.properties", ttpgTokenAliasList, "Could not read TTPG token_alias file");
         readAliasFile("ttpg_unit_alias.properties", ttpgUnitAliasList, "Could not read TTPG unit_alias file");
         readAliasFile("rules_injection.properties", rulesLinks, "Could not read TTPG unit_alias file");
@@ -79,7 +84,7 @@ public class AliasHandler {
 
     /**
      * Loads aliases in a simple format - used primarily for displaying aliases to users with the /help commands
-     * 
+     *
      * @param fileName file with lines like: key=value1,value2,value3
      * @param map map to load with key and values like: [key],[value1,value2,value3]
      */
@@ -98,7 +103,7 @@ public class AliasHandler {
 
     /**
      * Loads just the key or value for aliases - use the list for simple ifExists / contains checks
-     * 
+     *
      * @param fileName file with lines like: key=value1,value2,value3
      * @param list list to load
      * @param keys true -> load [key] into the list
@@ -131,7 +136,7 @@ public class AliasHandler {
 
     /**
      * Load aliases for actually resolving aliases
-     * 
+     *
      * @param fileName file with lines like: key=value1,value2,value3
      * @param aliasList map to load aliases like: (value1=key),(value2=key),(value=key)
      * @param errorMessage error message provided
@@ -163,16 +168,19 @@ public class AliasHandler {
     }
 
     public static void addNewPlanetAliases(PlanetModel planetModel) {
-        Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>())
-            .forEach(alias -> allPlanetAliases.put(alias.toLowerCase(), planetModel.getId()));
+        Optional.ofNullable(planetModel.getAliases())
+                .orElse(new ArrayList<>())
+                .forEach(alias -> allPlanetAliases.put(alias.toLowerCase(), planetModel.getId()));
         allPlanetAliases.put(planetModel.getId(), planetModel.getId()); // add the planet itself to aliashandler
     }
 
     public static void addNewTileAliases(TileModel tileModel) {
-        Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>())
-            .forEach(alias -> allTileAliases.put(alias.toLowerCase(), tileModel.getId()));
-        Optional.ofNullable(tileModel.getPlanets()).orElse(new ArrayList<>())
-            .forEach(planet -> allTileAliases.put(planet.toLowerCase(), tileModel.getId()));
+        Optional.ofNullable(tileModel.getAliases())
+                .orElse(new ArrayList<>())
+                .forEach(alias -> allTileAliases.put(alias.toLowerCase(), tileModel.getId()));
+        Optional.ofNullable(tileModel.getPlanets())
+                .orElse(new ArrayList<>())
+                .forEach(planet -> allTileAliases.put(planet.toLowerCase(), tileModel.getId()));
     }
 
     public static String resolveTile(String name) {
@@ -188,40 +196,41 @@ public class AliasHandler {
 
     /**
      * For resolving a TileID specific to this Async bot to a "Standard" TileID used by all other TI4 map tools, including TTPG/TTS
-     * 
+     *
      * @param name - Async specific Tile ID
      * @return Standard TI4 Tile ID number
      */
     public static String resolveStandardTile(String name) {
         String aliasID = tilemapAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for StandardTile: " + name);
+        // System.out.println("Could not find an alias for StandardTile: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveFaction(String name) {
         String aliasID = factionAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for Faction: " + name);
+        // System.out.println("Could not find an alias for Faction: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveColor(String name) {
-        return Optional.ofNullable(Mapper.getColor(name)).map(ColorModel::getName).orElse(name);
+        return Optional.ofNullable(Mapper.getColor(name))
+                .map(ColorModel::getName)
+                .orElse(name);
     }
 
     public static String resolveUnit(String name) {
         String aliasID = unitAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for Unit: " + name);
+        // System.out.println("Could not find an alias for Unit: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static List<String> getPlanetKeyList() {
-        return TileHelper.getAllPlanetModels().stream()
-            .map(PlanetModel::getId)
-            .toList();
+        return TileHelper.getAllPlanetModels().stream().map(PlanetModel::getId).toList();
     }
 
     public static String resolvePlanet(String name) {
-        if (name.contains(" ")) name = name.substring(0, name.lastIndexOf(" ")); //if there is a space " " then cut off remainder
+        if (name.contains(" "))
+            name = name.substring(0, name.lastIndexOf(" ")); // if there is a space " " then cut off remainder
         if ("gamma".equalsIgnoreCase(name)) {
             return name;
         }
@@ -238,61 +247,61 @@ public class AliasHandler {
         if ("gamma".equalsIgnoreCase(name)) {
             return name;
         }
-        //System.out.println("Could not find an alias for Attachment: " + name);
+        // System.out.println("Could not find an alias for Attachment: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveToken(String name) {
         String aliasID = ccTokenAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for Token: " + name);
+        // System.out.println("Could not find an alias for Token: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveTech(String name) {
         String aliasID = techAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for Tech: " + name);
+        // System.out.println("Could not find an alias for Tech: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveActionCard(String name) {
         String aliasID = actionCardAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for ActionCard: " + name);
+        // System.out.println("Could not find an alias for ActionCard: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveAgenda(String name) {
         String aliasID = agendaAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for Agenda: " + name);
+        // System.out.println("Could not find an alias for Agenda: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveExploration(String name) {
         String aliasID = explorationAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for Exploration: " + name);
+        // System.out.println("Could not find an alias for Exploration: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolvePromissory(String name) {
         String aliasID = promissoryAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for Promissory: " + name);
+        // System.out.println("Could not find an alias for Promissory: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveRelic(String name) {
         String aliasID = relicAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for Relic: " + name);
+        // System.out.println("Could not find an alias for Relic: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveObjective(String name) {
         String aliasID = objectiveAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for Objective: " + name);
+        // System.out.println("Could not find an alias for Objective: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveTTPGAttachment(String name) {
         String aliasID = ttpgAttachmentAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for ttpgAttachment: " + name);
+        // System.out.println("Could not find an alias for ttpgAttachment: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 
@@ -301,7 +310,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return resolveUnit(aliasID);
         } else {
-            //System.out.println("Could not find an alias for TTPGUnit: " + name);
+            // System.out.println("Could not find an alias for TTPGUnit: " + name);
             return name;
         }
     }
@@ -316,7 +325,7 @@ public class AliasHandler {
 
     /**
      * Given a Position parameter like [+-][0-9][+-][0-9], will return Async position like [0-9][a-z]
-     * 
+     *
      * @param position TTPG like [+-][0-9][+-][0-9] Eg. +0+0, +2-2, +0+8
      * @return Async position like [0-9][a-z] Eg. 0a, 2e, 4a
      */
@@ -326,6 +335,9 @@ public class AliasHandler {
     }
 
     public static String getFactionAliasEntryList(String faction) {
-        return factionAliasValuesList.stream().filter(a -> a.startsWith(faction)).findFirst().orElse(faction);
+        return factionAliasValuesList.stream()
+                .filter(a -> a.startsWith(faction))
+                .findFirst()
+                .orElse(faction);
     }
 }

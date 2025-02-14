@@ -13,8 +13,12 @@ class PutDiscardBackIntoDeckEvents extends GameStateSubcommand {
 
     public PutDiscardBackIntoDeckEvents() {
         super(Constants.PUT_DISCARD_BACK_INTO_DECK, "Put event back into deck from discard", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID, which is found between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHUFFLE_EVENTS, "Enter True to shuffle, otherwise False to put on top (default is True)"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID, which is found between ()")
+                .setRequired(true));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.SHUFFLE_EVENTS,
+                "Enter True to shuffle, otherwise False to put on top (default is True)"));
     }
 
     @Override
@@ -23,10 +27,12 @@ class PutDiscardBackIntoDeckEvents extends GameStateSubcommand {
         Game game = getGame();
         boolean success;
         if (shuffleEvents) {
-            success = game.shuffleEventBackIntoDeck(event.getOption(Constants.EVENT_ID).getAsInt());
+            success = game.shuffleEventBackIntoDeck(
+                    event.getOption(Constants.EVENT_ID).getAsInt());
             MessageHelper.sendMessageToChannel(event.getChannel(), "Event shuffled into deck.");
         } else {
-            success = game.putEventBackIntoDeckOnTop(event.getOption(Constants.EVENT_ID).getAsInt());
+            success = game.putEventBackIntoDeckOnTop(
+                    event.getOption(Constants.EVENT_ID).getAsInt());
             MessageHelper.sendMessageToChannel(event.getChannel(), "Event placed on top of deck.");
         }
 

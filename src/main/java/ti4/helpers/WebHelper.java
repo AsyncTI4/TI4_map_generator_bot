@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.exception.SdkClientException;
@@ -35,12 +34,15 @@ import ti4.website.WebsiteOverlay;
 public class WebHelper {
 
     private static final HttpClient httpClient = HttpClient.newHttpClient();
-    private static final S3AsyncClient s3AsyncClient = S3AsyncClient.builder().region(Region.US_EAST_1).build();
+    private static final S3AsyncClient s3AsyncClient =
+            S3AsyncClient.builder().region(Region.US_EAST_1).build();
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final Properties webProperties;
+
     static {
         webProperties = new Properties();
-        try (InputStream input = new FileInputStream(Objects.requireNonNull(ResourceHelper.getInstance().getWebFile("web.properties")))) {
+        try (InputStream input = new FileInputStream(
+                Objects.requireNonNull(ResourceHelper.getInstance().getWebFile("web.properties")))) {
             webProperties.load(input);
         } catch (IOException e) {
             BotLogger.log("Could not load web properties.", e);
@@ -48,55 +50,55 @@ public class WebHelper {
     }
 
     public static void putData(String gameName, Game game) {
-        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
-            return;
+        if (!GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) return;
 
         try {
             Map<String, Object> exportableFieldMap = game.getExportableFieldMap();
             String json = objectMapper.writeValueAsString(exportableFieldMap);
 
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("https://bbg9uiqewd.execute-api.us-east-1.amazonaws.com/Prod/map/%s", gameName)))
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
+                    .uri(URI.create(String.format(
+                            "https://bbg9uiqewd.execute-api.us-east-1.amazonaws.com/Prod/map/%s", gameName)))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
 
-            httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .exceptionally(e -> {
-                    BotLogger.log("An exception occurred while performing an async send of game data to the website.", e);
-                    return null;
-                });
+            httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).exceptionally(e -> {
+                BotLogger.log("An exception occurred while performing an async send of game data to the website.", e);
+                return null;
+            });
         } catch (IOException e) {
             BotLogger.log("Could not put data to web server", e);
         }
     }
 
     public static void putOverlays(String gameId, List<WebsiteOverlay> overlays) {
-        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
-            return;
+        if (!GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) return;
 
         try {
             String json = objectMapper.writeValueAsString(overlays);
 
             PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(webProperties.getProperty("bucket"))
-                .key(String.format("overlays/%s/%s.json", gameId, gameId))
-                .contentType("application/json")
-                .cacheControl("no-cache, no-store, must-revalidate")
-                .build();
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key(String.format("overlays/%s/%s.json", gameId, gameId))
+                    .contentType("application/json")
+                    .cacheControl("no-cache, no-store, must-revalidate")
+                    .build();
 
-            s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
-                .exceptionally(e -> {
-                    BotLogger.log("An exception occurred while performing an async send of overlay data to the website.", e);
-                    return null;
-                });
+            s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json)).exceptionally(e -> {
+                BotLogger.log(
+                        "An exception occurred while performing an async send of overlay data to the website.", e);
+                return null;
+            });
         } catch (Exception e) {
             BotLogger.log("Could not put overlay to web server", e);
         }
     }
 
     public static void putStats() {
-        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
-            return;
+        if (!GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) return;
 
         List<GameStatsDashboardPayload> payloads = new ArrayList<>();
         List<String> badGames = new ArrayList<>();
@@ -112,29 +114,30 @@ public class WebHelper {
                     payloads.add(new GameStatsDashboardPayload(game));
                 } catch (Exception e) {
                     badGames.add(managedGame.getName());
-                    BotLogger.log("Failed to create GameStatsDashboardPayload for game: `" + managedGame.getName() + "`", e);
+                    BotLogger.log(
+                            "Failed to create GameStatsDashboardPayload for game: `" + managedGame.getName() + "`", e);
                 }
             }
         }
 
-        String message = "# Statistics Upload\nOut of " + count + " eligible games, the statistics of " + payloads.size() + " games are being uploaded to the web server.";
+        String message = "# Statistics Upload\nOut of " + count + " eligible games, the statistics of "
+                + payloads.size() + " games are being uploaded to the web server.";
         if (count != payloads.size()) message += "\nBad Games:\n- " + StringUtils.join(badGames, "\n- ");
         BotLogger.log(message);
 
         try {
             String json = objectMapper.writeValueAsString(payloads);
             PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(webProperties.getProperty("bucket"))
-                .key("statistics/statistics.json")
-                .contentType("application/json")
-                .cacheControl("no-cache, no-store, must-revalidate")
-                .build();
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key("statistics/statistics.json")
+                    .contentType("application/json")
+                    .cacheControl("no-cache, no-store, must-revalidate")
+                    .build();
 
-            s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
-                .exceptionally(e -> {
-                    BotLogger.log("An exception occurred while performing an async send of game stats to the website.", e);
-                    return null;
-                });
+            s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json)).exceptionally(e -> {
+                BotLogger.log("An exception occurred while performing an async send of game stats to the website.", e);
+                return null;
+            });
         } catch (Exception e) {
             BotLogger.log("Could not put statistics to web server", e);
         }
@@ -145,8 +148,8 @@ public class WebHelper {
     }
 
     public static void putMap(String gameName, byte[] imageBytes, boolean frog, Player player) {
-        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
-            return;
+        if (!GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) return;
 
         try {
             String mapPath;
@@ -160,17 +163,21 @@ public class WebHelper {
             String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
             PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(webProperties.getProperty("bucket"))
-                .key(String.format(mapPath, gameName, dtstamp))
-                .contentType("image/jpg")
-                .build();
-            s3AsyncClient.putObject(request, AsyncRequestBody.fromBytes(imageBytes))
-                .exceptionally(e -> {
-                    BotLogger.log("An exception occurred while performing an async send of the game image to the website.", e);
-                    return null;
-                });
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key(String.format(mapPath, gameName, dtstamp))
+                    .contentType("image/jpg")
+                    .build();
+            s3AsyncClient
+                    .putObject(request, AsyncRequestBody.fromBytes(imageBytes))
+                    .exceptionally(e -> {
+                        BotLogger.log(
+                                "An exception occurred while performing an async send of the game image to the website.",
+                                e);
+                        return null;
+                    });
         } catch (SdkClientException e) {
-            BotLogger.log("Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.", e);
+            BotLogger.log(
+                    "Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.", e);
         } catch (Exception e) {
             BotLogger.log("Could not add image for game `" + gameName + "` to web server", e);
         }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import ti4.map.Game;
@@ -29,32 +28,30 @@ public class CombatModifierModel implements ModelInterface {
     private Boolean applyToOpponent = false;
 
     public boolean isValid() {
-        return type != null
-            && value != null
-            && persistenceType != null
-            && related != null;
+        return type != null && value != null && persistenceType != null && related != null;
     }
 
     public boolean isRelevantTo(String relatedType, String relatedAlias) {
-        return related.stream().anyMatch(related -> related.getAlias().equals(relatedAlias)
-            && related.getType().equals(relatedType));
+        return related.stream()
+                .anyMatch(related -> related.getAlias().equals(relatedAlias)
+                        && related.getType().equals(relatedType));
     }
 
-    public Boolean isInScopeForUnit(UnitModel unit, List<UnitModel> allUnits, CombatRollType rollType, Game game, Player player) {
+    public Boolean isInScopeForUnit(
+            UnitModel unit, List<UnitModel> allUnits, CombatRollType rollType, Game game, Player player) {
         boolean isInScope = false;
         if (scopeExcept != null) {
             if (!scopeExcept.equals(unit.getAsyncId())) {
                 isInScope = true;
             }
         } else {
-            if (StringUtils.isBlank(scope)
-                || "all".equals(scope)
-                || scope.equals(unit.getAsyncId())) {
+            if (StringUtils.isBlank(scope) || "all".equals(scope) || scope.equals(unit.getAsyncId())) {
                 isInScope = true;
             }
             if ("_best_".equals(scope)) {
                 List<UnitModel> sortedAllUnits = new ArrayList<>(allUnits);
-                sortedAllUnits.sort(Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player, game)));
+                sortedAllUnits.sort(
+                        Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player, game)));
                 isInScope = Objects.equals(sortedAllUnits.getFirst().getAsyncId(), unit.getAsyncId());
             }
             if ("_ship_".equals(scope)) {

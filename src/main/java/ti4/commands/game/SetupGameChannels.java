@@ -16,7 +16,8 @@ class SetupGameChannels extends GameStateSubcommand {
 
     public SetupGameChannels() {
         super(Constants.GAME_CHANNEL_SETUP, "Setup channels and roles for non-standard games", true, false);
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.MAIN_GAME_CHANNEL, "Main game channel").setRequired(true));
+        addOptions(
+                new OptionData(OptionType.CHANNEL, Constants.MAIN_GAME_CHANNEL, "Main game channel").setRequired(true));
         addOptions(new OptionData(OptionType.CHANNEL, Constants.TABLE_TALK_CHANNEL, "Table talk channel"));
 
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Main player for Community/Fog mode"));
@@ -82,7 +83,12 @@ class SetupGameChannels extends GameStateSubcommand {
         }
     }
 
-    private void setRoleAndChannel(SlashCommandInteractionEvent event, Game game, String playerConstant, String roleConstant, String channelConstant) {
+    private void setRoleAndChannel(
+            SlashCommandInteractionEvent event,
+            Game game,
+            String playerConstant,
+            String roleConstant,
+            String channelConstant) {
         OptionMapping player = event.getOption(playerConstant);
         OptionMapping role = event.getOption(roleConstant);
         OptionMapping channel = event.getOption(channelConstant);
@@ -94,20 +100,22 @@ class SetupGameChannels extends GameStateSubcommand {
             User asUser = player.getAsUser();
             Player player_ = game.getPlayer(asUser.getId());
             if (player_ == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify game player: " + playerConstant + " is invalid.");
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), "Must specify game player: " + playerConstant + " is invalid.");
                 return;
             }
 
-            //set community mode data
+            // set community mode data
             if (game.isCommunityMode()) {
                 if (role != null) {
                     player_.setRoleIDForCommunity(role.getAsRole().getId());
                 }
             }
 
-            //set private channel data
+            // set private channel data
             if (channel.getChannelType() != ChannelType.TEXT) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify text channel for " + channelConstant);
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), "Must specify text channel for " + channelConstant);
                 return;
             }
             player_.setPrivateChannelID(channel.getAsChannel().getId());

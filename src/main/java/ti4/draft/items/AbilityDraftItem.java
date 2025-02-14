@@ -1,10 +1,9 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -32,8 +31,12 @@ public class AbilityDraftItem extends DraftItem {
         if (abilityModel.getPermanentEffect().isPresent()) {
             sb.append(abilityModel.getPermanentEffect().get()).append("\n");
         }
-        if (abilityModel.getWindow().isPresent() && abilityModel.getWindowEffect().isPresent()) {
-            sb.append("*").append(abilityModel.getWindow().get()).append(":* ").append(abilityModel.getWindowEffect().get());
+        if (abilityModel.getWindow().isPresent()
+                && abilityModel.getWindowEffect().isPresent()) {
+            sb.append("*")
+                    .append(abilityModel.getWindow().get())
+                    .append(":* ")
+                    .append(abilityModel.getWindowEffect().get());
         }
         return sb.toString();
     }

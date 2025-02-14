@@ -3,7 +3,6 @@ package ti4.map;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-
 import ti4.helpers.AliasHandler;
 import ti4.message.BotLogger;
 

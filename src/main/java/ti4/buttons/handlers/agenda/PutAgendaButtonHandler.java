@@ -27,10 +27,11 @@ class PutAgendaButtonHandler {
         }
         AgendaModel agenda = Mapper.getAgenda(game.lookAtTopAgenda(0));
         Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
-        MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
-            "Put " + agenda.getName()
-                + " on the top of the agenda deck. You may use this button to undo that and reassign it.",
-            reassign);
+        MessageHelper.sendMessageToChannelWithButton(
+                event.getChannel(),
+                "Put " + agenda.getName()
+                        + " on the top of the agenda deck. You may use this button to undo that and reassign it.",
+                reassign);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -40,10 +41,11 @@ class PutAgendaButtonHandler {
         AgendaHelper.putBottom(Integer.parseInt(agendaNumID), game);
         AgendaModel agenda = Mapper.getAgenda(game.lookAtBottomAgenda(0));
         Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
-        MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
-            "Put " + agenda.getName()
-                + " on the bottom of the agenda deck. You may use this button to undo that and reassign it.",
-            reassign);
+        MessageHelper.sendMessageToChannelWithButton(
+                event.getChannel(),
+                "Put " + agenda.getName()
+                        + " on the bottom of the agenda deck. You may use this button to undo that and reassign it.",
+                reassign);
         String key = "round" + game.getRound() + "AgendaPlacement";
         if (game.getStoredValue(key).isEmpty()) {
             game.setStoredValue(key, "bottom");

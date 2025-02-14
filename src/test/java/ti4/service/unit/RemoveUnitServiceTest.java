@@ -1,5 +1,7 @@
 package ti4.service.unit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Units;
 import ti4.map.Game;
@@ -8,8 +10,6 @@ import ti4.map.Space;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.testUtils.BaseTi4Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class RemoveUnitServiceTest extends BaseTi4Test {
 
@@ -24,7 +24,8 @@ class RemoveUnitServiceTest extends BaseTi4Test {
 
         RemoveUnitService.removeUnit(null, tile, game, parsedUnit);
 
-        assertThat(tile.getPlanetUnitHolders().getFirst().getUnits().get(unitKey)).isNull();
+        assertThat(tile.getPlanetUnitHolders().getFirst().getUnits().get(unitKey))
+                .isNull();
     }
 
     private static Tile createTile(String location, Units.UnitKey unitKey, int amount) {

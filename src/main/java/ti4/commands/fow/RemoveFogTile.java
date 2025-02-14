@@ -2,7 +2,6 @@ package ti4.commands.fow;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -19,8 +18,13 @@ class RemoveFogTile extends GameStateSubcommand {
 
     public RemoveFogTile() {
         super(Constants.REMOVE_FOG_TILE, "Remove Fog of War tiles from the map.", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile positions on map or ALL to remove all fog tiles").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to remove from").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING, Constants.POSITION, "Tile positions on map or ALL to remove all fog tiles")
+                .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to remove from")
+                        .setRequired(true)
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -47,7 +51,7 @@ class RemoveFogTile extends GameStateSubcommand {
                 continue;
             }
 
-            //remove the custom tile from the player
+            // remove the custom tile from the player
             targetPlayer.removeFogTile(position);
         }
     }

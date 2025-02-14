@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -63,18 +62,26 @@ class EliminatePlayer extends GameStateSubcommand {
         MessageHelper.replyToMessage(event, stringBuilder.toString());
     }
 
-    private void removeUser(SlashCommandInteractionEvent event, Game game, String playerId, StringBuilder stringBuilder) {
+    private void removeUser(
+            SlashCommandInteractionEvent event, Game game, String playerId, StringBuilder stringBuilder) {
         OptionMapping option = event.getOption(playerId);
-        if (option == null) {return;}
+        if (option == null) {
+            return;
+        }
         User extraUser = option.getAsUser();
         Player player = game.getPlayer(extraUser.getId());
         Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
-        if (player == null || player.getColor() == null || player.getFaction() == null || "null".equalsIgnoreCase(player.getFaction()) ||
-                !player.isRealPlayer() || "".equalsIgnoreCase(player.getFaction())) {
+        if (player == null
+                || player.getColor() == null
+                || player.getFaction() == null
+                || "null".equalsIgnoreCase(player.getFaction())
+                || !player.isRealPlayer()
+                || "".equalsIgnoreCase(player.getFaction())) {
             game.removePlayer(player.getUserID());
         } else {
             if (!player.getPlanetsAllianceMode().isEmpty()) {
-                String msg = "This player doesn't meet the elimination conditions. If you wish to replace a player, run `/game replace`. Ping a bothelper for assistance if you need it.";
+                String msg =
+                        "This player doesn't meet the elimination conditions. If you wish to replace a player, run `/game replace`. Ping a bothelper for assistance if you need it.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 return;
             }
@@ -82,7 +89,9 @@ class EliminatePlayer extends GameStateSubcommand {
             Set<String> pns = new HashSet<>(player.getPromissoryNotes().keySet());
             for (String pnID : pns) {
                 PromissoryNoteModel pn = promissoryNotes.get(pnID);
-                if (pn != null && !pn.getOwner().equalsIgnoreCase(player.getColor()) && !pn.getOwner().equalsIgnoreCase(player.getFaction())) {
+                if (pn != null
+                        && !pn.getOwner().equalsIgnoreCase(player.getColor())
+                        && !pn.getOwner().equalsIgnoreCase(player.getFaction())) {
                     Player p2 = game.getPlayerFromColorOrFaction(pn.getOwner());
                     player.removePromissoryNote(pnID);
                     if (p2 == null) {
@@ -94,45 +103,49 @@ class EliminatePlayer extends GameStateSubcommand {
                 }
             }
 
-            //Purge all the PNs of the eliminated player that other players were holding
+            // Purge all the PNs of the eliminated player that other players were holding
             for (Player p2 : game.getPlayers().values()) {
                 pns = new HashSet<>(p2.getPromissoryNotes().keySet());
                 for (String pnID : pns) {
                     PromissoryNoteModel pn = promissoryNotes.get(pnID);
-                    if (pn != null && (pn.getOwner().equalsIgnoreCase(player.getColor()) || pn.getOwner().equalsIgnoreCase(player.getFaction()))) {
+                    if (pn != null
+                            && (pn.getOwner().equalsIgnoreCase(player.getColor())
+                                    || pn.getOwner().equalsIgnoreCase(player.getFaction()))) {
                         p2.removePromissoryNote(pnID);
                         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
                     }
                 }
             }
-            //Remove all the players units and ccs from the board
+            // Remove all the players units and ccs from the board
             for (Tile tile : game.getTileMap().values()) {
                 tile.removeAllUnits(player.getColor());
-                if (!"null".equalsIgnoreCase(player.getColor()) && CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
+                if (!"null".equalsIgnoreCase(player.getColor())
+                        && CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
                     RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
                 }
             }
-            //discard all of a players ACs
+            // discard all of a players ACs
             Map<String, Integer> acs = new LinkedHashMap<>(player.getActionCards());
             for (Map.Entry<String, Integer> ac : acs.entrySet()) {
                 game.discardActionCard(player.getUserID(), ac.getValue());
-                String sb = "Player: " + player.getUserName() + " - " + "Discarded action card:" + "\n" + Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
+                String sb = "Player: " + player.getUserName() + " - " + "Discarded action card:" + "\n"
+                        + Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
                 MessageHelper.sendMessageToChannel(event.getChannel(), sb);
             }
             ActionCardHelper.serveReverseEngineerButtons(game, player, new ArrayList<>(acs.keySet()));
 
-            //unscore all of a players SOs
+            // unscore all of a players SOs
             acs = new LinkedHashMap<>(player.getSecretsScored());
             for (int so : acs.values()) {
                 game.unscoreSecretObjective(player.getUserID(), so);
             }
-            //discard all of a players SOs
+            // discard all of a players SOs
 
             acs = new LinkedHashMap<>(player.getSecrets());
             for (int so : acs.values()) {
                 game.discardSecretObjective(player.getUserID(), so);
             }
-            //return SCs
+            // return SCs
             Set<Integer> scs = new HashSet<>(player.getSCs());
             for (int sc : scs) {
                 player.removeSC(sc);
@@ -150,6 +163,11 @@ class EliminatePlayer extends GameStateSubcommand {
         if (removedMember != null && roles.size() == 1) {
             guild.removeRoleFromMember(removedMember, roles.getFirst()).queue();
         }
-        stringBuilder.append("Eliminated player: ").append(player.getUserName()).append(" from game: ").append(game.getName()).append("\n");
+        stringBuilder
+                .append("Eliminated player: ")
+                .append(player.getUserName())
+                .append(" from game: ")
+                .append(game.getName())
+                .append("\n");
     }
 }

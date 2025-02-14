@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
@@ -15,9 +14,10 @@ public class PlayerTitleHelper {
 
     public static void offerEveryoneTitlePossibilities(Game game) {
         for (Player player : game.getRealAndEliminatedPlayers()) {
-            String msg = player.getRepresentation() + " you have the opportunity to anonymously bestow one title on someone else in this game."
-                + " Titles are just for fun, and have no real significance, but could a nice way to take something away from this game."
-                + " Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you wish to bestow it upon.";
+            String msg = player.getRepresentation()
+                    + " you have the opportunity to anonymously bestow one title on someone else in this game."
+                    + " Titles are just for fun, and have no real significance, but could a nice way to take something away from this game."
+                    + " Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you wish to bestow it upon.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("bestowTitleStep1_Life Of The Table", "Life Of The Table"));
             buttons.add(Buttons.green("bestowTitleStep1_Fun To Be Around", "Fun To Be Around"));
@@ -28,7 +28,7 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.green("bestowTitleStep1_A Mahact Puppet Master", "A Mahact Puppet Master"));
             buttons.add(Buttons.green("bestowTitleStep1_Intergalactic Bard", "Intergalactic Bard"));
 
-           // buttons.add(Buttons.blue("bestowTitleStep1_Lightning Fast", "Lightning Fast"));
+            // buttons.add(Buttons.blue("bestowTitleStep1_Lightning Fast", "Lightning Fast"));
             buttons.add(Buttons.blue("bestowTitleStep1_Fortune Favored", "Fortune Favored"));
             buttons.add(Buttons.blue("bestowTitleStep1_Possesses Cursed Dice", "Possesses Cursed Dice"));
             buttons.add(Buttons.blue("bestowTitleStep1_A Great Hollywooder", "A Great Hollywooder"));
@@ -42,8 +42,9 @@ public class PlayerTitleHelper {
 
             buttons.add(Buttons.red("bestowTitleStep1_A Sneaky One", "A Sneaky One"));
             buttons.add(Buttons.red("bestowTitleStep1_You Made Me Mad", "You Made Me Mad"));
-            buttons.add(Buttons.red("bestowTitleStep1_A Vuil'Raith In Xxcha Clothing", "A Vuil'Raith In Xxcha Clothing"));
-            //buttons.add(Buttons.red("bestowTitleStep1_Space Risker", "Space Risker"));
+            buttons.add(
+                    Buttons.red("bestowTitleStep1_A Vuil'Raith In Xxcha Clothing", "A Vuil'Raith In Xxcha Clothing"));
+            // buttons.add(Buttons.red("bestowTitleStep1_Space Risker", "Space Risker"));
             buttons.add(Buttons.red("bestowTitleStep1_A Warlord", "A Warlord"));
             buttons.add(Buttons.red("bestowTitleStep1_Word Breaker", "Word Breaker"));
             buttons.add(Buttons.red("bestowTitleStep1_One To Be Feared", "One To Be Feared"));
@@ -55,7 +56,8 @@ public class PlayerTitleHelper {
     }
 
     @ButtonHandler("bestowTitleStep1_")
-    public static void resolveBestowTitleStep1(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveBestowTitleStep1(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String title = buttonID.split("_")[1];
         String msg = player.getRepresentation() + " choose the player you wish to give the title of " + title;
         List<Button> buttons = new ArrayList<>();
@@ -63,15 +65,17 @@ public class PlayerTitleHelper {
             if (player2 == player) {
                 continue;
             }
-            buttons.add(Buttons.green("bestowTitleStep2_" + title + "_" + player2.getFaction(), player2.getFactionModel().getFactionName() + " (" + player2.getUserName() + ")"));
+            buttons.add(Buttons.green(
+                    "bestowTitleStep2_" + title + "_" + player2.getFaction(),
+                    player2.getFactionModel().getFactionName() + " (" + player2.getUserName() + ")"));
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("bestowTitleStep2_")
-    public static void resolveBestowTitleStep2(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveBestowTitleStep2(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String title = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(faction);

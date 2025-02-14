@@ -1,27 +1,26 @@
 package ti4.helpers;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.Data;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
-
-import org.jetbrains.annotations.Nullable;
 
 public class Units {
 
     private static final String EMDASH = "—";
-    private static final Pattern UNIT_PATTERN = Pattern.compile(RegexHelper.colorRegex(null) + EMDASH + RegexHelper.unitTypeRegex());
+    private static final Pattern UNIT_PATTERN =
+            Pattern.compile(RegexHelper.colorRegex(null) + EMDASH + RegexHelper.unitTypeRegex());
 
     /**
      * <H3>
      * DO NOT ADD NEW VALUES TO THIS OBJECT.
      * </H3>
-     * 
+     *
      * <p>
      * It is being used as a key in some major hashmaps which causes issues when we attempt to
      * save/restore from JSON as JSON map keys have to be strings, not JSON objects. This forces
@@ -99,9 +98,23 @@ public class Units {
      * UnitType - aka {@link UnitModel.getAsyncId()} - is a list of all the units in the game.
      */
     public enum UnitType {
-        Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), CabalSpacedock("csd"), Monument("monument"), // ground based
-        Fighter("ff"), Destroyer("dd"), Cruiser("ca"), Carrier("cv"), Dreadnought("dn"), Flagship("fs"), Warsun("ws"), //ships
-        PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"), Lady("lady"), Cavalry("cavalry"), //relics
+        Infantry("gf"),
+        Mech("mf"),
+        Pds("pd"),
+        Spacedock("sd"),
+        CabalSpacedock("csd"),
+        Monument("monument"), // ground based
+        Fighter("ff"),
+        Destroyer("dd"),
+        Cruiser("ca"),
+        Carrier("cv"),
+        Dreadnought("dn"),
+        Flagship("fs"),
+        Warsun("ws"), // ships
+        PlenaryOrbital("plenaryorbital"),
+        TyrantsLament("tyrantslament"),
+        Lady("lady"),
+        Cavalry("cavalry"), // relics
         StarfallPds("starfallpds");
 
         @Getter

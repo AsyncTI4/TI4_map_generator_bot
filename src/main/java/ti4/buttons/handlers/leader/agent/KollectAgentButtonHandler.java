@@ -3,7 +3,6 @@ package ti4.buttons.handlers.leader.agent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -23,24 +22,23 @@ import ti4.service.leader.CommanderUnlockCheckService;
 class KollectAgentButtonHandler {
 
     @ButtonHandler("kolleccAgentRes_")
-    public static void kolleccAgentResStep1(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player) {
+    public static void kolleccAgentResStep1(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         String msg2 = player.getFactionEmojiOrColor() + " selected "
-            + p2.getFactionEmojiOrColor() + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-            + "Captain Dust, the Kollecc" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
+                + p2.getFactionEmojiOrColor() + " as user of "
+                + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Captain Dust, the Kollecc" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                + " agent.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         List<Button> buttons = getKolleccAgentButtons(game, p2);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            p2.getRepresentationUnfogged() + " use buttons to resolve",
-            buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), p2.getRepresentationUnfogged() + " use buttons to resolve", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("kolleccAgentResStep2_")
-    public static void kolleccAgentResStep2(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player) {
+    public static void kolleccAgentResStep2(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String type = buttonID.split("_")[1];
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 2; i++) {

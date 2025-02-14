@@ -7,8 +7,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
@@ -29,7 +27,16 @@ public class DrawingUtil {
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final int DELTA_Y = 26;
 
-    public static void superDrawString(Graphics g, String txt, int x, int y, Color textColor, MapGenerator.HorizontalAlign h, MapGenerator.VerticalAlign v, Stroke outlineSize, Color outlineColor) {
+    public static void superDrawString(
+            Graphics g,
+            String txt,
+            int x,
+            int y,
+            Color textColor,
+            MapGenerator.HorizontalAlign h,
+            MapGenerator.VerticalAlign v,
+            Stroke outlineSize,
+            Color outlineColor) {
         superDrawString((Graphics2D) g, txt, x, y, textColor, h, v, outlineSize, outlineColor);
     }
 
@@ -46,15 +53,15 @@ public class DrawingUtil {
      * @param outlineColor
      */
     public static void superDrawString(
-        Graphics2D g,
-        String txt,
-        int x,
-        int y,
-        Color textColor,
-        MapGenerator.HorizontalAlign horizontalAlignment,
-        MapGenerator.VerticalAlign verticalAlignment,
-        Stroke outlineSize,
-        Color outlineColor) {
+            Graphics2D g,
+            String txt,
+            int x,
+            int y,
+            Color textColor,
+            MapGenerator.HorizontalAlign horizontalAlignment,
+            MapGenerator.VerticalAlign verticalAlignment,
+            Stroke outlineSize,
+            Color outlineColor) {
         if (txt == null) return;
 
         int width = g.getFontMetrics().stringWidth(txt);
@@ -62,8 +69,7 @@ public class DrawingUtil {
             switch (horizontalAlignment) {
                 case Center -> x -= width / 2.0;
                 case Right -> x -= width;
-                case Left -> {
-                }
+                case Left -> {}
             }
         }
 
@@ -72,8 +78,7 @@ public class DrawingUtil {
             switch (verticalAlignment) {
                 case Center -> y += height / 2;
                 case Top -> y += height;
-                case Bottom -> {
-                }
+                case Bottom -> {}
             }
         }
 
@@ -89,7 +94,8 @@ public class DrawingUtil {
         }
     }
 
-    private static void drawStringOutlined(Graphics2D g2, String text, int x, int y, Stroke outlineStroke, Color outlineColor, Color fillColor) {
+    private static void drawStringOutlined(
+            Graphics2D g2, String text, int x, int y, Stroke outlineStroke, Color outlineColor, Color fillColor) {
         if (text == null) return;
         Color origColor = g2.getColor();
         AffineTransform originalTileTransform = g2.getTransform();
@@ -114,11 +120,20 @@ public class DrawingUtil {
         g2.setRenderingHints(origHints);
     }
 
-    public static void drawCCOfPlayer(Graphics graphics, String ccID, int x, int y, int ccCount, Player player, boolean hideFactionIcon) {
+    public static void drawCCOfPlayer(
+            Graphics graphics, String ccID, int x, int y, int ccCount, Player player, boolean hideFactionIcon) {
         drawCCOfPlayer(graphics, ccID, x, y, ccCount, player, hideFactionIcon, true);
     }
 
-    public static void drawCCOfPlayer(Graphics graphics, String ccID, int x, int y, int ccCount, Player player, boolean hideFactionIcon, boolean rightAlign) {
+    public static void drawCCOfPlayer(
+            Graphics graphics,
+            String ccID,
+            int x,
+            int y,
+            int ccCount,
+            Player player,
+            boolean hideFactionIcon,
+            boolean rightAlign) {
         String ccPath = Mapper.getCCPath(ccID);
         try {
             BufferedImage ccImage = ImageHelper.read(ccPath);
@@ -131,7 +146,8 @@ public class DrawingUtil {
                 if (factionImage == null) {
                     hideFactionIcon = true;
                 } else {
-                    centreCustomTokenHorizontally = ccImage != null ? ccImage.getWidth() / 2 - factionImage.getWidth() / 2 : 0;
+                    centreCustomTokenHorizontally =
+                            ccImage != null ? ccImage.getWidth() / 2 - factionImage.getWidth() / 2 : 0;
                 }
             }
 
@@ -144,13 +160,15 @@ public class DrawingUtil {
             for (int i = 0; i < ccCount; i++) {
                 graphics.drawImage(ccImage, x + (delta * i), y, null);
                 if (!hideFactionIcon)
-                    graphics.drawImage(factionImage, x + (delta * i) + centreCustomTokenHorizontally, y + DELTA_Y, null);
+                    graphics.drawImage(
+                            factionImage, x + (delta * i) + centreCustomTokenHorizontally, y + DELTA_Y, null);
             }
         } catch (Exception e) {
             String gameName = "";
             if (player == null) gameName = "Null Player";
             if (player != null && player.getGame() == null) gameName = "Null Game";
-            if (player != null && player.getGame() != null) gameName = player.getGame().getName();
+            if (player != null && player.getGame() != null)
+                gameName = player.getGame().getName();
             BotLogger.log("Ignored error during map generation for `" + gameName + "`", e);
         }
     }
@@ -167,12 +185,12 @@ public class DrawingUtil {
 
     @Nullable
     public static BufferedImage getPlayerFactionIconImageScaled(Player player, int width, int height) {
-        if (player == null)
-            return null;
+        if (player == null) return null;
         Emoji factionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
         if (player.hasCustomFactionEmoji() && factionEmoji instanceof CustomEmoji factionCustomEmoji) {
             int urlImagePadding = 5;
-            return ImageHelper.readURLScaled(factionCustomEmoji.getImageUrl(), width - urlImagePadding, height - urlImagePadding);
+            return ImageHelper.readURLScaled(
+                    factionCustomEmoji.getImageUrl(), width - urlImagePadding, height - urlImagePadding);
         } else if (player.hasCustomFactionEmoji() && factionEmoji instanceof UnicodeEmoji uni) {
             BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = img.createGraphics();
@@ -182,7 +200,8 @@ public class DrawingUtil {
             GlyphVector gv = g2.getFont().createGlyphVector(g2.getFontRenderContext(), uni.getFormatted());
             Rectangle rect = gv.getGlyphPixelBounds(0, g2.getFontRenderContext(), 20, 60);
             int pad = 5;
-            BufferedImage img2 = img.getSubimage(rect.x - pad, rect.y - pad, rect.width + pad * 2, rect.height + pad * 2);
+            BufferedImage img2 =
+                    img.getSubimage(rect.x - pad, rect.y - pad, rect.width + pad * 2, rect.height + pad * 2);
             return ImageHelper.scale(ImageHelper.square(img2), width, height);
         }
 
@@ -192,8 +211,7 @@ public class DrawingUtil {
     @Nullable
     public static BufferedImage getFactionIconImageScaled(String factionID, int width, int height) {
         String factionPath = getFactionIconPath(factionID);
-        if (factionPath == null)
-            return null;
+        if (factionPath == null) return null;
 
         return ImageHelper.readScaled(factionPath, width, height);
     }
@@ -206,9 +224,12 @@ public class DrawingUtil {
         String factionFile = ResourceHelper.getInstance().getFactionFile(factionID + ".png");
         if (factionFile == null) {
             // Handle homebrew factions based on real factions
-            if (Mapper.getFaction(factionID) != null && Mapper.getFaction(factionID).getHomebrewReplacesID().isPresent()) {
+            if (Mapper.getFaction(factionID) != null
+                    && Mapper.getFaction(factionID).getHomebrewReplacesID().isPresent()) {
                 factionFile = ResourceHelper.getInstance()
-                    .getFactionFile(Mapper.getFaction(factionID).getHomebrewReplacesID().get() + ".png");
+                        .getFactionFile(Mapper.getFaction(factionID)
+                                        .getHomebrewReplacesID()
+                                        .get() + ".png");
             }
         }
         if (factionFile == null) {
@@ -250,15 +271,20 @@ public class DrawingUtil {
         g.drawString(text, x, y);
     }
 
-    public static void drawControlToken(Graphics graphics, BufferedImage bottomTokenImage, Player player, int x, int y, boolean hideFactionIcon, float scale) {
+    public static void drawControlToken(
+            Graphics graphics,
+            BufferedImage bottomTokenImage,
+            Player player,
+            int x,
+            int y,
+            boolean hideFactionIcon,
+            float scale) {
         graphics.drawImage(bottomTokenImage, x, y, null);
 
-        if (hideFactionIcon)
-            return;
+        if (hideFactionIcon) return;
         scale *= 0.50f;
         BufferedImage factionImage = DrawingUtil.getPlayerFactionIconImageScaled(player, scale);
-        if (factionImage == null)
-            return;
+        if (factionImage == null) return;
 
         int centreCustomTokenHorizontally = bottomTokenImage.getWidth() / 2 - factionImage.getWidth() / 2;
         int centreCustomTokenVertically = bottomTokenImage.getHeight() / 2 - factionImage.getHeight() / 2;
@@ -273,8 +299,9 @@ public class DrawingUtil {
                 String playerControlMarker = Mapper.getControlID(player_.getColor());
                 String playerCC = Mapper.getCCID(player_.getColor());
                 String playerSweep = Mapper.getSweepID(player_.getColor());
-                if (controlID.equals(playerControlMarker) || controlID.equals(playerCC)
-                    || controlID.equals(playerSweep)) {
+                if (controlID.equals(playerControlMarker)
+                        || controlID.equals(playerCC)
+                        || controlID.equals(playerSweep)) {
                     player = player_;
                     break;
                 }
@@ -302,21 +329,29 @@ public class DrawingUtil {
         float inlineSize = 3.0f;
         float outlineSize = 6.0f;
         // on, off, on, off, ....
-        float[] dash = { solidLines ? 85.0f : 30.0f, solidLines ? 1000.0f : 17.0f, 30.0f, 1000.0f };
-        float[] sparse = { 11.0f, 1000.0f };
+        float[] dash = {solidLines ? 85.0f : 30.0f, solidLines ? 1000.0f : 17.0f, 30.0f, 1000.0f};
+        float[] sparse = {11.0f, 1000.0f};
         Stroke line = new BasicStroke(inlineSize, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, dash, 0.0f);
         Stroke outline = new BasicStroke(outlineSize, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, dash, 0.0f);
-        Stroke lineSparse = new BasicStroke(inlineSize, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, sparse, 0.0f);
-        Stroke outlineSparse = new BasicStroke(outlineSize, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, sparse, 0.0f);
+        Stroke lineSparse =
+                new BasicStroke(inlineSize, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, sparse, 0.0f);
+        Stroke outlineSparse =
+                new BasicStroke(outlineSize, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, sparse, 0.0f);
 
         Color primary = color.primaryColor();
         Color secondary = color.secondaryColor();
         if (secondary == null) secondary = primary;
-        if (color.getName().equals("black"))
-            primary = secondary = Color.darkGray;
+        if (color.getName().equals("black")) primary = secondary = Color.darkGray;
 
-        List<Point> corners = List.of(new Point(88, 2), new Point(256, 2), new Point(342, 149), new Point(256, 296), new Point(88, 296), new Point(2, 149));
-        //corners.forEach(c -> c.translate(10, 10)); // offset by 10 pixels so that our border can slightly overlap the bounds of the hex
+        List<Point> corners = List.of(
+                new Point(88, 2),
+                new Point(256, 2),
+                new Point(342, 149),
+                new Point(256, 296),
+                new Point(88, 296),
+                new Point(2, 149));
+        // corners.forEach(c -> c.translate(10, 10)); // offset by 10 pixels so that our border can slightly overlap the
+        // bounds of the hex
 
         // Draw outlines
         g2.setColor(Color.BLACK);
@@ -366,23 +401,22 @@ public class DrawingUtil {
         return img;
     }
 
-    public static void drawPlayerFactionIconImage(Graphics graphics, Player player, int x, int y, int width, int height) {
+    public static void drawPlayerFactionIconImage(
+            Graphics graphics, Player player, int x, int y, int width, int height) {
         drawPlayerFactionIconImageOpaque(graphics, player, x, y, width, height, null);
     }
 
-    public static void drawPlayerFactionIconImageOpaque(Graphics graphics, Player player, int x, int y, int width, int height, Float opacity) {
-        if (player == null)
-            return;
+    public static void drawPlayerFactionIconImageOpaque(
+            Graphics graphics, Player player, int x, int y, int width, int height, Float opacity) {
+        if (player == null) return;
         try {
             BufferedImage resourceBufferedImage = DrawingUtil.getPlayerFactionIconImageScaled(player, width, height);
             Graphics2D g2 = (Graphics2D) graphics;
             float opacityToSet = opacity == null ? 1.0f : opacity;
             boolean setOpacity = opacity != null && !opacity.equals(1.0f);
-            if (setOpacity)
-                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacityToSet));
+            if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacityToSet));
             g2.drawImage(resourceBufferedImage, x, y, null);
-            if (setOpacity)
-                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+            if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         } catch (Exception e) {
             BotLogger.log("Could not display player's faction icon image", e);
         }
@@ -394,8 +428,7 @@ public class DrawingUtil {
 
     public static int width(Graphics2D g, String str) {
         int w = 0;
-        if (str != null && !str.isBlank())
-            w = g.getFontMetrics().stringWidth(str);
+        if (str != null && !str.isBlank()) w = g.getFontMetrics().stringWidth(str);
         return w;
     }
 
@@ -413,8 +446,7 @@ public class DrawingUtil {
                     while (width(g2, line.substring(0, nextSpace).trim()) < maxWidth) {
                         splitSpace = nextSpace;
                         nextSpace = line.indexOf(" ", splitSpace + 1);
-                        if (nextSpace == -1)
-                            break;
+                        if (nextSpace == -1) break;
                     }
                     finalSplit.add(line.substring(0, splitSpace).trim());
                     line = line.substring(splitSpace).trim();

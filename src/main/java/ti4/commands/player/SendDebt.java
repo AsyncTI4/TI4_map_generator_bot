@@ -16,9 +16,16 @@ class SendDebt extends GameStateSubcommand {
 
     public SendDebt() {
         super(Constants.SEND_DEBT, "Send a debt token (control token) to player/faction", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to send").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color receiving the debt token").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color sending the debt token").setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to send").setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.TARGET_FACTION_OR_COLOR,
+                        "Faction or Color receiving the debt token")
+                .setAutoComplete(true)
+                .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color sending the debt token")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -38,7 +45,8 @@ class SendDebt extends GameStateSubcommand {
         }
         SendDebtService.sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
         CommanderUnlockCheckService.checkPlayer(receivingPlayer, "vaden");
-        String debtMsg = sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation();
+        String debtMsg = sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to "
+                + receivingPlayer.getRepresentation();
         MessageHelper.sendMessageToEventChannel(event, debtMsg);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receivingPlayer.getPrivateChannel(), debtMsg);

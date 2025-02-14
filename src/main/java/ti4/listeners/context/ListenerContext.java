@@ -1,11 +1,10 @@
 package ti4.listeners.context;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
 import ti4.helpers.Constants;
@@ -42,7 +41,9 @@ public abstract class ListenerContext {
         this.componentID = this.origComponentID = compID;
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        game = GameManager.isValid(gameName) ? GameManager.getManagedGame(gameName).getGame() : null;
+        game = GameManager.isValid(gameName)
+                ? GameManager.getManagedGame(gameName).getGame()
+                : null;
         player = null;
         privateChannel = event.getMessageChannel();
         mainGameChannel = event.getMessageChannel();
@@ -52,7 +53,9 @@ public abstract class ListenerContext {
             player = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
 
             if (player == null && !"showGameAgain".equalsIgnoreCase(componentID)) {
-                event.getMessageChannel().sendMessage(event.getUser().getAsMention()+" is not a player of the game").queue();
+                event.getMessageChannel()
+                        .sendMessage(event.getUser().getAsMention() + " is not a player of the game")
+                        .queue();
                 contextIsValid = false;
                 return;
             }
@@ -64,7 +67,9 @@ public abstract class ListenerContext {
 
             if (game.isFowMode()) {
                 if (player != null && player.isRealPlayer() && player.getPrivateChannel() == null) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Private channels are not set up for this game. Messages will be suppressed.");
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            "Private channels are not set up for this game. Messages will be suppressed.");
                     privateChannel = null;
                 } else if (player != null) {
                     privateChannel = player.getPrivateChannel();
@@ -81,7 +86,9 @@ public abstract class ListenerContext {
                 componentID = componentID.replace("dummyPlayerSpoof" + identity + "_", "");
             }
 
-            if (player != null && game.getActivePlayerID() != null && player.getUserID().equalsIgnoreCase(game.getActivePlayerID())) {
+            if (player != null
+                    && game.getActivePlayerID() != null
+                    && player.getUserID().equalsIgnoreCase(game.getActivePlayerID())) {
                 AutoPingMetadataManager.delayPing(gameName);
             }
         }

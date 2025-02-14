@@ -3,7 +3,6 @@ package ti4.service.info;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -32,14 +31,15 @@ public class LeaderInfoService {
     public static void sendLeadersInfo(Game game, Player player) {
         // LEADERS
         List<MessageEmbed> leaderEmbeds = getPlayersLeaderEmbeds(player);
-        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), "**Leaders Information:**", leaderEmbeds, getLeaderButtons());
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                player.getCardsInfoThread(), "**Leaders Information:**", leaderEmbeds, getLeaderButtons());
 
-        //PROMISSORY NOTES
+        // PROMISSORY NOTES
         List<MessageEmbed> allianceEmbeds = new ArrayList<>();
         Map<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
         if (promissoryNotes != null) {
-            //PLAY AREA PROMISSORY NOTES
+            // PLAY AREA PROMISSORY NOTES
             for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (promissoryNotesInPlayArea.contains(pn.getKey())) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn.getKey());
@@ -59,10 +59,11 @@ public class LeaderInfoService {
             }
         }
         if (!allianceEmbeds.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), "**Alliance Commanders:**", allianceEmbeds);
+            MessageHelper.sendMessageToChannelWithEmbeds(
+                    player.getCardsInfoThread(), "**Alliance Commanders:**", allianceEmbeds);
         }
 
-        //ADD YSSARIL AGENT REFERENCE
+        // ADD YSSARIL AGENT REFERENCE
         List<MessageEmbed> yssarilEmbeds = new ArrayList<>();
         if (player.hasLeader("yssarilagent")) {
             for (Player otherPlayer : game.getPlayers().values()) {
@@ -76,10 +77,13 @@ public class LeaderInfoService {
             }
         }
         if (!yssarilEmbeds.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), LeaderEmojis.YssarilAgent + "**Clever, Clever Agents:**", yssarilEmbeds);
+            MessageHelper.sendMessageToChannelWithEmbeds(
+                    player.getCardsInfoThread(),
+                    LeaderEmojis.YssarilAgent + "**Clever, Clever Agents:**",
+                    yssarilEmbeds);
         }
 
-        //ADD MAHACT IMPERIA REFERENCE
+        // ADD MAHACT IMPERIA REFERENCE
         List<MessageEmbed> imperiaEmbeds = new ArrayList<>();
         if (player.hasAbility("imperia")) {
             for (Player otherPlayer : game.getPlayers().values()) {
@@ -95,7 +99,10 @@ public class LeaderInfoService {
             }
         }
         if (!imperiaEmbeds.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), "**Commanders from " + FactionEmojis.Mahact + " Imperia:**", imperiaEmbeds);
+            MessageHelper.sendMessageToChannelWithEmbeds(
+                    player.getCardsInfoThread(),
+                    "**Commanders from " + FactionEmojis.Mahact + " Imperia:**",
+                    imperiaEmbeds);
         }
     }
 

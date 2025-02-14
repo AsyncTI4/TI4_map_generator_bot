@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -23,7 +22,7 @@ public class SpinRingsHelper {
         List<String> customSpins = Arrays.asList(customSpinSptring.toLowerCase().split(" "));
         for (String spinString : customSpins) {
 
-            //Needs to have Ring:Direction:Steps  
+            // Needs to have Ring:Direction:Steps
             String[] spinSettings = spinString.toLowerCase().split(":");
             if (spinSettings.length != 3) {
                 return false;
@@ -43,7 +42,7 @@ public class SpinRingsHelper {
                 return false;
             }
 
-            //Step counts must be less than tiles in smallest ring
+            // Step counts must be less than tiles in smallest ring
             for (String stepsString : spinSettings[2].split(",")) {
                 int steps = parseInt(stepsString);
                 if (steps < 0 || steps > smallestRing * 6 - 1) {
@@ -56,14 +55,14 @@ public class SpinRingsHelper {
 
     /*
      * Custom rotation with random support
-     * 
+     *
      * Ring:Direction:Steps
      * 1:cw:1 2:ccw:2
-     * 
+     *
      * Or with random options
-     * 1,2:rnd:2,3 
+     * 1,2:rnd:2,3
      * to spin ring 1 OR 2 to random direction for 2 OR 3 steps
-     * 
+     *
      */
     public static void spinRingsCustom(Game game, String customSpinString, String flavourMsg) {
         List<String> customSpins = Arrays.asList(customSpinString.toLowerCase().split(" "));
@@ -139,7 +138,7 @@ public class SpinRingsHelper {
         }
     }
 
-    //the original spin logic which does
+    // the original spin logic which does
     // - ring 1 cw one step
     // - ring 2 ccw two steps
     // - ring 3 cw three steps (except 6p map HS positions)
@@ -159,7 +158,7 @@ public class SpinRingsHelper {
                 }
                 if (tile == null) {
                     continue;
-                } 
+                }
 
                 if (y == 2) {
                     if ((x - y) < 1) {

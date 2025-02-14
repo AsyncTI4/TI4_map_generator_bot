@@ -14,8 +14,12 @@ class AddAllianceMember extends GameStateSubcommand {
 
     public AddAllianceMember() {
         super(Constants.ADD_ALLIANCE_MEMBER, "Add an alliance member", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR,
-            "Faction or Color with which you are in an alliance").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.TARGET_FACTION_OR_COLOR,
+                        "Faction or Color with which you are in an alliance")
+                .setAutoComplete(true)
+                .setRequired(true));
     }
 
     @Override
@@ -59,25 +63,30 @@ class AddAllianceMember extends GameStateSubcommand {
         }
         if (player.hasAbility("edict")) {
             player.addMahactCC(otherPlayer.getColor());
-            MessageHelper.sendMessageToChannel(otherPlayer.getCorrectChannel(), "Heads up, " + otherPlayer.getRepresentation()
-                + ", in an alliance game with Mahact as an alliance partner, you do not get Mahact's alliance. "
-                + " They instead grab a command token from your reinforcements and put it in their fleet pool."
-                + " This is because Dane thought Mahact's commander was too powerful to share.");
+            MessageHelper.sendMessageToChannel(
+                    otherPlayer.getCorrectChannel(),
+                    "Heads up, " + otherPlayer.getRepresentation()
+                            + ", in an alliance game with Mahact as an alliance partner, you do not get Mahact's alliance. "
+                            + " They instead grab a command token from your reinforcements and put it in their fleet pool."
+                            + " This is because Dane thought Mahact's commander was too powerful to share.");
         }
         if (otherPlayer.hasAbility("edict")) {
             otherPlayer.addMahactCC(player.getColor());
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Heads up, " + player.getRepresentation()
-                + ", in an alliance game with Mahact as an alliance partner, you do not get Mahact's alliance. "
-                + " They instead grab a command token from your reinforcements and put it in their fleet pool."
-                + " This is because Dane thought Mahact's commander was too powerful to share.");
-
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Heads up, " + player.getRepresentation()
+                            + ", in an alliance game with Mahact as an alliance partner, you do not get Mahact's alliance. "
+                            + " They instead grab a command token from your reinforcements and put it in their fleet pool."
+                            + " This is because Dane thought Mahact's commander was too powerful to share.");
         }
         String msg = player.getRepresentationUnfogged() + otherPlayer.getRepresentationUnfogged()
-            + " pinging you into this.";
+                + " pinging you into this.";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
         MessageHelper.sendMessageToChannel(otherPlayer.getCardsInfoThread(), msg);
 
-        MessageHelper.sendMessageToEventChannel(event, "Added " + otherPlayer.getFaction() + " as part of " + player.getFaction()
-            + "'s alliance. This works 2 ways.");
+        MessageHelper.sendMessageToEventChannel(
+                event,
+                "Added " + otherPlayer.getFaction() + " as part of " + player.getFaction()
+                        + "'s alliance. This works 2 ways.");
     }
 }

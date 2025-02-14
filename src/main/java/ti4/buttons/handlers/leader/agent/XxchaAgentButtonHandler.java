@@ -14,13 +14,20 @@ import ti4.service.unit.RemoveUnitService;
 class XxchaAgentButtonHandler {
 
     @ButtonHandler("xxchaAgentRemoveInfantry_")
-    public static void resolveXxchaAgentInfantryRemoval(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveXxchaAgentInfantryRemoval(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         ButtonHelper.deleteMessage(event);
-        RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, p2.getColor(), "1 infantry " + planet);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you removed 1 infantry from " + planetRep);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " 1 infantry of yours on " + planetRep + " was removed via the Ggrocuto Rinn, the Xxcha agent.");
+        RemoveUnitService.removeUnits(
+                event, game.getTileFromPlanet(planet), game, p2.getColor(), "1 infantry " + planet);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " you removed 1 infantry from " + planetRep);
+        MessageHelper.sendMessageToChannel(
+                p2.getCorrectChannel(),
+                p2.getRepresentationUnfogged() + " 1 infantry of yours on " + planetRep
+                        + " was removed via the Ggrocuto Rinn, the Xxcha agent.");
     }
 }

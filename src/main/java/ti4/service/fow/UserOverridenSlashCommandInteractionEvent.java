@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 public class UserOverridenSlashCommandInteractionEvent extends SlashCommandInteractionEvent {
 
     private final User overriddenUser;
-        
+
     public UserOverridenSlashCommandInteractionEvent(SlashCommandInteractionEvent event, User overriddenUser) {
         super(event.getJDA(), event.getResponseNumber(), event.getInteraction());
         this.overriddenUser = overriddenUser;

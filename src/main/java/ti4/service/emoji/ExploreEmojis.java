@@ -3,13 +3,21 @@ package ti4.service.emoji;
 public enum ExploreEmojis implements TI4Emoji {
 
     // Frags
-    HFrag, CFrag, IFrag, UFrag,
+    HFrag,
+    CFrag,
+    IFrag,
+    UFrag,
 
     // Types
-    Cultural, Industrial, Hazardous, Frontier,
+    Cultural,
+    Industrial,
+    Hazardous,
+    Frontier,
 
     // Other
-    dmz, Relic, LinkGet;
+    dmz,
+    Relic,
+    LinkGet;
 
     public static TI4Emoji getTraitEmoji(String type) {
         return switch (type.toLowerCase()) {

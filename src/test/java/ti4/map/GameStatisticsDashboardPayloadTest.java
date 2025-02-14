@@ -1,8 +1,8 @@
 package ti4.map;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 class GameStatisticsDashboardPayloadTest {
 
@@ -32,5 +32,4 @@ class GameStatisticsDashboardPayloadTest {
         game.setCustomName("pbd123-a-test-for-you-and-me");
         return game;
     }
-
 }

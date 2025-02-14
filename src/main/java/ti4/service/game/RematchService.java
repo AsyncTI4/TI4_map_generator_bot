@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -55,10 +54,7 @@ public class RematchService {
         if (gameRole != null) {
             gameRole.getManager().setName(newName).queue();
         } else {
-            gameRole = guild.createRole()
-                .setName(newName)
-                .setMentionable(true)
-                .complete();
+            gameRole = guild.createRole().setName(newName).setMentionable(true).complete();
             for (Player player : game.getRealPlayers()) {
                 Member member = guild.getMemberById(player.getUserID());
                 if (member != null) {
@@ -95,16 +91,19 @@ public class RematchService {
         Game newGame = CreateGameService.createNewGame(newName, gameOwner);
         // ADD PLAYERS
         for (Player player : game.getPlayers().values()) {
-            if (player.getFaction()!= null && !player.getFaction().equals("neutral") && !player.getFaction().equalsIgnoreCase("null"))
+            if (player.getFaction() != null
+                    && !player.getFaction().equals("neutral")
+                    && !player.getFaction().equalsIgnoreCase("null"))
                 newGame.addPlayer(player.getUserID(), player.getUserName());
         }
         newGame.setPlayerCountForMap(newGame.getPlayers().size());
-        newGame.setStrategyCardsPerPlayer(newGame.getSCList().size() / newGame.getPlayers().size());
+        newGame.setStrategyCardsPerPlayer(
+                newGame.getSCList().size() / newGame.getPlayers().size());
 
         // CREATE CHANNELS
         String newGameName = game.getCustomName();
-        Matcher alreadyRematch = Pattern.compile(" Rematch #" + RegexHelper.intRegex("num"))
-            .matcher(game.getCustomName());
+        Matcher alreadyRematch =
+                Pattern.compile(" Rematch #" + RegexHelper.intRegex("num")).matcher(game.getCustomName());
         if (alreadyRematch.find()) {
             newGameName = newGameName.replace(alreadyRematch.group(), "");
             int prevMatch = Integer.parseInt(alreadyRematch.group("num"));
@@ -113,58 +112,59 @@ public class RematchService {
             newGameName += " Rematch #1";
         }
         newGame.setCustomName(newGameName);
-        if (tableTalkChannel != null)
-            newGame.setTableTalkChannelID(tableTalkChannel.getId());
+        if (tableTalkChannel != null) newGame.setTableTalkChannelID(tableTalkChannel.getId());
 
         // CREATE ACTIONS CHANNEL AND CLEAR PINS
         String newBotThreadName = newName + Constants.BOT_CHANNEL_SUFFIX;
         newGame.setMainChannelID(actionsChannel.getId());
-        actionsChannel.retrievePinnedMessages().queue(msgs -> msgs.forEach(msg -> msg.unpin().queue()), BotLogger::catchRestError);
+        actionsChannel
+                .retrievePinnedMessages()
+                .queue(msgs -> msgs.forEach(msg -> msg.unpin().queue()), BotLogger::catchRestError);
 
         // CREATE BOT/MAP THREAD
-        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
-            .complete();
+        ThreadChannel botThread =
+                actionsChannel.createThreadChannel(newBotThreadName).complete();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
         newGame.setUpPeakableObjectives(5, 1);
         newGame.setUpPeakableObjectives(5, 2);
         // INTRODUCTION TO TABLETALK CHANNEL
-        String tabletalkGetStartedMessage = gameRole.getAsMention() + " - table talk channel\n" +
-            "This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n"
-            +
-            "If this group has agreed to whispers (secret conversations), you may create private threads off this channel.\n"
-            +
-            "Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n";
+        String tabletalkGetStartedMessage = gameRole.getAsMention() + " - table talk channel\n"
+                + "This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n"
+                + "If this group has agreed to whispers (secret conversations), you may create private threads off this channel.\n"
+                + "Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n";
         MessageHelper.sendMessageToChannelAndPin(tableTalkChannel, tabletalkGetStartedMessage);
 
         // INTRODUCTION TO ACTIONS CHANNEL
-        String actionsGetStartedMessage = gameRole.getAsMention() + " - actions channel\n" +
-            "This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n" +
-            "Please keep this channel clear of any chat with other players. Ideally this channel is a nice clean ledger of what has physically happened in the game.\n";
+        String actionsGetStartedMessage = gameRole.getAsMention() + " - actions channel\n"
+                + "This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n"
+                + "Please keep this channel clear of any chat with other players. Ideally this channel is a nice clean ledger of what has physically happened in the game.\n";
         MessageHelper.sendMessageToChannelAndPin(actionsChannel, actionsGetStartedMessage);
         ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
 
         // INTRODUCTION TO BOT-MAP THREAD
-        String botGetStartedMessage = gameRole.getAsMention() + " - bot/map channel\n" +
-            "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n"
-            +
-            "### __Use the following commands to get started:__\n" +
-            "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n" +
-            "> `/player setup` to set player faction and color\n" +
-            "> `/game setup` to set player count and additional options\n" +
-            "> `/game set_order` to set the starting speaker order\n" +
-            "\n" +
-            "### __Other helpful commands:__\n" +
-            "> `/game replace` to replace a player in the game with a new one\n";
+        String botGetStartedMessage = gameRole.getAsMention() + " - bot/map channel\n"
+                + "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n"
+                + "### __Use the following commands to get started:__\n"
+                + "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n"
+                + "> `/player setup` to set player faction and color\n"
+                + "> `/game setup` to set player count and additional options\n"
+                + "> `/game set_order` to set the starting speaker order\n"
+                + "\n"
+                + "### __Other helpful commands:__\n"
+                + "> `/game replace` to replace a player in the game with a new one\n";
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
-        MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + newName);
+        MessageHelper.sendMessageToChannelAndPin(
+                botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + newName);
 
         List<Button> buttons2 = new ArrayList<>();
         buttons2.add(Buttons.green("getHomebrewButtons", "Yes, have homebrew"));
         buttons2.add(Buttons.red("deleteButtons", "No Homebrew"));
-        MessageHelper.sendMessageToChannelWithButtons(actionsChannel, "If you plan to have a supported homebrew mode in this game, " +
-            "please indicate so with these buttons", buttons2);
-        if (game.isCompetitiveTIGLGame())
-            TIGLHelper.initializeTIGLGame(newGame);
+        MessageHelper.sendMessageToChannelWithButtons(
+                actionsChannel,
+                "If you plan to have a supported homebrew mode in this game, "
+                        + "please indicate so with these buttons",
+                buttons2);
+        if (game.isCompetitiveTIGLGame()) TIGLHelper.initializeTIGLGame(newGame);
         GameManager.save(newGame, "Rematch");
         if (event instanceof ButtonInteractionEvent event2) {
             event2.getMessage().delete().queue();
@@ -196,5 +196,4 @@ public class RematchService {
             return oldName.substring(0, oldName.length() - 1) + next;
         }
     }
-
 }

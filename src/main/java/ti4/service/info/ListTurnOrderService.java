@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -47,7 +46,8 @@ public class ListTurnOrderService {
             for (int sc_ : SCs) {
                 Boolean found = scPlayed.get(sc_);
                 boolean isPlayed = found != null ? found : false;
-                TI4Emoji scEmoji = isPlayed ? CardEmojis.getSCBackFromInteger(sc_) : CardEmojis.getSCFrontFromInteger(sc_);
+                TI4Emoji scEmoji =
+                        isPlayed ? CardEmojis.getSCBackFromInteger(sc_) : CardEmojis.getSCFrontFromInteger(sc_);
                 if (isPlayed) {
                     textBuilder.append("~~");
                 }
@@ -75,7 +75,6 @@ public class ListTurnOrderService {
             }
 
             order.put(sc, text);
-
         }
         StringBuilder msg = new StringBuilder("__Turn Order:__\n");
 
@@ -102,6 +101,5 @@ public class ListTurnOrderService {
             channel = chan;
         }
         MessageHelper.sendMessageToChannel(channel, msg.toString());
-
     }
 }

@@ -3,13 +3,11 @@ package ti4.service.emoji;
 import java.time.temporal.ChronoField;
 import java.util.List;
 import java.util.Map;
-
-import org.jetbrains.annotations.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
+import org.jetbrains.annotations.NotNull;
 import ti4.json.PersistenceManager;
 import ti4.message.BotLogger;
 
@@ -22,8 +20,7 @@ public class ApplicationEmojiCacheService {
         } catch (Exception e) {
             BotLogger.log("Failed to read json data for EmojiCache.", e);
         }
-        if (cache == null)
-            return List.of();
+        if (cache == null) return List.of();
         return cache;
     }
 
@@ -61,6 +58,5 @@ public class ApplicationEmojiCacheService {
         public String toString() {
             return name + " " + id + " " + formatted + " " + timeCreated;
         }
-
     }
 }

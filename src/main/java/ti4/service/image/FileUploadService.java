@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.helpers.DateTimeHelper;
@@ -32,7 +31,8 @@ public class FileUploadService {
     private static void optionallySaveToLocal(byte[] bytes, String filenamePrefix) {
         String saveLocal = System.getenv("SAVE_LOCAL");
         if (Boolean.parseBoolean(saveLocal)) {
-            String mapImageStoragePath = Storage.getStoragePath() + File.separator + "mapImages" + File.separator + filenamePrefix + ".jpg";
+            String mapImageStoragePath =
+                    Storage.getStoragePath() + File.separator + "mapImages" + File.separator + filenamePrefix + ".jpg";
             try (FileOutputStream fileOutputStream = new FileOutputStream(mapImageStoragePath)) {
                 fileOutputStream.write(bytes);
             } catch (IOException e) {

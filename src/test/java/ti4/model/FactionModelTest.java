@@ -1,14 +1,13 @@
 package ti4.model;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.testUtils.BaseTi4Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FactionModelTest extends BaseTi4Test {
     @Test
@@ -16,7 +15,9 @@ class FactionModelTest extends BaseTi4Test {
         for (FactionModel faction : Mapper.getFactions()) {
             assertTrue(faction.isValid(), faction.getAlias() + ": invalid");
             assertTrue(validateAbilities(faction), faction.getAlias() + ": invalid Abilities");
-            assertTrue(validateFactionTech(faction), faction.getAlias() + ": invalid FactionTech: " + faction.getFactionTech());
+            assertTrue(
+                    validateFactionTech(faction),
+                    faction.getAlias() + ": invalid FactionTech: " + faction.getFactionTech());
             assertTrue(validateHomeSystem(faction), faction.getAlias() + ": invalid HomeSystem");
             assertTrue(validateHomePlanets(faction), faction.getAlias() + ": invalid HomePlanets");
             assertTrue(validateStartingTech(faction), faction.getAlias() + ": invalid StartingTech");
@@ -33,7 +34,8 @@ class FactionModelTest extends BaseTi4Test {
         for (String leaderID : faction.getLeaders()) {
             if (!Mapper.getLeaders().containsKey(leaderID)) invalidLeaderIDs.add(leaderID);
         }
-        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid leader IDs: `" + invalidLeaderIDs + "`");
+        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid leader IDs: `"
+                + invalidLeaderIDs + "`");
         return false;
     }
 
@@ -43,7 +45,8 @@ class FactionModelTest extends BaseTi4Test {
         for (String unitID : faction.getUnits()) {
             if (!Mapper.getUnits().containsKey(unitID)) invalidUnitIDs.add(unitID);
         }
-        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid unit IDs: `" + invalidUnitIDs + "`");
+        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid unit IDs: `"
+                + invalidUnitIDs + "`");
         return false;
     }
 
@@ -51,9 +54,11 @@ class FactionModelTest extends BaseTi4Test {
         if (Mapper.getPromissoryNotes().keySet().containsAll(faction.getPromissoryNotes())) return true;
         List<String> invalidPromissoryNoteIDs = new ArrayList<>();
         for (String promissoryNoteID : faction.getPromissoryNotes()) {
-            if (!Mapper.getPromissoryNotes().containsKey(promissoryNoteID)) invalidPromissoryNoteIDs.add(promissoryNoteID);
+            if (!Mapper.getPromissoryNotes().containsKey(promissoryNoteID))
+                invalidPromissoryNoteIDs.add(promissoryNoteID);
         }
-        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid promissory note IDs: `" + invalidPromissoryNoteIDs + "`");
+        System.out.println("Faction **" + faction.getAlias()
+                + "** failed validation due to invalid promissory note IDs: `" + invalidPromissoryNoteIDs + "`");
         return false;
     }
 
@@ -63,7 +68,8 @@ class FactionModelTest extends BaseTi4Test {
         for (String abilityID : faction.getAbilities()) {
             if (!Mapper.getAbilities().containsKey(abilityID)) invalidAbilityIDs.add(abilityID);
         }
-        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid ability IDs: `" + invalidAbilityIDs + "`");
+        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid ability IDs: `"
+                + invalidAbilityIDs + "`");
         return false;
     }
 
@@ -73,15 +79,18 @@ class FactionModelTest extends BaseTi4Test {
         for (String planetID : faction.getHomePlanets()) {
             if (!TileHelper.isValidPlanet(planetID)) invalidPlanetIDs.add(planetID);
         }
-        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid home planet IDs: `" + invalidPlanetIDs + "`");
+        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid home planet IDs: `"
+                + invalidPlanetIDs + "`");
         return false;
     }
 
     private static boolean validateHomeSystem(FactionModel faction) {
-        if (TileHelper.isValidTile(faction.getHomeSystem()) || faction.getHomeSystem().isEmpty()) {
+        if (TileHelper.isValidTile(faction.getHomeSystem())
+                || faction.getHomeSystem().isEmpty()) {
             return true;
         }
-        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid home system IDs: `" + faction.getHomeSystem() + "`");
+        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid home system IDs: `"
+                + faction.getHomeSystem() + "`");
         return false;
     }
 
@@ -95,7 +104,8 @@ class FactionModelTest extends BaseTi4Test {
         for (String startingTechID : testTechIDs) {
             if (!Mapper.getTechs().containsKey(startingTechID)) invalidStartingTechIDs.add(startingTechID);
         }
-        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid starting tech IDs: `" + invalidStartingTechIDs + "`");
+        System.out.println("Faction **" + faction.getAlias()
+                + "** failed validation due to invalid starting tech IDs: `" + invalidStartingTechIDs + "`");
         return false;
     }
 
@@ -105,14 +115,17 @@ class FactionModelTest extends BaseTi4Test {
         for (String factionTechID : faction.getFactionTech()) {
             if (!Mapper.getTechs().containsKey(factionTechID)) invalidFactionTechIDs.add(factionTechID);
         }
-        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid faction tech IDs: `" + invalidFactionTechIDs + "`");
+        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid faction tech IDs: `"
+                + invalidFactionTechIDs + "`");
         return false;
     }
 
     private boolean validateHomebrewReplacesID(FactionModel faction) {
         if (faction.getHomebrewReplacesID().isEmpty()) return true;
         if (Mapper.isValidFaction(faction.getHomebrewReplacesID().get())) return true;
-        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid HomebrewReplacesID: `" + faction.getHomebrewReplacesID().get() + "`");
+        System.out.println(
+                "Faction **" + faction.getAlias() + "** failed validation due to invalid HomebrewReplacesID: `"
+                        + faction.getHomebrewReplacesID().get() + "`");
         return false;
     }
 }

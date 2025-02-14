@@ -1,15 +1,14 @@
 package ti4.map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import ti4.testUtils.BaseTi4Test;
 import ti4.testUtils.JsonValidator;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LeaderTest extends BaseTi4Test {
     private final String expectedId = "testId";
@@ -25,15 +24,10 @@ public class LeaderTest extends BaseTi4Test {
 
     @Test
     public void testLeaderHasNoUnexpectedProperties() throws Exception {
-        // Given        
+        // Given
         Leader leader = buildLeader();
-        Set<String> knownJsonAttributes = new HashSet<>(Arrays.asList(
-            "id",
-            "type",
-            "tgCount",
-            "exhausted",
-            "locked",
-            "active"));
+        Set<String> knownJsonAttributes =
+                new HashSet<>(Arrays.asList("id", "type", "tgCount", "exhausted", "locked", "active"));
 
         // When
         JsonValidator.assertAvailableJsonAttributes(leader, knownJsonAttributes);
@@ -46,7 +40,7 @@ public class LeaderTest extends BaseTi4Test {
 
     @Test
     public void testLeaderJsonSaveAndRestore() throws JsonProcessingException {
-        // Given        
+        // Given
         Leader leader = buildLeader();
 
         // When

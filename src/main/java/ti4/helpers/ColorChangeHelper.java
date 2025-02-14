@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -22,10 +21,11 @@ public class ColorChangeHelper {
     public static boolean colorIsExclusive(String color, Player player) {
         String colorID = Mapper.getColorID(color);
         return switch (colorID) {
-            // Riftset is exclusive to eronous always
+                // Riftset is exclusive to eronous always
             case "ero" -> !player.getUserID().equals(Constants.eronousId);
-            // Lightgray is exclusive to chassit if chassit is in the game
-            case "lgy" -> !player.getUserID().equals(Constants.chassitId) && player.getGame().getPlayerIDs().contains(Constants.chassitId);
+                // Lightgray is exclusive to chassit if chassit is in the game
+            case "lgy" -> !player.getUserID().equals(Constants.chassitId)
+                    && player.getGame().getPlayerIDs().contains(Constants.chassitId);
             default -> false;
         };
     }
@@ -108,11 +108,12 @@ public class ColorChangeHelper {
 
         // Convert all unitholders
         game.getTileMap().values().stream()
-            .flatMap(t -> t.getUnitHolders().values().stream())
-            .forEach(uh -> replaceIDsOnUnitHolder(uh, oldColorID, newColorID));
-        game.getPlayers().values().stream().map(Player::getNomboxTile)
-            .flatMap(t -> t.getUnitHolders().values().stream())
-            .forEach(uh -> replaceIDsOnUnitHolder(uh, oldColorID, newColorID));
+                .flatMap(t -> t.getUnitHolders().values().stream())
+                .forEach(uh -> replaceIDsOnUnitHolder(uh, oldColorID, newColorID));
+        game.getPlayers().values().stream()
+                .map(Player::getNomboxTile)
+                .flatMap(t -> t.getUnitHolders().values().stream())
+                .forEach(uh -> replaceIDsOnUnitHolder(uh, oldColorID, newColorID));
     }
 
     private static void replaceIDsOnUnitHolder(UnitHolder unitHolder, String oldColorID, String newColorID) {

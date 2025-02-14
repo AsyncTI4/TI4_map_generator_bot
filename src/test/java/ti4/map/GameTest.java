@@ -1,12 +1,11 @@
 package ti4.map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Map;
 import java.util.Set;
-
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Constants;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class GameTest {
 
@@ -27,8 +26,7 @@ class GameTest {
         game.setPlayers(Map.of(
                 "hasThe2", createPlayer("hasThe2", Set.of(2, 5), game),
                 "hasThe1", createPlayer("hasThe1", Set.of(8, 1), game),
-                "naaluPnPlayer", naaluPnPlayer
-        ));
+                "naaluPnPlayer", naaluPnPlayer));
         return game;
     }
 
@@ -37,5 +35,4 @@ class GameTest {
         player.setSCs(strategyCards);
         return player;
     }
-
 }

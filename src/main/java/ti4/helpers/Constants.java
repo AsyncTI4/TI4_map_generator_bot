@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.User;
 import ti4.AsyncTI4DiscordBot;
 
@@ -861,6 +860,7 @@ public class Constants {
     public static final String HERO = "hero";
     public static final String ENVOY = "envoy";
     public static final List<String> leaderList = new ArrayList<>();
+
     static {
         leaderList.add(AGENT);
         leaderList.add(COMMANDER);
@@ -926,7 +926,7 @@ public class Constants {
     public static final String SHOW_GAME_AS_PLAYER = "show_game_as";
     public static final String CHECK_PRIVATE_COMMUNICATIONS = "check_private_communications";
 
-    //DRAFTS
+    // DRAFTS
     public static final String BAG_DRAFT = "bag_draft";
     public static final String MILTY_DRAFT_MANAGER = "milty_draft_manager";
     public static final String MILTY_DRAFT_SETTINGS = "milty_draft_settings";
@@ -985,11 +985,13 @@ public class Constants {
     public static final String VERBOSITY_AVERAGE = "average";
     public static final String VERBOSITY_MINIMAL = "minimal";
     public static final List<String> VERBOSITY_OPTIONS = new ArrayList<>();
+
     static {
         VERBOSITY_OPTIONS.add(VERBOSITY_VERBOSE);
         VERBOSITY_OPTIONS.add(VERBOSITY_AVERAGE);
         VERBOSITY_OPTIONS.add(VERBOSITY_MINIMAL);
     }
+
     public static final String BETA_TEST_MODE = "beta_test_mode";
     public static final String CC_LIMIT = "cc_limit";
     public static final String AGE_OF_EXPLORATION_MODE = "age_of_exploration_mode";

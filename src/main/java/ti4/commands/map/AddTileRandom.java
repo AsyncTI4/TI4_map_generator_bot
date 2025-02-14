@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -16,8 +15,8 @@ import ti4.image.PositionMapper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-import ti4.model.TileModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileModel;
 import ti4.service.map.AddTileService;
 import ti4.service.map.AddTileService.RandomOption;
 
@@ -34,7 +33,8 @@ class AddTileRandom extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String positionString = event.getOption(Constants.POSITION).getAsString();
-        String randomType = event.getOption(Constants.RANDOM_TYPE).getAsString().trim().toUpperCase();
+        String randomType =
+                event.getOption(Constants.RANDOM_TYPE).getAsString().trim().toUpperCase();
         boolean drawOnly = event.getOption(Constants.DRAW_ONLY, false, OptionMapping::getAsBoolean);
 
         Game game = getGame();
@@ -43,7 +43,7 @@ class AddTileRandom extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Cannot run this command in a private channel.");
             return;
         }
-        
+
         if (!RandomOption.isValid(randomType)) {
             MessageHelper.replyToMessage(event, "Invalid type: " + randomType);
             return;
@@ -66,10 +66,11 @@ class AddTileRandom extends GameStateSubcommand {
         List<String> drawnTiles = new ArrayList<>();
         StringBuffer msg = new StringBuffer();
         for (String position : positions) {
-            Set<TileModel> existingTileModels = game.getTileMap().values().stream()
-                .map(Tile::getTileModel).collect(Collectors.toSet());
+            Set<TileModel> existingTileModels =
+                    game.getTileMap().values().stream().map(Tile::getTileModel).collect(Collectors.toSet());
 
-            List<TileModel> availableTiles = AddTileService.availableTiles(sources, randomOption, existingTileModels, drawnTiles);
+            List<TileModel> availableTiles =
+                    AddTileService.availableTiles(sources, randomOption, existingTileModels, drawnTiles);
             if (availableTiles.isEmpty()) {
                 msg.append("No available tiles found.");
                 break;
@@ -81,8 +82,8 @@ class AddTileRandom extends GameStateSubcommand {
                 AddTileService.addTile(getGame(), new Tile(randomTile.getId(), position));
             }
 
-            msg.append((drawOnly ? "Drew " : "Added ") + randomTile.getEmbedTitle() 
-                + " to " + position + " from " + availableTiles.size() + " options\n");
+            msg.append((drawOnly ? "Drew " : "Added ") + randomTile.getEmbedTitle() + " to " + position + " from "
+                    + availableTiles.size() + " options\n");
         }
 
         MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());

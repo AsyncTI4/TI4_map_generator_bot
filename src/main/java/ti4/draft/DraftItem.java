@@ -1,9 +1,8 @@
 package ti4.draft;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.draft.items.AbilityDraftItem;
@@ -40,7 +39,21 @@ public abstract class DraftItem implements ModelInterface {
     }
 
     public enum Category {
-        ABILITY, TECH, AGENT, COMMANDER, HERO, MECH, FLAGSHIP, COMMODITIES, PN, HOMESYSTEM, STARTINGTECH, STARTINGFLEET, BLUETILE, REDTILE, DRAFTORDER
+        ABILITY,
+        TECH,
+        AGENT,
+        COMMANDER,
+        HERO,
+        MECH,
+        FLAGSHIP,
+        COMMODITIES,
+        PN,
+        HOMESYSTEM,
+        STARTINGTECH,
+        STARTINGFLEET,
+        BLUETILE,
+        REDTILE,
+        DRAFTORDER
     }
 
     public final Category ItemCategory;
@@ -51,23 +64,24 @@ public abstract class DraftItem implements ModelInterface {
     public DraftErrataModel Errata;
 
     public static DraftItem generate(Category category, String itemId) {
-        DraftItem item = switch (category) {
-            case ABILITY -> item = new AbilityDraftItem(itemId);
-            case TECH -> item = new TechDraftItem(itemId);
-            case AGENT -> item = new AgentDraftItem(itemId);
-            case COMMANDER -> item = new CommanderDraftItem(itemId);
-            case HERO -> item = new HeroDraftItem(itemId);
-            case MECH -> item = new MechDraftItem(itemId);
-            case FLAGSHIP -> item = new FlagshipDraftItem(itemId);
-            case COMMODITIES -> item = new CommoditiesDraftItem(itemId);
-            case PN -> item = new PNDraftItem(itemId);
-            case HOMESYSTEM -> item = new HomeSystemDraftItem(itemId);
-            case STARTINGTECH -> item = new StartingTechDraftItem(itemId);
-            case STARTINGFLEET -> item = new StartingFleetDraftItem(itemId);
-            case BLUETILE -> item = new BlueTileDraftItem(itemId);
-            case REDTILE -> item = new RedTileDraftItem(itemId);
-            case DRAFTORDER -> item = new SpeakerOrderDraftItem(itemId);
-        };
+        DraftItem item =
+                switch (category) {
+                    case ABILITY -> item = new AbilityDraftItem(itemId);
+                    case TECH -> item = new TechDraftItem(itemId);
+                    case AGENT -> item = new AgentDraftItem(itemId);
+                    case COMMANDER -> item = new CommanderDraftItem(itemId);
+                    case HERO -> item = new HeroDraftItem(itemId);
+                    case MECH -> item = new MechDraftItem(itemId);
+                    case FLAGSHIP -> item = new FlagshipDraftItem(itemId);
+                    case COMMODITIES -> item = new CommoditiesDraftItem(itemId);
+                    case PN -> item = new PNDraftItem(itemId);
+                    case HOMESYSTEM -> item = new HomeSystemDraftItem(itemId);
+                    case STARTINGTECH -> item = new StartingTechDraftItem(itemId);
+                    case STARTINGFLEET -> item = new StartingFleetDraftItem(itemId);
+                    case BLUETILE -> item = new BlueTileDraftItem(itemId);
+                    case REDTILE -> item = new RedTileDraftItem(itemId);
+                    case DRAFTORDER -> item = new SpeakerOrderDraftItem(itemId);
+                };
 
         item.Errata = Mapper.getFrankenErrata().get(item.getAlias());
         return item;
@@ -169,7 +183,8 @@ public abstract class DraftItem implements ModelInterface {
     public boolean isDraftable(Player player) {
         BagDraft draftRules = player.getGame().getActiveBagDraft();
         DraftBag draftHand = player.getDraftHand();
-        boolean isAtHandLimit = draftHand.getCategoryCount(ItemCategory) >= draftRules.getItemLimitForCategory(ItemCategory);
+        boolean isAtHandLimit =
+                draftHand.getCategoryCount(ItemCategory) >= draftRules.getItemLimitForCategory(ItemCategory);
         if (isAtHandLimit) {
             return false;
         }

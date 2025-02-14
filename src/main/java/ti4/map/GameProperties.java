@@ -2,7 +2,6 @@ package ti4.map;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.Constants;
@@ -14,7 +13,7 @@ public class GameProperties {
     private @ExportableField String ownerID;
     private @ExportableField String ownerName = "";
     private @ExportableField String creationDate;
-    private @ExportableField String name; //pbdXXXX
+    private @ExportableField String name; // pbdXXXX
     private @ExportableField String customName = "";
     private @ExportableField String mapTemplateID;
     private @ExportableField String phaseOfGame = "";

@@ -3,7 +3,6 @@ package ti4.commands.fow;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
@@ -22,7 +21,6 @@ public class FOWCommand implements ParentCommand {
                     new ShowGameAsPlayer(),
                     new PrivateCommunicationsCheck())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
 
     @Override
     public String getName() {

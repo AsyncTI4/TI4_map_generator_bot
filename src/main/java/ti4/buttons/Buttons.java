@@ -1,7 +1,6 @@
 package ti4.buttons;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -18,7 +17,8 @@ import ti4.service.emoji.TechEmojis;
 public class Buttons {
 
     public static final Button GET_A_TECH = green("acquireATech", "Get a Technology");
-    public static final Button GET_A_UNIT_TECH_WITH_INF = green("acquireAUnitTechWithInf", "Get a Unit Upgrade Technology");
+    public static final Button GET_A_UNIT_TECH_WITH_INF =
+            green("acquireAUnitTechWithInf", "Get a Unit Upgrade Technology");
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Technology");
     public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute Command Tokens");
     public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
@@ -31,28 +31,34 @@ public class Buttons {
     public static final Button REFRESH_INFO = green("refreshInfoButtons", "Other Info");
     public static final Button REFRESH_AC_INFO = green("refreshACInfo", "Action Card Info", CardEmojis.ActionCard);
     public static final Button REFRESH_PN_INFO = green("refreshPNInfo", "Promissory Notes Info", CardEmojis.PN);
-    public static final Button REFRESH_SO_INFO = green("refreshSOInfo", "Secret Objectives Info", CardEmojis.SecretObjective);
+    public static final Button REFRESH_SO_INFO =
+            green("refreshSOInfo", "Secret Objectives Info", CardEmojis.SecretObjective);
     public static final Button REFRESH_ABILITY_INFO = green("refreshAbilityInfo", "Ability Info");
-    public static final Button REFRESH_RELIC_INFO = green(Constants.REFRESH_RELIC_INFO, "Relic Info", ExploreEmojis.Relic);
-    public static final Button REFRESH_LEADER_INFO = green(Constants.REFRESH_LEADER_INFO, "Leader Info", LeaderEmojis.Hero);
-    public static final Button REFRESH_UNIT_INFO = green(Constants.REFRESH_UNIT_INFO, "Unit Info", TechEmojis.UnitUpgradeTech);
+    public static final Button REFRESH_RELIC_INFO =
+            green(Constants.REFRESH_RELIC_INFO, "Relic Info", ExploreEmojis.Relic);
+    public static final Button REFRESH_LEADER_INFO =
+            green(Constants.REFRESH_LEADER_INFO, "Leader Info", LeaderEmojis.Hero);
+    public static final Button REFRESH_UNIT_INFO =
+            green(Constants.REFRESH_UNIT_INFO, "Unit Info", TechEmojis.UnitUpgradeTech);
     public static final Button REFRESH_ALL_UNIT_INFO = green(Constants.REFRESH_ALL_UNIT_INFO, "Show All Units");
     public static final Button REFRESH_TECH_INFO = green(Constants.REFRESH_TECH_INFO, "Technology Info");
-    public static final Button REFRESH_PLANET_INFO = green(Constants.REFRESH_PLANET_INFO, "Planet Info", PlanetEmojis.SemLor);
+    public static final Button REFRESH_PLANET_INFO =
+            green(Constants.REFRESH_PLANET_INFO, "Planet Info", PlanetEmojis.SemLor);
 
-    public static final Button OFFER_PING_OPTIONS_BUTTON = Buttons.gray("playerPref_personalPingInterval", "Personal Ping Interval");
+    public static final Button OFFER_PING_OPTIONS_BUTTON =
+            Buttons.gray("playerPref_personalPingInterval", "Personal Ping Interval");
 
     public static final List<Button> REFRESH_INFO_BUTTONS = List.of(
-        REFRESH_AC_INFO,
-        REFRESH_PN_INFO,
-        REFRESH_SO_INFO,
-        REFRESH_ABILITY_INFO,
-        REFRESH_RELIC_INFO,
-        REFRESH_LEADER_INFO,
-        REFRESH_UNIT_INFO,
-        REFRESH_TECH_INFO,
-        REFRESH_PLANET_INFO,
-        FACTION_EMBED);
+            REFRESH_AC_INFO,
+            REFRESH_PN_INFO,
+            REFRESH_SO_INFO,
+            REFRESH_ABILITY_INFO,
+            REFRESH_RELIC_INFO,
+            REFRESH_LEADER_INFO,
+            REFRESH_UNIT_INFO,
+            REFRESH_TECH_INFO,
+            REFRESH_PLANET_INFO,
+            FACTION_EMBED);
 
     /** A blue button (primary style) */
     public static Button blue(String buttonID, String buttonLabel) {

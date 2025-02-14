@@ -1,12 +1,11 @@
 package ti4.helpers.settingsFramework.menus;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -45,7 +44,8 @@ public class MiltySettings extends SettingsMenu {
         // Initialize default values
         draftMode = new ChoiceSetting<>("DraftType", "Draft Type", "milty");
         draftMode.setEmoji(MiltyDraftEmojis.sliceA);
-        draftMode.setAllValues(Arrays.stream(DraftingMode.values()).collect(Collectors.toMap(DraftingMode::toString, x -> x)));
+        draftMode.setAllValues(
+                Arrays.stream(DraftingMode.values()).collect(Collectors.toMap(DraftingMode::toString, x -> x)));
         draftMode.setShow(DraftingMode::toString);
 
         // Get the correct JSON node for initialization if applicable.
@@ -54,14 +54,16 @@ public class MiltySettings extends SettingsMenu {
 
         // Check if this node represents this menu
         List<String> historicIDs = List.of("milty", "main");
-        if (json != null && json.has("menuId") && historicIDs.contains(json.get("menuId").asText(""))) {
+        if (json != null
+                && json.has("menuId")
+                && historicIDs.contains(json.get("menuId").asText(""))) {
             draftMode.initialize(json.get("draftMode"));
         }
 
         // initialize categories
         gameSettings = new GameSettings(game, json, this);
         sourceSettings = new SourceSettings(game, json, this);
-        //frankenSettings = new FrankenSettings(game, json, this);
+        // frankenSettings = new FrankenSettings(game, json, this);
         playerSettings = new PlayerFactionSettings(game, json, this);
         sliceSettings = new SliceGenerationSettings(game, json, this);
 
@@ -107,10 +109,11 @@ public class MiltySettings extends SettingsMenu {
 
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error = switch (action) {
-            case "startMilty" -> startMilty(event);
-            default -> null;
-        };
+        String error =
+                switch (action) {
+                    case "startMilty" -> startMilty(event);
+                    default -> null;
+                };
         return (error == null ? "success" : error);
     }
 
@@ -118,7 +121,9 @@ public class MiltySettings extends SettingsMenu {
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
     public enum DraftingMode {
-        none, milty, franken;
+        none,
+        milty,
+        franken;
 
         public String show() {
             return switch (this) {
@@ -133,7 +138,7 @@ public class MiltySettings extends SettingsMenu {
     protected List<SettingsMenu> draftModeCategories() {
         List<SettingsMenu> draftCategories = new ArrayList<>();
         switch (draftMode.getValue()) {
-            //case franken -> draftCategories.add(frankenSettings);
+                // case franken -> draftCategories.add(frankenSettings);
             default -> draftCategories.add(sliceSettings);
         }
         return draftCategories;

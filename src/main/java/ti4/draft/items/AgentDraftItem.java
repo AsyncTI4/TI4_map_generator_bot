@@ -1,10 +1,9 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.model.DraftErrataModel;
@@ -64,7 +63,8 @@ public class AgentDraftItem extends DraftItem {
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
         for (FactionModel faction : factions) {
             List<String> agents = faction.getLeaders();
-            agents.removeIf((String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
+            agents.removeIf(
+                    (String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
             for (String agent : agents) {
                 allItems.add(DraftItem.generate(Category.AGENT, agent));
             }

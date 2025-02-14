@@ -1,7 +1,6 @@
 package ti4.commands.cardsac;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -19,9 +18,13 @@ class SendAC extends GameStateSubcommand {
 
     public SendAC() {
         super(Constants.SEND_AC, "Send an action card to a player", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID to send").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to send to").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID to send")
+                .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to send to")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
@@ -50,7 +53,8 @@ class SendAC extends GameStateSubcommand {
 
         // FoW specific pinging
         if (game.isFowMode()) {
-            FoWHelper.pingPlayersTransaction(game, event, player, playerToSendTo, CardEmojis.ActionCard + " Action Card", null);
+            FoWHelper.pingPlayersTransaction(
+                    game, event, player, playerToSendTo, CardEmojis.ActionCard + " Action Card", null);
         }
 
         ActionCardHelper.sendActionCard(event, game, player, playerToSendTo, acID);

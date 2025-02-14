@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -36,38 +35,45 @@ class PickStrategyCardButtonHandler {
         String num = buttonID.replace("scPick_", "");
         int scpick = Integer.parseInt(num);
         if (game.getStoredValue("Public Disgrace") != null
-            && game.getStoredValue("Public Disgrace").contains("_" + scpick)
-            && (game.getStoredValue("Public Disgrace Only").isEmpty() || game.getStoredValue("Public Disgrace Only").contains(player.getFaction()))) {
+                && game.getStoredValue("Public Disgrace").contains("_" + scpick)
+                && (game.getStoredValue("Public Disgrace Only").isEmpty()
+                        || game.getStoredValue("Public Disgrace Only").contains(player.getFaction()))) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
                 }
                 if (game.getStoredValue("Public Disgrace").contains(p2.getFaction())
-                    && p2.getActionCards().containsKey("disgrace")) {
+                        && p2.getActionCards().containsKey("disgrace")) {
                     ActionCardHelper.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
                     game.setStoredValue("Public Disgrace", "");
-                    String msg = player.getRepresentationUnfogged() +
-                        " picked " + Helper.getSCRepresentation(game, scpick) + ".";
+                    String msg = player.getRepresentationUnfogged() + " picked "
+                            + Helper.getSCRepresentation(game, scpick) + ".";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        player.getRepresentation()
-                            + " you have been _Public Disgrace_'d because someone preset it to occur when the number " + scpick
-                            + " was chosen. If this is a mistake or the _Public Disgrace_ is Sabo'd, feel free to pick the strategy card again. Otherwise, pick a different strategy card.");
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " you have been _Public Disgrace_'d because someone preset it to occur when the number "
+                                    + scpick
+                                    + " was chosen. If this is a mistake or the _Public Disgrace_ is Sabo'd, feel free to pick the strategy card again. Otherwise, pick a different strategy card.");
                     return;
                 }
             }
         }
         if (game.getStoredValue("deflectedSC").equalsIgnoreCase(num)) {
             if (player.getStrategicCC() < 1) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
-                    + ", you can't pick this strategy card because it has been targeted by _Deflection_, and you don't have a command token in your strategy pool to spend.");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentation()
+                                + ", you can't pick this strategy card because it has been targeted by _Deflection_, and you don't have a command token in your strategy pool to spend.");
                 return;
             } else {
                 player.setStrategicCC(player.getStrategicCC() - 1);
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
-                    + " spent 1 command token from their strategy pool to pick this strategy card due to _Deflection_.");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentation()
+                                + " spent 1 command token from their strategy pool to pick this strategy card due to _Deflection_.");
             }
         }
 
@@ -83,7 +89,8 @@ class PickStrategyCardButtonHandler {
     }
 
     @ButtonHandler("checksNBalancesPt2_")
-    public static void resolvePt2ChecksNBalances(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+    public static void resolvePt2ChecksNBalances(
+            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String scPicked = buttonID.split("_")[1];
         int scpick = Integer.parseInt(scPicked);
         String factionPicked = buttonID.split("_")[2];
@@ -92,12 +99,12 @@ class PickStrategyCardButtonHandler {
         PlayerStatsService.secondHalfOfPickSC(event, game, p2, scpick);
 
         String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scpick, game)
-            + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");
+                + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
 
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), p2.getColor() + " was given " + Helper.getSCName(scpick, game));
-
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), p2.getColor() + " was given " + Helper.getSCName(scpick, game));
         }
         event.getMessage().delete().queue();
         List<Button> buttons = getPlayerOptionsForChecksNBalances(player, game, scpick);
@@ -107,7 +114,7 @@ class PickStrategyCardButtonHandler {
                 scPickedList.addAll(player_.getSCs());
             }
 
-            //ADD A TG TO UNPICKED SC
+            // ADD A TG TO UNPICKED SC
             game.incrementScTradeGoods();
 
             for (int sc : scPickedList) {
@@ -119,7 +126,8 @@ class PickStrategyCardButtonHandler {
             boolean foundPlayer = false;
             Player privatePlayer = null;
             List<Player> players = game.getRealPlayers();
-            if (game.isReverseSpeakerOrder() || !game.getStoredValue("willRevolution").isEmpty()) {
+            if (game.isReverseSpeakerOrder()
+                    || !game.getStoredValue("willRevolution").isEmpty()) {
                 Collections.reverse(players);
             }
             for (Player p3 : players) {
@@ -139,8 +147,11 @@ class PickStrategyCardButtonHandler {
             }
             game.setPhaseOfGame("strategy");
             game.updateActivePlayer(privatePlayer);
-            MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                privatePlayer.getRepresentationUnfogged() + ", please use buttons to pick which strategy card you wish to give someone else.", Helper.getRemainingSCButtons(game, privatePlayer));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    privatePlayer.getCorrectChannel(),
+                    privatePlayer.getRepresentationUnfogged()
+                            + ", please use buttons to pick which strategy card you wish to give someone else.",
+                    Helper.getRemainingSCButtons(game, privatePlayer));
         }
     }
 
@@ -169,24 +180,28 @@ class PickStrategyCardButtonHandler {
                 if (game.isFowMode()) {
                     buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), p2.getColor()));
                 } else {
-                    buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), " ").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
+                    buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), " ")
+                            .withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
                 }
             }
         }
         if (buttons.isEmpty()) {
-            buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + player.getFaction(), " ").withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
+            buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + player.getFaction(), " ")
+                    .withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
         }
 
         return buttons;
     }
 
-    public static void secondHalfOfSCPickWhenChecksNBalances(ButtonInteractionEvent event, Player player, Game game, int scPicked) {
+    public static void secondHalfOfSCPickWhenChecksNBalances(
+            ButtonInteractionEvent event, Player player, Game game, int scPicked) {
         List<Button> buttons = getPlayerOptionsForChecksNBalances(player, game, scPicked);
         Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
 
         for (Player playerStats : game.getRealPlayers()) {
             if (playerStats.getSCs().contains(scPicked)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getSCName(scPicked, game) + " is already picked.");
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), Helper.getSCName(scPicked, game) + " is already picked.");
                 return;
             }
         }
@@ -194,11 +209,14 @@ class PickStrategyCardButtonHandler {
         if (tgCount != null && tgCount != 0) {
             int tg = player.getTg();
             tg += tgCount;
-            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                + " from picking " + Helper.getSCName(scPicked, game) + ".");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
+                            + " from picking " + Helper.getSCName(scPicked, game) + ".");
             if (game.isFowMode()) {
-                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                    + " from picking " + Helper.getSCName(scPicked, game) + ".";
+                String messageToSend =
+                        ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " trade good"
+                                + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scPicked, game) + ".";
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);
@@ -211,8 +229,10 @@ class PickStrategyCardButtonHandler {
                 }
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged()
-            + " chose which player to give this strategy card to.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " chose which player to give this strategy card to.",
+                buttons);
         event.getMessage().delete().queue();
     }
 }

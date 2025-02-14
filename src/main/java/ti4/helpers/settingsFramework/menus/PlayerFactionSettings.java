@@ -1,5 +1,7 @@
 package ti4.helpers.settingsFramework.menus;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -8,17 +10,14 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.image.Mapper;
 import ti4.buttons.Buttons;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.FactionModel;
@@ -27,7 +26,7 @@ import ti4.service.emoji.SourceEmojis;
 
 // This is a sub-menu
 @Getter
-@JsonIgnoreProperties({ "messageId" })
+@JsonIgnoreProperties({"messageId"})
 public class PlayerFactionSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
@@ -41,22 +40,37 @@ public class PlayerFactionSettings extends SettingsMenu {
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
     public PlayerFactionSettings(Game game, JsonNode json, SettingsMenu parent) {
-        super("players", "Players and Factions", "Adjust which players are actually playing, draft order, and stuff like that", parent);
+        super(
+                "players",
+                "Players and Factions",
+                "Adjust which players are actually playing, draft order, and stuff like that",
+                parent);
 
         // Initialize Settings to default values
         presetDraftOrder = new BooleanSetting("StaticOrder", "static draft order", false);
 
         // Initialize values & keys for gamePlayers
         Set<Entry<String, Player>> allPlayers = game.getPlayers().entrySet();
-        Set<String> defaultPlayers = game.getPlayers().values().stream().map(Player::getUserID).collect(Collectors.toSet());
-        Set<String> players = Optional.ofNullable(gamePlayers).map(ListSetting::getKeys).orElse(defaultPlayers);
-        gamePlayers = new ListSetting<>("Players", "Players playing", "Add player", "Remove player", allPlayers, players, defaultPlayers);
+        Set<String> defaultPlayers =
+                game.getPlayers().values().stream().map(Player::getUserID).collect(Collectors.toSet());
+        Set<String> players =
+                Optional.ofNullable(gamePlayers).map(ListSetting::getKeys).orElse(defaultPlayers);
+        gamePlayers = new ListSetting<>(
+                "Players", "Players playing", "Add player", "Remove player", allPlayers, players, defaultPlayers);
 
         // Initialize values & keys for ban/priority factions
         Set<String> empty = new HashSet<>();
         Set<Entry<String, FactionModel>> allFactions = new HashSet<>();
-        banFactions = new ListSetting<>("BanFactions", "Banned factions", "Ban faction", "Unban faction", allFactions, empty, empty);
-        priFactions = new ListSetting<>("PriFactions", "Prioritized factions", "Prioritize faction", "Unprioritize faction", allFactions, empty, empty);
+        banFactions = new ListSetting<>(
+                "BanFactions", "Banned factions", "Ban faction", "Unban faction", allFactions, empty, empty);
+        priFactions = new ListSetting<>(
+                "PriFactions",
+                "Prioritized factions",
+                "Prioritize faction",
+                "Unprioritize faction",
+                allFactions,
+                empty,
+                empty);
 
         // Emojis
         banFactions.setGetEmoji(FactionModel::getFactionEmoji);
@@ -78,7 +92,9 @@ public class PlayerFactionSettings extends SettingsMenu {
 
         // Verify this is the correct JSON node and continue initialization
         List<String> historicIDs = new ArrayList<>(List.of("players"));
-        if (json != null && json.has("menuId") && historicIDs.contains(json.get("menuId").asText(""))) {
+        if (json != null
+                && json.has("menuId")
+                && historicIDs.contains(json.get("menuId").asText(""))) {
             presetDraftOrder.initialize(json.get("presetDraftOrder"));
             gamePlayers.initialize(json.get("gamePlayers"));
             banFactions.initialize(json.get("banFactions"));
@@ -104,9 +120,10 @@ public class PlayerFactionSettings extends SettingsMenu {
         if (parent instanceof MiltySettings m) {
             List<ComponentSource> sources = m.getSourceSettings().getFactionSources();
             Map<String, FactionModel> allFactions = Mapper.getFactions().stream()
-                .filter(model -> sources.contains(model.getSource()))
-                .filter(model -> !model.getAlias().contains("keleres") || model.getAlias().equals("keleresm")) // Limit the pool to only 1 keleres flavor
-                .collect(Collectors.toMap(FactionModel::getAlias, f -> f));
+                    .filter(model -> sources.contains(model.getSource()))
+                    .filter(model -> !model.getAlias().contains("keleres")
+                            || model.getAlias().equals("keleresm")) // Limit the pool to only 1 keleres flavor
+                    .collect(Collectors.toMap(FactionModel::getAlias, f -> f));
             banFactions.setAllValues(allFactions);
             priFactions.setAllValues(allFactions);
 
@@ -129,10 +146,11 @@ public class PlayerFactionSettings extends SettingsMenu {
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error = switch (action) {
-            case "dsFactionsOnly" -> prioritizeDSFactions();
-            default -> null;
-        };
+        String error =
+                switch (action) {
+                    case "dsFactionsOnly" -> prioritizeDSFactions();
+                    default -> null;
+                };
 
         return (error == null ? "success" : error);
     }
@@ -142,13 +160,11 @@ public class PlayerFactionSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     private String prioritizeDSFactions() {
         if (parent != null && parent instanceof MiltySettings ms) {
-            if (!ms.getSourceSettings().getDiscoStars().isVal())
-                return "Discordant stars is not enabled";
+            if (!ms.getSourceSettings().getDiscoStars().isVal()) return "Discordant stars is not enabled";
 
             List<String> newKeys = new ArrayList<>();
             for (FactionModel model : priFactions.getAllValues().values()) {
-                if (model.getSource() == ComponentSource.ds)
-                    newKeys.add(model.getAlias());
+                if (model.getSource() == ComponentSource.ds) newKeys.add(model.getAlias());
             }
             priFactions.setKeys(newKeys);
         }

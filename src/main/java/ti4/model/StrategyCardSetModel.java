@@ -1,12 +1,11 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import ti4.image.Mapper;
@@ -23,10 +22,10 @@ public class StrategyCardSetModel implements ModelInterface {
     @Override
     public boolean isValid() {
         return scIDs != null
-            && !scIDs.isEmpty()
-            && StringUtils.isNotBlank(name)
-            && StringUtils.isNotBlank(alias)
-            && source != null;
+                && !scIDs.isEmpty()
+                && StringUtils.isNotBlank(name)
+                && StringUtils.isNotBlank(alias)
+                && source != null;
     }
 
     @Override
@@ -42,25 +41,25 @@ public class StrategyCardSetModel implements ModelInterface {
     public Map<Integer, String> getCardValues() {
         Map<Integer, String> cardValues = new LinkedHashMap<>();
         for (String scID : scIDs) {
-            cardValues.put(Mapper.getStrategyCard(scID).getInitiative(), Mapper.getStrategyCard(scID).getName());
+            cardValues.put(
+                    Mapper.getStrategyCard(scID).getInitiative(),
+                    Mapper.getStrategyCard(scID).getName());
         }
         return cardValues;
     }
 
     @JsonIgnore
     public List<StrategyCardModel> getStrategyCardModels() {
-        return scIDs.stream()
-            .map(Mapper::getStrategyCard)
-            .collect(Collectors.toList());
+        return scIDs.stream().map(Mapper::getStrategyCard).collect(Collectors.toList());
     }
 
     public String getSCName(int scNumber) {
         return scIDs.stream()
-            .map(Mapper::getStrategyCard)
-            .filter(sc -> sc.getInitiative() == scNumber)
-            .map(StrategyCardModel::getName)
-            .findFirst()
-            .orElse("Name Unknown - Invalid Strategy Card Initiative Number: " + scNumber);
+                .map(Mapper::getStrategyCard)
+                .filter(sc -> sc.getInitiative() == scNumber)
+                .map(StrategyCardModel::getName)
+                .findFirst()
+                .orElse("Name Unknown - Invalid Strategy Card Initiative Number: " + scNumber);
     }
 
     public Optional<String> getDescription() {
@@ -69,16 +68,16 @@ public class StrategyCardSetModel implements ModelInterface {
 
     public Optional<StrategyCardModel> getStrategyCardModelByInitiative(int initiative) {
         return scIDs.stream()
-            .map(Mapper::getStrategyCard)
-            .filter(sc -> sc.getInitiative() == initiative)
-            .findFirst();
+                .map(Mapper::getStrategyCard)
+                .filter(sc -> sc.getInitiative() == initiative)
+                .findFirst();
     }
 
     public Optional<StrategyCardModel> getStrategyCardModelByName(String name) {
         return scIDs.stream()
-            .map(Mapper::getStrategyCard)
-            .filter(sc -> name.equalsIgnoreCase(sc.getName()))
-            .findFirst();
+                .map(Mapper::getStrategyCard)
+                .filter(sc -> name.equalsIgnoreCase(sc.getName()))
+                .findFirst();
     }
 
     @JsonIgnore

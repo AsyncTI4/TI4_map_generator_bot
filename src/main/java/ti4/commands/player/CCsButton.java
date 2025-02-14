@@ -15,5 +15,4 @@ class CCsButton extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
     }
-    
 }
