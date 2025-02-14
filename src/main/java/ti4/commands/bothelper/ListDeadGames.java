@@ -17,12 +17,13 @@ import ti4.service.game.ManagedGameService;
 
 class ListDeadGames extends Subcommand {
 
-    private static final String WARNING_MESSAGE = " this is a warning that this game will be cleaned up tomorrow, " +
-        "unless someone takes a turn. You can ignore this if you want it deleted. Ping Fin if this should not be done.";
+    private static final String WARNING_MESSAGE = " this is a warning that this game will be cleaned up tomorrow, "
+            + "unless someone takes a turn. You can ignore this if you want it deleted. Ping Fin if this should not be done.";
 
     public ListDeadGames() {
         super(Constants.LIST_DEAD_GAMES, "List games that haven't moved in 2+ months but still have channels");
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Delete with with DELETE, otherwise warning").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Delete with with DELETE, otherwise warning")
+                .setRequired(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -33,16 +34,27 @@ class ListDeadGames extends Subcommand {
         int channelCount = 0;
         int roleCount = 0;
         for (ManagedGame game : GameManager.getManagedGames()) {
-            if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
+            if (Helper.getDateDifference(
+                                    game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis()))
+                            < 30
+                    || !game.getName().contains("pbd")
+                    || game.getName().contains("test")) {
                 continue;
             }
-            if (game.getName().contains("pbd1000") || game.getName().contains("pbd2863") || game.getName().contains("pbd3000") || game.getName().equalsIgnoreCase("pbd104") || game.getName().equalsIgnoreCase("pbd100") || game.getName().equalsIgnoreCase("pbd100two")) {
+            if (game.getName().contains("pbd1000")
+                    || game.getName().contains("pbd2863")
+                    || game.getName().contains("pbd3000")
+                    || game.getName().equalsIgnoreCase("pbd104")
+                    || game.getName().equalsIgnoreCase("pbd100")
+                    || game.getName().equalsIgnoreCase("pbd100two")) {
                 continue;
             }
             long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange();
 
             // TODO: we really shouldn't use these magical numbers.
-            if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange() && milliSinceLastTurnChange < 1259600000L) {
+            if (game.isHasEnded()
+                    && game.getEndedDate() < game.getLastActivePlayerChange()
+                    && milliSinceLastTurnChange < 1259600000L) {
                 continue;
             }
             if (game.isHasEnded() || milliSinceLastTurnChange > 5259600000L) {
@@ -66,7 +78,6 @@ class ListDeadGames extends Subcommand {
                     r.delete().queue();
                 }
             }
-
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb + "Channel Count = " + channelCount);
         MessageHelper.sendMessageToChannel(event.getChannel(), sb2 + "Role Count =" + roleCount);
@@ -81,28 +92,33 @@ class ListDeadGames extends Subcommand {
         boolean warned = false;
         int channelCount = 0;
 
-        if (AsyncTI4DiscordBot.getAvailablePBDCategories().contains(actionsChannel.getParentCategory()) &&
-                actionsChannel.getParentCategory() != null && !actionsChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
+        if (AsyncTI4DiscordBot.getAvailablePBDCategories().contains(actionsChannel.getParentCategory())
+                && actionsChannel.getParentCategory() != null
+                && !actionsChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
             sb.append(actionsChannel.getJumpUrl()).append("\n");
             channelCount++;
             if (delete) {
                 actionsChannel.delete().queue();
             } else {
                 warned = true;
-                MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
+                MessageHelper.sendMessageToChannel(
+                        actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
             }
         }
 
         var tableTalkChannel = game.getTableTalkChannel();
-        if (tableTalkChannel != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(tableTalkChannel.getParentCategory()) &&
-                tableTalkChannel.getParentCategory() != null && !tableTalkChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
+        if (tableTalkChannel != null
+                && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(tableTalkChannel.getParentCategory())
+                && tableTalkChannel.getParentCategory() != null
+                && !tableTalkChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
             if (tableTalkChannel.getName().contains(game.getName() + "-")) {
                 sb.append(tableTalkChannel.getJumpUrl()).append("\n");
                 channelCount++;
                 if (delete) {
                     tableTalkChannel.delete().queue();
                 } else if (!warned) {
-                    MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
+                    MessageHelper.sendMessageToChannel(
+                            actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
                 }
             }
         }

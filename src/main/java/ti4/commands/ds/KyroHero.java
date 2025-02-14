@@ -17,7 +17,8 @@ class KyroHero extends GameStateSubcommand {
     public KyroHero() {
         super(Constants.KYRO_HERO, "Mark a strategy card as the target of Speygh, the Kyro Hero.", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Card Number").setRequired(true));
-        // addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALL_ASYNC_TILES, "True to include all async blue back tiles in this list (not just PoK + DS). Default: false)"));
+        // addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALL_ASYNC_TILES, "True to include all async
+        // blue back tiles in this list (not just PoK + DS). Default: false)"));
     }
 
     @Override
@@ -27,8 +28,11 @@ class KyroHero extends GameStateSubcommand {
         int dieResult = event.getOption(Constants.SC, 1, OptionMapping::getAsInt);
         game.setStoredValue("kyroHeroSC", dieResult + "");
         game.setStoredValue("kyroHeroPlayer", player.getFaction());
-        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getSCName(dieResult, game) + " has been marked with Speygh, the Kyro hero, and the faction that played the hero as " + player.getFaction() + ".");
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                Helper.getSCName(dieResult, game)
+                        + " has been marked with Speygh, the Kyro hero, and the faction that played the hero as "
+                        + player.getFaction() + ".");
         ListTurnOrderService.turnOrder(event, game);
     }
-
 }

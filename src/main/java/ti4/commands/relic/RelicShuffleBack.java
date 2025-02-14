@@ -13,8 +13,12 @@ class RelicShuffleBack extends GameStateSubcommand {
 
     public RelicShuffleBack() {
         super(Constants.SHUFFLE_BACK, "Shuffle relic back into deck from player area", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to shuffle back into deck from player area").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.RELIC, "Relic to shuffle back into deck from player area")
+                        .setAutoComplete(true)
+                        .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override

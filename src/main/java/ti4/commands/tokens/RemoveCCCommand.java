@@ -1,7 +1,6 @@
 package ti4.commands.tokens;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -19,11 +18,10 @@ public class RemoveCCCommand extends AddRemoveTokenCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
-                .setAutoComplete(true));
+                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
@@ -32,11 +30,13 @@ public class RemoveCCCommand extends AddRemoveTokenCommand {
             String ccID = Mapper.getCCID(color);
             String ccPath = tile.getCCPath(ccID);
             if (ccPath == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Command token: " + color + " is not valid and not supported.");
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), "Command token: " + color + " is not valid and not supported.");
             }
             if (game.isFowMode()) {
                 String colorMention = ColorEmojis.getColorEmojiWithName(color);
-                FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a command token in the system.");
+                FoWHelper.pingSystem(
+                        game, event, tile.getPosition(), colorMention + " has removed a command token in the system.");
             }
 
             tile.removeCC(ccID);

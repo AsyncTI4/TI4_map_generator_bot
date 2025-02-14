@@ -21,8 +21,10 @@ public class Leave extends GameStateSubcommand {
         Game game = getGame();
         User user = event.getUser();
         if (game.getPlayer(user.getId()).isRealPlayer()) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "You are a real player, and thus should not do `/game leave`."
-                + " You should do `/game eliminate`, or `/game replace`, depending on what you are looking for.");
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "You are a real player, and thus should not do `/game leave`."
+                            + " You should do `/game eliminate`, or `/game replace`, depending on what you are looking for.");
             return;
         }
         game.removePlayer(user.getId());

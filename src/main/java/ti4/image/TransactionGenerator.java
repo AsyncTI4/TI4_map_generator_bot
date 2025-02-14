@@ -2,9 +2,8 @@ package ti4.image;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.function.Function;
 import java.util.List;
-
+import java.util.function.Function;
 import ti4.ResourceHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
@@ -37,14 +36,16 @@ public class TransactionGenerator {
         int pnWidth = (int) (width * widthRatio);
         // Add player 1's color
         String pn1 = "pa_pn_color_" + Mapper.getColorID(p1.getColor()) + ".png";
-        BufferedImage color1 = ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn1), pnHeight, pnWidth);
+        BufferedImage color1 =
+                ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn1), pnHeight, pnWidth);
         g2.rotate(Math.toRadians(-90));
         g2.drawImage(color1, -1 * pnHeight, 0, null);
         g2.rotate(Math.toRadians(90));
 
         // Add player 2's color
         String pn2 = "pa_pn_color_" + Mapper.getColorID(p2.getColor()) + ".png";
-        BufferedImage color2 = ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn2), pnHeight, pnWidth);
+        BufferedImage color2 =
+                ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn2), pnHeight, pnWidth);
         g2.rotate(Math.toRadians(90));
         g2.drawImage(color2, height - pnHeight, -1 * width, null);
         g2.rotate(Math.toRadians(-90));
@@ -82,14 +83,18 @@ public class TransactionGenerator {
         // ACs
         if (p1.hasAbility("arbiters") || p2.hasAbility("arbiters")) {
             x += emojiSize + 5;
-            drawEmojiWithCenteredInt(g2, CardEmojis.ActionCard, p1.getActionCards().size(), x, y);
-            drawEmojiWithCenteredInt(g2, CardEmojis.ActionCard, p2.getActionCards().size(), width - x - emojiSize, y);
+            drawEmojiWithCenteredInt(
+                    g2, CardEmojis.ActionCard, p1.getActionCards().size(), x, y);
+            drawEmojiWithCenteredInt(
+                    g2, CardEmojis.ActionCard, p2.getActionCards().size(), width - x - emojiSize, y);
         }
 
         // Second Line, Frags
         // Frags
-        Function<String, Integer> p1fragcount = str -> (int) p1.getFragments().stream().filter(f -> f.startsWith(str)).count();
-        Function<String, Integer> p2fragcount = str -> (int) p2.getFragments().stream().filter(f -> f.startsWith(str)).count();
+        Function<String, Integer> p1fragcount = str ->
+                (int) p1.getFragments().stream().filter(f -> f.startsWith(str)).count();
+        Function<String, Integer> p2fragcount = str ->
+                (int) p2.getFragments().stream().filter(f -> f.startsWith(str)).count();
         y = 105;
         x = 5;
         drawEmojiWithCenteredInt(g2, ExploreEmojis.CFrag, p1fragcount.apply("crf"), x, y);
@@ -123,8 +128,7 @@ public class TransactionGenerator {
         TI4Emoji hero = LeaderEmojis.getLeaderEmoji(p1.getFaction() + "hero");
         if (MiscEmojis.goodDogs().contains(hero))
             DrawingUtil.drawEmoji(g2, hero, 210, 294, 200); // good doggies are smaller
-        else
-            DrawingUtil.drawEmoji(g2, hero, 60, 294, 500);
+        else DrawingUtil.drawEmoji(g2, hero, 60, 294, 500);
 
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         for (Player player : List.of(p1, p2)) {
@@ -145,7 +149,9 @@ public class TransactionGenerator {
                 String thingToTransact = item.split("_")[2];
                 String furtherDetail = item.split("_")[3];
                 int amountToTransact = 1;
-                if (thingToTransact.equalsIgnoreCase("frags") || ((thingToTransact.equalsIgnoreCase("PNs") || thingToTransact.equalsIgnoreCase("ACs")) && furtherDetail.contains("generic"))) {
+                if (thingToTransact.equalsIgnoreCase("frags")
+                        || ((thingToTransact.equalsIgnoreCase("PNs") || thingToTransact.equalsIgnoreCase("ACs"))
+                                && furtherDetail.contains("generic"))) {
                     amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
                     furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
                 }
@@ -168,32 +174,27 @@ public class TransactionGenerator {
                     case "TGs" -> {
                         amountToTransact = Integer.parseInt(furtherDetail);
                         drawEmojiWithCenteredInt(g2, MiscEmojis.tg, amountToTransact, emojiX, emojiRow);
-                        if (!skipYShift)
-                            y += 55;
+                        if (!skipYShift) y += 55;
                     }
                     case "Comms" -> {
                         amountToTransact = Integer.parseInt(furtherDetail);
                         drawEmojiWithCenteredInt(g2, MiscEmojis.comm, amountToTransact, emojiX, emojiRow);
-                        if (!skipYShift)
-                            y += 55;
+                        if (!skipYShift) y += 55;
                     }
                     case "ACs" -> {
                         Integer amt = amountToTransact == 1 ? null : amountToTransact;
                         drawEmojiWithCenteredInt(g2, CardEmojis.ActionCard, amt, emojiX, emojiRow);
-                        if (!skipYShift)
-                            y += 55;
+                        if (!skipYShift) y += 55;
                     }
                     case "PNs" -> {
                         Integer amt = amountToTransact == 1 ? null : amountToTransact;
                         drawEmojiWithCenteredInt(g2, CardEmojis.PN, amt, emojiX, emojiRow);
-                        if (!skipYShift)
-                            y += 55;
+                        if (!skipYShift) y += 55;
                     }
                     case "Frags" -> {
                         Integer amt = amountToTransact == 1 ? null : amountToTransact;
                         drawEmojiWithCenteredInt(g2, ExploreEmojis.getFragEmoji(furtherDetail), amt, emojiX, emojiRow);
-                        if (!skipYShift)
-                            y += 55;
+                        if (!skipYShift) y += 55;
                     }
                     case "SendDebt" -> {
                         amountToTransact = Integer.parseInt(furtherDetail);
@@ -240,18 +241,19 @@ public class TransactionGenerator {
                 g2.setFont(Storage.getFont24());
                 y += drawStringMultiLine(g2, nothing, x, y + 40, 250, hAlign);
             }
-            if (y > img.getHeight())
-                return null; // overflowed, default back to text
+            if (y > img.getHeight()) return null; // overflowed, default back to text
         }
 
         return img;
     }
 
     private static int totalMultilineHeight(Graphics2D g2, int numLines) {
-        return g2.getFontMetrics().getAscent() + (numLines - 1) * g2.getFontMetrics().getHeight();
+        return g2.getFontMetrics().getAscent()
+                + (numLines - 1) * g2.getFontMetrics().getHeight();
     }
 
-    private static void drawStringMultilineVertCenter(Graphics2D g2, String text, int x, int centerY, int width, HorizontalAlign hAlign) {
+    private static void drawStringMultilineVertCenter(
+            Graphics2D g2, String text, int x, int centerY, int width, HorizontalAlign hAlign) {
         int lineHeight = g2.getFontMetrics().getHeight();
         List<String> toDraw = DrawingUtil.layoutText(g2, text, width);
         int height = totalMultilineHeight(g2, toDraw.size());
@@ -262,7 +264,8 @@ public class TransactionGenerator {
         }
     }
 
-    private static int drawStringMultiLine(Graphics2D g2, String text, int x, int y, int width, HorizontalAlign hAlign) {
+    private static int drawStringMultiLine(
+            Graphics2D g2, String text, int x, int y, int width, HorizontalAlign hAlign) {
         int lineHeight = g2.getFontMetrics().getHeight();
         List<String> toDraw = DrawingUtil.layoutText(g2, text, width);
         int deltaY = 0;
@@ -281,8 +284,16 @@ public class TransactionGenerator {
         Font before = g2.getFont();
         g2.setFont(Storage.getFont32());
         if (amount != null)
-            DrawingUtil.superDrawString(g2, "" + amount, x + 25, y + 25, Color.white, HorizontalAlign.Center, VerticalAlign.Center, stroke5, Color.black);
+            DrawingUtil.superDrawString(
+                    g2,
+                    "" + amount,
+                    x + 25,
+                    y + 25,
+                    Color.white,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Center,
+                    stroke5,
+                    Color.black);
         g2.setFont(before);
     }
-
 }

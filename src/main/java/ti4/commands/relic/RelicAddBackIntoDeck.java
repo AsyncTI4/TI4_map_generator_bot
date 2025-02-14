@@ -1,7 +1,6 @@
 package ti4.commands.relic;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -14,7 +13,9 @@ class RelicAddBackIntoDeck extends GameStateSubcommand {
 
     public RelicAddBackIntoDeck() {
         super(Constants.ADD_BACK_INTO_DECK, "Add relic back into deck if already purged", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to add back into deck").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to add back into deck")
+                .setAutoComplete(true)
+                .setRequired(true));
     }
 
     @Override

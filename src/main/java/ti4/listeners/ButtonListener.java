@@ -1,8 +1,7 @@
 package ti4.listeners;
 
-import javax.annotation.Nonnull;
 import java.util.List;
-
+import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
@@ -14,16 +13,17 @@ public class ButtonListener extends ListenerAdapter {
     private static ButtonListener instance;
 
     public static ButtonListener getInstance() {
-        if (instance == null)
-            instance = new ButtonListener();
+        if (instance == null) instance = new ButtonListener();
         return instance;
     }
 
     @Override
     public void onButtonInteraction(@Nonnull ButtonInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
-            event.reply("You pressed: " + ButtonHelper.getButtonRepresentation(event.getButton()) + "\nPlease try again in a few minutes. The bot is rebooting.")
-                .setEphemeral(true).queue();
+            event.reply("You pressed: " + ButtonHelper.getButtonRepresentation(event.getButton())
+                            + "\nPlease try again in a few minutes. The bot is rebooting.")
+                    .setEphemeral(true)
+                    .queue();
             return;
         }
 
@@ -44,8 +44,8 @@ public class ButtonListener extends ListenerAdapter {
     /**
      * @return whether a button should show the bot is thinking - need to add the following at end of execution:
      * `    if (event instanceof ButtonInteractionEvent buttonEvent) {
-                buttonEvent.getHook().deleteOriginal().queue();
-            }`
+     * buttonEvent.getHook().deleteOriginal().queue();
+     * }`
      */
     private static boolean shouldShowBotIsThinking(ButtonInteractionEvent event) {
         return buttonsToThinkAbout.contains(event.getButton().getId());

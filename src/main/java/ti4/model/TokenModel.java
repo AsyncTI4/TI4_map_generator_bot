@@ -1,7 +1,6 @@
 package ti4.model;
 
 import java.util.List;
-
 import lombok.Data;
 import ti4.model.Source.ComponentSource;
 import ti4.model.WormholeModel.Wormhole;
@@ -22,8 +21,7 @@ public class TokenModel implements ModelInterface {
 
     @Override
     public boolean isValid() {
-        return id != null
-            && imagePath != null;
+        return id != null && imagePath != null;
     }
 
     @Override

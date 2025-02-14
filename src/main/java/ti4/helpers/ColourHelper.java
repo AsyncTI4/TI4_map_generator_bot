@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 import ti4.model.ColorModel;
 
 public class ColourHelper {
@@ -24,7 +23,7 @@ public class ColourHelper {
         newcolours.sort((c1, c2) -> colourValue(factionId, c2) - colourValue(factionId, c1));
         return newcolours;
     }
-    
+
     private static int colourValue(String factionId, ColorModel colour) {
         return colourValue(factionId, colour.getAlias());
     }

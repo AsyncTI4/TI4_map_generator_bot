@@ -3,7 +3,6 @@ package ti4.commands.map;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -18,7 +17,12 @@ public class AddBorderAnomaly extends GameStateSubcommand {
     public AddBorderAnomaly() {
         super(Constants.ADD_BORDER_ANOMALY, "Add a border anomaly to a tile", true, false);
         addOption(OptionType.STRING, Constants.PRIMARY_TILE, "Tile the border will be linked to", true, true);
-        addOption(OptionType.STRING, Constants.PRIMARY_TILE_DIRECTION, "Side of the tile the anomaly will be on", true, true);
+        addOption(
+                OptionType.STRING,
+                Constants.PRIMARY_TILE_DIRECTION,
+                "Side of the tile the anomaly will be on",
+                true,
+                true);
         addOption(OptionType.STRING, Constants.BORDER_TYPE, "Type of anomaly", true, true);
     }
 

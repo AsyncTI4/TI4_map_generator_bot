@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -32,12 +31,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && validateCategory()
-            && type != null
-            && text1 != null
-            && source != null;
+        return alias != null && name != null && validateCategory() && type != null && text1 != null && source != null;
     }
 
     private boolean validateCategory() {
@@ -46,7 +40,8 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
                 return Mapper.isValidFaction(getCategoryDescription());
             }
             case "event" -> {
-                return Stream.of("immediate", "permanent", "temporary").anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
+                return Stream.of("immediate", "permanent", "temporary")
+                        .anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
             }
             default -> {
                 return true;
@@ -174,7 +169,9 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

@@ -21,9 +21,21 @@ class SendTG extends GameStateSubcommand {
     public SendTG() {
         super(Constants.SEND_TG, "Sent trade goods to player/faction", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color receiving the trade goods").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.CLEAR_DEBT, "True to automatically clear any debt with receiving player"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color sending the trade goods (defaults to you)").setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.TARGET_FACTION_OR_COLOR,
+                        "Faction or Color receiving the trade goods")
+                .setAutoComplete(true)
+                .setRequired(true));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.CLEAR_DEBT,
+                "True to automatically clear any debt with receiving player"));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.FACTION_COLOR,
+                        "Faction or Color sending the trade goods (defaults to you)")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -56,7 +68,10 @@ class SendTG extends GameStateSubcommand {
 
         if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
             targetPlayer.clearDebt(player, sendTG);
-            MessageHelper.sendMessageToEventChannel(event, targetPlayer.getRepresentation() + " cleared " + sendTG + " debt tokens owned by " + player.getRepresentation());
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    targetPlayer.getRepresentation() + " cleared " + sendTG + " debt tokens owned by "
+                            + player.getRepresentation());
         }
 
         if (game.isFowMode()) {

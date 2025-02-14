@@ -3,7 +3,6 @@ package ti4.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -29,9 +28,7 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean isValid() {
-        return id != null
-            && imagePath != null
-            && source != null;
+        return id != null && imagePath != null && source != null;
     }
 
     @Override
@@ -63,7 +60,7 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
         sb.append(getId());
-        if (name != null) sb.append (" ").append(getName());
+        if (name != null) sb.append(" ").append(getName());
         if (resourcesModifier != 0) sb.append(" R").append(resourcesModifier);
         if (influenceModifier != 0) sb.append(" I").append(influenceModifier);
 
@@ -80,7 +77,6 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
         sb.append("__").append(getName()).append("__");
         eb.setTitle(sb.toString());
 
-
         sb = new StringBuilder();
         eb.setDescription(sb.toString());
 
@@ -95,10 +91,9 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return getName().contains(searchString)
-            || getId().contains(searchString)
-            || (isLegendary() && "legendary".contains(searchString))
-            || getSource().toString().contains(searchString)
-            || getAutoCompleteName().contains(searchString);
-
+                || getId().contains(searchString)
+                || (isLegendary() && "legendary".contains(searchString))
+                || getSource().toString().contains(searchString)
+                || getAutoCompleteName().contains(searchString);
     }
 }

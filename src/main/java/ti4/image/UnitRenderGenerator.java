@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import ti4.ResourceHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CalendarHelper;
@@ -19,7 +18,6 @@ import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.MapGenerator;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -31,37 +29,30 @@ public class UnitRenderGenerator {
 
     private final ResourceHelper resourceHelper = ResourceHelper.getInstance();
 
-    private record ImagePosition(
-        int originalX,
-        int originalY,
-        int x,
-        int y) {
-    }
+    private record ImagePosition(int originalX, int originalY, int x, int y) {}
 
     private record SystemContext(
-        boolean isSpace,
-        boolean isMirage,
-        boolean hasMirage,
-        boolean isJail,
-        boolean showJail,
-        Point unitOffset,
-        float mirageDragRatio,
-        int mirageDragX,
-        int mirageDragY,
-        int spaceUnitXOffset,
-        int spaceUnitYOffset,
-        UnitTokenPosition unitTokenPosition) {
-    }
+            boolean isSpace,
+            boolean isMirage,
+            boolean hasMirage,
+            boolean isJail,
+            boolean showJail,
+            Point unitOffset,
+            float mirageDragRatio,
+            int mirageDragX,
+            int mirageDragY,
+            int spaceUnitXOffset,
+            int spaceUnitYOffset,
+            UnitTokenPosition unitTokenPosition) {}
 
     private record PositioningContext(
-        Point centerPosition,
-        String holderName,
-        String tileID,
-        String unitId,
-        BufferedImage unitImage,
-        int planetHolderSize,
-        boolean fighterOrInfantry) {
-    }
+            Point centerPosition,
+            String holderName,
+            String tileID,
+            String unitId,
+            BufferedImage unitImage,
+            int planetHolderSize,
+            boolean fighterOrInfantry) {}
 
     private final Game game;
     private final Tile tile;
@@ -78,7 +69,17 @@ public class UnitRenderGenerator {
 
     SystemContext ctx;
 
-    public UnitRenderGenerator(Game game, DisplayType displayType, Tile tile, Graphics tileGraphics, List<Rectangle> rectangles, int degree, int degreeChange, UnitHolder unitHolder, int radius, Player frogPlayer) {
+    public UnitRenderGenerator(
+            Game game,
+            DisplayType displayType,
+            Tile tile,
+            Graphics tileGraphics,
+            List<Rectangle> rectangles,
+            int degree,
+            int degreeChange,
+            UnitHolder unitHolder,
+            int radius,
+            Player frogPlayer) {
         this.game = game;
         this.tile = tile;
         this.displayType = displayType;
@@ -139,25 +140,30 @@ public class UnitRenderGenerator {
             // Contains pre-computed values common to this 'unit class'
             // (e.g. all fighters, all infantry, all mechs, etc.)
             PositioningContext posCtx = new PositioningContext(
-                unitHolder.getHolderCenterPosition(),
-                unitHolder.getName(),
-                tile.getTileID(),
-                unitKey.asyncID(),
-                unitImage,
-                tile.getPlanetUnitHolders().size(),
-                Set.of(UnitType.Infantry, UnitType.Fighter).contains(unitKey.getUnitType()));
-            
+                    unitHolder.getHolderCenterPosition(),
+                    unitHolder.getName(),
+                    tile.getTileID(),
+                    unitKey.asyncID(),
+                    unitImage,
+                    tile.getPlanetUnitHolders().size(),
+                    Set.of(UnitType.Infantry, UnitType.Fighter).contains(unitKey.getUnitType()));
+
             // DRAW UNITS
             for (int i = 0; i < unitCount; i++) {
                 Point position = calculateUnitPosition(posCtx, unitKey, i + unitTypeCounts.get(unitKey.getUnitType()));
                 ImagePosition imagePos = calculateImagePosition(posCtx, position);
                 int imageX = imagePos.x();
                 int imageY = imagePos.y();
-                
-                if (containsDMZ || (isSpace && unitModel.getIsPlanetOnly()) || (!isSpace && unitModel.getIsSpaceOnly())) {
-                    String badPath = resourceHelper.getPositionFile("badpos_" + (bulkUnitCount != null ? "tkn_" : "") + unitKey.asyncID() + ".png");
-                    BufferedImage badPositionImage = scale == 1.0f ? ImageHelper.read(badPath) : ImageHelper.readScaled(badPath, scale);;
-                    tileGraphics.drawImage(badPositionImage, imageX-5, imageY-5, null);
+
+                if (containsDMZ
+                        || (isSpace && unitModel.getIsPlanetOnly())
+                        || (!isSpace && unitModel.getIsSpaceOnly())) {
+                    String badPath = resourceHelper.getPositionFile(
+                            "badpos_" + (bulkUnitCount != null ? "tkn_" : "") + unitKey.asyncID() + ".png");
+                    BufferedImage badPositionImage =
+                            scale == 1.0f ? ImageHelper.read(badPath) : ImageHelper.readScaled(badPath, scale);
+                    ;
+                    tileGraphics.drawImage(badPositionImage, imageX - 5, imageY - 5, null);
                 }
 
                 tileGraphics.drawImage(unitImage, imageX, imageY, null);
@@ -166,12 +172,12 @@ public class UnitRenderGenerator {
                     tileGraphics.drawImage(decal, imagePos.x(), imagePos.y(), null);
                 }
 
-                if ("81".equals(tile.getTileID()) && "muaat".equals(player.getFaction()) && unitKey.getUnitType() == UnitType.Warsun)
-                {
+                if ("81".equals(tile.getTileID())
+                        && "muaat".equals(player.getFaction())
+                        && unitKey.getUnitType() == UnitType.Warsun) {
                     BufferedImage faceNovaSeed = ImageHelper.read(resourceHelper.getDecalFile("NovaSeed.png"));
                     tileGraphics.drawImage(faceNovaSeed, imagePos.x(), imagePos.y(), null);
-                }
-                else if (spoopy != null) {
+                } else if (spoopy != null) {
                     tileGraphics.drawImage(spoopy, imagePos.x(), imagePos.y(), null);
                 }
 
@@ -188,15 +194,22 @@ public class UnitRenderGenerator {
                 drawUnitTags(unitKey, player, imagePos, i);
 
                 if (bulkUnitCount != null) {
-                    Color groupUnitColor = switch (Mapper.getColor(unitKey.getColorID()).getTextColor()) {
-                        case "black" -> Color.BLACK;
-                        default -> Color.WHITE;
-                    };
-                    Color groupUnitStroke = switch (Mapper.getColor(unitKey.getColorID()).getTextColor()) {
-                        case "black" -> Color.WHITE;
-                        default -> Color.BLACK;
-                    };
-                    drawBulkUnitCount(tileGraphics, bulkUnitCount, groupUnitColor, groupUnitStroke, imagePos); // TODO: can only show two player's Fighter/Infantry
+                    Color groupUnitColor =
+                            switch (Mapper.getColor(unitKey.getColorID()).getTextColor()) {
+                                case "black" -> Color.BLACK;
+                                default -> Color.WHITE;
+                            };
+                    Color groupUnitStroke =
+                            switch (Mapper.getColor(unitKey.getColorID()).getTextColor()) {
+                                case "black" -> Color.WHITE;
+                                default -> Color.BLACK;
+                            };
+                    drawBulkUnitCount(
+                            tileGraphics,
+                            bulkUnitCount,
+                            groupUnitColor,
+                            groupUnitStroke,
+                            imagePos); // TODO: can only show two player's Fighter/Infantry
                 }
 
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
@@ -215,14 +228,13 @@ public class UnitRenderGenerator {
     }
 
     private boolean isMechWithArticlesOfWar(UnitKey unitKey) {
-        return unitKey.getUnitType() == UnitType.Mech &&
-            (ButtonHelper.isLawInPlay(game, "articles_war") ||
-                ButtonHelper.isLawInPlay(game, "absol_articleswar"));
+        return unitKey.getUnitType() == UnitType.Mech
+                && (ButtonHelper.isLawInPlay(game, "articles_war")
+                        || ButtonHelper.isLawInPlay(game, "absol_articleswar"));
     }
 
     private boolean isWarsunWithSchematics(UnitKey unitKey) {
-        return unitKey.getUnitType() == UnitType.Warsun &&
-            ButtonHelper.isLawInPlay(game, "schematics");
+        return unitKey.getUnitType() == UnitType.Warsun && ButtonHelper.isLawInPlay(game, "schematics");
     }
 
     private void drawMechTearDecal(UnitKey unitKey, int imageX, int imageY) {
@@ -232,7 +244,8 @@ public class UnitRenderGenerator {
     }
 
     private void drawWarsunCrackDecal(UnitKey unitKey, int imageX, int imageY) {
-        String imagePath = "agenda_publicize_weapon_schematics" + DrawingUtil.getBlackWhiteFileSuffix(unitKey.getColorID());
+        String imagePath =
+                "agenda_publicize_weapon_schematics" + DrawingUtil.getBlackWhiteFileSuffix(unitKey.getColorID());
         BufferedImage wsCrackImage = ImageHelper.read(resourceHelper.getTokenFile(imagePath));
         tileGraphics.drawImage(wsCrackImage, imageX, imageY, null);
     }
@@ -273,25 +286,25 @@ public class UnitRenderGenerator {
         if (isSpace) {
             Set<String> tokenList = unitHolder.getTokenList();
             hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage"))
-                && (tile.getPlanetUnitHolders().size() != 3 + 1);
+                    && (tile.getPlanetUnitHolders().size() != 3 + 1);
         }
 
         Map<String, String> jailTiles = Map.of(
-            "s11", "cabal",
-            "s12", "nekro",
-            "s13", "yssaril");
+                "s11", "cabal",
+                "s12", "nekro",
+                "s13", "yssaril");
 
         String jailFaction = jailTiles.get(tile.getTileID());
         boolean isJail = jailTiles.get(tile.getTileID()) != null;
-        boolean showJail = frogPlayer == null ||
-            (isJail && FoWHelper.canSeeStatsOfFaction(game, jailFaction, frogPlayer));
+        boolean showJail =
+                frogPlayer == null || (isJail && FoWHelper.canSeeStatsOfFaction(game, jailFaction, frogPlayer));
 
         float mirageDragRatio = 2.0f / 3;
         int mirageDragX = Math.round(((float) 345 / 8 + TILE_PADDING) * (1 - mirageDragRatio));
         int mirageDragY = Math.round(((float) (3 * 300) / 4 + TILE_PADDING) * (1 - mirageDragRatio));
 
-        Point unitOffset = game.isAllianceMode() ? PositionMapper.getAllianceUnitOffset()
-            : PositionMapper.getUnitOffset();
+        Point unitOffset =
+                game.isAllianceMode() ? PositionMapper.getAllianceUnitOffset() : PositionMapper.getUnitOffset();
 
         int spaceUnitXOffset = unitOffset != null ? unitOffset.x : 10;
         int spaceUnitYOffset = unitOffset != null ? unitOffset.y : -7;
@@ -302,18 +315,18 @@ public class UnitRenderGenerator {
         }
 
         return new SystemContext(
-            isSpace,
-            isMirage,
-            hasMirage,
-            isJail,
-            showJail,
-            unitOffset,
-            mirageDragRatio,
-            mirageDragX,
-            mirageDragY,
-            spaceUnitXOffset,
-            spaceUnitYOffset,
-            unitTokenPosition);
+                isSpace,
+                isMirage,
+                hasMirage,
+                isJail,
+                showJail,
+                unitOffset,
+                mirageDragRatio,
+                mirageDragX,
+                mirageDragY,
+                spaceUnitXOffset,
+                spaceUnitYOffset,
+                unitTokenPosition);
     }
 
     private void drawBulkUnitCount(Graphics g, int count, Color color, Color stroke, ImagePosition imagePos) {
@@ -321,12 +334,20 @@ public class UnitRenderGenerator {
         int offsetX = numberPositionPoint.x + (count > 9 ? 5 : 0);
         int offsetY = numberPositionPoint.y + (count > 9 ? 5 : 0);
         BasicStroke strokeWidth = new BasicStroke(4.0f);
-        DrawingUtil.superDrawString((Graphics2D) g, count == 1 ? " 1" : Integer.toString(count), imagePos.x() + offsetX, imagePos.y() + offsetY, color,
-            MapGenerator.HorizontalAlign.Left, MapGenerator.VerticalAlign.Bottom, strokeWidth, stroke);
+        DrawingUtil.superDrawString(
+                (Graphics2D) g,
+                count == 1 ? " 1" : Integer.toString(count),
+                imagePos.x() + offsetX,
+                imagePos.y() + offsetY,
+                color,
+                MapGenerator.HorizontalAlign.Left,
+                MapGenerator.VerticalAlign.Bottom,
+                strokeWidth,
+                stroke);
     }
 
-    private void drawDamageIcon(Point unitPos, ImagePosition imagePos, BufferedImage unitImage,
-        BufferedImage dmgImage, UnitType unitType) {
+    private void drawDamageIcon(
+            Point unitPos, ImagePosition imagePos, BufferedImage unitImage, BufferedImage dmgImage, UnitType unitType) {
         int imageX = imagePos.x();
         int imageY = imagePos.y();
 
@@ -358,16 +379,18 @@ public class UnitRenderGenerator {
         return position != null ? position.y : imagePosition.originalY() - dmgImage.getHeight();
     }
 
-    private int getCenteredDamageX(Point position, ImagePosition imagePosition, BufferedImage unitImage, BufferedImage dmgImage) {
+    private int getCenteredDamageX(
+            Point position, ImagePosition imagePosition, BufferedImage unitImage, BufferedImage dmgImage) {
         return position != null
-            ? position.x + (unitImage.getWidth() / 2) - (dmgImage.getWidth() / 2)
-            : imagePosition.originalX() - (dmgImage.getWidth() / 2);
+                ? position.x + (unitImage.getWidth() / 2) - (dmgImage.getWidth() / 2)
+                : imagePosition.originalX() - (dmgImage.getWidth() / 2);
     }
 
-    private int getCenteredDamageY(Point position, ImagePosition imagePosition, BufferedImage unitImage, BufferedImage dmgImage) {
+    private int getCenteredDamageY(
+            Point position, ImagePosition imagePosition, BufferedImage unitImage, BufferedImage dmgImage) {
         return position != null
-            ? position.y + (unitImage.getHeight() / 2) - (dmgImage.getHeight() / 2)
-            : imagePosition.originalY() - (dmgImage.getHeight() / 2);
+                ? position.y + (unitImage.getHeight() / 2) - (dmgImage.getHeight() / 2)
+                : imagePosition.originalY() - (dmgImage.getHeight() / 2);
     }
 
     private boolean shouldSkipInvalidUnit(UnitKey unitKey) {
@@ -390,8 +413,7 @@ public class UnitRenderGenerator {
         unitPath = switch (unitKey.getUnitType()) {
             case Fighter -> unitPath.replace(Constants.COLOR_FF, Constants.BULK_FF);
             case Infantry -> unitPath.replace(Constants.COLOR_GF, Constants.BULK_GF);
-            default -> unitPath;
-        };
+            default -> unitPath;};
 
         Player player = game.getPlayerByColorID(unitKey.getColorID()).orElse(null);
         if (player == null) return unitPath;
@@ -405,8 +427,8 @@ public class UnitRenderGenerator {
         return switch (unitKey.getUnitType()) {
             case Lady -> unitPath.replace("lady", "fs");
             case Cavalry -> {
-                boolean hasM2Tech = game.getPNOwner("cavalry") != null &&
-                    game.getPNOwner("cavalry").hasTech("m2");
+                boolean hasM2Tech = game.getPNOwner("cavalry") != null
+                        && game.getPNOwner("cavalry").hasTech("m2");
                 String version = hasM2Tech ? "Memoria_2.png" : "Memoria_1.png";
                 yield resourceHelper.getUnitFile(version);
             }
@@ -473,10 +495,7 @@ public class UnitRenderGenerator {
         return sortedUnits;
     }
 
-    private Point calculateUnitPosition(
-        PositioningContext posCtx,
-        UnitKey unitKey,
-        int count) {
+    private Point calculateUnitPosition(PositioningContext posCtx, UnitKey unitKey, int count) {
         Point predefinedPosition = getTokenPosition(unitKey, posCtx);
 
         // Handle space units (non-fighter/infantry units in space with predefined positions)
@@ -497,8 +516,7 @@ public class UnitRenderGenerator {
         Point centerPosition = unitHolder.getHolderCenterPosition();
         int unitWidth = posCtx.unitImage.getWidth();
         int unitHeight = posCtx.unitImage.getHeight();
-        rectangles.add(
-            new Rectangle(
+        rectangles.add(new Rectangle(
                 centerPosition.x + position.x - (unitWidth / 2),
                 centerPosition.y + position.y - (unitHeight / 2),
                 unitWidth,
@@ -513,11 +531,7 @@ public class UnitRenderGenerator {
     }
 
     private Point calculateSpiralPosition(
-        PositioningContext posCtx,
-        int radius,
-        int degree,
-        int degreeChange,
-        List<Rectangle> rectangles) {
+            PositioningContext posCtx, int radius, int degree, int degreeChange, List<Rectangle> rectangles) {
         Point centerPosition = posCtx.centerPosition;
         int unitWidth = posCtx.unitImage.getWidth();
         int unitHeight = posCtx.unitImage.getHeight();
@@ -531,8 +545,8 @@ public class UnitRenderGenerator {
             int y = (int) (radius * Math.cos(degree));
             int candidateX = centerPosition.x + x - (unitWidth / 2);
             int candidateY = centerPosition.y + y - (unitHeight / 2);
-            if (rectangles.stream().noneMatch(rectangle -> rectangle.intersects(candidateX, candidateY,
-                unitWidth, unitHeight))) {
+            if (rectangles.stream()
+                    .noneMatch(rectangle -> rectangle.intersects(candidateX, candidateY, unitWidth, unitHeight))) {
                 searchPosition = false;
             } else if (degree > 360) {
                 searchPosition = false;
@@ -546,8 +560,7 @@ public class UnitRenderGenerator {
             }
         }
 
-        rectangles.add(
-            new Rectangle(foundX, foundY, unitWidth, unitHeight));
+        rectangles.add(new Rectangle(foundX, foundY, unitWidth, unitHeight));
 
         return new Point(foundX, foundY);
     }
@@ -575,8 +588,9 @@ public class UnitRenderGenerator {
             imageY += (posCtx.unitImage.getHeight() / 2);
 
             // Apply mirage drag transformation
-            imageX = Math.round(ctx.mirageDragRatio * imageX) + ctx.mirageDragX() +
-                (posCtx.fighterOrInfantry() ? 60 : 0);
+            imageX = Math.round(ctx.mirageDragRatio * imageX)
+                    + ctx.mirageDragX()
+                    + (posCtx.fighterOrInfantry() ? 60 : 0);
             imageY = Math.round(ctx.mirageDragRatio * imageY) + ctx.mirageDragY();
 
             // Adjust back from center

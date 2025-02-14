@@ -2,7 +2,6 @@ package ti4.buttons.handlers;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -21,7 +20,9 @@ class PingIntervalButtonHandler {
     public static void offerPersonalPingOptions(GenericInteractionCreateEvent event) {
         List<Button> buttons = getPersonalAutoPingButtons();
         UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
-        String message = event.getUser().getAsMention() + " please select the number of hours you would like the bot to wait before it pings you that it is your turn.\n**This will apply to all your games**.\n> Your current interval is `" + userSettings.getPersonalPingInterval() + "`";
+        String message = event.getUser().getAsMention()
+                + " please select the number of hours you would like the bot to wait before it pings you that it is your turn.\n**This will apply to all your games**.\n> Your current interval is `"
+                + userSettings.getPersonalPingInterval() + "`";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 

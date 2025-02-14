@@ -2,7 +2,6 @@ package ti4.settings.users;
 
 import java.io.File;
 import java.io.IOException;
-
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Storage;
 import ti4.json.PersistenceManager;
@@ -36,7 +35,8 @@ public class UserSettingsManager {
 
     private static void persistFile(UserSettings userSettings) {
         try {
-            PersistenceManager.writeObjectToJsonFile(USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
+            PersistenceManager.writeObjectToJsonFile(
+                    USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
         } catch (Exception e) {
             BotLogger.log("Failed to write json data for UserSettingsManager.", e);
         }

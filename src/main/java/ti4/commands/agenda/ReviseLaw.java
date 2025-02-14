@@ -16,9 +16,15 @@ class ReviseLaw extends GameStateSubcommand {
 
     public ReviseLaw() {
         super(Constants.REVISE_LAW, "Revise a law", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected non-player game object (e.g. secret objective, planet, etc.)"));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Elected Faction").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(
+                OptionType.STRING,
+                Constants.ELECTED,
+                "Elected non-player game object (e.g. secret objective, planet, etc.)"));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Elected Faction")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -33,7 +39,8 @@ class ReviseLaw extends GameStateSubcommand {
         Player player = CommandHelper.getOtherPlayerFromEvent(game, event);
 
         String optionText;
-        boolean playerWasElected = !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
+        boolean playerWasElected =
+                !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
         String message = "Law revised";
         if (playerWasElected && player != null) {
             optionText = player.getFaction();

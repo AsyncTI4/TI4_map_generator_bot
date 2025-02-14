@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -27,12 +26,12 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean isValid() {
         return id != null
-            && name != null
-            && type != null
-            && resolution != null
-            && List.of("Fragment", "Attach", "Instant", "Token", "Leader").contains(resolution)
-            && text != null
-            && source != null;
+                && name != null
+                && type != null
+                && resolution != null
+                && List.of("Fragment", "Attach", "Instant", "Token", "Leader").contains(resolution)
+                && text != null
+                && source != null;
     }
 
     @Override
@@ -53,7 +52,15 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
      */
     @Deprecated
     public String getRepresentation() {
-        return String.format("%s;%s;%s;%s;%s;%s;%s", getName(), getType().toLowerCase(), -1, getResolution(), getText(), getAttachmentId().orElse(""), getSource());
+        return String.format(
+                "%s;%s;%s;%s;%s;%s;%s",
+                getName(),
+                getType().toLowerCase(),
+                -1,
+                getResolution(),
+                getText(),
+                getAttachmentId().orElse(""),
+                getSource());
     }
 
     public String textRepresentation() {
@@ -66,11 +73,11 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
-        return getName().toLowerCase().contains(searchString) ||
-            getText().toLowerCase().contains(searchString) ||
-            getId().toLowerCase().contains(searchString) ||
-            getType().toLowerCase().contains(searchString) ||
-            getSearchTags().contains(searchString);
+        return getName().toLowerCase().contains(searchString)
+                || getText().toLowerCase().contains(searchString)
+                || getId().toLowerCase().contains(searchString)
+                || getType().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
@@ -89,7 +96,8 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
 
         if (includeID) {
             StringBuilder sb = new StringBuilder();
-            if (getAttachmentId().isPresent()) sb.append("Attachment: ").append(getAttachmentId().get()).append("\n");
+            if (getAttachmentId().isPresent())
+                sb.append("Attachment: ").append(getAttachmentId().get()).append("\n");
             sb.append("ID: ").append(getId()).append("  Source: ").append(getSource());
             eb.setFooter(sb.toString());
         }

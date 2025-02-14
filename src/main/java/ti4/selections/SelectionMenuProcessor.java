@@ -2,7 +2,6 @@ package ti4.selections;
 
 import java.util.Map;
 import java.util.function.Consumer;
-
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.executors.ExecutorManager;
@@ -15,11 +14,13 @@ import ti4.service.game.GameNameService;
 
 public class SelectionMenuProcessor {
 
-    private static final Map<String, Consumer<SelectionMenuContext>> knownMenus = AnnotationHandler.findKnownHandlers(SelectionMenuContext.class, SelectionHandler.class);
+    private static final Map<String, Consumer<SelectionMenuContext>> knownMenus =
+            AnnotationHandler.findKnownHandlers(SelectionMenuContext.class, SelectionHandler.class);
 
     public static void queue(StringSelectInteractionEvent event) {
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorManager.runAsync("SelectionMenuProcessor task", gameName, event.getMessageChannel(), () -> process(event));
+        ExecutorManager.runAsync(
+                "SelectionMenuProcessor task", gameName, event.getMessageChannel(), () -> process(event));
     }
 
     private static void process(StringSelectInteractionEvent event) {
@@ -30,7 +31,8 @@ public class SelectionMenuProcessor {
                 context.save();
             }
         } catch (Exception e) {
-            String message = "Selection Menu issue in event: " + event.getComponentId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
+            String message = "Selection Menu issue in event: " + event.getComponentId() + "\n> Channel: "
+                    + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
             BotLogger.log(message, e);
         }
     }
@@ -92,9 +94,8 @@ public class SelectionMenuProcessor {
     }
 
     public static String getSelectionMenuDebugText(StringSelectInteractionEvent event) {
-        return "You selected:\n```\n" +
-            "MenuID: " + event.getComponentId() + "\n" +
-            "Values: " + event.getValues() + "\n" +
-            "\n```";
+        return "You selected:\n```\n" + "MenuID: "
+                + event.getComponentId() + "\n" + "Values: "
+                + event.getValues() + "\n" + "\n```";
     }
 }

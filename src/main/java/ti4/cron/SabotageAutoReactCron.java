@@ -1,9 +1,10 @@
 package ti4.cron;
 
+import static java.util.function.Predicate.not;
+
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -15,8 +16,6 @@ import ti4.message.GameMessageType;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
 
-import static java.util.function.Predicate.not;
-
 @UtilityClass
 public class SabotageAutoReactCron {
 
@@ -24,14 +23,19 @@ public class SabotageAutoReactCron {
     private static final int RUNS_PER_HOUR = 60 / SCHEDULED_PERIOD_MINUTES;
 
     public static void register() {
-        CronManager.schedulePeriodically(SabotageAutoReactCron.class, SabotageAutoReactCron::autoReact, 5, SCHEDULED_PERIOD_MINUTES, TimeUnit.MINUTES);
+        CronManager.schedulePeriodically(
+                SabotageAutoReactCron.class,
+                SabotageAutoReactCron::autoReact,
+                5,
+                SCHEDULED_PERIOD_MINUTES,
+                TimeUnit.MINUTES);
     }
 
     private static void autoReact() {
         GameManager.getManagedGames().stream()
-            .filter(not(ManagedGame::isHasEnded))
-            .map(ManagedGame::getGame)
-            .forEach(SabotageAutoReactCron::autoReact);
+                .filter(not(ManagedGame::isHasEnded))
+                .map(ManagedGame::getGame)
+                .forEach(SabotageAutoReactCron::autoReact);
     }
 
     private static void autoReact(Game game) {
@@ -43,7 +47,8 @@ public class SabotageAutoReactCron {
     }
 
     private static void automaticallyReactToSabotageWindows(Game game) {
-        List<GameMessageManager.GameMessage> acMessages = GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
+        List<GameMessageManager.GameMessage> acMessages =
+                GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
         if (acMessages.isEmpty()) {
             return;
         }

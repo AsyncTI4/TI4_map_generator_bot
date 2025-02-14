@@ -13,8 +13,14 @@ import ti4.model.ExploreModel;
 class ExploreShuffleBackIntoDeck extends GameStateSubcommand {
 
     public ExploreShuffleBackIntoDeck() {
-        super(Constants.SHUFFLE_BACK_INTO_DECK, "Shuffle an exploration card back into the deck, including purged cards", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Exploration card ID, which is found between ()").setRequired(true));
+        super(
+                Constants.SHUFFLE_BACK_INTO_DECK,
+                "Shuffle an exploration card back into the deck, including purged cards",
+                true,
+                true);
+        addOptions(new OptionData(
+                        OptionType.STRING, Constants.EXPLORE_CARD_ID, "Exploration card ID, which is found between ()")
+                .setRequired(true));
     }
 
     @Override
@@ -27,9 +33,14 @@ class ExploreShuffleBackIntoDeck extends GameStateSubcommand {
             ExploreModel explore = Mapper.getExplore(id);
             if (explore != null) {
                 game.addExplore(id);
-                sb.append("Card shuffled into exploration deck: ").append(explore.textRepresentation()).append(System.lineSeparator());
+                sb.append("Card shuffled into exploration deck: ")
+                        .append(explore.textRepresentation())
+                        .append(System.lineSeparator());
             } else {
-                sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());
+                sb.append("Card ID ")
+                        .append(id)
+                        .append(" not found, please retry")
+                        .append(System.lineSeparator());
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

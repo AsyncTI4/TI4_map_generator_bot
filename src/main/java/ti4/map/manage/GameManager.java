@@ -1,11 +1,10 @@
 package ti4.map.manage;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -13,12 +12,13 @@ import ti4.map.Player;
 @UtilityClass
 public class GameManager {
 
-    private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>(); // TODO: We can evaluate dropping the managed objects entirely
+    private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame =
+            new ConcurrentHashMap<>(); // TODO: We can evaluate dropping the managed objects entirely
     private static final ConcurrentMap<String, ManagedPlayer> playerNameToManagedPlayer = new ConcurrentHashMap<>();
 
     public static void initialize() {
         GameLoadService.loadManagedGames()
-            .forEach(managedGame -> gameNameToManagedGame.put(managedGame.getName(), managedGame));
+                .forEach(managedGame -> gameNameToManagedGame.put(managedGame.getName(), managedGame));
     }
 
     private static Game load(String gameName) {

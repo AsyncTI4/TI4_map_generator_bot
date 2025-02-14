@@ -16,8 +16,7 @@ public class ButtonContext extends ListenerContext {
     }
 
     public ButtonInteractionEvent getEvent() {
-        if (event instanceof ButtonInteractionEvent button)
-            return button;
+        if (event instanceof ButtonInteractionEvent button) return button;
         return null;
     }
 
@@ -46,14 +45,14 @@ public class ButtonContext extends ListenerContext {
 
     @Override
     public void save() {
-        boolean skip = componentID.contains("ultimateUndo") ||
-            "showGameAgain".equalsIgnoreCase(componentID) ||
-            "cardsInfo".equalsIgnoreCase(componentID) ||
-            componentID.contains("showDeck") ||
-            componentID.contains("FactionInfo") ||
-            componentID.contains("searchMyGames") ||
-            componentID.contains("decline_explore") ||
-            componentID.contains("offerDeckButtons");
+        boolean skip = componentID.contains("ultimateUndo")
+                || "showGameAgain".equalsIgnoreCase(componentID)
+                || "cardsInfo".equalsIgnoreCase(componentID)
+                || componentID.contains("showDeck")
+                || componentID.contains("FactionInfo")
+                || componentID.contains("searchMyGames")
+                || componentID.contains("decline_explore")
+                || componentID.contains("offerDeckButtons");
         if (skip) {
             return;
         }

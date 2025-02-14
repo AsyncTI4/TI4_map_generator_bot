@@ -9,21 +9,25 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
-import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 
 public class RegexHelper {
 
     public static boolean runMatcher(String regex, String buttonID, Consumer<Matcher> function) {
-        return runMatcher(regex, buttonID, function, fail -> BotLogger.log("Error matching regex: " + buttonID + "\n" + Constants.jazzPing()));
+        return runMatcher(
+                regex,
+                buttonID,
+                function,
+                fail -> BotLogger.log("Error matching regex: " + buttonID + "\n" + Constants.jazzPing()));
     }
 
-    public static boolean runMatcher(String regex, String buttonID, Consumer<Matcher> function, Consumer<Void> failure) {
+    public static boolean runMatcher(
+            String regex, String buttonID, Consumer<Matcher> function, Consumer<Void> failure) {
         Matcher matcher = Pattern.compile(regex).matcher(buttonID);
         if (matcher.matches()) {
             function.accept(matcher);
@@ -68,8 +72,7 @@ public class RegexHelper {
     }
 
     public static String oneOf(List<String> regex) {
-        return "(" + "(" + String.join(")|(", regex) + ")" +
-                ")";
+        return "(" + "(" + String.join(")|(", regex) + ")" + ")";
     }
 
     /**

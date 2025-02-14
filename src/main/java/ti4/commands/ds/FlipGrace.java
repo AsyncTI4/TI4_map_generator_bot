@@ -21,12 +21,12 @@ class FlipGrace extends GameStateSubcommand {
         }
 
         if (player.removeExhaustedAbility("grace")) {
-            MessageHelper.sendMessageToEventChannel(event, "**Grace** (Edyn faction ability) was exhausted. Flipping it back to ready.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "**Grace** (Edyn faction ability) was exhausted. Flipping it back to ready.");
             return;
         }
 
         player.addExhaustedAbility("grace");
         MessageHelper.sendMessageToEventChannel(event, "**Grace** (Edyn faction ability) has been exhausted.");
     }
-
 }

@@ -18,8 +18,12 @@ class SetFactionIcon extends GameStateSubcommand {
 
     public SetFactionIcon() {
         super(Constants.SET_FACTION_ICON, "Set franken faction icon to use", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_EMOJI, "Custom emoji to use. Enter jibberish to reset.").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING, Constants.FACTION_EMOJI, "Custom emoji to use. Enter jibberish to reset.")
+                .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -37,12 +41,17 @@ class SetFactionIcon extends GameStateSubcommand {
 
         Emoji factionEmoji = Emoji.fromFormatted(factionEmojiString);
         if (!(factionEmoji instanceof CustomEmoji || factionEmoji instanceof UnicodeEmoji)) {
-            MessageHelper.sendMessageToEventChannel(event, factionEmojiString + " is not a supported emoji. Resetting to default.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, factionEmojiString + " is not a supported emoji. Resetting to default.");
             player.setFactionEmoji(null);
             return;
         }
-        if (!(factionEmoji instanceof UnicodeEmoji) && AsyncTI4DiscordBot.jda.getEmojiById(((CustomEmoji) factionEmoji).getId()) == null) {
-            MessageHelper.sendMessageToEventChannel(event, "The bot cannot load " + factionEmojiString + ". Please use a custom emoji from one of the bot servers. Resetting to default.");
+        if (!(factionEmoji instanceof UnicodeEmoji)
+                && AsyncTI4DiscordBot.jda.getEmojiById(((CustomEmoji) factionEmoji).getId()) == null) {
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "The bot cannot load " + factionEmojiString
+                            + ". Please use a custom emoji from one of the bot servers. Resetting to default.");
             player.setFactionEmoji(null);
             return;
         }

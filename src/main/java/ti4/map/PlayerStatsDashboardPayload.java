@@ -1,5 +1,7 @@
 package ti4.map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,13 +11,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
-import ti4.image.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.message.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.RelicModel;
@@ -40,7 +39,10 @@ public class PlayerStatsDashboardPayload {
         try {
             return mapper.writeValueAsString(this);
         } catch (Exception e) {
-            BotLogger.log("Could not get PlayerStatsDashboardPayload JSON for Game: " + player.getGame().getID() + " Player: " + player.getUserName(), e);
+            BotLogger.log(
+                    "Could not get PlayerStatsDashboardPayload JSON for Game: "
+                            + player.getGame().getID() + " Player: " + player.getUserName(),
+                    e);
             return null;
         }
     }
@@ -60,11 +62,11 @@ public class PlayerStatsDashboardPayload {
 
     public List<String> getAlliances() {
         return player.getPromissoryNotesInPlayArea().stream()
-            .map(Mapper::getPromissoryNote)
-            .filter(pn -> "Alliance".equalsIgnoreCase(pn.getName()))
-            .filter(pn -> game.getPNOwner(pn.getAlias()) != null)
-            .map(pn -> game.getPNOwner(pn.getAlias()).getColor())
-            .toList();
+                .map(Mapper::getPromissoryNote)
+                .filter(pn -> "Alliance".equalsIgnoreCase(pn.getName()))
+                .filter(pn -> game.getPNOwner(pn.getAlias()) != null)
+                .map(pn -> game.getPNOwner(pn.getAlias()).getColor())
+                .toList();
     }
 
     public String getColor() {
@@ -72,14 +74,15 @@ public class PlayerStatsDashboardPayload {
     }
 
     public String getColorActual() {
-        return getColor(); // I think TTPG has an underlying TTPG based colour ID, and a "TI4" colour which can be controlled via colour picker
+        return getColor(); // I think TTPG has an underlying TTPG based colour ID, and a "TI4" colour which can be
+        // controlled via colour picker
     }
 
     public Map<String, Integer> getCommandTokens() {
         return Map.of(
-            "fleet", player.getFleetCC(),
-            "strategy", player.getStrategicCC(),
-            "tactics", player.getTacticalCC());
+                "fleet", player.getFleetCC(),
+                "strategy", player.getStrategicCC(),
+                "tactics", player.getTacticalCC());
     }
 
     public int getCommodities() {
@@ -92,8 +95,9 @@ public class PlayerStatsDashboardPayload {
 
     public int getCustodianPoints() {
         return (int) game.getScoredPublicObjectives().entrySet().stream()
-            .filter(entry -> entry.getKey().toLowerCase().contains("custodian") && entry.getValue().contains(player.getUserID()))
-            .count();
+                .filter(entry -> entry.getKey().toLowerCase().contains("custodian")
+                        && entry.getValue().contains(player.getUserID()))
+                .count();
     }
 
     public String getFactionName() {
@@ -103,17 +107,17 @@ public class PlayerStatsDashboardPayload {
 
     public Map<String, Integer> getHandSummary() {
         return Map.of(
-            "Secret Objectives", player.getSecrets().size(),
-            "Actions", player.getActionCards().size(),
-            "Promissory", player.getPromissoryNotes().size());
+                "Secret Objectives", player.getSecrets().size(),
+                "Actions", player.getActionCards().size(),
+                "Promissory", player.getPromissoryNotes().size());
     }
 
     public List<String> getLaws() {
         return game.getLaws().keySet().stream()
-            .filter(lawId -> ButtonHelper.isPlayerElected(game, player, lawId))
-            .map(Mapper::getAgenda)
-            .map(AgendaModel::getName)
-            .toList();
+                .filter(lawId -> ButtonHelper.isPlayerElected(game, player, lawId))
+                .map(Mapper::getAgenda)
+                .map(AgendaModel::getName)
+                .toList();
     }
 
     public LeaderPayload getLeaders() {
@@ -125,7 +129,9 @@ public class PlayerStatsDashboardPayload {
         player.getLeaders().stream()
                 .filter(leader -> leader.getId().contains("hero"))
                 .findAny()
-                .ifPresentOrElse(hero -> leaderPayload.setHero(hero.isLocked() ? "locked" : "unlocked"), () -> leaderPayload.setHero("purged"));
+                .ifPresentOrElse(
+                        hero -> leaderPayload.setHero(hero.isLocked() ? "locked" : "unlocked"),
+                        () -> leaderPayload.setHero("purged"));
         return leaderPayload;
     }
 
@@ -176,14 +182,18 @@ public class PlayerStatsDashboardPayload {
         Map<String, Object> planetTotals = new HashMap<>();
 
         // Influence
-        planetTotals.put("influence", Map.of(
-            "avail", Helper.getPlayerInfluenceAvailable(player, player.getGame()),
-            "total", Helper.getPlayerInfluenceTotal(player, player.getGame())));
+        planetTotals.put(
+                "influence",
+                Map.of(
+                        "avail", Helper.getPlayerInfluenceAvailable(player, player.getGame()),
+                        "total", Helper.getPlayerInfluenceTotal(player, player.getGame())));
 
         // Resources
-        planetTotals.put("resources", Map.of(
-            "avail", Helper.getPlayerResourcesAvailable(player, player.getGame()),
-            "total", Helper.getPlayerResourcesTotal(player, player.getGame())));
+        planetTotals.put(
+                "resources",
+                Map.of(
+                        "avail", Helper.getPlayerResourcesAvailable(player, player.getGame()),
+                        "total", Helper.getPlayerResourcesTotal(player, player.getGame())));
 
         // Legendary Count
         long legendaryCount = player.getPlanets().stream()
@@ -209,10 +219,12 @@ public class PlayerStatsDashboardPayload {
                 .filter(Objects::nonNull)
                 .filter(p -> p.getPlanetTypes().contains("industrial"))
                 .count();
-        planetTotals.put("traits", Map.of(
-            "cultural", culturalCount,
-            "hazardous", hazardousCount,
-            "industrial", industrialCount));
+        planetTotals.put(
+                "traits",
+                Map.of(
+                        "cultural", culturalCount,
+                        "hazardous", hazardousCount,
+                        "industrial", industrialCount));
 
         // Techs
         AtomicInteger blueCount = new AtomicInteger();
@@ -236,11 +248,13 @@ public class PlayerStatsDashboardPayload {
                         redCount.getAndIncrement();
                     }
                 });
-        planetTotals.put("techs", Map.of(
-            "blue", blueCount.get(),
-            "green", redCount.get(),
-            "red", greenCount.get(),
-            "yellow", yellowCount.get()));
+        planetTotals.put(
+                "techs",
+                Map.of(
+                        "blue", blueCount.get(),
+                        "green", redCount.get(),
+                        "red", greenCount.get(),
+                        "yellow", yellowCount.get()));
 
         return planetTotals;
     }
@@ -259,18 +273,18 @@ public class PlayerStatsDashboardPayload {
 
     public List<String> getStrategyCards() {
         return player.getSCs().stream()
-            .map(sc -> player.getGame().getStrategyCardModelByInitiative(sc))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(StrategyCardModel::getName)
-            .toList();
+                .map(sc -> player.getGame().getStrategyCardModelByInitiative(sc))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(StrategyCardModel::getName)
+                .toList();
     }
 
     public List<String> getTechnologies() {
         return player.getTechs().stream()
-            .map(Mapper::getTech)
-            .map(TechnologyModel::getName)
-            .toList();
+                .map(Mapper::getTech)
+                .map(TechnologyModel::getName)
+                .toList();
     }
 
     public int getTradeGoods() {
@@ -289,9 +303,9 @@ public class PlayerStatsDashboardPayload {
     @JsonIgnore // Dashboard doesn't use this yet
     public List<String> getUnitUpgrades() {
         return player.getUnitModels().stream()
-            .filter(u -> u.getRequiredTechId().isPresent()) // is a unit that requires a tech upgrade
-            .map(UnitModel::getBaseType)
-            .toList();
+                .filter(u -> u.getRequiredTechId().isPresent()) // is a unit that requires a tech upgrade
+                .map(UnitModel::getBaseType)
+                .toList();
     }
 
     public int getTotalNumberOfTurns() {
@@ -323,5 +337,4 @@ public class PlayerStatsDashboardPayload {
         private String hero;
         private String commander;
     }
-
 }

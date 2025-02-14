@@ -1,7 +1,6 @@
 package ti4.commands.ds;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -23,12 +22,24 @@ class SetPolicy extends GameStateSubcommand {
     public SetPolicy() {
         super(Constants.SET_POLICY, "Set Policies for Olradin Faction Abilities to their + or - side", true, true);
         List<Choice> people = CommandHelper.toChoices("Connect", "Control", "+", "-");
-        addOptions(new OptionData(OptionType.STRING, Constants.SET_PEOPLE, "Policy - The People: \"Connect ➕\" or \"Control ➖\"").addChoices(people));
+        addOptions(new OptionData(
+                        OptionType.STRING, Constants.SET_PEOPLE, "Policy - The People: \"Connect ➕\" or \"Control ➖\"")
+                .addChoices(people));
         List<Choice> environment = CommandHelper.toChoices("Preserve", "Plunder", "+", "-");
-        addOptions(new OptionData(OptionType.STRING, Constants.SET_ENVIRONMENT, "Policy - The Environment: \"Preserve ➕\" or \"Plunder ➖\"").addChoices(environment));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.SET_ENVIRONMENT,
+                        "Policy - The Environment: \"Preserve ➕\" or \"Plunder ➖\"")
+                .addChoices(environment));
         List<Choice> economy = CommandHelper.toChoices("Empower", "Exploit", "+", "-");
-        addOptions(new OptionData(OptionType.STRING, Constants.SET_ECONOMY, "Policy - The Economy: \"Empower ➕\" or \"Exploit ➖\"").addChoices(economy));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to set Olradin Policies").setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.SET_ECONOMY,
+                        "Policy - The Economy: \"Empower ➕\" or \"Exploit ➖\"")
+                .addChoices(economy));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to set Olradin Policies")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -51,30 +62,34 @@ class SetPolicy extends GameStateSubcommand {
             pol1 = policy1.getAsString().toLowerCase();
             pol1 = convertChoice(pol1);
             if (pol1 == null) {
-                MessageHelper.sendMessageToEventChannel(event,
-                    "received an incorrect input for _Policy - The People_, will either ignore, or default to _Policy - The People: Connect ➕_ if this is your first time setting Policies.");
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "received an incorrect input for _Policy - The People_, will either ignore, or default to _Policy - The People: Connect ➕_ if this is your first time setting Policies.");
             }
         }
         if (policy2 != null) {
             pol2 = policy2.getAsString().toLowerCase();
             pol2 = convertChoice(pol2);
             if (pol2 == null) {
-                MessageHelper.sendMessageToEventChannel(event,
-                    "received an incorrect input for _Policy - The Environment_, will either ignore, or default to _Policy - The Environment: Preserve ➕_ if this is your first time setting Policies.");
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "received an incorrect input for _Policy - The Environment_, will either ignore, or default to _Policy - The Environment: Preserve ➕_ if this is your first time setting Policies.");
             }
         }
         if (policy3 != null) {
             pol3 = policy3.getAsString().toLowerCase();
             pol3 = convertChoice(pol3);
             if (pol3 == null) {
-                MessageHelper.sendMessageToEventChannel(event,
-                    "received an incorrect input for _Policy - The Economy_, will either ignore, or default to _Policy - The Economy: Empower ➕_ if this is your first time setting Policies.");
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "received an incorrect input for _Policy - The Economy_, will either ignore, or default to _Policy - The Economy: Empower ➕_ if this is your first time setting Policies.");
             }
         }
 
         Player player = getPlayer();
         if (!player.hasOlradinPolicies()) {
-            MessageHelper.sendMessageToEventChannel(event, "Player does not have **Policy** (Olradin faction ability).");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Player does not have **Policy** (Olradin faction ability).");
             return;
         }
 
@@ -84,17 +99,21 @@ class SetPolicy extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "Initiating Policies for Olradin.");
             if (pol1 == null) {
                 pol1 = "+";
-                MessageHelper.sendMessageToEventChannel(event,
-                    "Need to initially set _Policy - The People. Defaulting to _Policy - The People: Connect ➕_.");
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "Need to initially set _Policy - The People. Defaulting to _Policy - The People: Connect ➕_.");
             }
             if (pol2 == null) {
                 pol2 = "+";
-                MessageHelper.sendMessageToEventChannel(event,
-                    "Need to initially set _Policy - The Environment_ policy. Defaulting to _Policy - The Environment: Preserve ➕_.");
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "Need to initially set _Policy - The Environment_ policy. Defaulting to _Policy - The Environment: Preserve ➕_.");
             }
             if (pol3 == null) {
                 pol3 = "+";
-                MessageHelper.sendMessageToEventChannel(event, "Need to initially set _Policy - The Economy_. Defaulting to _Policy - The Economy: Empower ➕_.");
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "Need to initially set _Policy - The Economy_. Defaulting to _Policy - The Economy: Empower ➕_.");
             }
         }
         // MessageHelper.sendMessageToEventChannel(event, "debug finalset - pol1" + pol1 + " pol2 " + pol2 + " pol3 " +
@@ -151,17 +170,23 @@ class SetPolicy extends GameStateSubcommand {
                 if (!player.hasAbility("policy_the_economy_exploit")) {
                     player.addAbility("policy_the_economy_exploit");
                     player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
-                    MessageHelper.sendMessageToEventChannel(event, "added _Policy - The Economy: Exploit ➖_. Decreased commodities total by 1 (double check the value is correct).");
+                    MessageHelper.sendMessageToEventChannel(
+                            event,
+                            "added _Policy - The Economy: Exploit ➖_. Decreased commodities total by 1 (double check the value is correct).");
                 } else if (player.hasAbility("policy_the_economy_exploit")) {
                     player.addAbility("policy_the_economy_exploit");
-                    MessageHelper.sendMessageToEventChannel(event, "added _Policy - The Economy: Exploit ➖_. You already had this policy, so your commodities total is unchanged.");
+                    MessageHelper.sendMessageToEventChannel(
+                            event,
+                            "added _Policy - The Economy: Exploit ➖_. You already had this policy, so your commodities total is unchanged.");
                 }
                 negativePolicies++;
             } else if ("+".equals(pol3)) {
                 if (player.hasAbility("policy_the_economy_exploit")) {
                     player.removeAbility("policy_the_economy_exploit");
                     player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
-                    MessageHelper.sendMessageToEventChannel(event, "removed _Policy - The Economy: Exploit ➖_. Increased commodities total by 1 (double check the value is correct).");
+                    MessageHelper.sendMessageToEventChannel(
+                            event,
+                            "removed _Policy - The Economy: Exploit ➖_. Increased commodities total by 1 (double check the value is correct).");
                 }
                 player.addAbility("policy_the_economy_empower");
                 positivePolicies++;
@@ -194,15 +219,18 @@ class SetPolicy extends GameStateSubcommand {
         if (inputChoice == null) {
             return null;
         }
-        if (("exploit".equals(inputChoice)) || ("plunder".equals(inputChoice)) || ("control".equals(inputChoice))
-            || ("-".equals(inputChoice))) {
+        if (("exploit".equals(inputChoice))
+                || ("plunder".equals(inputChoice))
+                || ("control".equals(inputChoice))
+                || ("-".equals(inputChoice))) {
             return "-";
         }
-        if (("empower".equals(inputChoice)) || ("preserve".equals(inputChoice)) || ("connect".equals(inputChoice))
-            || ("+".equals(inputChoice))) {
+        if (("empower".equals(inputChoice))
+                || ("preserve".equals(inputChoice))
+                || ("connect".equals(inputChoice))
+                || ("+".equals(inputChoice))) {
             return "+";
         }
         return null;
-
     }
 }

@@ -6,19 +6,79 @@ import ti4.model.ColorModel;
 public enum ColorEmojis implements TI4Emoji {
 
     // Colors
-    black, bloodred, blue, brown, chocolate, chrome, rainbow, sherbet, rose, emerald, ethereal, forest, gold, gray, green, lavender, //
-    lightgray, lime, navy, orange, orca, petrol, pink, purple, red, spring, sunset, tan, teal, turquoise, yellow, //
-    copper, plum, peach, rust, tropical, jupiter, poison, vapourwave, watermelon, checker, paintball, wasp, magma, glacier, plaid, harlequin, //
-    splitbloodred, splitblue, splitchocolate, splitemerald, splitgold, splitgreen, splitlime, splitnavy, splitorange, //
-    splitpetrol, splitpink, splitpurple, splitrainbow, splitred, splittan, splitteal, splitturquoise, splityellow, riftset; //
+    black,
+    bloodred,
+    blue,
+    brown,
+    chocolate,
+    chrome,
+    rainbow,
+    sherbet,
+    rose,
+    emerald,
+    ethereal,
+    forest,
+    gold,
+    gray,
+    green,
+    lavender, //
+    lightgray,
+    lime,
+    navy,
+    orange,
+    orca,
+    petrol,
+    pink,
+    purple,
+    red,
+    spring,
+    sunset,
+    tan,
+    teal,
+    turquoise,
+    yellow, //
+    copper,
+    plum,
+    peach,
+    rust,
+    tropical,
+    jupiter,
+    poison,
+    vapourwave,
+    watermelon,
+    checker,
+    paintball,
+    wasp,
+    magma,
+    glacier,
+    plaid,
+    harlequin, //
+    splitbloodred,
+    splitblue,
+    splitchocolate,
+    splitemerald,
+    splitgold,
+    splitgreen,
+    splitlime,
+    splitnavy,
+    splitorange, //
+    splitpetrol,
+    splitpink,
+    splitpurple,
+    splitrainbow,
+    splitred,
+    splittan,
+    splitteal,
+    splitturquoise,
+    splityellow,
+    riftset; //
 
     public static String getColorEmojiWithName(String color) {
         if (getColorEmojiWithNameLegacy(color) != null) {
             return getColorEmojiWithNameLegacy(color);
         }
         ColorModel model = Mapper.getColor(color);
-        if (model != null)
-            return getColorEmoji(color) + " **" + model.getName() + "**";
+        if (model != null) return getColorEmoji(color) + " **" + model.getName() + "**";
         return getColorEmoji(color) + " " + color;
     }
 

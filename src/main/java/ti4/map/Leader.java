@@ -1,17 +1,15 @@
 package ti4.map;
 
-import java.awt.*;
-import java.util.Comparator;
-import java.util.Optional;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.awt.*;
+import java.util.Comparator;
+import java.util.Optional;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.apache.commons.lang3.StringUtils;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.model.LeaderModel;
 import ti4.service.emoji.MiscEmojis;
 
@@ -24,12 +22,13 @@ public class Leader {
     private boolean active;
 
     @JsonCreator
-    public Leader(@JsonProperty("id") String id,
-        @JsonProperty("type") String type,
-        @JsonProperty("tgCount") int tgCount,
-        @JsonProperty("exhausted") boolean exhausted,
-        @JsonProperty("locked") boolean locked,
-        @JsonProperty("active") boolean active) {
+    public Leader(
+            @JsonProperty("id") String id,
+            @JsonProperty("type") String type,
+            @JsonProperty("tgCount") int tgCount,
+            @JsonProperty("exhausted") boolean exhausted,
+            @JsonProperty("locked") boolean locked,
+            @JsonProperty("active") boolean active) {
         this.id = id;
         this.type = type;
         this.tgCount = tgCount;

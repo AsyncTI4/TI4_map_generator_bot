@@ -3,9 +3,7 @@ package ti4.service.emoji;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import javax.annotation.Nullable;
-
 import ti4.image.TileHelper;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
@@ -13,40 +11,170 @@ import ti4.model.TileModel.TileBack;
 public enum TileEmojis implements TI4Emoji {
 
     // tile backs
-    TileGreenBack, TileRedBack, TileBlueBack, TileBlackBack,
+    TileGreenBack,
+    TileRedBack,
+    TileBlueBack,
+    TileBlackBack,
 
     // base
-    Jord_01, MollPrimus_02, Darien_03, Muaat_04, Nestphar_05, L1_000_06, Winnu_07, MordaiII_08, //
-    Maaluuk_09, ArcPime_10, LisisII_11, Nar_12, Trenlak_13, ArchonRen_14, Retillion_15, Arretze_16, //
-    DeltaWH_17, MR_18, Wellon_19, VefutII_20, Thibah_21, Tarmann_22, Saudor_23, MeharXull_24, //
-    Quann_25, Lodor_26, NewAlbion_27, Tequran_28, Qucenn_29, Mellon_30, Lazar_31, DalBootha_32, //
-    Corneeq_33, Centauri_34, Bereg_35, Arnor_36, Arinam_37, Abyz_38, AlphaWH_39, BetaWH_40, //
-    GravityRift_41, Nebula_42, Supernova_43, Asteroids_44, Asteroids_45, Void_46, Void_47, Void_48, //
-    Void_49, Void_50, Creuss_51,
+    Jord_01,
+    MollPrimus_02,
+    Darien_03,
+    Muaat_04,
+    Nestphar_05,
+    L1_000_06,
+    Winnu_07,
+    MordaiII_08, //
+    Maaluuk_09,
+    ArcPime_10,
+    LisisII_11,
+    Nar_12,
+    Trenlak_13,
+    ArchonRen_14,
+    Retillion_15,
+    Arretze_16, //
+    DeltaWH_17,
+    MR_18,
+    Wellon_19,
+    VefutII_20,
+    Thibah_21,
+    Tarmann_22,
+    Saudor_23,
+    MeharXull_24, //
+    Quann_25,
+    Lodor_26,
+    NewAlbion_27,
+    Tequran_28,
+    Qucenn_29,
+    Mellon_30,
+    Lazar_31,
+    DalBootha_32, //
+    Corneeq_33,
+    Centauri_34,
+    Bereg_35,
+    Arnor_36,
+    Arinam_37,
+    Abyz_38,
+    AlphaWH_39,
+    BetaWH_40, //
+    GravityRift_41,
+    Nebula_42,
+    Supernova_43,
+    Asteroids_44,
+    Asteroids_45,
+    Void_46,
+    Void_47,
+    Void_48, //
+    Void_49,
+    Void_50,
+    Creuss_51,
 
     // pok
-    Ixth_52, Arcturus_53, Acheron_54, Elysium_55, TheDark_56, NaazirRokha_57, YlirAvarValk_58, //
-    ArchonVail_59, Perimeter_60, Ang_61, SemLore_62, Vorhal_63, Atlas_64, Primor_65, HopesEnd_66, //
-    Cormund_67, Everra_68, AccoenJeolIr_69, KraagSiig_70, BakalAlioPrima_71, LisisVelnor_72, //
-    CealdriXanhact_73, Vegas_74, Devils_75, Rigels_76, Void_77, Void_78, AsteroidsAlphaWH_79, //
-    Supernova_80, NovaSeed_81, MalliceLocked_82a, MalliceUnlocked_82b,
+    Ixth_52,
+    Arcturus_53,
+    Acheron_54,
+    Elysium_55,
+    TheDark_56,
+    NaazirRokha_57,
+    YlirAvarValk_58, //
+    ArchonVail_59,
+    Perimeter_60,
+    Ang_61,
+    SemLore_62,
+    Vorhal_63,
+    Atlas_64,
+    Primor_65,
+    HopesEnd_66, //
+    Cormund_67,
+    Everra_68,
+    AccoenJeolIr_69,
+    KraagSiig_70,
+    BakalAlioPrima_71,
+    LisisVelnor_72, //
+    CealdriXanhact_73,
+    Vegas_74,
+    Devils_75,
+    Rigels_76,
+    Void_77,
+    Void_78,
+    AsteroidsAlphaWH_79, //
+    Supernova_80,
+    NovaSeed_81,
+    MalliceLocked_82a,
+    MalliceUnlocked_82b,
 
     // codex 3
-    ArchonRenTauKeleres_92, YlirAvarValkKeleres_93, MollPrimusKeleres_94,
+    ArchonRenTauKeleres_92,
+    YlirAvarValkKeleres_93,
+    MollPrimusKeleres_94,
 
     // discordant stars
-    D01_Rhune, D02_Kjalengard, D03_Ekko, D04_Zarr, D05_AysisRest, D06_Alesna, D07_Benc, //
-    D08_Arche, D09_LastStop, D10_Avicenna, D11_Void, D12_Gen, D13_Kroll, D14_Pax, D15_Poh, //
-    D16_Louk, D17_Biaheo, D18_Delmor, D19_Demis, D20_Drah, D21_Discordia, D22_Sanctuary, D23_Aldra, //
-    D24_Ogdun, D25_Ellas, D26_Vadarian, D27_Axis, D28_Vaylar, D29_Abyssus, D30_Cymiae, D31_Prind, //
-    D32_ShiHalaum, D33_BohlDhur, D34_Susuros, D35a_Asteroids, D35b_Supernova, D36_Asteroids,
+    D01_Rhune,
+    D02_Kjalengard,
+    D03_Ekko,
+    D04_Zarr,
+    D05_AysisRest,
+    D06_Alesna,
+    D07_Benc, //
+    D08_Arche,
+    D09_LastStop,
+    D10_Avicenna,
+    D11_Void,
+    D12_Gen,
+    D13_Kroll,
+    D14_Pax,
+    D15_Poh, //
+    D16_Louk,
+    D17_Biaheo,
+    D18_Delmor,
+    D19_Demis,
+    D20_Drah,
+    D21_Discordia,
+    D22_Sanctuary,
+    D23_Aldra, //
+    D24_Ogdun,
+    D25_Ellas,
+    D26_Vadarian,
+    D27_Axis,
+    D28_Vaylar,
+    D29_Abyssus,
+    D30_Cymiae,
+    D31_Prind, //
+    D32_ShiHalaum,
+    D33_BohlDhur,
+    D34_Susuros,
+    D35a_Asteroids,
+    D35b_Supernova,
+    D36_Asteroids,
 
     // uncharted space
-    d100, d101, d102, d103, d104, d105, d106, d107, d108, d109, d110, d111, d112, d113, d114, d115, //
-    d116, d117, d118, d119, d120, d121, d122, d123,
+    d100,
+    d101,
+    d102,
+    d103,
+    d104,
+    d105,
+    d106,
+    d107,
+    d108,
+    d109,
+    d110,
+    d111,
+    d112,
+    d113,
+    d114,
+    d115, //
+    d116,
+    d117,
+    d118,
+    d119,
+    d120,
+    d121,
+    d122,
+    d123,
 
-    // other
-    ;
+// other
+;
 
     @Override
     public String toString() {
@@ -108,7 +236,7 @@ public enum TileEmojis implements TI4Emoji {
             case "50" -> Void_50;
             case "51" -> Creuss_51;
 
-            // PoK
+                // PoK
             case "52" -> Ixth_52;
             case "53" -> Arcturus_53;
             case "54" -> Acheron_54;
@@ -142,12 +270,12 @@ public enum TileEmojis implements TI4Emoji {
             case "82a", "82ah" -> MalliceLocked_82a;
             case "82b", "82bh" -> MalliceUnlocked_82b;
 
-            // Codex 3
+                // Codex 3
             case "92", "92new" -> ArchonRenTauKeleres_92;
             case "93", "93new" -> YlirAvarValkKeleres_93;
             case "94", "94new" -> MollPrimusKeleres_94;
 
-            // DS
+                // DS
             case "D01" -> D01_Rhune;
             case "D02" -> D02_Kjalengard;
             case "D03" -> D03_Ekko;
@@ -186,7 +314,7 @@ public enum TileEmojis implements TI4Emoji {
             case "D35b" -> D35b_Supernova;
             case "D36" -> D36_Asteroids;
 
-            // Uncharted Space
+                // Uncharted Space
             case "d100" -> d100;
             case "d101" -> d101;
             case "d102" -> d102;

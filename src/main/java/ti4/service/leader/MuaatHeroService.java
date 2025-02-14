@@ -20,7 +20,7 @@ public class MuaatHeroService {
         String message1 = "Moments before disaster in game " + game.getName() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, message1);
 
-        //Remove all other players units from the tile in question
+        // Remove all other players units from the tile in question
         for (Player player_ : game.getPlayers().values()) {
             if (player_ != player) {
                 tile.removeAllUnits(player_.getColor());
@@ -32,23 +32,26 @@ public class MuaatHeroService {
         space.removeAllTokens();
         game.removeTile(tile.getPosition());
 
-        //Add the muaat supernova to the map and copy over the space unitholder
+        // Add the muaat supernova to the map and copy over the space unitholder
         Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
         game.setTile(novaTile);
 
-        String message2 = tile.getRepresentation() +
-            " has been _Nova Seed_'d by " +
-            player.getRepresentation() + ".";
+        String message2 = tile.getRepresentation() + " has been _Nova Seed_'d by " + player.getRepresentation() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, novaTile, 1, message2);
 
         if (player.hasLeaderUnlocked("muaathero")) {
             Leader playerLeader = player.getLeader("muaathero").orElse(null);
-            StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+            StringBuilder message = new StringBuilder(player.getRepresentation())
+                    .append(" played ")
+                    .append(Helper.getLeaderFullRepresentation(playerLeader));
             boolean purged = player.removeLeader(playerLeader);
             if (purged) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Adjudicator Ba'al, the Muaat hero, has been purged.");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), message + " - Adjudicator Ba'al, the Muaat hero, has been purged.");
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Adjudicator Ba'al, the Muaat hero, was not purged - something went wrong.");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Adjudicator Ba'al, the Muaat hero, was not purged - something went wrong.");
             }
         }
     }

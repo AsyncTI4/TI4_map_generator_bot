@@ -1,7 +1,6 @@
 package ti4.commands.units;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.GameStateCommand;
@@ -29,11 +28,12 @@ public class ModifyUnitsButtons extends GameStateCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game  game = getGame();
+        Game game = getGame();
         Player player = getPlayer();
 
         List<Button> buttons = ButtonHelper.getTilesToModify(player, game);
-        String message = player.getRepresentation() + " Use the buttons to select the tile in which you wish to modify units. ";
+        String message =
+                player.getRepresentation() + " Use the buttons to select the tile in which you wish to modify units. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 }

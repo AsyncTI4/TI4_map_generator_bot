@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SpinRingsHelper;
@@ -58,9 +57,11 @@ public class StatusCleanupService {
             player.cleanExhaustedRelics();
             player.clearExhaustedAbilities();
 
-            if (player.isRealPlayer() && game.getStoredValue("Pre Pass " + player.getFaction()) != null
-                && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
-                if (game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction()) && !player.isPassed()) {
+            if (player.isRealPlayer()
+                    && game.getStoredValue("Pre Pass " + player.getFaction()) != null
+                    && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
+                if (game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())
+                        && !player.isPassed()) {
                     game.setStoredValue("Pre Pass " + player.getFaction(), "");
                 }
             }
@@ -74,8 +75,7 @@ public class StatusCleanupService {
                     }
                 }
             }
-            if (player.getPromissoryNotesInPlayArea().contains("sigma_cyber"))
-            {        
+            if (player.getPromissoryNotesInPlayArea().contains("sigma_cyber")) {
                 for (String planet : game.getPlanets()) {
                     game.getPlanetsInfo().get(planet).removeToken("attachment_sigma_cyber.png");
                 }
@@ -85,8 +85,8 @@ public class StatusCleanupService {
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, nonActivePlayer, false);
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get("sigma_cyber");
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                    "_" + pnModel.getName() + "_ has been returned.");
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(), "_" + pnModel.getName() + "_ has been returned.");
             }
         }
         for (int x = 0; x < 13; x++) {
@@ -113,7 +113,8 @@ public class StatusCleanupService {
             }
         }
         if (!game.isFowMode() && game.getTableTalkChannel() != null) {
-            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
+            MessageHelper.sendMessageToChannel(
+                    game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
             ListPlayerInfoService.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
         }
         game.clearAllEmptyStoredValues();
@@ -124,19 +125,22 @@ public class StatusCleanupService {
         for (Player player : players.values()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for (String pn : pns) {
-                //MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Checking a new pn");
+                // MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Checking a new pn");
                 Player pnOwner = game.getPNOwner(pn);
                 if (pnOwner == null || !pnOwner.isRealPlayer()) {
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
-                if (pnModel.getText().contains("eturn this card") && pnModel.getText().contains("end of the status phase")) {
+                if (pnModel.getText().contains("eturn this card")
+                        && pnModel.getText().contains("end of the status phase")) {
                     player.removePromissoryNote(pn);
                     pnOwner.setPromissoryNote(pn);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing() + ".");
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing()
+                                    + ".");
                 }
             }
         }

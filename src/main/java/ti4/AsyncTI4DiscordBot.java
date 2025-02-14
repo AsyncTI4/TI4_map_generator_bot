@@ -1,5 +1,7 @@
 package ti4;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,15 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
 import javax.imageio.ImageIO;
-
-import org.reflections.Reflections;
-import static org.reflections.scanners.Scanners.SubTypes;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -27,6 +21,10 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import ti4.commands.CommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CloseLaunchThreadsCron;
@@ -95,33 +93,35 @@ public class AsyncTI4DiscordBot {
         GlobalSettings.loadSettings();
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
         jda = JDABuilder.createDefault(args[0])
-            // This is a privileged gateway intent that is used to update user information and join/leaves (including kicks).
-            // This is required to cache all members of a guild (including chunking)
-            .enableIntents(GatewayIntent.GUILD_MEMBERS)
-            // This is a privileged gateway intent this is only used to enable access to the user content in messages
-            // (also including embeds/attachments/components).
-            .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-            // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
-            .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
-            // It *appears* we need to pull all members or else the bot has trouble pinging players
-            // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
-            // and avoid loading every user at startup
-            .setMemberCachePolicy(MemberCachePolicy.ALL)
-            .setChunkingFilter(ChunkingFilter.ALL)
-            // This allows us to use our own ShutdownHook, created below
-            .setEnableShutdownHook(false)
-            .build();
+                // This is a privileged gateway intent that is used to update user information and join/leaves
+                // (including kicks).
+                // This is required to cache all members of a guild (including chunking)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                // This is a privileged gateway intent this is only used to enable access to the user content in
+                // messages
+                // (also including embeds/attachments/components).
+                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+                // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
+                .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
+                // It *appears* we need to pull all members or else the bot has trouble pinging players
+                // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
+                // and avoid loading every user at startup
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .setChunkingFilter(ChunkingFilter.ALL)
+                // This allows us to use our own ShutdownHook, created below
+                .setEnableShutdownHook(false)
+                .build();
 
         jda.addEventListener(
-            new MessageListener(),
-            new ChannelCreationListener(),
-            new SlashCommandListener(),
-            ButtonListener.getInstance(),
-            ModalListener.getInstance(),
-            new SelectionMenuListener(),
-            new UserJoinServerListener(),
-            new UserLeaveServerListener(),
-            new AutoCompleteListener());
+                new MessageListener(),
+                new ChannelCreationListener(),
+                new SlashCommandListener(),
+                ButtonListener.getInstance(),
+                ModalListener.getInstance(),
+                new SelectionMenuListener(),
+                new UserJoinServerListener(),
+                new UserLeaveServerListener(),
+                new AutoCompleteListener());
 
         try {
             jda.awaitReady();
@@ -129,12 +129,14 @@ public class AsyncTI4DiscordBot {
             MessageHelper.sendMessageToBotLogWebhook("Error waiting for bot to get ready");
         }
 
-        jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
+        jda.getPresence()
+                .setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
 
         userID = args[1];
         guildPrimaryID = args[2];
 
-        MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
+        MessageHelper.sendMessageToBotLogWebhook(
+                "# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);
@@ -233,7 +235,7 @@ public class AsyncTI4DiscordBot {
         LogButtonRuntimeStatisticsCron.register();
         TechSummaryCron.register();
         SabotageAutoReactCron.register();
-        //AgendaPhaseAutoReactCron.register();  Disabled due to new afters/whens handling
+        // AgendaPhaseAutoReactCron.register();  Disabled due to new afters/whens handling
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
 
@@ -246,7 +248,8 @@ public class AsyncTI4DiscordBot {
         Thread mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
+                jda.getPresence()
+                        .setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS STARTED");
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS");
@@ -272,7 +275,8 @@ public class AsyncTI4DiscordBot {
                 jda.awaitShutdown(30, TimeUnit.SECONDS);
                 mainThread.join();
             } catch (Exception e) {
-                MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook:\n> " + e.getMessage());
+                MessageHelper.sendMessageToBotLogWebhook(
+                        "Error encountered within shutdown hook:\n> " + e.getMessage());
             }
         }));
     }
@@ -299,7 +303,7 @@ public class AsyncTI4DiscordBot {
      * Add your test server's role ID to enable access to these commands on your server
      */
     private static void initializeWhitelistedRoles() {
-        //ADMIN ROLES
+        // ADMIN ROLES
         adminRoles.add(jda.getRoleById("943596173896323072")); // Async Primary (Hub)
         adminRoles.add(jda.getRoleById("1090914497352446042")); // Async Secondary (Stroter's Paradise)
         adminRoles.add(jda.getRoleById("1146511484264906814")); // Async Tertiary (Dreadn't)
@@ -325,8 +329,8 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("951230650680225863")); // Community Server
         adminRoles.removeIf(Objects::isNull);
 
-        //DEVELOPER ROLES
-        developerRoles.addAll(adminRoles); //admins may also execute developer commands
+        // DEVELOPER ROLES
+        developerRoles.addAll(adminRoles); // admins may also execute developer commands
         developerRoles.add(jda.getRoleById("947648366056185897")); // Async Primary (Hub)
         developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary (Stroter's Paradise)
         developerRoles.add(jda.getRoleById("1146529125184581733")); // Async Tertiary (Dreadn't)
@@ -342,8 +346,8 @@ public class AsyncTI4DiscordBot {
         developerRoles.add(jda.getRoleById("1313966002551128166")); // ppups's Server
         developerRoles.removeIf(Objects::isNull);
 
-        //BOTHELPER ROLES
-        bothelperRoles.addAll(adminRoles); //admins can also execute bothelper commands
+        // BOTHELPER ROLES
+        bothelperRoles.addAll(adminRoles); // admins can also execute bothelper commands
         bothelperRoles.add(jda.getRoleById("1166011604488425482")); // Async Primary (Hub)
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary (Stroter's Paradise)
         bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async Tertiary (Dreadn't)
@@ -357,7 +361,7 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); // Jonjo's Server
         bothelperRoles.add(jda.getRoleById("1215450829096624129")); // Sigma's Server
         bothelperRoles.add(jda.getRoleById("1226068245010710558")); // Rintsi's Server
-        bothelperRoles.add(jda.getRoleById("1226805674046914560")); // Solax's Server 
+        bothelperRoles.add(jda.getRoleById("1226805674046914560")); // Solax's Server
         bothelperRoles.add(jda.getRoleById("1313965956338417784")); // ppups's Server
         bothelperRoles.add(jda.getRoleById("1248693989193023519")); // Community Server
         bothelperRoles.removeIf(Objects::isNull);
@@ -368,24 +372,25 @@ public class AsyncTI4DiscordBot {
     }
 
     public static boolean isReadyToReceiveCommands() {
-        return GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, false);
+        return GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, false);
     }
 
     public static List<Category> getAvailablePBDCategories() {
         return guilds.stream()
-            .flatMap(guild -> guild.getCategories().stream())
-            .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
-            .toList();
+                .flatMap(guild -> guild.getCategories().stream())
+                .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
+                .toList();
     }
 
     public static List<Class<?>> getAllClasses() {
         if (classes.isEmpty()) {
             Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .setUrls(ClasspathHelper.forJavaClassPath())
-                .setScanners(new SubTypesScanner(false)));
+                    .setUrls(ClasspathHelper.forJavaClassPath())
+                    .setScanners(new SubTypesScanner(false)));
             reflections.get(SubTypes.of(Object.class).asClass()).stream()
-                .filter(c -> c.getPackageName().startsWith("ti4"))
-                .forEach(classes::add);
+                    .filter(c -> c.getPackageName().startsWith("ti4"))
+                    .forEach(classes::add);
         }
         return classes;
     }

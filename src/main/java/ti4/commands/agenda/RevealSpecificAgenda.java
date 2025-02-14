@@ -1,7 +1,6 @@
 package ti4.commands.agenda;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -19,7 +18,10 @@ class RevealSpecificAgenda extends GameStateSubcommand {
 
     public RevealSpecificAgenda() {
         super(Constants.REVEAL_SPECIFIC, "Reveal top Agenda from deck", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.AGENDA_ID, "Agenda Card ID (text ID found in /search agendas)").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING, Constants.AGENDA_ID, "Agenda Card ID (text ID found in /search agendas)")
+                .setRequired(true)
+                .setAutoComplete(true));
         addOption(OptionType.BOOLEAN, Constants.FORCE, "Force reveal the agenda (even if it's not in the deck)");
     }
 
@@ -54,6 +56,5 @@ class RevealSpecificAgenda extends GameStateSubcommand {
         }
         game.putAgendaBackIntoDeckOnTop(uniqueID);
         AgendaHelper.revealAgenda(event, false, game, channel);
-
     }
 }

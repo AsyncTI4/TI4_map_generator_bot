@@ -1,7 +1,6 @@
 package ti4.commands.ds;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -19,8 +18,12 @@ class TrapSwap extends GameStateSubcommand {
 
     public TrapSwap() {
         super(Constants.LIZHO_SWAP_TRAP, "Select planets for which to swap traps", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET2, "Planet2").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET2, "Planet2")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override
@@ -51,8 +54,8 @@ class TrapSwap extends GameStateSubcommand {
         }
 
         Player player = getPlayer();
-        if (unitHolder.getTokenList().contains(Constants.LIZHO_TRAP_PNG) &&
-            unitHolder2.getTokenList().contains(Constants.LIZHO_TRAP_PNG)) {
+        if (unitHolder.getTokenList().contains(Constants.LIZHO_TRAP_PNG)
+                && unitHolder2.getTokenList().contains(Constants.LIZHO_TRAP_PNG)) {
             Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
             String trap1 = null;
             String trap2 = null;
@@ -83,8 +86,10 @@ class TrapSwap extends GameStateSubcommand {
             if (tile != null) {
                 break;
             }
-            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
-                if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
+            for (Map.Entry<String, UnitHolder> unitHolderEntry :
+                    tile_.getUnitHolders().entrySet()) {
+                if (unitHolderEntry.getValue() instanceof Planet
+                        && unitHolderEntry.getKey().equals(planetName)) {
                     tile = tile_;
                     unitHolder = unitHolderEntry.getValue();
                     break;

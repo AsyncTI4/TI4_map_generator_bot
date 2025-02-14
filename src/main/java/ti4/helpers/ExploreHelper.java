@@ -9,7 +9,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 
 public class ExploreHelper {
-    
+
     public static boolean checkForMech(String planetName, Game game, Player player) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
@@ -22,7 +22,7 @@ public class ExploreHelper {
         }
         return false;
     }
-    
+
     public static boolean checkForInf(String planetName, Game game, Player player) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
@@ -58,7 +58,8 @@ public class ExploreHelper {
             if (numMechs > 0) {
                 message = planetName + " has a mech. ";
             } else {
-                message = planetName + " does not have a mech, so 1 infantry is being removed (" + numInf + "->" + (numInf - 1) + "). ";
+                message = planetName + " does not have a mech, so 1 infantry is being removed (" + numInf + "->"
+                        + (numInf - 1) + "). ";
                 tile.removeUnit(planetName, infKey, 1);
             }
         } else {
@@ -67,11 +68,14 @@ public class ExploreHelper {
         return message;
     }
 
-    public static String getUnitListEmojisOnPlanetForHazardousExplorePurposes(Game game, Player player, String planetID) {
+    public static String getUnitListEmojisOnPlanetForHazardousExplorePurposes(
+            Game game, Player player, String planetID) {
         String message = "";
         Planet planet = game.getUnitHolderFromPlanet(planetID);
         if (planet != null) {
-            String planetName = Mapper.getPlanet(planetID) == null ? "`error?`" : Mapper.getPlanet(planetID).getName();
+            String planetName = Mapper.getPlanet(planetID) == null
+                    ? "`error?`"
+                    : Mapper.getPlanet(planetID).getName();
             String unitList = planet.getPlayersUnitListEmojisOnHolder(player);
             if (unitList.isEmpty()) {
                 message += "no units on " + planetName;

@@ -2,7 +2,6 @@ package ti4.commands.button;
 
 import java.util.Collections;
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -18,8 +17,12 @@ public class GenericButtonCommand implements ParentCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-            new OptionData(OptionType.STRING, Constants.BUTTON_TEXT, "The text/prompt that will appear on the button itself. Max 80 characters.").setRequired(true),
-            new OptionData(OptionType.STRING, "spoof_id", "Spoof the buttonID, mainly for debugging purposes"));
+                new OptionData(
+                                OptionType.STRING,
+                                Constants.BUTTON_TEXT,
+                                "The text/prompt that will appear on the button itself. Max 80 characters.")
+                        .setRequired(true),
+                new OptionData(OptionType.STRING, "spoof_id", "Spoof the buttonID, mainly for debugging purposes"));
     }
 
     @Override
@@ -46,8 +49,10 @@ public class GenericButtonCommand implements ParentCommand {
             buttonText = "Record Response";
         }
 
-        String id = event.getOption("spoof_id", Constants.GENERIC_BUTTON_ID_PREFIX + event.getId(), OptionMapping::getAsString);
+        String id = event.getOption(
+                "spoof_id", Constants.GENERIC_BUTTON_ID_PREFIX + event.getId(), OptionMapping::getAsString);
         Button button = Buttons.gray(id, buttonText);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, Collections.singletonList(button));
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), message, Collections.singletonList(button));
     }
 }

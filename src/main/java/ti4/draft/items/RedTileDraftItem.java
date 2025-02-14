@@ -1,9 +1,8 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -80,8 +79,7 @@ public class RedTileDraftItem extends DraftItem {
     public static List<DraftItem> buildAllDraftableItems(MiltyDraftManager draftManager) {
         List<DraftItem> allItems = new ArrayList<>();
         for (MiltyDraftTile tile : draftManager.getRed()) {
-            allItems.add(DraftItem.generate(Category.REDTILE,
-                tile.getTile().getTileID()));
+            allItems.add(DraftItem.generate(Category.REDTILE, tile.getTile().getTileID()));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.REDTILE);
         return allItems;

@@ -12,12 +12,15 @@ import ti4.message.MessageHelper;
 class SetUpPeakableObjectives extends GameStateSubcommand {
 
     public SetUpPeakableObjectives() {
-        super(Constants.SETUP_PEAKABLE_OBJECTIVES, "Set up how many remaining unrevealed objectives there are", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.NUMBER_OF_STAGE1_OBJECTIVES,
-            "How many unrevealed stage 1s"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.NUMBER_OF_STAGE2_OBJECTIVES,
-            "How many unrevealed stage 2s"));
-
+        super(
+                Constants.SETUP_PEAKABLE_OBJECTIVES,
+                "Set up how many remaining unrevealed objectives there are",
+                true,
+                true);
+        addOptions(new OptionData(
+                OptionType.INTEGER, Constants.NUMBER_OF_STAGE1_OBJECTIVES, "How many unrevealed stage 1s"));
+        addOptions(new OptionData(
+                OptionType.INTEGER, Constants.NUMBER_OF_STAGE2_OBJECTIVES, "How many unrevealed stage 2s"));
     }
 
     @Override
@@ -31,8 +34,7 @@ class SetUpPeakableObjectives extends GameStateSubcommand {
         if (loc2 != null) {
             game.setUpPeakableObjectives(loc2.getAsInt(), 2);
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            "Set up objective decks. Check map to confirm remaining unrevealed objectives.");
-
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(), "Set up objective decks. Check map to confirm remaining unrevealed objectives.");
     }
 }

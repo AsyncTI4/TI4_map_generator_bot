@@ -28,13 +28,19 @@ public class CommandCounterHelper {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel(
+                    (MessageChannel) event.getChannel(),
+                    "Command Counter: " + color + " is not valid and not supported.");
         }
         String gameName = GameNameService.getGameNameFromChannel(event);
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.isFowMode() && ping) {
             String colorMention = ColorEmojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(managedGame.getGame(), event, tile.getPosition(), colorMention + " has placed a command token in the system.");
+            FoWHelper.pingSystem(
+                    managedGame.getGame(),
+                    event,
+                    tile.getPosition(),
+                    colorMention + " has placed a command token in the system.");
         }
         tile.addCC(ccID);
     }
@@ -43,11 +49,13 @@ public class CommandCounterHelper {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         if (game.isFowMode() && ping) {
             String colorMention = ColorEmojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has placed a command token in the system.");
+            FoWHelper.pingSystem(
+                    game, event, tile.getPosition(), colorMention + " has placed a command token in the system.");
         }
         tile.addCC(ccID);
     }
@@ -56,7 +64,8 @@ public class CommandCounterHelper {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null && event != null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         return tile.hasCC(ccID);
     }

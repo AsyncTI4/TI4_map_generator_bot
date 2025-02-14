@@ -1,9 +1,8 @@
 package ti4.commands.bothelper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -30,13 +29,15 @@ class JazzCommand extends Subcommand {
     public static void sendJazzButton(GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("jazzButton", "Jazz button", MiscEmojis.ScoutSpinner));
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Constants.jazzPing() + " button", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), Constants.jazzPing() + " button", buttons);
     }
 
     public static boolean jazzCheck(GenericInteractionCreateEvent event) {
         if (Constants.jazzId.equals(event.getUser().getId())) return true;
         if (Constants.honoraryJazz.contains(event.getUser().getId())) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are an honorary jazz so you may proceed");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "You are an honorary jazz so you may proceed");
             return true;
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not " + Constants.jazzPing());

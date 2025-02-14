@@ -15,7 +15,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
@@ -26,7 +25,7 @@ import ti4.model.PlanetModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.TileModel;
 
-//Handles positions of map
+// Handles positions of map
 public class PositionMapper {
     private static final Properties tileImageCoordinates = new Properties();
     private static final Properties playerInfo = new Properties();
@@ -63,16 +62,20 @@ public class PositionMapper {
             return null;
         }
         var tileIdToPlanets = TileHelper.getPlanetsByTileId(tileID);
-        return tileIdToPlanets == null ? null :
-                tileIdToPlanets.stream().collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
+        return tileIdToPlanets == null
+                ? null
+                : tileIdToPlanets.stream()
+                        .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
     }
 
     public static List<Point> getSpaceTokenPositions(String tileID) {
-        List<Point> backup = List.of(new Point(190, 30), new Point(215, 110), new Point(185, 205), new Point(100, 190), new Point(60, 130));
+        List<Point> backup = List.of(
+                new Point(190, 30), new Point(215, 110), new Point(185, 205), new Point(100, 190), new Point(60, 130));
         TileModel tile = TileHelper.getTileById(tileID);
 
         if (Optional.ofNullable(tile.getShipPositionsType()).isPresent()) {
-            return Optional.ofNullable(tile.getShipPositionsType().getSpaceTokenLayout()).orElse(backup);
+            return Optional.ofNullable(tile.getShipPositionsType().getSpaceTokenLayout())
+                    .orElse(backup);
         } else {
             return backup;
         }
@@ -158,8 +161,7 @@ public class PositionMapper {
     }
 
     public static UnitTokenPosition getPlanetTokenPosition(String planetName) {
-        if ("space".equals(planetName))
-            return null;
+        if ("space".equals(planetName)) return null;
         UnitTokenPosition pos = TileHelper.getPlanetById(planetName).getUnitPositions();
         return SerializationUtils.clone(pos);
     }
@@ -195,7 +197,8 @@ public class PositionMapper {
 
     public static String getTileSpaceUnitLayout(String tileId) {
         return Optional.ofNullable(TileHelper.getTileById(tileId).getShipPositionsType())
-            .orElse(ShipPositionModel.ShipPosition.TYPE08).getPositions();
+                .orElse(ShipPositionModel.ShipPosition.TYPE08)
+                .getPositions();
     }
 
     public static UnitTokenPosition getSpaceUnitPosition(String planetName, String tileID) {
@@ -234,8 +237,7 @@ public class PositionMapper {
                 int totalTiles = Math.max(6 * ring, 1);
                 for (int x = 1; x <= totalTiles; x++) {
                     String pos = makeTileStr(ring, x);
-                    if (isTilePositionValid(pos))
-                        positions.add(pos);
+                    if (isTilePositionValid(pos)) positions.add(pos);
                 }
             } catch (Exception e) {
                 return positions;
@@ -256,8 +258,11 @@ public class PositionMapper {
         return Arrays.stream(property.split(",")).toList();
     }
 
-    // Below is JAZZ's attempt to rewrite the rewrite mentioned below. Adjacencies should follow the correct order (verification needed)
-    // Below is an attempt to rewrite the above method to allow for ring count up to 16 without needing to specify adjacencies within .prop file - currently stuck on ensuring the adjacencies follow the correct order of [N, NE, SE, S, SW, NW]
+    // Below is JAZZ's attempt to rewrite the rewrite mentioned below. Adjacencies should follow the correct order
+    // (verification needed)
+    // Below is an attempt to rewrite the above method to allow for ring count up to 16 without needing to specify
+    // adjacencies within .prop file - currently stuck on ensuring the adjacencies follow the correct order of [N, NE,
+    // SE, S, SW, NW]
     public static List<String> getAdjacentTilePositionsNew(String tileID) {
         List<String> adjacentTiles = new ArrayList<>();
         if (!Helper.isInteger(tileID)) return adjacentTiles;
@@ -285,7 +290,9 @@ public class PositionMapper {
         // This ordering is essentially "go out from mecatol, then go clockwise"
         // So we need to rotate it backwards based on that initial direction
         Collections.rotate(ordering, -1 * side);
-        return new ArrayList<>(ordering.stream().map(pos -> isTilePositionValid(pos) ? pos : "x").toList());
+        return new ArrayList<>(ordering.stream()
+                .map(pos -> isTilePositionValid(pos) ? pos : "x")
+                .toList());
     }
 
     // tileNum will be modulused to within the bounds of the ring (e.g. "tile 7" in ring 1 will become "tile 1")
@@ -355,7 +362,8 @@ public class PositionMapper {
 
     public static String getPositionOfTileOneRingLarger(String tileID) {
         int ring = Integer.parseInt(tileID) / 100;
-        return getTileIDAtPositionInRingSide(ring + 1, getRingSideNumberOfTileID(tileID), getPositionWithinHexSide(tileID));
+        return getTileIDAtPositionInRingSide(
+                ring + 1, getRingSideNumberOfTileID(tileID), getPositionWithinHexSide(tileID));
     }
 
     public static String getEquivalentPositionAtRing(int ring, String tileID) {
@@ -368,41 +376,41 @@ public class PositionMapper {
 
     public static int getLeftMostTileOffsetInGame(Game game) {
         return game.getTileMap().keySet().stream()
-            .mapToInt(pos -> {
-                if (!Helper.isInteger(pos)) return 2080;
-                return (int) PositionMapper.getTilePosition(pos).getX();
-            })
-            .min()
-            .orElse(0);
+                .mapToInt(pos -> {
+                    if (!Helper.isInteger(pos)) return 2080;
+                    return (int) PositionMapper.getTilePosition(pos).getX();
+                })
+                .min()
+                .orElse(0);
     }
 
     public static int getRightMostTileOffsetInGame(Game game) {
         return game.getTileMap().keySet().stream()
-            .mapToInt(pos -> {
-                if (!Helper.isInteger(pos)) return 2080;
-                return (int) PositionMapper.getTilePosition(pos).getX();
-            })
-            .max()
-            .orElse(0);
+                .mapToInt(pos -> {
+                    if (!Helper.isInteger(pos)) return 2080;
+                    return (int) PositionMapper.getTilePosition(pos).getX();
+                })
+                .max()
+                .orElse(0);
     }
 
     public static int getTopMostTileOffsetInGame(Game game) {
         return game.getTileMap().keySet().stream()
-            .mapToInt(pos -> {
-                if (!Helper.isInteger(pos)) return 2550;
-                return (int) PositionMapper.getTilePosition(pos).getY();
-            })
-            .min()
-            .orElse(0);
+                .mapToInt(pos -> {
+                    if (!Helper.isInteger(pos)) return 2550;
+                    return (int) PositionMapper.getTilePosition(pos).getY();
+                })
+                .min()
+                .orElse(0);
     }
 
     public static int getBottomMostTileOffsetInGame(Game game) {
         return game.getTileMap().keySet().stream()
-            .mapToInt(pos -> {
-                if (!Helper.isInteger(pos)) return 2550;
-                return (int) PositionMapper.getTilePosition(pos).getY();
-            })
-            .max()
-            .orElse(0);
+                .mapToInt(pos -> {
+                    if (!Helper.isInteger(pos)) return 2550;
+                    return (int) PositionMapper.getTilePosition(pos).getY();
+                })
+                .max()
+                .orElse(0);
     }
 }

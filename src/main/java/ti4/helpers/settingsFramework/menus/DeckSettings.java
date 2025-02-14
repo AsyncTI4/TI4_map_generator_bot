@@ -1,12 +1,10 @@
 package ti4.helpers.settingsFramework.menus;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
@@ -20,7 +18,7 @@ import ti4.service.emoji.TechEmojis;
 
 // This is a sub-menu
 @Getter
-@JsonIgnoreProperties({ "messageId" })
+@JsonIgnoreProperties({"messageId"})
 public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
@@ -38,8 +36,11 @@ public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private ChoiceSetting<DeckModel> deckChoice(String id, String name, String defaultDeck, DeckModel.DeckType deckType, TI4Emoji emoji) {
-        List<DeckModel> decks = Mapper.getDecks().values().stream().filter(deck -> deck.getType() == deckType).toList();
+    private ChoiceSetting<DeckModel> deckChoice(
+            String id, String name, String defaultDeck, DeckModel.DeckType deckType, TI4Emoji emoji) {
+        List<DeckModel> decks = Mapper.getDecks().values().stream()
+                .filter(deck -> deck.getType() == deckType)
+                .toList();
 
         ChoiceSetting<DeckModel> choice = new ChoiceSetting<>(id, name, defaultDeck);
         choice.setEmoji(emoji);
@@ -49,34 +50,48 @@ public class DeckSettings extends SettingsMenu {
     }
 
     protected DeckSettings(JsonNode json, SettingsMenu parent) {
-        super("decks", "Card Decks", "Manually adjust which decks your game will use. This should be automatic, for the most part", parent);
+        super(
+                "decks",
+                "Card Decks",
+                "Manually adjust which decks your game will use. This should be automatic, for the most part",
+                parent);
 
         // Initialize deck settings to default values
-        stage1 = deckChoice("Stg1Deck", "Stage 1 Deck", "public_stage_1_objectives_pok",
-            DeckModel.DeckType.PUBLIC_STAGE_1_OBJECTIVE, CardEmojis.Public1);
+        stage1 = deckChoice(
+                "Stg1Deck",
+                "Stage 1 Deck",
+                "public_stage_1_objectives_pok",
+                DeckModel.DeckType.PUBLIC_STAGE_1_OBJECTIVE,
+                CardEmojis.Public1);
 
-        stage2 = deckChoice("Stg2Deck", "Stage 2 Deck", "public_stage_2_objectives_pok",
-            DeckModel.DeckType.PUBLIC_STAGE_2_OBJECTIVE, CardEmojis.Public2);
+        stage2 = deckChoice(
+                "Stg2Deck",
+                "Stage 2 Deck",
+                "public_stage_2_objectives_pok",
+                DeckModel.DeckType.PUBLIC_STAGE_2_OBJECTIVE,
+                CardEmojis.Public2);
 
-        secrets = deckChoice("SecretDeck", "Secrets Deck", "secret_objectives_pok",
-            DeckModel.DeckType.SECRET_OBJECTIVE, CardEmojis.SecretObjective);
+        secrets = deckChoice(
+                "SecretDeck",
+                "Secrets Deck",
+                "secret_objectives_pok",
+                DeckModel.DeckType.SECRET_OBJECTIVE,
+                CardEmojis.SecretObjective);
 
-        actionCards = deckChoice("ACs", "Action Card Deck", "action_cards_pok",
-            DeckModel.DeckType.ACTION_CARD, CardEmojis.ActionCard);
+        actionCards = deckChoice(
+                "ACs", "Action Card Deck", "action_cards_pok", DeckModel.DeckType.ACTION_CARD, CardEmojis.ActionCard);
 
-        agendas = deckChoice("Agendas", "Agenda Deck", "agendas_pok",
-            DeckModel.DeckType.AGENDA, CardEmojis.Agenda);
+        agendas = deckChoice("Agendas", "Agenda Deck", "agendas_pok", DeckModel.DeckType.AGENDA, CardEmojis.Agenda);
 
-        techs = deckChoice("Techs", "Technology Deck", "techs_pok",
-            DeckModel.DeckType.TECHNOLOGY, TechEmojis.NonUnitTechSkip);
+        techs = deckChoice(
+                "Techs", "Technology Deck", "techs_pok", DeckModel.DeckType.TECHNOLOGY, TechEmojis.NonUnitTechSkip);
 
-        relics = deckChoice("Relics", "Relic Deck", "relics_pok",
-            DeckModel.DeckType.RELIC, ExploreEmojis.Relic);
+        relics = deckChoice("Relics", "Relic Deck", "relics_pok", DeckModel.DeckType.RELIC, ExploreEmojis.Relic);
 
-        explores = deckChoice("Explores", "Explore Decks", "explores_pok",
-            DeckModel.DeckType.EXPLORE, ExploreEmojis.Frontier);
+        explores = deckChoice(
+                "Explores", "Explore Decks", "explores_pok", DeckModel.DeckType.EXPLORE, ExploreEmojis.Frontier);
 
-        //scenarios = deckChoice("Scenarios", "Scenario Deck", "scenario", null);
+        // scenarios = deckChoice("Scenarios", "Scenario Deck", "scenario", null);
 
         // Initialize strat cards to default values
         stratCards = new ChoiceSetting<>("StratCards", "Strat Card Set", "pok");
@@ -90,7 +105,9 @@ public class DeckSettings extends SettingsMenu {
 
         // Verify this is the correct JSON node and continue initialization
         List<String> historicIDs = new ArrayList<>(List.of("decks"));
-        if (json != null && json.has("menuId") && historicIDs.contains(json.get("menuId").asText(""))) {
+        if (json != null
+                && json.has("menuId")
+                && historicIDs.contains(json.get("menuId").asText(""))) {
             stage1.initialize(json.get("stage1"));
             stage2.initialize(json.get("stage2"));
             secrets.initialize(json.get("secrets"));
@@ -99,7 +116,7 @@ public class DeckSettings extends SettingsMenu {
             techs.initialize(json.get("techs"));
             relics.initialize(json.get("relics"));
             explores.initialize(json.get("explores"));
-            //scenarios.initialize(json.get("scenarios"));
+            // scenarios.initialize(json.get("scenarios"));
             stratCards.initialize(json.get("stratCards"));
         }
     }
@@ -119,7 +136,7 @@ public class DeckSettings extends SettingsMenu {
         ls.add(relics);
         ls.add(explores);
         ls.add(stratCards);
-        //ls.add(scenarios);
+        // ls.add(scenarios);
         return ls;
     }
 }

@@ -36,7 +36,8 @@ class Announce extends GameStateSubcommand {
         }
 
         var game = getGame();
-        MessageChannel mainGameChannel = game.getMainGameChannel() == null ? event.getChannel() : game.getMainGameChannel();
+        MessageChannel mainGameChannel =
+                game.getMainGameChannel() == null ? event.getChannel() : game.getMainGameChannel();
         MessageHelper.sendMessageToChannel(mainGameChannel, message);
     }
 }

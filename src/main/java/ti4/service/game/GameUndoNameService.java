@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
@@ -27,18 +26,18 @@ public class GameUndoNameService {
 
     private static final Pattern lastestCommandPattern = Pattern.compile("^(?>latest_command ).*$");
     private static final Pattern lastModifiedPattern = Pattern.compile("^(?>last_modified_date ).*$");
-    private static final Comparator<File> fileComparator = Comparator.comparingInt(file -> getUndoNumberFromFileName(file.getName()));
+    private static final Comparator<File> fileComparator =
+            Comparator.comparingInt(file -> getUndoNumberFromFileName(file.getName()));
 
     public static Map<String, String> getUndoNamesToCommandText(Game game, int limit) {
         Path undoPath = Storage.getGameUndoDirectory(game.getName());
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(undoPath, game.getName() + "_*")) {
             return StreamSupport.stream(directoryStream.spliterator(), false)
-                .map(Path::toFile)
-                .sorted(fileComparator.reversed())
-                .limit(limit)
-                .collect(Collectors.toMap(
-                    File::getName,
-                    GameUndoNameService::getLastModifiedDateAndLastCommandTextFromFile));
+                    .map(Path::toFile)
+                    .sorted(fileComparator.reversed())
+                    .limit(limit)
+                    .collect(Collectors.toMap(
+                            File::getName, GameUndoNameService::getLastModifiedDateAndLastCommandTextFromFile));
         } catch (IOException e) {
             BotLogger.log("Error listing files in directory: " + undoPath, e);
             return Collections.emptyMap();
@@ -54,18 +53,18 @@ public class GameUndoNameService {
         try {
             List<String> fileLines = Files.readAllLines(file.toPath());
             latestCommand = fileLines.stream()
-                .filter(line -> lastestCommandPattern.matcher(line).matches())
-                .findFirst()
-                .map(s -> StringUtils.substringAfter(s, " "))
-                .orElse("Latest Command not Found");
+                    .filter(line -> lastestCommandPattern.matcher(line).matches())
+                    .findFirst()
+                    .map(s -> StringUtils.substringAfter(s, " "))
+                    .orElse("Latest Command not Found");
 
             lastModifiedDateString = fileLines.stream()
-                .filter(line -> lastModifiedPattern.matcher(line).matches())
-                .findFirst()
-                .map(s -> StringUtils.substringAfter(s, " "))
-                .map(Long::parseLong)
-                .map(lastModifiedDate -> DateTimeHelper.getTimeRepresentationToSeconds(dateTime - lastModifiedDate))
-                .orElse(DateTimeHelper.getTimestampFromMillisecondsEpoch(fileLastModifiedDate));
+                    .filter(line -> lastModifiedPattern.matcher(line).matches())
+                    .findFirst()
+                    .map(s -> StringUtils.substringAfter(s, " "))
+                    .map(Long::parseLong)
+                    .map(lastModifiedDate -> DateTimeHelper.getTimeRepresentationToSeconds(dateTime - lastModifiedDate))
+                    .orElse(DateTimeHelper.getTimestampFromMillisecondsEpoch(fileLastModifiedDate));
         } catch (Exception e) {
             BotLogger.log("Could not get AutoComplete data from undo file: " + file.getName());
         }

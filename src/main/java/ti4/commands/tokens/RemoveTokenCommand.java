@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -31,8 +30,7 @@ public class RemoveTokenCommand extends AddRemoveTokenCommand {
                 new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                         .setRequired(true)
                         .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.PLANET, "Planet name")
-                        .setAutoComplete(true));
+                new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true));
     }
 
     @Override
@@ -59,7 +57,11 @@ public class RemoveTokenCommand extends AddRemoveTokenCommand {
                 if (tokenID.equals(Constants.CUSTODIAN_TOKEN_PNG)) {
                     removeToken(event, tile, tokenID, false);
                 }
-                removeToken(event, tile, tokenID, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName));
+                removeToken(
+                        event,
+                        tile,
+                        tokenID,
+                        Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName));
                 game.clearPlanetsCache();
             }
         } else {
@@ -95,7 +97,8 @@ public class RemoveTokenCommand extends AddRemoveTokenCommand {
             String planet = planetTokenizer.nextToken();
             planet = PlanetService.getPlanet(tile, AliasHandler.resolvePlanet(planet));
             if (!tile.isSpaceHolderValid(planet)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planet + " is not valid and not supported.");
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), "Planet: " + planet + " is not valid and not supported.");
                 continue;
             }
             tile.removeToken(tokenID, planet);

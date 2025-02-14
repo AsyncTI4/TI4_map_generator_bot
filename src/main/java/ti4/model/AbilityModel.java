@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -29,10 +28,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean isValid() {
-        return id != null
-            && name != null
-            && faction != null
-            && source != null;
+        return id != null && name != null && faction != null && source != null;
     }
 
     @Override
@@ -44,7 +40,8 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shortName).orElse(getName());
         }
-        return Optional.ofNullable(shortName).orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShortName());
+        return Optional.ofNullable(shortName)
+                .orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShortName());
     }
 
     public Optional<String> getPermanentEffect() {
@@ -70,19 +67,23 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
-        String title = getFactionEmoji() + " __**" + getName() + "**__" + getSource().emoji();
+        // TITLE
+        String title =
+                getFactionEmoji() + " __**" + getName() + "**__" + getSource().emoji();
         eb.setTitle(title);
 
-        //DESCRIPTION
-        if (getPermanentEffect().isPresent()) eb.setDescription(getPermanentEffect().get());
+        // DESCRIPTION
+        if (getPermanentEffect().isPresent())
+            eb.setDescription(getPermanentEffect().get());
 
-        //FIELDS
-        if (getWindow().isPresent()) eb.addField(getWindow().get(), getWindowEffect().orElse(""), false);
+        // FIELDS
+        if (getWindow().isPresent())
+            eb.addField(getWindow().get(), getWindowEffect().orElse(""), false);
 
-        //FOOTER
+        // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        if (includeID)
+            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);
@@ -101,9 +102,13 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         String abilityText = getWindowEffect().orElse("");
 
         StringBuilder sb = new StringBuilder();
-        sb.append(FactionEmojis.getFactionIcon(abilitySourceFaction)).append("__**").append(abilityName).append("**__");
+        sb.append(FactionEmojis.getFactionIcon(abilitySourceFaction))
+                .append("__**")
+                .append(abilityName)
+                .append("**__");
         if (!abilityRawModifier.isBlank()) sb.append(": ").append(abilityRawModifier);
-        if (!abilityWindow.isBlank() || !abilityText.isBlank()) sb.append("\n> *").append(abilityWindow).append("*:\n> ").append(abilityText);
+        if (!abilityWindow.isBlank() || !abilityText.isBlank())
+            sb.append("\n> *").append(abilityWindow).append("*:\n> ").append(abilityText);
 
         return sb.toString();
     }
@@ -111,17 +116,15 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return getId().contains(searchString)
-            || getName().toLowerCase().contains(searchString)
-            || getFaction().toLowerCase().contains(searchString)
-            || getSource().toString().toLowerCase().contains(searchString)
-            || getSearchTags().contains(searchString);
+                || getName().toLowerCase().contains(searchString)
+                || getFaction().toLowerCase().contains(searchString)
+                || getSource().toString().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     @Override
     public String getAutoCompleteName() {
-        return getName() +
-            " (" + getFaction() + ")" +
-            " [" + getSource() + "]";
+        return getName() + " (" + getFaction() + ")" + " [" + getSource() + "]";
     }
 
     public TI4Emoji getFactionEmoji() {

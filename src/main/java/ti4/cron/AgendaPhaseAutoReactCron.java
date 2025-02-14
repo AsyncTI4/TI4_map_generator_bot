@@ -1,9 +1,9 @@
 package ti4.cron;
 
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 import static java.util.function.Predicate.not;
 
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -23,15 +23,19 @@ public class AgendaPhaseAutoReactCron {
     private static final int RUNS_PER_HOUR = 60 / SCHEDULED_PERIOD_MINUTES;
 
     public static void register() {
-       CronManager.schedulePeriodically(AgendaPhaseAutoReactCron.class, AgendaPhaseAutoReactCron::autoReact, 5, SCHEDULED_PERIOD_MINUTES, TimeUnit.MINUTES);
-       
+        CronManager.schedulePeriodically(
+                AgendaPhaseAutoReactCron.class,
+                AgendaPhaseAutoReactCron::autoReact,
+                5,
+                SCHEDULED_PERIOD_MINUTES,
+                TimeUnit.MINUTES);
     }
 
     private static void autoReact() {
         GameManager.getManagedGames().stream()
-            .filter(not(ManagedGame::isHasEnded))
-            .map(ManagedGame::getGame)
-            .forEach(AgendaPhaseAutoReactCron::autoReact);
+                .filter(not(ManagedGame::isHasEnded))
+                .map(ManagedGame::getGame)
+                .forEach(AgendaPhaseAutoReactCron::autoReact);
     }
 
     private static void autoReact(Game game) {
@@ -95,9 +99,6 @@ public class AgendaPhaseAutoReactCron {
         return false;
     }
 
-    
-    
-
     private static void handleAfters(Game game, Player player) {
         var aftersMessage = GameMessageManager.getOne(game.getName(), GameMessageType.AGENDA_AFTER);
         if (aftersMessage.isEmpty()) {
@@ -111,14 +112,14 @@ public class AgendaPhaseAutoReactCron {
     }
 
     private static boolean playerHasAfters(Player player) {
-        if (player.ownsPromissoryNote("rider") ||
-                player.getPromissoryNotes().containsKey("riderm") ||
-                player.hasAbility("radiance") ||
-                player.hasAbility("galactic_threat") ||
-                player.hasAbility("conspirators") ||
-                player.ownsPromissoryNote("riderx") ||
-                player.ownsPromissoryNote("riderm") ||
-                player.ownsPromissoryNote("ridera")) {
+        if (player.ownsPromissoryNote("rider")
+                || player.getPromissoryNotes().containsKey("riderm")
+                || player.hasAbility("radiance")
+                || player.hasAbility("galactic_threat")
+                || player.hasAbility("conspirators")
+                || player.ownsPromissoryNote("riderx")
+                || player.ownsPromissoryNote("riderm")
+                || player.ownsPromissoryNote("ridera")) {
             return true;
         }
         for (String acId : player.getActionCards().keySet()) {
@@ -130,6 +131,4 @@ public class AgendaPhaseAutoReactCron {
         }
         return false;
     }
-
-
 }

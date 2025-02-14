@@ -2,7 +2,6 @@ package ti4.commands.fow;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -30,14 +29,15 @@ class PingSystem extends GameStateSubcommand {
             return;
         }
 
-        //get players adjacent
+        // get players adjacent
         Game game = getGame();
         List<Player> players = FoWHelper.getAdjacentPlayers(game, position, true);
         List<Player> failList = new ArrayList<>();
         String message = event.getOption(Constants.MESSAGE).getAsString();
         int successfulCount = 0;
         for (Player player_ : players) {
-            String playerMessage = player_.getRepresentationUnfogged() + " - System " + position + " has been pinged:\n> " + message;
+            String playerMessage =
+                    player_.getRepresentationUnfogged() + " - System " + position + " has been pinged:\n> " + message;
             boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
             if (success) {
                 successfulCount++;
@@ -51,7 +51,8 @@ class PingSystem extends GameStateSubcommand {
             for (Player p : failList) {
                 sb.append(p.getUserName()).append(" ");
             }
-            MessageHelper.replyToMessage(event, "One or more pings failed to send. Please follow up with game's GM. Failed for: " + sb);
+            MessageHelper.replyToMessage(
+                    event, "One or more pings failed to send. Please follow up with game's GM. Failed for: " + sb);
         } else {
             MessageHelper.replyToMessage(event, "Successfully sent all pings.");
         }

@@ -3,7 +3,6 @@ package ti4.helpers.ignis_aurora;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -22,7 +21,8 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 
 public class IgnisAuroraHelperTechs {
-    public static void handleExhaustIgnisAuroraTech(GenericInteractionCreateEvent event, Game game, Player player, String tech) {
+    public static void handleExhaustIgnisAuroraTech(
+            GenericInteractionCreateEvent event, Game game, Player player, String tech) {
         boolean deleteMsg = true, deleteButton = true;
         switch (tech) {
             case "baldrick_nm" -> ActionCardHelper.drawActionCards(game, player, 1, true);
@@ -35,11 +35,14 @@ public class IgnisAuroraHelperTechs {
             case "fabrilerealignment" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.red("fibrileRealign_AC", "Discard/draw Action Card", CardEmojis.ActionCard));
-                buttons.add(Buttons.red("fibrileRealign_SO", "Discard/draw Secret Objective", CardEmojis.SecretObjective));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to resolve:", buttons);
+                buttons.add(
+                        Buttons.red("fibrileRealign_SO", "Discard/draw Secret Objective", CardEmojis.SecretObjective));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(), "Use buttons to resolve:", buttons);
             }
             case "stellarcorridors" -> postStellarCorridors(event, game, player);
-            default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "> This technology is not automated. Please resolve manually.");
+            default -> MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "> This technology is not automated. Please resolve manually.");
         }
         if (deleteMsg) {
             ButtonHelper.deleteMessage(event);
@@ -76,6 +79,7 @@ public class IgnisAuroraHelperTechs {
         };
         String action = "removeCCFromBoard_stellarcorridors";
         List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, action, pred, false);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to remove one of your command tokens.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), "Use buttons to remove one of your command tokens.", buttons);
     }
 }

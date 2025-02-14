@@ -10,12 +10,12 @@ public class PoweredOnePickFrankenDraft extends PoweredFrankenDraft {
 
     @Override
     public int getPicksFromFirstBag() {
-      return 1;
+        return 1;
     }
 
     @Override
     public int getPicksFromNextBags() {
-      return 1;
+        return 1;
     }
 
     @Override

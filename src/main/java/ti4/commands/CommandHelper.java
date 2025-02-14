@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -38,21 +37,30 @@ public class CommandHelper {
         return values.stream().map(v -> new Choice(v, v)).toList();
     }
 
-    public static boolean acceptIfValidGame(SlashCommandInteractionEvent event, boolean checkChannel, boolean checkPlayer) {
+    public static boolean acceptIfValidGame(
+            SlashCommandInteractionEvent event, boolean checkChannel, boolean checkPlayer) {
         var gameName = GameNameService.getGameName(event);
         var managedGame = GameManager.getManagedGame(gameName);
         if (managedGame == null) {
-            event.getHook().editOriginal("'" + event.getFullCommandName() + "' command canceled. Game name '" + gameName + "' is not valid. " +
-                "Execute command in correctly named channel that starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`")
-                .queue();
+            event.getHook()
+                    .editOriginal(
+                            "'" + event.getFullCommandName() + "' command canceled. Game name '" + gameName
+                                    + "' is not valid. "
+                                    + "Execute command in correctly named channel that starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`")
+                    .queue();
             return false;
         }
         if (checkChannel && !event.getChannel().getName().startsWith(managedGame.getName() + "-")) {
-            event.getHook().editOriginal("'" + event.getFullCommandName() + "' can only be executed in a game channel.").queue();
+            event.getHook()
+                    .editOriginal("'" + event.getFullCommandName() + "' can only be executed in a game channel.")
+                    .queue();
             return false;
         }
         if (checkPlayer && getPlayerFromEvent(managedGame.getGame(), event) == null) {
-            event.getHook().editOriginal("Command must be ran by a player in the game, please use `/game join gameName` or `/special2 setup_neutral_player`.").queue();
+            event.getHook()
+                    .editOriginal(
+                            "Command must be ran by a player in the game, please use `/game join gameName` or `/special2 setup_neutral_player`.")
+                    .queue();
             return false;
         }
         return true;
@@ -90,7 +98,8 @@ public class CommandHelper {
 
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
         if (factionColorOption != null) {
-            String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
+            String factionColor =
+                    AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
             return getPlayerByFactionColor(factionColor, game);
         }
         return getPlayerFromGame(game, event.getMember(), event.getUser().getId());
@@ -105,7 +114,8 @@ public class CommandHelper {
         Collection<Player> players = game.getPlayers().values();
         List<Role> roles = member.getRoles();
         for (Player player : players) {
-            if (roles.contains(player.getRoleForCommunity()) || player.getTeamMateIDs().contains(member.getUser().getId())) {
+            if (roles.contains(player.getRoleForCommunity())
+                    || player.getTeamMateIDs().contains(member.getUser().getId())) {
                 return player;
             }
         }
@@ -117,8 +127,8 @@ public class CommandHelper {
         factionColor = StringUtils.substringBefore(factionColor, " "); // TO HANDLE UNRESOLVED AUTOCOMPLETE
         factionColor = AliasHandler.resolveFaction(factionColor);
         for (Player player_ : game.getPlayers().values()) {
-            if (Objects.equals(factionColor, player_.getFaction()) ||
-                    Objects.equals(factionColor, player_.getColor())) {
+            if (Objects.equals(factionColor, player_.getFaction())
+                    || Objects.equals(factionColor, player_.getColor())) {
                 return player_;
             }
         }
@@ -135,7 +145,8 @@ public class CommandHelper {
 
         OptionMapping factionColorOption = event.getOption(Constants.TARGET_FACTION_OR_COLOR);
         if (factionColorOption != null) {
-            String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
+            String factionColor =
+                    AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
             return getPlayerByFactionColor(factionColor, game);
         }
 
@@ -146,8 +157,12 @@ public class CommandHelper {
         if (hasRole(event, acceptedRoles)) {
             return true;
         }
-        var acceptRolesStr = acceptedRoles.stream().map(Role::getName).distinct().collect(Collectors.joining(", "));
-        event.getHook().editOriginal("You are not authorized to use this command. You must have one of the following roles: " + acceptRolesStr).queue();
+        var acceptRolesStr =
+                acceptedRoles.stream().map(Role::getName).distinct().collect(Collectors.joining(", "));
+        event.getHook()
+                .editOriginal("You are not authorized to use this command. You must have one of the following roles: "
+                        + acceptRolesStr)
+                .queue();
         return false;
     }
 
@@ -184,7 +199,8 @@ public class CommandHelper {
                 return colorFromString;
             }
         } else {
-            Player foundPlayer = getPlayerFromGame(game, event.getMember(), event.getUser().getId());
+            Player foundPlayer =
+                    getPlayerFromGame(game, event.getMember(), event.getUser().getId());
             if (foundPlayer != null) {
                 return foundPlayer.getColor();
             }
@@ -196,8 +212,8 @@ public class CommandHelper {
         factionColor = AliasHandler.resolveColor(factionColor);
         factionColor = AliasHandler.resolveFaction(factionColor);
         for (Player player_ : game.getPlayers().values()) {
-            if (Objects.equals(factionColor, player_.getFaction()) ||
-                    Objects.equals(factionColor, player_.getColor())) {
+            if (Objects.equals(factionColor, player_.getFaction())
+                    || Objects.equals(factionColor, player_.getColor())) {
                 return player_.getColor();
             }
         }
@@ -205,7 +221,8 @@ public class CommandHelper {
     }
 
     public Tile getTile(SlashCommandInteractionEvent event, Game game) {
-        String tileName = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
+        String tileName = StringUtils.substringBefore(
+                event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
         String tileId = AliasHandler.resolveTile(tileName);
         return TileHelper.getTile(event, tileId, game);
     }

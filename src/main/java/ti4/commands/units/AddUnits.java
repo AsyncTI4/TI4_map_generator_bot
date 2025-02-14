@@ -1,7 +1,6 @@
 package ti4.commands.units;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -39,18 +38,27 @@ public class AddUnits extends GameStateCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri")
-                .setRequired(true),
-            new OptionData(OptionType.STRING, Constants.CC_USE, "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements")
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                .setAutoComplete(true),
-            new OptionData(OptionType.BOOLEAN, Constants.SLING_RELAY, "Declare use of and exhaust Sling Relay technology"),
-            new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")
-        );
+                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(
+                                OptionType.STRING,
+                                Constants.UNIT_NAMES,
+                                "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri")
+                        .setRequired(true),
+                new OptionData(
+                                OptionType.STRING,
+                                Constants.CC_USE,
+                                "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements")
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
+                        .setAutoComplete(true),
+                new OptionData(
+                        OptionType.BOOLEAN, Constants.SLING_RELAY, "Declare use of and exhaust Sling Relay technology"),
+                new OptionData(
+                        OptionType.BOOLEAN,
+                        Constants.NO_MAPGEN,
+                        "'True' to not generate a map update with this command"));
     }
 
     @Override
@@ -64,17 +72,27 @@ public class AddUnits extends GameStateCommand {
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
         UnitHolder space = tile.getUnitHolders().get("space");
         boolean doesTileHaveFloatingGF = false;
-        if(space != null && getPlayer().getColor() != null){
-            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0 || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
+        if (space != null && getPlayer().getColor() != null) {
+            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0
+                    || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
         }
         AddUnitService.addUnits(event, tile, game, color, unitList);
-        if(space != null && getPlayer().getColor() != null && !doesTileHaveFloatingGF && ButtonHelper.getOtherPlayersWithShipsInTheSystem(getPlayer(), game, tile).isEmpty()){
-            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0 || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
-            if(doesTileHaveFloatingGF){
+        if (space != null
+                && getPlayer().getColor() != null
+                && !doesTileHaveFloatingGF
+                && ButtonHelper.getOtherPlayersWithShipsInTheSystem(getPlayer(), game, tile)
+                        .isEmpty()) {
+            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0
+                    || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
+            if (doesTileHaveFloatingGF) {
                 List<Button> buttons = ButtonHelper.getLandingTroopsButtons(getPlayer(), game, event, tile);
-                Button concludeMove = Buttons.red(getPlayer().getFinsFactionCheckerPrefix() + "deleteButtons", "Done Landing Troops");
+                Button concludeMove =
+                        Buttons.red(getPlayer().getFinsFactionCheckerPrefix() + "deleteButtons", "Done Landing Troops");
                 buttons.add(concludeMove);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), getPlayer().getRepresentation()+" you can use these buttons to land troops if necessary",buttons);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getChannel(),
+                        getPlayer().getRepresentation() + " you can use these buttons to land troops if necessary",
+                        buttons);
             }
         }
         StartCombatService.combatCheck(game, event, tile);

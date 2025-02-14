@@ -1,7 +1,6 @@
 package ti4.commands.cardsso;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -19,11 +18,21 @@ class ShowSO extends GameStateSubcommand {
 
     public ShowSO() {
         super(Constants.SHOW_SO, "Show a Secret Objective to a player", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID, which is found between ()").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target faction or color").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (defaults to you)").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ONLY_PHASE, "Show only the phase of the secret objective (action/agenda/status). Default false"));
-
+        addOptions(new OptionData(
+                        OptionType.INTEGER,
+                        Constants.SECRET_OBJECTIVE_ID,
+                        "Secret objective ID, which is found between ()")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target faction or color")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (defaults to you)")
+                .setAutoComplete(true));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.ONLY_PHASE,
+                "Show only the phase of the secret objective (action/agenda/status). Default false"));
     }
 
     @Override
@@ -48,10 +57,10 @@ class ShowSO extends GameStateSubcommand {
             info = Mapper.getSecretObjective(soID).getPhase();
         }
         Game game = getGame();
-        String sb = "Game: " + game.getName() + "\n" +
-            "Player: " + player.getUserName() + "\n" +
-            "Showed Secret Objectives:" + "\n" +
-            info + "\n";
+        String sb = "Game: " + game.getName() + "\n" + "Player: "
+                + player.getUserName() + "\n" + "Showed Secret Objectives:"
+                + "\n" + info
+                + "\n";
 
         player.setSecret(soID);
 

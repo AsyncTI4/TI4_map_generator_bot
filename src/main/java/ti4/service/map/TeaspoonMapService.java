@@ -9,26 +9,26 @@ import ti4.map.Tile;
 public class TeaspoonMapService {
 
     public static void addTspmapHyperlanes(Game game) {
-        //ring 1
+        // ring 1
         game.setTile(new Tile(AliasHandler.resolveTile("87a5"), "102"));
         game.setTile(new Tile(AliasHandler.resolveTile("87a0"), "103"));
         game.setTile(new Tile(AliasHandler.resolveTile("87a2"), "105"));
         game.setTile(new Tile(AliasHandler.resolveTile("87a3"), "106"));
 
-        //ring 2
+        // ring 2
         game.setTile(new Tile(AliasHandler.resolveTile("hl_horizon_3"), "204"));
         game.setTile(new Tile(AliasHandler.resolveTile("hl_horizon_0"), "210"));
 
-        //ring 3
+        // ring 3
         game.setTile(new Tile(AliasHandler.resolveTile("87b3"), "309"));
 
-        //ring 4
+        // ring 4
         game.setTile(new Tile(AliasHandler.resolveTile("84b0"), "407"));
         game.setTile(new Tile(AliasHandler.resolveTile("83a2"), "411"));
         game.setTile(new Tile(AliasHandler.resolveTile("83a2"), "415"));
         game.setTile(new Tile(AliasHandler.resolveTile("84b0"), "419"));
 
-        //ring 5, corners
+        // ring 5, corners
         game.setTile(new Tile(AliasHandler.resolveTile("89a0"), "505"));
         game.setTile(new Tile(AliasHandler.resolveTile("89a0"), "512"));
         game.setTile(new Tile(AliasHandler.resolveTile("89a0"), "520"));

@@ -20,7 +20,8 @@ public class EventHelper {
         if (eventModel != null) {
             channel.sendMessageEmbeds(eventModel.getRepresentationEmbed()).queue();
         } else {
-            MessageHelper.sendMessageToEventChannel(event, "Something went wrong revealing an event; eventID: " + eventID);
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Something went wrong revealing an event; eventID: " + eventID);
         }
     }
 }

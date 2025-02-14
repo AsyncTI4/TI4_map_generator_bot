@@ -1,7 +1,6 @@
 package ti4.commands.relic;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -27,7 +26,8 @@ class RelicLookAtTop extends GameStateSubcommand {
         }
         String relicID = relicDeck.getFirst();
         RelicModel relicModel = Mapper.getRelic(relicID);
-        String sb = "**Relic - Look at Top**\n" + player.getRepresentation() + "\n" + relicModel.getSimpleRepresentation();
+        String sb =
+                "**Relic - Look at Top**\n" + player.getRepresentation() + "\n" + relicModel.getSimpleRepresentation();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
     }
 }

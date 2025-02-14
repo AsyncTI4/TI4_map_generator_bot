@@ -5,7 +5,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -60,10 +59,10 @@ public class MapRenderPipeline {
     }
 
     private static void render(RenderEvent renderEvent) {
-        var timedRunnable = new TimedRunnable("Render event task for " + renderEvent.game.getName(),
-                EXECUTION_TIME_SECONDS_WARNING_THRESHOLD,
-                () -> {
-                    try (var mapGenerator = new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
+        var timedRunnable = new TimedRunnable(
+                "Render event task for " + renderEvent.game.getName(), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
+                    try (var mapGenerator =
+                            new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
                         mapGenerator.draw();
                         if (renderEvent.uploadToDiscord) {
                             uploadToDiscord(mapGenerator, renderEvent.callback());
@@ -89,29 +88,44 @@ public class MapRenderPipeline {
     }
 
     public static void renderToWebsiteOnly(Game game, @Nullable GenericInteractionCreateEvent event) {
-        if (GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) {
+        if (GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) {
             queue(game, event, null, null, false, true);
         }
     }
 
-    public static void queue(Game game, @Nullable SlashCommandInteractionEvent event, @Nullable Consumer<FileUpload> callback) {
+    public static void queue(
+            Game game, @Nullable SlashCommandInteractionEvent event, @Nullable Consumer<FileUpload> callback) {
         queue(game, event, null, callback, true, true);
     }
 
-    public static void queue(Game game, @Nullable GenericInteractionCreateEvent event, @Nullable DisplayType displayType,
-                       @Nullable Consumer<FileUpload> callback) {
+    public static void queue(
+            Game game,
+            @Nullable GenericInteractionCreateEvent event,
+            @Nullable DisplayType displayType,
+            @Nullable Consumer<FileUpload> callback) {
         queue(game, event, displayType, callback, true, true);
     }
 
-    public static void queue(Game game, @Nullable GenericInteractionCreateEvent event,  @Nullable DisplayType displayType,
-                       @Nullable Consumer<FileUpload> callback, boolean uploadToDiscord, boolean uploadToWebsite) {
+    public static void queue(
+            Game game,
+            @Nullable GenericInteractionCreateEvent event,
+            @Nullable DisplayType displayType,
+            @Nullable Consumer<FileUpload> callback,
+            boolean uploadToDiscord,
+            boolean uploadToWebsite) {
         if (game == null) {
             throw new IllegalArgumentException("game cannot be null in render pipeline");
         }
-        instance.gameRenderQueue.add(new RenderEvent(game, event, displayType, callback, uploadToDiscord, uploadToWebsite));
+        instance.gameRenderQueue.add(
+                new RenderEvent(game, event, displayType, callback, uploadToDiscord, uploadToWebsite));
     }
 
-    public record RenderEvent(Game game, GenericInteractionCreateEvent event, DisplayType displayType,
-                              Consumer<FileUpload> callback, boolean uploadToDiscord, boolean uploadToWebsite) {}
-
+    public record RenderEvent(
+            Game game,
+            GenericInteractionCreateEvent event,
+            DisplayType displayType,
+            Consumer<FileUpload> callback,
+            boolean uploadToDiscord,
+            boolean uploadToWebsite) {}
 }

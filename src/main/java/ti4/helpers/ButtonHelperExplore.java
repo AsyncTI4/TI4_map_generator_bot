@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -39,11 +38,13 @@ public class ButtonHelperExplore {
             exhaustedMessage = "Explore";
         }
         if (!actionRow2.isEmpty()) {
-            event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+            event.getMessage()
+                    .editMessage(exhaustedMessage)
+                    .setComponents(actionRow2)
+                    .queue();
         } else {
             ButtonHelper.deleteMessage(event);
         }
-
     }
 
     @ButtonHandler("freelancersBuild_")
@@ -54,11 +55,12 @@ public class ButtonHelperExplore {
         if (tile == null) {
             tile = game.getTileByPosition(planet);
         }
-        buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "freelancers", "placeOneNDone_dontskipfreelancers");
-        String message = player.getRepresentation() + " Use the buttons to produce 1 unit. " + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
+        buttons = Helper.getPlaceUnitButtons(
+                event, player, game, tile, "freelancers", "placeOneNDone_dontskipfreelancers");
+        String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
+                + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
-
     }
 
     @ButtonHandler("purge_Frags_")
@@ -85,26 +87,27 @@ public class ButtonHelperExplore {
             String fragid = fragmentsToPurge.get(0);
             player.removeFragment(fragid);
             game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-            switch (fragid)
-            {
-                case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message += " a " + ExploreEmojis.CFrag + "cultural";
-                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->  message += " a " + ExploreEmojis.HFrag + "hazardous";
-                case "irf1", "irf2", "irf3", "irf4", "irf5" ->  message += " an " + ExploreEmojis.IFrag + "industrial";
-                case "urf1", "urf2", "urf3" ->  message += " an " + ExploreEmojis.UFrag + "unknown";
-                default ->  message += " " + fragid;
+            switch (fragid) {
+                case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message +=
+                        " a " + ExploreEmojis.CFrag + "cultural";
+                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message +=
+                        " a " + ExploreEmojis.HFrag + "hazardous";
+                case "irf1", "irf2", "irf3", "irf4", "irf5" -> message += " an " + ExploreEmojis.IFrag + "industrial";
+                case "urf1", "urf2", "urf3" -> message += " an " + ExploreEmojis.UFrag + "unknown";
+                default -> message += " " + fragid;
             }
             message += " relic fragment.";
         } else {
             for (String fragid : fragmentsToPurge) {
                 player.removeFragment(fragid);
                 game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-                switch (fragid)
-                {
-                    case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message += ExploreEmojis.CFrag;
-                    case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->  message += ExploreEmojis.HFrag;
-                    case "irf1", "irf2", "irf3", "irf4", "irf5" ->  message += ExploreEmojis.IFrag;
-                    case "urf1", "urf2", "urf3" ->  message += ExploreEmojis.UFrag;
-                    default ->  message += " " + fragid;
+                switch (fragid) {
+                    case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message +=
+                            ExploreEmojis.CFrag;
+                    case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message += ExploreEmojis.HFrag;
+                    case "irf1", "irf2", "irf3", "irf4", "irf5" -> message += ExploreEmojis.IFrag;
+                    case "urf1", "urf2", "urf3" -> message += ExploreEmojis.UFrag;
+                    default -> message += " " + fragid;
                 }
             }
             message += " relic fragments.";
@@ -117,9 +120,8 @@ public class ButtonHelperExplore {
 
         if (player.hasTech("dslaner")) {
             player.setAtsCount(player.getAtsCount() + 1);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
         }
-
     }
 }

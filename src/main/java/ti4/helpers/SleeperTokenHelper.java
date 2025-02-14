@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.util.List;
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -27,8 +26,10 @@ public class SleeperTokenHelper {
             if (tile != null) {
                 break;
             }
-            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
-                if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
+            for (Map.Entry<String, UnitHolder> unitHolderEntry :
+                    tile_.getUnitHolders().entrySet()) {
+                if (unitHolderEntry.getValue() instanceof Planet
+                        && unitHolderEntry.getKey().equals(planetName)) {
                     tile = tile_;
                     unitHolder = unitHolderEntry.getValue();
                     break;

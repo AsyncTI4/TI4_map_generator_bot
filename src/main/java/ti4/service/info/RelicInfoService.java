@@ -2,7 +2,6 @@ package ti4.service.info;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -26,10 +25,7 @@ public class RelicInfoService {
 
     public static void sendRelicInfo(Player player) {
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-            player.getCardsInfoThread(),
-            null,
-            getRelicEmbeds(player),
-            getRelicButtons());
+                player.getCardsInfoThread(), null, getRelicEmbeds(player), getRelicButtons());
     }
 
     private static List<MessageEmbed> getRelicEmbeds(Player player) {

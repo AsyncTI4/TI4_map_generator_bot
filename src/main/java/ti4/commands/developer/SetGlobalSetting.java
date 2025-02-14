@@ -13,9 +13,13 @@ class SetGlobalSetting extends Subcommand {
 
     public SetGlobalSetting() {
         super(Constants.SET_SETTING, "Set or change a global setting");
-        addOptions(new OptionData(OptionType.STRING, Constants.SETTING_NAME, "Setting to set").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.SETTING_NAME, "Setting to set")
+                .setRequired(true)
+                .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.SETTING_VALUE, "Value to set").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.SETTING_TYPE, "Type of setting").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.SETTING_TYPE, "Type of setting")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override
@@ -23,14 +27,15 @@ class SetGlobalSetting extends Subcommand {
         OptionMapping setting = event.getOption(Constants.SETTING_NAME);
         OptionMapping value = event.getOption(Constants.SETTING_VALUE);
         OptionMapping type = event.getOption(Constants.SETTING_TYPE);
-        if ("string".equals(type.getAsString()))
-            GlobalSettings.setSetting(setting.getAsString(), value.getAsString());
-        if ("number".equals(type.getAsString()))
-            GlobalSettings.setSetting(setting.getAsString(), value.getAsInt());
+        if ("string".equals(type.getAsString())) GlobalSettings.setSetting(setting.getAsString(), value.getAsString());
+        if ("number".equals(type.getAsString())) GlobalSettings.setSetting(setting.getAsString(), value.getAsInt());
         if ("bool".equals(type.getAsString()))
             GlobalSettings.setSetting(setting.getAsString(), Boolean.parseBoolean(value.getAsString()));
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Setting `" + "(" + type.getAsString() + ") " + setting.getAsString() + "` set to `" + value.getAsString() + "`");
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                "Setting `" + "(" + type.getAsString() + ") " + setting.getAsString() + "` set to `"
+                        + value.getAsString() + "`");
         MessageHelper.sendMessageToChannel(event.getChannel(), GlobalSettings.getSettingsRepresentation());
     }
 }

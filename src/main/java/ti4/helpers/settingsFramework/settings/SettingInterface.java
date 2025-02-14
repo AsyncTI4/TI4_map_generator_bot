@@ -1,10 +1,9 @@
 package ti4.helpers.settingsFramework.settings;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -52,13 +51,11 @@ public abstract class SettingInterface {
     // ---------------------------------------------------------------------------------------------------------------------------------
     public void initialize(JsonNode json) {
         if (json == null) return;
-        if (json.get("id").asText(id).equals(id))
-            init(json);
+        if (json.get("id").asText(id).equals(id)) init(json);
     }
 
     public List<Button> getButtons(String idPrefix) {
-        if (!editable)
-            return new ArrayList<>();
+        if (!editable) return new ArrayList<>();
         return buttons(idPrefix);
     }
 
@@ -72,10 +69,8 @@ public abstract class SettingInterface {
     public String longSummary(int pad, String extraInfoId) {
         String emote = emoji == null ? "" : emoji;
         String val;
-        if (Objects.equals(id, extraInfoId))
-            val = longValue() + (extraInfo != null ? " *" + extraInfo + "*" : "");
-        else
-            val = shortValue();
+        if (Objects.equals(id, extraInfoId)) val = longValue() + (extraInfo != null ? " *" + extraInfo + "*" : "");
+        else val = shortValue();
         return String.format("`%s`%s: %s", Helper.leftpad(name, pad), emote, val);
     }
 

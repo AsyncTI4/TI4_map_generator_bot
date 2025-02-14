@@ -1,7 +1,6 @@
 package ti4.commands.cardsso;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -16,8 +15,15 @@ class UnscoreSO extends GameStateSubcommand {
 
     public UnscoreSO() {
         super(Constants.UNSCORE_SO, "Unscore Secret Objective", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Scored secret objective ID, which is found between ()").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.INTEGER,
+                        Constants.SECRET_OBJECTIVE_ID,
+                        "Scored secret objective ID, which is found between ()")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -28,9 +34,11 @@ class UnscoreSO extends GameStateSubcommand {
         boolean scored = game.unscoreSecretObjective(player.getUserID(), soId);
         if (!scored) {
             List<String> scoredSOs = player.getSecretsScored().entrySet().stream()
-                .map(e -> "> (" + e.getValue() + ") " + SecretObjectiveInfoService.getSecretObjectiveRepresentationShort(e.getKey()))
-                .toList();
-            StringBuilder sb = new StringBuilder("Secret Objective ID found - please retry.\nYour current scored secret objectives are:\n");
+                    .map(e -> "> (" + e.getValue() + ") "
+                            + SecretObjectiveInfoService.getSecretObjectiveRepresentationShort(e.getKey()))
+                    .toList();
+            StringBuilder sb = new StringBuilder(
+                    "Secret Objective ID found - please retry.\nYour current scored secret objectives are:\n");
             scoredSOs.forEach(sb::append);
             if (scoredSOs.isEmpty()) sb.append("> None");
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());

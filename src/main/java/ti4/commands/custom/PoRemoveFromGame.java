@@ -11,12 +11,15 @@ class PoRemoveFromGame extends GameStateSubcommand {
 
     public PoRemoveFromGame() {
         super(Constants.REMOVE_PO_FROM_GAME, "Remove a public objective from the game", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PO_ID, "Public objective ID").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PO_ID, "Public objective ID")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean removed = getGame().removePOFromGame(event.getOption(Constants.PO_ID).getAsString());
+        boolean removed =
+                getGame().removePOFromGame(event.getOption(Constants.PO_ID).getAsString());
         if (removed) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Public objective removed from game deck.");
         } else {

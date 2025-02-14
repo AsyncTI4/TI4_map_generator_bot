@@ -2,7 +2,6 @@ package ti4.commands.special;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -18,7 +17,11 @@ class MakeSecretIntoPO extends GameStateSubcommand {
 
     public MakeSecretIntoPO() {
         super(Constants.MAKE_SO_INTO_PO, "Make a secret objective into a public objective", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID, which is found between ()").setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.INTEGER,
+                        Constants.SECRET_OBJECTIVE_ID,
+                        "Secret objective ID, which is found between ()")
+                .setRequired(true));
     }
 
     @Override
@@ -45,19 +48,19 @@ class MakeSecretIntoPO extends GameStateSubcommand {
             return;
         }
         if (soName.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Only a scored secret objective may be made into a public objective.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Only a scored secret objective may be made into a public objective.");
             return;
         }
         game.addToSoToPoList(soName);
         Integer poIndex = game.addCustomPO(soName, 1);
         game.scorePublicObjective(playerWithSO.getUserID(), poIndex);
 
-        String sb = "**Public Objective added from Secret:**" + "\n" +
-            "(" + poIndex + ") " + "\n" +
-            Mapper.getSecretObjectivesJustNames().get(soName) + "\n";
+        String sb = "**Public Objective added from Secret:**" + "\n" + "("
+                + poIndex + ") " + "\n" + Mapper.getSecretObjectivesJustNames().get(soName)
+                + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, playerWithSO, event);
-
     }
 }

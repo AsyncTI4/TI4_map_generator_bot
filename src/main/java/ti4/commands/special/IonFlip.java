@@ -17,7 +17,9 @@ class IonFlip extends GameStateSubcommand {
 
     public IonFlip() {
         super(Constants.ION_TOKEN_FLIP, "Flip ION Storm Token", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override
@@ -32,7 +34,8 @@ class IonFlip extends GameStateSubcommand {
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
         Tile tile = TileHelper.getTile(event, tileID, game);
         if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
         UnitHolder spaceUnitHolder = tile.getUnitHolders().get(Constants.SPACE);

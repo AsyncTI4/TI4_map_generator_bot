@@ -13,7 +13,9 @@ class SetFowFilter extends GameStateSubcommand {
 
     public SetFowFilter() {
         super(Constants.SET_FOG_FILTER, "Set the color of the fow tiles for your view of the map.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FOG_FILTER, "Color of the filter").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FOG_FILTER, "Color of the filter")
+                .setAutoComplete(true)
+                .setRequired(true));
     }
 
     @Override

@@ -1,11 +1,10 @@
 package ti4.helpers;
 
 import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -31,9 +30,14 @@ public class RelicHelper {
         for (int x = 0; x < advantage && x < relics.size(); x++) {
             RelicModel relicData = Mapper.getRelic(relics.get(x));
             buttons.add(Buttons.green("drawRelicAtPosition_" + x, relicData.getName()));
-            info.append("_").append(relicData.getName()).append("_: ").append(relicData.getText()).append("\n");
+            info.append("_")
+                    .append(relicData.getName())
+                    .append("_: ")
+                    .append(relicData.getText())
+                    .append("\n");
         }
-        String msg = player.getRepresentationUnfogged() + ", please choose the relic that you wish to draw. The relic text is reproduced for your convenience.";
+        String msg = player.getRepresentationUnfogged()
+                + ", please choose the relic that you wish to draw. The relic text is reproduced for your convenience.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), info.toString());
     }
@@ -42,18 +46,27 @@ public class RelicHelper {
         drawRelicAndNotify(player, event, game, 0, false);
     }
 
-    public static void drawRelicAndNotify(Player player, GenericInteractionCreateEvent event, Game game, int position, boolean checked) {
-        if (!checked && (player.hasAbility("data_leak") || (player.getPromissoryNotes().containsKey("dspnflor") && game.getPNOwner("dspnflor") != player))) {
+    public static void drawRelicAndNotify(
+            Player player, GenericInteractionCreateEvent event, Game game, int position, boolean checked) {
+        if (!checked
+                && (player.hasAbility("data_leak")
+                        || (player.getPromissoryNotes().containsKey("dspnflor")
+                                && game.getPNOwner("dspnflor") != player))) {
             drawWithAdvantage(player, game, 2);
             return;
         }
         if (player.hasAbility("a_new_edifice")) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                + "Due to your **A New Edifice** ability, you get to explore 3 planets rather than get a relic. Reminder that they should be different planets. ");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + "Due to your **A New Edifice** ability, you get to explore 3 planets rather than get a relic. Reminder that they should be different planets. ");
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #1 ", buttons);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #2 ", buttons);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #3 ", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), player.getRepresentation() + "Explore planet #1 ", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), player.getRepresentation() + "Explore planet #2 ", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), player.getRepresentation() + "Explore planet #3 ", buttons);
             return;
         }
 
@@ -71,19 +84,22 @@ public class RelicHelper {
         if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
         }
-        MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
+        MessageHelper.sendMessageToChannelWithEmbed(
+                player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
         resolveRelicEffects(event, game, player, relicID);
 
         if (checked) game.shuffleRelics();
     }
 
-    public static void resolveRelicEffects(GenericInteractionCreateEvent event, Game game, Player player, String relicID) {
+    public static void resolveRelicEffects(
+            GenericInteractionCreateEvent event, Game game, Player player, String relicID) {
         StringBuilder helpMessage = new StringBuilder();
-        //Append helpful commands after relic draws and resolve effects:
+        // Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
-            case "nanoforge" -> helpMessage.append("Run the following commands to use _Nano-Forge_:\n")
-                .append("     `/explore relic_purge relic: nanoforge`\n")
-                .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
+            case "nanoforge" -> helpMessage
+                    .append("Run the following commands to use _Nano-Forge_:\n")
+                    .append("     `/explore relic_purge relic: nanoforge`\n")
+                    .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
             case "obsidian" -> {
                 game.drawSecretObjective(player.getUserID());
 
@@ -101,16 +117,24 @@ public class RelicHelper {
             case "shard" -> {
                 Integer poIndex = game.addCustomPO("Shard of the Throne", 1);
                 game.scorePublicObjective(player.getUserID(), poIndex);
-                helpMessage.append("Custom objective _Shard of the Throne_ has been added.\n")
-                    .append(player.getRepresentation()).append(" scored _Shard of the Throne_.");
+                helpMessage
+                        .append("Custom objective _Shard of the Throne_ has been added.\n")
+                        .append(player.getRepresentation())
+                        .append(" scored _Shard of the Throne_.");
             }
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
                 String customPOName = "Shard of the Throne (" + absolShardNum + ")";
                 Integer poIndex = game.addCustomPO(customPOName, 1);
                 game.scorePublicObjective(player.getUserID(), poIndex);
-                helpMessage.append("Custom objective _").append(customPOName).append("_ has been added.\n")
-                    .append(player.getRepresentation()).append(" scored _").append(customPOName).append("_.");
+                helpMessage
+                        .append("Custom objective _")
+                        .append(customPOName)
+                        .append("_ has been added.\n")
+                        .append(player.getRepresentation())
+                        .append(" scored _")
+                        .append(customPOName)
+                        .append("_.");
             }
         }
 
@@ -118,7 +142,8 @@ public class RelicHelper {
         Helper.checkEndGame(game, player);
     }
 
-    public void sendFrags(GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game game) {
+    public void sendFrags(
+            GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game game) {
         List<String> fragments = new ArrayList<>();
         for (String cardID : sender.getFragments()) {
             ExploreModel card = Mapper.getExplore(cardID);
@@ -140,7 +165,8 @@ public class RelicHelper {
 
         String p1 = sender.getRepresentation();
         String p2 = receiver.getRepresentation();
-        String fragString = count + " " + trait + " " + ExploreEmojis.getFragEmoji(trait) + " relic fragment" + (count == 1 ? "" : "s");
+        String fragString = count + " " + trait + " " + ExploreEmojis.getFragEmoji(trait) + " relic fragment"
+                + (count == 1 ? "" : "s");
         String message = p1 + " sent " + fragString + " to " + p2;
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
@@ -170,23 +196,32 @@ public class RelicHelper {
         if (allRelics.isEmpty()) {
             text = new StringBuilder("There are no more cards in the relic deck.");
         } else {
-            text = new StringBuilder("__Relics remaining in deck__ (").append(deckCount).append(" - ").append(formatPercent.format(deckDrawChance)).append("):");
+            text = new StringBuilder("__Relics remaining in deck__ (")
+                    .append(deckCount)
+                    .append(" - ")
+                    .append(formatPercent.format(deckDrawChance))
+                    .append("):");
             Collections.sort(allRelics);
             for (String relicId : allRelics) {
                 String relicName = Mapper.getRelic(relicId).getName();
-                text.append("\n1. ").append(ExploreEmojis.Relic.toString()).append(" _").append(relicName).append("_");
+                text.append("\n1. ")
+                        .append(ExploreEmojis.Relic.toString())
+                        .append(" _")
+                        .append(relicName)
+                        .append("_");
             }
         }
 
         if (player != null && "action".equalsIgnoreCase(game.getPhaseOfGame()) && !over && game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), text.toString());
         }
     }
-    
-    public static String sillySpelling()
-    {
+
+    public static String sillySpelling() {
         StringBuilder empelar = new StringBuilder("Scepter of E");
         List<Character> letters = Arrays.asList('m', 'e', 'l', 'p', 'a');
         Collections.shuffle(letters);

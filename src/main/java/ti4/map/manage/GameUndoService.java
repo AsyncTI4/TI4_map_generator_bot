@@ -1,6 +1,5 @@
 package ti4.map.manage;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,7 +8,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -42,15 +41,15 @@ class GameUndoService {
         try {
             List<Integer> undoNumbers = GameUndoNameService.getSortedUndoNumbers(gameName);
             if (undoNumbers.isEmpty()) return 0;
-            
+
             int maxUndoNumber = undoNumbers.getLast();
             int maxUndoFilesPerGame = GameManager.getManagedGame(gameName).isHasEnded() ? 10 : 100;
             int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;
 
             undoNumbers.stream()
-                .filter(undoIndex -> undoIndex < oldestUndoNumberThatShouldExist)
-                .map(undoIndex -> getUndoFileName(gameName, undoIndex))
-                .forEach(fileName -> deleteFile(Storage.getGameUndo(gameName, fileName)));
+                    .filter(undoIndex -> undoIndex < oldestUndoNumberThatShouldExist)
+                    .map(undoIndex -> getUndoFileName(gameName, undoIndex))
+                    .forEach(fileName -> deleteFile(Storage.getGameUndo(gameName, fileName)));
 
             return maxUndoNumber;
         } catch (Exception e) {
@@ -123,7 +122,8 @@ class GameUndoService {
         if (gameToUndo.isFowMode()) {
             return;
         }
-        Map<String, String> undoNamesToCommandText = GameUndoNameService.getUndoNamesToCommandText(gameToUndo, latestUndoIndex - undoIndex);
+        Map<String, String> undoNamesToCommandText =
+                GameUndoNameService.getUndoNamesToCommandText(gameToUndo, latestUndoIndex - undoIndex);
         List<String> undoCommands = new ArrayList<>();
         for (int i = latestUndoIndex; i > undoIndex; i--) {
             String fileName = getUndoFileName(gameToUndo.getName(), i);
@@ -137,20 +137,32 @@ class GameUndoService {
         sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex, undoCommands);
     }
 
-    private static void sendUndoConfirmationMessage(Game game, int undoIndex, int latestUndoIndex, List<String> undoCommands) {
-        StringBuilder sb = new StringBuilder("Rolled back to save `").append(undoIndex).append("` from `").append(latestUndoIndex).append("`:\n");
+    private static void sendUndoConfirmationMessage(
+            Game game, int undoIndex, int latestUndoIndex, List<String> undoCommands) {
+        StringBuilder sb = new StringBuilder("Rolled back to save `")
+                .append(undoIndex)
+                .append("` from `")
+                .append(latestUndoIndex)
+                .append("`:\n");
 
         String gameName = game.getName();
         for (int i = 0; i < undoCommands.size(); i++) {
-            sb.append("> `").append(latestUndoIndex - i).append("` ").append(undoCommands.get(i)).append("\n");
+            sb.append("> `")
+                    .append(latestUndoIndex - i)
+                    .append("` ")
+                    .append(undoCommands.get(i))
+                    .append("\n");
         }
         ButtonHelper.findOrCreateThreadWithMessage(game, gameName + "-undo-log", sb.toString());
     }
 
     private static void generateSavedButtons(Game game) {
         try {
-            if (!game.getSavedButtons().isEmpty() && game.getSavedChannel() != null && !game.getPhaseOfGame().contains("status")) {
-                MessageHelper.sendMessageToChannelWithButtons(game.getSavedChannel(), game.getSavedMessage(), ButtonHelper.getSavedButtons(game));
+            if (!game.getSavedButtons().isEmpty()
+                    && game.getSavedChannel() != null
+                    && !game.getPhaseOfGame().contains("status")) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        game.getSavedChannel(), game.getSavedMessage(), ButtonHelper.getSavedButtons(game));
             }
         } catch (Exception e) {
             BotLogger.log("Error trying to generated saved buttons for " + game.getName(), e);

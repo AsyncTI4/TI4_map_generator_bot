@@ -12,13 +12,16 @@ class DiscardSpecificAgenda extends GameStateSubcommand {
 
     public DiscardSpecificAgenda() {
         super(Constants.DISCARD_SPECIFIC_AGENDA, "Discard Specific Agenda", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.AGENDA_ID, "Agenda ID").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.AGENDA_ID, "Agenda ID")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        boolean removed = game.discardSpecificAgenda(event.getOption(Constants.AGENDA_ID).getAsString());
+        boolean removed =
+                game.discardSpecificAgenda(event.getOption(Constants.AGENDA_ID).getAsString());
         if (removed) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda discarded from game deck");
         } else {

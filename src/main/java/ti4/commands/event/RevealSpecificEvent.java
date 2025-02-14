@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
@@ -17,7 +17,9 @@ class RevealSpecificEvent extends GameStateSubcommand {
 
     public RevealSpecificEvent() {
         super(Constants.REVEAL_SPECIFIC, "Reveal top Event from deck", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.EVENT_ID, "Event ID (text ID found in /search events)").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.EVENT_ID, "Event ID (text ID found in /search events)")
+                .setRequired(true)
+                .setAutoComplete(true));
         addOption(OptionType.BOOLEAN, Constants.FORCE, "Force reveal the Event (even if it's not in the deck)");
     }
 

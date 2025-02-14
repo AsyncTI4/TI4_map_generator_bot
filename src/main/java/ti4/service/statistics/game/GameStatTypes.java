@@ -45,6 +45,8 @@ public enum GameStatTypes {
     }
 
     public boolean search(String searchString) {
-        return name.toLowerCase().contains(searchString) || description.toLowerCase().contains(searchString) || toString().contains(searchString);
+        return name.toLowerCase().contains(searchString)
+                || description.toLowerCase().contains(searchString)
+                || toString().contains(searchString);
     }
 }

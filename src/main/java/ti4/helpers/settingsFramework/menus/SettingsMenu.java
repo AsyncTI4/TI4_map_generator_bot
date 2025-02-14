@@ -1,14 +1,13 @@
 package ti4.helpers.settingsFramework.menus;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -84,13 +83,11 @@ public abstract class SettingsMenu {
     /** Action Handler. Returns null on a success */
     protected String resetSettings() {
         if (enabledSettings().isEmpty()) return "No settings to reset.";
-        for (SettingInterface setting : enabledSettings())
-            setting.reset();
+        for (SettingInterface setting : enabledSettings()) setting.reset();
         return null;
     }
 
-    protected void updateTransientSettings() {
-    }
+    protected void updateTransientSettings() {}
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // "Static" methods:
@@ -103,11 +100,13 @@ public abstract class SettingsMenu {
 
     public String menuSummaryString(String lastSettingTouched) {
         StringBuilder sb = new StringBuilder("# **__").append(menuName).append(":__**");
-        for (String line : description)
-            sb.append("\n- *").append(line).append("*");
+        for (String line : description) sb.append("\n- *").append(line).append("*");
         sb.append("\n");
 
-        int pad = enabledSettings().stream().map(x -> x.getName().length()).max(Comparator.comparingInt(x -> x)).orElse(15);
+        int pad = enabledSettings().stream()
+                .map(x -> x.getName().length())
+                .max(Comparator.comparingInt(x -> x))
+                .orElse(15);
         for (SettingInterface setting : enabledSettings()) {
             sb.append("> ");
             sb.append(setting.longSummary(pad, lastSettingTouched));
@@ -127,7 +126,7 @@ public abstract class SettingsMenu {
                     shorterCatStrings.add(cat.shortSummaryString(true));
                 }
                 catStr = String.join("\n\n", shorterCatStrings);
-                if (sb.length() + catStr.length() > 1999) catStr = ""; //give up
+                if (sb.length() + catStr.length() > 1999) catStr = ""; // give up
             }
             sb.append(catStr);
         }
@@ -138,14 +137,15 @@ public abstract class SettingsMenu {
         StringBuilder sb = new StringBuilder("**__" + menuName + ":__**");
         for (String line : description) {
             sb.append("\n- *").append(line).append("*");
-            if (shortDescrOnly)
-                break;
+            if (shortDescrOnly) break;
         }
         if (shortDescrOnly) return sb.toString();
 
         int maxlength = enabledSettings().stream()
-            .filter(s -> s.getId() != null)
-            .map(s -> s.getId().length()).max(Comparator.comparingInt(x -> x)).orElse(5);
+                .filter(s -> s.getId() != null)
+                .map(s -> s.getId().length())
+                .max(Comparator.comparingInt(x -> x))
+                .orElse(5);
         for (SettingInterface setting : enabledSettings()) {
             sb.append("\n> ").append(setting.shortSummary(maxlength));
         }
@@ -235,7 +235,8 @@ public abstract class SettingsMenu {
         setMessageId(msg.getId());
     }
 
-    private boolean handleButtonPress(GenericInteractionCreateEvent event, String buttonType, String action, List<String> path) {
+    private boolean handleButtonPress(
+            GenericInteractionCreateEvent event, String buttonType, String action, List<String> path) {
         List<String> remainingPath = new ArrayList<>(path); // copy to prevent pointer shenanigans
         if (!remainingPath.isEmpty()) {
             String menu = remainingPath.getFirst();
@@ -328,16 +329,25 @@ public abstract class SettingsMenu {
         // Edit the existing message, if able
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             setMessageId(buttonEvent.getMessage());
-            buttonEvent.getHook().editOriginal(newSummary).setComponents(actionRows).queue();
+            buttonEvent
+                    .getHook()
+                    .editOriginal(newSummary)
+                    .setComponents(actionRows)
+                    .queue();
         } else if (event instanceof ModalInteractionEvent modalEvent) {
             if (modalEvent.getMessage() != null) {
-                modalEvent.getMessage().editMessage(newSummary).setComponents(actionRows).queue();
+                modalEvent
+                        .getMessage()
+                        .editMessage(newSummary)
+                        .setComponents(actionRows)
+                        .queue();
             }
         } else if (event instanceof StringSelectInteractionEvent selectEvent) {
-            selectEvent.getGuildChannel()
-                .editMessageById(getMessageId(), newSummary)
-                .setComponents(actionRows)
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+            selectEvent
+                    .getGuildChannel()
+                    .editMessageById(getMessageId(), newSummary)
+                    .setComponents(actionRows)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -392,12 +402,14 @@ public abstract class SettingsMenu {
             String navString = menuNav + "_" + navId() + "_";
             List<Button> buttonsToUse = new ArrayList<>();
             if (pageNum > 0) {
-                Button prevPage = Button.of(ButtonStyle.PRIMARY, navString + (pageNum - 1), "Previous Page", Emoji.fromUnicode("⏪"));
+                Button prevPage = Button.of(
+                        ButtonStyle.PRIMARY, navString + (pageNum - 1), "Previous Page", Emoji.fromUnicode("⏪"));
                 buttonsToUse.add(prevPage);
             }
             buttonsToUse.addAll(paginated.get(pageNum));
             if (pageNum < maxPage) {
-                Button nextPage = Button.of(ButtonStyle.PRIMARY, navString + (pageNum + 1), "Next Page", Emoji.fromUnicode("⏩"));
+                Button nextPage =
+                        Button.of(ButtonStyle.PRIMARY, navString + (pageNum + 1), "Next Page", Emoji.fromUnicode("⏩"));
                 buttonsToUse.add(nextPage);
             }
             return buttonsToUse;
@@ -409,8 +421,8 @@ public abstract class SettingsMenu {
         String prefixID = menuAction + "_" + navId() + "_";
         List<SettingInterface> interfaces = new ArrayList<>(enabledSettings());
         List<Button> settingButtons = interfaces.stream()
-            .flatMap(setting -> new ArrayList<>(setting.getButtons(prefixID)).stream())
-            .toList();
+                .flatMap(setting -> new ArrayList<>(setting.getButtons(prefixID)).stream())
+                .toList();
         List<Button> output = new ArrayList<>();
         if (!settingButtons.isEmpty())
             output.add(Button.of(ButtonStyle.DANGER, prefixID + "reset", "Reset to default settings"));

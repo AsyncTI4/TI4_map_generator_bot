@@ -2,7 +2,6 @@ package ti4.service;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -29,7 +28,8 @@ public class ShowGameService {
             if (includeButtons(displayType)) {
                 List<Button> buttons = new ArrayList<>();
                 if (!game.isFowMode()) {
-                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
+                    Button linkToWebsite = Button.link(
+                            "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
                     buttons.add(linkToWebsite);
                     buttons.add(Buttons.green("gameInfoButtons", "Player Info"));
                 }
@@ -38,7 +38,7 @@ public class ShowGameService {
                 buttons.add(Buttons.gray("showGameAgain", "Show Game"));
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
-                MessageChannel channel =sendMessage(game, event);
+                MessageChannel channel = sendMessage(game, event);
                 MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, null, buttons);
             } else {
                 MessageChannel channel = sendMessage(game, event);
@@ -52,16 +52,25 @@ public class ShowGameService {
 
     private static MessageChannel sendMessage(Game game, GenericInteractionCreateEvent event) {
         MessageChannel channel = event.getMessageChannel();
-        if (!game.isFowMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
+        if (!game.isFowMode()
+                && game.getActionsChannel() != null
+                && game.getBotMapUpdatesThread() != null
+                && channel.equals(game.getActionsChannel())) {
             channel = game.getBotMapUpdatesThread();
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
         } else if (game.isFowMode()) {
             Player player = game.getPlayer(event.getUser().getId());
-            if (!event.getClass().equals(UserOverridenSlashCommandInteractionEvent.class) 
-              && game.getRealPlayers().contains(player) && !game.getPlayersWithGMRole().contains(player)
-              && player.getPrivateChannel() != null && !channel.equals(player.getPrivateChannel())) {
+            if (!event.getClass().equals(UserOverridenSlashCommandInteractionEvent.class)
+                    && game.getRealPlayers().contains(player)
+                    && !game.getPlayersWithGMRole().contains(player)
+                    && player.getPrivateChannel() != null
+                    && !channel.equals(player.getPrivateChannel())) {
                 channel = player.getPrivateChannel();
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + ((TextChannel)player.getPrivateChannel()).getJumpUrl());
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Map Image sent to " + ((TextChannel) player.getPrivateChannel()).getJumpUrl());
             }
         }
         return channel;
@@ -69,8 +78,16 @@ public class ShowGameService {
 
     public static boolean includeButtons(DisplayType displayType) {
         return switch (displayType) {
-            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments,
-                 shipless -> false;
+            case wormholes,
+                    anomalies,
+                    legendaries,
+                    empties,
+                    aetherstream,
+                    spacecannon,
+                    traits,
+                    techskips,
+                    attachments,
+                    shipless -> false;
             default -> true;
         };
     }

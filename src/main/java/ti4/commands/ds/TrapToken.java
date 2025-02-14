@@ -1,7 +1,6 @@
 package ti4.commands.ds;
 
 import java.util.Collection;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -17,7 +16,9 @@ class TrapToken extends GameStateSubcommand {
 
     public TrapToken() {
         super(Constants.LIZHO_TRAP, "Select planets were to add/remove trap tokens", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
+                .setRequired(true)
+                .setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.LIZHO_TRAP_ID, "Trap ID").setRequired(true));
     }
 

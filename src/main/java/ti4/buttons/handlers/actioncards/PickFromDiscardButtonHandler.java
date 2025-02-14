@@ -16,7 +16,8 @@ class PickFromDiscardButtonHandler {
     }
 
     @ButtonHandler("pickFromDiscard_")
-    public static void pickACardFromDiscardStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    public static void pickACardFromDiscardStep2(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         ActionCardHelper.pickACardFromDiscardStep2(game, player, event, buttonID);
     }
 }

@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,8 +48,7 @@ public class Storage {
     private static Font TI_FONT_110;
 
     public static Font getEmojiFont() {
-        if (EMOJI_FONT_40 != null)
-            return EMOJI_FONT_40;
+        if (EMOJI_FONT_40 != null) return EMOJI_FONT_40;
         return EMOJI_FONT_40 = getEmojiFont(40f);
     }
 

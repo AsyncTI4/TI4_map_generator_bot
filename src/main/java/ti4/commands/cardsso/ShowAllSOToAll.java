@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -39,13 +38,21 @@ class ShowAllSOToAll extends GameStateSubcommand {
         sb.append("**Secret Objectives:**").append("\n");
         int index = 1;
         for (String so : secretObjectives) {
-            sb.append(index).append(" - ").append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so)).append("\n");
+            sb.append(index)
+                    .append(" - ")
+                    .append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so))
+                    .append("\n");
             player.setSecret(so);
             index++;
         }
         sb.append("\n").append("**Scored Secret Objectives:**").append("\n");
         for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
-            sb.append(index).append(". (").append(so.getValue()).append(") - ").append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so.getKey())).append("\n");
+            sb.append(index)
+                    .append(". (")
+                    .append(so.getValue())
+                    .append(") - ")
+                    .append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so.getKey()))
+                    .append("\n");
             index++;
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

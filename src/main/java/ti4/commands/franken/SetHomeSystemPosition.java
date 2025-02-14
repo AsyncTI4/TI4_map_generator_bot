@@ -15,8 +15,13 @@ class SetHomeSystemPosition extends GameStateSubcommand {
 
     public SetHomeSystemPosition() {
         super(Constants.SET_HOMESYSTEM_POS, "Set home system position to override other checks.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "Home system tile. Enter 'none' to reset to default.").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.HS_TILE_POSITION,
+                        "Home system tile. Enter 'none' to reset to default.")
+                .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
@@ -35,7 +40,9 @@ class SetHomeSystemPosition extends GameStateSubcommand {
             } else {
                 player.setHomeSystemPosition(hsTileString);
                 player.setPlayerStatsAnchorPosition(hsTileString);
-                MessageHelper.sendMessageToEventChannel(event, "Home system set to " + hsTile.getRepresentation() + " for " + player.getRepresentation());
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "Home system set to " + hsTile.getRepresentation() + " for " + player.getRepresentation());
             }
         }
     }

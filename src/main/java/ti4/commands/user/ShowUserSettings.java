@@ -1,10 +1,9 @@
 package ti4.commands.user;
 
-import java.util.List;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -30,7 +29,9 @@ class ShowUserSettings extends Subcommand {
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 event.getMessageChannel(),
                 null,
-                List.of(getSettingEmbed(event, UserSettingsManager.get(event.getUser().getId()))), getUserSettingsButtons());
+                List.of(getSettingEmbed(
+                        event, UserSettingsManager.get(event.getUser().getId()))),
+                getUserSettingsButtons());
     }
 
     private static MessageEmbed getSettingEmbed(GenericInteractionCreateEvent event, UserSettings userSettings) {

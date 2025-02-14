@@ -13,7 +13,8 @@ class SCCount extends GameStateSubcommand {
 
     public SCCount() {
         super(Constants.SC_COUNT, "Strategy cards count in game", false, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card count").setRequired(true));
+        addOptions(
+                new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card count").setRequired(true));
     }
 
     @Override
@@ -24,12 +25,13 @@ class SCCount extends GameStateSubcommand {
         if (scOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify strategy card.");
             return;
-
         }
 
         int sc = scOption.getAsInt();
         if (sc < 8) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy card count is by default 8, if you want more, please select number greater that 8.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Strategy card count is by default 8, if you want more, please select number greater that 8.");
             return;
         }
         for (int i = 8; i < sc; i++) {

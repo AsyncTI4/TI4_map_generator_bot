@@ -1,10 +1,9 @@
 package ti4.listeners;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-
+import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
@@ -23,8 +22,7 @@ public class ModalListener extends ListenerAdapter {
     private final Map<String, Consumer<ModalContext>> knownModals = new HashMap<>();
 
     public static ModalListener getInstance() {
-        if (instance == null)
-            instance = new ModalListener();
+        if (instance == null) instance = new ModalListener();
         return instance;
     }
 
@@ -35,7 +33,9 @@ public class ModalListener extends ListenerAdapter {
     @Override
     public void onModalInteraction(@Nonnull ModalInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
-            event.reply("Please try again in a moment. The bot is not ready to handle button presses.").setEphemeral(true).queue();
+            event.reply("Please try again in a moment. The bot is not ready to handle button presses.")
+                    .setEphemeral(true)
+                    .queue();
             return;
         }
 
@@ -53,7 +53,8 @@ public class ModalListener extends ListenerAdapter {
                 context.save();
             }
         } catch (Exception e) {
-            String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
+            String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: "
+                    + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
             BotLogger.log(message, e);
         }
     }

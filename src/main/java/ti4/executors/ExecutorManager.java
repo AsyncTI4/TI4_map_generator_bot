@@ -5,7 +5,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.TimedRunnable;
@@ -15,7 +14,8 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class ExecutorManager {
 
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
+    private static final ExecutorService EXECUTOR_SERVICE =
+            Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
     private static final Set<String> gameExecutions = ConcurrentHashMap.newKeySet();
 
     public static void runAsync(String name, String gameName, MessageChannel messageChannel, Runnable runnable) {
@@ -26,7 +26,8 @@ public class ExecutorManager {
 
     private static boolean canExecuteGameCommand(String gameName, MessageChannel messageChannel) {
         if (GameManager.isValid(gameName) && !gameExecutions.add(gameName)) {
-            MessageHelper.sendMessageToChannel(messageChannel, "The bot hasn't finished processing the last command for this game. Please wait.");
+            MessageHelper.sendMessageToChannel(
+                    messageChannel, "The bot hasn't finished processing the last command for this game. Please wait.");
             return false;
         }
         return true;
@@ -42,7 +43,12 @@ public class ExecutorManager {
         };
     }
 
-    public static void runAsync(String name, String gameName, MessageChannel messageChannel, int executionTimeWarningThresholdSeconds, Runnable runnable) {
+    public static void runAsync(
+            String name,
+            String gameName,
+            MessageChannel messageChannel,
+            int executionTimeWarningThresholdSeconds,
+            Runnable runnable) {
         if (canExecuteGameCommand(gameName, messageChannel)) {
             runAsync(name, executionTimeWarningThresholdSeconds, wrapWithGameRelease(gameName, runnable));
         }

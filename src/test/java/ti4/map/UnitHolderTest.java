@@ -1,11 +1,10 @@
 package ti4.map;
 
-import java.awt.*;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+import java.awt.*;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Units;
-
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class UnitHolderTest {
 
@@ -44,5 +43,4 @@ class UnitHolderTest {
 
         assertThat(actuallyRemoved).isEqualTo(2);
     }
-
 }

@@ -23,7 +23,8 @@ class CombatButtonHandler {
         String planet = buttonID.split("_")[3];
         String confirmed = buttonID.split("_")[4];
         if (player != p1 && player != p2) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This button is only for combat participants");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "This button is only for combat participants");
             return;
         }
         Player opponent;
@@ -36,9 +37,15 @@ class CombatButtonHandler {
         if (opponent == null || opponent.isDummy() || confirmed.equalsIgnoreCase("confirmed")) {
             ButtonHelperModifyUnits.automateGroundCombat(p1, p2, planet, game, event);
         } else if (p1 != null && p2 != null) {
-            Button automate = Buttons.green(opponent.getFinsFactionCheckerPrefix() + "automateGroundCombat_"
-                + p1.getFaction() + "_" + p2.getFaction() + "_" + planet + "_confirmed", "Automate Combat");
-            MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), opponent.getRepresentation() + " Your opponent has voted to automate the entire combat. Press to confirm:", automate);
+            Button automate = Buttons.green(
+                    opponent.getFinsFactionCheckerPrefix() + "automateGroundCombat_" + p1.getFaction() + "_"
+                            + p2.getFaction() + "_" + planet + "_confirmed",
+                    "Automate Combat");
+            MessageHelper.sendMessageToChannelWithButton(
+                    event.getMessageChannel(),
+                    opponent.getRepresentation()
+                            + " Your opponent has voted to automate the entire combat. Press to confirm:",
+                    automate);
         }
     }
 }

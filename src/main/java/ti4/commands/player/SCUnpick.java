@@ -3,7 +3,6 @@ package ti4.commands.player;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Queue;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -21,8 +20,11 @@ class SCUnpick extends GameStateSubcommand {
 
     public SCUnpick() {
         super(Constants.SC_UNPICK, "Unpick a Strategy Card", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card imitative number").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color returning strategy card").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card imitative number")
+                .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color returning strategy card")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -31,8 +33,10 @@ class SCUnpick extends GameStateSubcommand {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
 
         Collection<Player> activePlayers = game.getPlayers().values().stream()
-            .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !"null".equals(player_.getColor()))
-            .toList();
+                .filter(player_ -> player_.getFaction() != null
+                        && !player_.getFaction().isEmpty()
+                        && !"null".equals(player_.getColor()))
+                .toList();
         int maxSCsPerPlayer = game.getSCList().size() / activePlayers.size();
 
         OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
@@ -72,20 +76,21 @@ class SCUnpick extends GameStateSubcommand {
             }
         }
 
-        //INFORM ALL PLAYER HAVE PICKED
+        // INFORM ALL PLAYER HAVE PICKED
         if (allPicked) {
             msgExtra += "\nAll players picked strategy cards.";
 
-            //ADD A TG TO UNPICKED SC
+            // ADD A TG TO UNPICKED SC
             game.incrementScTradeGoods();
 
             Player nextPlayer = null;
             int lowestSC = 100;
             for (Player player_ : activePlayers) {
                 int playersLowestSC = player_.getLowestSC();
-                String scNumberIfNaaluInPlay = game.getSCNumberIfNaaluInPlay(player_, Integer.toString(playersLowestSC));
+                String scNumberIfNaaluInPlay =
+                        game.getSCNumberIfNaaluInPlay(player_, Integer.toString(playersLowestSC));
                 if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                    nextPlayer = player_; //no further processing, this player has the 0 token
+                    nextPlayer = player_; // no further processing, this player has the 0 token
                     break;
                 }
                 if (playersLowestSC < lowestSC) {
@@ -94,7 +99,7 @@ class SCUnpick extends GameStateSubcommand {
                 }
             }
 
-            //INFORM FIRST PLAYER IS UP FOR ACTION
+            // INFORM FIRST PLAYER IS UP FOR ACTION
             if (nextPlayer != null) {
                 msgExtra += " " + nextPlayer.getRepresentation() + " is up for an action";
                 privatePlayer = nextPlayer;
@@ -102,11 +107,12 @@ class SCUnpick extends GameStateSubcommand {
             }
         }
 
-        //SEND EXTRA MESSAGE
+        // SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
             if (allPicked) {
-                msgExtra = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
-                    + StringHelper.ordinal(privatePlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
+                msgExtra = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your "
+                        + StringHelper.ordinal(privatePlayer.getInRoundTurnCount()) + " turn of round "
+                        + game.getRound() + ").";
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";

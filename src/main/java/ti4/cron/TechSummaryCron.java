@@ -2,7 +2,6 @@ package ti4.cron;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import lombok.experimental.UtilityClass;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -16,7 +15,8 @@ import ti4.model.metadata.TechSummariesMetadataManager;
 public class TechSummaryCron {
 
     public static void register() {
-        CronManager.schedulePeriodically(TechSummaryCron.class, TechSummaryCron::postTechSummaries, 5, 10, TimeUnit.MINUTES);
+        CronManager.schedulePeriodically(
+                TechSummaryCron.class, TechSummaryCron::postTechSummaries, 5, 10, TimeUnit.MINUTES);
     }
 
     private static void postTechSummaries() {
@@ -28,14 +28,16 @@ public class TechSummaryCron {
             BotLogger.log("Unable to run TechSummaryCron: TechSummary was unavailable.");
             return;
         }
-        techSummaries.gameNameToTechSummary().entrySet()
-            .removeIf(e -> tryToPostTechSummary(e.getKey(), e.getValue()));
+        techSummaries.gameNameToTechSummary().entrySet().removeIf(e -> tryToPostTechSummary(e.getKey(), e.getValue()));
     }
 
-    private static boolean tryToPostTechSummary(String gameName, TechSummariesMetadataManager.RoundTechSummaries roundTechSummaries) {
+    private static boolean tryToPostTechSummary(
+            String gameName, TechSummariesMetadataManager.RoundTechSummaries roundTechSummaries) {
         try {
             var managedGame = GameManager.getManagedGame(gameName);
-            if (managedGame == null || managedGame.isHasEnded() ||  managedGame.getTableTalkChannel() == null
+            if (managedGame == null
+                    || managedGame.isHasEnded()
+                    || managedGame.getTableTalkChannel() == null
                     || managedGame.getRound() != roundTechSummaries.round()) {
                 return true;
             }
@@ -51,7 +53,8 @@ public class TechSummaryCron {
         }
     }
 
-    private static void postTechSummary(Game game, List<TechSummariesMetadataManager.FactionTechSummary> techSummaries) {
+    private static void postTechSummary(
+            Game game, List<TechSummariesMetadataManager.FactionTechSummary> techSummaries) {
         StringBuilder msg = new StringBuilder("**__Tech Summary For Round " + game.getRound() + "__**\n");
         for (var techSummary : techSummaries) {
             Player player = game.getPlayerFromColorOrFaction(techSummary.getFaction());

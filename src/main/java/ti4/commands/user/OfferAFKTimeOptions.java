@@ -10,7 +10,11 @@ import ti4.message.MessageHelper;
 class OfferAFKTimeOptions extends GameStateSubcommand {
 
     public OfferAFKTimeOptions() {
-        super(Constants.OFFER_AFKTIME_OPTIONS, "Offer hours in UTC which you'll be afk usually in (sleeping)", true, true);
+        super(
+                Constants.OFFER_AFKTIME_OPTIONS,
+                "Offer hours in UTC which you'll be afk usually in (sleeping)",
+                true,
+                true);
     }
 
     @Override

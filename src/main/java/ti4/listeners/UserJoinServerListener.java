@@ -1,10 +1,9 @@
 package ti4.listeners;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
+import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -65,7 +64,8 @@ public class UserJoinServerListener extends ListenerAdapter {
         }
     }
 
-    private static boolean checkIfNewUserIsInExistingGameAndAutoAddRole(ManagedGame managedGame, Guild guild, User user) {
+    private static boolean checkIfNewUserIsInExistingGameAndAutoAddRole(
+            ManagedGame managedGame, Guild guild, User user) {
         var gameGuild = managedGame.getGuild();
         if (gameGuild == null || !gameGuild.equals(guild) || !managedGame.hasPlayer(user.getId())) {
             return false;
@@ -74,10 +74,18 @@ public class UserJoinServerListener extends ListenerAdapter {
         Helper.fixGameChannelPermissions(guild, game);
         ThreadChannel mapThread = game.getBotMapUpdatesThread();
         if (mapThread != null && !mapThread.isLocked()) {
-            mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
+            mapThread
+                    .getManager()
+                    .setArchived(false)
+                    .queue(
+                            success -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS),
+                            BotLogger::catchRestError);
         }
         var player = game.getPlayer(user.getId());
-        if (player == null || !ButtonHelper.isPlayerNew(player.getUserID()) || game.getTableTalkChannel() == null || game.isFowMode()) {
+        if (player == null
+                || !ButtonHelper.isPlayerNew(player.getUserID())
+                || game.getTableTalkChannel() == null
+                || game.isFowMode()) {
             return true;
         }
         String msg = user.getAsMention() + " ping here";

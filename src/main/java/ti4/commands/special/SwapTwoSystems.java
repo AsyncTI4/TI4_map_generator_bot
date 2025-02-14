@@ -14,8 +14,12 @@ class SwapTwoSystems extends GameStateSubcommand {
 
     public SwapTwoSystems() {
         super(Constants.SWAP_SYSTEMS, "Swap two systems", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override
@@ -28,7 +32,8 @@ class SwapTwoSystems extends GameStateSubcommand {
             return;
         }
 
-        Tile tileTo = CommandHelper.getTile(event, game, event.getOption(Constants.TILE_NAME_TO).getAsString());
+        Tile tileTo = CommandHelper.getTile(
+                event, game, event.getOption(Constants.TILE_NAME_TO).getAsString());
         if (tileTo == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the tile you're moving to.");
             return;

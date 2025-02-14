@@ -18,8 +18,8 @@ public class PlayerStatisticsService {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
             return;
         }
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent(getEventName(statType), event, () -> getPlayerStatistics(event, statType)));
+        StatisticsPipeline.queue(new StatisticsPipeline.StatisticsEvent(
+                getEventName(statType), event, () -> getPlayerStatistics(event, statType)));
     }
 
     private void getPlayerStatistics(SlashCommandInteractionEvent event, PlayerStatTypes statType) {

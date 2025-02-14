@@ -11,10 +11,9 @@ import ti4.message.MessageHelper;
 
 public class ReloadGame extends Subcommand {
 
-    public ReloadGame()  {
+    public ReloadGame() {
         super(Constants.RELOAD_GAME, "Reload game from disk");
-        addOptions(
-            new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name to load to").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name to load to").setRequired(true));
     }
 
     @Override

@@ -3,7 +3,6 @@ package ti4.service.statistics;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import ti4.helpers.TimedRunnable;
 import ti4.message.BotLogger;
@@ -55,7 +54,11 @@ public class StatisticsPipeline {
     }
 
     public static void run(StatisticsEvent event) {
-        event.event.getHook().sendMessage("Your statistics are being processed, please hold...").setEphemeral(true).queue();
+        event.event
+                .getHook()
+                .sendMessage("Your statistics are being processed, please hold...")
+                .setEphemeral(true)
+                .queue();
         new TimedRunnable(event.name, event.runnable).run();
     }
 

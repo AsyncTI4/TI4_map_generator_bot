@@ -14,5 +14,4 @@ public interface Selection {
     void execute(StringSelectInteractionEvent event, SelectionMenuContext context);
 
     default void postExecute(StringSelectInteractionEvent event) {}
-
 }

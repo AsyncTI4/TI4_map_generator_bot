@@ -3,7 +3,6 @@ package ti4.commands.agenda;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
@@ -30,7 +29,6 @@ public class AgendaCommand implements ParentCommand {
                     new PutDiscardBackIntoDeckAgendas(),
                     new LawInfo())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
 
     @Override
     public String getName() {

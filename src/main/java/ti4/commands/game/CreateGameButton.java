@@ -3,7 +3,6 @@ package ti4.commands.game;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
@@ -24,7 +23,8 @@ class CreateGameButton extends Subcommand {
 
     public CreateGameButton() {
         super(Constants.CREATE_GAME_BUTTON, "Create Game Creation Button");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel")
+                .setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
@@ -50,11 +50,12 @@ class CreateGameButton extends Subcommand {
                 break;
             }
         }
-        if (categoryChannel == null)
-            categoryChannel = CreateGameService.createNewCategory(categoryChannelName);
+        if (categoryChannel == null) categoryChannel = CreateGameService.createNewCategory(categoryChannelName);
         if (categoryChannel == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not automatically find a category that begins with **" + categoryChannelName
-                + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "Could not automatically find a category that begins with **" + categoryChannelName
+                            + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
             return;
         }
         // SET GUILD BASED ON CATEGORY SELECTED
@@ -66,18 +67,19 @@ class CreateGameButton extends Subcommand {
         for (int i = 1; i <= 8; i++) {
             if (Objects.nonNull(event.getOption("player" + i))) {
                 Member member = event.getOption("player" + i).getAsMember();
-                if (member != null)
-                    members.add(member);
+                if (member != null) members.add(member);
                 // Rodrigo, a player we're limiting to 7 games rn
                 if (member.getId().equalsIgnoreCase("400038967744921612")) {
-                    int amount = SearchGameHelper.searchGames(member.getUser(), event, false, false, false, true, false, true, false, true);
+                    int amount = SearchGameHelper.searchGames(
+                            member.getUser(), event, false, false, false, true, false, true, false, true);
                     if (amount > 6) {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "One of the games proposed members is currently under a limit and cannot join more games at this time");
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(),
+                                "One of the games proposed members is currently under a limit and cannot join more games at this time");
                         return;
                     }
                 }
-                if (gameOwner == null)
-                    gameOwner = member;
+                if (gameOwner == null) gameOwner = member;
             } else {
                 break;
             }
@@ -90,13 +92,22 @@ class CreateGameButton extends Subcommand {
         buttons.add(Buttons.green("createGameChannels", "Create Game"));
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
         if (!members.isEmpty()) {
-            StringBuilder buttonMsg = new StringBuilder("Game Fun Name: " + gameFunName.replace(":", "") + "\nPlayers:\n");
+            StringBuilder buttonMsg =
+                    new StringBuilder("Game Fun Name: " + gameFunName.replace(":", "") + "\nPlayers:\n");
             int counter = 1;
             for (Member member : members) {
-                buttonMsg.append(counter).append(":").append(member.getId()).append(".(").append(member.getEffectiveName().replace(":", "")).append(")\n");
+                buttonMsg
+                        .append(counter)
+                        .append(":")
+                        .append(member.getId())
+                        .append(".(")
+                        .append(member.getEffectiveName().replace(":", ""))
+                        .append(")\n");
                 counter++;
             }
-            buttonMsg.append("\n\n").append(" Please hit this button after confirming that the members are the correct ones.");
+            buttonMsg
+                    .append("\n\n")
+                    .append(" Please hit this button after confirming that the members are the correct ones.");
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(buttonMsg.toString());
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), buttonMsg.toString(), buttons);
             ActionRow actionRow = ActionRow.of(buttons);

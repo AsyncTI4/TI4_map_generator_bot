@@ -19,11 +19,7 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
     ComponentSource source;
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && text != null
-            && cardType != null
-            && source != null;
+        return alias != null && name != null && text != null && cardType != null && source != null;
     }
 
     public String autoCompleteString() {
@@ -36,7 +32,9 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getCardType().toString().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
+                || getCardType().toString().contains(searchString);
     }
 
     public String getRepresentation() {

@@ -17,8 +17,8 @@ public class GameStatisticsService {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not determine stat type.");
             return;
         }
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent(getEventName(statType), event, () -> getGameStatistics(event, statType)));
+        StatisticsPipeline.queue(new StatisticsPipeline.StatisticsEvent(
+                getEventName(statType), event, () -> getGameStatistics(event, statType)));
     }
 
     private void getGameStatistics(SlashCommandInteractionEvent event, GameStatTypes statType) {
@@ -48,6 +48,7 @@ public class GameStatisticsService {
 
     // WARNING: This iterates over each game and is very slow.
     public String getWinningPathComparison(String winningPath, int playerCount, int totalVictoryPoints) {
-        return WinningPathsStatisticsService.compareWinningPathToAllOthers(winningPath, playerCount, totalVictoryPoints);
+        return WinningPathsStatisticsService.compareWinningPathToAllOthers(
+                winningPath, playerCount, totalVictoryPoints);
     }
 }

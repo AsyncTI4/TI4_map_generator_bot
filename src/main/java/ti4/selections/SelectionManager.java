@@ -2,7 +2,6 @@ package ti4.selections;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import ti4.selections.selectmenus.BigSelectDemo;
 import ti4.selections.selectmenus.SelectFaction;
 
@@ -11,8 +10,7 @@ public class SelectionManager {
     private final List<Selection> selectionMenuList = new ArrayList<>();
     private static SelectionManager manager;
 
-    private SelectionManager() {
-    }
+    private SelectionManager() {}
 
     public static SelectionManager getInstance() {
         if (manager == null) {

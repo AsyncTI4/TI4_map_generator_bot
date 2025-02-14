@@ -12,7 +12,7 @@ public class ShipRepairComparator implements Comparator<UnitKey> {
 
     private int getAssignedValue(UnitKey ship) {
         return switch (ship.getUnitType()) {
-            case Units.UnitType.Cruiser -> 4;       // SE2 can have sustained damage
+            case Units.UnitType.Cruiser -> 4; // SE2 can have sustained damage
             case Units.UnitType.Dreadnought -> 3;
             case Units.UnitType.Flagship -> 2;
             case Units.UnitType.Warsun -> 1;

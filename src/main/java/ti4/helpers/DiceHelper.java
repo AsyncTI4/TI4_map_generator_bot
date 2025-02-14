@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
 import ti4.service.emoji.DiceEmojis;
 
 public class DiceHelper {
@@ -35,10 +34,8 @@ public class DiceHelper {
         }
 
         public String getRedDieIfSuccessOrGrayDieIfFailure() {
-            if (isSuccess())
-                return DiceEmojis.getRedDieEmoji(result);
-            else
-                return DiceEmojis.getGrayDieEmoji(result);
+            if (isSuccess()) return DiceEmojis.getRedDieEmoji(result);
+            else return DiceEmojis.getGrayDieEmoji(result);
         }
 
         public String printResult() {
@@ -85,7 +82,8 @@ public class DiceHelper {
             mapByThreshold.put(d.getThreshold(), l);
         }
 
-        List<Integer> smallestToLargest = mapByThreshold.keySet().stream().sorted().toList();
+        List<Integer> smallestToLargest =
+                mapByThreshold.keySet().stream().sorted().toList();
         StringBuilder sb = new StringBuilder();
         for (Integer threshold : smallestToLargest) {
             List<Die> results = mapByThreshold.get(threshold);

@@ -20,9 +20,18 @@ class SendCommodities extends GameStateSubcommand {
     public SendCommodities() {
         super(Constants.SEND_COMMODITIES, "Sent Commodities to player/faction", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodities count").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to which you send Commodities").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.CLEAR_DEBT, "True to automatically clear any debt with receiving player"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (defaults to you)").setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.TARGET_FACTION_OR_COLOR,
+                        "Faction or Color to which you send Commodities")
+                .setAutoComplete(true)
+                .setRequired(true));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.CLEAR_DEBT,
+                "True to automatically clear any debt with receiving player"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (defaults to you)")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -30,9 +39,11 @@ class SendCommodities extends GameStateSubcommand {
         Game game = getGame();
         Player player = getPlayer();
         if (player.hasAbility("military_industrial_complex")) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
-                + ", since you cannot send players commodities due to your **Military Industrial Complex** faction ability, sending commodities here seems likely an error."
-                + " Nothing has been processed as a result. Try a different route if this correction is wrong.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", since you cannot send players commodities due to your **Military Industrial Complex** faction ability, sending commodities here seems likely an error."
+                            + " Nothing has been processed as a result. Try a different route if this correction is wrong.");
             return;
         }
 
@@ -71,8 +82,10 @@ class SendCommodities extends GameStateSubcommand {
 
         if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
             targetPlayer.clearDebt(player, sendCommodities);
-            MessageHelper.sendMessageToEventChannel(event, targetPlayer.getRepresentation() + " cleared "
-                + sendCommodities + " debt tokens owned by " + player.getRepresentation() + ".");
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    targetPlayer.getRepresentation() + " cleared " + sendCommodities + " debt tokens owned by "
+                            + player.getRepresentation() + ".");
         }
 
         if (game.isFowMode()) {

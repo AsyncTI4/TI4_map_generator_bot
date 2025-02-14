@@ -1,7 +1,6 @@
 package ti4.commands.search;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.Command.Option;
@@ -16,7 +15,10 @@ class SearchCommandsSubcommand extends Subcommand {
 
     public SearchCommandsSubcommand() {
         super(Constants.SEARCH_COMMANDS, "List all of the bot's commands and subcommands");
-        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
+        addOptions(new OptionData(
+                OptionType.STRING,
+                Constants.SEARCH,
+                "Searches the text and limits results to those containing this string."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_OPTIONS, "True to include command options"));
         addOptions(new OptionData(OptionType.BOOLEAN, "show_counts", "True to show some debug count info"));
     }
@@ -33,7 +35,7 @@ class SearchCommandsSubcommand extends Subcommand {
         if (showCounts) sb.append(" (").append(commandCount).append("/100)");
         sb.append("\n");
 
-        //COMMANDS
+        // COMMANDS
         for (Command command : commands) {
             var subcommands = command.getSubcommands();
             int subcommandCount = subcommands.size();
@@ -46,7 +48,7 @@ class SearchCommandsSubcommand extends Subcommand {
             if (showCounts) commandSB.append(" (").append(subcommandCount).append("/25)");
             commandSB.append("\n");
 
-            //COMMAND OPTIONS
+            // COMMAND OPTIONS
             if (includeOptions) {
                 for (Option option : options) {
                     String optionText = "> `     " + option.getName() + "` : " + option.getDescription();
@@ -56,12 +58,12 @@ class SearchCommandsSubcommand extends Subcommand {
                 }
             }
 
-            //SUBCOMMANDS
+            // SUBCOMMANDS
             for (var subcommand : subcommands) {
                 String subcommandText = "> `/" + subcommand.getFullCommandName() + "` : " + subcommand.getDescription();
                 List<Option> suboptions = subcommand.getOptions();
 
-                //SUBCOMMAND OPTIONS
+                // SUBCOMMAND OPTIONS
                 StringBuilder suboptionSB = new StringBuilder();
                 if (includeOptions) {
                     for (Option option : suboptions) {
@@ -73,7 +75,9 @@ class SearchCommandsSubcommand extends Subcommand {
                 }
 
                 boolean foundMatchingOptions = !suboptionSB.isEmpty();
-                if (searchString == null || subcommandText.toLowerCase().contains(searchString.toLowerCase()) || foundMatchingOptions) {
+                if (searchString == null
+                        || subcommandText.toLowerCase().contains(searchString.toLowerCase())
+                        || foundMatchingOptions) {
                     commandSB.append(subcommandText).append("\n");
                     commandSB.append(suboptionSB);
                 }

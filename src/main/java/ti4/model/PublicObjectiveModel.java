@@ -1,14 +1,12 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -29,11 +27,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && phase != null
-            && text != null
-            && source != null;
+        return alias != null && name != null && phase != null && text != null && source != null;
     }
 
     @JsonIgnore
@@ -66,16 +60,18 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
-        String title = getObjectiveEmoji() + "__**" + getName() + "**__" + getSource().emoji();
+        // TITLE
+        String title =
+                getObjectiveEmoji() + "__**" + getName() + "**__" + getSource().emoji();
         eb.setTitle(title);
 
-        //DESCRIPTION
+        // DESCRIPTION
         eb.setDescription(getText());
 
-        //FOOTER
+        // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        if (includeID)
+            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
 
         eb.setColor(getEmbedColor());
@@ -91,7 +87,9 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

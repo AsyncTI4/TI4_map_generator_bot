@@ -1,7 +1,6 @@
 package ti4.commands.tigl;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -49,5 +48,4 @@ class TIGLShowHeroes extends Subcommand {
 
         MessageHelper.sendMessageToThread(event.getMessageChannel(), "Async Rank - Reigning Heroes", sb.toString());
     }
-
 }

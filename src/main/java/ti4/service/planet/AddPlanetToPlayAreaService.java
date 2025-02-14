@@ -2,7 +2,6 @@ package ti4.service.planet;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Constants;
@@ -16,7 +15,8 @@ import ti4.map.UnitHolder;
 @UtilityClass
 public class AddPlanetToPlayAreaService {
 
-    public static void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName, Game game) {
+    public static void addPlanetToPlayArea(
+            GenericInteractionCreateEvent event, Tile tile, String planetName, Game game) {
         if (Constants.SPACE.equals(planetName)) {
             return;
         }

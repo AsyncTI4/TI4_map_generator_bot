@@ -23,7 +23,8 @@ public class ExhaustLeaderService {
         LeaderModel leaderModel = leader.getLeaderModel().orElse(null);
         String message = player.getRepresentation() + " exhausted: ";
         if (leaderModel != null) {
-            MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), message, leaderModel.getRepresentationEmbed());
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(), message, leaderModel.getRepresentationEmbed());
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message + leader.getId());
         }
@@ -37,18 +38,28 @@ public class ExhaustLeaderService {
             } else if ("nomadagentartuno".equals(leaderModel.getID())) {
                 leaderName = "Clever Clever Artuno the Betrayer, a Nomad/Yssaril agent";
             }
-            sb.append(tgCount).append(" trade good").append(tgCount == 1 ? "" : "s")
-                .append(" were placed on top of ").append(leaderName).append(".");
+            sb.append(tgCount)
+                    .append(" trade good")
+                    .append(tgCount == 1 ? "" : "s")
+                    .append(" were placed on top of ")
+                    .append(leaderName)
+                    .append(".");
             if (leader.getTgCount() != tgCount) {
-                sb.append(" *(").append(tgCount).append(MiscEmojis.getTGorNomadCoinEmoji(game)).append(" total)*\n");
+                sb.append(" *(")
+                        .append(tgCount)
+                        .append(MiscEmojis.getTGorNomadCoinEmoji(game))
+                        .append(" total)*\n");
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         }
 
-        TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.LEADER, leader.getId(), player.getNumberTurns());
+        TemporaryCombatModifierModel possibleCombatMod =
+                CombatTempModHelper.getPossibleTempModifier(Constants.LEADER, leader.getId(), player.getNumberTurns());
         if (possibleCombatMod != null) {
             player.addNewTempCombatMod(possibleCombatMod);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Combat modifier will be applied next time you push the combat roll button.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Combat modifier will be applied next time you push the combat roll button.");
         }
     }
 }
