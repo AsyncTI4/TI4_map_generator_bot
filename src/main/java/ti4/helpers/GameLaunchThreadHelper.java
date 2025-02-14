@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
@@ -36,6 +37,6 @@ public class GameLaunchThreadHelper {
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), game.getPing() + " all users have now joined the server! Let the games begin!");
             MessageHelper.sendMessageToChannel(threadChannel, "All users have joined the game, this thread will now be closed.");
         }
-        threadChannel.getManager().setArchived(true).queue();
+        threadChannel.getManager().setArchived(true).queueAfter(5, TimeUnit.SECONDS);
     }
 }

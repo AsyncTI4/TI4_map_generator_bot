@@ -493,6 +493,7 @@ public class Constants {
     public static final String GAME = "game";
     public static final String MAP = "map";
     public static final String INFO = "info";
+    public static final String SHUFFLE_EXPLORES = "shuffle_explores";
     public static final String CHANGE_TYPE = "change_type";
     public static final String START_FRANKEN_DRAFT = "start_franken_draft";
 

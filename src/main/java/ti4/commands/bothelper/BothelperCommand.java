@@ -23,6 +23,7 @@ public class BothelperCommand implements ParentCommand {
                     new BeginVideoGeneration(),
                     new JazzCommand(),
                     new ListButtons(),
+                    new ReloadGame(),
                     new ServerGameStats(),
                     new ListDeadGames(),
                     new RemoveTitle(),
