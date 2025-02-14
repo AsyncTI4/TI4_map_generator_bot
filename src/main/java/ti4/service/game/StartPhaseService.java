@@ -403,7 +403,7 @@ public class StartPhaseService {
 
         if (playersWithSCs > 0) {
             StatusCleanupService.runStatusCleanup(game);
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " **Status Cleanup Run!**");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "### " + game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
                 MapRenderPipeline.queue(game, event, DisplayType.map,
                     fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
@@ -488,7 +488,7 @@ public class StartPhaseService {
                 }
             }
         }
-        String message2 = "Resolve status homework using the buttons. \n ";
+        String message2 = "Resolve status homework using the buttons. \n";
         game.setCurrentACDrawStatusInfo("");
         Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.ActionCard);
         Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens").withEmoji(Emoji.fromFormatted("🔺"));
@@ -506,7 +506,7 @@ public class StartPhaseService {
                 + "Please click the \"Ready For Agenda\" button once you are done resolving these or if you decline to do so.";
         } else {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Strategy Phase");
-            message2 += "This is the moment when you should resolve: \n-_ Political Stability_ \n- _Summit_ \n- _Manipulate Investments_\n"
+            message2 += "This is the moment when you should resolve: \n-_Political Stability_ \n- _Summit_ \n- _Manipulate Investments_\n"
                 + "Please click the \"Ready For Strategy Phase\" button once you are done resolving these or if you decline to do so.";
         }
         List<Button> buttons = new ArrayList<>();

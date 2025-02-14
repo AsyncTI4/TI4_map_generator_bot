@@ -23,7 +23,7 @@ public class RevealPublicObjectiveService {
         Map.Entry<String, Integer> objective = game.revealStage2();
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        MessageHelper.sendMessageToChannel(channel, game.getPing() + " **Stage 2 Public Objective Revealed**");
+        MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + " **Stage 2 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
             if (!game.isFowMode()) {
@@ -47,7 +47,7 @@ public class RevealPublicObjectiveService {
                     ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                game.getPing() + " **Status Cleanup Run!**");
+                "### " + game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
                 DisplayType displayType = DisplayType.map;
                 MapRenderPipeline.queue(game, event, displayType,
@@ -85,7 +85,7 @@ public class RevealPublicObjectiveService {
     public void revealS1(Game game, GenericInteractionCreateEvent event, MessageChannel channel) {
         Map.Entry<String, Integer> objective = game.revealStage1();
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        MessageHelper.sendMessageToChannel(channel, game.getPing() + " **Stage 1 Public Objective Revealed**");
+        MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + " **Stage 1 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
             if (!game.isFowMode()) {
@@ -107,7 +107,7 @@ public class RevealPublicObjectiveService {
                 MessageHelper.sendMessageToChannel(channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                game.getPing() + " **Status Cleanup Run!**");
+                "### " + game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
                 MapRenderPipeline.queue(game, event, DisplayType.map,
                     fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));

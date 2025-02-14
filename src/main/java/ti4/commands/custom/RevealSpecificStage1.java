@@ -28,7 +28,7 @@ class RevealSpecificStage1 extends GameStateSubcommand {
             return;
         }
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        MessageHelper.sendMessageToChannel(event.getChannel(), game.getPing() + " **Stage 1 Public Objective Revealed**");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "### " + game.getPing() + " **Stage 1 Public Objective Revealed**");
         event.getChannel().sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
     }
 }

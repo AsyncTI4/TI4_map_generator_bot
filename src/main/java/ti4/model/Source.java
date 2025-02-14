@@ -21,7 +21,7 @@ public class Source {
         draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000, fow, dane_leaks,
 
         // personal projs
-        somno, ignis_aurora, asteroid, cryypter, voice_of_the_council, cpti, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma, byz_agendas, memephilosopher,
+        somno, ignis_aurora, asteroid, cryypter, voice_of_the_council, cpti, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma, byz_agendas, memephilosopher, riftset,
 
         // catchall
         other;
@@ -71,7 +71,7 @@ public class Source {
                 case absol -> SourceEmojis.Absol;
                 case ds -> SourceEmojis.DiscordantStars;
                 case uncharted_space -> SourceEmojis.UnchartedSpace;
-                case eronous -> SourceEmojis.Eronous;
+                case eronous, riftset -> SourceEmojis.Eronous;
                 case admins -> FactionEmojis.AdminsFaction;
                 case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
                 case keleresplus -> SourceEmojis.KeleresPlus;

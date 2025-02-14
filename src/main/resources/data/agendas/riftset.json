@@ -1,0 +1,11 @@
+[
+    {
+        "alias": "riftset_crucible",
+        "name": "Crucible Reallocation",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player gets Crucible from whoever currently has it.",
+        "text2": "",
+        "source": "riftset"
+    }
+]
