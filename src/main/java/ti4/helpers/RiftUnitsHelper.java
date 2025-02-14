@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -26,6 +24,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
@@ -152,6 +151,7 @@ public class RiftUnitsHelper {
             var parsedUnit = new ParsedUnit(unitKey);
             RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
             msg += " and failed. Condolences for your loss.";
+            cabal = RiftSetModeService.getCabalPlayer(game);
             if (cabal != null && cabal != player
                 && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
