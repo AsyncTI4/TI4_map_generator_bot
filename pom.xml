@@ -134,7 +134,7 @@
             <removeUnusedImports/>
             <java>
               <formatAnnotations/>
-              <googleJavaFormat/>
+              <palantirJavaFormat/>
             </java>
             <pom>
               <sortPom>
