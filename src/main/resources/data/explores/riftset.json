@@ -1,0 +1,11 @@
+[
+    {
+        "id": "riftset_invasion",
+        "name": "Unstable Rifts",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Ping your GM to resolve.\nAfter resolving this event, you may explore another frontier token in this system.",
+        "flavorText": "The air warps and twists as the gravity rift splits wide, spilling forth unseen horrors.",
+        "source": "riftset"
+    }
+]
