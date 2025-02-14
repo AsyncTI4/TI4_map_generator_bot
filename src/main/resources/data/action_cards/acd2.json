@@ -129,8 +129,8 @@
     "alias": "chain_reaction",
     "name": "Chain Reaction",
     "phase": "Action",
-    "window": "After you destroy another player's non-fighter ship in the active system",
-    "text": "Produce 1 hit against that player's ships in that system. Then, roll 1 die; on a result of 7-10, apply -1 to the result of each of your future die rolls during this ability and repeat its effect.",
+    "window": "After you destroy 1 of your opponent's non-fighter ships",
+    "text": "Produce 1 hit against your opponent's ships. Then, roll 1 die; on a result of 7-10, apply -1 to the result of each of your future die rolls during this ability and repeat its effect.",
     "flavorText": "As Jace tore through the enemy line, his ordnance erupted into a symphony of explosions.",
     "source": "action_deck_2"
   },
@@ -337,7 +337,7 @@
     "name": "Espionage",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose another player with the most victory points. Either look at 1 of that player's unscored secret objectives, at random, or look at their action cards.",
+    "text": "Choose another player with the most victory points. Either look at 1 of that player's unscored secret objectives, at random, or their action cards.",
     "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
     "source": "action_deck_2"
   },
@@ -445,7 +445,7 @@
     "name": "Heist",
     "phase": "Action",
     "window": "After you gain control of a planet that was controlled by another player",
-    "text": "Take up to 2 of that player's relic fragments. Then, for each, you may discard that relic fragment to gain 2 trade goods.",
+    "text": "Take up to 2 of that player's relic fragments. Then, for each of those relic fragments, you may discard that card to gain 2 trade goods.",
     "flavorText": "Mot awoke in a pool of his own blood. S'ula had the courtesy to let him live—just barely—but he was too weak to stand. So, he lay in front of the empty vault and wept.",
     "source": "action_deck_2"
   },
