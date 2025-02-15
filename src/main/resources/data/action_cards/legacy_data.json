@@ -879,7 +879,7 @@
         "window": "After an agenda is revealed",
         "text": "Choose another player. That player may give you 1 random promissory note from their hand; otherwise, they must cast at least 1 vote for an outcome of your choice during this agenda, if able.",
         "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
-        "source": "action_deck_2"
+        "source": "action_deck_2_old"
     },
     {
         "alias": "energy_pulse",
@@ -888,7 +888,7 @@
         "window": "After the \"Move Ships\" substep of a tactical action in a system that contains your units",
         "text": "Choose 1 non-flagship unit in that system. That unit loses its printed abilities during this tactical action.",
         "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
-        "source": "action_deck_2"
+        "source": "action_deck_2_old"
     },
     {
         "alias": "smuggler_routes_acd2",
@@ -897,6 +897,15 @@
         "window": "Action",
         "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this action. [Note: You can transport units during this movement.]",
         "flavorText": "Greg closed his book, a tale of the Passage of Tears, with a sigh. As he looked to the sky and imagined the space beyond—a place he had never been—he quietly sang in tune with the Symphony, \"I wanna be where the Mentak are. I wanna see—wanna see 'em raidin'.\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "spatial_collapse",
+        "name": "Spatial Collapse",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Swap the positions of 2 adjacent, non-home systems, other than the Mecatol Rex system and the Wormhole Nexus; one of the chosen systems must contain your ships.",
+        "flavorText": "The reports were so incredible that Rin demanded a firsthand view. Defying all she knew, the spatial dimension was a twisted mockery of itself, the nearby systems perfectly mirrored in position.",
         "source": "action_deck_2_old"
     }
 ]
