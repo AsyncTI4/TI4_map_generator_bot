@@ -310,7 +310,7 @@
     "name": "Discord",
     "phase": "Action",
     "window": "When a player performs a strategic action",
-    "text": "Choose another player. If that player spends a command token during this strategic action, they must spend 1 additional token from their command sheet, if able.",
+    "text": "Choose 1 player. If that player spends a command token during this strategic action, they must spend 1 additional token from their command sheet, if able.",
     "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their human minions had done well.",
     "source": "action_deck_2"
   },
@@ -418,7 +418,7 @@
     "name": "Foreign Aid",
     "phase": "Action",
     "window": "When you perform a strategic action",
-    "text": "Choose up to 2 other players. During this strategic action, those players do not have to spend or place a command token to resolve the secondary ability of your strategy card.",
+    "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
     "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
     "source": "action_deck_2"
   },
