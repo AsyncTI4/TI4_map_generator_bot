@@ -40,7 +40,7 @@
     "name": "Armistice",
     "phase": "Action",
     "window": "When another player activates a system that contains your units",
-    "text": "That player may discard 1 random action card from their hand to return their command token from that system to their tactic pool. Then, end that player's turn.",
+    "text": "Return that player's command token from that system to their tactic pool and end their turn.",
     "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
     "source": "action_deck_2"
   },
@@ -76,7 +76,7 @@
     "name": "Betrayal",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "Choose another player. That player gives you 1 random action card from their hand. During this turn, that player cannot choose to play action cards or promissory notes.",
+    "text": "Choose another player. During this turn, that player cannot choose to play action cards or promissory notes.",
     "flavorText": "The cabin door exploded as they forced it open, sending three of Claire's guards to their graves. Inside, they found neither Ronald nor the documents signed by the Custodian arbiter.",
     "source": "action_deck_2"
   },
@@ -256,7 +256,7 @@
     "name": "Deflection",
     "phase": "Strategy",
     "window": "At the start of the strategy phase",
-    "text": "Choose 1 strategy card. During this strategy phase, other players must spend 1 token from their strategy pool to choose that strategy card, if they have another choice.",
+    "text": "Choose 1 strategy card. During this strategy phase, other players must spend 1 token from their strategy pool to choose that strategy card, if able.",
     "flavorText": "\"It was their idea,\" Zo Cou shrugged. \"Or so they believe. Their mistake was a poison I fed them. Now they choke on it.\"",
     "source": "action_deck_2"
   },
@@ -783,6 +783,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "retrofit",
+    "name": "Retrofit",
+    "phase": "Action",
+    "window": "After a player activates a system",
+    "text": "Choose 1 of your non-fighter ships. That unit gains SPACE CANNON 6, BOMBARDMENT 5, or SUSTAIN DAMAGE during this tactical action.",
+    "flavorText": "The massive cannon platform floated between two ships, held in place by tractor beams. Mendosa admired the engineering—right up until it fired and hurled itself into deep space.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "revolution",
     "name": "Revolution",
     "phase": "Strategy",
@@ -954,15 +963,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "spatial_collapse",
-    "name": "Spatial Collapse",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Swap the positions of 2 adjacent, non-home systems, other than the Mecatol Rex system and the Wormhole Nexus; one of the chosen systems must contain your ships.",
-    "flavorText": "The reports were so incredible that Rin demanded a firsthand view. Defying all she knew, the spatial dimension was a twisted mockery of itself, the nearby systems perfectly mirrored in position.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "special_considerations",
     "name": "Special Considerations",
     "phase": "Agenda",
@@ -1012,7 +1012,7 @@
     "name": "Syndicate",
     "phase": "Action",
     "window": "Action",
-    "text": "Reveal a number of cards from the top of the action card deck equal to the number of players. Each player takes 1 of those cards of your choice. During this turn, you can exchange action cards as part of transactions.",
+    "text": "Reveal a number of cards from the top of the action card deck equal to the number of players. Each player takes 1 of those cards of your choice.",
     "flavorText": "\"What if I'm not ready?\" the operative asked, looking away. Harka squeezed her hand. \"Believe in me, who believes in you.\"",
     "source": "action_deck_2"
   },
