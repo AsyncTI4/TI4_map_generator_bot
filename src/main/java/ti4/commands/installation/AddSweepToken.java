@@ -8,6 +8,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -26,7 +27,8 @@ class AddSweepToken extends GameStateSubcommand {
         Player player = getPlayer();
 
         String tileOption = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
-        Tile tile = TileHelper.getTile(event, tileOption, game);
+        String tileID = AliasHandler.resolveTile(tileOption);
+        Tile tile = TileHelper.getTile(event, tileID, game);
         if (tile == null) return;
 
         String sweepToken = Mapper.getSweepID(player.getColor());

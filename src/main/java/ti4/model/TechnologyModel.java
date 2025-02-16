@@ -52,18 +52,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                 case WARFARE -> TechEmojis.WarfareTech.toString();
                 case BIOTIC -> TechEmojis.BioticTech.toString();
                 case UNITUPGRADE -> TechEmojis.UnitUpgradeTech.toString();
-                case NONE -> "";
-            };
-        }
-
-        public String readableName() {
-            return switch (this) {
-                case PROPULSION -> "Propulsion";
-                case CYBERNETIC -> "Cybernetic";
-                case WARFARE -> "Warfare";
-                case BIOTIC -> "Biotic";
-                case UNITUPGRADE -> "Unit Upgrade";
-                case NONE -> "<None>";
+                default -> "";
             };
         }
 

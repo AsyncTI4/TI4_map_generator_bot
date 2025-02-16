@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -116,20 +115,5 @@ public class MapTemplateModel implements ModelInterface {
 
         if (!Helper.isInteger(firstTwoDigits)) return 0;
         return Integer.parseInt(firstTwoDigits);
-    }
-
-    public List<Integer> getSortedHomeSystemLocations() {
-        List<Integer> locations = new ArrayList<>();
-        for (int i = 1; i <= playerCount; i++) {
-            for (MapTemplateTile t : templateTiles) {
-                if (i != Objects.requireNonNullElse(t.getPlayerNumber(), 0)) continue;
-                if (!Objects.requireNonNullElse(t.getHome(), false)) continue;
-
-                try {
-                    locations.add(Integer.parseInt(t.getPos()));
-                } catch (Exception e) {}
-            }
-        }
-        return locations;
     }
 }

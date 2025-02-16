@@ -10,9 +10,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateCommand;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -27,13 +27,13 @@ abstract class AddRemoveTokenCommand extends GameStateCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.PLANET, "Planet name")
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
-                .setAutoComplete(true));
+                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.PLANET, "Planet name")
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -70,8 +70,16 @@ abstract class AddRemoveTokenCommand extends GameStateCommand {
         String tileString = tileOptions.toLowerCase().replace(" ", "");
         StringTokenizer tileTokenizer = new StringTokenizer(tileString, ",");
         while (tileTokenizer.hasMoreTokens()) {
-            String tileID = tileTokenizer.nextToken();
-            Tile tile = TileHelper.getTile(event, tileID, game);
+            String tileID = AliasHandler.resolveTile(tileTokenizer.nextToken());
+
+            if (game.isTileDuplicated(tileID)) {
+                MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
+                return;
+            }
+            Tile tile = game.getTile(tileID);
+            if (tile == null) {
+                tile = game.getTileByPosition(tileID);
+            }
             if (tile == null) {
                 MessageHelper.replyToMessage(event, "Tile in map not found");
                 return;

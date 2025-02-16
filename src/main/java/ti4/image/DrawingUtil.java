@@ -54,8 +54,7 @@ public class DrawingUtil {
         MapGenerator.HorizontalAlign horizontalAlignment,
         MapGenerator.VerticalAlign verticalAlignment,
         Stroke outlineSize,
-        Color outlineColor
-    ) {
+        Color outlineColor) {
         if (txt == null) return;
 
         int width = g.getFontMetrics().stringWidth(txt);
@@ -251,12 +250,6 @@ public class DrawingUtil {
         g.drawString(text, x, y);
     }
 
-    public static void getAndDrawControlToken(Graphics graphics, Player player, int x, int y, boolean hideFactionIcon, float scale) {
-        String color = (player == null || hideFactionIcon) ? "gray" : player.getColor();
-        BufferedImage controlToken = ImageHelper.readScaled(Mapper.getCCPath(Mapper.getControlID(color)), scale);
-        drawControlToken(graphics, controlToken, player, x, y, hideFactionIcon, scale);
-    }
-
     public static void drawControlToken(Graphics graphics, BufferedImage bottomTokenImage, Player player, int x, int y, boolean hideFactionIcon, float scale) {
         graphics.drawImage(bottomTokenImage, x, y, null);
 
@@ -299,22 +292,6 @@ public class DrawingUtil {
 
     public BufferedImage hexBorder(String hexBorderStyle, ColorModel color, List<Integer> openSides) {
         return hexBorder(color, openSides, hexBorderStyle.equals("solid"));
-    }
-
-    public BufferedImage tintedBackground(Color color, float alpha) {
-        BufferedImage bgImg = new BufferedImage(345, 299, BufferedImage.TYPE_INT_ARGB);
-        Polygon p = new Polygon();
-        for (int i = 0; i < 6; i++) {
-            int theta = 0 + i * 60;
-            int x = Math.clamp(Math.round(172.0 * Math.cos(Math.toRadians(theta)) + 172.5), 0, 345);
-            int y = Math.clamp(Math.round(172.0 * Math.sin(Math.toRadians(theta)) + 149.5), 0, 299);
-            p.addPoint(x, y);
-        }
-        Graphics2D g2 = bgImg.createGraphics();
-        g2.setColor(color);
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-        g2.fillPolygon(p);
-        return bgImg;
     }
 
     private BufferedImage hexBorder(ColorModel color, List<Integer> openSides, boolean solidLines) {
@@ -394,10 +371,10 @@ public class DrawingUtil {
     }
 
     public static void drawPlayerFactionIconImageOpaque(Graphics graphics, Player player, int x, int y, int width, int height, Float opacity) {
-        BufferedImage resourceBufferedImage = DrawingUtil.getPlayerFactionIconImageScaled(player, width, height);
-        if (resourceBufferedImage == null)
+        if (player == null)
             return;
         try {
+            BufferedImage resourceBufferedImage = DrawingUtil.getPlayerFactionIconImageScaled(player, width, height);
             Graphics2D g2 = (Graphics2D) graphics;
             float opacityToSet = opacity == null ? 1.0f : opacity;
             boolean setOpacity = opacity != null && !opacity.equals(1.0f);
@@ -406,29 +383,6 @@ public class DrawingUtil {
             g2.drawImage(resourceBufferedImage, x, y, null);
             if (setOpacity)
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
-        } catch (Exception e) {
-            BotLogger.log("Could not display player's faction icon image", e);
-        }
-    }
-
-    public static void drawPlayerFactionIconImageUnderlay(Graphics graphics, Player player, int x, int y, int width, int height) {
-        BufferedImage faction = DrawingUtil.getPlayerFactionIconImageScaled(player, width, height);
-        if (faction == null)
-            return;
-        try {
-            BufferedImage underlay = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            for (int i = 0; i < faction.getWidth(); i++) {
-                for (int j = 0; j < faction.getHeight(); j++) {
-                    long argb = Integer.toUnsignedLong(faction.getRGB(i, j));
-                    long alpha = (argb & 0xFF000000l) >> 24;
-                    System.out.println(Long.toHexString(argb) + " -> " + Long.toHexString(alpha));
-                    if (alpha > 127) {
-                        underlay.setRGB(i, j, 0xFF000000);
-                    }
-                }
-            }
-            Graphics2D g2 = (Graphics2D) graphics;
-            g2.drawImage(underlay, x, y, null);
         } catch (Exception e) {
             BotLogger.log("Could not display player's faction icon image", e);
         }

@@ -44,6 +44,7 @@ import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.RemoveUnitService;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -245,6 +246,7 @@ public class CombatRollService {
                 String msg = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered " + h + " hit" + (h == 1 ? "" : "s") + " in round #" + round2 + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 if (h > 0) {
+
                     String finChecker = "FFCC_" + opponent.getFaction() + "_";
                     if (opponent.isDummy()) {
                         buttons.add(Buttons.green(opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h, "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
@@ -309,9 +311,11 @@ public class CombatRollService {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
         }
         if (!game.isFowMode() && rollType == CombatRollType.bombardment && h > 0) {
+
             List<Button> buttons = new ArrayList<>();
 
             buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "_bombardment", "Assign Hit" + (h == 1 ? "" : "s")));
+
             String msg2 = " you may use this button to assign " + (h == 1 ? "the BOMBARDMENT hit" : "BOMBARDMENT hits") + ".";
             boolean someone = false;
             for (Player p2 : game.getRealPlayers()) {
@@ -346,15 +350,9 @@ public class CombatRollService {
         return h;
     }
 
-    public static String rollForUnits(
-        Map<UnitModel, Integer> playerUnits,
-        List<NamedCombatModifierModel> extraRolls,
-        List<NamedCombatModifierModel> autoMods,
-        List<NamedCombatModifierModel> tempMods,
-        Player player, Player opponent,
-        Game game, CombatRollType rollType,
-        GenericInteractionCreateEvent event, Tile activeSystem
-    ) {
+    public static String rollForUnits(Map<UnitModel, Integer> playerUnits, List<NamedCombatModifierModel> extraRolls,
+        List<NamedCombatModifierModel> autoMods, List<NamedCombatModifierModel> tempMods, Player player,
+        Player opponent, Game game, CombatRollType rollType, GenericInteractionCreateEvent event, Tile activeSystem) {
         String result = "";
 
         List<NamedCombatModifierModel> mods = new ArrayList<>(autoMods);
@@ -413,7 +411,8 @@ public class CombatRollService {
             }
             if (unitModel.getId().equalsIgnoreCase("sigma_jolnar_flagship_1") || unitModel.getId().equalsIgnoreCase("sigma_jolnar_flagship_2")) {
                 int additionalDice = hitRolls;
-                while (hitRolls < 100 && additionalDice > 0) {
+                while (hitRolls < 100 && additionalDice > 0)
+                {
                     List<DiceHelper.Die> additionalResultRolls = DiceHelper.rollDice(toHit - modifierToHit, additionalDice);
                     additionalDice = DiceHelper.countSuccesses(additionalResultRolls);
                     hitRolls += additionalDice;
@@ -627,10 +626,8 @@ public class CombatRollService {
         return opponent;
     }
 
-    public static Map<UnitModel, Integer> getUnitsInCombat(
-        Tile tile, UnitHolder unitHolder, Player player,
-        GenericInteractionCreateEvent event, CombatRollType roleType, Game game
-    ) {
+    public static Map<UnitModel, Integer> getUnitsInCombat(Tile tile, UnitHolder unitHolder, Player player,
+        GenericInteractionCreateEvent event, CombatRollType roleType, Game game) {
         Planet unitHolderPlanet = null;
         if (unitHolder instanceof Planet) {
             unitHolderPlanet = (Planet) unitHolder;
@@ -644,7 +641,8 @@ public class CombatRollService {
         };
     }
 
-    public static Map<UnitModel, Integer> getUnitsInCombatRound(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event, Tile tile) {
+    public static Map<UnitModel, Integer> getUnitsInCombatRound(UnitHolder unitHolder, Player player,
+        GenericInteractionCreateEvent event, Tile tile) {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
@@ -698,7 +696,8 @@ public class CombatRollService {
         return output;
     }
 
-    public static Map<UnitModel, Integer> getUnitsInAFB(Tile tile, Player player, GenericInteractionCreateEvent event) {
+    public static Map<UnitModel, Integer> getUnitsInAFB(Tile tile, Player player,
+        GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
 
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
@@ -735,7 +734,8 @@ public class CombatRollService {
         }
     }
 
-    public static Map<UnitModel, Integer> getUnitsInBombardment(Tile tile, Player player, GenericInteractionCreateEvent event) {
+    public static Map<UnitModel, Integer> getUnitsInBombardment(Tile tile, Player player,
+        GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -751,7 +751,8 @@ public class CombatRollService {
         return output;
     }
 
-    public static Map<UnitModel, Integer> getUnitsInSpaceCannonDefence(Planet planet, Player player, GenericInteractionCreateEvent event) {
+    public static Map<UnitModel, Integer> getUnitsInSpaceCannonDefence(Planet planet, Player player,
+        GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
 
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
@@ -777,7 +778,7 @@ public class CombatRollService {
         // Check for space cannon die on planet
         PlanetModel planetModel = Mapper.getPlanet(planet.getName());
         String ccID = Mapper.getControlID(player.getColor());
-        if (player.controlsMecatol(true) && Constants.MECATOLS.contains(planet.getName()) && player.hasIIHQ()) {
+        if (player.controlsMecatol(true) && Constants.MECATOLS.contains(planet.getName()) && player.hasTech("iihq")) {
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
             planet.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
             planet.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
@@ -803,7 +804,8 @@ public class CombatRollService {
         return output;
     }
 
-    public static Map<UnitModel, Integer> getUnitsInSpaceCannonOffense(Tile tile, Player player, GenericInteractionCreateEvent event, Game game) {
+    public static Map<UnitModel, Integer> getUnitsInSpaceCannonOffense(Tile tile, Player player,
+        GenericInteractionCreateEvent event, Game game) {
         String colorID = Mapper.getColorID(player.getColor());
 
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
@@ -840,7 +842,7 @@ public class CombatRollService {
 
         for (UnitHolder unitHolder : unitHolders) {
             if (unitHolder instanceof Planet planet) {
-                if (player.controlsMecatol(true) && Constants.MECATOLS.contains(planet.getName()) && player.hasIIHQ()) {
+                if (player.controlsMecatol(true) && Constants.MECATOLS.contains(planet.getName()) && player.hasTech("iihq")) {
                     PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
                     planet.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
                     planet.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
@@ -917,7 +919,8 @@ public class CombatRollService {
         return output;
     }
 
-    private static void checkBadUnits(Player player, GenericInteractionCreateEvent event, Map<String, Integer> unitsByAsyncId, HashMap<UnitModel, Integer> output) {
+    private static void checkBadUnits(Player player, GenericInteractionCreateEvent event,
+        Map<String, Integer> unitsByAsyncId, HashMap<UnitModel, Integer> output) {
         Set<String> duplicates = new HashSet<>();
         List<String> dupes = output.keySet().stream()
             .filter(unit -> !duplicates.add(unit.getAsyncId()))

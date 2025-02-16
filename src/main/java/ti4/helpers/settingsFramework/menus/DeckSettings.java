@@ -2,7 +2,6 @@ package ti4.helpers.settingsFramework.menus;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,10 +11,12 @@ import lombok.Getter;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.model.DeckModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
 
 // This is a sub-menu
 @Getter
@@ -37,42 +38,48 @@ public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private ChoiceSetting<DeckModel> deckChoice(String id, String defaultDeck, DeckModel.DeckType deckType) {
+    private ChoiceSetting<DeckModel> deckChoice(String id, String name, String defaultDeck, DeckModel.DeckType deckType, TI4Emoji emoji) {
         List<DeckModel> decks = Mapper.getDecks().values().stream().filter(deck -> deck.getType() == deckType).toList();
 
-        ChoiceSetting<DeckModel> choice = new ChoiceSetting<>(id, deckType.typeName(), defaultDeck);
-        choice.setEmoji(deckType.deckEmoji());
+        ChoiceSetting<DeckModel> choice = new ChoiceSetting<>(id, name, defaultDeck);
+        choice.setEmoji(emoji);
         choice.setShow(DeckModel::getName);
         choice.setAllValues(decks.stream().collect(Collectors.toMap(DeckModel::getAlias, x -> x)));
         return choice;
     }
 
-    protected DeckSettings(JsonNode json, SettingsMenu parent, Optional<Game> game) {
+    protected DeckSettings(JsonNode json, SettingsMenu parent) {
         super("decks", "Card Decks", "Manually adjust which decks your game will use. This should be automatic, for the most part", parent);
 
-        // Get default deck IDs for this game
-        String defaultStage1 = game.map(Game::getStage1PublicDeckID).orElse("public_stage_1_objectives_pok");
-        String defaultStage2 = game.map(Game::getStage2PublicDeckID).orElse("public_stage_2_objectives_pok");
-        String defaultSecret = game.map(Game::getSoDeckID).orElse("secret_objectives_pok");
-        String defaultACdeck = game.map(Game::getAcDeckID).orElse("action_cards_pok");
-        String defaultAgendas = game.map(Game::getAgendaDeckID).orElse("agendas_pok");
-        String defaultTechs = game.map(Game::getTechnologyDeckID).orElse("techs_pok");
-        String defaultRelics = game.map(Game::getRelicDeckID).orElse("relics_pok");
-        String defaultExplores = game.map(Game::getExplorationDeckID).orElse("explores_pok");
-        String defaultSCs = game.map(Game::getScSetID).orElse("pok");
-
         // Initialize deck settings to default values
-        stage1 = deckChoice("Stg1Deck", defaultStage1, DeckModel.DeckType.PUBLIC_STAGE_1_OBJECTIVE);
-        stage2 = deckChoice("Stg2Deck", defaultStage2, DeckModel.DeckType.PUBLIC_STAGE_2_OBJECTIVE);
-        secrets = deckChoice("SecretDeck", defaultSecret, DeckModel.DeckType.SECRET_OBJECTIVE);
-        actionCards = deckChoice("ACs", defaultACdeck, DeckModel.DeckType.ACTION_CARD);
-        agendas = deckChoice("Agendas", defaultAgendas, DeckModel.DeckType.AGENDA);
-        techs = deckChoice("Techs", defaultTechs, DeckModel.DeckType.TECHNOLOGY);
-        relics = deckChoice("Relics", defaultRelics, DeckModel.DeckType.RELIC);
-        explores = deckChoice("Explores", defaultExplores, DeckModel.DeckType.EXPLORE);
+        stage1 = deckChoice("Stg1Deck", "Stage 1 Deck", "public_stage_1_objectives_pok",
+            DeckModel.DeckType.PUBLIC_STAGE_1_OBJECTIVE, CardEmojis.Public1);
+
+        stage2 = deckChoice("Stg2Deck", "Stage 2 Deck", "public_stage_2_objectives_pok",
+            DeckModel.DeckType.PUBLIC_STAGE_2_OBJECTIVE, CardEmojis.Public2);
+
+        secrets = deckChoice("SecretDeck", "Secrets Deck", "secret_objectives_pok",
+            DeckModel.DeckType.SECRET_OBJECTIVE, CardEmojis.SecretObjective);
+
+        actionCards = deckChoice("ACs", "Action Card Deck", "action_cards_pok",
+            DeckModel.DeckType.ACTION_CARD, CardEmojis.ActionCard);
+
+        agendas = deckChoice("Agendas", "Agenda Deck", "agendas_pok",
+            DeckModel.DeckType.AGENDA, CardEmojis.Agenda);
+
+        techs = deckChoice("Techs", "Technology Deck", "techs_pok",
+            DeckModel.DeckType.TECHNOLOGY, TechEmojis.NonUnitTechSkip);
+
+        relics = deckChoice("Relics", "Relic Deck", "relics_pok",
+            DeckModel.DeckType.RELIC, ExploreEmojis.Relic);
+
+        explores = deckChoice("Explores", "Explore Decks", "explores_pok",
+            DeckModel.DeckType.EXPLORE, ExploreEmojis.Frontier);
+
+        //scenarios = deckChoice("Scenarios", "Scenario Deck", "scenario", null);
 
         // Initialize strat cards to default values
-        stratCards = new ChoiceSetting<>("StratCards", "Strat Card Set", defaultSCs);
+        stratCards = new ChoiceSetting<>("StratCards", "Strat Card Set", "pok");
         stratCards.setEmoji(CardEmojis.SCFrontBlank);
         stratCards.setAllValues(Mapper.getStrategyCardSets());
         stratCards.setShow(StrategyCardSetModel::getName);
@@ -92,6 +99,7 @@ public class DeckSettings extends SettingsMenu {
             techs.initialize(json.get("techs"));
             relics.initialize(json.get("relics"));
             explores.initialize(json.get("explores"));
+            //scenarios.initialize(json.get("scenarios"));
             stratCards.initialize(json.get("stratCards"));
         }
     }
@@ -111,6 +119,7 @@ public class DeckSettings extends SettingsMenu {
         ls.add(relics);
         ls.add(explores);
         ls.add(stratCards);
+        //ls.add(scenarios);
         return ls;
     }
 }

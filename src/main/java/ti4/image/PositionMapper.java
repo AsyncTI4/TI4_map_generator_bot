@@ -24,7 +24,6 @@ import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.ShipPositionModel;
-import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.model.TileModel;
 
 //Handles positions of map
@@ -64,14 +63,19 @@ public class PositionMapper {
             return null;
         }
         var tileIdToPlanets = TileHelper.getPlanetsByTileId(tileID);
-        return tileIdToPlanets == null ? null : tileIdToPlanets.stream().collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
+        return tileIdToPlanets == null ? null :
+                tileIdToPlanets.stream().collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
     }
 
     public static List<Point> getSpaceTokenPositions(String tileID) {
         List<Point> backup = List.of(new Point(190, 30), new Point(215, 110), new Point(185, 205), new Point(100, 190), new Point(60, 130));
         TileModel tile = TileHelper.getTileById(tileID);
 
-        return Optional.ofNullable(tile.getShipPositionsType()).map(ShipPosition::getSpaceTokenLayout).orElse(backup);
+        if (Optional.ofNullable(tile.getShipPositionsType()).isPresent()) {
+            return Optional.ofNullable(tile.getShipPositionsType().getSpaceTokenLayout()).orElse(backup);
+        } else {
+            return backup;
+        }
     }
 
     public static boolean isTilePositionValid(String position) {
@@ -242,10 +246,10 @@ public class PositionMapper {
     }
 
     /**
-     * @return List of tiles adjacent to position in clockwise compass order: [N, NE, SE, S, SW, NW]
+     * @return List of tiles adjacent to tileID in clockwise compass order: [N, NE, SE, S, SW, NW]
      */
-    public static List<String> getAdjacentTilePositions(String position) {
-        String property = tileAdjacencies.getProperty(position);
+    public static List<String> getAdjacentTilePositions(String tileID) {
+        String property = tileAdjacencies.getProperty(tileID);
         if (property == null) {
             return Collections.emptyList();
         }
@@ -254,13 +258,13 @@ public class PositionMapper {
 
     // Below is JAZZ's attempt to rewrite the rewrite mentioned below. Adjacencies should follow the correct order (verification needed)
     // Below is an attempt to rewrite the above method to allow for ring count up to 16 without needing to specify adjacencies within .prop file - currently stuck on ensuring the adjacencies follow the correct order of [N, NE, SE, S, SW, NW]
-    public static List<String> getAdjacentTilePositionsNew(String position) {
+    public static List<String> getAdjacentTilePositionsNew(String tileID) {
         List<String> adjacentTiles = new ArrayList<>();
-        if (!Helper.isInteger(position)) return adjacentTiles;
-        if (position.equals("000")) return List.of("101", "102", "103", "104", "105", "106");
+        if (!Helper.isInteger(tileID)) return adjacentTiles;
+        if (tileID.equals("000")) return List.of("101", "102", "103", "104", "105", "106");
 
-        int ring = Integer.parseInt(position) / 100;
-        int tile = Integer.parseInt(position) % 100;
+        int ring = Integer.parseInt(tileID) / 100;
+        int tile = Integer.parseInt(tileID) % 100;
         int side = (tile - 1) / ring; // math
         boolean isCorner = ((tile - 1) % ring) == 0;
 
@@ -366,8 +370,7 @@ public class PositionMapper {
         return game.getTileMap().keySet().stream()
             .mapToInt(pos -> {
                 if (!Helper.isInteger(pos)) return 2080;
-                Point p = PositionMapper.getTilePosition(pos);
-                return (p != null ? p.x : 2080);
+                return (int) PositionMapper.getTilePosition(pos).getX();
             })
             .min()
             .orElse(0);
@@ -377,8 +380,7 @@ public class PositionMapper {
         return game.getTileMap().keySet().stream()
             .mapToInt(pos -> {
                 if (!Helper.isInteger(pos)) return 2080;
-                Point p = PositionMapper.getTilePosition(pos);
-                return (p != null ? p.x : 2080);
+                return (int) PositionMapper.getTilePosition(pos).getX();
             })
             .max()
             .orElse(0);
@@ -388,8 +390,7 @@ public class PositionMapper {
         return game.getTileMap().keySet().stream()
             .mapToInt(pos -> {
                 if (!Helper.isInteger(pos)) return 2550;
-                Point p = PositionMapper.getTilePosition(pos);
-                return (p != null ? p.y : 2550);
+                return (int) PositionMapper.getTilePosition(pos).getY();
             })
             .min()
             .orElse(0);
@@ -399,8 +400,7 @@ public class PositionMapper {
         return game.getTileMap().keySet().stream()
             .mapToInt(pos -> {
                 if (!Helper.isInteger(pos)) return 2550;
-                Point p = PositionMapper.getTilePosition(pos);
-                return (p != null ? p.y : 2550);
+                return (int) PositionMapper.getTilePosition(pos).getY();
             })
             .max()
             .orElse(0);

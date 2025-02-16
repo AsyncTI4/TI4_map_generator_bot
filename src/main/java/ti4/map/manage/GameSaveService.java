@@ -44,7 +44,15 @@ class GameSaveService {
     }
 
     public static boolean save(Game game) {
-        GameLoadService.updateTransientGameDetails(game);
+        try {
+            ButtonHelperFactionSpecific.checkIihqAttachment(game);
+            DiscordantStarsHelper.checkGardenWorlds(game);
+            DiscordantStarsHelper.checkSigil(game);
+            DiscordantStarsHelper.checkOlradinMech(game);
+        } catch (Exception e) {
+            BotLogger.log("Error adding transient attachment tokens for game " + game.getName(), e);
+        }
+
         //Ugly fix to update seen tiles data for fog since doing it in 
         //MapGenerator/TileGenerator won't save changes anymore
         if (game.isFowMode()) {

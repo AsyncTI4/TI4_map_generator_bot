@@ -913,7 +913,7 @@ public class ButtonHelperActionCards {
             message += ", and then drew a second secret objective due to **Plausible Deniability**";
         }
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
-        MessageHelper.sendMessageToChannel(event.getChannel(), message + ".");
+        MessageHelper.sendMessageToChannel(event.getChannel(), message+".");
         buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation()
             + ", please pay the 3 influence for _Impersonation_.", buttons);
@@ -1028,7 +1028,7 @@ public class ButtonHelperActionCards {
             player.getRepresentationUnfogged() + " you removed 1 command from the tactic pool of " + p2.getFactionEmojiOrColor() + ".");
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
             p2.getRepresentationUnfogged() + ", you lost a command token from your tactic pool due to _Insubordination_ ("
-                + (p2.getTacticalCC() + 1) + "->" + p2.getTacticalCC() + ").");
+            + (p2.getTacticalCC() + 1) + "->" + p2.getTacticalCC() + ").");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1067,7 +1067,7 @@ public class ButtonHelperActionCards {
         player.setTg(player.getTg() + comm);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " stole " + comm + "commodit " + (comm == 1 ? "y" : "ies")
-                + " from " + player.getFactionEmojiOrColor());
+            + " from " + player.getFactionEmojiOrColor());
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
             p2.getRepresentationUnfogged() + " your commodities were somehow stolen with _Salvage_.");
         ButtonHelper.deleteMessage(event);
@@ -1120,7 +1120,8 @@ public class ButtonHelperActionCards {
     @ButtonHandler("resolveInsiderInformation")
     public static void resolveInsiderInformation(Player player, Game game, ButtonInteractionEvent event) {
         AgendaHelper.sendTopAgendaToCardsInfoSkipCovert(game, player);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent info for the top card of the agenda deck to " + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent info for the top card of the agenda deck to " 
+            + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1128,7 +1129,7 @@ public class ButtonHelperActionCards {
     public static void resolveEmergencyMeeting(Player player, Game game, ButtonInteractionEvent event) {
         game.shuffleAllAgendasBackIntoDeck();
         AgendaHelper.drawAgenda(3, game, player);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent info for the top three cards of the agenda deck to "
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent info for the top three cards of the agenda deck to " 
             + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
         ButtonHelper.deleteMessage(event);
     }
@@ -1259,14 +1260,17 @@ public class ButtonHelperActionCards {
         Tile tile = game.getTileByPosition(pos);
         CommandCounterHelper.addCC(event, p2.getColor(), tile);
         ButtonHelper.deleteMessage(event);
-        if (game.isFowMode()) {
+        if (game.isFowMode())
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " you _Signal Jam_'d the tile: "
                     + tile.getRepresentationForButtons(game, player) + ".");
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + " you were _Signal Jam_'d in tile: "
                     + tile.getRepresentationForButtons(game, p2) + ".");
-        } else {
+        }
+        else
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " has _Signal Jam_'d " + p2.getRepresentationUnfogged()
                     + " in tile " + tile.getRepresentationForButtons(game, p2) + ".");
@@ -1317,13 +1321,16 @@ public class ButtonHelperActionCards {
             unitHolderName = "";
         }
         RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), "sd " + unitHolderName);
-        if (game.isFowMode()) {
+        if (game.isFowMode())
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", you melted the space dock in " + tile.getRepresentation());
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + ", your space dock in " + tile.getRepresentation() + " was melted.");
             ButtonHelper.checkFleetAndCapacity(p2, game, tile, event);
-        } else {
+        }
+        else
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " has melted the space dock that used to belong to "
                     + p2.getRepresentationUnfogged() + " in " + tile.getRepresentation() + ".");
@@ -1520,7 +1527,7 @@ public class ButtonHelperActionCards {
                 + " you have the option to pre-assign which strategy card you will Publicly Disgrace."
                 + " _Public Disgrace_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
                 + " Feel free to ignore this message if you don't intend to play it any time soon or are unsure of the target. "
-                + " If you use these buttons, you will then be given the option for it to only trigger on a particular player.";
+                +" If you use these buttons, you will then be given the option for it to only trigger on a particular player.";
             List<Button> scButtons = new ArrayList<>();
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0)
@@ -1603,13 +1610,16 @@ public class ButtonHelperActionCards {
             }
         }
         ButtonHelper.deleteMessage(event);
-        if (game.isFowMode() && exhaustCount == 0) {
+        if (game.isFowMode() && exhaustCount == 0)
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "In what must be a stroke of unfathomable genius, " + player.getRepresentationUnfogged()
-                    + " has tactically bombarded the interstellar medium in " + tile.getRepresentation() + ".");
-        } else {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getFactionEmoji() + " exhausted all enemy planets in " + tile.getRepresentation() + ".");
+                + " has tactically bombarded the interstellar medium in " + tile.getRepresentation() + ".");
+        }
+        else
+        {
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getFactionEmoji() + " exhausted all enemy planets in " + tile.getRepresentation() + ".");
         }
     }
 
@@ -1665,19 +1675,22 @@ public class ButtonHelperActionCards {
             ButtonHelperFactionSpecific.offerMahactInfButtons(p2, game);
         }
         RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, p2.getColor(), amountToKill + " inf " + planet);
-        if (game.isFowMode()) {
+        if (game.isFowMode())
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " you exhausted " + planetRep
                     + " and killed " + amountToKill + " infantry there.");
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + " your planet " + planetRep
                     + " was exhausted and " + amountToKill + " infantry were destroyed.");
-        } else {
+        }
+        else
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " has destabilised " + planetRep + ", " + (didExhaust ? "exhausting it" : "which was already exhausted")
-                    + ", and " + (amountToKill == 0 ? "did not kill any" : "killed " + amountToKill) + " infantry belonging to " + p2.getRepresentationUnfogged() + ".");
+                + ", and " + (amountToKill == 0 ? "did not kill any" : "killed " + amountToKill) + " infantry belonging to " + p2.getRepresentationUnfogged() + ".");
         }
-
+                
     }
 
     @ButtonHandler("seizeArtifactStep3_")
@@ -1687,15 +1700,18 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
         p2.removeFragment(fragID);
         player.addFragment(fragID);
-        if (game.isFowMode()) {
+        if (game.isFowMode())
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " you gained the fragment " + fragID + ".");
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + " your fragment " + fragID + " was seized.");
-        } else {
+        }
+        else
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " swiped the fragment " + fragID
-                    + " from the collection of " + p2.getRepresentationUnfogged() + ".");
+                + " from the collection of " + p2.getRepresentationUnfogged() + ".");
         }
     }
 
@@ -1713,15 +1729,18 @@ public class ButtonHelperActionCards {
             player.getFactionEmoji() + " gained " + resValue + " trade good" + (resValue == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ").");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, resValue);
-        if (game.isFowMode()) {
+        if (game.isFowMode())
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " you exhausted " + planetRep);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + " your planet " + planetRep + " was exhausted.");
-        } else {
+        }
+        else
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " instigated an _Uprising_ on " + planetRep
-                    + ", exhausting it, much to the dismay of " + p2.getRepresentationUnfogged() + ".");
+                + ", exhausting it, much to the dismay of " + p2.getRepresentationUnfogged() + ".");
         }
     }
 
@@ -1775,22 +1794,25 @@ public class ButtonHelperActionCards {
                 adjective = " catastrophic";
             } else if (hits <= amount / 3) {
                 adjective = " minor";
-            } else if (hits >= 2 * (amount + 1) / 3) {
+            } else if (hits >= 2 * (amount+1) / 3) {
                 adjective = " major";
             } else if (hits * 2 == amount) {
                 adjective = " typical";
             }
         }
-        if (game.isFowMode()) {
+        if (game.isFowMode())
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", you _Plague_'d " + planetRep + " and got " + hits + " hit" + (hits == 1 ? "" : "s"));
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + ", your planet " + planetRep + " suffered a"
                     + adjective + " _Plague_ and you lost " + hits + " infantry.");
-        } else {
+        }
+        else
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " has released a _Plague_ upon " + planetRep + ".\n"
-                    + p2.getRepresentationUnfogged() + ", your planet " + planetRep + " suffered a"
+                + p2.getRepresentationUnfogged() + ", your planet " + planetRep + " suffered a"
                     + adjective + " _Plague_ and you lost " + hits + " infantry.");
         }
     }
@@ -1846,18 +1868,21 @@ public class ButtonHelperActionCards {
             var unit = new ParsedUnit(key, amount, planet);
             RemoveUnitService.removeUnit(event, game.getTileFromPlanet(planet), game, unit);
         }
-        if (game.isFowMode()) {
+        if (game.isFowMode())
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " you crippled " + planetRep
-                    + (amount > 0 ? " and killed " + amount + " PDS." : ". There were no PDS to kill."));
+                + (amount > 0 ? " and killed " + amount + " PDS." : ". There were no PDS to kill."));
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + " your planet " + planetRep + " was crippled"
-                    + (amount > 0 ? " killing " + amount + " of your PDS." : ". There were no PDS to kill."));
-        } else {
+                + (amount > 0 ? " killing " + amount + " of your PDS." : ". There were no PDS to kill."));
+        }
+        else
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " you crippled " + planetRep
-                    + (amount > 0 ? " and killed " + amount + "of " + p2.getRepresentationUnfogged() + " PDS."
-                        : ". There were no" + p2.getRepresentationUnfogged() + "PDS to kill."));
+                + (amount > 0 ? " and killed " + amount + "of " + p2.getRepresentationUnfogged() + " PDS." 
+                    : ". There were no" + p2.getRepresentationUnfogged() + "PDS to kill."));
         }
     }
 
@@ -1875,10 +1900,13 @@ public class ButtonHelperActionCards {
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         p2.exhaustPlanet(planet);
-        if (game.isFowMode()) {
+        if (game.isFowMode())
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you exhausted " + planetRep + ".");
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " your planet " + planetRep + " was exhausted.");
-        } else {
+        }
+        else
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you exhausted "
                 + planetRep + " belonging to " + p2.getRepresentationUnfogged() + ".");
         }
@@ -1902,14 +1930,15 @@ public class ButtonHelperActionCards {
     }
 
     @ButtonHandler("focusedResearch")
-    public static void focusedResearch(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+    public static void focusedResearch(Game game, Player player, String buttonID,
+        ButtonInteractionEvent event) {
         if (player.getTg() < 4 && (!player.hasUnexhaustedLeader("keleresagent") || player.getCommodities() < 1)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
                 + ", you do not have 4 trade goods, guttersnipe, and thus cannot resolve _Focused Research_.");
             return;
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(false, false)
-                + " has spent 4 trade goods " + player.gainTG(-4) + " on _Focused Research_.");
+            + " has spent 4 trade goods " + player.gainTG(-4) + " on _Focused Research_.");
         }
         if (!player.hasAbility("propagation")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -2102,7 +2131,9 @@ public class ButtonHelperActionCards {
             if (p != null && p.getResources() > count) {
                 count = p.getResources();
                 bestPlanet = planet;
-            } else if (p != null && p.getResources() == count && !bestPlanet.endsWith(" or whatever")) {
+            }
+            else if (p != null && p.getResources() == count && !bestPlanet.endsWith(" or whatever"))
+            {
                 bestPlanet += " or whatever";
             }
         }

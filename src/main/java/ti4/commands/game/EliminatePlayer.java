@@ -65,15 +65,12 @@ class EliminatePlayer extends GameStateSubcommand {
 
     private void removeUser(SlashCommandInteractionEvent event, Game game, String playerId, StringBuilder stringBuilder) {
         OptionMapping option = event.getOption(playerId);
-        if (option == null) {
-            return;
-        }
+        if (option == null) {return;}
         User extraUser = option.getAsUser();
         Player player = game.getPlayer(extraUser.getId());
         Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
-        if (player == null) return;
-        if (player.getColor() == null || player.getFaction() == null || "null".equalsIgnoreCase(player.getFaction()) ||
-            !player.isRealPlayer() || "".equalsIgnoreCase(player.getFaction())) {
+        if (player == null || player.getColor() == null || player.getFaction() == null || "null".equalsIgnoreCase(player.getFaction()) ||
+                !player.isRealPlayer() || "".equalsIgnoreCase(player.getFaction())) {
             game.removePlayer(player.getUserID());
         } else {
             if (!player.getPlanetsAllianceMode().isEmpty()) {

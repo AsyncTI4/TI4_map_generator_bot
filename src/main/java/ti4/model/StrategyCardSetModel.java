@@ -1,6 +1,8 @@
 package ti4.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,19 @@ public class StrategyCardSetModel implements ModelInterface {
     @Override
     public String getAlias() {
         return alias;
+    }
+
+    /**
+     * @deprecated This method is deprecated and only here to support legacy code.
+     */
+    @JsonIgnore
+    @Deprecated
+    public Map<Integer, String> getCardValues() {
+        Map<Integer, String> cardValues = new LinkedHashMap<>();
+        for (String scID : scIDs) {
+            cardValues.put(Mapper.getStrategyCard(scID).getInitiative(), Mapper.getStrategyCard(scID).getName());
+        }
+        return cardValues;
     }
 
     @JsonIgnore

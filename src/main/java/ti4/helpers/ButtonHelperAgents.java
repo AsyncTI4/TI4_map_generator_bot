@@ -37,6 +37,7 @@ import ti4.model.UnitModel;
 import ti4.service.PlanetService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -188,7 +189,8 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
-    public static List<Button> getArboAgentReplacementOptions(Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String unit) {
+    public static List<Button> getArboAgentReplacementOptions(Player player, Game game,
+        GenericInteractionCreateEvent event, Tile tile, String unit) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
 
@@ -350,7 +352,8 @@ public class ButtonHelperAgents {
     }
 
     @ButtonHandler("vaylerianAgent_")
-    public static void resolveVaylerianAgent(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    public static void resolveVaylerianAgent(String buttonID, ButtonInteractionEvent event, Game game,
+        Player player) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String message = ButtonHelper.resolveACDraw(p2, game, event);
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message);
@@ -546,7 +549,7 @@ public class ButtonHelperAgents {
                 ButtonHelper.deleteTheOneButton(buttonEvent);
             }
             return;
-
+            
         }
         if ("lizhoagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Vasra Ivo, the Li-Zho" + ssruuSlash + " agent.";
@@ -1070,7 +1073,8 @@ public class ButtonHelperAgents {
             buttons);
     }
 
-    public static boolean checkForEdynAgentPreset(Game game, Player passedPlayer, Player upNextPlayer, GenericInteractionCreateEvent event) {
+    public static boolean checkForEdynAgentPreset(Game game, Player passedPlayer, Player upNextPlayer,
+        GenericInteractionCreateEvent event) {
         Player edyn = Helper.getPlayerFromUnlockedLeader(game, "edynagent");
         if (edyn != null && edyn.hasUnexhaustedLeader("edynagent")) {
             String preset = game.getStoredValue("edynAgentPreset");
@@ -1253,7 +1257,8 @@ public class ButtonHelperAgents {
         return legendaries;
     }
 
-    public static List<String> getAllControlledPlanetsInThisSystemAndAdjacent(Game game, Player player, Tile tile) {
+    public static List<String> getAllControlledPlanetsInThisSystemAndAdjacent(Game game, Player player,
+        Tile tile) {
         List<String> legendaries = new ArrayList<>();
         List<String> adjTiles = new ArrayList<>(
             FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false));

@@ -184,8 +184,9 @@ public class RelicHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), text.toString());
         }
     }
-
-    public static String sillySpelling() {
+    
+    public static String sillySpelling()
+    {
         StringBuilder empelar = new StringBuilder("Scepter of E");
         List<Character> letters = Arrays.asList('m', 'e', 'l', 'p', 'a');
         Collections.shuffle(letters);

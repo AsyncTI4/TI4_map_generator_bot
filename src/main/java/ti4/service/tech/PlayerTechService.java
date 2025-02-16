@@ -1,7 +1,6 @@
 package ti4.service.tech;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
@@ -381,18 +380,10 @@ public class PlayerTechService {
 
     public static void getTech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String ident = player.getRepresentationNoPing();
-        boolean isResearch = !buttonID.contains("__comp");
-        boolean isStrat = !buttonID.contains("__comp");
         boolean paymentRequired = !buttonID.contains("__noPay");
-
-        List<String> buttonIDComponents = Arrays.asList(buttonID.split("__"));
-        buttonID = buttonIDComponents.getFirst();
-        String paymentType = buttonIDComponents.size() > 1 ? buttonIDComponents.get(1) : "res";
-
-        if (buttonIDComponents.contains("comp")) {
-            isResearch = false;
-            isStrat = false;
-        }
+        final String[] buttonIDComponents = buttonID.split("__");
+        buttonID = buttonIDComponents[0];
+        final String paymentType = buttonIDComponents.length > 1 ? buttonIDComponents[1] : "res";
 
         String techID = StringUtils.substringAfter(buttonID, "getTech_");
         techID = AliasHandler.resolveTech(techID);
@@ -467,9 +458,7 @@ public class PlayerTechService {
                 buttons);
         }
 
-        if (isResearch) {
-            ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, techID, game);
-        }
+        ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, techID, game);
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
         if ("iihq".equalsIgnoreCase(techID)) {
             message.append("\n Automatically added the Custodia Vigilia planet");
@@ -501,7 +490,7 @@ public class PlayerTechService {
         }
         CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
 
-        if (!isStrat || game.isComponentAction() || !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
+        if (game.isComponentAction() || !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         } else {
             ButtonHelper.sendMessageToRightStratThread(player, game, message.toString(), "technology");
@@ -534,7 +523,7 @@ public class PlayerTechService {
         String trueIdentity = player.getRepresentationUnfogged();
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
         String payType = payWith != null ? payWith : "res";
-        if (!payType.equals("res") && !payType.equals("inf") && !payType.equals("tgsonly")) {
+        if (!payType.equals("res") && !payType.equals("inf")) {
             payType = "res";
         }
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, payType + "tech");

@@ -19,13 +19,11 @@ class CustomizationOptions extends GameStateSubcommand {
 
     public CustomizationOptions() {
         super(Constants.CUSTOMIZATION, "Small Customization Options", true, true);
-        List<Choice> onOff = CommandHelper.toChoices("ON", "OFF");
-        List<Choice> verbChoices = CommandHelper.toChoices(Constants.VERBOSITY_OPTIONS);
-        List<Choice> hexBorderChoices = CommandHelper.toChoices("off", "dash", "solid");
-
         addOptions(new OptionData(OptionType.STRING, Constants.TEXT_SIZE, "tint/small/medium/large (default = medium)").setAutoComplete(true));
+        List<Choice> onOff = CommandHelper.toChoices("ON", "OFF");
         addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS, "Turn ON or OFF strategy card follow reminders at the start of turn").addChoices(onOff));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_FULL_COMPONENT_TEXT, "Show full text of components when using/exhausting"));
+        List<Choice> verbChoices = CommandHelper.toChoices(Constants.VERBOSITY_OPTIONS);
         addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").addChoices(verbChoices));
         addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Turn ON or OFF pings for exceeding component limits").addChoices(onOff));
         addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS, "Turn ON or OFF the bot leaving your faction react on msgs").addChoices(onOff));
@@ -39,6 +37,7 @@ class CustomizationOptions extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TRANSACTION_METHOD, "Use the new transaction method"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BANNERS, "Show faction banner at start of turn"));
+        List<Choice> hexBorderChoices = CommandHelper.toChoices("off", "dash", "solid");
         addOptions(new OptionData(OptionType.STRING, Constants.SHOW_HEX_BORDERS, "Show borders around systems with player ships").addChoices(hexBorderChoices));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INJECT_RULES_LINKS, "Have the bot inject helpful links to rules within it's output"));

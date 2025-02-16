@@ -72,8 +72,8 @@ public class SearchGameHelper {
         sb.append("**").append(game.getName()).append("**");
         sb.append(gameChannelLink);
         if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(playerAverageMapTurnLength(player)).append("`]");
-        if (game.hasWinner()) {
-            for (Player winner : game.getWinners()) {
+        if (game.hasWinner()){
+            for(Player winner : game.getWinners()){
                 if (winner.getUserID().equals(player.getUserID())) sb.append(" **👑WINNER👑**");
             }
         }

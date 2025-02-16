@@ -25,8 +25,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitType;
+import ti4.helpers.Units;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
@@ -71,21 +70,14 @@ public class EndTurnService {
         }
     }
 
-    public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
-        pingNextPlayer(event, game, player);
-        if (!game.isFowMode()) {
-            ButtonHelper.updateMap(game, event, "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + player.getRepresentationNoPing() + ".");
-        }
-    }
-
     public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer) {
         pingNextPlayer(event, game, mainPlayer, false);
     }
 
     public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
         game.setStoredValue("lawsDisabled", "no");
-        game.removeStoredValue("endTurnWhenSCFinished");
-        game.removeStoredValue("fleetLogWhenSCFinished");
+        game.setStoredValue("endTurnWhenSCFinished", "");
+        game.setStoredValue("fleetLogWhenSCFinished", "");
         CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
@@ -118,7 +110,8 @@ public class EndTurnService {
         }
 
         if (game.getPlayers().values().stream().allMatch(Player::isPassed)) {
-            if (mainPlayer.getSecretsUnscored().containsKey("pe")) {
+            if (mainPlayer.getSecretsUnscored().containsKey("pe"))
+            {
                 MessageHelper.sendMessageToChannel(mainPlayer.getCardsInfoThread(),
                     "You were the last player to pass, and so you can score _Prove Endurance_.");
             }
@@ -265,7 +258,8 @@ public class EndTurnService {
             .addContent(messageText)
             .addComponents(actionRows).build();
 
-        gameChannel.sendMessage(messageObject).queue(message -> GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.STATUS_SCORING, game.getLastModifiedDate()));
+        gameChannel.sendMessage(messageObject).queue(message ->
+            GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.STATUS_SCORING, game.getLastModifiedDate()));
 
         int maxVP = 0;
         for (Player player : game.getRealPlayers()) {
@@ -334,7 +328,7 @@ public class EndTurnService {
                         if (player.hasRelic("emphidia")) {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                                 player.getRepresentation() + "Reminder this is __not__ the window to use _The Crown of Emphidia_."
-                                    + " You may purge _The Crown of Emphidia_ in the status homework phase, which is when buttons will appear.");
+                                + " You may purge _The Crown of Emphidia_ in the status homework phase, which is when buttons will appear.");
                         } else {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                                 player.getRepresentation() + "Reminder this is the window to use _The Crown of Emphidia_.");
@@ -413,43 +407,34 @@ public class EndTurnService {
                 game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");
             }
         }
-
-        // Optional abilities
-        sendMitosisButtons(game);
-        sendHoldingCompanyButtons(game);
-
-        // Obligatory abilities
-        resolveSolFlagship(game);
-    }
-
-    private static void sendMitosisButtons(Game game) {
         Player arborec = Helper.getPlayerFromAbility(game, "mitosis");
-        if (arborec == null) return;
-
-        String mitosisMessage = arborec.getRepresentationUnfogged() + ", a reminder to do **Mitosis**.";
-        MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
-    }
-
-    private static void sendHoldingCompanyButtons(Game game) {
+        if (arborec != null) {
+            String mitosisMessage = arborec.getRepresentationUnfogged() + ", a reminder to do **Mitosis**.";
+            MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
+        }
         Player veldyr = Helper.getPlayerFromAbility(game, "holding_company");
-        if (veldyr == null) return;
+        if (veldyr != null) {
+            ButtonHelperFactionSpecific.offerHoldingCompanyButtons(veldyr, game);
+        }
+        Player solPlayer = Helper.getPlayerFromUnit(game, "sol_flagship");
 
-        ButtonHelperFactionSpecific.offerHoldingCompanyButtons(veldyr, game);
-    }
-
-    private static void resolveSolFlagship(Game game) {
-        for (Player player : game.getRealPlayers()) {
-            if (!player.hasUnit("sol_flagship")) continue;
-
-            String colorID = Mapper.getColorID(player.getColor());
-            UnitKey infKey = Mapper.getUnitKey("gf", colorID);
-            for (Tile tile : game.getTileMap().values()) {
-                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    if (unitHolder.getUnits() == null) continue;
-                    if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
+        if (solPlayer == null) {
+            return;
+        }
+        String colorID = Mapper.getColorID(solPlayer.getColor());
+        Units.UnitKey infKey = Mapper.getUnitKey("gf", colorID);
+        for (Tile tile : game.getTileMap().values()) {
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                if (unitHolder.getUnits() != null) {
+                    if (unitHolder.getUnitCount(Units.UnitType.Flagship, colorID) > 0) {
                         unitHolder.addUnit(infKey, 1);
-                        String genesisMessage = player.getRepresentationUnfogged() + " 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), genesisMessage);
+                        String genesisMessage = solPlayer.getRepresentationUnfogged()
+                            + " 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
+                        if (game.isFowMode()) {
+                            MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
+                        } else {
+                            MessageHelper.sendMessageToChannel(gameChannel, genesisMessage);
+                        }
                     }
                 }
             }
