@@ -33,10 +33,9 @@ class MoveCreussWormhole extends GameStateSubcommand {
         Player player = getPlayer();
 
         String tileName = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
-        String tileID = AliasHandler.resolveTile(tileName);
-        Tile tile = TileHelper.getTile(event, tileID, game);
+        Tile tile = TileHelper.getTile(event, tileName, game);
         if (tile == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileID + "`. Tile not found");
+            MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileName + "`. Tile not found");
             return;
         }
 

@@ -35,7 +35,7 @@ public class CheckDistanceHelper {
         for (Tile tile : originTiles) {
             Map<String, Integer> someDistances = getTileDistances(game, player, tile.getPosition(), 15, true);
             for (String tilePos : someDistances.keySet()) {
-                if (CommandCounterHelper.hasCC(player, game.getTileByPosition(tilePos))) {
+                if (!ButtonHelper.canActivateTile(game, player, game.getTileByPosition(tilePos))) {
                     continue;
                 }
                 if (distances.get(tilePos) == null && someDistances.get(tilePos) != null) {
@@ -73,9 +73,9 @@ public class CheckDistanceHelper {
                 int distance = i;
                 if (!existingPosition.equalsIgnoreCase(tilePosition)) {
                     if (tile == null
-                            || (tile.isNebula() && player != null && !player.getAbilities().contains("voidborn") && !ButtonHelper.isLawInPlay(game, "shared_research"))
-                            || (tile.isSupernova() && player != null && !player.getAbilities().contains("gashlai_physiology"))
-                            || (tile.isAsteroidField() && player != null && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd"))) {
+                        || (tile.isNebula() && player != null && !player.getAbilities().contains("voidborn") && !ButtonHelper.isLawInPlay(game, "shared_research"))
+                        || (tile.isSupernova() && player != null && !player.getAbilities().contains("gashlai_physiology"))
+                        || (tile.isAsteroidField() && player != null && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd"))) {
                         continue;
                     }
                 }

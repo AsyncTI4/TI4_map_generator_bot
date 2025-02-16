@@ -20,6 +20,10 @@ import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
 @UtilityClass
 public class ShowGameService {
 
+    public static void simpleEphemeralShowGame(Game game, GenericInteractionCreateEvent event) {
+        ephemeralShowGame(game, event, DisplayType.map);
+    }
+
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event) {
         simpleShowGame(game, event, DisplayType.all);
     }
@@ -38,7 +42,7 @@ public class ShowGameService {
                 buttons.add(Buttons.gray("showGameAgain", "Show Game"));
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
-                MessageChannel channel =sendMessage(game, event);
+                MessageChannel channel = sendMessage(game, event);
                 MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, null, buttons);
             } else {
                 MessageChannel channel = sendMessage(game, event);
@@ -50,6 +54,12 @@ public class ShowGameService {
         });
     }
 
+    public static void ephemeralShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
+        MapRenderPipeline.queue(game, event, displayType, fileUpload -> {
+            MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
+        });
+    }
+
     private static MessageChannel sendMessage(Game game, GenericInteractionCreateEvent event) {
         MessageChannel channel = event.getMessageChannel();
         if (!game.isFowMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
@@ -57,11 +67,12 @@ public class ShowGameService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
         } else if (game.isFowMode()) {
             Player player = game.getPlayer(event.getUser().getId());
-            if (!event.getClass().equals(UserOverridenSlashCommandInteractionEvent.class) 
-              && game.getRealPlayers().contains(player) && !game.getPlayersWithGMRole().contains(player)
-              && player.getPrivateChannel() != null && !channel.equals(player.getPrivateChannel())) {
-                channel = player.getPrivateChannel();
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + ((TextChannel)player.getPrivateChannel()).getJumpUrl());
+            MessageChannel privateChannel = player.getPrivateChannel();
+            if (!event.getClass().equals(UserOverridenSlashCommandInteractionEvent.class)
+                && game.getRealPlayers().contains(player) && !game.getPlayersWithGMRole().contains(player)
+                && privateChannel != null && !channel.equals(privateChannel)) {
+                channel = privateChannel;
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + ((TextChannel) privateChannel).getJumpUrl());
             }
         }
         return channel;
@@ -69,8 +80,7 @@ public class ShowGameService {
 
     public static boolean includeButtons(DisplayType displayType) {
         return switch (displayType) {
-            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments,
-                 shipless -> false;
+            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments, shipless -> false;
             default -> true;
         };
     }

@@ -528,27 +528,25 @@ public class Game extends GameProperties {
     @JsonIgnore
     public String getGameModesText() {
         boolean isNormalGame = isNormalGame();
-        Map<String, Boolean> gameModes = new HashMap<>() {
-            {
-                put(SourceEmojis.TI4PoK + "Normal", isNormalGame);
-                put(SourceEmojis.TI4BaseGame + "Base Game", isBaseGameMode());
-                put(SourceEmojis.MiltyMod + "MiltyMod", isMiltyModMode());
-                put(MiscEmojis.TIGL + "TIGL", isCompetitiveTIGLGame());
-                put("Community", isCommunityMode());
-                put("Minor Factions", isMinorFactionsMode());
-                put("Age of Exploration", isAgeOfExplorationMode());
-                put("Alliance", isAllianceMode());
-                put("FoW", isFowMode());
-                put("Franken", isFrankenGame());
-                put(SourceEmojis.Absol + "Absol", isAbsolMode());
-                put("VotC", isVotcMode());
-                put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
-                put("HomebrewSC", isHomebrewSCMode());
-                put("Little Omega", isLittleOmega());
-                put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
-                put("Homebrew", !isNormalGame);
-            }
-        };
+        Map<String, Boolean> gameModes = new HashMap<>();
+        gameModes.put(SourceEmojis.TI4PoK + "Normal", isNormalGame);
+        gameModes.put(SourceEmojis.TI4BaseGame + "Base Game", isBaseGameMode());
+        gameModes.put(SourceEmojis.MiltyMod + "MiltyMod", isMiltyModMode());
+        gameModes.put(MiscEmojis.TIGL + "TIGL", isCompetitiveTIGLGame());
+        gameModes.put("Community", isCommunityMode());
+        gameModes.put("Minor Factions", isMinorFactionsMode());
+        gameModes.put("Age of Exploration", isAgeOfExplorationMode());
+        gameModes.put("Alliance", isAllianceMode());
+        gameModes.put("FoW", isFowMode());
+        gameModes.put("Franken", isFrankenGame());
+        gameModes.put(SourceEmojis.Absol + "Absol", isAbsolMode());
+        gameModes.put("VotC", isVotcMode());
+        gameModes.put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
+        gameModes.put("HomebrewSC", isHomebrewSCMode());
+        gameModes.put("Little Omega", isLittleOmega());
+        gameModes.put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
+        gameModes.put("Homebrew", !isNormalGame);
+
         for (String tag : getTags()) {
             gameModes.put(tag, true);
         }
@@ -1443,9 +1441,6 @@ public class Game extends GameProperties {
             }
         }
 
-        if (getRound() > 1 && !discardAgendas.isEmpty()) {
-            custodiansTaken = true;
-        }
         for (Player p : getRealPlayers()) {
             if (p.controlsMecatol(false)) {
                 return true;
@@ -2555,7 +2550,7 @@ public class Game extends GameProperties {
         }
     }
 
-    public void drawSecretObjective(String userID) {
+    public String drawSecretObjective(String userID) {
         if (!getSecretObjectives().isEmpty()) {
             String id = getSecretObjectives().getFirst();
             Player player = getPlayer(userID);
@@ -2564,7 +2559,9 @@ public class Game extends GameProperties {
                 player.setSecret(id);
                 checkSOLimit(player);
             }
+            return id;
         }
+        return null;
     }
 
     @Nullable
@@ -2929,11 +2926,12 @@ public class Game extends GameProperties {
     }
 
     public boolean validateAndSetPublicObjectivesStage1Deck(GenericInteractionCreateEvent event, DeckModel deck) {
+        if (getStage1PublicDeckID().equals(deck.getAlias())) return true;
+
         int peekableStageOneCount = getPublicObjectives1Peakable().size();
         setUpPeakableObjectives(0, 1);
         if (getRevealedPublicObjectives().size() > 1) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **"
-                + deck.getName() + "** while there are revealed public objectives.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **" + deck.getName() + "** while there are revealed public objectives.");
             return false;
         }
 
@@ -2944,11 +2942,12 @@ public class Game extends GameProperties {
     }
 
     public boolean validateAndSetPublicObjectivesStage2Deck(GenericInteractionCreateEvent event, DeckModel deck) {
+        if (getStage2PublicDeckID().equals(deck.getAlias())) return true;
+
         int peekableStageTwoCount = getPublicObjectives2Peakable().size();
         setUpPeakableObjectives(0, 2);
         if (getRevealedPublicObjectives().size() > 1) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **"
-                + deck.getName() + "** while there are revealed public objectives.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **" + deck.getName() + "** while there are revealed public objectives.");
             return false;
         }
 
@@ -2967,6 +2966,8 @@ public class Game extends GameProperties {
     }
 
     public boolean validateAndSetActionCardDeck(GenericInteractionCreateEvent event, DeckModel deck) {
+        if (getAcDeckID().equals(deck.getAlias())) return true;
+
         boolean shuffledExtrasIn = false;
         List<String> oldDeck = new ArrayList<>(Mapper.getDeck(getAcDeckID()).getNewShuffledDeck());
         setAcDeckID(deck.getAlias());
@@ -2975,14 +2976,12 @@ public class Game extends GameProperties {
             newDeck.remove(ac);
         }
         if (!getDiscardActionCards().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Since there were action cards in the discard pile, will just shuffle any new action cards into the existing deck.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Since there were action cards in the discard pile, will just shuffle any new action cards into the existing deck.");
             shuffledExtrasIn = true;
         } else {
             for (Player player : getPlayers().values()) {
                 if (!player.getActionCards().isEmpty()) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Since there were action cards in players hands, will just shuffle any new action cards into the existing deck.");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Since there were action cards in players hands, will just shuffle any new action cards into the existing deck.");
                     shuffledExtrasIn = true;
                     break;
                 }
@@ -3000,6 +2999,8 @@ public class Game extends GameProperties {
     }
 
     public boolean validateAndSetRelicDeck(DeckModel deck) {
+        if (getRelicDeckID().equals(deck.getAlias())) return true;
+
         setRelicDeckID(deck.getAlias());
         setRelics(deck.getNewShuffledDeck());
         return true;
@@ -3013,11 +3014,11 @@ public class Game extends GameProperties {
     }
 
     public boolean validateAndSetSecretObjectiveDeck(GenericInteractionCreateEvent event, DeckModel deck) {
+        if (getSoDeckID().equals(deck.getAlias())) return true;
+
         for (Player player : getPlayers().values()) {
             if (!player.getSecrets().isEmpty()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Cannot change secret objective deck to **" + deck.getName()
-                        + "** while there are secret objectives in player hands.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change secret objective deck to **" + deck.getName() + "** while there are secret objectives in player hands.");
                 return false;
             }
         }
@@ -3027,9 +3028,10 @@ public class Game extends GameProperties {
     }
 
     public boolean validateAndSetExploreDeck(GenericInteractionCreateEvent event, DeckModel deck) {
+        if (getExplorationDeckID().equals(deck.getAlias())) return true;
+
         if (!getAllExploreDiscard().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change exploration deck to **"
-                + deck.getName() + "** while there are exploration cards in the discard piles.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change exploration deck to **" + deck.getName() + "** while there are exploration cards in the discard piles.");
             return false;
         }
         setExplorationDeckID(deck.getAlias());
@@ -3038,9 +3040,10 @@ public class Game extends GameProperties {
     }
 
     public boolean validateAndSetAgendaDeck(GenericInteractionCreateEvent event, DeckModel deck) {
+        if (getAgendaDeckID().equals(deck.getAlias())) return true;
+
         if (!getDiscardAgendas().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change agenda deck to **"
-                + deck.getName() + "** while there are agendas in the discard pile.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change agenda deck to **" + deck.getName() + "** while there are agendas in the discard pile.");
             return false;
         }
         setAgendaDeckID(deck.getAlias());
@@ -3049,6 +3052,8 @@ public class Game extends GameProperties {
     }
 
     public boolean validateAndSetTechnologyDeck(GenericInteractionCreateEvent event, DeckModel deck) {
+        if (getTechnologyDeckID().equals(deck.getAlias())) return true;
+
         swapOutVariantTechs();
         setTechnologyDeckID(deck.getAlias());
         swapInVariantTechs();
@@ -3056,9 +3061,10 @@ public class Game extends GameProperties {
     }
 
     public boolean validateAndSetEventDeck(GenericInteractionCreateEvent event, DeckModel deck) {
+        if (getEventDeckID().equals(deck.getAlias())) return true;
+
         if (!getDiscardedEvents().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change event deck to **"
-                + deck.getName() + "** while there are events in the discard pile.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change event deck to **" + deck.getName() + "** while there are events in the discard pile.");
             return false;
         }
         setEventDeckID(deck.getAlias());
@@ -3117,6 +3123,12 @@ public class Game extends GameProperties {
 
     public Map<String, Tile> getTileMap() {
         return tileMap;
+    }
+
+    public Tile getTileFromPositionOrAlias(String positionOrAlias) {
+        if (getTileByPosition(positionOrAlias) != null)
+            return getTileByPosition(positionOrAlias);
+        return getTile(AliasHandler.resolveTile(positionOrAlias));
     }
 
     public Tile getTile(String tileID) {
@@ -3372,8 +3384,7 @@ public class Game extends GameProperties {
         return tileNameAutocompleteOptionsCache;
     }
 
-    public void setTileNameAutocompleteOptionsCache(
-        List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache) {
+    public void setTileNameAutocompleteOptionsCache(List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache) {
         this.tileNameAutocompleteOptionsCache = tileNameAutocompleteOptionsCache;
     }
 

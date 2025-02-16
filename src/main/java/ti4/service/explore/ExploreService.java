@@ -62,8 +62,11 @@ import ti4.service.unit.AddUnitService;
 @UtilityClass
 public class ExploreService {
 
-    public void explorePlanet(GenericInteractionCreateEvent event, Tile tile, String planetName, String drawColor, Player player, boolean NRACheck, Game game, int numExplores,
-        boolean ownerShipOverride) {
+    public void explorePlanet(
+        GenericInteractionCreateEvent event, Tile tile,
+        String planetName, String drawColor, Player player,
+        boolean NRACheck, Game game, int numExplores, boolean ownerShipOverride
+    ) {
         if (!player.getPlanetsAllianceMode().contains(planetName) && !ownerShipOverride) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not control this planet, thus cannot explore it.");
             return;
@@ -274,8 +277,7 @@ public class ExploreService {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetID, String messageText,
-        Player player, Game game) {
+    public static void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetID, String messageText, Player player, Game game) {
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -843,7 +845,9 @@ public class ExploreService {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename) || force) {
-            if (space.getTokenList().contains(frontierFilename)) { space.removeToken(frontierFilename); }
+            if (space.getTokenList().contains(frontierFilename)) {
+                space.removeToken(frontierFilename);
+            }
             String cardID = game.drawExplore(Constants.FRONTIER);
             String messageText = player.getRepresentation() + (force ? " force" : "") + " explored the " + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
             ExploreService.resolveExplore(event, cardID, tile, null, messageText, player, game);
@@ -891,12 +895,12 @@ public class ExploreService {
             Collections.sort(discard);
             Integer discardCount = discard.size();
 
-            info.append("__").append(currentType.substring(0,1).toUpperCase()).append(currentType.substring(1)).append(" exploration deck__ (")
-                .append(deckCount).append(" - ").append(formatPercent.format(deckDrawChance)).append(")\n");
+            info.append("__").append(currentType.substring(0, 1).toUpperCase()).append(currentType.substring(1));
+            info.append(" exploration deck__ (").append(deckCount).append(" - ").append(formatPercent.format(deckDrawChance)).append(")\n");
             info.append(listNames(deck, true, fullText, ExploreEmojis.getTraitEmoji(currentType).toString())).append("\n");
 
-            info.append("__").append(currentType.substring(0,1).toUpperCase()).append(currentType.substring(1)).append(" exploration discards__ (")
-                .append(discardCount).append(")\n");
+            info.append("__").append(currentType.substring(0, 1).toUpperCase()).append(currentType.substring(1));
+            info.append(" exploration discards__ (").append(discardCount).append(")\n");
             info.append(listNames(discard, false, fullText, ExploreEmojis.getTraitEmoji(currentType).toString()));
 
             if (types.indexOf(currentType) != types.size() - 1) {

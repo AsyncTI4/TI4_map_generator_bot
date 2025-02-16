@@ -232,8 +232,7 @@ public class ButtonHelperAbilities {
     }
 
     @ButtonHandler("autoneticMemoryDecline_")
-    public static void autoneticMemoryDecline(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void autoneticMemoryDecline(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         event.getMessage().delete().queue();
         int count = Integer.parseInt(buttonID.split("_")[1]);
         game.drawActionCard(player.getUserID(), count);
@@ -741,11 +740,11 @@ public class ButtonHelperAbilities {
             buttons);
         event.getMessage().delete().queue();
     }
-    
+
     public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(Player player, Game game) {
         return getPlanetPlaceUnitButtonsForMechMitosis(player, game, "mitosis");
     }
-    
+
     public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(Player player, Game game, String reason) {
         List<Button> planetButtons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
@@ -961,8 +960,7 @@ public class ButtonHelperAbilities {
     }
 
     @ButtonHandler("olradinConnectStep2_")
-    public static void resolveOlradinConnectStep2(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    public static void resolveOlradinConnectStep2(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet1 = buttonID.split("_")[1];
         String planet2 = buttonID.split("_")[2];
         player.setHasUsedPeopleConnectAbility(true);
@@ -1063,6 +1061,10 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
+    public static void pillageCheck(Player player) {
+        if (player != null) pillageCheck(player, player.getGame());
+    }
+
     public static void pillageCheck(Player player, Game game) {
         if (canBePillaged(player, game, player.getTg())) {
             Player pillager = Helper.getPlayerFromAbility(game, "pillage");
@@ -1140,11 +1142,13 @@ public class ButtonHelperAbilities {
         String unit = buttonID.split("_")[0];
         String message;
         SleeperTokenHelper.addOrRemoveSleeper(event, game, planetName, player);
+
+        Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         if ("mech".equalsIgnoreCase(unit)) {
-            AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), "mech " + planetName + ", inf " + planetName);
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "mech " + planetName + ", inf " + planetName);
             message = player.getFactionEmojiOrColor() + " replaced a Sleeper on " + Helper.getPlanetRepresentation(planetName, game) + " with a " + UnitEmojis.mech + " and " + UnitEmojis.infantry;
         } else {
-            AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), "pds " + planetName);
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "pds " + planetName);
             message = player.getFactionEmojiOrColor() + " replaced a Sleeper on " + Helper.getPlanetRepresentation(planetName, game) + " with a " + UnitEmojis.pds;
             CommanderUnlockCheckService.checkPlayer(player, "titans");
         }
@@ -1333,7 +1337,7 @@ public class ButtonHelperAbilities {
         String amount = "1";
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
 
-        AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planet)), game, player.getColor(), amount + " inf " + planet);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " inf " + planet);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " used their **Contagion** ability to land " + amount
                 + " infantry on " + Helper.getPlanetRepresentation(planet, game) + ".");
@@ -1370,7 +1374,7 @@ public class ButtonHelperAbilities {
         String planet = buttonID.split("_")[1];
         List<Button> options = new ArrayList<>();
         options.add(Buttons.green("indoctrinate_" + planet + "_infantry", "Indoctrinate 1 Infantry into 1 Infantry").withEmoji(UnitEmojis.infantry.asEmoji()));
-        if(player.hasUnit("yin_mech")){
+        if (player.hasUnit("yin_mech")) {
             options.add(Buttons.green("indoctrinate_" + planet + "_mech", "Indoctrinate 1 Infantry into 1 Mech").withEmoji(UnitEmojis.mech.asEmoji()));
         }
         options.add(Buttons.red("deleteButtons", "Decline"));
