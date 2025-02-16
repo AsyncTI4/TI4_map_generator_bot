@@ -1190,7 +1190,7 @@ public class ActionCardHelper {
                     Set<String> tokenList = unitHolder.getTokenList();
                     boolean ignorePlanet = false;
                     for (String token : tokenList) {
-                        if (token.contains("dmz") || token.contains(Constants.WORLD_DESTROYED_PNG) || token.contains("arcane_shield")) {
+                        if (token.contains("dmz") || token.contains(Constants.WORLD_DESTROYED) || token.contains("arcane_shield")) {
                             ignorePlanet = true;
                             break;
                         }
