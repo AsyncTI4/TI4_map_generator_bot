@@ -153,6 +153,14 @@ public class ImageHelper {
         }
     }
 
+    @SneakyThrows
+    public static byte[] writePng(BufferedImage image) {
+        try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
+            ImageIO.write(image, "png", byteArrayOutputStream);
+            return byteArrayOutputStream.toByteArray();
+        }
+    }
+
     private static BufferedImage redrawWithoutAlpha(BufferedImage image) {
         var imageWithoutAlpha = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = imageWithoutAlpha.createGraphics();

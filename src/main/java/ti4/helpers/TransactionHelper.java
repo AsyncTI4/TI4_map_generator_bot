@@ -592,16 +592,16 @@ public class TransactionHelper {
                         }
                         PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
                         Player owner = game.getPNOwner(pnShortHand);
-                        if(owner != null){
+                        if (owner != null) {
                             Button transact = Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand),
-                            promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+                                promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
                             stuffToTransButtons.add(transact);
-                        }else{
+                        } else {
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                                player.getRepresentation() + ", you have a promissory note with a null owner. Its number ID is `" 
-                                + p1.getPromissoryNotes().get(pnShortHand) + "` and its letter ID is " + pnShortHand + "`.");
+                                player.getRepresentation() + ", you have a promissory note with a null owner. Its number ID is `"
+                                    + p1.getPromissoryNotes().get(pnShortHand) + "` and its letter ID is " + pnShortHand + "`.");
                         }
-                        
+
                     }
                 }
                 message += "\nReminder that, unlike other things, you may only send a player 1 promissory note in each transaction"
@@ -609,30 +609,19 @@ public class TransactionHelper {
             }
             case "Frags" -> {
                 message += " Click the number of relic fragments you wish to " + requestOrOffer + ".";
+                String prefix = "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction();
                 for (int x = 1; x <= p1.getCrf(); x++) {
-                    Button transact = Buttons.blue(
-                        "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_CRF" + x, "Cultural Fragments (x" + x + ")");
-                    stuffToTransButtons.add(transact);
+                    stuffToTransButtons.add(Buttons.blue(prefix + "_CRF" + x, "Cultural Fragments (x" + x + ")", ExploreEmojis.CFrag));
                 }
-
                 for (int x = 1; x <= p1.getIrf(); x++) {
-                    Button transact = Buttons.green(
-                        "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_IRF" + x, "Industrial Fragments (x" + x + ")");
-                    stuffToTransButtons.add(transact);
+                    stuffToTransButtons.add(Buttons.green(prefix + "_IRF" + x, "Industrial Fragments (x" + x + ")", ExploreEmojis.IFrag));
                 }
-
                 for (int x = 1; x <= p1.getHrf(); x++) {
-                    Button transact = Buttons.red(
-                        "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_HRF" + x, "Hazardous Fragments (x" + x + ")");
-                    stuffToTransButtons.add(transact);
+                    stuffToTransButtons.add(Buttons.red(prefix + "_HRF" + x, "Hazardous Fragments (x" + x + ")", ExploreEmojis.HFrag));
                 }
-
                 for (int x = 1; x <= p1.getUrf(); x++) {
-                    Button transact = Buttons.gray(
-                        "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_URF" + x, "Unknown Fragments (x" + x + ")");
-                    stuffToTransButtons.add(transact);
+                    stuffToTransButtons.add(Buttons.gray(prefix + "_URF" + x, "Unknown Fragments (x" + x + ")", ExploreEmojis.UFrag));
                 }
-
             }
         }
         event.getMessage().delete().queue();
@@ -725,6 +714,8 @@ public class TransactionHelper {
             return true;
         if (event.getTimeCreated().getMonth() == Month.APRIL && event.getTimeCreated().getDayOfMonth() == 1)
             return true;
+        if ("pbd100two".equals(game.getName()))
+            return RandomHelper.isOneInX(20);
         return RandomHelper.isOneInX(1000);
     }
 
@@ -735,16 +726,18 @@ public class TransactionHelper {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " sent a transaction offer to " + p2.getRepresentationNoPing() + ".");
         if (game.getTableTalkChannel() != null) {
             boolean sentMeme = false;
+            String publicOfferText = TransactionHelper.buildTransactionOffer(player, p2, game, true);
             if (sendMemeInsteadOfText(event, game)) {
                 BufferedImage tradeOfferMeme = TransactionGenerator.drawTradeOfferMeme(game, player, p2);
                 if (tradeOfferMeme != null) {
                     FileUpload upload = FileUploadService.createFileUpload(tradeOfferMeme, "trade_offer");
+                    upload.setDescription(publicOfferText);
                     MessageHelper.sendFileUploadToChannel(game.getTableTalkChannel(), upload);
                     sentMeme = true;
                 }
             }
             if (!sentMeme) {
-                String offerMessage = "Trade offer from " + player.getRepresentationNoPing() + " to " + p2.getRepresentationNoPing() + ":\n" + TransactionHelper.buildTransactionOffer(player, p2, game, true);
+                String offerMessage = "Trade offer from " + player.getRepresentationNoPing() + " to " + p2.getRepresentationNoPing() + ":\n" + publicOfferText;
                 MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), offerMessage);
             }
         }

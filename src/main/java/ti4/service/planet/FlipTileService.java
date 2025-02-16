@@ -16,40 +16,7 @@ public class FlipTileService {
 
     @NotNull
     public static Tile flipTileIfNeeded(Tile tile, Game game) {
-        if ("82a".equals(tile.getTileID())) {
-            String position = tile.getPosition();
-            game.removeTile(position);
-
-            String planetTileName = AliasHandler.resolveTile("82b");
-            if (!PositionMapper.isTilePositionValid(position)) {
-                throw new IllegalStateException("Position tile not allowed");
-            }
-
-            String tileName = Mapper.getTileID(planetTileName);
-            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
-            if (tilePath == null) {
-                throw new IllegalStateException("Could not find tile: " + planetTileName);
-            }
-            tile = new Tile(planetTileName, position);
-            game.setTile(tile);
-        } else if ("82ah".equals(tile.getTileID())) {
-            String position = tile.getPosition();
-            game.removeTile(position);
-
-            String planetTileName = AliasHandler.resolveTile("82bh");
-            if (!PositionMapper.isTilePositionValid(position)) {
-                throw new IllegalStateException("Position tile not allowed");
-            }
-
-            String tileName = Mapper.getTileID(planetTileName);
-            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
-            if (tilePath == null) {
-                throw new IllegalStateException("Could not find tile: " + planetTileName);
-            }
-            tile = new Tile(planetTileName, position);
-            game.setTile(tile);
-        }
-        return tile;
+        return flipTileIfNeeded(null, tile, game);
     }
 
     public static Tile flipTileIfNeeded(ButtonInteractionEvent event, Tile tile, Game game) {
@@ -58,6 +25,8 @@ public class FlipTileService {
             game.removeTile(position);
             String planetTileName = AliasHandler.resolveTile("82b");
             if (!PositionMapper.isTilePositionValid(position)) {
+                if (event == null)
+                    throw new IllegalStateException("Position tile not allowed");
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
                 return null;
             }
@@ -65,6 +34,8 @@ public class FlipTileService {
             String tileName = Mapper.getTileID(planetTileName);
             String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
             if (tilePath == null) {
+                if (event == null)
+                    throw new IllegalStateException("Could not find tile: " + planetTileName);
                 MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
                 return null;
             }
@@ -75,6 +46,8 @@ public class FlipTileService {
             game.removeTile(position);
             String planetTileName = AliasHandler.resolveTile("82bh");
             if (!PositionMapper.isTilePositionValid(position)) {
+                if (event == null)
+                    throw new IllegalStateException("Position tile not allowed");
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
                 return null;
             }
@@ -82,6 +55,8 @@ public class FlipTileService {
             String tileName = Mapper.getTileID(planetTileName);
             String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
             if (tilePath == null) {
+                if (event == null)
+                    throw new IllegalStateException("Could not find tile: " + planetTileName);
                 MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
                 return null;
             }

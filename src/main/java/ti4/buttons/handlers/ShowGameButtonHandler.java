@@ -18,6 +18,11 @@ class ShowGameButtonHandler {
         ShowGameService.simpleShowGame(game, event);
     }
 
+    @ButtonHandler("showGameEphemeral")
+    public static void simpleEphemeralShowGame(Game game, ButtonInteractionEvent event) {
+        ShowGameService.simpleEphemeralShowGame(game, event);
+    }
+
     @ButtonHandler("showMap")
     public static void showMap(Game game, ButtonInteractionEvent event) {
         MapRenderPipeline.queue(game, event, DisplayType.map, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));

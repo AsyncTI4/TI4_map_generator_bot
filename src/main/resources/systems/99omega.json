@@ -3,15 +3,10 @@
     "name": "99 Omega",
     "aliases": [
         "99omega",
-        "omega",
-        "99",
         "o99",
         "99o"
     ],
     "imagePath": "m21_99omega",
-    "planetIds": [
-        "99omega"
-    ],
     "shipPositionsType": "TYPE01",
     "spaceTokenLocations": [
         {

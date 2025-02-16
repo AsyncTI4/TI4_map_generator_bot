@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.commands.GameStateSubcommand;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Tile;
 
@@ -21,8 +20,7 @@ class RemoveSweepToken extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         String tileName = event.getOption(Constants.TILE_NAME).getAsString().toLowerCase();
         tileName = StringUtils.substringBefore(tileName, " ");
-        String tileID = AliasHandler.resolveTile(tileName);
-        Tile tile = TileHelper.getTile(event, tileID, getGame());
+        Tile tile = TileHelper.getTile(event, tileName, getGame());
         if (tile == null) return;
 
         String sweepToken = Mapper.getSweepID(getPlayer().getColor());

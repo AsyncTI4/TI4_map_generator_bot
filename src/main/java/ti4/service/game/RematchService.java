@@ -52,6 +52,12 @@ public class RematchService {
 
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         TextChannel actionsChannel = game.getMainGameChannel();
+        if (tableTalkChannel.getParentCategory().getName().equals("The in-limbo PBD Archive")
+            || actionsChannel.getParentCategory().getName().equals("The in-limbo PBD Archive")) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "These game channels are in the archive, so they cannot have a rematch created. Please create new game channels in the \"Making New Games\" forum channel in the HUB server");
+            return;
+        }
+
         if (gameRole != null) {
             gameRole.getManager().setName(newName).queue();
         } else {
@@ -95,7 +101,7 @@ public class RematchService {
         Game newGame = CreateGameService.createNewGame(newName, gameOwner);
         // ADD PLAYERS
         for (Player player : game.getPlayers().values()) {
-            if (player.getFaction()!= null && !player.getFaction().equals("neutral") && !player.getFaction().equalsIgnoreCase("null"))
+            if (player.getFaction() != null && !player.getFaction().equals("neutral") && !player.getFaction().equalsIgnoreCase("null"))
                 newGame.addPlayer(player.getUserID(), player.getUserName());
         }
         newGame.setPlayerCountForMap(newGame.getPlayers().size());
