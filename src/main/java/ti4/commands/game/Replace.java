@@ -28,6 +28,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.milty.DraftDisplayService;
+import ti4.service.milty.MiltyDraftManager;
 
 class Replace extends GameStateSubcommand {
 
@@ -185,7 +187,8 @@ class Replace extends GameStateSubcommand {
         game.getMiltyDraftManager().replacePlayer(oldPlayerUserId, replacedPlayer.getUserID());
 
         if (game.getMiltyDraftManager().getDraftIndex() < game.getMiltyDraftManager().getDraftOrder().size()) {
-            game.getMiltyDraftManager().repostDraftInformation(event, game);
+            MiltyDraftManager manager = game.getMiltyDraftManager();
+            DraftDisplayService.repostDraftInformation(event, manager, game);
         }
 
         String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: " + replacementUser.getName();

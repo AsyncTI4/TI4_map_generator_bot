@@ -129,38 +129,38 @@ public class MiltyDraftHelper {
             if (taken) graphics.drawImage(fogFilter, p.x, p.y, null);
             index++;
         }
-        List<BufferedImage> whs = new ArrayList<>();
-        List<BufferedImage> legendary = new ArrayList<>();
-        List<BufferedImage> blueSkips = new ArrayList<>();
-        List<BufferedImage> greenSkips = new ArrayList<>();
-        List<BufferedImage> yellowSkips = new ArrayList<>();
-        List<BufferedImage> redSkips = new ArrayList<>();
+        List<TI4Emoji> whs = new ArrayList<>();
+        List<TI4Emoji> legendary = new ArrayList<>();
+        List<TI4Emoji> blueSkips = new ArrayList<>();
+        List<TI4Emoji> greenSkips = new ArrayList<>();
+        List<TI4Emoji> yellowSkips = new ArrayList<>();
+        List<TI4Emoji> redSkips = new ArrayList<>();
         for (MiltyDraftTile tile : slice.getTiles()) {
-            if (tile.isHasAlphaWH()) whs.add(getEmojiImage(MiscEmojis.WHalpha));
-            if (tile.isHasBetaWH()) whs.add(getEmojiImage(MiscEmojis.WHbeta));
-            if (tile.isHasOtherWH()) whs.add(getEmojiImage(MiscEmojis.WHgamma));
-            if (tile.isLegendary()) legendary.add(getEmojiImage(MiscEmojis.LegendaryPlanet));
+            if (tile.isHasAlphaWH()) whs.add(MiscEmojis.WHalpha);
+            if (tile.isHasBetaWH()) whs.add(MiscEmojis.WHbeta);
+            if (tile.isHasOtherWH()) whs.add(MiscEmojis.WHgamma);
+            if (tile.isLegendary()) legendary.add(MiscEmojis.LegendaryPlanet);
 
             for (UnitHolder uh : tile.getTile().getPlanetUnitHolders()) {
                 if (uh instanceof Planet p) {
                     for (String spec : p.getTechSpecialities()) {
                         switch (spec) {
-                            case "propulsion" -> blueSkips.add(getEmojiImage(TechEmojis.PropulsionTech));
-                            case "biotic" -> greenSkips.add(getEmojiImage(TechEmojis.BioticTech));
-                            case "cybernetic" -> yellowSkips.add(getEmojiImage(TechEmojis.CyberneticTech));
-                            case "warfare" -> redSkips.add(getEmojiImage(TechEmojis.WarfareTech));
+                            case "propulsion" -> blueSkips.add(TechEmojis.PropulsionTech);
+                            case "biotic" -> greenSkips.add(TechEmojis.BioticTech);
+                            case "cybernetic" -> yellowSkips.add(TechEmojis.CyberneticTech);
+                            case "warfare" -> redSkips.add(TechEmojis.WarfareTech);
                         }
                     }
                 }
             }
         }
-        List<BufferedImage> features = new ArrayList<>();
-        features.addAll(yellowSkips);
-        features.addAll(blueSkips);
-        features.addAll(greenSkips);
-        features.addAll(redSkips);
-        features.addAll(whs);
-        features.addAll(legendary);
+        List<TI4Emoji> featureEmojis = new ArrayList<>();
+        featureEmojis.addAll(yellowSkips);
+        featureEmojis.addAll(blueSkips);
+        featureEmojis.addAll(greenSkips);
+        featureEmojis.addAll(redSkips);
+        featureEmojis.addAll(whs);
+        featureEmojis.addAll(legendary);
 
         List<Point> featurePoints = Arrays.asList(
             new Point(83, 3), new Point(220, 3),
@@ -181,8 +181,9 @@ public class MiltyDraftHelper {
 
         index = 0;
         graphics.setColor(Color.black);
-        for (BufferedImage featureImage : features) {
+        for (TI4Emoji feature : featureEmojis) {
             Point fPoint = featurePoints.get(index);
+            BufferedImage featureImage = getEmojiImage(feature);
             featureImage.getGraphics();
             graphics.setColor(Color.black);
             graphics.fillRoundRect(fPoint.x + hs.x, fPoint.y + hs.y, 40, 40, 40, 40);
@@ -241,7 +242,7 @@ public class MiltyDraftHelper {
     }
 
     private static BufferedImage getEmojiImage(TI4Emoji emoji) {
-        return ImageHelper.readEmojiImageScaled(emoji.toString(), 40);
+        return ImageHelper.readEmojiImageScaled(emoji, 40);
     }
 
     private static BufferedImage getEmojiImage(String emojiString) {

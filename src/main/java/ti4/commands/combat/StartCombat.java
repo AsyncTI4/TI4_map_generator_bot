@@ -9,9 +9,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands.GameStateSubcommand;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -35,15 +35,8 @@ class StartCombat extends GameStateSubcommand {
         String tileID = event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString);
         tileID = StringUtils.substringBefore(tileID, " ");
         String combatType = event.getOption(Constants.COMBAT_TYPE, "space", OptionMapping::getAsString);
-        tileID = AliasHandler.resolveTile(tileID);
-        if (game.isTileDuplicated(tileID)) {
-            MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
-            return;
-        }
-        Tile tile = game.getTile(tileID);
-        if (tile == null) {
-            tile = game.getTileByPosition(tileID);
-        }
+
+        Tile tile = TileHelper.getTile(event, tileID, game);
         if (tile == null) {
             MessageHelper.replyToMessage(event, "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;

@@ -3,6 +3,7 @@ package ti4.helpers.settingsFramework.menus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -20,6 +21,7 @@ import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiltyDraftEmojis;
@@ -28,7 +30,7 @@ import ti4.service.emoji.SourceEmojis;
 
 // This is a sub-menu
 @Getter
-@JsonIgnoreProperties({ "messageId" })
+@JsonIgnoreProperties({ "messageId", "bpp" })
 public class GameSettings extends SettingsMenu {
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -44,6 +46,8 @@ public class GameSettings extends SettingsMenu {
     private final BooleanSetting tigl;
     private final BooleanSetting alliance;
     private final ChoiceSetting<MapTemplateModel> mapTemplate;
+
+    private int bpp;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -92,7 +96,8 @@ public class GameSettings extends SettingsMenu {
             mapTemplate.initialize(json.get("mapTemplate"));
         }
 
-        decks = new DeckSettings(json, this);
+        bpp = mapTemplate.getValue().bluePerPlayer();
+        decks = new DeckSettings(json, this, Optional.ofNullable(game));
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -134,16 +139,8 @@ public class GameSettings extends SettingsMenu {
             case "preset444" -> preset444();
             default -> null;
         };
-        System.out.println("Game action: " + action);
-        if (action.startsWith("changeTemplate_")) {
-            if (event instanceof StringSelectInteractionEvent sEvent) {
-                FileUpload preview = null;
-                if (parent != null && parent instanceof MiltySettings mparent)
-                    preview = MapTemplateHelper.generateTemplatePreviewImage(event, mparent.getGame(), mapTemplate.getValue());
-                if (preview != null)
-                    sEvent.getHook().sendMessage("Here is a preview of the selected map template:")
-                        .addFiles(preview).setEphemeral(true).queue();
-            }
+        if (action.startsWith("changeTemplate_") && event instanceof StringSelectInteractionEvent sEvent) {
+            afterChangeMapTemplateHandler(sEvent);
         }
         return (error == null ? "success" : error);
     }
@@ -179,5 +176,35 @@ public class GameSettings extends SettingsMenu {
         this.stage2s.setVal(5);
         this.secrets.setVal(3);
         return null;
+    }
+
+    private void afterChangeMapTemplateHandler(StringSelectInteractionEvent event) {
+        FileUpload preview = null;
+        if (parent != null && parent instanceof MiltySettings mparent)
+            preview = MapTemplateHelper.generateTemplatePreviewImage(event, mparent.getGame(), mapTemplate.getValue());
+        if (preview != null)
+            event.getHook().sendMessage("Here is a preview of the selected map template:")
+                .addFiles(preview).setEphemeral(true).queue();
+        if (mapTemplate.getValue().bluePerPlayer() != bpp && parent instanceof MiltySettings m) {
+            SliceGenerationSettings slice = m.getSliceSettings();
+            bpp = mapTemplate.getValue().bluePerPlayer();
+            if (bpp == 3) {
+                slice.getMinimumRes().setVal(2);
+                slice.getMinimumInf().setVal(3);
+                slice.getTotalValue().setValLow(9);
+                slice.getTotalValue().setValHigh(13);
+            } else if (bpp == 2) {
+                slice.getMinimumRes().setVal(1);
+                slice.getMinimumInf().setVal(1);
+                slice.getTotalValue().setValLow(5);
+                slice.getTotalValue().setValHigh(8);
+            } else if (bpp == 1) {
+                slice.getMinimumRes().setVal(0);
+                slice.getMinimumInf().setVal(0);
+                slice.getTotalValue().setValLow(0);
+                slice.getTotalValue().setValHigh(6);
+            }
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "The number of blue tiles per player in the map template changed, your slice settings have been reset to accomodate the change.");
+        }
     }
 }

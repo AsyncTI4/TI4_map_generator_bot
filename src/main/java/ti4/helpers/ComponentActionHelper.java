@@ -532,16 +532,15 @@ public class ComponentActionHelper {
                 game.setStoredValue("absolMOW", p1.getFaction());
             }
             case "actionCards" -> {
-                String secretScoreMsg = "_ _\nClick a button below to play an action card.";
+                String secretScoreMsg = "Click a button below to play an action card.";
                 List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
+                acButtons.add(Buttons.DONE_DELETE_BUTTONS);
                 if (!acButtons.isEmpty()) {
                     List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
-                    ThreadChannel cardsInfoThreadChannel = p1.getCardsInfoThread();
                     for (MessageCreateData message : messageList) {
-                        cardsInfoThreadChannel.sendMessage(message).queue();
+                        event.getHook().setEphemeral(true).sendMessage(message).queue();
                     }
                 }
-
             }
             case "doStarCharts" -> {
                 ButtonHelper.purge2StarCharters(p1);

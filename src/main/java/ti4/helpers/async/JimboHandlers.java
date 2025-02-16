@@ -106,14 +106,15 @@ public class JimboHandlers {
         String regexPt1 = JimboConst.tileAdd + "_(?<type>(green|blue|red|hyperlane|draft|other))" + rotationAndPage;
         String regexPt2 = JimboConst.tileAdd + "_" + RegexHelper.tileIDRegex();
         String regexPt3 = regexPt2 + "_ring" + RegexHelper.oneOf(List.of(RegexHelper.intRegex("ring"), "corners"));
-        String regexPt4 = regexPt2 + "_tile" + RegexHelper.posRegex();
+        String regexPt4 = regexPt3 + "_" + RegexHelper.pageRegex();
+        String regexPt5 = regexPt3 + "_pos" + RegexHelper.posRegex();
 
         if ((matcher = Pattern.compile(regexPt1).matcher(buttonID)).matches()) {
             String msg = "Choose a tile that you want to place on the map:";
             String type = matcher.group("type");
             System.out.println("JIMBOta - " + buttonID);
 
-            Function<TileModel, Button> toButton = tile -> JimboButtons.tileToButton(tile, JimboConst.tileAdd + "_");
+            Function<TileModel, Button> toButton = tile -> JimboButtons.tileToButton(tile, JimboConst.tileAdd);
             int rotation = matcher.group("index") != null ? Integer.parseInt(matcher.group("index")) : 0;
             List<Button> bonusButtons = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE));
             System.out.println("JIMBOta - rot=" + rotation);
@@ -134,13 +135,25 @@ public class JimboHandlers {
             TileModel model = TileHelper.getTileById(matcher.group("tileID"));
             String msg = "Choose a location to place " + model.getName() + " (" + model.getAlias() + "): \n> - Any existing tile will be overwritten";
             List<Button> bonus = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE));
-            bonus.add(Buttons.gray(JimboConst.tileAdd, "Pick a different tile"));
             bonus.add(Buttons.gray(JimboConst.tileAdd + "_" + model.getAlias(), "Pick a different ring"));
+            bonus.add(Buttons.gray("showGameEphemeral", "Show map"));
             List<String> locations = PositionMapper.getPositionsInRing(matcher.group("ring"), null);
-            Function<String, Button> buttonator = pos -> JimboButtons.positionToButton(pos, JimboConst.tileAdd + "_" + model.getAlias(), game);
+            String buttonatorPrefix = JimboConst.tileAdd + "_" + model.getAlias() + "_ring" + matcher.group("ring");
+            Function<String, Button> buttonator = pos -> JimboButtons.positionToButton(pos, buttonatorPrefix, game);
             JimboButtons.jimboPagination(event, msg, locations, buttonator, null, bonus, 15, buttonID);
 
         } else if ((matcher = Pattern.compile(regexPt4).matcher(buttonID)).matches()) {
+            TileModel model = TileHelper.getTileById(matcher.group("tileID"));
+            String msg = "Choose a location to place " + model.getName() + " (" + model.getAlias() + "): \n> - Any existing tile will be overwritten";
+            List<Button> bonus = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE));
+            bonus.add(Buttons.gray(JimboConst.tileAdd + "_" + model.getAlias(), "Pick a different ring"));
+            bonus.add(Buttons.gray("showGameEphemeral", "Show map"));
+            List<String> locations = PositionMapper.getPositionsInRing(matcher.group("ring"), null);
+            String buttonatorPrefix = JimboConst.tileAdd + "_" + model.getAlias() + "_ring" + matcher.group("ring");
+            Function<String, Button> buttonator = pos -> JimboButtons.positionToButton(pos, buttonatorPrefix, game);
+            JimboButtons.jimboPagination(event, msg, locations, buttonator, null, bonus, 15, buttonID);
+
+        } else if ((matcher = Pattern.compile(regexPt5).matcher(buttonID)).matches()) {
             TileModel model = TileHelper.getTileById(matcher.group("tileID"));
             String pos = matcher.group("pos");
             AddTileService.addTile(game, new Tile(model.getAlias(), pos));

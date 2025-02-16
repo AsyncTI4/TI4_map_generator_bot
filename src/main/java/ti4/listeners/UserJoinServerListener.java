@@ -74,7 +74,9 @@ public class UserJoinServerListener extends ListenerAdapter {
         Helper.fixGameChannelPermissions(guild, game);
         ThreadChannel mapThread = game.getBotMapUpdatesThread();
         if (mapThread != null && !mapThread.isLocked()) {
-            mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
+            mapThread.getManager().setArchived(false).queue(success -> {
+                mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS);
+            }, BotLogger::catchRestError);
         }
         var player = game.getPlayer(user.getId());
         if (player == null || !ButtonHelper.isPlayerNew(player.getUserID()) || game.getTableTalkChannel() == null || game.isFowMode()) {

@@ -2,17 +2,22 @@ package ti4.service.objectives;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.SecretObjectiveModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.info.SecretObjectiveInfoService;
 
@@ -29,13 +34,21 @@ public class DrawSecretService {
             output += "Drew a " + (count == 1 ? "second" : StringHelper.ordinal(count + 1)) + " secret objective due to **Plausible Deniability**.";
             count++;
         }
+        List<String> idsDrawn = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            game.drawSecretObjective(player.getUserID());
+            idsDrawn.add(game.drawSecretObjective(player.getUserID()));
         }
         MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + output);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
         if (useTnelis && player.hasAbility("plausible_deniability")) {
             SecretObjectiveHelper.sendSODiscardButtons(player);
+        }
+        if (event instanceof ButtonInteractionEvent bevent) {
+            List<MessageEmbed> soEmbeds = idsDrawn.stream().map(Mapper::getSecretObjective).filter(Objects::nonNull)
+                .map(SecretObjectiveModel::getRepresentationEmbed).toList();
+            bevent.getHook().setEphemeral(true)
+                .sendMessage("Drew the following secret objective(s):")
+                .addEmbeds(soEmbeds).queue();
         }
     }
 
@@ -47,7 +60,7 @@ public class DrawSecretService {
                 }
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() 
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
                         + " due to **Plausible Deniability**, you were dealt an extra secret objective. Thus, you must also discard an extra secret objective.");
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);

@@ -122,6 +122,9 @@ public class TIGLHelper {
     private static final String TIGL_ADMIN_THREAD = "tigl-admin";
 
     public static boolean validateTIGLness() {
+        String testing = System.getenv("TESTING");
+        if (testing != null) return false;
+
         boolean tiglProblem = false;
         if (getTIGLChannel() == null) {
             BotLogger.log("TIGLHelper.validateTIGLness: missing channel: `" + TIGL_CHANNEL_NAME + "`");

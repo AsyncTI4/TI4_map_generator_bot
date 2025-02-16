@@ -18,6 +18,7 @@ import ti4.commands.planet.PlanetExhaust;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.context.ButtonContext;
 import ti4.map.Game;
@@ -109,12 +110,8 @@ public class ButtonHelperCommanders {
     public static void arboCommanderBuild(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.replace("arboCommanderBuild_", "");
         List<Button> buttons;
-        Tile tile = game.getTile(AliasHandler.resolveTile(planet));
-        if (tile == null) {
-            tile = game.getTileByPosition(planet);
-        }
-        buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "arboCommander",
-            "placeOneNDone_dontskiparboCommander");
+        Tile tile = TileHelper.getTile(event, planet, game);
+        buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "arboCommander", "placeOneNDone_dontskiparboCommander");
         String message = player.getRepresentation() + " Use the buttons to produce 1 unit. " + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
@@ -153,7 +150,7 @@ public class ButtonHelperCommanders {
             return;
         }
         StringBuilder summary = new StringBuilder(player.getRepresentation() + " you could potentially use Brother Omar, the Yin Commander, to sacrifice 1 infantry"
-        + " and ignore the prerequisites for these technologies (the bot did not check if you have the prerequisites otherwise):\n");
+            + " and ignore the prerequisites for these technologies (the bot did not check if you have the prerequisites otherwise):\n");
         List<String> techsSummed = getVeldyrCommanderTechs(player, game, true);
         for (String tech : techsSummed) {
             TechnologyModel model = Mapper.getTech(tech);
@@ -164,14 +161,13 @@ public class ButtonHelperCommanders {
         }
     }
 
-    public static List<String> getVeldyrCommanderTechs(Player player, Game game, boolean yin){
+    public static List<String> getVeldyrCommanderTechs(Player player, Game game, boolean yin) {
         List<String> techsSummed = new ArrayList<>();
-        if(yin){
+        if (yin) {
             if (!game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
                 return techsSummed;
             }
-        }
-        else{
+        } else {
             if (!game.playerHasLeaderUnlockedOrAlliance(player, "veldyrcommander")) {
                 return techsSummed;
             }
@@ -481,7 +477,7 @@ public class ButtonHelperCommanders {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
                             + ", you gained a technology while having Nekro Acidos, the Nekro commander."
-                            +" Use the buttons to draw 2 action cards (**Scheming** increases this from the normal 1 action card).",
+                            + " Use the buttons to draw 2 action cards (**Scheming** increases this from the normal 1 action card).",
                         buttons);
                 } else {
                     buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));

@@ -253,13 +253,14 @@ public class ApplicationEmojiService {
     }
 
     private static Stream<File> enumerateEmojiFilesRecursive(File folder) {
+        if (folder == null || !folder.exists()) return Stream.of();
         List<File> filesAndDirectories = Arrays.asList(folder.listFiles());
         return filesAndDirectories.stream().flatMap(fileOrDir -> {
-            if (fileOrDir == null) return null;
+            if (fileOrDir == null) return Stream.of();
             if (isValidEmojiFile(fileOrDir)) return Stream.of(fileOrDir);
             if (fileOrDir.isDirectory() && !isIgnoredDirectory(fileOrDir))
                 return enumerateEmojiFilesRecursive(fileOrDir);
-            return null;
+            return Stream.of();
         });
     }
 

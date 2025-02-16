@@ -79,6 +79,11 @@ public class Tile {
                 .forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
     }
 
+    public void inheritFogData(Tile t) {
+        fog.putAll(t.getFog());
+        fogLabel.putAll(t.getFogLabel());
+    }
+
     @Nullable
     public String getCCPath(String ccID) {
         return Mapper.getCCPath(ccID);
@@ -484,19 +489,6 @@ public class Tile {
     }
 
     @JsonIgnore
-    public int getWormholeCount() {
-        int whs = 0;
-        if (getTileModel().getWormholes() != null)
-            whs += getTileModel().getWormholes().size();
-        for (String token : getSpaceUnitHolder().getTokenList()) {
-            if (token.contains("alpha")) whs++;
-            if (token.contains("beta")) whs++;
-            if (token.contains("gamma")) whs++;
-        }
-        return whs;
-    }
-
-    @JsonIgnore
     public boolean hasCabalSpaceDockOrGravRiftToken() {
         return hasCabalSpaceDockOrGravRiftToken(null);
     }
@@ -584,13 +576,7 @@ public class Tile {
 
     @JsonIgnore
     public boolean containsPlayersUnitsWithModelCondition(Player p, Predicate<? super UnitModel> condition) {
-        return getUnitHolders().values().stream()
-            .flatMap(uh -> uh.getUnits().entrySet().stream())
-            .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
-            .map(Map.Entry::getKey)
-            .map(p::getUnitFromUnitKey)
-            .filter(Objects::nonNull)
-            .anyMatch(condition);
+        return getUnitHolders().values().stream().anyMatch(uh -> uh.countPlayersUnitsWithModelCondition(p, condition) > 0);
     }
 
     @JsonIgnore

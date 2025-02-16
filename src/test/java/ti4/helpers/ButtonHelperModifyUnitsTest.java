@@ -18,9 +18,9 @@ import ti4.testUtils.BaseTi4Test;
 public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
     private final Game game = new Game();
     private Tile tile = new Tile("tile 1", null, null, null, null);
+
     @Test
     void testAutoAssignSpaceCombatHits_SpaceCombat_DuraniumArmor() {
-
         Player player = createPlayerWithDuraniumArmor(game, "red");
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
@@ -48,7 +48,6 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
 
         UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
-
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, true, false);
 
@@ -111,7 +110,7 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
 
         assertTrue(actualMessage.contains("Would repair 1 <normalEmoji> due to _Duranium Armor_"));
     }
-    
+
     @Test
     void testAutoAssignSpaceCombatHits_Summarizing_DuraniumArmor_UnitDamage_AutoAssignAllDamagedUnits() {
         Player player = createPlayerWithDuraniumArmor(game, "red");
@@ -153,7 +152,7 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
 
         assertTrue(actualMessage.contains("Would repair 1 <normalEmoji> due to _Duranium Armor_"));
     }
-        
+
     @Disabled("Need a way to mock emoji's to prove actual message string")
     @Test
     void testAutoAssignSpaceCombatHits_Summarizing_DuraniumArmor_UnitDamage_DuraniumPreference() {
@@ -191,13 +190,11 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
 
-
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, false, false);
 
         assertFalse(actualMessage.contains("Would repair 1 <normalEmoji> due to _Duranium Armor_"));
     }
 
-    
     @Test
     void testAutoAssignSpaceCombatHits_DuraniumArmor_NoUnitDamage_MultipleTypesOfDamagedUnits() {
         Player player = createPlayerWithDuraniumArmor(game, "red");
@@ -254,7 +251,7 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
 
         assertTrue(actualMessage.contains("Repaired 1 <normalEmoji> due to _Duranium Armor_"));
     }
-    
+
     @Test
     void testAutoAssignSpaceCombatHits_DuraniumArmor_UnitDamage_AutoAssignAllDamagedUnits() {
         Player player = createPlayerWithDuraniumArmor(game, "red");
@@ -295,7 +292,7 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
         assertTrue(actualMessage.contains("Repaired 1 <normalEmoji> due to _Duranium Armor_"));
     }
-        
+
     @Test
     void testAutoAssignSpaceCombatHits_DuraniumArmor_UnitDamage_DuraniumPreference() {
         Player player = createPlayerWithDuraniumArmor(game, "red");
