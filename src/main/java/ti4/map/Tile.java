@@ -345,7 +345,7 @@ public class Tile {
     public List<Planet> getPlanetUnitHolders() {
         List<Planet> planets = new ArrayList<>();
         for (UnitHolder uH : unitHolders.values()) {
-            if (uH instanceof Planet p && !p.getTokenList().contains(Constants.WORLD_DESTROYED_PNG)) {
+            if (uH instanceof Planet p && uH.getTokenList().stream().noneMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
                 planets.add(p);
             }
         }
@@ -497,7 +497,7 @@ public class Tile {
     public boolean hasCabalSpaceDockOrGravRiftToken(Game game) {
         for (UnitHolder unitHolder : getUnitHolders().values()) {
             Set<String> tokenList = unitHolder.getTokenList();
-            if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png", "token_ds_wound.png")) {
+            if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) {
                 return true;
             }
             for (UnitKey unit : unitHolder.getUnits().keySet()) {
