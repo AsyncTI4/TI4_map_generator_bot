@@ -48,6 +48,7 @@ import ti4.service.emoji.CardEmojis;
  * 
  * TODO
   * A way to see what _own_ units Cabal has captured
+  * Change frontier token image to a special one after custodians is taken
   */
 public class RiftSetModeService {
     private static final String CRUCIBLE_PN = "crucible";
